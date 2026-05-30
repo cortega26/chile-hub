@@ -1,0 +1,27 @@
+# Datos locales (nunca commitear)
+data/
+
+# Entornos virtuales de Python
+.venv/
+venv/
+ENV/
+env/
+
+# Python cache y compilaciones
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Sistema
+.DS_Store
+Thumbs.db
