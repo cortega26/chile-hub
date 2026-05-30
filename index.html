@@ -433,6 +433,99 @@
             line-height: 1.5;
         }
 
+        .dataset-artifact-meta {
+            color: var(--text-secondary);
+            font-size: 0.74rem;
+            line-height: 1.45;
+        }
+
+        .dataset-example {
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+            padding: 0.9rem;
+            border-radius: 12px;
+            background: rgba(3, 7, 18, 0.58);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .dataset-example-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .dataset-example-title {
+            color: var(--text-secondary);
+            font-size: 0.76rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .dataset-example-tabs {
+            display: flex;
+            gap: 0.45rem;
+            flex-wrap: wrap;
+        }
+
+        .dataset-example-tab {
+            padding: 0.35rem 0.55rem;
+            border-radius: 999px;
+            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-secondary);
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .dataset-example-tab.active {
+            color: #052e28;
+            background: rgba(52, 211, 153, 0.85);
+            border-color: rgba(52, 211, 153, 0.45);
+        }
+
+        .dataset-example-copy {
+            flex-shrink: 0;
+            padding: 0.4rem 0.65rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-secondary);
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .dataset-example-copy:hover {
+            border-color: rgba(34, 211, 238, 0.25);
+            background: rgba(34, 211, 238, 0.08);
+            color: var(--accent-cyan);
+        }
+
+        .dataset-example-copy.copied {
+            color: #052e28;
+            background: rgba(52, 211, 153, 0.85);
+            border-color: rgba(52, 211, 153, 0.45);
+        }
+
+        .dataset-example-code {
+            margin: 0;
+            color: #d1fae5;
+            font-size: 0.78rem;
+            line-height: 1.55;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+        }
+
         .dataset-tag {
             font-size: 0.78rem;
             padding: 0.35rem 0.55rem;
@@ -922,15 +1015,30 @@ make hub-list</pre>
             return `${(sizeBytes / (1024 * 1024)).toFixed(2)} MB`;
         }
 
-        function buildArtifactLink(path, label) {
+        function formatArtifactLabel(path, fallbackLabel) {
+            const manifestEntry = artifactManifestByPath[path];
+            if (!manifestEntry?.output_type) return fallbackLabel;
+            return manifestEntry.output_type.toUpperCase();
+        }
+
+        function buildArtifactLink(path, fallbackLabel) {
             if (!path) return "";
             const manifestEntry = artifactManifestByPath[path];
             const sizeLabel = manifestEntry ? ` · ${formatBytes(manifestEntry.size_bytes)}` : "";
+            const label = formatArtifactLabel(path, fallbackLabel);
             return `
                 <a class="dataset-action" href="${escapeHtml(path)}" target="_blank" rel="noopener noreferrer">
                     ${escapeHtml(label)}${escapeHtml(sizeLabel)}
                 </a>
             `;
+        }
+
+        function buildArtifactMeta(path) {
+            const manifestEntry = artifactManifestByPath[path];
+            if (!manifestEntry) return "";
+            const shortHash = manifestEntry.sha256 ? manifestEntry.sha256.slice(0, 12) : "N/D";
+            const type = manifestEntry.output_type || "N/D";
+            return `<div class="dataset-artifact-meta">tipo: ${escapeHtml(type)} · sha256: ${escapeHtml(shortHash)}</div>`;
         }
 
         function buildSimpleLink(path, label) {
@@ -940,6 +1048,61 @@ make hub-list</pre>
                     ${escapeHtml(label)}
                 </a>
             `;
+        }
+
+        function buildDatasetExample(dataset, preferredKind = "python") {
+            const examples = dataset.usage_examples || {};
+            const kinds = ["python", "duckdb", "cli"].filter(kind => examples[kind]);
+            if (kinds.length === 0) return "";
+
+            const activeKind = kinds.includes(preferredKind) ? preferredKind : kinds[0];
+            const exampleId = `dataset-example-${escapeHtml(dataset.dataset)}`;
+            const tabs = kinds.map(kind => `
+                <button class="dataset-example-tab ${kind === activeKind ? "active" : ""}" data-kind="${escapeHtml(kind)}">
+                    ${escapeHtml(kind)}
+                </button>
+            `).join("");
+
+            return `
+                <div class="dataset-example" data-dataset-example data-examples='${escapeHtml(JSON.stringify(examples))}'>
+                    <div class="dataset-example-head">
+                        <span class="dataset-example-title">Receta de uso</span>
+                        <div class="dataset-example-tabs">
+                            ${tabs}
+                            <button class="dataset-example-copy" data-copy-target="${exampleId}">Copiar</button>
+                        </div>
+                    </div>
+                    <pre class="dataset-example-code" id="${exampleId}">${escapeHtml(examples[activeKind])}</pre>
+                </div>
+            `;
+        }
+
+        function activateDatasetExample(container, nextKind) {
+            const examples = JSON.parse(container.dataset.examples || "{}");
+            if (!examples[nextKind]) return;
+
+            container.querySelectorAll(".dataset-example-tab").forEach(tab => {
+                tab.classList.toggle("active", tab.dataset.kind === nextKind);
+            });
+
+            const code = container.querySelector(".dataset-example-code");
+            if (code) code.textContent = examples[nextKind];
+        }
+
+        function wireDatasetExampleInteractions() {
+            document.querySelectorAll("[data-dataset-example]").forEach(container => {
+                container.querySelectorAll(".dataset-example-tab").forEach(button => {
+                    button.addEventListener("click", () => {
+                        activateDatasetExample(container, button.dataset.kind);
+                    });
+                });
+                const copyButton = container.querySelector(".dataset-example-copy");
+                if (copyButton) {
+                    copyButton.addEventListener("click", () => {
+                        copyTextFromTarget(copyButton, copyButton.dataset.copyTarget);
+                    });
+                }
+            });
         }
 
         function fallbackCopyText(text) {
@@ -1066,15 +1229,19 @@ make hub-list</pre>
                             ${buildArtifactLink(parquetPath, "Parquet")}
                             ${buildArtifactLink(jsonPath, "JSON")}
                         </div>
+                        ${buildArtifactMeta(parquetPath)}
+                        ${buildArtifactMeta(jsonPath)}
+                        ${buildDatasetExample(dataset)}
                         <div class="dataset-tags">${outputs}</div>
                         <div class="dataset-tags">${warnings}</div>
                     </article>
                 `;
             }).join("");
+
+            wireDatasetExampleInteractions();
         }
 
-        async function copyQuickstartSnippet(button) {
-            const targetId = button.dataset.copyTarget;
+        async function copyTextFromTarget(button, targetId) {
             const target = document.getElementById(targetId);
             if (!target) return;
 
@@ -1104,6 +1271,10 @@ make hub-list</pre>
                 button.textContent = originalLabel;
                 button.classList.remove("copied");
             }, 1400);
+        }
+
+        async function copyQuickstartSnippet(button) {
+            return copyTextFromTarget(button, button.dataset.copyTarget);
         }
 
         // Cargar indicadores económicos en KPI Cards

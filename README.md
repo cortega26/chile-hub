@@ -185,6 +185,9 @@ df_comunas = hub.load_polars("comunas")
 python -m src.chile_hub list
 python -m src.chile_hub show comunas
 python -m src.chile_hub path comunas --output parquet
+python -m src.chile_hub example indicadores --kind duckdb
+python -m src.chile_hub artifacts comunas
+python -m src.chile_hub inventory
 ```
 
 ### SQLite
@@ -201,6 +204,9 @@ Bootstrap recomendado:
 make bootstrap
 make doctor
 ```
+
+`make bootstrap` también instala `Chromium` para que `make verify-landing` funcione desde el mismo entorno del proyecto.
+Si ya tienes la `.venv` lista y solo quieres preparar browsers para la landing, usa `make install-browsers`.
 
 Si prefieres hacerlo a mano:
 
@@ -222,6 +228,7 @@ Eso ejecuta:
 - build de outputs
 - verificación de artefactos
 - smoke tests del helper
+- smoke test de la landing en navegador
 
 Si quieres correr pasos sueltos:
 
@@ -229,6 +236,7 @@ Si quieres correr pasos sueltos:
 make extract
 make build
 make verify
+make verify-landing
 make test
 ```
 
@@ -258,6 +266,9 @@ Revisa el manifest de artefactos publicables:
 cat data/normalized/artifact_manifest.json
 ```
 
+Ese manifest ahora incluye `dataset` y `output_type` para cada artefacto publicable derivado de una capa.
+La landing reutiliza esa metadata para mostrar tipo de output y hash corto junto a los links de descarga.
+
 O usa el verificador local:
 
 ```bash
@@ -276,6 +287,7 @@ Secuencia mínima recomendada para validar el hub localmente:
 make build
 make verify
 make test
+make verify-landing
 ```
 
 Atajos del proyecto:
@@ -287,6 +299,9 @@ make test
 make check
 make status
 make hub-list
+make hub-example
+make hub-artifacts
+make hub-inventory
 ```
 
 Y para un resumen humano del último estado:
@@ -301,6 +316,11 @@ También expone links directos a documentación y artefactos `JSON`/`Parquet` po
 Además deja accesos rápidos a `pipeline_status.md`, `dataset_catalog.json`, `dataset_catalog.md` y `artifact_manifest.json`, junto con la URL fuente de cada capa.
 También incluye recetas breves de consumo para `Python`, `DuckDB` y la `CLI` local del proyecto.
 Esas recetas en la landing son copiables directamente desde la interfaz.
+Cada dataset card además muestra ejemplos específicos por capa para `python`, `duckdb` y `cli`, tomados desde el catálogo generado.
+Esos ejemplos por dataset también son copiables y responden al tab activo en cada card.
+La landing también se puede smoke-testear en navegador con `make verify-landing`.
+Ese smoke test cubre estado, quick-start, metadata de artefactos, recetas por dataset y flujos de copia.
+El workflow `pipeline-check` ejecuta esa verificación de landing además del build, verify y smoke tests del helper.
 El workflow de CI publica un artifact `chile-hub-publishable-bundle` con los outputs ligeros y el manifest asociado.
 
 ## Criterio para crecer

@@ -24,6 +24,10 @@ DATASET_CATALOG_CONFIG = {
         "description": "Capa derivada de regiones para filtros, joins y referencias administrativas de alto nivel.",
         "join_keys": ["codigo_region"],
         "confidence_tier": "Tier B",
+        "freshness_policy": {
+            "max_age_hours": 24 * 90,
+            "label": "estable",
+        },
         "usage_examples": {
             "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('regiones')",
             "duckdb": "SELECT *\nFROM 'data/normalized/regiones.parquet'\nORDER BY codigo_region;",
@@ -42,6 +46,10 @@ DATASET_CATALOG_CONFIG = {
         "description": "Capa derivada de provincias para cruces intermedios entre region y comuna.",
         "join_keys": ["codigo_provincia", "codigo_region"],
         "confidence_tier": "Tier B",
+        "freshness_policy": {
+            "max_age_hours": 24 * 90,
+            "label": "estable",
+        },
         "usage_examples": {
             "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('provincias')",
             "duckdb": "SELECT *\nFROM 'data/normalized/provincias.parquet'\nWHERE codigo_region = '13';",
@@ -60,6 +68,10 @@ DATASET_CATALOG_CONFIG = {
         "description": "Base territorial normalizada para cruces por region, provincia y comuna.",
         "join_keys": ["codigo_comuna", "codigo_region"],
         "confidence_tier": "Tier B",
+        "freshness_policy": {
+            "max_age_hours": 24 * 90,
+            "label": "estable",
+        },
         "usage_examples": {
             "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('comunas')",
             "duckdb": "SELECT codigo_comuna, nombre_comuna, nombre_region\nFROM 'data/normalized/comunas.parquet'\nLIMIT 10;",
@@ -78,6 +90,10 @@ DATASET_CATALOG_CONFIG = {
         "description": "Serie de indicadores economicos diarios de referencia para analisis y software.",
         "join_keys": ["fecha", "codigo_indicador"],
         "confidence_tier": "Tier A/B",
+        "freshness_policy": {
+            "max_age_hours": 72,
+            "label": "diaria",
+        },
         "usage_examples": {
             "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('indicadores')",
             "duckdb": "SELECT *\nFROM 'data/normalized/indicadores.parquet'\nORDER BY fecha DESC, codigo_indicador;",
@@ -93,6 +109,38 @@ DATASET_CATALOG_CONFIG = {
         "documentation": "docs/datasets/indicadores.md",
     },
 }
+
+
+def parse_iso_datetime(value):
+    if not value:
+        return None
+    try:
+        parsed = datetime.fromisoformat(value)
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        return parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
+def build_freshness(refreshed_at_utc, max_age_hours):
+    refreshed_at = parse_iso_datetime(refreshed_at_utc)
+    if refreshed_at is None or max_age_hours is None:
+        return {
+            "status": "unknown",
+            "age_hours": None,
+            "max_age_hours": max_age_hours,
+            "checked_at_utc": datetime.now(timezone.utc).isoformat(),
+        }
+
+    checked_at = datetime.now(timezone.utc)
+    age_hours = max((checked_at - refreshed_at).total_seconds() / 3600, 0)
+    return {
+        "status": "fresh" if age_hours <= max_age_hours else "stale",
+        "age_hours": round(age_hours, 2),
+        "max_age_hours": max_age_hours,
+        "checked_at_utc": checked_at.isoformat(),
+    }
 
 def ensure_directories():
     os.makedirs(NORMALIZED_DIR, exist_ok=True)
@@ -205,6 +253,7 @@ def write_dataset_catalog(pipeline_metadata):
     for dataset_name, dataset_metadata in pipeline_metadata["datasets"].items():
         validation = pipeline_metadata["validations"].get(dataset_name, {})
         config = DATASET_CATALOG_CONFIG.get(dataset_name, {})
+        freshness_policy = config.get("freshness_policy", {})
         datasets.append(
             {
                 "dataset": dataset_name,
@@ -218,6 +267,8 @@ def write_dataset_catalog(pipeline_metadata):
                 "fields": dataset_metadata.get("fields", []),
                 "join_keys": config.get("join_keys", []),
                 "confidence_tier": config.get("confidence_tier"),
+                "freshness": dataset_metadata.get("freshness", {}),
+                "freshness_policy": freshness_policy,
                 "usage_examples": config.get("usage_examples", {}),
                 "outputs": config.get("outputs", {}),
                 "documentation": config.get("documentation"),
@@ -244,7 +295,20 @@ def compute_sha256(path):
             hasher.update(chunk)
     return hasher.hexdigest()
 
+def build_publishable_artifact_index():
+    artifact_index = {}
+    for dataset_name, config in DATASET_CATALOG_CONFIG.items():
+        outputs = config.get("outputs", {})
+        for output_type, path in outputs.items():
+            if isinstance(path, str) and path.startswith("data/normalized/"):
+                artifact_index[path] = {
+                    "dataset": dataset_name,
+                    "output_type": output_type,
+                }
+    return artifact_index
+
 def write_artifact_manifest():
+    artifact_index = build_publishable_artifact_index()
     artifacts = []
     for filename in sorted(os.listdir(NORMALIZED_DIR)):
         if not filename.endswith(PUBLISHABLE_ARTIFACT_SUFFIXES):
@@ -252,9 +316,13 @@ def write_artifact_manifest():
         path = os.path.join(NORMALIZED_DIR, filename)
         if not os.path.isfile(path):
             continue
+        relative_path = f"data/normalized/{filename}"
+        artifact_metadata = artifact_index.get(relative_path, {})
         artifacts.append(
             {
-                "path": f"data/normalized/{filename}",
+                "path": relative_path,
+                "dataset": artifact_metadata.get("dataset"),
+                "output_type": artifact_metadata.get("output_type"),
                 "size_bytes": os.path.getsize(path),
                 "sha256": compute_sha256(path),
             }
@@ -487,24 +555,53 @@ def main():
     build_sqlite(df_regiones, df_provincias, df_comunas, df_indicadores, os.path.join(NORMALIZED_DIR, "chile_data.db"))
     build_excel(df_regiones, df_provincias, df_comunas, df_indicadores, os.path.join(NORMALIZED_DIR, "chile_data_latest.xlsx"))
     build_flat_files(df_regiones, df_provincias, df_comunas, df_indicadores)
-    metadata_output = write_pipeline_metadata(
-        {
-            "regiones": {
-                **comunas_metadata,
-                "dataset": "regiones",
-                "record_count": df_regiones.height,
-                "fields": df_regiones.columns,
-            },
-            "provincias": {
-                **comunas_metadata,
-                "dataset": "provincias",
-                "record_count": df_provincias.height,
-                "fields": df_provincias.columns,
-            },
-            "comunas": comunas_metadata,
-            "indicadores": indicadores_metadata,
+    dataset_metadata = {
+        "regiones": {
+            **comunas_metadata,
+            "dataset": "regiones",
+            "record_count": df_regiones.height,
+            "fields": df_regiones.columns,
+            "freshness": build_freshness(
+                comunas_metadata.get("refreshed_at_utc"),
+                DATASET_CATALOG_CONFIG["regiones"]["freshness_policy"]["max_age_hours"],
+            ),
         },
-        validations,
+        "provincias": {
+            **comunas_metadata,
+            "dataset": "provincias",
+            "record_count": df_provincias.height,
+            "fields": df_provincias.columns,
+            "freshness": build_freshness(
+                comunas_metadata.get("refreshed_at_utc"),
+                DATASET_CATALOG_CONFIG["provincias"]["freshness_policy"]["max_age_hours"],
+            ),
+        },
+        "comunas": {
+            **comunas_metadata,
+            "freshness": build_freshness(
+                comunas_metadata.get("refreshed_at_utc"),
+                DATASET_CATALOG_CONFIG["comunas"]["freshness_policy"]["max_age_hours"],
+            ),
+        },
+        "indicadores": {
+            **indicadores_metadata,
+            "freshness": build_freshness(
+                indicadores_metadata.get("refreshed_at_utc"),
+                DATASET_CATALOG_CONFIG["indicadores"]["freshness_policy"]["max_age_hours"],
+            ),
+        },
+    }
+    validations_with_freshness = {
+        dataset_name: {
+            **validation,
+            "freshness_status": dataset_metadata[dataset_name]["freshness"]["status"],
+            "freshness_age_hours": dataset_metadata[dataset_name]["freshness"]["age_hours"],
+        }
+        for dataset_name, validation in validations.items()
+    }
+    metadata_output = write_pipeline_metadata(
+        dataset_metadata,
+        validations_with_freshness,
     )
     with open(metadata_output, "r", encoding="utf-8") as f:
         pipeline_metadata = json.load(f)

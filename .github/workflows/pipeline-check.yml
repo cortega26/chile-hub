@@ -22,6 +22,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Install Chromium for landing verification
+        run: python -m playwright install --with-deps chromium
+
       - name: Run extractors
         run: |
           python src/extractors/subdere_extractor.py
@@ -35,6 +38,9 @@ jobs:
 
       - name: Run hub smoke tests
         run: python -m unittest discover -s tests
+
+      - name: Run landing smoke verification
+        run: python scripts/verify_landing.py
 
       - name: Generate pipeline status
         run: python scripts/pipeline_status.py

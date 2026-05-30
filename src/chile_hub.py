@@ -8,6 +8,7 @@ import polars as pl
 ROOT_DIR = Path(__file__).resolve().parents[1]
 NORMALIZED_DIR = ROOT_DIR / "data" / "normalized"
 DATASET_CATALOG_PATH = NORMALIZED_DIR / "dataset_catalog.json"
+ARTIFACT_MANIFEST_PATH = NORMALIZED_DIR / "artifact_manifest.json"
 
 
 class ChileHub:
@@ -18,6 +19,10 @@ class ChileHub:
 
     def _load_catalog(self):
         with self.catalog_path.open("r", encoding="utf-8") as f:
+            return json.load(f)
+
+    def _load_artifact_manifest(self):
+        with ARTIFACT_MANIFEST_PATH.open("r", encoding="utf-8") as f:
             return json.load(f)
 
     def list_datasets(self):
@@ -62,10 +67,62 @@ class ChileHub:
                 "record_count": entry["record_count"],
                 "join_keys": entry.get("join_keys", []),
                 "confidence_tier": entry.get("confidence_tier"),
+                "freshness_status": entry.get("freshness", {}).get("status"),
+                "freshness_age_hours": entry.get("freshness", {}).get("age_hours"),
                 "validation_status": entry.get("validation_status"),
             }
             for entry in self.catalog.get("datasets", [])
         ]
+
+    def artifacts(self, dataset_name=None):
+        manifest = self._load_artifact_manifest()
+        artifacts = manifest.get("artifacts", [])
+        if dataset_name is None:
+            return artifacts
+
+        self.get_dataset(dataset_name)
+        return [entry for entry in artifacts if entry.get("dataset") == dataset_name]
+
+    def inventory(self):
+        inventory = []
+        manifest_artifacts = self.artifacts()
+        by_dataset = {}
+        for artifact in manifest_artifacts:
+            dataset = artifact.get("dataset")
+            if not dataset:
+                continue
+            by_dataset.setdefault(dataset, []).append(artifact)
+
+        for entry in self.catalog.get("datasets", []):
+            dataset_name = entry["dataset"]
+            artifacts = sorted(
+                by_dataset.get(dataset_name, []),
+                key=lambda item: (item.get("output_type") or "", item.get("path") or ""),
+            )
+            published_outputs = [artifact["output_type"] for artifact in artifacts if artifact.get("output_type")]
+            inventory.append(
+                {
+                    "dataset": dataset_name,
+                    "source_mode": entry.get("source_mode"),
+                    "record_count": entry.get("record_count"),
+                    "validation_status": entry.get("validation_status"),
+                    "confidence_tier": entry.get("confidence_tier"),
+                    "freshness_status": entry.get("freshness", {}).get("status"),
+                    "freshness_age_hours": entry.get("freshness", {}).get("age_hours"),
+                    "published_outputs": published_outputs,
+                    "artifact_count": len(artifacts),
+                    "total_size_bytes": sum(artifact.get("size_bytes", 0) for artifact in artifacts),
+                    "artifacts": [
+                        {
+                            "path": artifact.get("path"),
+                            "output_type": artifact.get("output_type"),
+                            "size_bytes": artifact.get("size_bytes"),
+                        }
+                        for artifact in artifacts
+                    ],
+                }
+            )
+        return inventory
 
 
 def build_parser():
@@ -93,6 +150,15 @@ def build_parser():
         help="Tipo de ejemplo a mostrar, por ejemplo python, duckdb o cli",
     )
 
+    artifacts_parser = subparsers.add_parser("artifacts", help="Mostrar artefactos publicables")
+    artifacts_parser.add_argument(
+        "dataset",
+        nargs="?",
+        help="Nombre opcional de dataset para filtrar artefactos",
+    )
+
+    subparsers.add_parser("inventory", help="Mostrar inventario compacto de datasets y artefactos")
+
     subparsers.add_parser("summary", help="Mostrar resumen breve de datasets")
     return parser
 
@@ -117,6 +183,14 @@ def main():
 
     if args.command == "example":
         print(hub.example_usage(args.dataset, args.kind))
+        return
+
+    if args.command == "artifacts":
+        print(json.dumps(hub.artifacts(args.dataset), ensure_ascii=False, indent=2))
+        return
+
+    if args.command == "inventory":
+        print(json.dumps(hub.inventory(), ensure_ascii=False, indent=2))
         return
 
     if args.command == "summary":

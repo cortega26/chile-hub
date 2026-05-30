@@ -20,6 +20,17 @@ def format_warnings(warnings):
     return "; ".join(warnings)
 
 
+def format_freshness(freshness):
+    if not freshness:
+        return "unknown"
+    status = freshness.get("status", "unknown")
+    age_hours = freshness.get("age_hours")
+    max_age_hours = freshness.get("max_age_hours")
+    if age_hours is None or max_age_hours is None:
+        return status
+    return f"{status} ({age_hours}h / {max_age_hours}h)"
+
+
 def build_status_text(metadata):
     lines = []
     generated_at = metadata.get("generated_at_utc", "unknown")
@@ -39,6 +50,7 @@ def build_status_text(metadata):
         lines.append(f"mode: {dataset.get('source_mode', 'unknown')}")
         lines.append(f"detail: {dataset.get('source_detail', 'unknown')}")
         lines.append(f"refreshed_at_utc: {dataset.get('refreshed_at_utc', 'unknown')}")
+        lines.append(f"freshness: {format_freshness(dataset.get('freshness'))}")
         lines.append(f"records: {dataset.get('record_count', 'unknown')}")
         lines.append(f"validation_status: {validation.get('status', 'unknown')}")
         lines.append(f"warnings: {format_warnings(validation.get('warnings', []))}")
@@ -66,8 +78,8 @@ def build_status_markdown(metadata):
         "",
         f"- `generated_at_utc`: `{generated_at}`",
         "",
-        "| Dataset | Source | Mode | Detail | Records | Validation | Warnings |",
-        "| :--- | :--- | :--- | :--- | ---: | :--- | :--- |",
+        "| Dataset | Source | Mode | Detail | Freshness | Records | Validation | Warnings |",
+        "| :--- | :--- | :--- | :--- | :--- | ---: | :--- | :--- |",
     ]
 
     for dataset_name in sorted(datasets.keys()):
@@ -80,6 +92,7 @@ def build_status_markdown(metadata):
             f"{dataset.get('source_name', 'unknown')} | "
             f"`{dataset.get('source_mode', 'unknown')}` | "
             f"`{dataset.get('source_detail', 'unknown')}` | "
+            f"`{format_freshness(dataset.get('freshness'))}` | "
             f"{dataset.get('record_count', 'unknown')} | "
             f"`{validation.get('status', 'unknown')}` | "
             f"{warnings} |"
@@ -93,6 +106,7 @@ def build_status_markdown(metadata):
         lines.append(f"## {dataset_name}")
         lines.append("")
         lines.append(f"- `refreshed_at_utc`: `{dataset.get('refreshed_at_utc', 'unknown')}`")
+        lines.append(f"- `freshness`: `{format_freshness(dataset.get('freshness'))}`")
         lines.append(f"- `fields`: `{', '.join(dataset.get('fields', []))}`")
 
         notes = dataset.get("notes", [])
@@ -125,8 +139,8 @@ def build_dataset_catalog_markdown(catalog):
         f"- `generated_at_utc`: `{catalog.get('generated_at_utc', 'unknown')}`",
         f"- `dataset_count`: `{catalog.get('dataset_count', 0)}`",
         "",
-        "| Dataset | Source | Mode | Records | Confidence | Join Keys | Validation |",
-        "| :--- | :--- | :--- | ---: | :--- | :--- | :--- |",
+        "| Dataset | Source | Mode | Freshness | Records | Confidence | Join Keys | Validation |",
+        "| :--- | :--- | :--- | :--- | ---: | :--- | :--- | :--- |",
     ]
 
     for entry in catalog.get("datasets", []):
@@ -135,6 +149,7 @@ def build_dataset_catalog_markdown(catalog):
             f"`{entry.get('dataset', 'unknown')}` | "
             f"{entry.get('source_name', 'unknown')} | "
             f"`{entry.get('source_mode', 'unknown')}` | "
+            f"`{format_freshness(entry.get('freshness'))}` | "
             f"{entry.get('record_count', 'unknown')} | "
             f"`{entry.get('confidence_tier', 'unknown')}` | "
             f"`{', '.join(entry.get('join_keys', []))}` | "
@@ -150,6 +165,7 @@ def build_dataset_catalog_markdown(catalog):
         lines.append("")
         lines.append(f"- `source_url`: {entry.get('source_url', 'unknown')}")
         lines.append(f"- `documentation`: `{entry.get('documentation', 'unknown')}`")
+        lines.append(f"- `freshness`: `{format_freshness(entry.get('freshness'))}`")
         lines.append(f"- `fields`: `{', '.join(entry.get('fields', []))}`")
         lines.append(f"- `join_keys`: `{', '.join(entry.get('join_keys', []))}`")
         lines.append(f"- `outputs`: `{json.dumps(entry.get('outputs', {}), ensure_ascii=False)}`")

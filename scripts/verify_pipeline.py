@@ -86,6 +86,14 @@ def verify_pipeline_metadata():
         if dataset_metadata.get("source_mode") not in {"live", "fallback"}:
             fail(f"{dataset_name} metadata has invalid source_mode: {dataset_metadata.get('source_mode')}")
 
+        freshness = dataset_metadata.get("freshness", {})
+        if freshness.get("status") not in {"fresh", "stale", "unknown"}:
+            fail(f"{dataset_name} metadata has invalid freshness status: {freshness.get('status')}")
+        if freshness.get("max_age_hours") is None:
+            fail(f"{dataset_name} metadata is missing freshness.max_age_hours")
+        if not freshness.get("checked_at_utc"):
+            fail(f"{dataset_name} metadata is missing freshness.checked_at_utc")
+
         if validation.get("status") != "ok":
             fail(f"{dataset_name} validation status is not ok: {validation.get('status')}")
 
@@ -97,6 +105,12 @@ def verify_pipeline_metadata():
             fail(
                 f"{dataset_name} record_count mismatch between datasets and validations: "
                 f"{dataset_metadata.get('record_count')} vs {validation.get('record_count')}"
+            )
+
+        if validation.get("freshness_status") != freshness.get("status"):
+            fail(
+                f"{dataset_name} freshness mismatch between datasets and validations: "
+                f"{freshness.get('status')} vs {validation.get('freshness_status')}"
             )
 
         warnings = validation.get("warnings", [])
@@ -150,6 +164,20 @@ def verify_dataset_catalog():
             fail(f"{entry.get('dataset')} catalog entry is missing outputs")
         if not entry.get("join_keys"):
             fail(f"{entry.get('dataset')} catalog entry is missing join_keys")
+        freshness = entry.get("freshness", {})
+        if freshness.get("status") not in {"fresh", "stale", "unknown"}:
+            fail(
+                f"{entry.get('dataset')} catalog entry has invalid freshness.status: "
+                f"{freshness.get('status')}"
+            )
+        if not entry.get("freshness_policy", {}).get("max_age_hours"):
+            fail(f"{entry.get('dataset')} catalog entry is missing freshness_policy.max_age_hours")
+        usage_examples = entry.get("usage_examples", {})
+        for required_example in ("python", "duckdb", "cli"):
+            if not usage_examples.get(required_example):
+                fail(
+                    f"{entry.get('dataset')} catalog entry is missing usage_examples.{required_example}"
+                )
         if entry.get("validation_status") != "ok":
             fail(
                 f"{entry.get('dataset')} catalog entry has invalid validation_status: "
@@ -190,6 +218,29 @@ def verify_artifact_manifest():
         )
 
     for entry in artifacts:
+        path = entry.get("path")
+        if path in expected_paths:
+            if path.endswith((".parquet", ".json")) and path not in {
+                "data/normalized/pipeline_metadata.json",
+                "data/normalized/dataset_catalog.json",
+                "data/normalized/artifact_manifest.json",
+            }:
+                if not entry.get("dataset"):
+                    fail(f"artifact manifest entry is missing dataset: {entry}")
+            if path.endswith((".parquet", ".json")) and path not in {
+                "data/normalized/pipeline_metadata.json",
+                "data/normalized/dataset_catalog.json",
+                "data/normalized/artifact_manifest.json",
+            }:
+                if path.endswith(".parquet") and not entry.get("output_type") == "parquet":
+                    fail(f"artifact manifest entry has invalid output_type for parquet: {entry}")
+        if path in {
+            "data/normalized/regiones.json",
+            "data/normalized/provincias.json",
+            "data/normalized/comunas.json",
+            "data/normalized/indicadores_hoy.json",
+        } and not entry.get("output_type") == "json":
+            fail(f"artifact manifest entry has invalid output_type for json: {entry}")
         if not entry.get("sha256"):
             fail(f"artifact manifest entry is missing sha256: {entry}")
         if entry.get("size_bytes", 0) <= 0:
