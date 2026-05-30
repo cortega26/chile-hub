@@ -1,0 +1,146 @@
+{
+  "generated_at_utc": "2026-05-30T20:35:29.457773+00:00",
+  "dataset_count": 4,
+  "datasets": [
+    {
+      "dataset": "regiones",
+      "description": "Capa derivada de regiones para filtros, joins y referencias administrativas de alto nivel.",
+      "source_name": "BCN ArcGIS",
+      "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
+      "source_mode": "live",
+      "source_detail": "bcn_arcgis",
+      "refreshed_at_utc": "2026-05-30T20:11:47.000584+00:00",
+      "record_count": 16,
+      "fields": [
+        "codigo_region",
+        "nombre_region"
+      ],
+      "join_keys": [
+        "codigo_region"
+      ],
+      "confidence_tier": "Tier B",
+      "outputs": {
+        "parquet": "data/normalized/regiones.parquet",
+        "json": "data/normalized/regiones.json",
+        "duckdb_table": "regiones",
+        "sqlite_table": "regiones",
+        "excel_sheet": "Regiones"
+      },
+      "documentation": "docs/datasets/regiones.md",
+      "validation_status": "ok",
+      "warnings": [],
+      "notes": [
+        "bcn_skipped_null_code_records: 1",
+        "bcn_supplemented_missing_comunas: 1"
+      ]
+    },
+    {
+      "dataset": "provincias",
+      "description": "Capa derivada de provincias para cruces intermedios entre region y comuna.",
+      "source_name": "BCN ArcGIS",
+      "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
+      "source_mode": "live",
+      "source_detail": "bcn_arcgis",
+      "refreshed_at_utc": "2026-05-30T20:11:47.000584+00:00",
+      "record_count": 56,
+      "fields": [
+        "codigo_region",
+        "nombre_region",
+        "codigo_provincia",
+        "nombre_provincia"
+      ],
+      "join_keys": [
+        "codigo_provincia",
+        "codigo_region"
+      ],
+      "confidence_tier": "Tier B",
+      "outputs": {
+        "parquet": "data/normalized/provincias.parquet",
+        "json": "data/normalized/provincias.json",
+        "duckdb_table": "provincias",
+        "sqlite_table": "provincias",
+        "excel_sheet": "Provincias"
+      },
+      "documentation": "docs/datasets/provincias.md",
+      "validation_status": "ok",
+      "warnings": [],
+      "notes": [
+        "bcn_skipped_null_code_records: 1",
+        "bcn_supplemented_missing_comunas: 1"
+      ]
+    },
+    {
+      "dataset": "comunas",
+      "description": "Base territorial normalizada para cruces por region, provincia y comuna.",
+      "source_name": "BCN ArcGIS",
+      "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
+      "source_mode": "live",
+      "source_detail": "bcn_arcgis",
+      "refreshed_at_utc": "2026-05-30T20:11:47.000584+00:00",
+      "record_count": 346,
+      "fields": [
+        "codigo_region",
+        "nombre_region",
+        "abreviatura",
+        "codigo_provincia",
+        "nombre_provincia",
+        "codigo_comuna",
+        "nombre_comuna",
+        "nombre_comuna_clean",
+        "latitud_cabecera",
+        "longitud_cabecera",
+        "poblacion_estimada"
+      ],
+      "join_keys": [
+        "codigo_comuna",
+        "codigo_region"
+      ],
+      "confidence_tier": "Tier B",
+      "outputs": {
+        "parquet": "data/normalized/comunas.parquet",
+        "json": "data/normalized/comunas.json",
+        "duckdb_table": "comunas",
+        "sqlite_table": "comunas",
+        "excel_sheet": "Comunas y Regiones"
+      },
+      "documentation": "docs/datasets/comunas.md",
+      "validation_status": "ok",
+      "warnings": [],
+      "notes": [
+        "bcn_skipped_null_code_records: 1",
+        "bcn_supplemented_missing_comunas: 1"
+      ]
+    },
+    {
+      "dataset": "indicadores",
+      "description": "Serie de indicadores economicos diarios de referencia para analisis y software.",
+      "source_name": "mindicador.cl",
+      "source_url": "https://mindicador.cl/api",
+      "source_mode": "live",
+      "source_detail": "public_api",
+      "refreshed_at_utc": "2026-05-30T20:01:17.545148+00:00",
+      "record_count": 5,
+      "fields": [
+        "fecha",
+        "codigo_indicador",
+        "valor"
+      ],
+      "join_keys": [
+        "fecha",
+        "codigo_indicador"
+      ],
+      "confidence_tier": "Tier A/B",
+      "outputs": {
+        "parquet": "data/normalized/indicadores.parquet",
+        "json": "data/normalized/indicadores_hoy.json",
+        "duckdb_table": "indicadores",
+        "sqlite_table": "indicadores",
+        "excel_sheet": "Indicadores Diarios"
+      },
+      "documentation": "docs/datasets/indicadores.md",
+      "validation_status": "ok",
+      "warnings": [],
+      "notes": []
+    }
+  ]
+}

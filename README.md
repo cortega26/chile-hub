@@ -1,119 +1,302 @@
-# 🇨🇱 chile-data-core
+# 🇨🇱 chile-hub
 
-[![Status](https://img.shields.io/badge/status-alpha--validation-orange.svg)]()
+[![Status](https://img.shields.io/badge/status-alpha-orange.svg)]()
 [![License](https://img.shields.io/badge/license-CC--BY--4.0-blue.svg)]()
-[![CI/CD Data Updates](https://img.shields.io/badge/data--pipeline-active-success.svg)]()
 
-La capa base territorial (geo-administrativa) y económica de Chile, normalizada y empaquetada para su consumo inmediato en DuckDB, Python, R y Excel.
+Capas de datos chilenas curadas, normalizadas y fáciles de consumir, a partir de fuentes abiertas o legalmente reutilizables.
 
-> **El problema:** datos.gob.cl es un catálogo de enlaces rotos y archivos Excel deformes. Cada vez que inicias un proyecto de BI, analítica o desarrollo de software en Chile, pierdes horas limpiando nombres de comunas, validando códigos SUBDERE/CUT y programando scrapers inestables para obtener el valor de la UF.
->
-> **La solución:** `chile-data-core` te entrega un único set de datos limpio, curado y versionado, consumible localmente o vía CDN en una sola línea de código.
+`chile-hub` no busca "tener todos los datos de Chile". Busca reducir el costo de encontrar, limpiar, entender, cruzar y consumir datasets confiables de Chile.
 
----
+## Qué problema resuelve
 
-## 🚀 Modos de Consumo Rápido
+Trabajar con datos chilenos casi siempre parte igual:
 
-### 💻 Para Desarrolladores y Analistas (Técnico)
+- enlaces rotos o poco mantenidos
+- Excels deformes
+- códigos territoriales inconsistentes
+- nombres difíciles de cruzar
+- documentación insuficiente
+- scrapers frágiles para obtener datos básicos
 
-Los datos se publican a diario en formatos de alto rendimiento. Puedes leerlos directamente desde nuestro CDN estático (GitHub Releases) sin descargar archivos de forma manual.
+El valor del proyecto está en transformar esas fuentes en capas listas para usar con:
 
-#### 1. Ingesta Directa con DuckDB (Recomendado)
-DuckDB puede leer los archivos Parquet remotos de forma nativa a la velocidad del rayo:
+- esquema estable
+- trazabilidad de origen
+- outputs útiles para análisis y software
+- ejemplos de consumo simples
 
-```sql
--- Consultar la división político-administrativa completa
-SELECT * 
-FROM read_parquet('https://cdn.datos.cl/latest/comunas.parquet');
+## Qué es y qué no es
 
--- Cruzar tus datos locales con la población comunal oficial
-SELECT 
-    c.nombre_comuna, 
-    c.poblacion_estimada, 
-    v.ventas
-FROM read_parquet('https://cdn.datos.cl/latest/comunas.parquet') c
-JOIN my_local_sales v ON c.codigo_comuna = v.codigo_comuna;
-```
+### Sí es
 
-#### 2. Carga en Python (Polars / Pandas)
+- un hub de capas de datos reutilizables de Chile
+- un pipeline de extracción, normalización y empaquetado
+- un catálogo técnico con foco en confianza y consumo inmediato
 
-```python
-import polars as pl
+### No es
 
-# Cargar comunas normalizadas en un DataFrame de Polars
-df_comunas = pl.read_parquet("https://cdn.datos.cl/latest/comunas.parquet")
+- un reemplazo de las fuentes oficiales
+- un catálogo infinito de links
+- una promesa de cobertura universal desde el día uno
+- una API compleja como requisito del MVP
 
-# Obtener los indicadores económicos macro de hoy
-df_indicadores = pl.read_json("https://cdn.datos.cl/latest/indicadores_hoy.json")
-print(df_indicadores)
-```
+## Estado actual
 
-#### 3. Endpoint JSON para Frontend Web
-Ideal para poblar dinámicamente selectores `<select>` de región y comuna en formularios de registro:
+El repo hoy parte con un MVP acotado:
 
-```javascript
-// Obtener comunas ordenadas jerárquicamente
-fetch("https://cdn.datos.cl/latest/dpa_jerarquica.json")
-  .then(response => response.json())
-  .then(data => console.log(data));
-```
+- capas territoriales derivadas: regiones, provincias y comunas
+- capa territorial base: regiones, provincias y comunas
+- indicadores económicos diarios de alta reutilización
 
----
+Eso no define el límite del producto. Define el punto de partida.
 
-### 📊 Para Analistas de Negocio y Finanzas (No Técnico)
+La visión de largo plazo es incorporar nuevas capas de datos solo cuando cumplan criterios razonables de:
 
-No necesitas escribir código para usar los datos actualizados de Chile.
+- utilidad transversal
+- calidad de fuente
+- claridad legal
+- factibilidad de automatización
+- bajo costo de mantenimiento
 
-1.  **Descarga Directa en Excel (.xlsx):**
-    *   Descarga el archivo consolidado diario [chile_data_latest.xlsx](https://cdn.datos.cl/latest/chile_data_latest.xlsx). Contiene pestañas limpias con la lista oficial de comunas (con códigos CUT de texto que no pierden el cero inicial) e indicadores económicos actualizados.
-2.  **Plantilla en Google Sheets Autocargable:**
-    *   Crea una copia de nuestra [Plantilla de Google Sheets Oficial](https://docs.google.com/spreadsheets/d/1DemoTemplateChileData/copy).
-    *   La plantilla utiliza fórmulas nativas como `=IMPORTDATA("https://cdn.datos.cl/latest/indicadores.csv")` para cargar de forma automática la UF, el Dólar y la UTM del día cada vez que abras la hoja de cálculo.
+## Capas incluidas hoy
 
----
+### 1. `regiones`
 
-## 🗺️ Estructura del Modelo de Datos
+Capa territorial derivada para filtros, agregaciones y joins de alto nivel.
 
-El dataset consolidado incluye las siguientes tablas:
+| Columna | Tipo | Descripción | Ejemplo |
+| :--- | :--- | :--- | :--- |
+| `codigo_region` | `VARCHAR` | Código CUT de la región (2 chars) | `"01"` |
+| `nombre_region` | `VARCHAR` | Nombre oficial de la región | `"Tarapacá"` |
 
-### 1. `comunas`
-La división político-administrativa con códigos **CUT** oficiales de 5 dígitos (con formato de texto para evitar que Excel elimine los ceros iniciales como en el caso de comunas de la Región de Tarapacá).
+### 2. `provincias`
+
+Capa territorial derivada para cruces intermedios entre región y comuna.
+
+| Columna | Tipo | Descripción | Ejemplo |
+| :--- | :--- | :--- | :--- |
+| `codigo_region` | `VARCHAR` | Código CUT de la región (2 chars) | `"01"` |
+| `nombre_region` | `VARCHAR` | Nombre oficial de la región | `"Tarapacá"` |
+| `codigo_provincia` | `VARCHAR` | Código CUT de la provincia (3 chars) | `"011"` |
+| `nombre_provincia` | `VARCHAR` | Nombre oficial de la provincia | `"Iquique"` |
+
+### 3. `comunas`
+
+Base territorial normalizada con códigos CUT y campos preparados para cruces.
 
 | Columna | Tipo | Descripción | Ejemplo |
 | :--- | :--- | :--- | :--- |
 | `codigo_comuna` | `VARCHAR` | Código CUT de la comuna (5 chars) | `"01101"` |
 | `nombre_comuna` | `VARCHAR` | Nombre oficial normalizado con acentos | `"Iquique"` |
-| `nombre_comuna_clean`| `VARCHAR` | Nombre en minúsculas y sin acentos | `"iquique"` |
+| `nombre_comuna_clean` | `VARCHAR` | Nombre en minúsculas y sin acentos | `"iquique"` |
 | `codigo_provincia` | `VARCHAR` | Código CUT de la provincia (3 chars) | `"011"` |
 | `nombre_provincia` | `VARCHAR` | Nombre oficial de la provincia | `"Iquique"` |
 | `codigo_region` | `VARCHAR` | Código CUT de la región (2 chars) | `"01"` |
 | `nombre_region` | `VARCHAR` | Nombre oficial de la región | `"Tarapacá"` |
 | `latitud_cabecera` | `DOUBLE` | Latitud de la capital comunal | `-20.2138` |
-| `longitud_cabecera`| `DOUBLE` | Longitud de la capital comunal | `-70.1508` |
-| `poblacion_estimada`| `INTEGER`| Proyección de población del INE para el año actual | `223400` |
+| `longitud_cabecera` | `DOUBLE` | Longitud de la capital comunal | `-70.1508` |
+| `poblacion_estimada` | `INTEGER` | Proyección o referencia poblacional | `223400` |
 
-### 2. `indicadores`
-Serie de tiempo con valores económicos diarios de referencia del Banco Central de Chile.
+### 4. `indicadores`
+
+Serie de indicadores económicos diarios de referencia.
 
 | Columna | Tipo | Descripción | Ejemplo |
 | :--- | :--- | :--- | :--- |
 | `fecha` | `DATE` | Fecha de aplicación (YYYY-MM-DD) | `2026-05-30` |
 | `codigo_indicador` | `VARCHAR` | Identificador corto (`uf`, `dolar`, `utm`, `euro`) | `"uf"` |
-| `valor` | `DOUBLE` | Valor en Pesos Chilenos (CLP) | `39420.50` |
+| `valor` | `DOUBLE` | Valor del indicador | `39420.50` |
 
----
+## Outputs disponibles
 
-## 🛠️ Licencias y Atribución Legal
+El pipeline actual genera entregables locales en [`data/normalized`](/home/carlos/VS_Code_Projects/chile-hub/data/normalized):
 
-Este proyecto recopila y normaliza información pública bajo la Ley de Transparencia de Chile (Nº 20.285).
-*   **Códigos Territoriales:** Fuente SUBDERE / INE. Licencia Pública de Datos Abiertos.
-*   **Población:** Estimaciones y Proyecciones de Población del Instituto Nacional de Estadísticas (INE).
-*   **Indicadores Económicos:** API de Datos del Banco Central de Chile.
-*   **Distribución:** El dataset consolidado y el código de los transformadores se distribuyen bajo la licencia [Creative Commons Atribución 4.0 Internacional (CC-BY-4.0)](https://creativecommons.org/licenses/by/4.0/deed.es). Puedes usarlo con fines comerciales siempre que menciones a `chile-data-core` y a las fuentes gubernamentales de origen.
+- `chile_data.duckdb`
+- `chile_data.db`
+- `chile_data_latest.xlsx`
+- `regiones.parquet`
+- `provincias.parquet`
+- `comunas.parquet`
+- `indicadores.parquet`
+- `regiones.json`
+- `provincias.json`
+- `comunas.json`
+- `indicadores_hoy.json`
+- `pipeline_metadata.json`
+- `pipeline_status.md`
+- `dataset_catalog.json`
+- `dataset_catalog.md`
+- `artifact_manifest.json`
 
----
+Además, los extractores dejan metadata intermedia en `data/staging` para dejar trazabilidad de:
 
-## 📢 Nota sobre la Fase de Validación
+- origen efectivo (`live` o `fallback`)
+- timestamp de refresh
+- cantidad de registros
+- campos publicados
 
-> [!NOTE]
-> Este proyecto se encuentra actualmente en **Fase de Validación de Tracción**. Si encuentras útiles estos datos para tus flujos de trabajo diarios, por favor **danos una estrella ⭐ en GitHub** o abre un Issue sugiriendo nuevas variables (ej. patentes comerciales, presupuestos SINIM, datos SII). Esto nos ayudará a justificar el costo de mantener la API dinámica en tiempo real y agregar más sets de datos chilenos.
+Política del repo:
+
+- `data/staging` y binarios pesados locales no deberían versionarse
+- artefactos livianos de `data/normalized` como catálogos, metadata, JSON y Parquet sí pueden publicarse para hacer visible el estado real del hub
+- `artifact_manifest.json` publica hashes y tamaños para esos artefactos ligeros
+
+## Uso rápido
+
+### DuckDB
+
+```sql
+SELECT *
+FROM 'data/normalized/regiones.parquet';
+
+SELECT *
+FROM 'data/normalized/provincias.parquet';
+
+SELECT *
+FROM 'data/normalized/comunas.parquet';
+
+SELECT *
+FROM 'data/normalized/indicadores.parquet'
+ORDER BY fecha DESC, codigo_indicador;
+```
+
+### Python con Polars
+
+```python
+import polars as pl
+
+df_comunas = pl.read_parquet("data/normalized/comunas.parquet")
+df_indicadores = pl.read_parquet("data/normalized/indicadores.parquet")
+```
+
+### Python helper del hub
+
+```python
+from src.chile_hub import ChileHub
+
+hub = ChileHub()
+print(hub.list_datasets())
+df_comunas = hub.load_polars("comunas")
+```
+
+### CLI mínima del hub
+
+```bash
+python -m src.chile_hub list
+python -m src.chile_hub show comunas
+python -m src.chile_hub path comunas --output parquet
+```
+
+### SQLite
+
+```bash
+sqlite3 data/normalized/chile_data.db
+```
+
+## Cómo correr el pipeline
+
+Instala dependencias:
+
+```bash
+pip install -r requirements.txt
+```
+
+Ejecuta extractores:
+
+```bash
+python src/extractors/subdere_extractor.py
+python src/extractors/bcentral_extractor.py
+```
+
+Compila los outputs:
+
+```bash
+python src/build_dev_db.py
+```
+
+Revisa metadata y validaciones:
+
+```bash
+cat data/normalized/pipeline_metadata.json
+```
+
+Explora el catálogo machine-readable:
+
+```bash
+cat data/normalized/dataset_catalog.json
+```
+
+Revisa el manifest de artefactos publicables:
+
+```bash
+cat data/normalized/artifact_manifest.json
+```
+
+O usa el verificador local:
+
+```bash
+python scripts/verify_pipeline.py
+```
+
+Smoke tests del helper y contratos del catálogo:
+
+```bash
+python -m unittest discover -s tests
+```
+
+Secuencia mínima recomendada para validar el hub localmente:
+
+```bash
+python src/build_dev_db.py
+python scripts/verify_pipeline.py
+python -m unittest discover -s tests
+```
+
+Atajos del proyecto:
+
+```bash
+make build
+make verify
+make test
+make check
+make status
+make hub-list
+```
+
+Y para un resumen humano del último estado:
+
+```bash
+python scripts/pipeline_status.py
+```
+
+Ese comando también genera `data/normalized/pipeline_status.md`.
+La landing local en `index.html` consume `dataset_catalog.json` para reflejar el estado real de las capas publicadas.
+El workflow de CI publica un artifact `chile-hub-publishable-bundle` con los outputs ligeros y el manifest asociado.
+
+## Criterio para crecer
+
+Una nueva capa de datos no debería entrar solo porque "suena útil". Debería justificar:
+
+1. dolor recurrente de usuario
+2. valor de cruce con otras capas
+3. fuente confiable y accesible
+4. licencia clara o reutilización defendible
+5. costo de mantenimiento razonable
+
+La visión y criterios de producto están documentados en [docs/product-spec.md](/home/carlos/VS_Code_Projects/chile-hub/docs/product-spec.md).
+El catálogo de capas actualmente disponibles está en [docs/datasets/README.md](/home/carlos/VS_Code_Projects/chile-hub/docs/datasets/README.md).
+
+## Fuentes actuales
+
+- BCN ArcGIS para la capa territorial operativa actual, con fallback secundario a SUBDERE
+- mindicador.cl como fuente pública de indicadores en esta fase
+
+## Licencia y atribución
+
+Este repo empaqueta transformaciones y datasets derivados de fuentes públicas o reutilizables. La redistribución de cada capa debe evaluarse según su fuente y condiciones específicas.
+
+El código y la estructura del proyecto se distribuyen bajo [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.es). Si reutilizas outputs o transformaciones, atribuye también las fuentes originales cuando corresponda.
+
+## Próximo foco
+
+El próximo objetivo razonable no es abrir el scope sin control, sino convertir este repo en un catálogo confiable de capas de datos chilenas, empezando por pocas capas muy útiles y mantenibles.

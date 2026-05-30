@@ -1,4 +1,6 @@
 import os
+import json
+from datetime import datetime, timezone
 import requests
 import polars as pl
 
@@ -6,10 +8,28 @@ import polars as pl
 DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data"))
 RAW_DIR = os.path.join(DATA_DIR, "raw")
 STAGING_DIR = os.path.join(DATA_DIR, "staging")
+METADATA_PATH = os.path.join(STAGING_DIR, "comunas.metadata.json")
 
 # URL Oficial de la Codificación Territorial del INE (DPA 2020/2021)
 # Esta URL oficial puede estar caída o cambiar sin previo aviso.
 SUBDERE_DPA_URL = "https://www.subdere.gov.cl/sites/default/files/documentos/cut_2018_0.xls"
+BCN_COMUNAS_SERVICE_URL = (
+    "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query"
+)
+SUPPLEMENTAL_COMUNAS = [
+    {
+        "codigo_region": "12",
+        "nombre_region": "Región de Magallanes y Antártica Chilena",
+        "abreviatura": "",
+        "codigo_provincia": "122",
+        "nombre_provincia": "Antártica Chilena",
+        "codigo_comuna": "12202",
+        "nombre_comuna": "Antártica",
+        "latitud_cabecera": 0.0,
+        "longitud_cabecera": 0.0,
+        "poblacion_estimada": 0,
+    }
+]
 
 # Fallback local con una muestra representativa y real de comunas de Chile (con Ñuble y comunas con ceros iniciales)
 DPA_FALLBACK_DATA = [
@@ -48,6 +68,73 @@ def ensure_directories():
     os.makedirs(RAW_DIR, exist_ok=True)
     os.makedirs(STAGING_DIR, exist_ok=True)
 
+def write_metadata(metadata):
+    with open(METADATA_PATH, "w", encoding="utf-8") as f:
+        json.dump(metadata, f, ensure_ascii=False, indent=2)
+
+def fetch_bcn_comunas():
+    print(f"Intentando descargar base territorial desde BCN ArcGIS: {BCN_COMUNAS_SERVICE_URL}")
+    params = {
+        "where": "1=1",
+        "outFields": "nom_reg,nom_prov,nom_com,cod_comuna,codregion",
+        "returnGeometry": "false",
+        "f": "json",
+    }
+    response = requests.get(BCN_COMUNAS_SERVICE_URL, params=params, timeout=20)
+    response.raise_for_status()
+    payload = response.json()
+    features = payload.get("features", [])
+    if not features:
+        raise ValueError("BCN ArcGIS did not return features")
+
+    records = []
+    skipped_null_codes = 0
+    for feature in features:
+        attrs = feature["attributes"]
+        if attrs.get("cod_comuna") is None or attrs.get("codregion") is None:
+            skipped_null_codes += 1
+            continue
+        codigo_comuna = str(int(attrs["cod_comuna"]))  # cod_comuna can arrive as numeric
+        codigo_comuna = codigo_comuna.rjust(5, "0")
+        codigo_region = str(int(attrs["codregion"])).rjust(2, "0")
+        codigo_provincia = codigo_comuna[:3]
+        records.append(
+            {
+                "codigo_region": codigo_region,
+                "nombre_region": attrs["nom_reg"],
+                "abreviatura": "",
+                "codigo_provincia": codigo_provincia,
+                "nombre_provincia": attrs["nom_prov"],
+                "codigo_comuna": codigo_comuna,
+                "nombre_comuna": attrs["nom_com"],
+                "latitud_cabecera": 0.0,
+                "longitud_cabecera": 0.0,
+                "poblacion_estimada": 0,
+            }
+        )
+
+    df = pl.DataFrame(records)
+    original_count = df.height
+    df = df.unique(subset=["codigo_comuna"], keep="first")
+    deduped_rows = original_count - df.height
+
+    supplemental_added = 0
+    existing_codes = set(df["codigo_comuna"].to_list())
+    missing_records = [
+        record for record in SUPPLEMENTAL_COMUNAS if record["codigo_comuna"] not in existing_codes
+    ]
+    if missing_records:
+        df = pl.concat([df, pl.DataFrame(missing_records)], how="vertical")
+        supplemental_added = len(missing_records)
+
+    print(
+        f"BCN ArcGIS respondió con {original_count} registros válidos,"
+        f" {skipped_null_codes} omitidos,"
+        f" {deduped_rows} deduplicados"
+        f" y {supplemental_added} suplementados."
+    )
+    return df, skipped_null_codes, deduped_rows, supplemental_added
+
 def download_subdere_file():
     target_path = os.path.join(RAW_DIR, "cut_2018.xls")
     print(f"Intentando descargar base territorial de SUBDERE: {SUBDERE_DPA_URL}")
@@ -64,53 +151,74 @@ def download_subdere_file():
         print(f"Error al descargar la base territorial: {e}. Se utilizará el fallback local.")
     return None
 
-def normalize_dpa(file_path=None):
+def normalize_dpa():
     print("Normalizando la División Político-Administrativa (DPA)...")
-    if file_path and os.path.exists(file_path):
-        try:
-            # Si logramos descargar la base de SUBDERE, la procesamos
-            # Nota: cut_2018.xls suele requerir xlrd para leer con pandas o polars
-            # En la Fase 0 usaremos el motor openpyxl o pandas para leer el excel si está instalado
-            import pandas as pd
-            df_pandas = pd.read_excel(file_path, dtype=str)
-            df = pl.from_pandas(df_pandas)
-            print("Procesando datos desde el archivo descargado de SUBDERE...")
-            
-            # Aquí vendría la lógica de renombre de columnas de SUBDERE a nuestro canon
-            # Como ejemplo simplificado y robusto de normalización:
-            # (SUBDERE tiene columnas Código Región, Nombre Región, Código Provincia, etc.)
-            # Normalizamos el formato del Código Comuna a 5 dígitos
-            df = df.rename({
-                "Código Región": "codigo_region",
-                "Nombre Región": "nombre_region",
-                "Código Provincia": "codigo_provincia",
-                "Nombre Provincia": "nombre_provincia",
-                "Código Comuna": "codigo_comuna",
-                "Nombre Comuna": "nombre_comuna"
-            })
-            
-            # Aseguramos ceros a la izquierda
-            df = df.with_columns([
-                pl.col("codigo_region").str.rjust(2, "0"),
-                pl.col("codigo_provincia").str.rjust(3, "0"),
-                pl.col("codigo_comuna").str.rjust(5, "0"),
-            ])
-            
-            # Agregar abreviaturas y centroides por defecto si no existen
-            # (En un pipeline de producción completo esto cruza con datos de IDE Chile)
-            df = df.with_columns([
-                pl.lit("").alias("abreviatura"),
-                pl.lit(0.0).cast(pl.Float64).alias("latitud_cabecera"),
-                pl.lit(0.0).cast(pl.Float64).alias("longitud_cabecera"),
-                pl.lit(0).cast(pl.Int32).alias("poblacion_estimada")
-            ])
-        except Exception as e:
-            print(f"Error procesando el Excel de SUBDERE: {e}. Usando fallback de datos estático.")
+    source_mode = "fallback"
+    source_detail = "embedded_sample"
+    notes = []
+    try:
+        df, skipped_null_codes, deduped_rows, supplemental_added = fetch_bcn_comunas()
+        source_mode = "live"
+        source_detail = "bcn_arcgis"
+        if skipped_null_codes:
+            notes.append(f"bcn_skipped_null_code_records: {skipped_null_codes}")
+        if deduped_rows:
+            notes.append(f"bcn_deduped_codigo_comuna_records: {deduped_rows}")
+        if supplemental_added:
+            notes.append(f"bcn_supplemented_missing_comunas: {supplemental_added}")
+    except Exception as bcn_error:
+        print(f"Error consultando BCN ArcGIS: {bcn_error}.")
+        notes.append(f"bcn_fetch_error: {bcn_error}")
+        file_path = download_subdere_file()
+        if file_path and os.path.exists(file_path):
+            try:
+                # Si logramos descargar la base de SUBDERE, la procesamos
+                # Nota: cut_2018.xls suele requerir xlrd para leer con pandas o polars
+                # En la Fase 0 usaremos el motor openpyxl o pandas para leer el excel si está instalado
+                import pandas as pd
+                df_pandas = pd.read_excel(file_path, dtype=str)
+                df = pl.from_pandas(df_pandas)
+                print("Procesando datos desde el archivo descargado de SUBDERE...")
+                source_mode = "live"
+                source_detail = "subdere_xls"
+                
+                # Aquí vendría la lógica de renombre de columnas de SUBDERE a nuestro canon
+                # Como ejemplo simplificado y robusto de normalización:
+                # (SUBDERE tiene columnas Código Región, Nombre Región, Código Provincia, etc.)
+                # Normalizamos el formato del Código Comuna a 5 dígitos
+                df = df.rename({
+                    "Código Región": "codigo_region",
+                    "Nombre Región": "nombre_region",
+                    "Código Provincia": "codigo_provincia",
+                    "Nombre Provincia": "nombre_provincia",
+                    "Código Comuna": "codigo_comuna",
+                    "Nombre Comuna": "nombre_comuna"
+                })
+                
+                # Aseguramos ceros a la izquierda
+                df = df.with_columns([
+                    pl.col("codigo_region").str.rjust(2, "0"),
+                    pl.col("codigo_provincia").str.rjust(3, "0"),
+                    pl.col("codigo_comuna").str.rjust(5, "0"),
+                ])
+                
+                # Agregar abreviaturas y centroides por defecto si no existen
+                # (En un pipeline de producción completo esto cruza con datos de IDE Chile)
+                df = df.with_columns([
+                    pl.lit("").alias("abreviatura"),
+                    pl.lit(0.0).cast(pl.Float64).alias("latitud_cabecera"),
+                    pl.lit(0.0).cast(pl.Float64).alias("longitud_cabecera"),
+                    pl.lit(0).cast(pl.Int32).alias("poblacion_estimada")
+                ])
+            except Exception as e:
+                print(f"Error procesando el Excel de SUBDERE: {e}. Usando fallback de datos estático.")
+                df = pl.DataFrame(DPA_FALLBACK_DATA)
+                notes.append(f"fallback_after_subdere_processing_error: {e}")
+        else:
+            # Fallback local con los datos predefinidos
+            print("Usando set de datos DPA embebido (Fase 0 Fallback)...")
             df = pl.DataFrame(DPA_FALLBACK_DATA)
-    else:
-        # Fallback local con los datos predefinidos
-        print("Usando set de datos DPA embebido (Fase 0 Fallback)...")
-        df = pl.DataFrame(DPA_FALLBACK_DATA)
+            notes.append("fallback_due_to_missing_remote_file")
     
     # Normalización adicional (nombre clean para búsquedas sin acento)
     # Reemplazo de caracteres con acento común en Chile
@@ -143,11 +251,26 @@ def normalize_dpa(file_path=None):
     
     output_path = os.path.join(STAGING_DIR, "comunas.csv")
     df_clean.write_csv(output_path)
+    source_name = "SUBDERE"
+    source_url = SUBDERE_DPA_URL
+    if source_detail == "bcn_arcgis":
+        source_name = "BCN ArcGIS"
+        source_url = BCN_COMUNAS_SERVICE_URL
+    metadata = {
+        "dataset": "comunas",
+        "source_name": source_name,
+        "source_url": source_url,
+        "source_mode": source_mode,
+        "source_detail": source_detail,
+        "refreshed_at_utc": datetime.now(timezone.utc).isoformat(),
+        "record_count": len(df_clean),
+        "fields": df_clean.columns,
+        "notes": notes,
+    }
+    write_metadata(metadata)
     print(f"Guardada DPA normalizada en: {output_path} (Total registros: {len(df_clean)})")
     return output_path
 
 if __name__ == "__main__":
     ensure_directories()
-    # Intentamos la descarga, pero el script es inmune a fallos de red por el fallback
-    raw_file = download_subdere_file()
-    normalize_dpa(raw_file)
+    normalize_dpa()

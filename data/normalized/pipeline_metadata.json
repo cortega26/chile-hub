@@ -1,0 +1,126 @@
+{
+  "generated_at_utc": "2026-05-30T20:35:29.457773+00:00",
+  "datasets": {
+    "regiones": {
+      "dataset": "regiones",
+      "source_name": "BCN ArcGIS",
+      "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
+      "source_mode": "live",
+      "source_detail": "bcn_arcgis",
+      "refreshed_at_utc": "2026-05-30T20:11:47.000584+00:00",
+      "record_count": 16,
+      "fields": [
+        "codigo_region",
+        "nombre_region"
+      ],
+      "notes": [
+        "bcn_skipped_null_code_records: 1",
+        "bcn_supplemented_missing_comunas: 1"
+      ]
+    },
+    "provincias": {
+      "dataset": "provincias",
+      "source_name": "BCN ArcGIS",
+      "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
+      "source_mode": "live",
+      "source_detail": "bcn_arcgis",
+      "refreshed_at_utc": "2026-05-30T20:11:47.000584+00:00",
+      "record_count": 56,
+      "fields": [
+        "codigo_region",
+        "nombre_region",
+        "codigo_provincia",
+        "nombre_provincia"
+      ],
+      "notes": [
+        "bcn_skipped_null_code_records: 1",
+        "bcn_supplemented_missing_comunas: 1"
+      ]
+    },
+    "comunas": {
+      "dataset": "comunas",
+      "source_name": "BCN ArcGIS",
+      "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
+      "source_mode": "live",
+      "source_detail": "bcn_arcgis",
+      "refreshed_at_utc": "2026-05-30T20:11:47.000584+00:00",
+      "record_count": 346,
+      "fields": [
+        "codigo_region",
+        "nombre_region",
+        "abreviatura",
+        "codigo_provincia",
+        "nombre_provincia",
+        "codigo_comuna",
+        "nombre_comuna",
+        "nombre_comuna_clean",
+        "latitud_cabecera",
+        "longitud_cabecera",
+        "poblacion_estimada"
+      ],
+      "notes": [
+        "bcn_skipped_null_code_records: 1",
+        "bcn_supplemented_missing_comunas: 1"
+      ]
+    },
+    "indicadores": {
+      "dataset": "indicadores",
+      "source_name": "mindicador.cl",
+      "source_url": "https://mindicador.cl/api",
+      "source_mode": "live",
+      "source_detail": "public_api",
+      "refreshed_at_utc": "2026-05-30T20:01:17.545148+00:00",
+      "record_count": 5,
+      "fields": [
+        "fecha",
+        "codigo_indicador",
+        "valor"
+      ],
+      "indicator_codes": [
+        "dolar",
+        "euro",
+        "ipc",
+        "uf",
+        "utm"
+      ],
+      "notes": []
+    }
+  },
+  "validations": {
+    "regiones": {
+      "dataset": "regiones",
+      "status": "ok",
+      "record_count": 16,
+      "errors": [],
+      "warnings": []
+    },
+    "provincias": {
+      "dataset": "provincias",
+      "status": "ok",
+      "record_count": 56,
+      "errors": [],
+      "warnings": []
+    },
+    "comunas": {
+      "dataset": "comunas",
+      "status": "ok",
+      "record_count": 346,
+      "errors": [],
+      "warnings": []
+    },
+    "indicadores": {
+      "dataset": "indicadores",
+      "status": "ok",
+      "record_count": 5,
+      "errors": [],
+      "warnings": [],
+      "indicator_codes": [
+        "dolar",
+        "euro",
+        "ipc",
+        "uf",
+        "utm"
+      ]
+    }
+  }
+}

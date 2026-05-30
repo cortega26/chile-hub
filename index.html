@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChileData — Buscador y Consolidado de Datos Públicos</title>
+    <title>chile-hub — Capas de Datos de Chile</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b0f19'/%3E%3Cpath d='M18 20h11c9 0 14 5 14 12 0 9-6 14-15 14H18V20zm9 20c6 0 9-3 9-8 0-4-3-7-8-7h-3v15h2z' fill='%2322d3ee'/%3E%3Cpath d='M45 18l4 7 7 4-7 4-4 7-4-7-7-4 7-4 4-7z' fill='%23818cf8'/%3E%3C/svg%3E">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -151,6 +152,171 @@
         .kpi-date {
             font-size: 0.75rem;
             color: var(--text-secondary);
+        }
+
+        .status-banner,
+        .catalog-section {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            backdrop-filter: blur(12px);
+        }
+
+        .status-banner {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .status-copy {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .status-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .status-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .status-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .status-pill {
+            padding: 0.65rem 0.9rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-primary);
+        }
+
+        .catalog-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.25rem;
+        }
+
+        .catalog-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .catalog-meta {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1rem;
+        }
+
+        .dataset-card {
+            background: rgba(10, 15, 25, 0.45);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+        }
+
+        .dataset-card-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.75rem;
+            align-items: flex-start;
+        }
+
+        .dataset-name {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .dataset-desc {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+
+        .dataset-badge {
+            border-radius: 999px;
+            padding: 0.35rem 0.6rem;
+            font-size: 0.74rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            white-space: nowrap;
+        }
+
+        .dataset-badge.live {
+            color: #052e28;
+            background: rgba(52, 211, 153, 0.85);
+        }
+
+        .dataset-badge.fallback {
+            color: #3f2500;
+            background: rgba(251, 191, 36, 0.85);
+        }
+
+        .dataset-facts {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.75rem;
+        }
+
+        .dataset-fact {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .dataset-fact-label {
+            color: var(--text-secondary);
+            font-size: 0.74rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .dataset-fact-value {
+            color: var(--text-primary);
+            font-size: 0.92rem;
+        }
+
+        .dataset-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .dataset-tag {
+            font-size: 0.78rem;
+            padding: 0.35rem 0.55rem;
+            border-radius: 999px;
+            background: rgba(129, 140, 248, 0.12);
+            border: 1px solid rgba(129, 140, 248, 0.2);
+            color: #c7d2fe;
         }
 
         /* Search & Filters Section */
@@ -402,8 +568,8 @@
 
     <header>
         <div class="logo-section">
-            <h1>chile-data-core <span class="badge-alpha">Fase 0</span></h1>
-            <p>Buscador interactivo y consolidado geo-económico chileno</p>
+            <h1>chile-hub <span class="badge-alpha">Fase 0</span></h1>
+            <p>Capas de datos chilenas curadas para análisis, software y cruces confiables</p>
         </div>
         <div class="actions-group">
             <a href="https://github.com/carlos/chile-hub" target="_blank" class="btn btn-secondary">
@@ -435,6 +601,32 @@
                 <span class="kpi-label">U. Tributaria Mensual (UTM)</span>
                 <span class="kpi-value"><div class="spinner"></div></span>
                 <span class="kpi-date">Cargando...</span>
+            </div>
+        </section>
+
+        <section class="status-banner" id="status-banner">
+            <div class="status-copy">
+                <span class="status-title">Estado del pipeline</span>
+                <span class="status-subtitle" id="status-subtitle">Cargando estado operativo de las capas...</span>
+            </div>
+            <div class="status-pills" id="status-pills">
+                <span class="status-pill">Cargando catálogo…</span>
+            </div>
+        </section>
+
+        <section class="catalog-section">
+            <div class="catalog-header">
+                <div>
+                    <div class="catalog-title">Capas publicadas</div>
+                    <div class="catalog-meta">Catálogo derivado del pipeline local y pensado para consumo inmediato.</div>
+                </div>
+                <div class="catalog-meta" id="catalog-generated-at">Generando resumen...</div>
+            </div>
+            <div class="catalog-grid" id="catalog-grid">
+                <div class="dataset-card">
+                    <div class="dataset-name">Cargando catálogo...</div>
+                    <div class="dataset-desc">Esperando `data/normalized/dataset_catalog.json`.</div>
+                </div>
             </div>
         </section>
 
@@ -495,7 +687,7 @@
 
     <footer>
         <p>Procesado con ⚡ usando Python, Polars y DuckDB.</p>
-        <p>Datos obtenidos de fuentes oficiales (SUBDERE, INE y Banco Central de Chile) bajo la Ley de Transparencia 20.285.</p>
+        <p>Datos obtenidos desde BCN ArcGIS y mindicador.cl, con metadata local para trazabilidad operativa.</p>
         <p>Licencia del Consolidado: <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank">CC-BY-4.0</a></p>
     </footer>
 
@@ -514,6 +706,10 @@
         const prevBtn = document.getElementById("prev-page-btn");
         const nextBtn = document.getElementById("next-page-btn");
         const pageInfo = document.getElementById("page-info");
+        const statusSubtitle = document.getElementById("status-subtitle");
+        const statusPills = document.getElementById("status-pills");
+        const catalogGeneratedAt = document.getElementById("catalog-generated-at");
+        const catalogGrid = document.getElementById("catalog-grid");
 
         // Formateador de moneda en pesos chilenos (CLP)
         const formatCLP = new Intl.NumberFormat("es-CL", {
@@ -524,6 +720,92 @@
 
         // Formateador de número para población
         const formatNum = new Intl.NumberFormat("es-CL");
+
+        function escapeHtml(value) {
+            return String(value)
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+        }
+
+        function loadCatalog() {
+            fetch("data/normalized/dataset_catalog.json")
+                .then(res => {
+                    if (!res.ok) throw new Error("No se pudo cargar el catálogo");
+                    return res.json();
+                })
+                .then(catalog => {
+                    renderCatalog(catalog);
+                })
+                .catch(err => {
+                    console.error("Error cargando catálogo:", err);
+                    statusSubtitle.textContent = "No se pudo cargar el estado del hub local.";
+                    statusPills.innerHTML = `<span class="status-pill">Catálogo no disponible</span>`;
+                    catalogGeneratedAt.textContent = "Sin metadata local";
+                    catalogGrid.innerHTML = `
+                        <div class="dataset-card">
+                            <div class="dataset-name">Catálogo no disponible</div>
+                            <div class="dataset-desc">Compila el pipeline para generar \`data/normalized/dataset_catalog.json\`.</div>
+                        </div>
+                    `;
+                });
+        }
+
+        function renderCatalog(catalog) {
+            const datasets = catalog.datasets || [];
+            const liveCount = datasets.filter(d => d.source_mode === "live").length;
+            const warningCount = datasets.reduce((acc, d) => acc + (d.warnings?.length || 0), 0);
+
+            statusSubtitle.textContent = `${liveCount}/${datasets.length} capas operativas en modo live. ${warningCount === 0 ? "Sin warnings activos." : `${warningCount} warnings activos.`}`;
+            statusPills.innerHTML = `
+                <span class="status-pill">Capas: ${datasets.length}</span>
+                <span class="status-pill">Live: ${liveCount}</span>
+                <span class="status-pill">Warnings: ${warningCount}</span>
+            `;
+
+            catalogGeneratedAt.textContent = `Actualizado: ${catalog.generated_at_utc || "N/D"}`;
+
+            catalogGrid.innerHTML = datasets.map(dataset => {
+                const outputs = Object.keys(dataset.outputs || {}).map(key => `<span class="dataset-tag">${escapeHtml(key)}</span>`).join("");
+                const warnings = (dataset.warnings && dataset.warnings.length > 0)
+                    ? dataset.warnings.map(w => `<span class="dataset-tag">${escapeHtml(w)}</span>`).join("")
+                    : `<span class="dataset-tag">sin warnings</span>`;
+
+                return `
+                    <article class="dataset-card">
+                        <div class="dataset-card-top">
+                            <div>
+                                <div class="dataset-name">${escapeHtml(dataset.dataset)}</div>
+                                <div class="dataset-desc">${escapeHtml(dataset.description || "Sin descripción")}</div>
+                            </div>
+                            <span class="dataset-badge ${escapeHtml(dataset.source_mode || "fallback")}">${escapeHtml(dataset.source_mode || "unknown")}</span>
+                        </div>
+                        <div class="dataset-facts">
+                            <div class="dataset-fact">
+                                <span class="dataset-fact-label">Fuente</span>
+                                <span class="dataset-fact-value">${escapeHtml(dataset.source_name || "N/D")}</span>
+                            </div>
+                            <div class="dataset-fact">
+                                <span class="dataset-fact-label">Registros</span>
+                                <span class="dataset-fact-value">${escapeHtml(dataset.record_count ?? "N/D")}</span>
+                            </div>
+                            <div class="dataset-fact">
+                                <span class="dataset-fact-label">Join keys</span>
+                                <span class="dataset-fact-value">${escapeHtml((dataset.join_keys || []).join(", ") || "N/D")}</span>
+                            </div>
+                            <div class="dataset-fact">
+                                <span class="dataset-fact-label">Confianza</span>
+                                <span class="dataset-fact-value">${escapeHtml(dataset.confidence_tier || "N/D")}</span>
+                            </div>
+                        </div>
+                        <div class="dataset-tags">${outputs}</div>
+                        <div class="dataset-tags">${warnings}</div>
+                    </article>
+                `;
+            }).join("");
+        }
 
         // Cargar indicadores económicos en KPI Cards
         function loadKPIs() {
@@ -738,6 +1020,7 @@
         // Inicialización
         window.addEventListener("DOMContentLoaded", () => {
             loadKPIs();
+            loadCatalog();
             loadComunas();
         });
     </script>

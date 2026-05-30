@@ -1,5 +1,12 @@
-# Datos locales (nunca commitear)
-data/
+# Datos locales
+# Ocultamos por defecto todo `data/` y reabrimos solo artefactos livianos
+# de `data/normalized` que sirven para publicar el estado real del hub.
+data/*
+!data/normalized/
+data/normalized/*
+!data/normalized/*.json
+!data/normalized/*.md
+!data/normalized/*.parquet
 
 # Entornos virtuales de Python
 .venv/
@@ -25,3 +32,7 @@ __pycache__/
 # Sistema
 .DS_Store
 Thumbs.db
+
+
+#Ignore vscode AI rules
+.github/instructions/codacy.instructions.md

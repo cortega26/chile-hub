@@ -1,0 +1,65 @@
+name: Pipeline Check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run extractors
+        run: |
+          python src/extractors/subdere_extractor.py
+          python src/extractors/bcentral_extractor.py
+
+      - name: Build outputs
+        run: python src/build_dev_db.py
+
+      - name: Verify pipeline artifacts
+        run: python scripts/verify_pipeline.py
+
+      - name: Run hub smoke tests
+        run: python -m unittest discover -s tests
+
+      - name: Generate pipeline status
+        run: python scripts/pipeline_status.py
+
+      - name: Publish job summary
+        run: |
+          cat data/normalized/pipeline_status.md >> "$GITHUB_STEP_SUMMARY"
+          printf "\n\n" >> "$GITHUB_STEP_SUMMARY"
+          cat data/normalized/dataset_catalog.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload publishable data bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: chile-hub-publishable-bundle
+          path: |
+            data/normalized/regiones.parquet
+            data/normalized/provincias.parquet
+            data/normalized/comunas.parquet
+            data/normalized/indicadores.parquet
+            data/normalized/regiones.json
+            data/normalized/provincias.json
+            data/normalized/comunas.json
+            data/normalized/indicadores_hoy.json
+            data/normalized/pipeline_metadata.json
+            data/normalized/pipeline_status.md
+            data/normalized/dataset_catalog.json
+            data/normalized/dataset_catalog.md
+            data/normalized/artifact_manifest.json

@@ -1,0 +1,71 @@
+{
+  "generated_at_utc": "2026-05-30T20:35:29.458725+00:00",
+  "artifact_count": 13,
+  "artifacts": [
+    {
+      "path": "data/normalized/artifact_manifest.json",
+      "size_bytes": 1497,
+      "sha256": "5686124deb7e1e08f94743c28939aac5915ec2a88043186bb11e8187431ece61"
+    },
+    {
+      "path": "data/normalized/comunas.json",
+      "size_bytes": 127156,
+      "sha256": "d3f5e28720d71aa25c55f0dda2a373e8544e6d9a7614075bee015fe97888658f"
+    },
+    {
+      "path": "data/normalized/comunas.parquet",
+      "size_bytes": 11404,
+      "sha256": "9f43b927a17c1282b2edf37c0c172b36c4e137a6ce60dc96ebdc883c8c1ad07f"
+    },
+    {
+      "path": "data/normalized/dataset_catalog.json",
+      "size_bytes": 4679,
+      "sha256": "2aceb952563cc6170a7f56b45f87469c0eca22444b62dc7fb203a79546aa5fab"
+    },
+    {
+      "path": "data/normalized/dataset_catalog.md",
+      "size_bytes": 3183,
+      "sha256": "a1f3f2a001ca497242e75eff132ed7518a564ba58e1046e799077a3fbf532a9c"
+    },
+    {
+      "path": "data/normalized/indicadores.parquet",
+      "size_bytes": 1218,
+      "sha256": "9247e0c822838c9714e3073dd0c91f6526e04c212119acf7b0cf71fd62ce5b54"
+    },
+    {
+      "path": "data/normalized/indicadores_hoy.json",
+      "size_bytes": 441,
+      "sha256": "540abce1198fb042797b0931617e51ecf34b90ba78974e4eb8e667eefc8d9b97"
+    },
+    {
+      "path": "data/normalized/pipeline_metadata.json",
+      "size_bytes": 3263,
+      "sha256": "ed8fd95d66f311bf5363b1ec722b4976e06558f2df95ad2ea6cdc794646e199a"
+    },
+    {
+      "path": "data/normalized/pipeline_status.md",
+      "size_bytes": 1523,
+      "sha256": "f8cd79ad2aa339fb862391bc98641320ac5d8e4104023c27ecf6b82ce084d2ff"
+    },
+    {
+      "path": "data/normalized/provincias.json",
+      "size_bytes": 8622,
+      "sha256": "b5e791c6228377202df557c1c933c067c44131ac23895de0ccb256b015b58344"
+    },
+    {
+      "path": "data/normalized/provincias.parquet",
+      "size_bytes": 2768,
+      "sha256": "04980f32989850a0575a7ce8fca5a7c2535fd497adb127d4d2b9808f9861d21c"
+    },
+    {
+      "path": "data/normalized/regiones.json",
+      "size_bytes": 1371,
+      "sha256": "d7f3b237f53209a8021c29dae915ab42c9662aa543ba6e9896fddafdfc2bb68c"
+    },
+    {
+      "path": "data/normalized/regiones.parquet",
+      "size_bytes": 1318,
+      "sha256": "ac709667dc4409a090632c103519451b52fe1a82d3f9803de369c0ea82a2f78f"
+    }
+  ]
+}

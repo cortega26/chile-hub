@@ -1,0 +1,27 @@
+[
+  {
+    "fecha": "2025-12-01",
+    "codigo_indicador": "ipc",
+    "valor": -0.2
+  },
+  {
+    "fecha": "2026-05-01",
+    "codigo_indicador": "utm",
+    "valor": 70588.0
+  },
+  {
+    "fecha": "2026-05-29",
+    "codigo_indicador": "dolar",
+    "valor": 892.89
+  },
+  {
+    "fecha": "2026-05-29",
+    "codigo_indicador": "euro",
+    "valor": 1040.06
+  },
+  {
+    "fecha": "2026-05-30",
+    "codigo_indicador": "uf",
+    "valor": 40593.77
+  }
+]

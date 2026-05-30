@@ -1,17 +1,23 @@
 import os
 import datetime
+import json
 import requests
 import polars as pl
 
 # Configuración de rutas
 DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data"))
 STAGING_DIR = os.path.join(DATA_DIR, "staging")
+METADATA_PATH = os.path.join(STAGING_DIR, "indicadores.metadata.json")
 
 # API pública gratuita recomendada para desarrollo en Chile
 MINDICADOR_API_URL = "https://mindicador.cl/api"
 
 def ensure_directories():
     os.makedirs(STAGING_DIR, exist_ok=True)
+
+def write_metadata(metadata):
+    with open(METADATA_PATH, "w", encoding="utf-8") as f:
+        json.dump(metadata, f, ensure_ascii=False, indent=2)
 
 def fetch_live_indicators():
     print(f"Intentando descargar indicadores económicos diarios desde: {MINDICADOR_API_URL}")
@@ -93,6 +99,8 @@ def generate_fallback_indicators():
 
 def process_indicators():
     ensure_directories()
+    source_mode = "live"
+    notes = []
     
     # Intentamos obtener datos en vivo
     records = fetch_live_indicators()
@@ -100,6 +108,8 @@ def process_indicators():
     # Si la API falla, usamos el simulador estático
     if not records:
         records = generate_fallback_indicators()
+        source_mode = "fallback"
+        notes.append("fallback_due_to_live_fetch_failure")
         
     df = pl.DataFrame(records)
     
@@ -112,6 +122,19 @@ def process_indicators():
     
     output_path = os.path.join(STAGING_DIR, "indicadores.csv")
     df.write_csv(output_path)
+    metadata = {
+        "dataset": "indicadores",
+        "source_name": "mindicador.cl",
+        "source_url": MINDICADOR_API_URL,
+        "source_mode": source_mode,
+        "source_detail": "public_api" if source_mode == "live" else "generated_fallback",
+        "refreshed_at_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        "record_count": len(df),
+        "fields": df.columns,
+        "indicator_codes": sorted(df["codigo_indicador"].unique().to_list()),
+        "notes": notes,
+    }
+    write_metadata(metadata)
     print(f"Guardados indicadores normalizados en: {output_path} (Total registros: {len(df)})")
     return output_path
 
