@@ -1,6 +1,6 @@
 # chile-hub dataset catalog
 
-- `generated_at_utc`: `2026-05-30T23:19:29.538854+00:00`
+- `generated_at_utc`: `2026-05-30T23:29:15.822942+00:00`
 - `dataset_count`: `4`
 
 | Dataset | Source | Mode | Records | Confidence | Join Keys | Validation |
@@ -19,6 +19,7 @@ Capa derivada de regiones para filtros, joins y referencias administrativas de a
 - `fields`: `codigo_region, nombre_region`
 - `join_keys`: `codigo_region`
 - `outputs`: `{"parquet": "data/normalized/regiones.parquet", "json": "data/normalized/regiones.json", "duckdb_table": "regiones", "sqlite_table": "regiones", "excel_sheet": "Regiones"}`
+- `usage_examples`: `{"python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('regiones')", "duckdb": "SELECT *\nFROM 'data/normalized/regiones.parquet'\nORDER BY codigo_region;", "cli": "python -m src.chile_hub show regiones"}`
 - `warnings`: none
 - `notes`: bcn_skipped_null_code_records: 1; bcn_supplemented_missing_comunas: 1
 
@@ -31,6 +32,7 @@ Capa derivada de provincias para cruces intermedios entre region y comuna.
 - `fields`: `codigo_region, nombre_region, codigo_provincia, nombre_provincia`
 - `join_keys`: `codigo_provincia, codigo_region`
 - `outputs`: `{"parquet": "data/normalized/provincias.parquet", "json": "data/normalized/provincias.json", "duckdb_table": "provincias", "sqlite_table": "provincias", "excel_sheet": "Provincias"}`
+- `usage_examples`: `{"python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('provincias')", "duckdb": "SELECT *\nFROM 'data/normalized/provincias.parquet'\nWHERE codigo_region = '13';", "cli": "python -m src.chile_hub show provincias"}`
 - `warnings`: none
 - `notes`: bcn_skipped_null_code_records: 1; bcn_supplemented_missing_comunas: 1
 
@@ -43,6 +45,7 @@ Base territorial normalizada para cruces por region, provincia y comuna.
 - `fields`: `codigo_region, nombre_region, abreviatura, codigo_provincia, nombre_provincia, codigo_comuna, nombre_comuna, nombre_comuna_clean, latitud_cabecera, longitud_cabecera, poblacion_estimada`
 - `join_keys`: `codigo_comuna, codigo_region`
 - `outputs`: `{"parquet": "data/normalized/comunas.parquet", "json": "data/normalized/comunas.json", "duckdb_table": "comunas", "sqlite_table": "comunas", "excel_sheet": "Comunas y Regiones"}`
+- `usage_examples`: `{"python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('comunas')", "duckdb": "SELECT codigo_comuna, nombre_comuna, nombre_region\nFROM 'data/normalized/comunas.parquet'\nLIMIT 10;", "cli": "python -m src.chile_hub path comunas --output parquet"}`
 - `warnings`: none
 - `notes`: bcn_skipped_null_code_records: 1; bcn_supplemented_missing_comunas: 1
 
@@ -55,4 +58,5 @@ Serie de indicadores economicos diarios de referencia para analisis y software.
 - `fields`: `fecha, codigo_indicador, valor`
 - `join_keys`: `fecha, codigo_indicador`
 - `outputs`: `{"parquet": "data/normalized/indicadores.parquet", "json": "data/normalized/indicadores_hoy.json", "duckdb_table": "indicadores", "sqlite_table": "indicadores", "excel_sheet": "Indicadores Diarios"}`
+- `usage_examples`: `{"python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('indicadores')", "duckdb": "SELECT *\nFROM 'data/normalized/indicadores.parquet'\nORDER BY fecha DESC, codigo_indicador;", "cli": "python -m src.chile_hub show indicadores"}`
 - `warnings`: none

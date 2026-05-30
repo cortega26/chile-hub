@@ -1,6 +1,6 @@
 # chile-hub pipeline status
 
-- `generated_at_utc`: `2026-05-30T23:19:29.538854+00:00`
+- `generated_at_utc`: `2026-05-30T23:29:15.822942+00:00`
 
 | Dataset | Source | Mode | Detail | Records | Validation | Warnings |
 | :--- | :--- | :--- | :--- | ---: | :--- | :--- |

@@ -1,11 +1,11 @@
 {
-  "generated_at_utc": "2026-05-30T23:19:29.539732+00:00",
+  "generated_at_utc": "2026-05-30T23:29:15.824275+00:00",
   "artifact_count": 13,
   "artifacts": [
     {
       "path": "data/normalized/artifact_manifest.json",
       "size_bytes": 2363,
-      "sha256": "d0b202136304e0ba36b48d450ebf72dd4bf0222bd2ae0028d96f69a3c11c23cf"
+      "sha256": "2143f7952b09234a72a46ad3f8c8827fe4ec26357785cfe8ff565edaa0300a84"
     },
     {
       "path": "data/normalized/comunas.json",
@@ -19,13 +19,13 @@
     },
     {
       "path": "data/normalized/dataset_catalog.json",
-      "size_bytes": 4679,
-      "sha256": "f861979135ffd3f8850c8f7a6fd25444252b24874b11fc906901ffbad895fc37"
+      "size_bytes": 5939,
+      "sha256": "c0eaa61ba4f3ec0b69702f72f3a6e31883db6911e29244c9e1bf079221ddfd25"
     },
     {
       "path": "data/normalized/dataset_catalog.md",
-      "size_bytes": 3183,
-      "sha256": "f8de36ccaff49d18cdf185249901514256febc614cea979e6ae9a93f0dbf6297"
+      "size_bytes": 4303,
+      "sha256": "501c7095a99d6ef0bf129ac11d0e4080d5bb1558c1232a06b86004ef008a41b3"
     },
     {
       "path": "data/normalized/indicadores.parquet",
@@ -40,12 +40,12 @@
     {
       "path": "data/normalized/pipeline_metadata.json",
       "size_bytes": 3263,
-      "sha256": "b9197567ddc659b6a65076d622908302bfc3a2c3b4a73a70d064e3f4262beb97"
+      "sha256": "6c7cfe45c60bfe1e1ba6b408c26a9bb0404ea309a39c85aafa831117c3cf0d2c"
     },
     {
       "path": "data/normalized/pipeline_status.md",
       "size_bytes": 1523,
-      "sha256": "3df2d27e2c98bf9b77b0f57e5593166147ba4c30fb0260016ed7f35b619760e8"
+      "sha256": "d77b028b8c1896f933fba10c12b6af4363c2fef7fa6153ac08d8d5f245433d0c"
     },
     {
       "path": "data/normalized/provincias.json",

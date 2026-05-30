@@ -44,6 +44,16 @@ class ChileHub:
         path = self.get_output_path(dataset_name, "parquet")
         return pl.read_parquet(path)
 
+    def example_usage(self, dataset_name, kind="python"):
+        dataset = self.get_dataset(dataset_name)
+        examples = dataset.get("usage_examples", {})
+        if kind not in examples:
+            available = ", ".join(sorted(examples.keys()))
+            raise KeyError(
+                f"Example '{kind}' no existe para '{dataset_name}'. Disponibles: {available}"
+            )
+        return examples[kind]
+
     def summary(self):
         return [
             {
@@ -75,6 +85,14 @@ def build_parser():
         help="Tipo de output a resolver, por ejemplo parquet, json o sqlite_table",
     )
 
+    example_parser = subparsers.add_parser("example", help="Mostrar ejemplo de uso de un dataset")
+    example_parser.add_argument("dataset", help="Nombre del dataset")
+    example_parser.add_argument(
+        "--kind",
+        default="python",
+        help="Tipo de ejemplo a mostrar, por ejemplo python, duckdb o cli",
+    )
+
     subparsers.add_parser("summary", help="Mostrar resumen breve de datasets")
     return parser
 
@@ -95,6 +113,10 @@ def main():
 
     if args.command == "path":
         print(hub.get_output_path(args.dataset, args.output))
+        return
+
+    if args.command == "example":
+        print(hub.example_usage(args.dataset, args.kind))
         return
 
     if args.command == "summary":

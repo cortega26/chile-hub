@@ -153,6 +153,9 @@ def build_dataset_catalog_markdown(catalog):
         lines.append(f"- `fields`: `{', '.join(entry.get('fields', []))}`")
         lines.append(f"- `join_keys`: `{', '.join(entry.get('join_keys', []))}`")
         lines.append(f"- `outputs`: `{json.dumps(entry.get('outputs', {}), ensure_ascii=False)}`")
+        usage_examples = entry.get("usage_examples", {})
+        if usage_examples:
+            lines.append(f"- `usage_examples`: `{json.dumps(usage_examples, ensure_ascii=False)}`")
 
         warnings = entry.get("warnings", [])
         if warnings:

@@ -155,7 +155,8 @@
         }
 
         .status-banner,
-        .catalog-section {
+        .catalog-section,
+        .quickstart-section {
             background: var(--panel-bg);
             border: 1px solid var(--border-color);
             border-radius: 16px;
@@ -195,6 +196,13 @@
             gap: 0.75rem;
         }
 
+        .status-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            width: 100%;
+        }
+
         .status-pill {
             padding: 0.65rem 0.9rem;
             border-radius: 999px;
@@ -228,6 +236,83 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 1rem;
+        }
+
+        .quickstart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1rem;
+        }
+
+        .quickstart-card {
+            background: rgba(10, 15, 25, 0.45);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+        }
+
+        .quickstart-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .quickstart-desc {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+
+        .quickstart-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .quickstart-copy {
+            flex-shrink: 0;
+            padding: 0.45rem 0.7rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-secondary);
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .quickstart-copy:hover {
+            border-color: rgba(34, 211, 238, 0.25);
+            background: rgba(34, 211, 238, 0.08);
+            color: var(--accent-cyan);
+        }
+
+        .quickstart-copy.copied {
+            color: #052e28;
+            background: rgba(52, 211, 153, 0.85);
+            border-color: rgba(52, 211, 153, 0.45);
+        }
+
+        .quickstart-code {
+            margin: 0;
+            padding: 0.95rem 1rem;
+            border-radius: 12px;
+            background: rgba(3, 7, 18, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: #d1fae5;
+            font-size: 0.82rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
         }
 
         .dataset-card {
@@ -308,6 +393,44 @@
             display: flex;
             flex-wrap: wrap;
             gap: 0.5rem;
+        }
+
+        .dataset-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-top: 0.15rem;
+        }
+
+        .dataset-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 0.75rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .dataset-action:hover {
+            border-color: rgba(34, 211, 238, 0.25);
+            background: rgba(34, 211, 238, 0.08);
+            color: var(--accent-cyan);
+        }
+
+        .dataset-action.muted {
+            color: var(--text-secondary);
+        }
+
+        .dataset-meta-line {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            line-height: 1.5;
         }
 
         .dataset-tag {
@@ -572,7 +695,7 @@
             <p>Capas de datos chilenas curadas para análisis, software y cruces confiables</p>
         </div>
         <div class="actions-group">
-            <a href="https://github.com/carlos/chile-hub" target="_blank" class="btn btn-secondary">
+            <a href="https://github.com/cortega26/chile-hub" target="_blank" class="btn btn-secondary">
                 <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"/></svg>
                 GitHub Repo
             </a>
@@ -612,6 +735,12 @@
             <div class="status-pills" id="status-pills">
                 <span class="status-pill">Cargando catálogo…</span>
             </div>
+            <div class="status-actions" id="status-actions">
+                <a class="dataset-action muted" href="data/normalized/pipeline_status.md" target="_blank" rel="noopener noreferrer">Status</a>
+                <a class="dataset-action muted" href="data/normalized/dataset_catalog.json" target="_blank" rel="noopener noreferrer">Catalog JSON</a>
+                <a class="dataset-action muted" href="data/normalized/dataset_catalog.md" target="_blank" rel="noopener noreferrer">Catalog MD</a>
+                <a class="dataset-action muted" href="data/normalized/artifact_manifest.json" target="_blank" rel="noopener noreferrer">Manifest</a>
+            </div>
         </section>
 
         <section class="catalog-section">
@@ -627,6 +756,49 @@
                     <div class="dataset-name">Cargando catálogo...</div>
                     <div class="dataset-desc">Esperando `data/normalized/dataset_catalog.json`.</div>
                 </div>
+            </div>
+        </section>
+
+        <section class="quickstart-section">
+            <div class="catalog-header">
+                <div>
+                    <div class="catalog-title">Uso rápido</div>
+                    <div class="catalog-meta">Tres formas simples de empezar a consumir el hub según tu flujo de trabajo.</div>
+                </div>
+            </div>
+            <div class="quickstart-grid">
+                <article class="quickstart-card">
+                    <div class="quickstart-head">
+                        <div class="quickstart-title">Python + helper</div>
+                        <button class="quickstart-copy" data-copy-target="quickstart-python">Copiar</button>
+                    </div>
+                    <div class="quickstart-desc">Ideal si quieres descubrir capas y cargar Parquet sin recordar paths manualmente.</div>
+                    <pre class="quickstart-code" id="quickstart-python">from src.chile_hub import ChileHub
+
+hub = ChileHub()
+print(hub.list_datasets())
+df = hub.load_polars("comunas")</pre>
+                </article>
+                <article class="quickstart-card">
+                    <div class="quickstart-head">
+                        <div class="quickstart-title">DuckDB directo</div>
+                        <button class="quickstart-copy" data-copy-target="quickstart-duckdb">Copiar</button>
+                    </div>
+                    <div class="quickstart-desc">Útil para explorar datasets rápido desde SQL sin depender de otro stack.</div>
+                    <pre class="quickstart-code" id="quickstart-duckdb">SELECT *
+FROM 'data/normalized/comunas.parquet'
+LIMIT 10;</pre>
+                </article>
+                <article class="quickstart-card">
+                    <div class="quickstart-head">
+                        <div class="quickstart-title">CLI y refresh local</div>
+                        <button class="quickstart-copy" data-copy-target="quickstart-cli">Copiar</button>
+                    </div>
+                    <div class="quickstart-desc">La ruta más corta para reconstruir el hub y revisar su estado local.</div>
+                    <pre class="quickstart-code" id="quickstart-cli">make refresh
+make status
+make hub-list</pre>
+                </article>
             </div>
         </section>
 
@@ -708,8 +880,11 @@
         const pageInfo = document.getElementById("page-info");
         const statusSubtitle = document.getElementById("status-subtitle");
         const statusPills = document.getElementById("status-pills");
+        const statusActions = document.getElementById("status-actions");
         const catalogGeneratedAt = document.getElementById("catalog-generated-at");
         const catalogGrid = document.getElementById("catalog-grid");
+        const quickstartCopyButtons = document.querySelectorAll(".quickstart-copy");
+        let artifactManifestByPath = {};
 
         // Formateador de moneda en pesos chilenos (CLP)
         const formatCLP = new Intl.NumberFormat("es-CL", {
@@ -730,19 +905,87 @@
                 .replaceAll("'", "&#039;");
         }
 
+        function formatTimestamp(isoValue) {
+            if (!isoValue) return "N/D";
+            const date = new Date(isoValue);
+            if (Number.isNaN(date.getTime())) return isoValue;
+            return new Intl.DateTimeFormat("es-CL", {
+                dateStyle: "medium",
+                timeStyle: "short"
+            }).format(date);
+        }
+
+        function formatBytes(sizeBytes) {
+            if (typeof sizeBytes !== "number" || Number.isNaN(sizeBytes)) return "";
+            if (sizeBytes < 1024) return `${sizeBytes} B`;
+            if (sizeBytes < 1024 * 1024) return `${(sizeBytes / 1024).toFixed(1)} KB`;
+            return `${(sizeBytes / (1024 * 1024)).toFixed(2)} MB`;
+        }
+
+        function buildArtifactLink(path, label) {
+            if (!path) return "";
+            const manifestEntry = artifactManifestByPath[path];
+            const sizeLabel = manifestEntry ? ` · ${formatBytes(manifestEntry.size_bytes)}` : "";
+            return `
+                <a class="dataset-action" href="${escapeHtml(path)}" target="_blank" rel="noopener noreferrer">
+                    ${escapeHtml(label)}${escapeHtml(sizeLabel)}
+                </a>
+            `;
+        }
+
+        function buildSimpleLink(path, label) {
+            if (!path) return "";
+            return `
+                <a class="dataset-action muted" href="${escapeHtml(path)}" target="_blank" rel="noopener noreferrer">
+                    ${escapeHtml(label)}
+                </a>
+            `;
+        }
+
+        function fallbackCopyText(text) {
+            const textarea = document.createElement("textarea");
+            textarea.value = text;
+            textarea.setAttribute("readonly", "");
+            textarea.style.position = "absolute";
+            textarea.style.left = "-9999px";
+            document.body.appendChild(textarea);
+            textarea.select();
+            textarea.setSelectionRange(0, textarea.value.length);
+
+            let copied = false;
+            try {
+                copied = document.execCommand("copy");
+            } catch (error) {
+                copied = false;
+            }
+
+            document.body.removeChild(textarea);
+            return copied;
+        }
+
         function loadCatalog() {
-            fetch("data/normalized/dataset_catalog.json")
-                .then(res => {
+            Promise.all([
+                fetch("data/normalized/dataset_catalog.json").then(res => {
                     if (!res.ok) throw new Error("No se pudo cargar el catálogo");
                     return res.json();
-                })
-                .then(catalog => {
+                }),
+                fetch("data/normalized/artifact_manifest.json")
+                    .then(res => res.ok ? res.json() : null)
+                    .catch(() => null)
+            ])
+                .then(([catalog, manifest]) => {
+                    artifactManifestByPath = Object.fromEntries(
+                        (manifest?.artifacts || []).map(entry => [entry.path, entry])
+                    );
                     renderCatalog(catalog);
                 })
                 .catch(err => {
                     console.error("Error cargando catálogo:", err);
                     statusSubtitle.textContent = "No se pudo cargar el estado del hub local.";
                     statusPills.innerHTML = `<span class="status-pill">Catálogo no disponible</span>`;
+                    statusActions.innerHTML = `
+                        <a class="dataset-action muted" href="data/normalized/dataset_catalog.json" target="_blank" rel="noopener noreferrer">Catalog JSON</a>
+                    `;
                     catalogGeneratedAt.textContent = "Sin metadata local";
                     catalogGrid.innerHTML = `
                         <div class="dataset-card">
@@ -764,14 +1007,27 @@
                 <span class="status-pill">Live: ${liveCount}</span>
                 <span class="status-pill">Warnings: ${warningCount}</span>
             `;
+            statusActions.innerHTML = `
+                ${buildSimpleLink("data/normalized/pipeline_status.md", "Status")}
+                ${buildSimpleLink("data/normalized/dataset_catalog.json", "Catalog JSON")}
+                ${buildSimpleLink("data/normalized/dataset_catalog.md", "Catalog MD")}
+                ${buildSimpleLink("data/normalized/artifact_manifest.json", "Manifest")}
+            `;
 
-            catalogGeneratedAt.textContent = `Actualizado: ${catalog.generated_at_utc || "N/D"}`;
+            catalogGeneratedAt.textContent = `Actualizado: ${formatTimestamp(catalog.generated_at_utc)}`;
 
             catalogGrid.innerHTML = datasets.map(dataset => {
                 const outputs = Object.keys(dataset.outputs || {}).map(key => `<span class="dataset-tag">${escapeHtml(key)}</span>`).join("");
                 const warnings = (dataset.warnings && dataset.warnings.length > 0)
                     ? dataset.warnings.map(w => `<span class="dataset-tag">${escapeHtml(w)}</span>`).join("")
                     : `<span class="dataset-tag">sin warnings</span>`;
+                const jsonPath = dataset.outputs?.json;
+                const parquetPath = dataset.outputs?.parquet;
+                const docsPath = dataset.documentation;
+                const sourceUrl = dataset.source_url;
+                const recordCount = typeof dataset.record_count === "number"
+                    ? formatNum.format(dataset.record_count)
+                    : "N/D";
 
                 return `
                     <article class="dataset-card">
@@ -789,7 +1045,7 @@
                             </div>
                             <div class="dataset-fact">
                                 <span class="dataset-fact-label">Registros</span>
-                                <span class="dataset-fact-value">${escapeHtml(dataset.record_count ?? "N/D")}</span>
+                                <span class="dataset-fact-value">${escapeHtml(recordCount)}</span>
                             </div>
                             <div class="dataset-fact">
                                 <span class="dataset-fact-label">Join keys</span>
@@ -800,11 +1056,54 @@
                                 <span class="dataset-fact-value">${escapeHtml(dataset.confidence_tier || "N/D")}</span>
                             </div>
                         </div>
+                        <div class="dataset-meta-line">
+                            Validación: <strong>${escapeHtml(dataset.validation_status || "N/D")}</strong> ·
+                            Actualizado: ${escapeHtml(formatTimestamp(dataset.refreshed_at_utc))}
+                        </div>
+                        <div class="dataset-actions">
+                            ${docsPath ? `<a class="dataset-action muted" href="${escapeHtml(docsPath)}" target="_blank" rel="noopener noreferrer">Docs</a>` : ""}
+                            ${sourceUrl ? `<a class="dataset-action muted" href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">Fuente</a>` : ""}
+                            ${buildArtifactLink(parquetPath, "Parquet")}
+                            ${buildArtifactLink(jsonPath, "JSON")}
+                        </div>
                         <div class="dataset-tags">${outputs}</div>
                         <div class="dataset-tags">${warnings}</div>
                     </article>
                 `;
             }).join("");
+        }
+
+        async function copyQuickstartSnippet(button) {
+            const targetId = button.dataset.copyTarget;
+            const target = document.getElementById(targetId);
+            if (!target) return;
+
+            const text = target.innerText;
+            const originalLabel = button.textContent;
+
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(text);
+                } else if (!fallbackCopyText(text)) {
+                    throw new Error("clipboard_unavailable");
+                }
+                button.textContent = "Copiado";
+                button.classList.add("copied");
+            } catch (error) {
+                const copied = fallbackCopyText(text);
+                if (copied) {
+                    button.textContent = "Copiado";
+                    button.classList.add("copied");
+                } else {
+                    console.error("No se pudo copiar el snippet:", error);
+                    button.textContent = "Error";
+                }
+            }
+
+            window.setTimeout(() => {
+                button.textContent = originalLabel;
+                button.classList.remove("copied");
+            }, 1400);
         }
 
         // Cargar indicadores económicos en KPI Cards
@@ -1015,6 +1314,12 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+        });
+
+        quickstartCopyButtons.forEach(button => {
+            button.addEventListener("click", () => {
+                copyQuickstartSnippet(button);
+            });
         });
 
         // Inicialización

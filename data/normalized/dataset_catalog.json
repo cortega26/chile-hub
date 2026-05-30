@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-05-30T23:19:29.538854+00:00",
+  "generated_at_utc": "2026-05-30T23:29:15.822942+00:00",
   "dataset_count": 4,
   "datasets": [
     {
@@ -19,6 +19,11 @@
         "codigo_region"
       ],
       "confidence_tier": "Tier B",
+      "usage_examples": {
+        "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('regiones')",
+        "duckdb": "SELECT *\nFROM 'data/normalized/regiones.parquet'\nORDER BY codigo_region;",
+        "cli": "python -m src.chile_hub show regiones"
+      },
       "outputs": {
         "parquet": "data/normalized/regiones.parquet",
         "json": "data/normalized/regiones.json",
@@ -54,6 +59,11 @@
         "codigo_region"
       ],
       "confidence_tier": "Tier B",
+      "usage_examples": {
+        "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('provincias')",
+        "duckdb": "SELECT *\nFROM 'data/normalized/provincias.parquet'\nWHERE codigo_region = '13';",
+        "cli": "python -m src.chile_hub show provincias"
+      },
       "outputs": {
         "parquet": "data/normalized/provincias.parquet",
         "json": "data/normalized/provincias.json",
@@ -96,6 +106,11 @@
         "codigo_region"
       ],
       "confidence_tier": "Tier B",
+      "usage_examples": {
+        "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('comunas')",
+        "duckdb": "SELECT codigo_comuna, nombre_comuna, nombre_region\nFROM 'data/normalized/comunas.parquet'\nLIMIT 10;",
+        "cli": "python -m src.chile_hub path comunas --output parquet"
+      },
       "outputs": {
         "parquet": "data/normalized/comunas.parquet",
         "json": "data/normalized/comunas.json",
@@ -130,6 +145,11 @@
         "codigo_indicador"
       ],
       "confidence_tier": "Tier A/B",
+      "usage_examples": {
+        "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('indicadores')",
+        "duckdb": "SELECT *\nFROM 'data/normalized/indicadores.parquet'\nORDER BY fecha DESC, codigo_indicador;",
+        "cli": "python -m src.chile_hub show indicadores"
+      },
       "outputs": {
         "parquet": "data/normalized/indicadores.parquet",
         "json": "data/normalized/indicadores_hoy.json",

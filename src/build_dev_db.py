@@ -24,6 +24,11 @@ DATASET_CATALOG_CONFIG = {
         "description": "Capa derivada de regiones para filtros, joins y referencias administrativas de alto nivel.",
         "join_keys": ["codigo_region"],
         "confidence_tier": "Tier B",
+        "usage_examples": {
+            "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('regiones')",
+            "duckdb": "SELECT *\nFROM 'data/normalized/regiones.parquet'\nORDER BY codigo_region;",
+            "cli": "python -m src.chile_hub show regiones",
+        },
         "outputs": {
             "parquet": "data/normalized/regiones.parquet",
             "json": "data/normalized/regiones.json",
@@ -37,6 +42,11 @@ DATASET_CATALOG_CONFIG = {
         "description": "Capa derivada de provincias para cruces intermedios entre region y comuna.",
         "join_keys": ["codigo_provincia", "codigo_region"],
         "confidence_tier": "Tier B",
+        "usage_examples": {
+            "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('provincias')",
+            "duckdb": "SELECT *\nFROM 'data/normalized/provincias.parquet'\nWHERE codigo_region = '13';",
+            "cli": "python -m src.chile_hub show provincias",
+        },
         "outputs": {
             "parquet": "data/normalized/provincias.parquet",
             "json": "data/normalized/provincias.json",
@@ -50,6 +60,11 @@ DATASET_CATALOG_CONFIG = {
         "description": "Base territorial normalizada para cruces por region, provincia y comuna.",
         "join_keys": ["codigo_comuna", "codigo_region"],
         "confidence_tier": "Tier B",
+        "usage_examples": {
+            "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('comunas')",
+            "duckdb": "SELECT codigo_comuna, nombre_comuna, nombre_region\nFROM 'data/normalized/comunas.parquet'\nLIMIT 10;",
+            "cli": "python -m src.chile_hub path comunas --output parquet",
+        },
         "outputs": {
             "parquet": "data/normalized/comunas.parquet",
             "json": "data/normalized/comunas.json",
@@ -63,6 +78,11 @@ DATASET_CATALOG_CONFIG = {
         "description": "Serie de indicadores economicos diarios de referencia para analisis y software.",
         "join_keys": ["fecha", "codigo_indicador"],
         "confidence_tier": "Tier A/B",
+        "usage_examples": {
+            "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('indicadores')",
+            "duckdb": "SELECT *\nFROM 'data/normalized/indicadores.parquet'\nORDER BY fecha DESC, codigo_indicador;",
+            "cli": "python -m src.chile_hub show indicadores",
+        },
         "outputs": {
             "parquet": "data/normalized/indicadores.parquet",
             "json": "data/normalized/indicadores_hoy.json",
@@ -198,6 +218,7 @@ def write_dataset_catalog(pipeline_metadata):
                 "fields": dataset_metadata.get("fields", []),
                 "join_keys": config.get("join_keys", []),
                 "confidence_tier": config.get("confidence_tier"),
+                "usage_examples": config.get("usage_examples", {}),
                 "outputs": config.get("outputs", {}),
                 "documentation": config.get("documentation"),
                 "validation_status": validation.get("status"),

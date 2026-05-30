@@ -44,6 +44,11 @@ class ChileHubTests(unittest.TestCase):
             {"regiones": "ok", "provincias": "ok", "comunas": "ok", "indicadores": "ok"},
         )
 
+    def test_example_usage(self):
+        example = self.hub.example_usage("comunas", "python")
+        self.assertIn("ChileHub", example)
+        self.assertIn("load_polars('comunas')", example)
+
     def test_unknown_dataset_raises(self):
         with self.assertRaises(KeyError):
             self.hub.get_dataset("no-existe")
@@ -66,6 +71,13 @@ class ArtifactContractTests(unittest.TestCase):
         self.assertIn("data/normalized/regiones.parquet", artifact_paths)
         self.assertIn("data/normalized/provincias.parquet", artifact_paths)
         self.assertIn("data/normalized/comunas.parquet", artifact_paths)
+
+    def test_catalog_usage_examples_present(self):
+        for dataset in self.catalog["datasets"]:
+            examples = dataset.get("usage_examples", {})
+            self.assertIn("python", examples)
+            self.assertIn("duckdb", examples)
+            self.assertIn("cli", examples)
 
     def test_manifest_hashes_present(self):
         for artifact in self.manifest["artifacts"]:
@@ -93,6 +105,10 @@ class ChileHubCliTests(unittest.TestCase):
     def test_cli_path(self):
         result = self.run_cli("path", "comunas", "--output", "parquet")
         self.assertTrue(result.stdout.strip().endswith("data/normalized/comunas.parquet"))
+
+    def test_cli_example(self):
+        result = self.run_cli("example", "indicadores", "--kind", "duckdb")
+        self.assertIn("data/normalized/indicadores.parquet", result.stdout)
 
 
 if __name__ == "__main__":

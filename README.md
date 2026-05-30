@@ -297,6 +297,10 @@ make status
 
 Ese comando también genera `data/normalized/pipeline_status.md`.
 La landing local en `index.html` consume `dataset_catalog.json` para reflejar el estado real de las capas publicadas.
+También expone links directos a documentación y artefactos `JSON`/`Parquet` por dataset usando `dataset_catalog.json` y `artifact_manifest.json`.
+Además deja accesos rápidos a `pipeline_status.md`, `dataset_catalog.json`, `dataset_catalog.md` y `artifact_manifest.json`, junto con la URL fuente de cada capa.
+También incluye recetas breves de consumo para `Python`, `DuckDB` y la `CLI` local del proyecto.
+Esas recetas en la landing son copiables directamente desde la interfaz.
 El workflow de CI publica un artifact `chile-hub-publishable-bundle` con los outputs ligeros y el manifest asociado.
 
 ## Criterio para crecer
