@@ -4,6 +4,33 @@ from datetime import datetime, timezone
 import requests
 import polars as pl
 
+# curl_cffi impersona el fingerprint TLS de Chrome, evitando bloqueos a nivel de TLS
+# que rechazan al user-agent por defecto de la librería requests de Python.
+try:
+    from curl_cffi import requests as _cffi_requests
+    _CURL_CFFI_AVAILABLE = True
+except ImportError:
+    _CURL_CFFI_AVAILABLE = False
+
+
+def _stealth_get(url: str, **kwargs):
+    """
+    HTTP GET con impersonación de Chrome (curl_cffi) cuando está disponible,
+    con fallback a requests estándar + headers de navegador.
+    Resuelve rechazos TLS de servidores que bloquean fingerprints de Python.
+    """
+    if _CURL_CFFI_AVAILABLE:
+        return _cffi_requests.get(url, impersonate="chrome124", **kwargs)
+    # Fallback: headers de navegador para evitar bloqueos por User-Agent
+    headers = kwargs.pop("headers", {})
+    headers.setdefault("User-Agent",
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+    )
+    headers.setdefault("Accept", "application/json, text/plain, */*")
+    headers.setdefault("Accept-Language", "es-CL,es;q=0.9,en;q=0.8")
+    return requests.get(url, headers=headers, **kwargs)
+
 # Configuración de rutas
 DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data"))
 RAW_DIR = os.path.join(DATA_DIR, "raw")
@@ -120,11 +147,10 @@ def fetch_bcn_comunas():
     params = {
         "where": "1=1",
         "outFields": "nom_reg,nom_prov,nom_com,cod_comuna,codregion",
-        "returnGeometry": "true",   # Solicitar geometría para extraer coordenadas
-        "outSR": "4326",             # WGS84: x=longitud, y=latitud
+        "returnGeometry": "false",   # Capa_Factores es tabla de atributos, sin geometría
         "f": "json",
     }
-    response = requests.get(BCN_COMUNAS_SERVICE_URL, params=params, timeout=90)
+    response = _stealth_get(BCN_COMUNAS_SERVICE_URL, params=params, timeout=60)
     response.raise_for_status()
     payload = response.json()
     # Persistir snapshot raw para trazabilidad
@@ -301,6 +327,37 @@ def normalize_dpa():
         "poblacion_estimada"
     ])
     
+    # ── Enriquecimiento de coordenadas desde tabla de referencia estática ────────
+    # Aplica las coords del CSV a cualquier comuna con latitud_cabecera == 0.0.
+    # Funciona para datos en vivo (BCN sin geometría) y datos de fallback.
+    _coords_csv = os.path.join(
+        os.path.dirname(__file__), "../data/comunas_coords.csv"
+    )
+    if os.path.exists(_coords_csv):
+        coords_ref = pl.read_csv(
+            _coords_csv,
+            schema_overrides={"codigo_comuna": pl.String},
+        ).rename({"latitud": "_lat_ref", "longitud": "_lon_ref"})
+        df_clean = (
+            df_clean
+            .join(coords_ref, on="codigo_comuna", how="left")
+            .with_columns([
+                pl.when(pl.col("latitud_cabecera") == 0.0)
+                  .then(pl.col("_lat_ref"))
+                  .otherwise(pl.col("latitud_cabecera"))
+                  .alias("latitud_cabecera"),
+                pl.when(pl.col("longitud_cabecera") == 0.0)
+                  .then(pl.col("_lon_ref"))
+                  .otherwise(pl.col("longitud_cabecera"))
+                  .alias("longitud_cabecera"),
+            ])
+            .drop(["_lat_ref", "_lon_ref"])
+        )
+        _coords_filled = df_clean.filter(pl.col("latitud_cabecera") != 0.0).height
+        print(f"Coordenadas: {_coords_filled}/{df_clean.height} comunas con coords no-cero.")
+    else:
+        print("Advertencia: tabla de referencia de coordenadas no encontrada.")
+
     output_path = os.path.join(STAGING_DIR, "comunas.csv")
     df_clean.write_csv(output_path)
     source_name = "SUBDERE"
