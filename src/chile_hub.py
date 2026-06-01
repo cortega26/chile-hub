@@ -137,6 +137,38 @@ class ChileHub:
             f"Reporte '{shared_type}' con formato '{format}' no existe en el bundle."
         )
 
+    def overview(self):
+        health = self.health()
+        bundle = self.bundle()
+        packages = self.packages()
+        shared_artifacts = self.shared_artifacts()
+        return {
+            "generated_at_utc": health.get("generated_at_utc"),
+            "overall_status": health.get("overall_status"),
+            "dataset_count": health.get("dataset_count"),
+            "live_count": health.get("live_count"),
+            "fallback_count": health.get("fallback_count"),
+            "stale_count": health.get("stale_count"),
+            "drifted_count": health.get("drifted_count"),
+            "degraded_count": health.get("degraded_count"),
+            "partial_coverage_count": health.get("partial_coverage_count"),
+            "warning_count": health.get("warning_count"),
+            "shared_artifact_count": len(shared_artifacts),
+            "package_count": len(packages),
+            "report_keys": sorted(bundle.get("reports", {}).keys()),
+            "datasets": [
+                {
+                    "dataset": entry.get("dataset"),
+                    "source_mode": entry.get("source_mode"),
+                    "validation_status": entry.get("validation_status"),
+                    "freshness_status": entry.get("freshness_status"),
+                    "coverage_status": entry.get("coverage_status"),
+                    "drift_status": entry.get("drift_status"),
+                }
+                for entry in health.get("datasets", [])
+            ],
+        }
+
     def inventory(self):
         inventory = []
         manifest_artifacts = self.artifacts()
@@ -249,6 +281,7 @@ def build_parser():
     report_parser.add_argument("--format", default="json", help="Formato del reporte, por ejemplo json o markdown")
 
     subparsers.add_parser("inventory", help="Mostrar inventario compacto de datasets y artefactos")
+    subparsers.add_parser("overview", help="Mostrar vista agregada compacta del hub")
     subparsers.add_parser("health", help="Mostrar salud agregada del hub")
     subparsers.add_parser("bundle", help="Mostrar bundle consolidado del hub")
     subparsers.add_parser("packages", help="Mostrar paquetes publicables del hub")
@@ -296,6 +329,10 @@ def main():
 
     if args.command == "inventory":
         print(json.dumps(hub.inventory(), ensure_ascii=False, indent=2))
+        return
+
+    if args.command == "overview":
+        print(json.dumps(hub.overview(), ensure_ascii=False, indent=2))
         return
 
     if args.command == "health":

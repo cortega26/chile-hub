@@ -31,6 +31,10 @@ REQUIRED_FILES = [
     NORMALIZED_DIR / "redistribution_report.md",
     NORMALIZED_DIR / "provenance_report.json",
     NORMALIZED_DIR / "provenance_report.md",
+    NORMALIZED_DIR / "drift_report.json",
+    NORMALIZED_DIR / "drift_report.md",
+    NORMALIZED_DIR / "overview.json",
+    NORMALIZED_DIR / "overview.md",
     NORMALIZED_DIR / "dataset_catalog.json",
     NORMALIZED_DIR / "dataset_catalog.md",
     NORMALIZED_DIR / "artifact_manifest.json",
@@ -266,6 +270,8 @@ def verify_artifact_manifest():
         "data/normalized/provenance_report.md",
         "data/normalized/drift_report.json",
         "data/normalized/drift_report.md",
+        "data/normalized/overview.json",
+        "data/normalized/overview.md",
         "data/normalized/dataset_catalog.json",
         "data/normalized/dataset_catalog.md",
     }
@@ -286,6 +292,7 @@ def verify_artifact_manifest():
                 "data/normalized/redistribution_report.json",
                 "data/normalized/provenance_report.json",
                 "data/normalized/drift_report.json",
+                "data/normalized/overview.json",
                 "data/normalized/dataset_catalog.json",
                 "data/normalized/artifact_manifest.json",
             }:
@@ -310,6 +317,7 @@ def verify_artifact_manifest():
             "data/normalized/redistribution_report.json",
             "data/normalized/provenance_report.json",
             "data/normalized/drift_report.json",
+            "data/normalized/overview.json",
             "data/normalized/dataset_catalog.json",
             "data/normalized/artifact_manifest.json",
         }:
@@ -323,6 +331,7 @@ def verify_artifact_manifest():
             "data/normalized/redistribution_report.md",
             "data/normalized/provenance_report.md",
             "data/normalized/drift_report.md",
+            "data/normalized/overview.md",
             "data/normalized/dataset_catalog.md",
         }:
             if not entry.get("shared_type"):
@@ -351,6 +360,10 @@ def verify_artifact_manifest():
         fail(f"artifact_manifest.json has invalid package_type: {package}")
     if package.get("checksum_path") != "data/normalized/chile-hub-publishable-bundle.zip.sha256":
         fail(f"artifact_manifest.json has invalid checksum_path: {package}")
+    if package.get("checksum_algorithm") != "sha256":
+        fail(f"artifact_manifest.json has invalid checksum_algorithm: {package}")
+    if package.get("verification_command") != "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256":
+        fail(f"artifact_manifest.json has invalid verification_command: {package}")
     if not package.get("sha256") or package.get("size_bytes", 0) <= 0:
         fail(f"artifact_manifest.json has invalid package metadata: {package}")
 
@@ -426,6 +439,8 @@ def verify_hub_bundle():
         "provenance_markdown": ("provenance_report", "markdown"),
         "drift_json": ("drift_report", "json"),
         "drift_markdown": ("drift_report", "markdown"),
+        "overview_json": ("overview", "json"),
+        "overview_markdown": ("overview", "markdown"),
         "catalog_json": ("dataset_catalog", "json"),
         "catalog_markdown": ("dataset_catalog", "markdown"),
         "manifest_json": ("artifact_manifest", "json"),
@@ -461,6 +476,10 @@ def verify_hub_bundle():
     packages = bundle.get("packages", [])
     if len(packages) != 1 or packages[0].get("package_type") != "zip":
         fail(f"hub_bundle.json has invalid packages metadata: {packages}")
+    if packages[0].get("checksum_algorithm") != "sha256":
+        fail(f"hub_bundle.json has invalid package checksum_algorithm: {packages[0]}")
+    if packages[0].get("verification_command") != "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256":
+        fail(f"hub_bundle.json has invalid package verification_command: {packages[0]}")
 
 
 def verify_redistribution_report():

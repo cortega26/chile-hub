@@ -14,6 +14,7 @@ from pipeline_status_utils import (
     write_redistribution_report_markdown_file,
     write_provenance_report_markdown_file,
     write_drift_report_markdown_file,
+    write_overview_markdown_file,
 )
 
 # Configuración de rutas
@@ -556,6 +557,14 @@ def build_publishable_artifact_index():
             "shared_type": "drift_report",
             "format": "markdown",
         },
+        "data/normalized/overview.json": {
+            "shared_type": "overview",
+            "format": "json",
+        },
+        "data/normalized/overview.md": {
+            "shared_type": "overview",
+            "format": "markdown",
+        },
         "data/normalized/dataset_catalog.json": {
             "shared_type": "dataset_catalog",
             "format": "json",
@@ -755,6 +764,44 @@ def write_drift_report_json(report):
     return output_path
 
 
+def build_overview(hub_health, hub_bundle, artifact_manifest):
+    return {
+        "generated_at_utc": hub_health.get("generated_at_utc"),
+        "overall_status": hub_health.get("overall_status"),
+        "dataset_count": hub_health.get("dataset_count"),
+        "live_count": hub_health.get("live_count"),
+        "fallback_count": hub_health.get("fallback_count"),
+        "stale_count": hub_health.get("stale_count"),
+        "drifted_count": hub_health.get("drifted_count"),
+        "degraded_count": hub_health.get("degraded_count"),
+        "partial_coverage_count": hub_health.get("partial_coverage_count"),
+        "warning_count": hub_health.get("warning_count"),
+        "shared_artifact_count": len(
+            [entry for entry in artifact_manifest.get("artifacts", []) if entry.get("shared_type")]
+        ),
+        "package_count": len(artifact_manifest.get("packages", [])),
+        "report_keys": sorted(hub_bundle.get("reports", {}).keys()),
+        "datasets": [
+            {
+                "dataset": entry.get("dataset"),
+                "source_mode": entry.get("source_mode"),
+                "validation_status": entry.get("validation_status"),
+                "freshness_status": entry.get("freshness_status"),
+                "coverage_status": entry.get("coverage_status"),
+                "drift_status": entry.get("drift_status"),
+            }
+            for entry in hub_health.get("datasets", [])
+        ],
+    }
+
+
+def write_overview_json(overview):
+    output_path = os.path.join(NORMALIZED_DIR, "overview.json")
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(overview, f, ensure_ascii=False, indent=2)
+    return output_path
+
+
 def write_hub_bundle_json(pipeline_metadata, hub_health, dataset_catalog, artifact_manifest):
     artifacts_by_dataset = {}
     shared_artifacts = []
@@ -784,6 +831,8 @@ def write_hub_bundle_json(pipeline_metadata, hub_health, dataset_catalog, artifa
         "provenance_markdown": ("provenance_report", "markdown"),
         "drift_json": ("drift_report", "json"),
         "drift_markdown": ("drift_report", "markdown"),
+        "overview_json": ("overview", "json"),
+        "overview_markdown": ("overview", "markdown"),
         "catalog_json": ("dataset_catalog", "json"),
         "catalog_markdown": ("dataset_catalog", "markdown"),
         "manifest_json": ("artifact_manifest", "json"),
@@ -899,7 +948,9 @@ def attach_publishable_package_to_manifest(zip_path, sha256_path):
             "package_type": "zip",
             "size_bytes": os.path.getsize(zip_path),
             "sha256": compute_sha256(zip_path),
+            "checksum_algorithm": "sha256",
             "checksum_path": checksum_path,
+            "verification_command": f"shasum -a 256 -c {checksum_path}",
         }
     ]
 
@@ -1214,6 +1265,11 @@ def main():
         dataset_catalog,
         artifact_manifest,
     )
+    with open(hub_bundle_output, "r", encoding="utf-8") as f:
+        hub_bundle = json.load(f)
+    overview = build_overview(hub_health, hub_bundle, artifact_manifest)
+    overview_output = write_overview_json(overview)
+    write_overview_markdown_file(overview)
     artifact_manifest_output = write_artifact_manifest()
     zip_output = write_publishable_bundle_zip()
     sha256_output = write_publishable_bundle_sha256(zip_output)
@@ -1226,12 +1282,18 @@ def main():
         dataset_catalog,
         artifact_manifest,
     )
+    with open(hub_bundle_output, "r", encoding="utf-8") as f:
+        hub_bundle = json.load(f)
+    overview = build_overview(hub_health, hub_bundle, artifact_manifest)
+    overview_output = write_overview_json(overview)
+    write_overview_markdown_file(overview)
     print(f"Metadata y validaciones exportadas a: {metadata_output}")
     print(f"Resumen de salud exportado a: {hub_health_output}")
     print(f"Catalogo de datasets exportado a: {catalog_output}")
     print(f"Reporte de redistribucion exportado a: {redistribution_report_output}")
     print(f"Reporte de procedencia exportado a: {provenance_report_output}")
     print(f"Reporte de drift exportado a: {drift_report_output}")
+    print(f"Overview exportado a: {overview_output}")
     print(f"Manifest de artefactos exportado a: {artifact_manifest_output}")
     print(f"Bundle publicable exportado a: {hub_bundle_output}")
     print(f"ZIP publicable exportado a: {zip_output}")

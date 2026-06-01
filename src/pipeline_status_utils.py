@@ -11,6 +11,7 @@ HUB_HEALTH_MARKDOWN_PATH = NORMALIZED_DIR / "hub_health.md"
 REDISTRIBUTION_REPORT_MARKDOWN_PATH = NORMALIZED_DIR / "redistribution_report.md"
 PROVENANCE_REPORT_MARKDOWN_PATH = NORMALIZED_DIR / "provenance_report.md"
 DRIFT_REPORT_MARKDOWN_PATH = NORMALIZED_DIR / "drift_report.md"
+OVERVIEW_MARKDOWN_PATH = NORMALIZED_DIR / "overview.md"
 
 
 def load_metadata(path=PIPELINE_METADATA_PATH):
@@ -423,6 +424,51 @@ def build_drift_report_markdown(report):
 
 def write_drift_report_markdown_file(report, path=DRIFT_REPORT_MARKDOWN_PATH):
     Path(path).write_text(build_drift_report_markdown(report), encoding="utf-8")
+
+
+def build_overview_markdown(overview):
+    lines = [
+        "# chile-hub overview",
+        "",
+        f"- `generated_at_utc`: `{overview.get('generated_at_utc', 'unknown')}`",
+        f"- `overall_status`: `{overview.get('overall_status', 'unknown')}`",
+        f"- `dataset_count`: `{overview.get('dataset_count', 0)}`",
+        f"- `live_count`: `{overview.get('live_count', 0)}`",
+        f"- `fallback_count`: `{overview.get('fallback_count', 0)}`",
+        f"- `stale_count`: `{overview.get('stale_count', 0)}`",
+        f"- `drifted_count`: `{overview.get('drifted_count', 0)}`",
+        f"- `degraded_count`: `{overview.get('degraded_count', 0)}`",
+        f"- `partial_coverage_count`: `{overview.get('partial_coverage_count', 0)}`",
+        f"- `warning_count`: `{overview.get('warning_count', 0)}`",
+        f"- `shared_artifact_count`: `{overview.get('shared_artifact_count', 0)}`",
+        f"- `package_count`: `{overview.get('package_count', 0)}`",
+        "",
+        "| Dataset | Mode | Validation | Freshness | Coverage | Drift |",
+        "| :--- | :--- | :--- | :--- | :--- | :--- |",
+    ]
+
+    for entry in overview.get("datasets", []):
+        lines.append(
+            "| "
+            f"`{entry.get('dataset', 'unknown')}` | "
+            f"`{entry.get('source_mode', 'unknown')}` | "
+            f"`{entry.get('validation_status', 'unknown')}` | "
+            f"`{entry.get('freshness_status', 'unknown')}` | "
+            f"`{entry.get('coverage_status', 'unknown')}` | "
+            f"`{entry.get('drift_status', 'unknown')}` |"
+        )
+
+    lines.append("")
+    report_keys = overview.get("report_keys", [])
+    if report_keys:
+        lines.append(f"- `report_keys`: `{', '.join(report_keys)}`")
+        lines.append("")
+
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def write_overview_markdown_file(overview, path=OVERVIEW_MARKDOWN_PATH):
+    Path(path).write_text(build_overview_markdown(overview), encoding="utf-8")
 
 
 def build_dataset_catalog_markdown(catalog):

@@ -81,7 +81,7 @@ def verify_landing():
             fail(f"Unexpected repo href: {repo_href}")
 
         status_actions = page.locator("#status-actions .dataset-action").all_inner_texts()
-        expected_status_actions = ["Status", "Health JSON", "Health MD", "Bundle JSON", "Reuse JSON", "Reuse MD", "Provenance JSON", "Provenance MD", "Drift JSON", "Drift MD", "Catalog JSON", "Catalog MD", "Manifest"]
+        expected_status_actions = ["Status", "Health JSON", "Health MD", "Bundle JSON", "Reuse JSON", "Reuse MD", "Provenance JSON", "Provenance MD", "Drift JSON", "Drift MD", "Overview JSON", "Overview MD", "Catalog JSON", "Catalog MD", "Manifest"]
         if status_actions != expected_status_actions:
             fail(f"Unexpected status actions: {status_actions}")
 

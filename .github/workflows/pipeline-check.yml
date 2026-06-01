@@ -47,6 +47,8 @@ jobs:
 
       - name: Publish job summary
         run: |
+          cat data/normalized/overview.md >> "$GITHUB_STEP_SUMMARY"
+          printf "\n\n" >> "$GITHUB_STEP_SUMMARY"
           cat data/normalized/hub_health.md >> "$GITHUB_STEP_SUMMARY"
           printf "\n\n" >> "$GITHUB_STEP_SUMMARY"
           cat data/normalized/redistribution_report.md >> "$GITHUB_STEP_SUMMARY"
@@ -83,6 +85,8 @@ jobs:
             data/normalized/provenance_report.md
             data/normalized/drift_report.json
             data/normalized/drift_report.md
+            data/normalized/overview.json
+            data/normalized/overview.md
             data/normalized/chile-hub-publishable-bundle.zip
             data/normalized/chile-hub-publishable-bundle.zip.sha256
             data/normalized/dataset_catalog.json

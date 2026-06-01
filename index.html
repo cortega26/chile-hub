@@ -915,7 +915,7 @@
                             <div class="package-verify-title">Verificar integridad</div>
                             <button class="quickstart-copy" id="package-verify-copy" data-copy-target="package-verify-code">Copiar</button>
                         </div>
-                        <pre class="quickstart-code" id="package-verify-code">echo "sha256 pendiente  data/normalized/chile-hub-publishable-bundle.zip" | shasum -a 256 -c -</pre>
+                        <pre class="quickstart-code" id="package-verify-code">shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256</pre>
                     </div>
                 </div>
                 <div class="package-actions" id="package-actions">
@@ -1280,7 +1280,7 @@ make hub-list</pre>
                     packageActions.innerHTML = `
                         <a class="dataset-action muted" href="data/normalized/hub_bundle.json" target="_blank" rel="noopener noreferrer">Bundle JSON</a>
                     `;
-                    document.getElementById("package-verify-code").textContent = "echo \"sha256 pendiente  data/normalized/chile-hub-publishable-bundle.zip\" | shasum -a 256 -c -";
+                    document.getElementById("package-verify-code").textContent = "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256";
                     catalogGeneratedAt.textContent = "Sin metadata local";
                     catalogGrid.innerHTML = `
                         <div class="dataset-card">
@@ -1308,9 +1308,8 @@ make hub-list</pre>
                 ? `Bundle ZIP · ${formatBytes(zipPackage.size_bytes)}`
                 : "Bundle ZIP";
             const zipHash = zipPackage?.sha256 ? zipPackage.sha256.slice(0, 12) : "N/D";
-            const verifyCommand = zipPackage
-                ? `shasum -a 256 -c ${zipPackage.checksum_path}`
-                : "echo \"sha256 pendiente  data/normalized/chile-hub-publishable-bundle.zip\" | shasum -a 256 -c -";
+            const verifyCommand = zipPackage?.verification_command
+                || (zipPackage?.checksum_path ? `shasum -a 256 -c ${zipPackage.checksum_path}` : "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256");
 
             statusSubtitle.textContent = `${liveCount}/${datasets.length} capas operativas en modo live. Estado global: ${overallStatus}. ${staleCount === 0 ? "Sin capas stale." : `${staleCount} capas stale.`} ${driftedCount === 0 ? "Sin capas con drift." : `${driftedCount} capas con drift.`} ${degradedCount === 0 ? "Sin capas degradadas." : `${degradedCount} capas degradadas.`} ${partialCoverageCount === 0 ? "Sin regresiones de cobertura." : `${partialCoverageCount} capas con cobertura parcial.`} ${reviewTermsCount === 0 ? "Sin capas en review_terms." : `${reviewTermsCount} capas en review_terms.`} ${warningCount === 0 ? "Sin warnings activos." : `${warningCount} warnings activos.`}`;
             statusPills.innerHTML = `
@@ -1335,6 +1334,8 @@ make hub-list</pre>
                 ${buildSimpleLink(findReportPath(reports, "provenance_report", "markdown", "data/normalized/provenance_report.md"), "Provenance MD")}
                 ${buildSimpleLink(findReportPath(reports, "drift_report", "json", "data/normalized/drift_report.json"), "Drift JSON")}
                 ${buildSimpleLink(findReportPath(reports, "drift_report", "markdown", "data/normalized/drift_report.md"), "Drift MD")}
+                ${buildSimpleLink(findReportPath(reports, "overview", "json", "data/normalized/overview.json"), "Overview JSON")}
+                ${buildSimpleLink(findReportPath(reports, "overview", "markdown", "data/normalized/overview.md"), "Overview MD")}
                 ${buildSimpleLink(findReportPath(reports, "dataset_catalog", "json", "data/normalized/dataset_catalog.json"), "Catalog JSON")}
                 ${buildSimpleLink(findReportPath(reports, "dataset_catalog", "markdown", "data/normalized/dataset_catalog.md"), "Catalog MD")}
                 ${buildSimpleLink(findReportPath(reports, "artifact_manifest", "json", "data/normalized/artifact_manifest.json"), "Manifest")}

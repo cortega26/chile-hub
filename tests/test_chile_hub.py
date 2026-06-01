@@ -97,6 +97,20 @@ class ChileHubTests(unittest.TestCase):
         self.assertEqual(report["shared_type"], "drift_report")
         self.assertEqual(report["format"], "markdown")
         self.assertEqual(report["path"], "data/normalized/drift_report.md")
+        overview_report = self.hub.get_report("overview", "json")
+        self.assertEqual(overview_report["shared_type"], "overview")
+        self.assertEqual(overview_report["format"], "json")
+        self.assertEqual(overview_report["path"], "data/normalized/overview.json")
+
+    def test_overview(self):
+        overview = self.hub.overview()
+        self.assertIn(overview["overall_status"], {"ok", "warn", "error"})
+        self.assertEqual(overview["dataset_count"], 4)
+        self.assertGreaterEqual(overview["shared_artifact_count"], 1)
+        self.assertGreaterEqual(overview["package_count"], 1)
+        self.assertIn("health_json", overview["report_keys"])
+        self.assertIn("drift_json", overview["report_keys"])
+        self.assertEqual(len(overview["datasets"]), 4)
 
     def test_inventory_contains_artifact_types(self):
         inventory = self.hub.inventory()
@@ -160,12 +174,19 @@ class ChileHubTests(unittest.TestCase):
         self.assertEqual(len(bundle["datasets"]), 4)
         self.assertEqual(bundle["reports"]["health_json"]["path"], "data/normalized/hub_health.json")
         self.assertEqual(bundle["reports"]["provenance_json"]["path"], "data/normalized/provenance_report.json")
+        self.assertEqual(bundle["reports"]["overview_json"]["path"], "data/normalized/overview.json")
+        self.assertEqual(bundle["reports"]["overview_markdown"]["path"], "data/normalized/overview.md")
         self.assertEqual(bundle["health"]["publishable_count"], self.health["publishable_count"])
         self.assertEqual(bundle["health"]["review_terms_count"], self.health["review_terms_count"])
         self.assertEqual(bundle["health"]["partial_coverage_count"], self.health["partial_coverage_count"])
         self.assertEqual(bundle["health"]["drifted_count"], self.health["drifted_count"])
         self.assertEqual(bundle["packages"][0]["package_type"], "zip")
+        self.assertEqual(bundle["packages"][0]["checksum_algorithm"], "sha256")
         self.assertTrue(bundle["packages"][0]["checksum_path"].endswith(".sha256"))
+        self.assertEqual(
+            bundle["packages"][0]["verification_command"],
+            "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256",
+        )
         comunas = next(entry for entry in bundle["datasets"] if entry["dataset"] == "comunas")
         self.assertIn(comunas["severity"], {"ok", "warn", "error"})
         self.assertTrue(comunas["artifacts"])
@@ -229,6 +250,8 @@ class ArtifactContractTests(unittest.TestCase):
         self.assertIn("data/normalized/provenance_report.md", artifact_paths)
         self.assertIn("data/normalized/drift_report.json", artifact_paths)
         self.assertIn("data/normalized/drift_report.md", artifact_paths)
+        self.assertIn("data/normalized/overview.json", artifact_paths)
+        self.assertIn("data/normalized/overview.md", artifact_paths)
         self.assertIn("data/normalized/regiones.parquet", artifact_paths)
         self.assertIn("data/normalized/provincias.parquet", artifact_paths)
         self.assertIn("data/normalized/comunas.parquet", artifact_paths)
@@ -243,6 +266,8 @@ class ArtifactContractTests(unittest.TestCase):
         self.assertEqual(by_path["data/normalized/hub_health.json"]["format"], "json")
         self.assertEqual(by_path["data/normalized/drift_report.md"]["shared_type"], "drift_report")
         self.assertEqual(by_path["data/normalized/drift_report.md"]["format"], "markdown")
+        self.assertEqual(by_path["data/normalized/overview.json"]["shared_type"], "overview")
+        self.assertEqual(by_path["data/normalized/overview.json"]["format"], "json")
 
     def test_catalog_usage_examples_present(self):
         for dataset in self.catalog["datasets"]:
@@ -285,7 +310,12 @@ class ArtifactContractTests(unittest.TestCase):
             self.assertTrue(artifact["sha256"])
             self.assertGreater(artifact["size_bytes"], 0)
         self.assertEqual(self.manifest["packages"][0]["package_type"], "zip")
+        self.assertEqual(self.manifest["packages"][0]["checksum_algorithm"], "sha256")
         self.assertTrue(self.manifest["packages"][0]["checksum_path"].endswith(".sha256"))
+        self.assertEqual(
+            self.manifest["packages"][0]["verification_command"],
+            "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256",
+        )
 
     def test_publishable_zip_exists_and_contains_bundle(self):
         zip_path = self.normalized_dir / "chile-hub-publishable-bundle.zip"
@@ -296,6 +326,7 @@ class ArtifactContractTests(unittest.TestCase):
             names = set(archive.namelist())
         self.assertIn("data/normalized/hub_bundle.json", names)
         self.assertIn("data/normalized/artifact_manifest.json", names)
+        self.assertIn("data/normalized/overview.json", names)
 
 
 class ChileHubCliTests(unittest.TestCase):
@@ -337,6 +368,9 @@ class ChileHubCliTests(unittest.TestCase):
         result = self.run_cli("report", "drift_report", "--format", "markdown")
         self.assertIn('"shared_type": "drift_report"', result.stdout)
         self.assertIn('"path": "data/normalized/drift_report.md"', result.stdout)
+        overview_result = self.run_cli("report", "overview", "--format", "json")
+        self.assertIn('"shared_type": "overview"', overview_result.stdout)
+        self.assertIn('"path": "data/normalized/overview.json"', overview_result.stdout)
 
     def test_cli_inventory(self):
         result = self.run_cli("inventory")
@@ -349,6 +383,12 @@ class ChileHubCliTests(unittest.TestCase):
         self.assertIn('"drift_status":', result.stdout)
         self.assertIn('"reuse_status":', result.stdout)
         self.assertIn('"degradation_status":', result.stdout)
+
+    def test_cli_overview(self):
+        result = self.run_cli("overview")
+        self.assertIn('"overall_status":', result.stdout)
+        self.assertIn('"shared_artifact_count":', result.stdout)
+        self.assertIn('"report_keys":', result.stdout)
 
     def test_cli_health(self):
         result = self.run_cli("health")

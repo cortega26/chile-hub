@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-06-01T16:00:48.413368+00:00",
+  "generated_at_utc": "2026-06-01T17:27:34.063201+00:00",
   "datasets": {
     "regiones": {
       "dataset": "regiones",
@@ -28,9 +28,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.02,
+        "age_hours": 1.46,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-01T16:00:48.412876+00:00"
+        "checked_at_utc": "2026-06-01T17:27:34.062920+00:00"
       },
       "degradation": {
         "status": "none",
@@ -79,9 +79,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.02,
+        "age_hours": 1.46,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-01T16:00:48.412922+00:00"
+        "checked_at_utc": "2026-06-01T17:27:34.062955+00:00"
       },
       "degradation": {
         "status": "none",
@@ -137,9 +137,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.02,
+        "age_hours": 1.46,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-01T16:00:48.412933+00:00"
+        "checked_at_utc": "2026-06-01T17:27:34.062964+00:00"
       },
       "degradation": {
         "status": "none",
@@ -192,9 +192,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.37,
+        "age_hours": 1.82,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-06-01T16:00:48.413312+00:00"
+        "checked_at_utc": "2026-06-01T17:27:34.063165+00:00"
       },
       "degradation": {
         "status": "none",
@@ -223,7 +223,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.02
+      "freshness_age_hours": 1.46
     },
     "provincias": {
       "dataset": "provincias",
@@ -232,7 +232,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.02
+      "freshness_age_hours": 1.46
     },
     "comunas": {
       "dataset": "comunas",
@@ -241,7 +241,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.02
+      "freshness_age_hours": 1.46
     },
     "indicadores": {
       "dataset": "indicadores",
@@ -257,7 +257,7 @@
         "utm"
       ],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.37
+      "freshness_age_hours": 1.82
     }
   }
 }

@@ -1,7 +1,7 @@
 PYTHON ?= $(if $(wildcard .venv/bin/python),.venv/bin/python,python3)
 VENV_DIR ?= .venv
 
-.PHONY: help bootstrap install-browsers doctor extract build verify verify-landing test check refresh status catalog hub-list hub-summary hub-example hub-artifacts hub-shared-artifacts hub-report hub-inventory hub-health hub-bundle hub-packages hub-redistribution hub-provenance hub-drift package-bundle clean-publishable
+.PHONY: help bootstrap install-browsers doctor extract build verify verify-landing test check refresh status catalog hub-list hub-summary hub-example hub-artifacts hub-shared-artifacts hub-report hub-inventory hub-overview hub-health hub-bundle hub-packages hub-redistribution hub-provenance hub-drift package-bundle clean-publishable
 
 help:
 	@printf "Targets disponibles:\n"
@@ -24,6 +24,7 @@ help:
 	@printf "  make hub-shared-artifacts Lista artefactos compartidos del hub\n"
 	@printf "  make hub-report       Resuelve metadata del reporte hub_health en JSON\n"
 	@printf "  make hub-inventory    Muestra inventario compacto del hub\n"
+	@printf "  make hub-overview     Muestra vista agregada compacta del hub\n"
 	@printf "  make hub-health       Muestra salud agregada del hub\n"
 	@printf "  make hub-bundle       Muestra bundle consolidado del hub\n"
 	@printf "  make hub-packages     Muestra paquetes publicables del hub\n"
@@ -93,6 +94,9 @@ hub-report:
 
 hub-inventory:
 	$(PYTHON) -m src.chile_hub inventory
+
+hub-overview:
+	$(PYTHON) -m src.chile_hub overview
 
 hub-health:
 	$(PYTHON) -m src.chile_hub health
