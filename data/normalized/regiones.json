@@ -1,46 +1,66 @@
 [
   {
     "codigo_region": "01",
-    "nombre_region": "Tarapacá"
+    "nombre_region": "Región de Tarapacá"
   },
   {
     "codigo_region": "02",
-    "nombre_region": "Antofagasta"
+    "nombre_region": "Región de Antofagasta"
+  },
+  {
+    "codigo_region": "03",
+    "nombre_region": "Región de Atacama"
+  },
+  {
+    "codigo_region": "04",
+    "nombre_region": "Región de Coquimbo"
   },
   {
     "codigo_region": "05",
-    "nombre_region": "Valparaíso"
+    "nombre_region": "Región de Valparaíso"
+  },
+  {
+    "codigo_region": "06",
+    "nombre_region": "Región del Libertador Bernardo O'Higgins"
+  },
+  {
+    "codigo_region": "07",
+    "nombre_region": "Región del Maule"
   },
   {
     "codigo_region": "08",
-    "nombre_region": "Biobío"
+    "nombre_region": "Región del Bío-Bío"
   },
   {
     "codigo_region": "09",
-    "nombre_region": "La Araucanía"
+    "nombre_region": "Región de La Araucanía"
   },
   {
     "codigo_region": "10",
-    "nombre_region": "Los Lagos"
+    "nombre_region": "Región de Los Lagos"
+  },
+  {
+    "codigo_region": "11",
+    "nombre_region": "Región de Aysén del Gral.Ibañez del Campo"
   },
   {
     "codigo_region": "12",
-    "nombre_region": "Magallanes y de la Antártica Chilena"
+    "nombre_region": "Región de Magallanes y Antártica Chilena"
   },
   {
     "codigo_region": "13",
-    "nombre_region": "Metropolitana de Santiago"
+    "nombre_region": "Región Metropolitana de Santiago"
   },
   {
     "codigo_region": "14",
-    "nombre_region": "Los Ríos"
+    "nombre_region": "Región de Los Ríos"
   },
   {
     "codigo_region": "15",
-    "nombre_region": "Arica y Parinacota"
+    "nombre_region": "Región de Arica y Parinacota"
   },
   {
     "codigo_region": "16",
-    "nombre_region": "Ñuble"
+    "nombre_region": "Región de Ñuble"
   }
 ]

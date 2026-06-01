@@ -1,27 +1,27 @@
 # chile-hub health summary
 
-- `generated_at_utc`: `2026-05-31T22:17:30.175286+00:00`
-- `overall_status`: `warn`
+- `generated_at_utc`: `2026-06-01T15:38:38.360107+00:00`
+- `overall_status`: `ok`
 - `dataset_count`: `4`
-- `ok_count`: `1`
-- `warn_count`: `3`
+- `ok_count`: `4`
+- `warn_count`: `0`
 - `error_count`: `0`
-- `live_count`: `1`
-- `fallback_count`: `3`
+- `live_count`: `4`
+- `fallback_count`: `0`
 - `stale_count`: `0`
 - `publishable_count`: `4`
 - `review_terms_count`: `0`
 - `unknown_reuse_count`: `0`
-- `degraded_count`: `3`
+- `degraded_count`: `0`
 - `degradation_warning_count`: `0`
-- `partial_coverage_count`: `3`
+- `partial_coverage_count`: `0`
 - `unknown_coverage_count`: `0`
-- `drifted_count`: `3`
-- `warning_count`: `1`
+- `drifted_count`: `0`
+- `warning_count`: `0`
 
 | Dataset | Severity | Mode | Freshness | Coverage | Drift | Publishability | Degradation | Validation | Warnings |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | ---: |
-| `comunas` | `warn` | `fallback` | `fresh` | `partial` | `drifted` | `ready` | `degraded` | `ok` | 1 |
+| `comunas` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `indicadores` | `ok` | `live` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 0 |
-| `provincias` | `warn` | `fallback` | `fresh` | `partial` | `drifted` | `ready` | `degraded` | `ok` | 0 |
-| `regiones` | `warn` | `fallback` | `fresh` | `partial` | `drifted` | `ready` | `degraded` | `ok` | 0 |
+| `provincias` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
+| `regiones` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |

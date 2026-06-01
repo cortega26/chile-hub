@@ -1,68 +1,338 @@
 [
   {
     "codigo_region": "01",
-    "nombre_region": "Tarapacá",
+    "nombre_region": "Región de Tarapacá",
     "codigo_provincia": "011",
     "nombre_provincia": "Iquique"
   },
   {
+    "codigo_region": "01",
+    "nombre_region": "Región de Tarapacá",
+    "codigo_provincia": "014",
+    "nombre_provincia": "Tamarugal"
+  },
+  {
     "codigo_region": "02",
-    "nombre_region": "Antofagasta",
+    "nombre_region": "Región de Antofagasta",
     "codigo_provincia": "021",
     "nombre_provincia": "Antofagasta"
   },
   {
+    "codigo_region": "02",
+    "nombre_region": "Región de Antofagasta",
+    "codigo_provincia": "022",
+    "nombre_provincia": "El Loa"
+  },
+  {
+    "codigo_region": "02",
+    "nombre_region": "Región de Antofagasta",
+    "codigo_provincia": "023",
+    "nombre_provincia": "Tocopilla"
+  },
+  {
+    "codigo_region": "03",
+    "nombre_region": "Región de Atacama",
+    "codigo_provincia": "031",
+    "nombre_provincia": "Copiapó"
+  },
+  {
+    "codigo_region": "03",
+    "nombre_region": "Región de Atacama",
+    "codigo_provincia": "032",
+    "nombre_provincia": "Chañaral"
+  },
+  {
+    "codigo_region": "03",
+    "nombre_region": "Región de Atacama",
+    "codigo_provincia": "033",
+    "nombre_provincia": "Huasco"
+  },
+  {
+    "codigo_region": "04",
+    "nombre_region": "Región de Coquimbo",
+    "codigo_provincia": "041",
+    "nombre_provincia": "Elqui"
+  },
+  {
+    "codigo_region": "04",
+    "nombre_region": "Región de Coquimbo",
+    "codigo_provincia": "042",
+    "nombre_provincia": "Choapa"
+  },
+  {
+    "codigo_region": "04",
+    "nombre_region": "Región de Coquimbo",
+    "codigo_provincia": "043",
+    "nombre_provincia": "Limarí"
+  },
+  {
     "codigo_region": "05",
-    "nombre_region": "Valparaíso",
+    "nombre_region": "Región de Valparaíso",
     "codigo_provincia": "051",
     "nombre_provincia": "Valparaíso"
   },
   {
+    "codigo_region": "05",
+    "nombre_region": "Región de Valparaíso",
+    "codigo_provincia": "052",
+    "nombre_provincia": "Isla de Pascua"
+  },
+  {
+    "codigo_region": "05",
+    "nombre_region": "Región de Valparaíso",
+    "codigo_provincia": "053",
+    "nombre_provincia": "Los Andes"
+  },
+  {
+    "codigo_region": "05",
+    "nombre_region": "Región de Valparaíso",
+    "codigo_provincia": "054",
+    "nombre_provincia": "Petorca"
+  },
+  {
+    "codigo_region": "05",
+    "nombre_region": "Región de Valparaíso",
+    "codigo_provincia": "055",
+    "nombre_provincia": "Quillota"
+  },
+  {
+    "codigo_region": "05",
+    "nombre_region": "Región de Valparaíso",
+    "codigo_provincia": "056",
+    "nombre_provincia": "San Antonio"
+  },
+  {
+    "codigo_region": "05",
+    "nombre_region": "Región de Valparaíso",
+    "codigo_provincia": "057",
+    "nombre_provincia": "San Felipe"
+  },
+  {
+    "codigo_region": "05",
+    "nombre_region": "Región de Valparaíso",
+    "codigo_provincia": "058",
+    "nombre_provincia": "Marga Marga"
+  },
+  {
+    "codigo_region": "06",
+    "nombre_region": "Región del Libertador Bernardo O'Higgins",
+    "codigo_provincia": "061",
+    "nombre_provincia": "Cachapoal"
+  },
+  {
+    "codigo_region": "06",
+    "nombre_region": "Región del Libertador Bernardo O'Higgins",
+    "codigo_provincia": "062",
+    "nombre_provincia": "Cardenal Caro"
+  },
+  {
+    "codigo_region": "06",
+    "nombre_region": "Región del Libertador Bernardo O'Higgins",
+    "codigo_provincia": "063",
+    "nombre_provincia": "Colchagua"
+  },
+  {
+    "codigo_region": "07",
+    "nombre_region": "Región del Maule",
+    "codigo_provincia": "071",
+    "nombre_provincia": "Talca"
+  },
+  {
+    "codigo_region": "07",
+    "nombre_region": "Región del Maule",
+    "codigo_provincia": "072",
+    "nombre_provincia": "Cauquenes"
+  },
+  {
+    "codigo_region": "07",
+    "nombre_region": "Región del Maule",
+    "codigo_provincia": "073",
+    "nombre_provincia": "Curicó"
+  },
+  {
+    "codigo_region": "07",
+    "nombre_region": "Región del Maule",
+    "codigo_provincia": "074",
+    "nombre_provincia": "Linares"
+  },
+  {
     "codigo_region": "08",
-    "nombre_region": "Biobío",
+    "nombre_region": "Región del Bío-Bío",
     "codigo_provincia": "081",
     "nombre_provincia": "Concepción"
   },
   {
+    "codigo_region": "08",
+    "nombre_region": "Región del Bío-Bío",
+    "codigo_provincia": "082",
+    "nombre_provincia": "Arauco"
+  },
+  {
+    "codigo_region": "08",
+    "nombre_region": "Región del Bío-Bío",
+    "codigo_provincia": "083",
+    "nombre_provincia": "Bío-Bío"
+  },
+  {
     "codigo_region": "09",
-    "nombre_region": "La Araucanía",
+    "nombre_region": "Región de La Araucanía",
     "codigo_provincia": "091",
     "nombre_provincia": "Cautín"
   },
   {
+    "codigo_region": "09",
+    "nombre_region": "Región de La Araucanía",
+    "codigo_provincia": "092",
+    "nombre_provincia": "Malleco"
+  },
+  {
     "codigo_region": "10",
-    "nombre_region": "Los Lagos",
+    "nombre_region": "Región de Los Lagos",
     "codigo_provincia": "101",
     "nombre_provincia": "Llanquihue"
   },
   {
+    "codigo_region": "10",
+    "nombre_region": "Región de Los Lagos",
+    "codigo_provincia": "102",
+    "nombre_provincia": "Chiloe"
+  },
+  {
+    "codigo_region": "10",
+    "nombre_region": "Región de Los Lagos",
+    "codigo_provincia": "103",
+    "nombre_provincia": "Osorno"
+  },
+  {
+    "codigo_region": "10",
+    "nombre_region": "Región de Los Lagos",
+    "codigo_provincia": "104",
+    "nombre_provincia": "Palena"
+  },
+  {
+    "codigo_region": "11",
+    "nombre_region": "Región de Aysén del Gral.Ibañez del Campo",
+    "codigo_provincia": "111",
+    "nombre_provincia": "Coyhaique"
+  },
+  {
+    "codigo_region": "11",
+    "nombre_region": "Región de Aysén del Gral.Ibañez del Campo",
+    "codigo_provincia": "112",
+    "nombre_provincia": "Aysén"
+  },
+  {
+    "codigo_region": "11",
+    "nombre_region": "Región de Aysén del Gral.Ibañez del Campo",
+    "codigo_provincia": "113",
+    "nombre_provincia": "Capitán Prat"
+  },
+  {
+    "codigo_region": "11",
+    "nombre_region": "Región de Aysén del Gral.Ibañez del Campo",
+    "codigo_provincia": "114",
+    "nombre_provincia": "General Carrera"
+  },
+  {
     "codigo_region": "12",
-    "nombre_region": "Magallanes y de la Antártica Chilena",
+    "nombre_region": "Región de Magallanes y Antártica Chilena",
     "codigo_provincia": "121",
     "nombre_provincia": "Magallanes"
   },
   {
+    "codigo_region": "12",
+    "nombre_region": "Región de Magallanes y Antártica Chilena",
+    "codigo_provincia": "122",
+    "nombre_provincia": "Antártica Chilena"
+  },
+  {
+    "codigo_region": "12",
+    "nombre_region": "Región de Magallanes y Antártica Chilena",
+    "codigo_provincia": "123",
+    "nombre_provincia": "Tierra del Fuego"
+  },
+  {
+    "codigo_region": "12",
+    "nombre_region": "Región de Magallanes y Antártica Chilena",
+    "codigo_provincia": "124",
+    "nombre_provincia": "Ultima Esperanza"
+  },
+  {
     "codigo_region": "13",
-    "nombre_region": "Metropolitana de Santiago",
+    "nombre_region": "Región Metropolitana de Santiago",
     "codigo_provincia": "131",
     "nombre_provincia": "Santiago"
   },
   {
+    "codigo_region": "13",
+    "nombre_region": "Región Metropolitana de Santiago",
+    "codigo_provincia": "132",
+    "nombre_provincia": "Cordillera"
+  },
+  {
+    "codigo_region": "13",
+    "nombre_region": "Región Metropolitana de Santiago",
+    "codigo_provincia": "133",
+    "nombre_provincia": "Chacabuco"
+  },
+  {
+    "codigo_region": "13",
+    "nombre_region": "Región Metropolitana de Santiago",
+    "codigo_provincia": "134",
+    "nombre_provincia": "Maipo"
+  },
+  {
+    "codigo_region": "13",
+    "nombre_region": "Región Metropolitana de Santiago",
+    "codigo_provincia": "135",
+    "nombre_provincia": "Melipilla"
+  },
+  {
+    "codigo_region": "13",
+    "nombre_region": "Región Metropolitana de Santiago",
+    "codigo_provincia": "136",
+    "nombre_provincia": "Talagante"
+  },
+  {
     "codigo_region": "14",
-    "nombre_region": "Los Ríos",
+    "nombre_region": "Región de Los Ríos",
     "codigo_provincia": "141",
     "nombre_provincia": "Valdivia"
   },
   {
+    "codigo_region": "14",
+    "nombre_region": "Región de Los Ríos",
+    "codigo_provincia": "142",
+    "nombre_provincia": "Ranco"
+  },
+  {
     "codigo_region": "15",
-    "nombre_region": "Arica y Parinacota",
+    "nombre_region": "Región de Arica y Parinacota",
     "codigo_provincia": "151",
     "nombre_provincia": "Arica"
   },
   {
+    "codigo_region": "15",
+    "nombre_region": "Región de Arica y Parinacota",
+    "codigo_provincia": "152",
+    "nombre_provincia": "Parinacota"
+  },
+  {
     "codigo_region": "16",
-    "nombre_region": "Ñuble",
+    "nombre_region": "Región de Ñuble",
     "codigo_provincia": "161",
-    "nombre_provincia": "Diguillín"
+    "nombre_provincia": "Ñuble"
+  },
+  {
+    "codigo_region": "16",
+    "nombre_region": "Región de Ñuble",
+    "codigo_provincia": "162",
+    "nombre_provincia": "Itata"
+  },
+  {
+    "codigo_region": "16",
+    "nombre_region": "Región de Ñuble",
+    "codigo_provincia": "163",
+    "nombre_provincia": "Punilla"
   }
 ]

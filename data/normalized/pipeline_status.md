@@ -1,27 +1,27 @@
 # chile-hub pipeline status
 
-- `generated_at_utc`: `2026-05-31T22:17:30.175286+00:00`
+- `generated_at_utc`: `2026-06-01T15:38:38.360107+00:00`
 
 | Dataset | Source | Mode | Detail | Freshness | Coverage | Records | Validation | Warnings |
 | :--- | :--- | :--- | :--- | :--- | :--- | ---: | :--- | :--- |
-| `comunas` | SUBDERE | `fallback` | `embedded_sample` | `fresh (1.87h / 2160h)` | `partial` | 18 | `ok` | comunas source_mode is fallback; coverage is limited by design |
-| `indicadores` | Banco Central de Chile (via mindicador.cl) | `live` | `public_api` | `fresh (2.26h / 72h)` | `not_applicable` | 375 | `ok` | none |
-| `provincias` | SUBDERE | `fallback` | `embedded_sample` | `fresh (1.87h / 2160h)` | `partial` | 11 | `ok` | none |
-| `regiones` | SUBDERE | `fallback` | `embedded_sample` | `fresh (1.87h / 2160h)` | `partial` | 11 | `ok` | none |
+| `comunas` | BCN ArcGIS | `live` | `bcn_arcgis` | `fresh (0.01h / 2160h)` | `full` | 346 | `ok` | none |
+| `indicadores` | Banco Central de Chile (via mindicador.cl) | `live` | `public_api` | `fresh (0.0h / 72h)` | `not_applicable` | 375 | `ok` | none |
+| `provincias` | BCN ArcGIS | `live` | `bcn_arcgis` | `fresh (0.01h / 2160h)` | `full` | 56 | `ok` | none |
+| `regiones` | BCN ArcGIS | `live` | `bcn_arcgis` | `fresh (0.01h / 2160h)` | `full` | 16 | `ok` | none |
 
 ## comunas
 
-- `refreshed_at_utc`: `2026-05-31T20:25:25.852270+00:00`
-- `freshness`: `fresh (1.87h / 2160h)`
-- `coverage`: `Cobertura parcial: 18/346 filas respecto del baseline esperado.`
+- `refreshed_at_utc`: `2026-06-01T15:38:12.156192+00:00`
+- `freshness`: `fresh (0.01h / 2160h)`
+- `coverage`: `Cobertura completa: 346/346 filas respecto del baseline esperado.`
 - `fields`: `codigo_region, nombre_region, abreviatura, codigo_provincia, nombre_provincia, codigo_comuna, nombre_comuna, nombre_comuna_clean, latitud_cabecera, longitud_cabecera, poblacion_estimada`
-- `notes`: bcn_fetch_error: Failed to perform, curl: (52) Empty reply from server. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.; fallback_due_to_missing_remote_file
-- `warnings`: comunas source_mode is fallback; coverage is limited by design
+- `notes`: bcn_skipped_null_code_records: 1; bcn_supplemented_missing_comunas: 1
+- `warnings`: none
 
 ## indicadores
 
-- `refreshed_at_utc`: `2026-05-31T20:01:54.399040+00:00`
-- `freshness`: `fresh (2.26h / 72h)`
+- `refreshed_at_utc`: `2026-06-01T15:38:37.668778+00:00`
+- `freshness`: `fresh (0.0h / 72h)`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
 - `fields`: `fecha, codigo_indicador, valor`
 - `indicator_codes`: `dolar, euro, ipc, uf, utm`
@@ -29,18 +29,18 @@
 
 ## provincias
 
-- `refreshed_at_utc`: `2026-05-31T20:25:25.852270+00:00`
-- `freshness`: `fresh (1.87h / 2160h)`
-- `coverage`: `Cobertura parcial: 11/56 filas respecto del baseline esperado.`
+- `refreshed_at_utc`: `2026-06-01T15:38:12.156192+00:00`
+- `freshness`: `fresh (0.01h / 2160h)`
+- `coverage`: `Cobertura completa: 56/56 filas respecto del baseline esperado.`
 - `fields`: `codigo_region, nombre_region, codigo_provincia, nombre_provincia`
-- `notes`: bcn_fetch_error: Failed to perform, curl: (52) Empty reply from server. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.; fallback_due_to_missing_remote_file
+- `notes`: bcn_skipped_null_code_records: 1; bcn_supplemented_missing_comunas: 1
 - `warnings`: none
 
 ## regiones
 
-- `refreshed_at_utc`: `2026-05-31T20:25:25.852270+00:00`
-- `freshness`: `fresh (1.87h / 2160h)`
-- `coverage`: `Cobertura parcial: 11/16 filas respecto del baseline esperado.`
+- `refreshed_at_utc`: `2026-06-01T15:38:12.156192+00:00`
+- `freshness`: `fresh (0.01h / 2160h)`
+- `coverage`: `Cobertura completa: 16/16 filas respecto del baseline esperado.`
 - `fields`: `codigo_region, nombre_region`
-- `notes`: bcn_fetch_error: Failed to perform, curl: (52) Empty reply from server. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.; fallback_due_to_missing_remote_file
+- `notes`: bcn_skipped_null_code_records: 1; bcn_supplemented_missing_comunas: 1
 - `warnings`: none

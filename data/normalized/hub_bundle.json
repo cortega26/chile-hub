@@ -1,32 +1,32 @@
 {
-  "generated_at_utc": "2026-05-31T22:17:30.175286+00:00",
-  "overall_status": "warn",
+  "generated_at_utc": "2026-06-01T15:38:38.360107+00:00",
+  "overall_status": "ok",
   "dataset_count": 4,
   "health": {
-    "ok_count": 1,
-    "warn_count": 3,
+    "ok_count": 4,
+    "warn_count": 0,
     "error_count": 0,
-    "live_count": 1,
-    "fallback_count": 3,
+    "live_count": 4,
+    "fallback_count": 0,
     "stale_count": 0,
     "publishable_count": 4,
     "review_terms_count": 0,
     "unknown_reuse_count": 0,
-    "degraded_count": 3,
+    "degraded_count": 0,
     "degradation_warning_count": 0,
-    "partial_coverage_count": 3,
+    "partial_coverage_count": 0,
     "unknown_coverage_count": 0,
-    "drifted_count": 3,
-    "warning_count": 1
+    "drifted_count": 0,
+    "warning_count": 0
   },
   "datasets": [
     {
       "dataset": "regiones",
       "description": "Capa derivada de regiones para filtros, joins y referencias administrativas de alto nivel.",
-      "source_name": "SUBDERE",
-      "source_url": "https://www.subdere.gov.cl/sites/default/files/documentos/cut_2018_0.xls",
-      "source_mode": "fallback",
-      "record_count": 11,
+      "source_name": "BCN ArcGIS",
+      "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
+      "source_mode": "live",
+      "record_count": 16,
       "join_keys": [
         "codigo_region"
       ],
@@ -42,29 +42,29 @@
       "validation_status": "ok",
       "freshness": {
         "status": "fresh",
-        "age_hours": 1.87,
+        "age_hours": 0.01,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-05-31T22:17:30.175113+00:00"
+        "checked_at_utc": "2026-06-01T15:38:38.359860+00:00"
       },
       "coverage": {
-        "status": "partial",
+        "status": "full",
         "expected_record_count": 16,
-        "actual_record_count": 11,
-        "coverage_ratio": 0.6875,
-        "summary": "Cobertura parcial: 11/16 filas respecto del baseline esperado."
+        "actual_record_count": 16,
+        "coverage_ratio": 1.0,
+        "summary": "Cobertura completa: 16/16 filas respecto del baseline esperado."
       },
       "warning_count": 0,
-      "severity": "warn",
+      "severity": "ok",
       "publishability_status": "ready",
       "degradation": {
-        "status": "degraded",
-        "impact": "Capa derivada desde comunas en fallback; cardinalidad reducida a 11 filas.",
-        "recommended_action": "Recuperar comunas live para restaurar cobertura derivada completa."
+        "status": "none",
+        "impact": "Sin degradación operativa detectada en este build.",
+        "recommended_action": "Ninguna."
       },
       "drift": {
-        "status": "drifted",
-        "summary": "Drift detectado: mode=fallback, coverage=partial, degradation=degraded.",
-        "recommended_action": "Recuperar comunas live para restaurar cobertura derivada completa."
+        "status": "healthy",
+        "summary": "Sin drift operativo detectado en este build.",
+        "recommended_action": "Ninguna."
       },
       "documentation": "docs/datasets/regiones.md",
       "outputs": {
@@ -86,8 +86,8 @@
           "output_type": "json",
           "shared_type": null,
           "format": null,
-          "size_bytes": 817,
-          "sha256": "fab645df4eb4d851ec01072b17152751861f48869eb164b57b4e76dde98e95af"
+          "size_bytes": 1371,
+          "sha256": "d7f3b237f53209a8021c29dae915ab42c9662aa543ba6e9896fddafdfc2bb68c"
         },
         {
           "path": "data/normalized/regiones.parquet",
@@ -95,18 +95,18 @@
           "output_type": "parquet",
           "shared_type": null,
           "format": null,
-          "size_bytes": 1077,
-          "sha256": "4101ab1a1b70d5a1b9d2b0af53847c9bf9f959b45dfe2a5f046311709146773f"
+          "size_bytes": 1318,
+          "sha256": "ac709667dc4409a090632c103519451b52fe1a82d3f9803de369c0ea82a2f78f"
         }
       ]
     },
     {
       "dataset": "provincias",
       "description": "Capa derivada de provincias para cruces intermedios entre region y comuna.",
-      "source_name": "SUBDERE",
-      "source_url": "https://www.subdere.gov.cl/sites/default/files/documentos/cut_2018_0.xls",
-      "source_mode": "fallback",
-      "record_count": 11,
+      "source_name": "BCN ArcGIS",
+      "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
+      "source_mode": "live",
+      "record_count": 56,
       "join_keys": [
         "codigo_provincia",
         "codigo_region"
@@ -123,29 +123,29 @@
       "validation_status": "ok",
       "freshness": {
         "status": "fresh",
-        "age_hours": 1.87,
+        "age_hours": 0.01,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-05-31T22:17:30.175138+00:00"
+        "checked_at_utc": "2026-06-01T15:38:38.359886+00:00"
       },
       "coverage": {
-        "status": "partial",
+        "status": "full",
         "expected_record_count": 56,
-        "actual_record_count": 11,
-        "coverage_ratio": 0.1964,
-        "summary": "Cobertura parcial: 11/56 filas respecto del baseline esperado."
+        "actual_record_count": 56,
+        "coverage_ratio": 1.0,
+        "summary": "Cobertura completa: 56/56 filas respecto del baseline esperado."
       },
       "warning_count": 0,
-      "severity": "warn",
+      "severity": "ok",
       "publishability_status": "ready",
       "degradation": {
-        "status": "degraded",
-        "impact": "Capa derivada desde comunas en fallback; cardinalidad reducida a 11 filas.",
-        "recommended_action": "Recuperar comunas live para restaurar cobertura derivada completa."
+        "status": "none",
+        "impact": "Sin degradación operativa detectada en este build.",
+        "recommended_action": "Ninguna."
       },
       "drift": {
-        "status": "drifted",
-        "summary": "Drift detectado: mode=fallback, coverage=partial, degradation=degraded.",
-        "recommended_action": "Recuperar comunas live para restaurar cobertura derivada completa."
+        "status": "healthy",
+        "summary": "Sin drift operativo detectado en este build.",
+        "recommended_action": "Ninguna."
       },
       "documentation": "docs/datasets/provincias.md",
       "outputs": {
@@ -167,8 +167,8 @@
           "output_type": "json",
           "shared_type": null,
           "format": null,
-          "size_bytes": 1564,
-          "sha256": "a991671eedb0ed72cc931ade20a900df7e50b89d3a0e5d336c91110d0f813264"
+          "size_bytes": 8622,
+          "sha256": "b5e791c6228377202df557c1c933c067c44131ac23895de0ccb256b015b58344"
         },
         {
           "path": "data/normalized/provincias.parquet",
@@ -176,18 +176,18 @@
           "output_type": "parquet",
           "shared_type": null,
           "format": null,
-          "size_bytes": 1991,
-          "sha256": "270972e4153f01896b801aadf855b1dcb86e1563da79f678f345228154cdcf6b"
+          "size_bytes": 2768,
+          "sha256": "04980f32989850a0575a7ce8fca5a7c2535fd497adb127d4d2b9808f9861d21c"
         }
       ]
     },
     {
       "dataset": "comunas",
       "description": "Base territorial normalizada para cruces por region, provincia y comuna.",
-      "source_name": "SUBDERE",
-      "source_url": "https://www.subdere.gov.cl/sites/default/files/documentos/cut_2018_0.xls",
-      "source_mode": "fallback",
-      "record_count": 18,
+      "source_name": "BCN ArcGIS",
+      "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
+      "source_mode": "live",
+      "record_count": 346,
       "join_keys": [
         "codigo_comuna",
         "codigo_region"
@@ -204,29 +204,29 @@
       "validation_status": "ok",
       "freshness": {
         "status": "fresh",
-        "age_hours": 1.87,
+        "age_hours": 0.01,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-05-31T22:17:30.175146+00:00"
+        "checked_at_utc": "2026-06-01T15:38:38.359893+00:00"
       },
       "coverage": {
-        "status": "partial",
+        "status": "full",
         "expected_record_count": 346,
-        "actual_record_count": 18,
-        "coverage_ratio": 0.052,
-        "summary": "Cobertura parcial: 18/346 filas respecto del baseline esperado."
+        "actual_record_count": 346,
+        "coverage_ratio": 1.0,
+        "summary": "Cobertura completa: 346/346 filas respecto del baseline esperado."
       },
-      "warning_count": 1,
-      "severity": "warn",
+      "warning_count": 0,
+      "severity": "ok",
       "publishability_status": "ready",
       "degradation": {
-        "status": "degraded",
-        "impact": "Cobertura territorial parcial: 18 comunas disponibles desde fallback embebido.",
-        "recommended_action": "Reintentar extractores o restaurar la fuente territorial primaria."
+        "status": "none",
+        "impact": "Sin degradación operativa detectada en este build.",
+        "recommended_action": "Ninguna."
       },
       "drift": {
-        "status": "drifted",
-        "summary": "Drift detectado: mode=fallback, coverage=partial, degradation=degraded.",
-        "recommended_action": "Reintentar extractores o restaurar la fuente territorial primaria."
+        "status": "healthy",
+        "summary": "Sin drift operativo detectado en este build.",
+        "recommended_action": "Ninguna."
       },
       "documentation": "docs/datasets/comunas.md",
       "outputs": {
@@ -248,8 +248,8 @@
           "output_type": "json",
           "shared_type": null,
           "format": null,
-          "size_bytes": 6775,
-          "sha256": "cb51451f7efb7e17abd6041ac24b266257ef21e6192756e5af86428998a39b08"
+          "size_bytes": 130890,
+          "sha256": "44e5345878b34466e499fd8d656505bc8a7bd71f234f37d35c6c36e80d39f9e0"
         },
         {
           "path": "data/normalized/comunas.parquet",
@@ -257,8 +257,8 @@
           "output_type": "parquet",
           "shared_type": null,
           "format": null,
-          "size_bytes": 5538,
-          "sha256": "3730bb8bc779b1ba229b8bcd69fc589662b4c18ce72ce1cb48760a8c8397ea19"
+          "size_bytes": 14244,
+          "sha256": "a9a23b359836cb4e9e6c8677a5e3cf466b84a4796147a436320eb71e02ef3424"
         }
       ]
     },
@@ -285,9 +285,9 @@
       "validation_status": "ok",
       "freshness": {
         "status": "fresh",
-        "age_hours": 2.26,
+        "age_hours": 0.0,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-05-31T22:17:30.175250+00:00"
+        "checked_at_utc": "2026-06-01T15:38:38.360066+00:00"
       },
       "coverage": {
         "status": "not_applicable",
@@ -351,8 +351,8 @@
       "output_type": null,
       "shared_type": "pipeline_status",
       "format": "markdown",
-      "size_bytes": 2687,
-      "sha256": "4e3b4a47efcfa2141d539928754a728f7896a27dbd91480ef1b4b8c48b155b39"
+      "size_bytes": 2208,
+      "sha256": "98c6e4f69391095a7e63477e935a0ddaabd52c627c0edd49a814c01d30323d19"
     },
     "health_json": {
       "path": "data/normalized/hub_health.json",
@@ -360,8 +360,8 @@
       "output_type": null,
       "shared_type": "hub_health",
       "format": "json",
-      "size_bytes": 2322,
-      "sha256": "e1f5515f3c7531399c74cc250e1b0162ca26bd2510a2151ab96b80ce79ceaeb1"
+      "size_bytes": 2273,
+      "sha256": "1d84ab98c2eccfcc7d85a2d498fc7549fe5391b29d42f153b32d6d2f467a3be1"
     },
     "health_markdown": {
       "path": "data/normalized/hub_health.md",
@@ -369,8 +369,8 @@
       "output_type": null,
       "shared_type": "hub_health",
       "format": "markdown",
-      "size_bytes": 1122,
-      "sha256": "ce38b7a80c9164ba7cb9bbfac5d6c7fc276e60984962fd957ef2a3ad47632c2a"
+      "size_bytes": 1081,
+      "sha256": "e5dd284a78a7b3f632926eee0d2eabd81b7fb2280758cab6aa1f77e27f69e169"
     },
     "bundle_json": {
       "path": "data/normalized/hub_bundle.json",
@@ -378,8 +378,8 @@
       "output_type": null,
       "shared_type": "hub_bundle",
       "format": "json",
-      "size_bytes": 21134,
-      "sha256": "5ad00b4a1bdab793157185d361f3f1e0507d206241081fad6ef30e2fdf0295b9"
+      "size_bytes": 20655,
+      "sha256": "f3cfaae14aae2eb47b1f90c1b122c0bdcc2c8e0cf22815339dfa940196beebc4"
     },
     "redistribution_json": {
       "path": "data/normalized/redistribution_report.json",
@@ -388,7 +388,7 @@
       "shared_type": "redistribution_report",
       "format": "json",
       "size_bytes": 2396,
-      "sha256": "aed99278023acb79f7ae46beb049fbf85b148679acf9459c51ad5a87137e343b"
+      "sha256": "9d93da4babbbcd30fd8f78827027713bc06521b53e11ee9f27ed713e746649d0"
     },
     "redistribution_markdown": {
       "path": "data/normalized/redistribution_report.md",
@@ -397,7 +397,7 @@
       "shared_type": "redistribution_report",
       "format": "markdown",
       "size_bytes": 2345,
-      "sha256": "b1d797ac28a43c413ce55ad03e1d7e9431c2aae4ac5bf781e63d904d4c2e6ce5"
+      "sha256": "ba7cfa9508777bda4a9cc45e59c5957c27fbca891ac4579bd0b5d8678f17a5f8"
     },
     "provenance_json": {
       "path": "data/normalized/provenance_report.json",
@@ -405,8 +405,8 @@
       "output_type": null,
       "shared_type": "provenance_report",
       "format": "json",
-      "size_bytes": 2069,
-      "sha256": "2b961ea753e3eeb2c57092cf640f84a1488ec4745a1e36ce3e6d078b4be0820b"
+      "size_bytes": 2104,
+      "sha256": "15987a7cb25dacc6f81d8ebe4c422e0d10831dc500f2800b426f7b5a95fa608b"
     },
     "provenance_markdown": {
       "path": "data/normalized/provenance_report.md",
@@ -414,8 +414,8 @@
       "output_type": null,
       "shared_type": "provenance_report",
       "format": "markdown",
-      "size_bytes": 2349,
-      "sha256": "119b4614845e53af3df913987c337a2608b60e8abc59c0c231b10342d6297bb2"
+      "size_bytes": 2365,
+      "sha256": "a4c97e39096b9e080e76e2e767b3a6e5575c6062b50aa50f17f7a959d6263e03"
     },
     "drift_json": {
       "path": "data/normalized/drift_report.json",
@@ -423,8 +423,8 @@
       "output_type": null,
       "shared_type": "drift_report",
       "format": "json",
-      "size_bytes": 2764,
-      "sha256": "21548fb4cc7d39f5acee09cbf11ad7efaa1fb3c061787d7cb852a5053ef093d2"
+      "size_bytes": 2399,
+      "sha256": "e2016b973cd58df543c2427bea39b0ea0159da7069b12ce9b024928486424ab4"
     },
     "drift_markdown": {
       "path": "data/normalized/drift_report.md",
@@ -432,8 +432,8 @@
       "output_type": null,
       "shared_type": "drift_report",
       "format": "markdown",
-      "size_bytes": 2067,
-      "sha256": "082337058c7a712073d85f2fff5c3672f219c3f1d9a39e63dc12c678610395ed"
+      "size_bytes": 1605,
+      "sha256": "101f3dfe66019fa067509c4718b645fd73999b12a7b8cd045a412c856c8a8706"
     },
     "catalog_json": {
       "path": "data/normalized/dataset_catalog.json",
@@ -441,8 +441,8 @@
       "output_type": null,
       "shared_type": "dataset_catalog",
       "format": "json",
-      "size_bytes": 11795,
-      "sha256": "98d4ccaaf4d72b1890b16bccf8a3a069c88d1f6f84f478ed524b7175a7b2cc13"
+      "size_bytes": 10886,
+      "sha256": "0db7a368c54d88bc01176c9760174f904e07daecba3281a4d8344b2f63413d4a"
     },
     "catalog_markdown": {
       "path": "data/normalized/dataset_catalog.md",
@@ -450,8 +450,8 @@
       "output_type": null,
       "shared_type": "dataset_catalog",
       "format": "markdown",
-      "size_bytes": 6403,
-      "sha256": "a9ac09b399254285103073ee2b536b388a03639215a8bc8d73e3346c3750ef47"
+      "size_bytes": 6056,
+      "sha256": "75c9c7d42c3e7a428cfd0726a004fd1b2192b148e1e24ecb8b99e0c57ce5c875"
     },
     "manifest_json": {
       "path": "data/normalized/artifact_manifest.json",
@@ -459,8 +459,8 @@
       "output_type": null,
       "shared_type": "artifact_manifest",
       "format": "json",
-      "size_bytes": 6447,
-      "sha256": "a44958741e74f818de342383e6437edb5c3b472f88d2bf7114f905e0ba1c6164"
+      "size_bytes": 6451,
+      "sha256": "e3dd24265347a648549959c709f7f54cec65376fec1b951b02e7c544030ed6dc"
     }
   },
   "shared_artifacts": [
@@ -470,8 +470,8 @@
       "output_type": null,
       "shared_type": "artifact_manifest",
       "format": "json",
-      "size_bytes": 6447,
-      "sha256": "a44958741e74f818de342383e6437edb5c3b472f88d2bf7114f905e0ba1c6164"
+      "size_bytes": 6451,
+      "sha256": "e3dd24265347a648549959c709f7f54cec65376fec1b951b02e7c544030ed6dc"
     },
     {
       "path": "data/normalized/dataset_catalog.json",
@@ -479,8 +479,8 @@
       "output_type": null,
       "shared_type": "dataset_catalog",
       "format": "json",
-      "size_bytes": 11795,
-      "sha256": "98d4ccaaf4d72b1890b16bccf8a3a069c88d1f6f84f478ed524b7175a7b2cc13"
+      "size_bytes": 10886,
+      "sha256": "0db7a368c54d88bc01176c9760174f904e07daecba3281a4d8344b2f63413d4a"
     },
     {
       "path": "data/normalized/dataset_catalog.md",
@@ -488,8 +488,8 @@
       "output_type": null,
       "shared_type": "dataset_catalog",
       "format": "markdown",
-      "size_bytes": 6403,
-      "sha256": "a9ac09b399254285103073ee2b536b388a03639215a8bc8d73e3346c3750ef47"
+      "size_bytes": 6056,
+      "sha256": "75c9c7d42c3e7a428cfd0726a004fd1b2192b148e1e24ecb8b99e0c57ce5c875"
     },
     {
       "path": "data/normalized/drift_report.json",
@@ -497,8 +497,8 @@
       "output_type": null,
       "shared_type": "drift_report",
       "format": "json",
-      "size_bytes": 2764,
-      "sha256": "21548fb4cc7d39f5acee09cbf11ad7efaa1fb3c061787d7cb852a5053ef093d2"
+      "size_bytes": 2399,
+      "sha256": "e2016b973cd58df543c2427bea39b0ea0159da7069b12ce9b024928486424ab4"
     },
     {
       "path": "data/normalized/drift_report.md",
@@ -506,8 +506,8 @@
       "output_type": null,
       "shared_type": "drift_report",
       "format": "markdown",
-      "size_bytes": 2067,
-      "sha256": "082337058c7a712073d85f2fff5c3672f219c3f1d9a39e63dc12c678610395ed"
+      "size_bytes": 1605,
+      "sha256": "101f3dfe66019fa067509c4718b645fd73999b12a7b8cd045a412c856c8a8706"
     },
     {
       "path": "data/normalized/hub_bundle.json",
@@ -515,8 +515,8 @@
       "output_type": null,
       "shared_type": "hub_bundle",
       "format": "json",
-      "size_bytes": 21134,
-      "sha256": "5ad00b4a1bdab793157185d361f3f1e0507d206241081fad6ef30e2fdf0295b9"
+      "size_bytes": 20655,
+      "sha256": "f3cfaae14aae2eb47b1f90c1b122c0bdcc2c8e0cf22815339dfa940196beebc4"
     },
     {
       "path": "data/normalized/hub_health.json",
@@ -524,8 +524,8 @@
       "output_type": null,
       "shared_type": "hub_health",
       "format": "json",
-      "size_bytes": 2322,
-      "sha256": "e1f5515f3c7531399c74cc250e1b0162ca26bd2510a2151ab96b80ce79ceaeb1"
+      "size_bytes": 2273,
+      "sha256": "1d84ab98c2eccfcc7d85a2d498fc7549fe5391b29d42f153b32d6d2f467a3be1"
     },
     {
       "path": "data/normalized/hub_health.md",
@@ -533,8 +533,8 @@
       "output_type": null,
       "shared_type": "hub_health",
       "format": "markdown",
-      "size_bytes": 1122,
-      "sha256": "ce38b7a80c9164ba7cb9bbfac5d6c7fc276e60984962fd957ef2a3ad47632c2a"
+      "size_bytes": 1081,
+      "sha256": "e5dd284a78a7b3f632926eee0d2eabd81b7fb2280758cab6aa1f77e27f69e169"
     },
     {
       "path": "data/normalized/pipeline_metadata.json",
@@ -542,8 +542,8 @@
       "output_type": null,
       "shared_type": "pipeline_metadata",
       "format": "json",
-      "size_bytes": 9142,
-      "sha256": "5175a0244a3da9a0d9c7b661d7afeab5e89f778129c19a7fb9af649ee753ecba"
+      "size_bytes": 8233,
+      "sha256": "dae69c1fd070dcc61f6daefd323d4978f5a969486ba195ff4729834d9985195b"
     },
     {
       "path": "data/normalized/pipeline_status.md",
@@ -551,8 +551,8 @@
       "output_type": null,
       "shared_type": "pipeline_status",
       "format": "markdown",
-      "size_bytes": 2687,
-      "sha256": "4e3b4a47efcfa2141d539928754a728f7896a27dbd91480ef1b4b8c48b155b39"
+      "size_bytes": 2208,
+      "sha256": "98c6e4f69391095a7e63477e935a0ddaabd52c627c0edd49a814c01d30323d19"
     },
     {
       "path": "data/normalized/provenance_report.json",
@@ -560,8 +560,8 @@
       "output_type": null,
       "shared_type": "provenance_report",
       "format": "json",
-      "size_bytes": 2069,
-      "sha256": "2b961ea753e3eeb2c57092cf640f84a1488ec4745a1e36ce3e6d078b4be0820b"
+      "size_bytes": 2104,
+      "sha256": "15987a7cb25dacc6f81d8ebe4c422e0d10831dc500f2800b426f7b5a95fa608b"
     },
     {
       "path": "data/normalized/provenance_report.md",
@@ -569,8 +569,8 @@
       "output_type": null,
       "shared_type": "provenance_report",
       "format": "markdown",
-      "size_bytes": 2349,
-      "sha256": "119b4614845e53af3df913987c337a2608b60e8abc59c0c231b10342d6297bb2"
+      "size_bytes": 2365,
+      "sha256": "a4c97e39096b9e080e76e2e767b3a6e5575c6062b50aa50f17f7a959d6263e03"
     },
     {
       "path": "data/normalized/redistribution_report.json",
@@ -579,7 +579,7 @@
       "shared_type": "redistribution_report",
       "format": "json",
       "size_bytes": 2396,
-      "sha256": "aed99278023acb79f7ae46beb049fbf85b148679acf9459c51ad5a87137e343b"
+      "sha256": "9d93da4babbbcd30fd8f78827027713bc06521b53e11ee9f27ed713e746649d0"
     },
     {
       "path": "data/normalized/redistribution_report.md",
@@ -588,15 +588,15 @@
       "shared_type": "redistribution_report",
       "format": "markdown",
       "size_bytes": 2345,
-      "sha256": "b1d797ac28a43c413ce55ad03e1d7e9431c2aae4ac5bf781e63d904d4c2e6ce5"
+      "sha256": "ba7cfa9508777bda4a9cc45e59c5957c27fbca891ac4579bd0b5d8678f17a5f8"
     }
   ],
   "packages": [
     {
       "path": "data/normalized/chile-hub-publishable-bundle.zip",
       "package_type": "zip",
-      "size_bytes": 31041,
-      "sha256": "5b199a3291608d34f099d98ae103c54726971c635b1aa44bffb52b1d056bdf6a",
+      "size_bytes": 49006,
+      "sha256": "f41553541d7b97531bc1489122ec5e0f3b368e7e6bddbc7607696ff3d7c9ef8f",
       "checksum_path": "data/normalized/chile-hub-publishable-bundle.zip.sha256"
     }
   ]

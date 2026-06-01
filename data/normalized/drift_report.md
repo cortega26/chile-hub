@@ -1,43 +1,43 @@
 # chile-hub drift report
 
-- `generated_at_utc`: `2026-05-31T22:17:30.175286+00:00`
+- `generated_at_utc`: `2026-06-01T15:38:38.360107+00:00`
 - `dataset_count`: `4`
-- `drifted_count`: `3`
-- `healthy_count`: `1`
-- `fallback_count`: `3`
-- `partial_coverage_count`: `3`
-- `degraded_count`: `3`
+- `drifted_count`: `0`
+- `healthy_count`: `4`
+- `fallback_count`: `0`
+- `partial_coverage_count`: `0`
+- `degraded_count`: `0`
 
 | Dataset | Drift | Mode | Coverage | Degradation | Action |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| `regiones` | `drifted` | `fallback` | `partial` | `degraded` | Recuperar comunas live para restaurar cobertura derivada completa. |
-| `provincias` | `drifted` | `fallback` | `partial` | `degraded` | Recuperar comunas live para restaurar cobertura derivada completa. |
-| `comunas` | `drifted` | `fallback` | `partial` | `degraded` | Reintentar extractores o restaurar la fuente territorial primaria. |
+| `regiones` | `healthy` | `live` | `full` | `none` | Ninguna. |
+| `provincias` | `healthy` | `live` | `full` | `none` | Ninguna. |
+| `comunas` | `healthy` | `live` | `full` | `none` | Ninguna. |
 | `indicadores` | `healthy` | `live` | `not_applicable` | `none` | Ninguna. |
 
 ## regiones
 
-- `drift_status`: `drifted`
-- `source_mode`: `fallback`
-- `coverage`: `Cobertura parcial: 11/16 filas respecto del baseline esperado.`
-- `degradation`: Capa derivada desde comunas en fallback; cardinalidad reducida a 11 filas.
-- `recommended_action`: Recuperar comunas live para restaurar cobertura derivada completa.
+- `drift_status`: `healthy`
+- `source_mode`: `live`
+- `coverage`: `Cobertura completa: 16/16 filas respecto del baseline esperado.`
+- `degradation`: Sin degradación operativa detectada en este build.
+- `recommended_action`: Ninguna.
 
 ## provincias
 
-- `drift_status`: `drifted`
-- `source_mode`: `fallback`
-- `coverage`: `Cobertura parcial: 11/56 filas respecto del baseline esperado.`
-- `degradation`: Capa derivada desde comunas en fallback; cardinalidad reducida a 11 filas.
-- `recommended_action`: Recuperar comunas live para restaurar cobertura derivada completa.
+- `drift_status`: `healthy`
+- `source_mode`: `live`
+- `coverage`: `Cobertura completa: 56/56 filas respecto del baseline esperado.`
+- `degradation`: Sin degradación operativa detectada en este build.
+- `recommended_action`: Ninguna.
 
 ## comunas
 
-- `drift_status`: `drifted`
-- `source_mode`: `fallback`
-- `coverage`: `Cobertura parcial: 18/346 filas respecto del baseline esperado.`
-- `degradation`: Cobertura territorial parcial: 18 comunas disponibles desde fallback embebido.
-- `recommended_action`: Reintentar extractores o restaurar la fuente territorial primaria.
+- `drift_status`: `healthy`
+- `source_mode`: `live`
+- `coverage`: `Cobertura completa: 346/346 filas respecto del baseline esperado.`
+- `degradation`: Sin degradación operativa detectada en este build.
+- `recommended_action`: Ninguna.
 
 ## indicadores
 

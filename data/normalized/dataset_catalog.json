@@ -1,16 +1,16 @@
 {
-  "generated_at_utc": "2026-05-31T22:17:30.175286+00:00",
+  "generated_at_utc": "2026-06-01T15:38:38.360107+00:00",
   "dataset_count": 4,
   "datasets": [
     {
       "dataset": "regiones",
       "description": "Capa derivada de regiones para filtros, joins y referencias administrativas de alto nivel.",
-      "source_name": "SUBDERE",
-      "source_url": "https://www.subdere.gov.cl/sites/default/files/documentos/cut_2018_0.xls",
-      "source_mode": "fallback",
-      "source_detail": "embedded_sample",
-      "refreshed_at_utc": "2026-05-31T20:25:25.852270+00:00",
-      "record_count": 11,
+      "source_name": "BCN ArcGIS",
+      "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
+      "source_mode": "live",
+      "source_detail": "bcn_arcgis",
+      "refreshed_at_utc": "2026-06-01T15:38:12.156192+00:00",
+      "record_count": 16,
       "fields": [
         "codigo_region",
         "nombre_region"
@@ -29,25 +29,25 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 1.87,
+        "age_hours": 0.01,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-05-31T22:17:30.175113+00:00"
+        "checked_at_utc": "2026-06-01T15:38:38.359860+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
         "label": "estable"
       },
       "coverage": {
-        "status": "partial",
+        "status": "full",
         "expected_record_count": 16,
-        "actual_record_count": 11,
-        "coverage_ratio": 0.6875,
-        "summary": "Cobertura parcial: 11/16 filas respecto del baseline esperado."
+        "actual_record_count": 16,
+        "coverage_ratio": 1.0,
+        "summary": "Cobertura completa: 16/16 filas respecto del baseline esperado."
       },
       "drift": {
-        "status": "drifted",
-        "summary": "Drift detectado: mode=fallback, coverage=partial, degradation=degraded.",
-        "recommended_action": "Recuperar comunas live para restaurar cobertura derivada completa."
+        "status": "healthy",
+        "summary": "Sin drift operativo detectado en este build.",
+        "recommended_action": "Ninguna."
       },
       "usage_examples": {
         "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('regiones')",
@@ -65,24 +65,24 @@
       "validation_status": "ok",
       "warnings": [],
       "degradation": {
-        "status": "degraded",
-        "impact": "Capa derivada desde comunas en fallback; cardinalidad reducida a 11 filas.",
-        "recommended_action": "Recuperar comunas live para restaurar cobertura derivada completa."
+        "status": "none",
+        "impact": "Sin degradación operativa detectada en este build.",
+        "recommended_action": "Ninguna."
       },
       "notes": [
-        "bcn_fetch_error: Failed to perform, curl: (52) Empty reply from server. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.",
-        "fallback_due_to_missing_remote_file"
+        "bcn_skipped_null_code_records: 1",
+        "bcn_supplemented_missing_comunas: 1"
       ]
     },
     {
       "dataset": "provincias",
       "description": "Capa derivada de provincias para cruces intermedios entre region y comuna.",
-      "source_name": "SUBDERE",
-      "source_url": "https://www.subdere.gov.cl/sites/default/files/documentos/cut_2018_0.xls",
-      "source_mode": "fallback",
-      "source_detail": "embedded_sample",
-      "refreshed_at_utc": "2026-05-31T20:25:25.852270+00:00",
-      "record_count": 11,
+      "source_name": "BCN ArcGIS",
+      "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
+      "source_mode": "live",
+      "source_detail": "bcn_arcgis",
+      "refreshed_at_utc": "2026-06-01T15:38:12.156192+00:00",
+      "record_count": 56,
       "fields": [
         "codigo_region",
         "nombre_region",
@@ -104,25 +104,25 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 1.87,
+        "age_hours": 0.01,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-05-31T22:17:30.175138+00:00"
+        "checked_at_utc": "2026-06-01T15:38:38.359886+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
         "label": "estable"
       },
       "coverage": {
-        "status": "partial",
+        "status": "full",
         "expected_record_count": 56,
-        "actual_record_count": 11,
-        "coverage_ratio": 0.1964,
-        "summary": "Cobertura parcial: 11/56 filas respecto del baseline esperado."
+        "actual_record_count": 56,
+        "coverage_ratio": 1.0,
+        "summary": "Cobertura completa: 56/56 filas respecto del baseline esperado."
       },
       "drift": {
-        "status": "drifted",
-        "summary": "Drift detectado: mode=fallback, coverage=partial, degradation=degraded.",
-        "recommended_action": "Recuperar comunas live para restaurar cobertura derivada completa."
+        "status": "healthy",
+        "summary": "Sin drift operativo detectado en este build.",
+        "recommended_action": "Ninguna."
       },
       "usage_examples": {
         "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('provincias')",
@@ -140,24 +140,24 @@
       "validation_status": "ok",
       "warnings": [],
       "degradation": {
-        "status": "degraded",
-        "impact": "Capa derivada desde comunas en fallback; cardinalidad reducida a 11 filas.",
-        "recommended_action": "Recuperar comunas live para restaurar cobertura derivada completa."
+        "status": "none",
+        "impact": "Sin degradación operativa detectada en este build.",
+        "recommended_action": "Ninguna."
       },
       "notes": [
-        "bcn_fetch_error: Failed to perform, curl: (52) Empty reply from server. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.",
-        "fallback_due_to_missing_remote_file"
+        "bcn_skipped_null_code_records: 1",
+        "bcn_supplemented_missing_comunas: 1"
       ]
     },
     {
       "dataset": "comunas",
       "description": "Base territorial normalizada para cruces por region, provincia y comuna.",
-      "source_name": "SUBDERE",
-      "source_url": "https://www.subdere.gov.cl/sites/default/files/documentos/cut_2018_0.xls",
-      "source_mode": "fallback",
-      "source_detail": "embedded_sample",
-      "refreshed_at_utc": "2026-05-31T20:25:25.852270+00:00",
-      "record_count": 18,
+      "source_name": "BCN ArcGIS",
+      "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
+      "source_mode": "live",
+      "source_detail": "bcn_arcgis",
+      "refreshed_at_utc": "2026-06-01T15:38:12.156192+00:00",
+      "record_count": 346,
       "fields": [
         "codigo_region",
         "nombre_region",
@@ -186,25 +186,25 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 1.87,
+        "age_hours": 0.01,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-05-31T22:17:30.175146+00:00"
+        "checked_at_utc": "2026-06-01T15:38:38.359893+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
         "label": "estable"
       },
       "coverage": {
-        "status": "partial",
+        "status": "full",
         "expected_record_count": 346,
-        "actual_record_count": 18,
-        "coverage_ratio": 0.052,
-        "summary": "Cobertura parcial: 18/346 filas respecto del baseline esperado."
+        "actual_record_count": 346,
+        "coverage_ratio": 1.0,
+        "summary": "Cobertura completa: 346/346 filas respecto del baseline esperado."
       },
       "drift": {
-        "status": "drifted",
-        "summary": "Drift detectado: mode=fallback, coverage=partial, degradation=degraded.",
-        "recommended_action": "Reintentar extractores o restaurar la fuente territorial primaria."
+        "status": "healthy",
+        "summary": "Sin drift operativo detectado en este build.",
+        "recommended_action": "Ninguna."
       },
       "usage_examples": {
         "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('comunas')",
@@ -220,17 +220,15 @@
       },
       "documentation": "docs/datasets/comunas.md",
       "validation_status": "ok",
-      "warnings": [
-        "comunas source_mode is fallback; coverage is limited by design"
-      ],
+      "warnings": [],
       "degradation": {
-        "status": "degraded",
-        "impact": "Cobertura territorial parcial: 18 comunas disponibles desde fallback embebido.",
-        "recommended_action": "Reintentar extractores o restaurar la fuente territorial primaria."
+        "status": "none",
+        "impact": "Sin degradación operativa detectada en este build.",
+        "recommended_action": "Ninguna."
       },
       "notes": [
-        "bcn_fetch_error: Failed to perform, curl: (52) Empty reply from server. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.",
-        "fallback_due_to_missing_remote_file"
+        "bcn_skipped_null_code_records: 1",
+        "bcn_supplemented_missing_comunas: 1"
       ]
     },
     {
@@ -240,7 +238,7 @@
       "source_url": "https://mindicador.cl/api",
       "source_mode": "live",
       "source_detail": "public_api",
-      "refreshed_at_utc": "2026-05-31T20:01:54.399040+00:00",
+      "refreshed_at_utc": "2026-06-01T15:38:37.668778+00:00",
       "record_count": 375,
       "fields": [
         "fecha",
@@ -262,9 +260,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 2.26,
+        "age_hours": 0.0,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-05-31T22:17:30.175250+00:00"
+        "checked_at_utc": "2026-06-01T15:38:38.360066+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 72,
