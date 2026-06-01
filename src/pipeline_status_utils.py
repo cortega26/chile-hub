@@ -459,6 +459,22 @@ def build_overview_markdown(overview):
         )
 
     lines.append("")
+    primary_package = overview.get("primary_package")
+    if primary_package:
+        lines.append("## Primary Package")
+        lines.append("")
+        lines.append(f"- `path`: `{primary_package.get('path', 'unknown')}`")
+        lines.append(f"- `package_type`: `{primary_package.get('package_type', 'unknown')}`")
+        lines.append(f"- `size_bytes`: `{primary_package.get('size_bytes', 0)}`")
+        lines.append(
+            f"- `checksum`: `{primary_package.get('checksum_algorithm', 'unknown')}` "
+            f"via `{primary_package.get('checksum_path', 'unknown')}`"
+        )
+        lines.append(
+            f"- `verification_command`: `{primary_package.get('verification_command', 'unknown')}`"
+        )
+        lines.append("")
+
     report_keys = overview.get("report_keys", [])
     if report_keys:
         lines.append(f"- `report_keys`: `{', '.join(report_keys)}`")

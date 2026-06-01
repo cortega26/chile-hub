@@ -75,6 +75,13 @@ class ChileHubTests(unittest.TestCase):
                 {"none", "warning", "degraded"},
             )
 
+    def test_summary_table(self):
+        table = self.hub.summary_table()
+        self.assertIn("chile-hub summary", table)
+        self.assertIn("dataset      mode      records", table)
+        self.assertIn("comunas", table)
+        self.assertIn("indicadores", table)
+
     def test_example_usage(self):
         example = self.hub.example_usage("comunas", "python")
         self.assertIn("ChileHub", example)
@@ -102,15 +109,80 @@ class ChileHubTests(unittest.TestCase):
         self.assertEqual(overview_report["format"], "json")
         self.assertEqual(overview_report["path"], "data/normalized/overview.json")
 
+    def test_report_index(self):
+        report_index = self.hub.report_index()
+        report_keys = {entry["report_key"] for entry in report_index}
+        self.assertIn("health_json", report_keys)
+        self.assertIn("overview_markdown", report_keys)
+        self.assertTrue(all(entry["shared_type"] for entry in report_index))
+        self.assertTrue(all(entry["path"] for entry in report_index))
+
+    def test_report_index_table(self):
+        table = self.hub.report_index_table()
+        self.assertIn("chile-hub report index", table)
+        self.assertIn("report_key", table)
+        self.assertIn("health_json", table)
+        self.assertIn("overview_markdown", table)
+
+    def test_shared_artifacts_table(self):
+        table = self.hub.shared_artifacts_table("hub_health", "json")
+        self.assertIn("chile-hub shared artifacts", table)
+        self.assertIn("hub_health", table)
+        self.assertIn("data/normalized/hub_health.json", table)
+
     def test_overview(self):
         overview = self.hub.overview()
         self.assertIn(overview["overall_status"], {"ok", "warn", "error"})
         self.assertEqual(overview["dataset_count"], 4)
         self.assertGreaterEqual(overview["shared_artifact_count"], 1)
         self.assertGreaterEqual(overview["package_count"], 1)
+        self.assertEqual(overview["primary_package"]["package_type"], "zip")
+        self.assertEqual(
+            overview["primary_package"]["checksum_path"],
+            "data/normalized/chile-hub-publishable-bundle.zip.sha256",
+        )
+        self.assertEqual(
+            overview["primary_package"]["verification_command"],
+            "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256",
+        )
         self.assertIn("health_json", overview["report_keys"])
         self.assertIn("drift_json", overview["report_keys"])
         self.assertEqual(len(overview["datasets"]), 4)
+
+    def test_primary_package_and_verification(self):
+        package = self.hub.primary_package()
+        verification = self.hub.package_verification()
+        self.assertEqual(package["package_type"], "zip")
+        self.assertEqual(package["path"], "data/normalized/chile-hub-publishable-bundle.zip")
+        self.assertEqual(verification["checksum_algorithm"], "sha256")
+        self.assertEqual(
+            verification["verification_command"],
+            "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256",
+        )
+        self.assertEqual(verification["path"], package["path"])
+
+    def test_packages_table(self):
+        table = self.hub.packages_table()
+        self.assertIn("chile-hub packages", table)
+        self.assertIn("package_type", table)
+        self.assertIn("zip", table)
+        self.assertIn("data/normalized/chile-hub-publishable-bundle.zip", table)
+
+    def test_snapshot_text(self):
+        snapshot = self.hub.snapshot_text()
+        self.assertIn("chile-hub snapshot", snapshot)
+        self.assertIn("status: ok", snapshot)
+        self.assertIn("package: data/normalized/chile-hub-publishable-bundle.zip", snapshot)
+        self.assertIn("verify: shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256", snapshot)
+        self.assertIn("- comunas:", snapshot)
+
+    def test_snapshot_table(self):
+        snapshot = self.hub.snapshot_table()
+        self.assertIn("chile-hub snapshot table", snapshot)
+        self.assertIn("overall_status", snapshot)
+        self.assertIn("package_path", snapshot)
+        self.assertIn("dataset      mode      validation", snapshot)
+        self.assertIn("comunas", snapshot)
 
     def test_inventory_contains_artifact_types(self):
         inventory = self.hub.inventory()
@@ -136,6 +208,13 @@ class ChileHubTests(unittest.TestCase):
         self.assertIn(comunas["coverage_status"], {"full", "partial", "unknown", "not_applicable"})
         self.assertIn(comunas["drift_status"], {"healthy", "drifted"})
         self.assertIn(comunas["degradation_status"], {"none", "warning", "degraded"})
+
+    def test_inventory_table(self):
+        table = self.hub.inventory_table()
+        self.assertIn("chile-hub inventory", table)
+        self.assertIn("dataset      mode      records", table)
+        self.assertIn("comunas", table)
+        self.assertIn("indicadores", table)
 
     def test_unknown_dataset_raises(self):
         with self.assertRaises(KeyError):
@@ -166,6 +245,13 @@ class ChileHubTests(unittest.TestCase):
             health["drifted_count"] + sum(1 for entry in health["datasets"] if entry["drift_status"] == "healthy"),
             4,
         )
+
+    def test_health_table(self):
+        table = self.hub.health_table()
+        self.assertIn("chile-hub health", table)
+        self.assertIn("overall=ok", table)
+        self.assertIn("dataset      severity  mode", table)
+        self.assertIn("comunas", table)
 
     def test_bundle_summary(self):
         bundle = self.bundle
@@ -206,6 +292,13 @@ class ChileHubTests(unittest.TestCase):
         indicadores = next(entry for entry in report["datasets"] if entry["dataset"] == "indicadores")
         self.assertIn(indicadores["publishability_status"], {"ready", "review_terms", "unknown"})
         self.assertTrue(indicadores["recommended_action"])
+
+    def test_redistribution_table(self):
+        table = self.hub.redistribution_table()
+        self.assertIn("chile-hub redistribution", table)
+        self.assertIn("ready=", table)
+        self.assertIn("dataset      status", table)
+        self.assertIn("indicadores", table)
 
     def test_provenance_report(self):
         report = self.hub.provenance()
@@ -346,6 +439,12 @@ class ChileHubCliTests(unittest.TestCase):
             ["regiones", "provincias", "comunas", "indicadores"],
         )
 
+    def test_cli_summary_table(self):
+        result = self.run_cli("summary", "--format", "table")
+        self.assertIn("chile-hub summary", result.stdout)
+        self.assertIn("dataset      mode      records", result.stdout)
+        self.assertIn("comunas", result.stdout)
+
     def test_cli_path(self):
         result = self.run_cli("path", "comunas", "--output", "parquet")
         self.assertTrue(result.stdout.strip().endswith("data/normalized/comunas.parquet"))
@@ -360,9 +459,26 @@ class ChileHubCliTests(unittest.TestCase):
         self.assertIn("data/normalized/regiones.json", result.stdout)
 
     def test_cli_shared_artifacts(self):
-        result = self.run_cli("shared-artifacts", "--shared-type", "hub_health", "--format", "json")
+        result = self.run_cli("shared-artifacts", "--shared-type", "hub_health", "--artifact-format", "json")
         self.assertIn('"shared_type": "hub_health"', result.stdout)
         self.assertIn('"path": "data/normalized/hub_health.json"', result.stdout)
+
+    def test_cli_shared_artifacts_table(self):
+        result = self.run_cli("shared-artifacts", "--shared-type", "hub_health", "--artifact-format", "json", "--output", "table")
+        self.assertIn("chile-hub shared artifacts", result.stdout)
+        self.assertIn("hub_health", result.stdout)
+        self.assertIn("data/normalized/hub_health.json", result.stdout)
+
+    def test_cli_reports(self):
+        result = self.run_cli("reports")
+        self.assertIn('"report_key": "health_json"', result.stdout)
+        self.assertIn('"report_key": "overview_markdown"', result.stdout)
+
+    def test_cli_reports_table(self):
+        result = self.run_cli("reports", "--format", "table")
+        self.assertIn("chile-hub report index", result.stdout)
+        self.assertIn("health_json", result.stdout)
+        self.assertIn("overview_markdown", result.stdout)
 
     def test_cli_report(self):
         result = self.run_cli("report", "drift_report", "--format", "markdown")
@@ -384,10 +500,32 @@ class ChileHubCliTests(unittest.TestCase):
         self.assertIn('"reuse_status":', result.stdout)
         self.assertIn('"degradation_status":', result.stdout)
 
+    def test_cli_inventory_table(self):
+        result = self.run_cli("inventory", "--format", "table")
+        self.assertIn("chile-hub inventory", result.stdout)
+        self.assertIn("dataset      mode      records", result.stdout)
+        self.assertIn("comunas", result.stdout)
+
+    def test_cli_snapshot(self):
+        result = self.run_cli("snapshot")
+        self.assertIn("chile-hub snapshot", result.stdout)
+        self.assertIn("status: ok", result.stdout)
+        self.assertIn("package: data/normalized/chile-hub-publishable-bundle.zip", result.stdout)
+        self.assertIn("verify: shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256", result.stdout)
+
+    def test_cli_snapshot_table(self):
+        result = self.run_cli("snapshot", "--format", "table")
+        self.assertIn("chile-hub snapshot table", result.stdout)
+        self.assertIn("overall_status", result.stdout)
+        self.assertIn("dataset      mode      validation", result.stdout)
+        self.assertIn("comunas", result.stdout)
+
     def test_cli_overview(self):
         result = self.run_cli("overview")
         self.assertIn('"overall_status":', result.stdout)
         self.assertIn('"shared_artifact_count":', result.stdout)
+        self.assertIn('"primary_package": {', result.stdout)
+        self.assertIn('"verification_command": "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256"', result.stdout)
         self.assertIn('"report_keys":', result.stdout)
 
     def test_cli_health(self):
@@ -397,6 +535,12 @@ class ChileHubCliTests(unittest.TestCase):
         self.assertIn('"review_terms_count":', result.stdout)
         self.assertIn('"partial_coverage_count":', result.stdout)
         self.assertIn('"drifted_count":', result.stdout)
+
+    def test_cli_health_table(self):
+        result = self.run_cli("health", "--format", "table")
+        self.assertIn("chile-hub health", result.stdout)
+        self.assertIn("overall=ok", result.stdout)
+        self.assertIn("dataset      severity  mode", result.stdout)
 
     def test_cli_bundle(self):
         result = self.run_cli("bundle")
@@ -408,11 +552,36 @@ class ChileHubCliTests(unittest.TestCase):
         result = self.run_cli("packages")
         self.assertIn('"package_type": "zip"', result.stdout)
         self.assertIn('"path": "data/normalized/chile-hub-publishable-bundle.zip"', result.stdout)
+        self.assertIn('"checksum_algorithm": "sha256"', result.stdout)
+        self.assertIn('"verification_command": "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256"', result.stdout)
+
+    def test_cli_packages_table(self):
+        result = self.run_cli("packages", "--format", "table")
+        self.assertIn("chile-hub packages", result.stdout)
+        self.assertIn("package_type", result.stdout)
+        self.assertIn("data/normalized/chile-hub-publishable-bundle.zip", result.stdout)
+
+    def test_cli_package(self):
+        result = self.run_cli("package")
+        self.assertIn('"package_type": "zip"', result.stdout)
+        self.assertIn('"path": "data/normalized/chile-hub-publishable-bundle.zip"', result.stdout)
+
+    def test_cli_verify_package(self):
+        result = self.run_cli("verify-package")
+        self.assertIn('"checksum_algorithm": "sha256"', result.stdout)
+        self.assertIn('"checksum_path": "data/normalized/chile-hub-publishable-bundle.zip.sha256"', result.stdout)
+        self.assertIn('"verification_command": "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256"', result.stdout)
 
     def test_cli_redistribution(self):
         result = self.run_cli("redistribution")
         self.assertIn('"review_terms_count":', result.stdout)
         self.assertIn('"dataset": "indicadores"', result.stdout)
+
+    def test_cli_redistribution_table(self):
+        result = self.run_cli("redistribution", "--format", "table")
+        self.assertIn("chile-hub redistribution", result.stdout)
+        self.assertIn("dataset      status", result.stdout)
+        self.assertIn("indicadores", result.stdout)
 
     def test_cli_provenance(self):
         result = self.run_cli("provenance")

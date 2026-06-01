@@ -562,6 +562,54 @@ def verify_drift_report():
             fail(f"drift_report.json is missing recommended_action: {entry}")
 
 
+def verify_overview():
+    overview_path = NORMALIZED_DIR / "overview.json"
+    overview = load_json(overview_path)
+
+    if overview.get("dataset_count") != len(REQUIRED_DATASETS):
+        fail(f"overview.json has unexpected dataset_count: {overview.get('dataset_count')}")
+    if overview.get("overall_status") not in {"ok", "warn", "error"}:
+        fail(f"overview.json has invalid overall_status: {overview.get('overall_status')}")
+    if overview.get("shared_artifact_count", 0) <= 0:
+        fail(f"overview.json has invalid shared_artifact_count: {overview.get('shared_artifact_count')}")
+    if overview.get("package_count", 0) <= 0:
+        fail(f"overview.json has invalid package_count: {overview.get('package_count')}")
+
+    primary_package = overview.get("primary_package")
+    if not primary_package:
+        fail("overview.json is missing primary_package")
+    if primary_package.get("path") != "data/normalized/chile-hub-publishable-bundle.zip":
+        fail(f"overview.json has invalid primary_package.path: {primary_package}")
+    if primary_package.get("package_type") != "zip":
+        fail(f"overview.json has invalid primary_package.package_type: {primary_package}")
+    if primary_package.get("checksum_algorithm") != "sha256":
+        fail(f"overview.json has invalid primary_package.checksum_algorithm: {primary_package}")
+    if primary_package.get("checksum_path") != "data/normalized/chile-hub-publishable-bundle.zip.sha256":
+        fail(f"overview.json has invalid primary_package.checksum_path: {primary_package}")
+    if primary_package.get("verification_command") != "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256":
+        fail(f"overview.json has invalid primary_package.verification_command: {primary_package}")
+
+    report_keys = overview.get("report_keys", [])
+    if "overview_json" not in report_keys or "health_json" not in report_keys or "drift_json" not in report_keys:
+        fail(f"overview.json has incomplete report_keys: {report_keys}")
+
+    datasets = overview.get("datasets", [])
+    dataset_names = {entry.get("dataset") for entry in datasets}
+    if dataset_names != REQUIRED_DATASETS:
+        fail(f"overview.json has unexpected datasets: {sorted(dataset_names)}")
+    for entry in datasets:
+        if entry.get("source_mode") not in {"live", "fallback"}:
+            fail(f"overview.json has invalid source_mode: {entry}")
+        if entry.get("validation_status") != "ok":
+            fail(f"overview.json has unexpected validation_status: {entry}")
+        if entry.get("freshness_status") not in {"fresh", "stale", "unknown"}:
+            fail(f"overview.json has invalid freshness_status: {entry}")
+        if entry.get("coverage_status") not in {"full", "partial", "unknown", "not_applicable"}:
+            fail(f"overview.json has invalid coverage_status: {entry}")
+        if entry.get("drift_status") not in {"healthy", "drifted"}:
+            fail(f"overview.json has invalid drift_status: {entry}")
+
+
 def verify_publishable_zip():
     zip_path = NORMALIZED_DIR / "chile-hub-publishable-bundle.zip"
     if zip_path.stat().st_size <= 0:
@@ -580,6 +628,7 @@ def main():
     verify_redistribution_report()
     verify_provenance_report()
     verify_drift_report()
+    verify_overview()
     verify_dataset_catalog()
     verify_artifact_manifest()
     verify_publishable_zip()

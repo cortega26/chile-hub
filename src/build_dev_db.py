@@ -765,6 +765,10 @@ def write_drift_report_json(report):
 
 
 def build_overview(hub_health, hub_bundle, artifact_manifest):
+    primary_package = next(
+        (package for package in artifact_manifest.get("packages", []) if package.get("package_type") == "zip"),
+        None,
+    )
     return {
         "generated_at_utc": hub_health.get("generated_at_utc"),
         "overall_status": hub_health.get("overall_status"),
@@ -780,6 +784,16 @@ def build_overview(hub_health, hub_bundle, artifact_manifest):
             [entry for entry in artifact_manifest.get("artifacts", []) if entry.get("shared_type")]
         ),
         "package_count": len(artifact_manifest.get("packages", [])),
+        "primary_package": {
+            "path": primary_package.get("path"),
+            "package_type": primary_package.get("package_type"),
+            "size_bytes": primary_package.get("size_bytes"),
+            "checksum_algorithm": primary_package.get("checksum_algorithm"),
+            "checksum_path": primary_package.get("checksum_path"),
+            "verification_command": primary_package.get("verification_command"),
+        }
+        if primary_package
+        else None,
         "report_keys": sorted(hub_bundle.get("reports", {}).keys()),
         "datasets": [
             {

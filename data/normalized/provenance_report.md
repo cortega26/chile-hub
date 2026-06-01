@@ -1,16 +1,16 @@
 # chile-hub provenance report
 
-- `generated_at_utc`: `2026-06-01T17:27:34.063201+00:00`
+- `generated_at_utc`: `2026-06-01T17:37:55.601608+00:00`
 - `dataset_count`: `4`
 - `live_count`: `4`
 - `fallback_count`: `0`
 
 | Dataset | Source | Mode | Detail | Refreshed | Freshness | Reuse |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `regiones` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-01T15:59:50.538076+00:00` | `fresh (1.46h / 2160h)` | `open-attribution` |
-| `provincias` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-01T15:59:50.538076+00:00` | `fresh (1.46h / 2160h)` | `open-attribution` |
-| `comunas` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-01T15:59:50.538076+00:00` | `fresh (1.46h / 2160h)` | `open-attribution` |
-| `indicadores` | Banco Central de Chile (via mindicador.cl) | `live` | `public_api` | `2026-06-01T15:38:37.668778+00:00` | `fresh (1.82h / 72h)` | `open-attribution` |
+| `regiones` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-01T15:59:50.538076+00:00` | `fresh (1.63h / 2160h)` | `open-attribution` |
+| `provincias` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-01T15:59:50.538076+00:00` | `fresh (1.63h / 2160h)` | `open-attribution` |
+| `comunas` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-01T15:59:50.538076+00:00` | `fresh (1.63h / 2160h)` | `open-attribution` |
+| `indicadores` | Banco Central de Chile (via mindicador.cl) | `live` | `public_api` | `2026-06-01T15:38:37.668778+00:00` | `fresh (1.99h / 72h)` | `open-attribution` |
 
 ## regiones
 
@@ -19,7 +19,7 @@
 - `source_mode`: `live`
 - `source_detail`: `bcn_arcgis`
 - `refreshed_at_utc`: `2026-06-01T15:59:50.538076+00:00`
-- `freshness`: `fresh (1.46h / 2160h)`
+- `freshness`: `fresh (1.63h / 2160h)`
 - `reuse_status`: `open-attribution`
 - `documentation`: `docs/datasets/regiones.md`
 
@@ -30,7 +30,7 @@
 - `source_mode`: `live`
 - `source_detail`: `bcn_arcgis`
 - `refreshed_at_utc`: `2026-06-01T15:59:50.538076+00:00`
-- `freshness`: `fresh (1.46h / 2160h)`
+- `freshness`: `fresh (1.63h / 2160h)`
 - `reuse_status`: `open-attribution`
 - `documentation`: `docs/datasets/provincias.md`
 
@@ -41,7 +41,7 @@
 - `source_mode`: `live`
 - `source_detail`: `bcn_arcgis`
 - `refreshed_at_utc`: `2026-06-01T15:59:50.538076+00:00`
-- `freshness`: `fresh (1.46h / 2160h)`
+- `freshness`: `fresh (1.63h / 2160h)`
 - `reuse_status`: `open-attribution`
 - `documentation`: `docs/datasets/comunas.md`
 
@@ -52,6 +52,6 @@
 - `source_mode`: `live`
 - `source_detail`: `public_api`
 - `refreshed_at_utc`: `2026-06-01T15:38:37.668778+00:00`
-- `freshness`: `fresh (1.82h / 72h)`
+- `freshness`: `fresh (1.99h / 72h)`
 - `reuse_status`: `open-attribution`
 - `documentation`: `docs/datasets/indicadores.md`

@@ -60,6 +60,15 @@ def verify_landing():
     review_terms_count = health.get("review_terms_count", 0)
     warning_count = health.get("warning_count", 0)
     overall_status = bundle.get("overall_status", "unknown")
+    zip_package = next(
+        (package for package in bundle.get("packages", []) if package.get("package_type") == "zip"),
+        None,
+    )
+    expected_verification_command = (
+        zip_package.get("verification_command")
+        if zip_package and zip_package.get("verification_command")
+        else "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256"
+    )
     expected_status_subtitle = (
         f"{live_count}/{len(datasets)} capas operativas en modo live. "
         f"Estado global: {overall_status}. "
@@ -112,7 +121,7 @@ def verify_landing():
             fail(f"Unexpected package verify title: {package_verify_title}")
 
         package_verify_line = page.locator("#package-verify-code").inner_text().splitlines()[0]
-        if package_verify_line != "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256":
+        if package_verify_line != expected_verification_command:
             fail(f"Unexpected package verify command: {package_verify_line}")
 
         package_copy = page.locator("#package-verify-copy")

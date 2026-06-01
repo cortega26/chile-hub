@@ -194,23 +194,36 @@ df_comunas = hub.load_polars("comunas")
 
 ```bash
 python -m src.chile_hub list
+python -m src.chile_hub summary --format table
 python -m src.chile_hub show comunas
 python -m src.chile_hub path comunas --output parquet
 python -m src.chile_hub example indicadores --kind duckdb
 python -m src.chile_hub artifacts comunas
-python -m src.chile_hub shared-artifacts --shared-type hub_health --format json
+python -m src.chile_hub shared-artifacts --shared-type hub_health --artifact-format json
+python -m src.chile_hub shared-artifacts --shared-type hub_health --artifact-format json --output table
+python -m src.chile_hub reports
+python -m src.chile_hub reports --format table
 python -m src.chile_hub report drift_report --format markdown
 python -m src.chile_hub overview
+python -m src.chile_hub snapshot
+python -m src.chile_hub snapshot --format table
 python -m src.chile_hub inventory
+python -m src.chile_hub inventory --format table
 python -m src.chile_hub health
+python -m src.chile_hub health --format table
 python -m src.chile_hub bundle
 python -m src.chile_hub packages
+python -m src.chile_hub packages --format table
+python -m src.chile_hub package
+python -m src.chile_hub verify-package
 python -m src.chile_hub redistribution
+python -m src.chile_hub redistribution --format table
 python -m src.chile_hub provenance
 python -m src.chile_hub drift
 ```
 
 `summary` e `inventory` ahora exponen también `freshness_status`, `freshness_age_hours`, `coverage_status` y `coverage_ratio` por capa, para detectar builds envejecidos o con regresión de cobertura sin tener que abrir los JSON crudos.
+`summary` también puede emitirse como tabla compacta con `summary --format table`.
 También exponen `reuse_status`, `reuse_license` y si la capa requiere atribución.
 También exponen `degradation_status` para distinguir una capa sana de una capa operativamente degradada.
 Además incluyen `warning_count`, que sube automáticamente cuando una capa queda `stale`, `unknown` o entra en fallback con advertencias operativas.
@@ -219,11 +232,22 @@ También agrega conteos de publicabilidad: cuántas capas están listas para red
 Y ahora agrega conteos de degradación operativa y cobertura parcial, para distinguir warnings genéricos de capas realmente degradadas o con regresión de cardinalidad.
 `bundle` entrega un único índice machine-readable que consolida health, catálogo, reportes tipados y artefactos publicables por dataset.
 `packages` expone los paquetes publicables del hub, incluido el ZIP listo para descarga.
+También puede emitirse como tabla compacta con `packages --format table`.
+`package` resuelve directamente el package principal del hub sin tener que inspeccionar una lista completa.
+`verify-package` expone la receta exacta para verificar integridad del package principal usando la metadata publicada del propio hub.
 `shared-artifacts` lista artefactos compartidos del hub usando `shared_type` y `format`, sin depender de nombres de archivo.
+Ahora también puede emitirse como tabla compacta con `--output table`.
+`reports` lista los reportes compartidos del bundle y puede emitirse como tabla compacta para descubrir rápido qué vistas existen.
 `report` resuelve metadata de un reporte compartido específico usando la misma semántica.
 `overview` entrega una vista compacta del estado actual del hub: counts agregados, reportes publicados y estado breve por capa.
+Ahora también incluye un resumen del package principal, con checksum y comando exacto de verificación.
+`snapshot` entrega una versión humana y rápida de ese mismo estado para leer desde terminal sin navegar JSON.
+También puede emitirse como tabla compacta con `snapshot --format table`.
+`inventory` también puede emitirse como tabla compacta con `inventory --format table` para inspeccionar outputs, tamaños y estado por capa sin leer JSON largo.
+`health` también puede emitirse como tabla compacta con `health --format table` para revisar estado agregado y severidad por capa sin navegar JSON.
 Esa misma vista también se publica como `overview.json` y `overview.md` dentro de `data/normalized/`.
 `redistribution` entrega un inventario explícito de publicabilidad por capa con licencia, acción recomendada y cautelas de redistribución.
+También puede emitirse como tabla compacta con `redistribution --format table`.
 `provenance` entrega un inventario explícito de procedencia efectiva por capa, incluyendo fuente, modo, detalle y timestamp del último refresh.
 `drift` entrega una vista explícita de drift operativo por capa, consolidando fallback, cobertura parcial, degradación y acción recomendada.
 Además, cada dataset del catálogo y del bundle publica ahora una sección `degradation` con impacto y acción recomendada cuando la capa cae a fallback o warning operativo.
@@ -364,18 +388,30 @@ make test
 make check
 make status
 make hub-list
+make hub-summary-table
 make hub-example
 make hub-artifacts
 make hub-shared-artifacts
+make hub-shared-artifacts-table
+make hub-reports
+make hub-reports-table
 make hub-report
 make hub-inventory
+make hub-inventory-table
+make hub-snapshot
+make hub-snapshot-table
 make hub-overview
 make hub-health
+make hub-health-table
 make hub-bundle
+make hub-packages
+make hub-packages-table
+make hub-package
+make hub-package-verify
 make hub-redistribution
+make hub-redistribution-table
 make hub-provenance
 make hub-drift
-make hub-packages
 make package-bundle
 ```
 
@@ -395,7 +431,8 @@ También expone `provenance_report.json` y `provenance_report.md` como vista dir
 También expone `overview.json` y `overview.md` como snapshot compacto del estado actual del hub.
 Y muestra el `Bundle ZIP` como descarga directa del paquete publicable.
 Además dedica un bloque visible al paquete descargable, con tamaño y hash abreviado del ZIP del último build.
-Ese mismo bloque incluye una receta copiables para verificar la integridad del ZIP con `shasum -a 256`.
+Ese mismo bloque incluye una receta copiable para verificar la integridad del ZIP con `shasum -a 256`.
+La receta se deriva de la metadata publicada del package (`verification_command`, `checksum_algorithm`, `checksum_path`) para no depender de strings hardcodeados en la UI.
 También muestra `freshness`, `coverage` y `degradation` por dataset, además de conteos agregados de capas `stale`, `degraded` y con cobertura parcial para detectar drifting del hub.
 También muestra metadata de reuso por capa, incluyendo licencia o cautela de redistribución y si requiere atribución.
 Y el banner superior resume cuántas capas siguen en `review_terms`.
