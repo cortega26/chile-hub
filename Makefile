@@ -1,7 +1,7 @@
 PYTHON ?= $(if $(wildcard .venv/bin/python),.venv/bin/python,python3)
 VENV_DIR ?= .venv
 
-.PHONY: help bootstrap install-browsers doctor extract build verify verify-landing test check refresh status catalog hub-list hub-summary hub-summary-table hub-example hub-artifacts hub-shared-artifacts hub-shared-artifacts-table hub-reports hub-reports-table hub-report hub-inventory hub-inventory-table hub-snapshot hub-snapshot-table hub-overview hub-overview-table hub-health hub-health-table hub-bundle hub-freshness-audit hub-freshness-audit-table hub-runtime-status hub-runtime-status-table hub-top-issue hub-top-issue-text hub-packages hub-packages-table hub-package hub-package-verify hub-redistribution hub-redistribution-table hub-provenance hub-provenance-table hub-drift hub-drift-table package-bundle clean-publishable
+.PHONY: help bootstrap install-browsers doctor extract build verify verify-landing test check refresh status catalog hub-list hub-summary hub-summary-table hub-example hub-artifacts hub-shared-artifacts hub-shared-artifacts-table hub-reports hub-reports-table hub-report hub-inventory hub-inventory-table hub-snapshot hub-snapshot-table hub-overview hub-overview-table hub-health hub-health-table hub-bundle hub-freshness-audit hub-freshness-audit-table hub-runtime-status hub-runtime-status-table hub-top-issue hub-top-issue-text hub-top-issue-table hub-packages hub-packages-table hub-package hub-package-verify hub-redistribution hub-redistribution-table hub-provenance hub-provenance-table hub-drift hub-drift-table package-bundle clean-publishable
 
 help:
 	@printf "Targets disponibles:\n"
@@ -42,6 +42,7 @@ help:
 	@printf "  make hub-runtime-status-table Muestra estado runtime en tabla compacta\n"
 	@printf "  make hub-top-issue    Muestra la capa prioritaria que requiere atención\n"
 	@printf "  make hub-top-issue-text Muestra top issue en formato breve\n"
+	@printf "  make hub-top-issue-table Muestra top issue en tabla compacta\n"
 	@printf "  make hub-packages     Muestra paquetes publicables del hub\n"
 	@printf "  make hub-packages-table Muestra indice tabular de paquetes publicables\n"
 	@printf "  make hub-package      Muestra el package principal del hub\n"
@@ -169,6 +170,9 @@ hub-top-issue:
 
 hub-top-issue-text:
 	$(PYTHON) -m src.chile_hub top-issue --format text
+
+hub-top-issue-table:
+	$(PYTHON) -m src.chile_hub top-issue --format table
 
 hub-packages:
 	$(PYTHON) -m src.chile_hub packages

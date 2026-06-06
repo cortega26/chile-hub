@@ -113,6 +113,26 @@ class ChileHub:
             return None
         return ordered[0]
 
+    def top_issue_table(self):
+        top_issue = self.top_issue()
+        lines = ["chile-hub top issue", ""]
+        if not top_issue:
+            lines.append("Sin top issue activo.")
+            return "\n".join(lines) + "\n"
+
+        rows = [
+            ("dataset", top_issue.get("dataset", "unknown")),
+            ("attention_priority", str(top_issue.get("attention_priority", "unknown"))),
+            ("build_freshness_status", top_issue.get("build_freshness_status", "unknown")),
+            ("current_freshness_status", top_issue.get("current_freshness_status", "unknown")),
+            ("drift_status", top_issue.get("drift_status", "unknown")),
+            ("degradation_status", top_issue.get("degradation_status", "unknown")),
+            ("warning_count", str(top_issue.get("warning_count", 0))),
+        ]
+        label_width = max(len(label) for label, _ in rows)
+        lines.extend(f"{label.ljust(label_width)} : {value}" for label, value in rows)
+        return "\n".join(lines) + "\n"
+
     def list_datasets(self):
         return [entry["dataset"] for entry in self.catalog.get("datasets", [])]
 
@@ -1047,7 +1067,7 @@ def build_parser():
     )
     top_issue_parser.add_argument(
         "--format",
-        choices=["json", "text"],
+        choices=["json", "text", "table"],
         default="json",
         help="Formato de salida de top-issue",
     )
@@ -1195,7 +1215,9 @@ def main():
 
     if args.command == "top-issue":
         top_issue = hub.top_issue()
-        if args.format == "text":
+        if args.format == "table":
+            print(hub.top_issue_table(), end="")
+        elif args.format == "text":
             if not top_issue:
                 print("chile-hub top issue\n\nSin top issue activo.\n", end="")
             else:

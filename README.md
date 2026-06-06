@@ -222,6 +222,7 @@ python -m src.chile_hub runtime-status
 python -m src.chile_hub runtime-status --format table
 python -m src.chile_hub top-issue
 python -m src.chile_hub top-issue --format text
+python -m src.chile_hub top-issue --format table
 python -m src.chile_hub packages
 python -m src.chile_hub packages --format table
 python -m src.chile_hub package
@@ -267,6 +268,7 @@ También puede emitirse como tabla compacta con `freshness-audit --format table`
 También puede emitirse como tabla compacta con `runtime-status --format table`.
 Esa vista también publica `top_issue` para mantener la misma prioridad operativa que usa la landing.
 `top-issue` expone directamente esa capa prioritaria sin tener que leer `overview` o `runtime-status` completos.
+También puede emitirse como tabla compacta con `top-issue --format table`.
 Esa misma vista también se publica como `overview.json` y `overview.md` dentro de `data/normalized/`.
 `redistribution` entrega un inventario explícito de publicabilidad por capa con licencia, acción recomendada y cautelas de redistribución.
 También puede emitirse como tabla compacta con `redistribution --format table`.
@@ -435,6 +437,7 @@ make hub-runtime-status
 make hub-runtime-status-table
 make hub-top-issue
 make hub-top-issue-text
+make hub-top-issue-table
 make hub-packages
 make hub-packages-table
 make hub-package
@@ -474,6 +477,7 @@ Cuando una capa tiene warnings activos, la card muestra además una `Acción rec
 Esas capas también se resaltan visualmente con estado `atención`, para que las señales stale/drift/warning no queden enterradas entre cards sanas.
 Además, el catálogo de la landing prioriza arriba las capas con atención operativa activa, para que el problema más relevante del momento aparezca primero.
 El banner superior también publica `Top issue` y un acceso directo `Ver top issue` hacia esa card priorizada.
+Al seguir ese acceso, la card destino queda además resaltada como `:target` para que el foco visual no se pierda.
 También muestra metadata de reuso por capa, incluyendo licencia o cautela de redistribución y si requiere atribución.
 Y el banner superior resume cuántas capas siguen en `review_terms`.
 También incluye recetas breves de consumo para `Python`, `DuckDB` y la `CLI` local del proyecto.

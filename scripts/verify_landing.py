@@ -136,6 +136,9 @@ def verify_landing():
         expected_status_actions = ["Status", "Health JSON", "Health MD", "Bundle JSON", "Reuse JSON", "Reuse MD", "Provenance JSON", "Provenance MD", "Drift JSON", "Drift MD", "Overview JSON", "Overview MD", "Catalog JSON", "Catalog MD", "Manifest", "Ver top issue"]
         if status_actions != expected_status_actions:
             fail(f"Unexpected status actions: {status_actions}")
+        top_issue_href = page.get_by_role("link", name="Ver top issue").get_attribute("href")
+        if top_issue_href != "#dataset-indicadores":
+            fail(f"Unexpected top issue href: {top_issue_href}")
 
         status_subtitle = page.locator("#status-subtitle").inner_text()
         if status_subtitle != expected_status_subtitle:
@@ -249,6 +252,11 @@ def verify_landing():
         indicadores_card = page.locator(".dataset-card").filter(
             has=page.locator(".dataset-name", has_text="indicadores")
         ).first
+        page.get_by_role("link", name="Ver top issue").click()
+        page.wait_for_timeout(100)
+        hash_value = page.evaluate("() => window.location.hash")
+        if hash_value != "#dataset-indicadores":
+            fail(f"Unexpected hash after top issue click: {hash_value}")
         indicadores_attention = indicadores_card.evaluate("el => el.classList.contains('attention')")
         if not indicadores_attention:
             fail("Indicadores card is missing attention visual state")
