@@ -1400,37 +1400,6 @@ make hub-list</pre>
                 || (zipPackage?.checksum_path ? `shasum -a 256 -c ${zipPackage.checksum_path}` : "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256");
 
             statusSubtitle.textContent = `${liveCount}/${datasets.length} capas operativas en modo live. Estado build: ${buildOverallStatus}. Estado actual: ${currentOverallStatus}. ${staleCount === 0 ? "Sin capas stale." : `${staleCount} capas stale.`} ${unknownFreshnessCount === 0 ? "Sin capas con freshness unknown." : `${unknownFreshnessCount} capas con freshness unknown.`} ${driftedCount === 0 ? "Sin capas con drift." : `${driftedCount} capas con drift.`} ${degradedCount === 0 ? "Sin capas degradadas." : `${degradedCount} capas degradadas.`} ${partialCoverageCount === 0 ? "Sin regresiones de cobertura." : `${partialCoverageCount} capas con cobertura parcial.`} ${reviewTermsCount === 0 ? "Sin capas en review_terms." : `${reviewTermsCount} capas en review_terms.`} ${warningCount === 0 ? "Sin warnings activos." : `${warningCount} warnings activos.`}`;
-            statusPills.innerHTML = `
-                <span class="status-pill">Estado build: ${buildOverallStatus}</span>
-                <span class="status-pill">Estado actual: ${currentOverallStatus}</span>
-                <span class="status-pill">Capas: ${datasets.length}</span>
-                <span class="status-pill">Live: ${liveCount}</span>
-                <span class="status-pill">Stale: ${staleCount}</span>
-                <span class="status-pill">Freshness unknown: ${unknownFreshnessCount}</span>
-                <span class="status-pill">Drifted: ${driftedCount}</span>
-                <span class="status-pill">Degraded: ${degradedCount}</span>
-                <span class="status-pill">Partial coverage: ${partialCoverageCount}</span>
-                <span class="status-pill">Review terms: ${reviewTermsCount}</span>
-                <span class="status-pill">Warnings: ${warningCount}</span>
-            `;
-            statusActions.innerHTML = `
-                ${buildSimpleLink(findReportPath(reports, "pipeline_status", "markdown", "data/normalized/pipeline_status.md"), "Status")}
-                ${buildSimpleLink(findReportPath(reports, "hub_health", "json", "data/normalized/hub_health.json"), "Health JSON")}
-                ${buildSimpleLink(findReportPath(reports, "hub_health", "markdown", "data/normalized/hub_health.md"), "Health MD")}
-                ${buildSimpleLink(findReportPath(reports, "hub_bundle", "json", "data/normalized/hub_bundle.json"), "Bundle JSON")}
-                ${buildSimpleLink(findReportPath(reports, "redistribution_report", "json", "data/normalized/redistribution_report.json"), "Reuse JSON")}
-                ${buildSimpleLink(findReportPath(reports, "redistribution_report", "markdown", "data/normalized/redistribution_report.md"), "Reuse MD")}
-                ${buildSimpleLink(findReportPath(reports, "provenance_report", "json", "data/normalized/provenance_report.json"), "Provenance JSON")}
-                ${buildSimpleLink(findReportPath(reports, "provenance_report", "markdown", "data/normalized/provenance_report.md"), "Provenance MD")}
-                ${buildSimpleLink(findReportPath(reports, "drift_report", "json", "data/normalized/drift_report.json"), "Drift JSON")}
-                ${buildSimpleLink(findReportPath(reports, "drift_report", "markdown", "data/normalized/drift_report.md"), "Drift MD")}
-                ${buildSimpleLink(findReportPath(reports, "overview", "json", "data/normalized/overview.json"), "Overview JSON")}
-                ${buildSimpleLink(findReportPath(reports, "overview", "markdown", "data/normalized/overview.md"), "Overview MD")}
-                ${buildSimpleLink(findReportPath(reports, "dataset_catalog", "json", "data/normalized/dataset_catalog.json"), "Catalog JSON")}
-                ${buildSimpleLink(findReportPath(reports, "dataset_catalog", "markdown", "data/normalized/dataset_catalog.md"), "Catalog MD")}
-                ${buildSimpleLink(findReportPath(reports, "artifact_manifest", "json", "data/normalized/artifact_manifest.json"), "Manifest")}
-            `;
-
             packageMeta.textContent = zipPackage
                 ? `Tamaño: ${formatBytes(zipPackage.size_bytes)} · sha256: ${zipHash} · generado junto al último build`
                 : "No hay package ZIP disponible en este build.";
@@ -1452,6 +1421,44 @@ make hub-list</pre>
                 if (leftPriority !== rightPriority) return leftPriority - rightPriority;
                 return left.dataset.localeCompare(right.dataset, "es");
             });
+            const topAttentionDataset = orderedDatasets.find(dataset => {
+                const runtimeFreshness = runtimeFreshnessByDataset[dataset.dataset] || { status: "unknown" };
+                return computeAttentionPriority(dataset, runtimeFreshness) === 0;
+            });
+
+            statusPills.innerHTML = `
+                <span class="status-pill">Estado build: ${buildOverallStatus}</span>
+                <span class="status-pill">Estado actual: ${currentOverallStatus}</span>
+                ${topAttentionDataset ? `<span class="status-pill">Top issue: ${escapeHtml(topAttentionDataset.dataset)}</span>` : ""}
+                <span class="status-pill">Capas: ${datasets.length}</span>
+                <span class="status-pill">Live: ${liveCount}</span>
+                <span class="status-pill">Stale: ${staleCount}</span>
+                <span class="status-pill">Freshness unknown: ${unknownFreshnessCount}</span>
+                <span class="status-pill">Drifted: ${driftedCount}</span>
+                <span class="status-pill">Degraded: ${degradedCount}</span>
+                <span class="status-pill">Partial coverage: ${partialCoverageCount}</span>
+                <span class="status-pill">Review terms: ${reviewTermsCount}</span>
+                <span class="status-pill">Warnings: ${warningCount}</span>
+            `;
+
+            statusActions.innerHTML = `
+                ${buildSimpleLink(findReportPath(reports, "pipeline_status", "markdown", "data/normalized/pipeline_status.md"), "Status")}
+                ${buildSimpleLink(findReportPath(reports, "hub_health", "json", "data/normalized/hub_health.json"), "Health JSON")}
+                ${buildSimpleLink(findReportPath(reports, "hub_health", "markdown", "data/normalized/hub_health.md"), "Health MD")}
+                ${buildSimpleLink(findReportPath(reports, "hub_bundle", "json", "data/normalized/hub_bundle.json"), "Bundle JSON")}
+                ${buildSimpleLink(findReportPath(reports, "redistribution_report", "json", "data/normalized/redistribution_report.json"), "Reuse JSON")}
+                ${buildSimpleLink(findReportPath(reports, "redistribution_report", "markdown", "data/normalized/redistribution_report.md"), "Reuse MD")}
+                ${buildSimpleLink(findReportPath(reports, "provenance_report", "json", "data/normalized/provenance_report.json"), "Provenance JSON")}
+                ${buildSimpleLink(findReportPath(reports, "provenance_report", "markdown", "data/normalized/provenance_report.md"), "Provenance MD")}
+                ${buildSimpleLink(findReportPath(reports, "drift_report", "json", "data/normalized/drift_report.json"), "Drift JSON")}
+                ${buildSimpleLink(findReportPath(reports, "drift_report", "markdown", "data/normalized/drift_report.md"), "Drift MD")}
+                ${buildSimpleLink(findReportPath(reports, "overview", "json", "data/normalized/overview.json"), "Overview JSON")}
+                ${buildSimpleLink(findReportPath(reports, "overview", "markdown", "data/normalized/overview.md"), "Overview MD")}
+                ${buildSimpleLink(findReportPath(reports, "dataset_catalog", "json", "data/normalized/dataset_catalog.json"), "Catalog JSON")}
+                ${buildSimpleLink(findReportPath(reports, "dataset_catalog", "markdown", "data/normalized/dataset_catalog.md"), "Catalog MD")}
+                ${buildSimpleLink(findReportPath(reports, "artifact_manifest", "json", "data/normalized/artifact_manifest.json"), "Manifest")}
+                ${topAttentionDataset ? `<a class="dataset-action muted" href="#dataset-${escapeHtml(topAttentionDataset.dataset)}">Ver top issue</a>` : ""}
+            `;
 
             catalogGrid.innerHTML = orderedDatasets.map(dataset => {
                 const runtimeFreshness = runtimeFreshnessByDataset[dataset.dataset] || { status: "unknown" };
@@ -1474,7 +1481,7 @@ make hub-list</pre>
                     : "N/D";
 
                 return `
-                    <article class="dataset-card ${needsAttention ? "attention" : ""}">
+                    <article class="dataset-card ${needsAttention ? "attention" : ""}" id="dataset-${escapeHtml(dataset.dataset)}">
                         <div class="dataset-card-top">
                             <div>
                                 <div class="dataset-name">${escapeHtml(dataset.dataset)}</div>

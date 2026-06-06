@@ -466,6 +466,7 @@ Cada dataset card también expone ahora la `Procedencia técnica` efectiva del �
 Cuando una capa tiene warnings activos, la card muestra además una `Acción recomendada` derivada del contrato de degradación/drift para hacer más accionable ese estado desde la propia UI.
 Esas capas también se resaltan visualmente con estado `atención`, para que las señales stale/drift/warning no queden enterradas entre cards sanas.
 Además, el catálogo de la landing prioriza arriba las capas con atención operativa activa, para que el problema más relevante del momento aparezca primero.
+El banner superior también publica `Top issue` y un acceso directo `Ver top issue` hacia esa card priorizada.
 También muestra metadata de reuso por capa, incluyendo licencia o cautela de redistribución y si requiere atribución.
 Y el banner superior resume cuántas capas siguen en `review_terms`.
 También incluye recetas breves de consumo para `Python`, `DuckDB` y la `CLI` local del proyecto.

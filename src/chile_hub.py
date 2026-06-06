@@ -74,6 +74,45 @@ class ChileHub:
             return "unknown"
         return max(filtered, key=cls._status_rank)
 
+    @staticmethod
+    def _attention_priority_for_dataset(summary_entry, current_freshness_status):
+        warning_count = summary_entry.get("warning_count", 0) or 0
+        drift_status = summary_entry.get("drift_status")
+        degradation_status = summary_entry.get("degradation_status")
+        if warning_count > 0 or current_freshness_status in {"stale", "unknown"}:
+            return 0
+        if drift_status == "drifted" or degradation_status in {"warning", "degraded"}:
+            return 1
+        return 2
+
+    def top_issue(self):
+        freshness_by_dataset = {
+            entry.get("dataset"): entry for entry in self.freshness_audit().get("datasets", [])
+        }
+        candidates = []
+        for entry in self.summary():
+            runtime = freshness_by_dataset.get(entry.get("dataset"), {})
+            current_status = runtime.get("current_freshness_status", "unknown")
+            priority = self._attention_priority_for_dataset(entry, current_status)
+            candidates.append(
+                {
+                    "dataset": entry.get("dataset"),
+                    "attention_priority": priority,
+                    "warning_count": entry.get("warning_count", 0),
+                    "build_freshness_status": entry.get("freshness_status"),
+                    "current_freshness_status": current_status,
+                    "drift_status": entry.get("drift_status"),
+                    "degradation_status": entry.get("degradation_status"),
+                }
+            )
+
+        if not candidates:
+            return None
+        ordered = sorted(candidates, key=lambda item: (item["attention_priority"], item["dataset"]))
+        if ordered[0]["attention_priority"] >= 2:
+            return None
+        return ordered[0]
+
     def list_datasets(self):
         return [entry["dataset"] for entry in self.catalog.get("datasets", [])]
 
@@ -159,6 +198,7 @@ class ChileHub:
             entry.get("dataset"): entry for entry in freshness_audit.get("datasets", [])
         }
         package = overview.get("primary_package") or {}
+        top_issue = overview.get("top_issue")
         lines = [
             "chile-hub snapshot",
             f"generated_at_utc: {overview.get('generated_at_utc', 'unknown')}",
@@ -178,6 +218,14 @@ class ChileHub:
                 f"checked_at={freshness_audit.get('checked_at_utc', 'unknown')}"
             ),
         ]
+        if top_issue:
+            lines.append(
+                f"top_issue: {top_issue.get('dataset')} | "
+                f"build={top_issue.get('build_freshness_status', 'unknown')} | "
+                f"current={top_issue.get('current_freshness_status', 'unknown')} | "
+                f"drift={top_issue.get('drift_status', 'unknown')} | "
+                f"warnings={top_issue.get('warning_count', 0)}"
+            )
 
         if package:
             lines.append(
@@ -224,6 +272,16 @@ class ChileHub:
             ("current_unknown", str(freshness_audit.get("unknown_count", 0))),
             ("audit_checked", freshness_audit.get("checked_at_utc", "unknown")),
         ]
+        top_issue = overview.get("top_issue")
+        if top_issue:
+            rows.extend(
+                [
+                    ("top_issue", top_issue.get("dataset", "unknown")),
+                    ("top_issue_build", top_issue.get("build_freshness_status", "unknown")),
+                    ("top_issue_current", top_issue.get("current_freshness_status", "unknown")),
+                    ("top_issue_drift", top_issue.get("drift_status", "unknown")),
+                ]
+            )
 
         package = overview.get("primary_package") or {}
         if package:
@@ -355,6 +413,7 @@ class ChileHub:
             primary_package = self.primary_package()
         except KeyError:
             primary_package = None
+        top_issue = self.top_issue()
         shared_artifacts = self.shared_artifacts()
         return {
             "generated_at_utc": health.get("generated_at_utc"),
@@ -373,6 +432,7 @@ class ChileHub:
             "current_stale_count": runtime_status.get("stale_count"),
             "current_unknown_count": runtime_status.get("unknown_count"),
             "current_checked_at_utc": runtime_status.get("checked_at_utc"),
+            "top_issue": top_issue,
             "shared_artifact_count": len(shared_artifacts),
             "package_count": len(packages),
             "primary_package": {
@@ -420,6 +480,16 @@ class ChileHub:
             ("packages", str(overview.get("package_count", 0))),
             ("current_checked_at", overview.get("current_checked_at_utc", "unknown")),
         ]
+        top_issue = overview.get("top_issue")
+        if top_issue:
+            rows.extend(
+                [
+                    ("top_issue", top_issue.get("dataset", "unknown")),
+                    ("top_issue_build", top_issue.get("build_freshness_status", "unknown")),
+                    ("top_issue_current", top_issue.get("current_freshness_status", "unknown")),
+                    ("top_issue_drift", top_issue.get("drift_status", "unknown")),
+                ]
+            )
 
         package = overview.get("primary_package") or {}
         if package:
@@ -647,6 +717,7 @@ class ChileHub:
                     "warning_count": entry.get("warning_count", 0),
                 }
             )
+        top_issue = self.top_issue()
         return {
             "generated_at_utc": health.get("generated_at_utc"),
             "build_overall_status": runtime_audit.get("build_overall_status"),
@@ -660,6 +731,7 @@ class ChileHub:
             "drifted_count": health.get("drifted_count"),
             "warning_count": health.get("warning_count"),
             "checked_at_utc": runtime_audit.get("checked_at_utc"),
+            "top_issue": top_issue,
             "datasets": datasets,
         }
 
@@ -678,6 +750,15 @@ class ChileHub:
             f"warnings={runtime.get('warning_count', 0)} | "
             f"checked_at={runtime.get('checked_at_utc', 'unknown')}"
         )
+        if runtime.get("top_issue"):
+            top_issue = runtime["top_issue"]
+            lines.append(
+                f"top_issue={top_issue.get('dataset', 'unknown')} | "
+                f"build={top_issue.get('build_freshness_status', 'unknown')} | "
+                f"current={top_issue.get('current_freshness_status', 'unknown')} | "
+                f"drift={top_issue.get('drift_status', 'unknown')} | "
+                f"warnings={top_issue.get('warning_count', 0)}"
+            )
         lines.append("")
         lines.append("dataset      mode      severity  build      current    age_h   max_h   coverage        drift     warnings")
         lines.append("-----------  --------  --------  ---------  ---------  ------  ------  --------------  --------  --------")

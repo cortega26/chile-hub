@@ -133,7 +133,7 @@ def verify_landing():
             fail(f"Unexpected repo href: {repo_href}")
 
         status_actions = page.locator("#status-actions .dataset-action").all_inner_texts()
-        expected_status_actions = ["Status", "Health JSON", "Health MD", "Bundle JSON", "Reuse JSON", "Reuse MD", "Provenance JSON", "Provenance MD", "Drift JSON", "Drift MD", "Overview JSON", "Overview MD", "Catalog JSON", "Catalog MD", "Manifest"]
+        expected_status_actions = ["Status", "Health JSON", "Health MD", "Bundle JSON", "Reuse JSON", "Reuse MD", "Provenance JSON", "Provenance MD", "Drift JSON", "Drift MD", "Overview JSON", "Overview MD", "Catalog JSON", "Catalog MD", "Manifest", "Ver top issue"]
         if status_actions != expected_status_actions:
             fail(f"Unexpected status actions: {status_actions}")
 
@@ -146,6 +146,8 @@ def verify_landing():
             fail(f"Build status pill not found: {status_pills}")
         if f"Estado actual: {current_overall_status}" not in status_pills:
             fail(f"Current status pill not found: {status_pills}")
+        if "Top issue: indicadores" not in status_pills:
+            fail(f"Top issue pill not found: {status_pills}")
         if f"Review terms: {review_terms_count}" not in status_pills:
             fail(f"Review terms pill not found: {status_pills}")
         if f"Degraded: {degraded_count}" not in status_pills:
