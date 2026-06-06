@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>chile-hub — Capas de Datos de Chile</title>
+    <link rel="canonical" href="https://cortega26.github.io/chile-hub/">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b0f19'/%3E%3Cpath d='M18 20h11c9 0 14 5 14 12 0 9-6 14-15 14H18V20zm9 20c6 0 9-3 9-8 0-4-3-7-8-7h-3v15h2z' fill='%2322d3ee'/%3E%3Cpath d='M45 18l4 7 7 4-7 4-4 7-4-7-7-4 7-4 4-7z' fill='%23818cf8'/%3E%3C/svg%3E">
     
     <!-- Google Fonts -->
@@ -391,6 +392,17 @@
             display: flex;
             flex-direction: column;
             gap: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .dataset-card.attention {
+            border-color: rgba(251, 191, 36, 0.45);
+            box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.12), 0 16px 32px -20px rgba(251, 191, 36, 0.45);
+            background: linear-gradient(180deg, rgba(120, 53, 15, 0.16), rgba(10, 15, 25, 0.58));
+        }
+
+        .dataset-card:hover {
+            transform: translateY(-2px);
         }
 
         .dataset-card-top {
@@ -431,6 +443,18 @@
         .dataset-badge.fallback {
             color: #3f2500;
             background: rgba(251, 191, 36, 0.85);
+        }
+
+        .dataset-badge.attention {
+            color: #3f2500;
+            background: rgba(251, 191, 36, 0.92);
+        }
+
+        .dataset-badges {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 0.45rem;
         }
 
         .dataset-facts {
@@ -856,6 +880,10 @@
             <p>Capas de datos chilenas curadas para análisis, software y cruces confiables</p>
         </div>
         <div class="actions-group">
+            <a href="https://cortega26.github.io/chile-hub/" target="_blank" class="btn btn-secondary">
+                <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3l8 8h-6v10h-4V11H4l8-8z"/></svg>
+                Sitio web
+            </a>
             <a href="https://github.com/cortega26/chile-hub" target="_blank" class="btn btn-secondary">
                 <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"/></svg>
                 GitHub Repo
@@ -1406,6 +1434,12 @@ make hub-list</pre>
 
             catalogGrid.innerHTML = datasets.map(dataset => {
                 const runtimeFreshness = runtimeFreshnessByDataset[dataset.dataset] || { status: "unknown" };
+                const needsAttention = (dataset.warning_count ?? 0) > 0
+                    || runtimeFreshness.status === "stale"
+                    || runtimeFreshness.status === "unknown"
+                    || dataset.drift?.status === "drifted"
+                    || dataset.degradation?.status === "warning"
+                    || dataset.degradation?.status === "degraded";
                 const outputs = Object.keys(dataset.outputs || {}).map(key => `<span class="dataset-tag">${escapeHtml(key)}</span>`).join("");
                 const warnings = (dataset.warning_count && dataset.warning_count > 0)
                     ? `<span class="dataset-tag">${escapeHtml(`${dataset.warning_count} warnings`)}</span>`
@@ -1419,13 +1453,16 @@ make hub-list</pre>
                     : "N/D";
 
                 return `
-                    <article class="dataset-card">
+                    <article class="dataset-card ${needsAttention ? "attention" : ""}">
                         <div class="dataset-card-top">
                             <div>
                                 <div class="dataset-name">${escapeHtml(dataset.dataset)}</div>
                                 <div class="dataset-desc">${escapeHtml(dataset.description || "Sin descripción")}</div>
                             </div>
-                            <span class="dataset-badge ${escapeHtml(dataset.source_mode || "fallback")}">${escapeHtml(dataset.source_mode || "unknown")}</span>
+                            <div class="dataset-badges">
+                                <span class="dataset-badge ${escapeHtml(dataset.source_mode || "fallback")}">${escapeHtml(dataset.source_mode || "unknown")}</span>
+                                ${needsAttention ? `<span class="dataset-badge attention">atención</span>` : ""}
+                            </div>
                         </div>
                         <div class="dataset-facts">
                             <div class="dataset-fact">
@@ -1475,6 +1512,9 @@ make hub-list</pre>
                             Warnings: <strong>${escapeHtml(String(dataset.warning_count ?? 0))}</strong>
                         </div>
                         <div class="dataset-meta-line">Freshness build: ${escapeHtml(formatFreshness(dataset.freshness))} · Freshness actual: ${escapeHtml(formatFreshness(runtimeFreshness))}</div>
+                        ${dataset.warning_count > 0 && (dataset.degradation?.recommended_action || dataset.drift?.recommended_action)
+                            ? `<div class="dataset-meta-line">Acción recomendada: ${escapeHtml(dataset.degradation?.recommended_action || dataset.drift?.recommended_action)}</div>`
+                            : ""}
                         ${dataset.drift?.summary ? `<div class="dataset-meta-line">Drift: ${escapeHtml(dataset.drift.summary)}</div>` : ""}
                         ${dataset.coverage?.summary ? `<div class="dataset-meta-line">Cobertura: ${escapeHtml(dataset.coverage.summary)}</div>` : ""}
                         ${dataset.degradation?.impact ? `<div class="dataset-meta-line">Impacto: ${escapeHtml(dataset.degradation.impact)}</div>` : ""}

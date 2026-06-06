@@ -128,7 +128,7 @@ def verify_landing():
         page = browser.new_page(viewport={"width": 1440, "height": 1600})
         page.goto(url, wait_until="networkidle")
 
-        repo_href = page.locator("header a.btn.btn-secondary").get_attribute("href")
+        repo_href = page.get_by_role("link", name="GitHub Repo").get_attribute("href")
         if repo_href != "https://github.com/cortega26/chile-hub":
             fail(f"Unexpected repo href: {repo_href}")
 
@@ -212,7 +212,10 @@ def verify_landing():
         first_card_meta = first_card.locator(".dataset-meta-line").first.inner_text()
         if "Requiere atribución: sí" not in first_card_meta:
             fail(f"Reuse attribution metadata not found in first dataset card: {first_card_meta}")
-        freshness_meta = first_card.locator(".dataset-meta-line").nth(1).inner_text()
+        provenance_meta = first_card.locator(".dataset-meta-line").nth(1).inner_text()
+        if "Procedencia técnica:" not in provenance_meta or "bcn_arcgis" not in provenance_meta or "Warnings: 0" not in provenance_meta:
+            fail(f"Technical provenance metadata not found in first dataset card: {provenance_meta}")
+        freshness_meta = first_card.locator(".dataset-meta-line").nth(2).inner_text()
         if "Freshness build:" not in freshness_meta or "Freshness actual:" not in freshness_meta:
             fail(f"Runtime freshness metadata not found in first dataset card: {freshness_meta}")
 
@@ -240,6 +243,21 @@ def verify_landing():
         copied_class = copy_button.evaluate("el => el.classList.contains('copied')")
         if not copied_class:
             fail("Dataset example copy button did not activate copied class")
+
+        indicadores_card = page.locator(".dataset-card").filter(
+            has=page.locator(".dataset-name", has_text="indicadores")
+        ).first
+        indicadores_attention = indicadores_card.evaluate("el => el.classList.contains('attention')")
+        if not indicadores_attention:
+            fail("Indicadores card is missing attention visual state")
+        indicadores_badges = indicadores_card.locator(".dataset-badge").all_inner_texts()
+        if "ATENCIÓN" not in indicadores_badges:
+            fail(f"Attention badge not found in indicadores card: {indicadores_badges}")
+        indicadores_meta = indicadores_card.locator(".dataset-meta-line").all_inner_texts()
+        if not any("Warnings: 1" in line for line in indicadores_meta):
+            fail(f"Warning count not found in indicadores card metadata: {indicadores_meta}")
+        if not any("Acción recomendada:" in line for line in indicadores_meta):
+            fail(f"Recommended action not found in indicadores card metadata: {indicadores_meta}")
 
         browser.close()
 

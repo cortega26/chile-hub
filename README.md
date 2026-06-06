@@ -2,6 +2,9 @@
 
 [![Status](https://img.shields.io/badge/status-alpha-orange.svg)]()
 [![License](https://img.shields.io/badge/license-CC--BY--4.0-blue.svg)]()
+[![Website](https://img.shields.io/badge/website-cortega26.github.io%2Fchile-hub-0ea5e9.svg)](https://cortega26.github.io/chile-hub/)
+
+Sitio web publicado: [cortega26.github.io/chile-hub](https://cortega26.github.io/chile-hub/)
 
 Capas de datos chilenas curadas, normalizadas y fáciles de consumir, a partir de fuentes abiertas o legalmente reutilizables.
 
@@ -459,6 +462,9 @@ La receta se deriva de la metadata publicada del package (`verification_command`
 También muestra `freshness`, `coverage` y `degradation` por dataset, además de conteos agregados de capas `stale`, `degraded` y con cobertura parcial para detectar drifting del hub.
 La `freshness` visible en la landing se recalcula contra el reloj actual del navegador a partir de `refreshed_at_utc` y la política de cada capa, para no depender solo del estado persistido del último build.
 Por la misma razón, el banner principal muestra `Estado build` y `Estado actual` por separado.
+Cada dataset card también expone ahora la `Procedencia técnica` efectiva del último build, por ejemplo `bcn_arcgis` o `public_api`, junto al conteo de warnings de esa capa.
+Cuando una capa tiene warnings activos, la card muestra además una `Acción recomendada` derivada del contrato de degradación/drift para hacer más accionable ese estado desde la propia UI.
+Esas capas también se resaltan visualmente con estado `atención`, para que las señales stale/drift/warning no queden enterradas entre cards sanas.
 También muestra metadata de reuso por capa, incluyendo licencia o cautela de redistribución y si requiere atribución.
 Y el banner superior resume cuántas capas siguen en `review_terms`.
 También incluye recetas breves de consumo para `Python`, `DuckDB` y la `CLI` local del proyecto.
