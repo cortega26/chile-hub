@@ -1,8 +1,8 @@
 {
-  "generated_at_utc": "2026-06-01T17:37:55.601608+00:00",
+  "generated_at_utc": "2026-06-06T23:11:44.833453+00:00",
   "dataset_count": 4,
-  "drifted_count": 0,
-  "healthy_count": 4,
+  "drifted_count": 1,
+  "healthy_count": 3,
   "fallback_count": 0,
   "partial_coverage_count": 0,
   "degraded_count": 0,
@@ -48,15 +48,15 @@
     },
     {
       "dataset": "indicadores",
-      "drift_status": "healthy",
+      "drift_status": "drifted",
       "source_mode": "live",
       "coverage_status": "not_applicable",
       "coverage_ratio": null,
       "coverage_summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
-      "degradation_status": "none",
-      "degradation_impact": "Sin degradación operativa detectada en este build.",
-      "drift_summary": "Sin drift operativo detectado en este build.",
-      "recommended_action": "Ninguna.",
+      "degradation_status": "warning",
+      "degradation_impact": "indicadores freshness is stale: 127.55h since refresh, policy max is 72h",
+      "drift_summary": "Drift detectado: mode=live, coverage=not_applicable, degradation=warning.",
+      "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción.",
       "documentation": "docs/datasets/indicadores.md"
     }
   ]

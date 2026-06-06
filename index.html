@@ -1117,6 +1117,45 @@ make hub-list</pre>
             return `${status} · ${freshness.age_hours}h / ${freshness.max_age_hours}h`;
         }
 
+        function parseIsoDate(value) {
+            if (!value) return null;
+            const date = new Date(value);
+            return Number.isNaN(date.getTime()) ? null : date;
+        }
+
+        function computeRuntimeFreshness(dataset) {
+            const persisted = dataset?.freshness || {};
+            const refreshedAt = parseIsoDate(dataset?.refreshed_at_utc);
+            const maxAgeHours = persisted.max_age_hours;
+            if (!refreshedAt || typeof maxAgeHours !== "number") {
+                return {
+                    status: "unknown",
+                    age_hours: null,
+                    max_age_hours: maxAgeHours ?? null,
+                };
+            }
+            const ageHours = Math.max((Date.now() - refreshedAt.getTime()) / 3600000, 0);
+            return {
+                status: ageHours <= maxAgeHours ? "fresh" : "stale",
+                age_hours: Number(ageHours.toFixed(2)),
+                max_age_hours: maxAgeHours,
+            };
+        }
+
+        function statusRank(status) {
+            return { ok: 0, warn: 1, error: 2 }[status] ?? 1;
+        }
+
+        function computeRuntimeOverallStatus(buildStatus, runtimeFreshnessByDataset) {
+            const freshnessValues = Object.values(runtimeFreshnessByDataset);
+            const hasUnknown = freshnessValues.some(freshness => freshness.status === "unknown");
+            const hasStale = freshnessValues.some(freshness => freshness.status === "stale");
+            const runtimeFreshnessStatus = hasUnknown || hasStale ? "warn" : "ok";
+            return statusRank(runtimeFreshnessStatus) > statusRank(buildStatus)
+                ? runtimeFreshnessStatus
+                : buildStatus;
+        }
+
         function formatCoverage(coverage) {
             if (!coverage) return "N/D";
             const status = coverage.status || "unknown";
@@ -1295,14 +1334,23 @@ make hub-list</pre>
             const datasets = bundle.datasets || [];
             const health = bundle.health || {};
             const reports = bundle.reports || {};
+            const runtimeFreshnessByDataset = Object.fromEntries(
+                datasets.map(dataset => [dataset.dataset, computeRuntimeFreshness(dataset)])
+            );
             const liveCount = health.live_count ?? datasets.filter(d => d.source_mode === "live").length;
             const warningCount = health.warning_count ?? datasets.reduce((acc, d) => acc + (d.warning_count || 0), 0);
-            const staleCount = health.stale_count ?? datasets.filter(d => d.freshness?.status === "stale").length;
+            const staleCount = Object.values(runtimeFreshnessByDataset).filter(
+                freshness => freshness.status === "stale"
+            ).length;
+            const unknownFreshnessCount = Object.values(runtimeFreshnessByDataset).filter(
+                freshness => freshness.status === "unknown"
+            ).length;
             const reviewTermsCount = health.review_terms_count ?? datasets.filter(d => d.publishability_status === "review_terms").length;
             const degradedCount = health.degraded_count ?? datasets.filter(d => d.degradation?.status === "degraded").length;
             const partialCoverageCount = health.partial_coverage_count ?? datasets.filter(d => d.coverage?.status === "partial").length;
             const driftedCount = health.drifted_count ?? datasets.filter(d => d.drift?.status === "drifted").length;
-            const overallStatus = bundle.overall_status || "ok";
+            const buildOverallStatus = bundle.overall_status || "ok";
+            const currentOverallStatus = computeRuntimeOverallStatus(buildOverallStatus, runtimeFreshnessByDataset);
             const zipPackage = (bundle.packages || []).find(pkg => pkg.package_type === "zip");
             const zipLabel = zipPackage
                 ? `Bundle ZIP · ${formatBytes(zipPackage.size_bytes)}`
@@ -1311,12 +1359,14 @@ make hub-list</pre>
             const verifyCommand = zipPackage?.verification_command
                 || (zipPackage?.checksum_path ? `shasum -a 256 -c ${zipPackage.checksum_path}` : "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256");
 
-            statusSubtitle.textContent = `${liveCount}/${datasets.length} capas operativas en modo live. Estado global: ${overallStatus}. ${staleCount === 0 ? "Sin capas stale." : `${staleCount} capas stale.`} ${driftedCount === 0 ? "Sin capas con drift." : `${driftedCount} capas con drift.`} ${degradedCount === 0 ? "Sin capas degradadas." : `${degradedCount} capas degradadas.`} ${partialCoverageCount === 0 ? "Sin regresiones de cobertura." : `${partialCoverageCount} capas con cobertura parcial.`} ${reviewTermsCount === 0 ? "Sin capas en review_terms." : `${reviewTermsCount} capas en review_terms.`} ${warningCount === 0 ? "Sin warnings activos." : `${warningCount} warnings activos.`}`;
+            statusSubtitle.textContent = `${liveCount}/${datasets.length} capas operativas en modo live. Estado build: ${buildOverallStatus}. Estado actual: ${currentOverallStatus}. ${staleCount === 0 ? "Sin capas stale." : `${staleCount} capas stale.`} ${unknownFreshnessCount === 0 ? "Sin capas con freshness unknown." : `${unknownFreshnessCount} capas con freshness unknown.`} ${driftedCount === 0 ? "Sin capas con drift." : `${driftedCount} capas con drift.`} ${degradedCount === 0 ? "Sin capas degradadas." : `${degradedCount} capas degradadas.`} ${partialCoverageCount === 0 ? "Sin regresiones de cobertura." : `${partialCoverageCount} capas con cobertura parcial.`} ${reviewTermsCount === 0 ? "Sin capas en review_terms." : `${reviewTermsCount} capas en review_terms.`} ${warningCount === 0 ? "Sin warnings activos." : `${warningCount} warnings activos.`}`;
             statusPills.innerHTML = `
-                <span class="status-pill">Estado: ${overallStatus}</span>
+                <span class="status-pill">Estado build: ${buildOverallStatus}</span>
+                <span class="status-pill">Estado actual: ${currentOverallStatus}</span>
                 <span class="status-pill">Capas: ${datasets.length}</span>
                 <span class="status-pill">Live: ${liveCount}</span>
                 <span class="status-pill">Stale: ${staleCount}</span>
+                <span class="status-pill">Freshness unknown: ${unknownFreshnessCount}</span>
                 <span class="status-pill">Drifted: ${driftedCount}</span>
                 <span class="status-pill">Degraded: ${degradedCount}</span>
                 <span class="status-pill">Partial coverage: ${partialCoverageCount}</span>
@@ -1355,6 +1405,7 @@ make hub-list</pre>
             catalogGeneratedAt.textContent = `Actualizado: ${formatTimestamp(bundle.generated_at_utc)}`;
 
             catalogGrid.innerHTML = datasets.map(dataset => {
+                const runtimeFreshness = runtimeFreshnessByDataset[dataset.dataset] || { status: "unknown" };
                 const outputs = Object.keys(dataset.outputs || {}).map(key => `<span class="dataset-tag">${escapeHtml(key)}</span>`).join("");
                 const warnings = (dataset.warning_count && dataset.warning_count > 0)
                     ? `<span class="dataset-tag">${escapeHtml(`${dataset.warning_count} warnings`)}</span>`
@@ -1395,7 +1446,7 @@ make hub-list</pre>
                             </div>
                             <div class="dataset-fact">
                                 <span class="dataset-fact-label">Freshness</span>
-                                <span class="dataset-fact-value">${escapeHtml(formatFreshness(dataset.freshness))}</span>
+                                <span class="dataset-fact-value">${escapeHtml(formatFreshness(runtimeFreshness))}</span>
                             </div>
                             <div class="dataset-fact">
                                 <span class="dataset-fact-label">Coverage</span>
@@ -1419,6 +1470,11 @@ make hub-list</pre>
                             Actualizado: ${escapeHtml(formatTimestamp(dataset.refreshed_at_utc))} ·
                             Requiere atribución: <strong>${dataset.reuse_policy?.attribution_required ? "sí" : "no"}</strong>
                         </div>
+                        <div class="dataset-meta-line">
+                            Procedencia técnica: <strong>${escapeHtml(dataset.source_detail || "N/D")}</strong> ·
+                            Warnings: <strong>${escapeHtml(String(dataset.warning_count ?? 0))}</strong>
+                        </div>
+                        <div class="dataset-meta-line">Freshness build: ${escapeHtml(formatFreshness(dataset.freshness))} · Freshness actual: ${escapeHtml(formatFreshness(runtimeFreshness))}</div>
                         ${dataset.drift?.summary ? `<div class="dataset-meta-line">Drift: ${escapeHtml(dataset.drift.summary)}</div>` : ""}
                         ${dataset.coverage?.summary ? `<div class="dataset-meta-line">Cobertura: ${escapeHtml(dataset.coverage.summary)}</div>` : ""}
                         ${dataset.degradation?.impact ? `<div class="dataset-meta-line">Impacto: ${escapeHtml(dataset.degradation.impact)}</div>` : ""}

@@ -901,6 +901,8 @@ def write_hub_bundle_json(pipeline_metadata, hub_health, dataset_catalog, artifa
                 "source_name": dataset.get("source_name"),
                 "source_url": dataset.get("source_url"),
                 "source_mode": dataset.get("source_mode"),
+                "source_detail": dataset.get("source_detail"),
+                "refreshed_at_utc": dataset.get("refreshed_at_utc"),
                 "record_count": dataset.get("record_count"),
                 "join_keys": dataset.get("join_keys", []),
                 "confidence_tier": dataset.get("confidence_tier"),

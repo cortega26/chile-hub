@@ -1,5 +1,6 @@
-import json
 import argparse
+import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 import polars as pl
@@ -49,6 +50,29 @@ class ChileHub:
     def _load_drift_report(self):
         with DRIFT_REPORT_PATH.open("r", encoding="utf-8") as f:
             return json.load(f)
+
+    @staticmethod
+    def _parse_iso_datetime(value):
+        if not value:
+            return None
+        try:
+            parsed = datetime.fromisoformat(value)
+        except ValueError:
+            return None
+        if parsed.tzinfo is None:
+            return parsed.replace(tzinfo=timezone.utc)
+        return parsed.astimezone(timezone.utc)
+
+    @staticmethod
+    def _status_rank(status):
+        return {"ok": 0, "warn": 1, "error": 2}.get(status, 1)
+
+    @classmethod
+    def _max_status(cls, *statuses):
+        filtered = [status for status in statuses if status]
+        if not filtered:
+            return "unknown"
+        return max(filtered, key=cls._status_rank)
 
     def list_datasets(self):
         return [entry["dataset"] for entry in self.catalog.get("datasets", [])]
@@ -129,17 +153,29 @@ class ChileHub:
 
     def snapshot_text(self):
         overview = self.overview()
+        freshness_audit = self.freshness_audit()
+        runtime_status = self.runtime_status_audit()
+        freshness_by_dataset = {
+            entry.get("dataset"): entry for entry in freshness_audit.get("datasets", [])
+        }
         package = overview.get("primary_package") or {}
         lines = [
             "chile-hub snapshot",
             f"generated_at_utc: {overview.get('generated_at_utc', 'unknown')}",
             (
-                f"status: {overview.get('overall_status', 'unknown')} | "
+                f"status_build: {overview.get('build_overall_status', overview.get('overall_status', 'unknown'))} | "
+                f"status_current: {overview.get('current_overall_status', runtime_status.get('current_overall_status', 'unknown'))} | "
                 f"datasets={overview.get('dataset_count', 0)} | "
                 f"live={overview.get('live_count', 0)} | "
                 f"stale={overview.get('stale_count', 0)} | "
                 f"drifted={overview.get('drifted_count', 0)} | "
                 f"warnings={overview.get('warning_count', 0)}"
+            ),
+            (
+                f"current_freshness: fresh={freshness_audit.get('fresh_count', 0)} | "
+                f"stale={freshness_audit.get('stale_count', 0)} | "
+                f"unknown={freshness_audit.get('unknown_count', 0)} | "
+                f"checked_at={freshness_audit.get('checked_at_utc', 'unknown')}"
             ),
         ]
 
@@ -155,11 +191,13 @@ class ChileHub:
 
         lines.append("")
         for entry in overview.get("datasets", []):
+            runtime_freshness = freshness_by_dataset.get(entry.get("dataset"), {})
             lines.append(
                 f"- {entry.get('dataset', 'unknown')}: "
                 f"mode={entry.get('source_mode', 'unknown')}, "
                 f"validation={entry.get('validation_status', 'unknown')}, "
-                f"freshness={entry.get('freshness_status', 'unknown')}, "
+                f"freshness_build={entry.get('freshness_status', 'unknown')}, "
+                f"freshness_now={runtime_freshness.get('current_freshness_status', 'unknown')}, "
                 f"coverage={entry.get('coverage_status', 'unknown')}, "
                 f"drift={entry.get('drift_status', 'unknown')}"
             )
@@ -168,14 +206,23 @@ class ChileHub:
 
     def snapshot_table(self):
         overview = self.overview()
+        freshness_audit = self.freshness_audit()
+        freshness_by_dataset = {
+            entry.get("dataset"): entry for entry in freshness_audit.get("datasets", [])
+        }
         rows = [
             ("generated_at_utc", overview.get("generated_at_utc", "unknown")),
-            ("overall_status", overview.get("overall_status", "unknown")),
+            ("build_overall_status", overview.get("build_overall_status", overview.get("overall_status", "unknown"))),
+            ("current_overall_status", overview.get("current_overall_status", "unknown")),
             ("datasets", str(overview.get("dataset_count", 0))),
             ("live", str(overview.get("live_count", 0))),
             ("stale", str(overview.get("stale_count", 0))),
             ("drifted", str(overview.get("drifted_count", 0))),
             ("warnings", str(overview.get("warning_count", 0))),
+            ("current_fresh", str(freshness_audit.get("fresh_count", 0))),
+            ("current_stale", str(freshness_audit.get("stale_count", 0))),
+            ("current_unknown", str(freshness_audit.get("unknown_count", 0))),
+            ("audit_checked", freshness_audit.get("checked_at_utc", "unknown")),
         ]
 
         package = overview.get("primary_package") or {}
@@ -193,15 +240,17 @@ class ChileHub:
         lines = ["chile-hub snapshot table", ""]
         lines.extend(f"{label.ljust(label_width)} : {value}" for label, value in rows)
         lines.append("")
-        lines.append("dataset      mode      validation  freshness  coverage        drift")
-        lines.append("-----------  --------  ----------  ---------  --------------  --------")
+        lines.append("dataset      mode      validation  build      current    coverage        drift")
+        lines.append("-----------  --------  ----------  ---------  ---------  --------------  --------")
 
         for entry in overview.get("datasets", []):
+            runtime_freshness = freshness_by_dataset.get(entry.get("dataset"), {})
             lines.append(
                 f"{entry.get('dataset', 'unknown'):<11}  "
                 f"{entry.get('source_mode', 'unknown'):<8}  "
                 f"{entry.get('validation_status', 'unknown'):<10}  "
                 f"{entry.get('freshness_status', 'unknown'):<9}  "
+                f"{runtime_freshness.get('current_freshness_status', 'unknown'):<9}  "
                 f"{entry.get('coverage_status', 'unknown'):<14}  "
                 f"{entry.get('drift_status', 'unknown'):<8}"
             )
@@ -300,6 +349,7 @@ class ChileHub:
         health = self.health()
         bundle = self.bundle()
         packages = self.packages()
+        runtime_status = self.runtime_status_audit()
         primary_package = None
         try:
             primary_package = self.primary_package()
@@ -309,6 +359,8 @@ class ChileHub:
         return {
             "generated_at_utc": health.get("generated_at_utc"),
             "overall_status": health.get("overall_status"),
+            "build_overall_status": health.get("overall_status"),
+            "current_overall_status": runtime_status.get("current_overall_status"),
             "dataset_count": health.get("dataset_count"),
             "live_count": health.get("live_count"),
             "fallback_count": health.get("fallback_count"),
@@ -317,6 +369,10 @@ class ChileHub:
             "degraded_count": health.get("degraded_count"),
             "partial_coverage_count": health.get("partial_coverage_count"),
             "warning_count": health.get("warning_count"),
+            "current_fresh_count": runtime_status.get("fresh_count"),
+            "current_stale_count": runtime_status.get("stale_count"),
+            "current_unknown_count": runtime_status.get("unknown_count"),
+            "current_checked_at_utc": runtime_status.get("checked_at_utc"),
             "shared_artifact_count": len(shared_artifacts),
             "package_count": len(packages),
             "primary_package": {
@@ -342,6 +398,55 @@ class ChileHub:
                 for entry in health.get("datasets", [])
             ],
         }
+
+    def overview_table(self):
+        overview = self.overview()
+        rows = [
+            ("generated_at_utc", overview.get("generated_at_utc", "unknown")),
+            ("build_overall_status", overview.get("build_overall_status", "unknown")),
+            ("current_overall_status", overview.get("current_overall_status", "unknown")),
+            ("datasets", str(overview.get("dataset_count", 0))),
+            ("live", str(overview.get("live_count", 0))),
+            ("fallback", str(overview.get("fallback_count", 0))),
+            ("build_stale", str(overview.get("stale_count", 0))),
+            ("current_fresh", str(overview.get("current_fresh_count", 0))),
+            ("current_stale", str(overview.get("current_stale_count", 0))),
+            ("current_unknown", str(overview.get("current_unknown_count", 0))),
+            ("drifted", str(overview.get("drifted_count", 0))),
+            ("degraded", str(overview.get("degraded_count", 0))),
+            ("partial_coverage", str(overview.get("partial_coverage_count", 0))),
+            ("warnings", str(overview.get("warning_count", 0))),
+            ("shared_artifacts", str(overview.get("shared_artifact_count", 0))),
+            ("packages", str(overview.get("package_count", 0))),
+            ("current_checked_at", overview.get("current_checked_at_utc", "unknown")),
+        ]
+
+        package = overview.get("primary_package") or {}
+        if package:
+            rows.extend(
+                [
+                    ("package_path", package.get("path", "unknown")),
+                    ("package_type", package.get("package_type", "unknown")),
+                    ("checksum", package.get("checksum_algorithm", "unknown")),
+                ]
+            )
+
+        label_width = max(len(label) for label, _ in rows)
+        lines = ["chile-hub overview", ""]
+        lines.extend(f"{label.ljust(label_width)} : {value}" for label, value in rows)
+        lines.append("")
+        lines.append("dataset      mode      validation  build      coverage        drift")
+        lines.append("-----------  --------  ----------  ---------  --------------  --------")
+        for entry in overview.get("datasets", []):
+            lines.append(
+                f"{entry.get('dataset', 'unknown'):<11}  "
+                f"{entry.get('source_mode', 'unknown'):<8}  "
+                f"{entry.get('validation_status', 'unknown'):<10}  "
+                f"{entry.get('freshness_status', 'unknown'):<9}  "
+                f"{entry.get('coverage_status', 'unknown'):<14}  "
+                f"{entry.get('drift_status', 'unknown'):<8}"
+            )
+        return "\n".join(lines) + "\n"
 
     def inventory(self):
         inventory = []
@@ -456,6 +561,174 @@ class ChileHub:
             )
         return "\n".join(lines) + "\n"
 
+    def freshness_audit(self):
+        checked_at = datetime.now(timezone.utc)
+        datasets = []
+        fresh_count = 0
+        stale_count = 0
+        unknown_count = 0
+
+        for entry in self.catalog.get("datasets", []):
+            refreshed_at = self._parse_iso_datetime(entry.get("refreshed_at_utc"))
+            max_age_hours = entry.get("freshness_policy", {}).get("max_age_hours")
+            age_hours = None
+            current_status = "unknown"
+            if refreshed_at is not None and isinstance(max_age_hours, (int, float)):
+                age_hours = round(max((checked_at - refreshed_at).total_seconds() / 3600, 0), 2)
+                current_status = "fresh" if age_hours <= max_age_hours else "stale"
+
+            if current_status == "fresh":
+                fresh_count += 1
+            elif current_status == "stale":
+                stale_count += 1
+            else:
+                unknown_count += 1
+
+            datasets.append(
+                {
+                    "dataset": entry.get("dataset"),
+                    "source_mode": entry.get("source_mode"),
+                    "refreshed_at_utc": entry.get("refreshed_at_utc"),
+                    "build_freshness_status": entry.get("freshness", {}).get("status"),
+                    "current_freshness_status": current_status,
+                    "current_age_hours": age_hours,
+                    "max_age_hours": max_age_hours,
+                    "freshness_label": entry.get("freshness_policy", {}).get("label"),
+                }
+            )
+
+        return {
+            "checked_at_utc": checked_at.isoformat(),
+            "dataset_count": len(datasets),
+            "fresh_count": fresh_count,
+            "stale_count": stale_count,
+            "unknown_count": unknown_count,
+            "datasets": datasets,
+        }
+
+    def runtime_status_audit(self):
+        health = self.health()
+        freshness_audit = self.freshness_audit()
+        build_overall_status = health.get("overall_status", "unknown")
+        runtime_freshness_status = "ok"
+        if freshness_audit.get("unknown_count", 0) > 0 or freshness_audit.get("stale_count", 0) > 0:
+            runtime_freshness_status = "warn"
+        current_overall_status = self._max_status(build_overall_status, runtime_freshness_status)
+        return {
+            "build_overall_status": build_overall_status,
+            "current_overall_status": current_overall_status,
+            "fresh_count": freshness_audit.get("fresh_count", 0),
+            "stale_count": freshness_audit.get("stale_count", 0),
+            "unknown_count": freshness_audit.get("unknown_count", 0),
+            "checked_at_utc": freshness_audit.get("checked_at_utc"),
+        }
+
+    def runtime_status(self):
+        health = self.health()
+        runtime_audit = self.runtime_status_audit()
+        freshness_by_dataset = {
+            entry.get("dataset"): entry for entry in self.freshness_audit().get("datasets", [])
+        }
+        datasets = []
+        for entry in health.get("datasets", []):
+            freshness_entry = freshness_by_dataset.get(entry.get("dataset"), {})
+            datasets.append(
+                {
+                    "dataset": entry.get("dataset"),
+                    "source_mode": entry.get("source_mode"),
+                    "severity": entry.get("severity"),
+                    "validation_status": entry.get("validation_status"),
+                    "build_freshness_status": entry.get("freshness_status"),
+                    "current_freshness_status": freshness_entry.get("current_freshness_status", "unknown"),
+                    "current_age_hours": freshness_entry.get("current_age_hours"),
+                    "max_age_hours": freshness_entry.get("max_age_hours"),
+                    "coverage_status": entry.get("coverage_status"),
+                    "drift_status": entry.get("drift_status"),
+                    "warning_count": entry.get("warning_count", 0),
+                }
+            )
+        return {
+            "generated_at_utc": health.get("generated_at_utc"),
+            "build_overall_status": runtime_audit.get("build_overall_status"),
+            "current_overall_status": runtime_audit.get("current_overall_status"),
+            "dataset_count": health.get("dataset_count"),
+            "live_count": health.get("live_count"),
+            "fallback_count": health.get("fallback_count"),
+            "fresh_count": runtime_audit.get("fresh_count"),
+            "stale_count": runtime_audit.get("stale_count"),
+            "unknown_count": runtime_audit.get("unknown_count"),
+            "drifted_count": health.get("drifted_count"),
+            "warning_count": health.get("warning_count"),
+            "checked_at_utc": runtime_audit.get("checked_at_utc"),
+            "datasets": datasets,
+        }
+
+    def runtime_status_table(self):
+        runtime = self.runtime_status()
+        lines = ["chile-hub runtime status", ""]
+        lines.append(
+            f"build={runtime.get('build_overall_status', 'unknown')} | "
+            f"current={runtime.get('current_overall_status', 'unknown')} | "
+            f"datasets={runtime.get('dataset_count', 0)} | "
+            f"live={runtime.get('live_count', 0)} | "
+            f"fresh={runtime.get('fresh_count', 0)} | "
+            f"stale={runtime.get('stale_count', 0)} | "
+            f"unknown={runtime.get('unknown_count', 0)} | "
+            f"drifted={runtime.get('drifted_count', 0)} | "
+            f"warnings={runtime.get('warning_count', 0)} | "
+            f"checked_at={runtime.get('checked_at_utc', 'unknown')}"
+        )
+        lines.append("")
+        lines.append("dataset      mode      severity  build      current    age_h   max_h   coverage        drift     warnings")
+        lines.append("-----------  --------  --------  ---------  ---------  ------  ------  --------------  --------  --------")
+        for entry in runtime.get("datasets", []):
+            age = entry.get("current_age_hours")
+            age_label = f"{age:.2f}" if isinstance(age, (int, float)) else "N/D"
+            max_age = entry.get("max_age_hours")
+            max_age_label = str(max_age) if isinstance(max_age, (int, float)) else "N/D"
+            lines.append(
+                f"{entry.get('dataset', 'unknown'):<11}  "
+                f"{entry.get('source_mode', 'unknown'):<8}  "
+                f"{entry.get('severity', 'unknown'):<8}  "
+                f"{entry.get('build_freshness_status', 'unknown'):<9}  "
+                f"{entry.get('current_freshness_status', 'unknown'):<9}  "
+                f"{age_label:<6}  "
+                f"{max_age_label:<6}  "
+                f"{entry.get('coverage_status', 'unknown'):<14}  "
+                f"{entry.get('drift_status', 'unknown'):<8}  "
+                f"{str(entry.get('warning_count', 0)):<8}"
+            )
+        return "\n".join(lines) + "\n"
+
+    def freshness_audit_table(self):
+        audit = self.freshness_audit()
+        lines = ["chile-hub freshness audit", ""]
+        lines.append(
+            f"checked_at_utc={audit.get('checked_at_utc')} | "
+            f"datasets={audit.get('dataset_count', 0)} | "
+            f"fresh={audit.get('fresh_count', 0)} | "
+            f"stale={audit.get('stale_count', 0)} | "
+            f"unknown={audit.get('unknown_count', 0)}"
+        )
+        lines.append("")
+        lines.append("dataset      mode      build      current    age_h   max_h   label")
+        lines.append("-----------  --------  ---------  ---------  ------  ------  --------")
+        for entry in audit.get("datasets", []):
+            age = entry.get("current_age_hours")
+            age_label = f"{age:.2f}" if isinstance(age, (int, float)) else "N/D"
+            max_age = entry.get("max_age_hours")
+            max_age_label = str(max_age) if isinstance(max_age, (int, float)) else "N/D"
+            lines.append(
+                f"{entry.get('dataset', 'unknown'):<11}  "
+                f"{entry.get('source_mode', 'unknown'):<8}  "
+                f"{entry.get('build_freshness_status', 'unknown'):<9}  "
+                f"{entry.get('current_freshness_status', 'unknown'):<9}  "
+                f"{age_label:<6}  "
+                f"{max_age_label:<6}  "
+                f"{entry.get('freshness_label', 'N/D')}"
+            )
+        return "\n".join(lines) + "\n"
+
     def bundle(self):
         return self._load_hub_bundle()
 
@@ -535,8 +808,53 @@ class ChileHub:
     def provenance(self):
         return self._load_provenance_report()
 
+    def provenance_table(self):
+        report = self.provenance()
+        lines = ["chile-hub provenance", ""]
+        lines.append(
+            f"datasets={report.get('dataset_count', 0)} | "
+            f"live={report.get('live_count', 0)} | "
+            f"fallback={report.get('fallback_count', 0)}"
+        )
+        lines.append("")
+        lines.append("dataset      mode      source                 freshness  refreshed_at_utc")
+        lines.append("-----------  --------  ---------------------  ---------  --------------------------------")
+        for entry in report.get("datasets", []):
+            lines.append(
+                f"{entry.get('dataset', 'unknown'):<11}  "
+                f"{entry.get('source_mode', 'unknown'):<8}  "
+                f"{entry.get('source_detail', 'unknown'):<21}  "
+                f"{entry.get('freshness_status', 'unknown'):<9}  "
+                f"{entry.get('refreshed_at_utc', 'unknown')}"
+            )
+        return "\n".join(lines) + "\n"
+
     def drift(self):
         return self._load_drift_report()
+
+    def drift_table(self):
+        report = self.drift()
+        lines = ["chile-hub drift", ""]
+        lines.append(
+            f"datasets={report.get('dataset_count', 0)} | "
+            f"drifted={report.get('drifted_count', 0)} | "
+            f"healthy={report.get('healthy_count', 0)} | "
+            f"fallback={report.get('fallback_count', 0)} | "
+            f"partial_coverage={report.get('partial_coverage_count', 0)} | "
+            f"degraded={report.get('degraded_count', 0)}"
+        )
+        lines.append("")
+        lines.append("dataset      drift      mode      coverage        degradation")
+        lines.append("-----------  ---------  --------  --------------  -----------")
+        for entry in report.get("datasets", []):
+            lines.append(
+                f"{entry.get('dataset', 'unknown'):<11}  "
+                f"{entry.get('drift_status', 'unknown'):<9}  "
+                f"{entry.get('source_mode', 'unknown'):<8}  "
+                f"{entry.get('coverage_status', 'unknown'):<14}  "
+                f"{entry.get('degradation_status', 'unknown')}"
+            )
+        return "\n".join(lines) + "\n"
 
 
 def build_parser():
@@ -607,7 +925,13 @@ def build_parser():
         default="text",
         help="Formato de salida del snapshot",
     )
-    subparsers.add_parser("overview", help="Mostrar vista agregada compacta del hub")
+    overview_parser = subparsers.add_parser("overview", help="Mostrar vista agregada compacta del hub")
+    overview_parser.add_argument(
+        "--format",
+        choices=["json", "table"],
+        default="json",
+        help="Formato de salida de overview",
+    )
     health_parser = subparsers.add_parser("health", help="Mostrar salud agregada del hub")
     health_parser.add_argument(
         "--format",
@@ -616,6 +940,26 @@ def build_parser():
         help="Formato de salida de health",
     )
     subparsers.add_parser("bundle", help="Mostrar bundle consolidado del hub")
+    freshness_audit_parser = subparsers.add_parser(
+        "freshness-audit",
+        help="Recalcular frescura contra el reloj actual sin reconstruir el hub",
+    )
+    freshness_audit_parser.add_argument(
+        "--format",
+        choices=["json", "table"],
+        default="json",
+        help="Formato de salida de freshness-audit",
+    )
+    runtime_status_parser = subparsers.add_parser(
+        "runtime-status",
+        help="Combinar estado build y estado actual recalculado del hub",
+    )
+    runtime_status_parser.add_argument(
+        "--format",
+        choices=["json", "table"],
+        default="json",
+        help="Formato de salida de runtime-status",
+    )
     packages_parser = subparsers.add_parser("packages", help="Mostrar paquetes publicables del hub")
     packages_parser.add_argument(
         "--format",
@@ -637,8 +981,20 @@ def build_parser():
         default="json",
         help="Formato de salida de redistribution",
     )
-    subparsers.add_parser("provenance", help="Mostrar inventario de procedencia del hub")
-    subparsers.add_parser("drift", help="Mostrar inventario de drift operativo del hub")
+    provenance_parser = subparsers.add_parser("provenance", help="Mostrar inventario de procedencia del hub")
+    provenance_parser.add_argument(
+        "--format",
+        choices=["json", "table"],
+        default="json",
+        help="Formato de salida de provenance",
+    )
+    drift_parser = subparsers.add_parser("drift", help="Mostrar inventario de drift operativo del hub")
+    drift_parser.add_argument(
+        "--format",
+        choices=["json", "table"],
+        default="json",
+        help="Formato de salida de drift",
+    )
 
     summary_parser = subparsers.add_parser("summary", help="Mostrar resumen breve de datasets")
     summary_parser.add_argument(
@@ -715,7 +1071,10 @@ def main():
         return
 
     if args.command == "overview":
-        print(json.dumps(hub.overview(), ensure_ascii=False, indent=2))
+        if args.format == "table":
+            print(hub.overview_table(), end="")
+        else:
+            print(json.dumps(hub.overview(), ensure_ascii=False, indent=2))
         return
 
     if args.command == "health":
@@ -727,6 +1086,20 @@ def main():
 
     if args.command == "bundle":
         print(json.dumps(hub.bundle(), ensure_ascii=False, indent=2))
+        return
+
+    if args.command == "freshness-audit":
+        if args.format == "table":
+            print(hub.freshness_audit_table(), end="")
+        else:
+            print(json.dumps(hub.freshness_audit(), ensure_ascii=False, indent=2))
+        return
+
+    if args.command == "runtime-status":
+        if args.format == "table":
+            print(hub.runtime_status_table(), end="")
+        else:
+            print(json.dumps(hub.runtime_status(), ensure_ascii=False, indent=2))
         return
 
     if args.command == "packages":
@@ -752,11 +1125,17 @@ def main():
         return
 
     if args.command == "provenance":
-        print(json.dumps(hub.provenance(), ensure_ascii=False, indent=2))
+        if args.format == "table":
+            print(hub.provenance_table(), end="")
+        else:
+            print(json.dumps(hub.provenance(), ensure_ascii=False, indent=2))
         return
 
     if args.command == "drift":
-        print(json.dumps(hub.drift(), ensure_ascii=False, indent=2))
+        if args.format == "table":
+            print(hub.drift_table(), end="")
+        else:
+            print(json.dumps(hub.drift(), ensure_ascii=False, indent=2))
         return
 
     if args.command == "summary":

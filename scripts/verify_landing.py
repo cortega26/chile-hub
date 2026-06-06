@@ -2,6 +2,7 @@ import contextlib
 import json
 import socket
 import threading
+from datetime import datetime, timezone
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
 
@@ -13,6 +14,41 @@ BUNDLE_PATH = ROOT_DIR / "data" / "normalized" / "hub_bundle.json"
 def fail(message):
     print(f"ERROR: {message}")
     raise SystemExit(1)
+
+
+def parse_iso_datetime(value):
+    if not value:
+        return None
+    try:
+        parsed = datetime.fromisoformat(value)
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        return parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
+def compute_runtime_freshness(dataset):
+    refreshed_at = parse_iso_datetime(dataset.get("refreshed_at_utc"))
+    max_age_hours = dataset.get("freshness", {}).get("max_age_hours")
+    if refreshed_at is None or not isinstance(max_age_hours, (int, float)):
+        return {"status": "unknown", "age_hours": None, "max_age_hours": max_age_hours}
+    age_hours = max((datetime.now(timezone.utc) - refreshed_at).total_seconds() / 3600, 0)
+    return {
+        "status": "fresh" if age_hours <= max_age_hours else "stale",
+        "age_hours": round(age_hours, 2),
+        "max_age_hours": max_age_hours,
+    }
+
+
+def status_rank(status):
+    return {"ok": 0, "warn": 1, "error": 2}.get(status, 1)
+
+
+def compute_runtime_overall_status(build_status, runtime_freshness):
+    statuses = [entry["status"] for entry in runtime_freshness.values()]
+    runtime_freshness_status = "warn" if any(status in {"stale", "unknown"} for status in statuses) else "ok"
+    return runtime_freshness_status if status_rank(runtime_freshness_status) > status_rank(build_status) else build_status
 
 
 def get_free_port():
@@ -52,14 +88,19 @@ def verify_landing():
     bundle = json.loads(BUNDLE_PATH.read_text(encoding="utf-8"))
     health = bundle.get("health", {})
     datasets = bundle.get("datasets", [])
+    runtime_freshness = {dataset["dataset"]: compute_runtime_freshness(dataset) for dataset in datasets}
     live_count = health.get("live_count", 0)
-    stale_count = health.get("stale_count", 0)
+    stale_count = sum(1 for freshness in runtime_freshness.values() if freshness["status"] == "stale")
+    unknown_freshness_count = sum(
+        1 for freshness in runtime_freshness.values() if freshness["status"] == "unknown"
+    )
     degraded_count = health.get("degraded_count", 0)
     partial_coverage_count = health.get("partial_coverage_count", 0)
     drifted_count = health.get("drifted_count", 0)
     review_terms_count = health.get("review_terms_count", 0)
     warning_count = health.get("warning_count", 0)
-    overall_status = bundle.get("overall_status", "unknown")
+    build_overall_status = bundle.get("overall_status", "unknown")
+    current_overall_status = compute_runtime_overall_status(build_overall_status, runtime_freshness)
     zip_package = next(
         (package for package in bundle.get("packages", []) if package.get("package_type") == "zip"),
         None,
@@ -71,8 +112,10 @@ def verify_landing():
     )
     expected_status_subtitle = (
         f"{live_count}/{len(datasets)} capas operativas en modo live. "
-        f"Estado global: {overall_status}. "
+        f"Estado build: {build_overall_status}. "
+        f"Estado actual: {current_overall_status}. "
         f"{'Sin capas stale.' if stale_count == 0 else f'{stale_count} capas stale.'} "
+        f"{'Sin capas con freshness unknown.' if unknown_freshness_count == 0 else f'{unknown_freshness_count} capas con freshness unknown.'} "
         f"{'Sin capas con drift.' if drifted_count == 0 else f'{drifted_count} capas con drift.'} "
         f"{'Sin capas degradadas.' if degraded_count == 0 else f'{degraded_count} capas degradadas.'} "
         f"{'Sin regresiones de cobertura.' if partial_coverage_count == 0 else f'{partial_coverage_count} capas con cobertura parcial.'} "
@@ -99,12 +142,18 @@ def verify_landing():
             fail(f"Unexpected status subtitle: {status_subtitle}")
 
         status_pills = page.locator("#status-pills .status-pill").all_inner_texts()
+        if f"Estado build: {build_overall_status}" not in status_pills:
+            fail(f"Build status pill not found: {status_pills}")
+        if f"Estado actual: {current_overall_status}" not in status_pills:
+            fail(f"Current status pill not found: {status_pills}")
         if f"Review terms: {review_terms_count}" not in status_pills:
             fail(f"Review terms pill not found: {status_pills}")
         if f"Degraded: {degraded_count}" not in status_pills:
             fail(f"Degraded pill not found: {status_pills}")
         if f"Drifted: {drifted_count}" not in status_pills:
             fail(f"Drifted pill not found: {status_pills}")
+        if f"Freshness unknown: {unknown_freshness_count}" not in status_pills:
+            fail(f"Freshness unknown pill not found: {status_pills}")
         if f"Partial coverage: {partial_coverage_count}" not in status_pills:
             fail(f"Partial coverage pill not found: {status_pills}")
 
@@ -148,7 +197,8 @@ def verify_landing():
             fail(f"Unexpected artifact metadata: {artifact_meta}")
 
         first_card_facts = first_card.locator(".dataset-fact").all_inner_texts()
-        if "FRESHNESS\nfresh ·" not in "\n".join(first_card_facts):
+        expected_first_runtime_status = runtime_freshness["regiones"]["status"]
+        if f"FRESHNESS\n{expected_first_runtime_status} ·" not in "\n".join(first_card_facts):
             fail(f"Freshness fact not found in first dataset card: {first_card_facts}")
         if "COVERAGE\n" not in "\n".join(first_card_facts):
             fail(f"Coverage fact not found in first dataset card: {first_card_facts}")
@@ -162,6 +212,9 @@ def verify_landing():
         first_card_meta = first_card.locator(".dataset-meta-line").first.inner_text()
         if "Requiere atribución: sí" not in first_card_meta:
             fail(f"Reuse attribution metadata not found in first dataset card: {first_card_meta}")
+        freshness_meta = first_card.locator(".dataset-meta-line").nth(1).inner_text()
+        if "Freshness build:" not in freshness_meta or "Freshness actual:" not in freshness_meta:
+            fail(f"Runtime freshness metadata not found in first dataset card: {freshness_meta}")
 
         example_title = first_card.locator(".dataset-example-title").inner_text()
         if example_title.upper() != "RECETA DE USO":

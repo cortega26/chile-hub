@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-06-01T17:37:55.601608+00:00",
+  "generated_at_utc": "2026-06-06T23:11:44.833453+00:00",
   "dataset_count": 4,
   "datasets": [
     {
@@ -29,9 +29,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 1.63,
+        "age_hours": 127.2,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-01T17:37:55.601046+00:00"
+        "checked_at_utc": "2026-06-06T23:11:44.833248+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -104,9 +104,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 1.63,
+        "age_hours": 127.2,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-01T17:37:55.601103+00:00"
+        "checked_at_utc": "2026-06-06T23:11:44.833273+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -186,9 +186,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 1.63,
+        "age_hours": 127.2,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-01T17:37:55.601115+00:00"
+        "checked_at_utc": "2026-06-06T23:11:44.833280+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -259,10 +259,10 @@
         "summary": "Datos del Banco Central de Chile (BCCh) e INE. Libre reproducción con citación. Acceso vía mindicador.cl (API pública de la comunidad)."
       },
       "freshness": {
-        "status": "fresh",
-        "age_hours": 1.99,
+        "status": "stale",
+        "age_hours": 127.55,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-06-01T17:37:55.601557+00:00"
+        "checked_at_utc": "2026-06-06T23:11:44.833412+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 72,
@@ -276,9 +276,9 @@
         "summary": "Sin baseline de cobertura por cardinalidad para esta capa."
       },
       "drift": {
-        "status": "healthy",
-        "summary": "Sin drift operativo detectado en este build.",
-        "recommended_action": "Ninguna."
+        "status": "drifted",
+        "summary": "Drift detectado: mode=live, coverage=not_applicable, degradation=warning.",
+        "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
       },
       "usage_examples": {
         "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('indicadores')",
@@ -294,11 +294,13 @@
       },
       "documentation": "docs/datasets/indicadores.md",
       "validation_status": "ok",
-      "warnings": [],
+      "warnings": [
+        "indicadores freshness is stale: 127.55h since refresh, policy max is 72h"
+      ],
       "degradation": {
-        "status": "none",
-        "impact": "Sin degradación operativa detectada en este build.",
-        "recommended_action": "Ninguna."
+        "status": "warning",
+        "impact": "indicadores freshness is stale: 127.55h since refresh, policy max is 72h",
+        "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
       },
       "notes": []
     }

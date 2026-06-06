@@ -3,6 +3,7 @@ import subprocess
 import sys
 import unittest
 import zipfile
+from datetime import datetime, timezone
 from pathlib import Path
 
 
@@ -133,9 +134,16 @@ class ChileHubTests(unittest.TestCase):
     def test_overview(self):
         overview = self.hub.overview()
         self.assertIn(overview["overall_status"], {"ok", "warn", "error"})
+        self.assertIn(overview["build_overall_status"], {"ok", "warn", "error"})
+        self.assertIn(overview["current_overall_status"], {"ok", "warn", "error"})
         self.assertEqual(overview["dataset_count"], 4)
         self.assertGreaterEqual(overview["shared_artifact_count"], 1)
         self.assertGreaterEqual(overview["package_count"], 1)
+        self.assertEqual(
+            overview["current_fresh_count"] + overview["current_stale_count"] + overview["current_unknown_count"],
+            4,
+        )
+        self.assertTrue(overview["current_checked_at_utc"])
         self.assertEqual(overview["primary_package"]["package_type"], "zip")
         self.assertEqual(
             overview["primary_package"]["checksum_path"],
@@ -148,6 +156,42 @@ class ChileHubTests(unittest.TestCase):
         self.assertIn("health_json", overview["report_keys"])
         self.assertIn("drift_json", overview["report_keys"])
         self.assertEqual(len(overview["datasets"]), 4)
+
+    def test_overview_table(self):
+        table = self.hub.overview_table()
+        self.assertIn("chile-hub overview", table)
+        self.assertIn("build_overall_status", table)
+        self.assertIn("current_overall_status", table)
+        self.assertIn("dataset      mode      validation", table)
+        self.assertIn("indicadores", table)
+
+    def test_runtime_status_audit(self):
+        audit = self.hub.runtime_status_audit()
+        self.assertIn(audit["build_overall_status"], {"ok", "warn", "error"})
+        self.assertIn(audit["current_overall_status"], {"ok", "warn", "error"})
+        self.assertEqual(audit["fresh_count"] + audit["stale_count"] + audit["unknown_count"], 4)
+        self.assertTrue(audit["checked_at_utc"])
+
+    def test_runtime_status(self):
+        runtime = self.hub.runtime_status()
+        self.assertIn(runtime["build_overall_status"], {"ok", "warn", "error"})
+        self.assertIn(runtime["current_overall_status"], {"ok", "warn", "error"})
+        self.assertEqual(runtime["fresh_count"] + runtime["stale_count"] + runtime["unknown_count"], 4)
+        self.assertEqual(runtime["dataset_count"], 4)
+        self.assertEqual(len(runtime["datasets"]), 4)
+        indicadores = next(entry for entry in runtime["datasets"] if entry["dataset"] == "indicadores")
+        self.assertIn(indicadores["build_freshness_status"], {"fresh", "stale", "unknown"})
+        self.assertIn(indicadores["current_freshness_status"], {"fresh", "stale", "unknown"})
+        self.assertIn(indicadores["coverage_status"], {"full", "partial", "unknown", "not_applicable"})
+        self.assertIn(indicadores["drift_status"], {"healthy", "drifted"})
+
+    def test_runtime_status_table(self):
+        table = self.hub.runtime_status_table()
+        self.assertIn("chile-hub runtime status", table)
+        self.assertIn("build=", table)
+        self.assertIn("current=", table)
+        self.assertIn("dataset      mode      severity", table)
+        self.assertIn("indicadores", table)
 
     def test_primary_package_and_verification(self):
         package = self.hub.primary_package()
@@ -171,17 +215,25 @@ class ChileHubTests(unittest.TestCase):
     def test_snapshot_text(self):
         snapshot = self.hub.snapshot_text()
         self.assertIn("chile-hub snapshot", snapshot)
-        self.assertIn("status: ok", snapshot)
+        self.assertIn(f"status_build: {self.health['overall_status']}", snapshot)
+        self.assertIn("status_current:", snapshot)
+        self.assertIn("current_freshness:", snapshot)
         self.assertIn("package: data/normalized/chile-hub-publishable-bundle.zip", snapshot)
         self.assertIn("verify: shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256", snapshot)
         self.assertIn("- comunas:", snapshot)
+        self.assertIn("freshness_build=", snapshot)
+        self.assertIn("freshness_now=", snapshot)
 
     def test_snapshot_table(self):
         snapshot = self.hub.snapshot_table()
         self.assertIn("chile-hub snapshot table", snapshot)
-        self.assertIn("overall_status", snapshot)
+        self.assertIn("build_overall_status", snapshot)
+        self.assertIn("current_overall_status", snapshot)
+        self.assertIn("current_fresh", snapshot)
+        self.assertIn("current_stale", snapshot)
+        self.assertIn("current_unknown", snapshot)
         self.assertIn("package_path", snapshot)
-        self.assertIn("dataset      mode      validation", snapshot)
+        self.assertIn("dataset      mode      validation  build      current", snapshot)
         self.assertIn("comunas", snapshot)
 
     def test_inventory_contains_artifact_types(self):
@@ -249,9 +301,25 @@ class ChileHubTests(unittest.TestCase):
     def test_health_table(self):
         table = self.hub.health_table()
         self.assertIn("chile-hub health", table)
-        self.assertIn("overall=ok", table)
+        self.assertIn(f"overall={self.health['overall_status']}", table)
         self.assertIn("dataset      severity  mode", table)
         self.assertIn("comunas", table)
+
+    def test_freshness_audit(self):
+        audit = self.hub.freshness_audit()
+        self.assertEqual(audit["dataset_count"], 4)
+        self.assertEqual(audit["fresh_count"] + audit["stale_count"] + audit["unknown_count"], 4)
+        indicadores = next(entry for entry in audit["datasets"] if entry["dataset"] == "indicadores")
+        refreshed_at = datetime.fromisoformat(indicadores["refreshed_at_utc"]).astimezone(timezone.utc)
+        age_hours = max((datetime.now(timezone.utc) - refreshed_at).total_seconds() / 3600, 0)
+        expected_status = "fresh" if age_hours <= indicadores["max_age_hours"] else "stale"
+        self.assertEqual(indicadores["current_freshness_status"], expected_status)
+
+    def test_freshness_audit_table(self):
+        table = self.hub.freshness_audit_table()
+        self.assertIn("chile-hub freshness audit", table)
+        self.assertIn("dataset      mode      build", table)
+        self.assertIn("indicadores", table)
 
     def test_bundle_summary(self):
         bundle = self.bundle
@@ -276,12 +344,16 @@ class ChileHubTests(unittest.TestCase):
         comunas = next(entry for entry in bundle["datasets"] if entry["dataset"] == "comunas")
         self.assertIn(comunas["severity"], {"ok", "warn", "error"})
         self.assertTrue(comunas["artifacts"])
+        self.assertTrue(comunas["source_detail"])
+        self.assertTrue(comunas["refreshed_at_utc"])
         self.assertEqual(comunas["reuse_policy"]["status"], self.catalog_by_dataset["comunas"]["reuse_policy"]["status"])
         self.assertIn(comunas["publishability_status"], {"ready", "review_terms", "unknown"})
         self.assertIn(comunas["coverage"]["status"], {"full", "partial", "unknown", "not_applicable"})
         self.assertIn(comunas["drift"]["status"], {"healthy", "drifted"})
         self.assertIn(comunas["degradation"]["status"], {"none", "warning", "degraded"})
         indicadores = next(entry for entry in bundle["datasets"] if entry["dataset"] == "indicadores")
+        self.assertTrue(indicadores["source_detail"])
+        self.assertTrue(indicadores["refreshed_at_utc"])
         self.assertEqual(indicadores["reuse_policy"]["status"], self.catalog_by_dataset["indicadores"]["reuse_policy"]["status"])
         self.assertIn(indicadores["publishability_status"], {"ready", "review_terms", "unknown"})
 
@@ -309,6 +381,12 @@ class ChileHubTests(unittest.TestCase):
         self.assertTrue(comunas["source_detail"])
         self.assertIn(comunas["freshness_status"], {"fresh", "stale", "unknown"})
 
+    def test_provenance_table(self):
+        table = self.hub.provenance_table()
+        self.assertIn("chile-hub provenance", table)
+        self.assertIn("dataset      mode      source", table)
+        self.assertIn("comunas", table)
+
     def test_drift_report(self):
         report = self.hub.drift()
         self.assertEqual(report["dataset_count"], 4)
@@ -318,6 +396,12 @@ class ChileHubTests(unittest.TestCase):
         self.assertIn(comunas["coverage_status"], {"full", "partial", "unknown", "not_applicable"})
         self.assertIn(comunas["degradation_status"], {"none", "warning", "degraded"})
         self.assertTrue(comunas["recommended_action"])
+
+    def test_drift_table(self):
+        table = self.hub.drift_table()
+        self.assertIn("chile-hub drift", table)
+        self.assertIn("dataset      drift      mode", table)
+        self.assertIn("indicadores", table)
 
 
 class ArtifactContractTests(unittest.TestCase):
@@ -423,6 +507,10 @@ class ArtifactContractTests(unittest.TestCase):
 
 
 class ChileHubCliTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.health = ChileHub().health()
+
     def run_cli(self, *args):
         return subprocess.run(
             [sys.executable, "-m", "src.chile_hub", *args],
@@ -509,15 +597,19 @@ class ChileHubCliTests(unittest.TestCase):
     def test_cli_snapshot(self):
         result = self.run_cli("snapshot")
         self.assertIn("chile-hub snapshot", result.stdout)
-        self.assertIn("status: ok", result.stdout)
+        self.assertIn(f"status_build: {self.health['overall_status']}", result.stdout)
+        self.assertIn("status_current:", result.stdout)
+        self.assertIn("current_freshness:", result.stdout)
         self.assertIn("package: data/normalized/chile-hub-publishable-bundle.zip", result.stdout)
         self.assertIn("verify: shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256", result.stdout)
 
     def test_cli_snapshot_table(self):
         result = self.run_cli("snapshot", "--format", "table")
         self.assertIn("chile-hub snapshot table", result.stdout)
-        self.assertIn("overall_status", result.stdout)
-        self.assertIn("dataset      mode      validation", result.stdout)
+        self.assertIn("build_overall_status", result.stdout)
+        self.assertIn("current_overall_status", result.stdout)
+        self.assertIn("current_fresh", result.stdout)
+        self.assertIn("dataset      mode      validation  build      current", result.stdout)
         self.assertIn("comunas", result.stdout)
 
     def test_cli_overview(self):
@@ -527,6 +619,14 @@ class ChileHubCliTests(unittest.TestCase):
         self.assertIn('"primary_package": {', result.stdout)
         self.assertIn('"verification_command": "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256"', result.stdout)
         self.assertIn('"report_keys":', result.stdout)
+
+    def test_cli_overview_table(self):
+        result = self.run_cli("overview", "--format", "table")
+        self.assertIn("chile-hub overview", result.stdout)
+        self.assertIn("build_overall_status", result.stdout)
+        self.assertIn("current_overall_status", result.stdout)
+        self.assertIn("dataset      mode      validation", result.stdout)
+        self.assertIn("indicadores", result.stdout)
 
     def test_cli_health(self):
         result = self.run_cli("health")
@@ -539,7 +639,7 @@ class ChileHubCliTests(unittest.TestCase):
     def test_cli_health_table(self):
         result = self.run_cli("health", "--format", "table")
         self.assertIn("chile-hub health", result.stdout)
-        self.assertIn("overall=ok", result.stdout)
+        self.assertIn(f"overall={self.health['overall_status']}", result.stdout)
         self.assertIn("dataset      severity  mode", result.stdout)
 
     def test_cli_bundle(self):
@@ -547,6 +647,27 @@ class ChileHubCliTests(unittest.TestCase):
         self.assertIn('"overall_status":', result.stdout)
         self.assertIn('"shared_artifacts"', result.stdout)
         self.assertIn('"reports"', result.stdout)
+
+    def test_cli_freshness_audit_table(self):
+        result = self.run_cli("freshness-audit", "--format", "table")
+        self.assertIn("chile-hub freshness audit", result.stdout)
+        self.assertIn("dataset      mode      build", result.stdout)
+        self.assertIn("indicadores", result.stdout)
+
+    def test_cli_runtime_status(self):
+        result = self.run_cli("runtime-status")
+        self.assertIn('"build_overall_status":', result.stdout)
+        self.assertIn('"current_overall_status":', result.stdout)
+        self.assertIn('"checked_at_utc":', result.stdout)
+        self.assertIn('"dataset": "indicadores"', result.stdout)
+
+    def test_cli_runtime_status_table(self):
+        result = self.run_cli("runtime-status", "--format", "table")
+        self.assertIn("chile-hub runtime status", result.stdout)
+        self.assertIn("build=", result.stdout)
+        self.assertIn("current=", result.stdout)
+        self.assertIn("dataset      mode      severity", result.stdout)
+        self.assertIn("indicadores", result.stdout)
 
     def test_cli_packages(self):
         result = self.run_cli("packages")
@@ -588,10 +709,22 @@ class ChileHubCliTests(unittest.TestCase):
         self.assertIn('"live_count":', result.stdout)
         self.assertIn('"source_name":', result.stdout)
 
+    def test_cli_provenance_table(self):
+        result = self.run_cli("provenance", "--format", "table")
+        self.assertIn("chile-hub provenance", result.stdout)
+        self.assertIn("dataset      mode      source", result.stdout)
+        self.assertIn("comunas", result.stdout)
+
     def test_cli_drift(self):
         result = self.run_cli("drift")
         self.assertIn('"drifted_count":', result.stdout)
         self.assertIn('"coverage_status":', result.stdout)
+
+    def test_cli_drift_table(self):
+        result = self.run_cli("drift", "--format", "table")
+        self.assertIn("chile-hub drift", result.stdout)
+        self.assertIn("dataset      drift      mode", result.stdout)
+        self.assertIn("indicadores", result.stdout)
 
 
 if __name__ == "__main__":

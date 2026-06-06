@@ -473,6 +473,10 @@ def verify_hub_bundle():
             fail(f"hub_bundle.json dataset entry has invalid coverage: {entry}")
         if entry.get("drift", {}).get("status") not in {"healthy", "drifted"}:
             fail(f"hub_bundle.json dataset entry has invalid drift: {entry}")
+        if not entry.get("source_detail"):
+            fail(f"hub_bundle.json dataset entry is missing source_detail: {entry}")
+        if not entry.get("refreshed_at_utc"):
+            fail(f"hub_bundle.json dataset entry is missing refreshed_at_utc: {entry}")
     packages = bundle.get("packages", [])
     if len(packages) != 1 or packages[0].get("package_type") != "zip":
         fail(f"hub_bundle.json has invalid packages metadata: {packages}")

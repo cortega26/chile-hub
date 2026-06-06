@@ -1,7 +1,7 @@
 PYTHON ?= $(if $(wildcard .venv/bin/python),.venv/bin/python,python3)
 VENV_DIR ?= .venv
 
-.PHONY: help bootstrap install-browsers doctor extract build verify verify-landing test check refresh status catalog hub-list hub-summary hub-summary-table hub-example hub-artifacts hub-shared-artifacts hub-shared-artifacts-table hub-reports hub-reports-table hub-report hub-inventory hub-inventory-table hub-snapshot hub-snapshot-table hub-overview hub-health hub-health-table hub-bundle hub-packages hub-packages-table hub-package hub-package-verify hub-redistribution hub-redistribution-table hub-provenance hub-drift package-bundle clean-publishable
+.PHONY: help bootstrap install-browsers doctor extract build verify verify-landing test check refresh status catalog hub-list hub-summary hub-summary-table hub-example hub-artifacts hub-shared-artifacts hub-shared-artifacts-table hub-reports hub-reports-table hub-report hub-inventory hub-inventory-table hub-snapshot hub-snapshot-table hub-overview hub-overview-table hub-health hub-health-table hub-bundle hub-freshness-audit hub-freshness-audit-table hub-runtime-status hub-runtime-status-table hub-packages hub-packages-table hub-package hub-package-verify hub-redistribution hub-redistribution-table hub-provenance hub-provenance-table hub-drift hub-drift-table package-bundle clean-publishable
 
 help:
 	@printf "Targets disponibles:\n"
@@ -32,9 +32,14 @@ help:
 	@printf "  make hub-snapshot     Muestra snapshot humano y compacto del hub\n"
 	@printf "  make hub-snapshot-table Muestra snapshot tabular del hub\n"
 	@printf "  make hub-overview     Muestra vista agregada compacta del hub\n"
+	@printf "  make hub-overview-table Muestra overview tabular del hub\n"
 	@printf "  make hub-health       Muestra salud agregada del hub\n"
 	@printf "  make hub-health-table Muestra salud agregada en tabla compacta\n"
 	@printf "  make hub-bundle       Muestra bundle consolidado del hub\n"
+	@printf "  make hub-freshness-audit Recalcula frescura actual del hub\n"
+	@printf "  make hub-freshness-audit-table Muestra auditoria tabular de frescura actual\n"
+	@printf "  make hub-runtime-status Muestra estado runtime agregado del hub\n"
+	@printf "  make hub-runtime-status-table Muestra estado runtime en tabla compacta\n"
 	@printf "  make hub-packages     Muestra paquetes publicables del hub\n"
 	@printf "  make hub-packages-table Muestra indice tabular de paquetes publicables\n"
 	@printf "  make hub-package      Muestra el package principal del hub\n"
@@ -42,7 +47,9 @@ help:
 	@printf "  make hub-redistribution Muestra inventario de redistribucion del hub\n"
 	@printf "  make hub-redistribution-table Muestra redistribucion en tabla compacta\n"
 	@printf "  make hub-provenance   Muestra inventario de procedencia del hub\n"
+	@printf "  make hub-provenance-table Muestra procedencia en tabla compacta\n"
 	@printf "  make hub-drift        Muestra inventario de drift operativo del hub\n"
+	@printf "  make hub-drift-table  Muestra drift en tabla compacta\n"
 	@printf "  make package-bundle   Genera ZIP publicable desde el manifest\n"
 	@printf "  make clean-publishable Elimina artefactos livianos versionables\n"
 
@@ -131,6 +138,9 @@ hub-snapshot-table:
 hub-overview:
 	$(PYTHON) -m src.chile_hub overview
 
+hub-overview-table:
+	$(PYTHON) -m src.chile_hub overview --format table
+
 hub-health:
 	$(PYTHON) -m src.chile_hub health
 
@@ -139,6 +149,18 @@ hub-health-table:
 
 hub-bundle:
 	$(PYTHON) -m src.chile_hub bundle
+
+hub-freshness-audit:
+	$(PYTHON) -m src.chile_hub freshness-audit
+
+hub-freshness-audit-table:
+	$(PYTHON) -m src.chile_hub freshness-audit --format table
+
+hub-runtime-status:
+	$(PYTHON) -m src.chile_hub runtime-status
+
+hub-runtime-status-table:
+	$(PYTHON) -m src.chile_hub runtime-status --format table
 
 hub-packages:
 	$(PYTHON) -m src.chile_hub packages
@@ -161,8 +183,14 @@ hub-redistribution-table:
 hub-provenance:
 	$(PYTHON) -m src.chile_hub provenance
 
+hub-provenance-table:
+	$(PYTHON) -m src.chile_hub provenance --format table
+
 hub-drift:
 	$(PYTHON) -m src.chile_hub drift
+
+hub-drift-table:
+	$(PYTHON) -m src.chile_hub drift --format table
 
 package-bundle:
 	$(PYTHON) scripts/package_publishable_bundle.py

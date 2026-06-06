@@ -205,6 +205,7 @@ python -m src.chile_hub reports
 python -m src.chile_hub reports --format table
 python -m src.chile_hub report drift_report --format markdown
 python -m src.chile_hub overview
+python -m src.chile_hub overview --format table
 python -m src.chile_hub snapshot
 python -m src.chile_hub snapshot --format table
 python -m src.chile_hub inventory
@@ -212,6 +213,10 @@ python -m src.chile_hub inventory --format table
 python -m src.chile_hub health
 python -m src.chile_hub health --format table
 python -m src.chile_hub bundle
+python -m src.chile_hub freshness-audit
+python -m src.chile_hub freshness-audit --format table
+python -m src.chile_hub runtime-status
+python -m src.chile_hub runtime-status --format table
 python -m src.chile_hub packages
 python -m src.chile_hub packages --format table
 python -m src.chile_hub package
@@ -219,7 +224,9 @@ python -m src.chile_hub verify-package
 python -m src.chile_hub redistribution
 python -m src.chile_hub redistribution --format table
 python -m src.chile_hub provenance
+python -m src.chile_hub provenance --format table
 python -m src.chile_hub drift
+python -m src.chile_hub drift --format table
 ```
 
 `summary` e `inventory` ahora exponen también `freshness_status`, `freshness_age_hours`, `coverage_status` y `coverage_ratio` por capa, para detectar builds envejecidos o con regresión de cobertura sin tener que abrir los JSON crudos.
@@ -239,17 +246,26 @@ También puede emitirse como tabla compacta con `packages --format table`.
 Ahora también puede emitirse como tabla compacta con `--output table`.
 `reports` lista los reportes compartidos del bundle y puede emitirse como tabla compacta para descubrir rápido qué vistas existen.
 `report` resuelve metadata de un reporte compartido específico usando la misma semántica.
-`overview` entrega una vista compacta del estado actual del hub: counts agregados, reportes publicados y estado breve por capa.
+`overview` entrega una vista compacta del estado actual del hub: counts agregados, reportes publicados, `build_overall_status`, `current_overall_status` y estado breve por capa.
 Ahora también incluye un resumen del package principal, con checksum y comando exacto de verificación.
+También puede emitirse como tabla compacta con `overview --format table`.
 `snapshot` entrega una versión humana y rápida de ese mismo estado para leer desde terminal sin navegar JSON.
+También distingue explícitamente entre `status_build` y `status_current`, para no mezclar la salud persistida del último build con la frescura recalculada contra el reloj actual.
+Ahora también deja explícita la diferencia entre la frescura persistida del último build y la frescura recalculada contra el reloj actual.
 También puede emitirse como tabla compacta con `snapshot --format table`.
 `inventory` también puede emitirse como tabla compacta con `inventory --format table` para inspeccionar outputs, tamaños y estado por capa sin leer JSON largo.
 `health` también puede emitirse como tabla compacta con `health --format table` para revisar estado agregado y severidad por capa sin navegar JSON.
+`freshness-audit` recalcula la frescura contra el reloj actual, sin depender de la evaluación persistida del último build.
+También puede emitirse como tabla compacta con `freshness-audit --format table`.
+`runtime-status` combina en una sola salida el estado global del build, el estado global actual recalculado y una fila breve por dataset con build/current freshness, coverage, drift y warnings.
+También puede emitirse como tabla compacta con `runtime-status --format table`.
 Esa misma vista también se publica como `overview.json` y `overview.md` dentro de `data/normalized/`.
 `redistribution` entrega un inventario explícito de publicabilidad por capa con licencia, acción recomendada y cautelas de redistribución.
 También puede emitirse como tabla compacta con `redistribution --format table`.
 `provenance` entrega un inventario explícito de procedencia efectiva por capa, incluyendo fuente, modo, detalle y timestamp del último refresh.
+También puede emitirse como tabla compacta con `provenance --format table`.
 `drift` entrega una vista explícita de drift operativo por capa, consolidando fallback, cobertura parcial, degradación y acción recomendada.
+También puede emitirse como tabla compacta con `drift --format table`.
 Además, cada dataset del catálogo y del bundle publica ahora una sección `degradation` con impacto y acción recomendada cuando la capa cae a fallback o warning operativo.
 También publica `coverage`, con baseline esperado, ratio y resumen legible para detectar drift territorial o regresiones de cobertura en el último build.
 
@@ -401,9 +417,14 @@ make hub-inventory-table
 make hub-snapshot
 make hub-snapshot-table
 make hub-overview
+make hub-overview-table
 make hub-health
 make hub-health-table
 make hub-bundle
+make hub-freshness-audit
+make hub-freshness-audit-table
+make hub-runtime-status
+make hub-runtime-status-table
 make hub-packages
 make hub-packages-table
 make hub-package
@@ -411,7 +432,9 @@ make hub-package-verify
 make hub-redistribution
 make hub-redistribution-table
 make hub-provenance
+make hub-provenance-table
 make hub-drift
+make hub-drift-table
 make package-bundle
 ```
 
@@ -434,6 +457,8 @@ Además dedica un bloque visible al paquete descargable, con tamaño y hash abre
 Ese mismo bloque incluye una receta copiable para verificar la integridad del ZIP con `shasum -a 256`.
 La receta se deriva de la metadata publicada del package (`verification_command`, `checksum_algorithm`, `checksum_path`) para no depender de strings hardcodeados en la UI.
 También muestra `freshness`, `coverage` y `degradation` por dataset, además de conteos agregados de capas `stale`, `degraded` y con cobertura parcial para detectar drifting del hub.
+La `freshness` visible en la landing se recalcula contra el reloj actual del navegador a partir de `refreshed_at_utc` y la política de cada capa, para no depender solo del estado persistido del último build.
+Por la misma razón, el banner principal muestra `Estado build` y `Estado actual` por separado.
 También muestra metadata de reuso por capa, incluyendo licencia o cautela de redistribución y si requiere atribución.
 Y el banner superior resume cuántas capas siguen en `review_terms`.
 También incluye recetas breves de consumo para `Python`, `DuckDB` y la `CLI` local del proyecto.
