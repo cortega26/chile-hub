@@ -1,6 +1,6 @@
 # chile-hub drift report
 
-- `generated_at_utc`: `2026-06-06T23:11:44.833453+00:00`
+- `generated_at_utc`: `2026-06-11T23:01:16.584873+00:00`
 - `dataset_count`: `4`
 - `drifted_count`: `1`
 - `healthy_count`: `3`
@@ -44,5 +44,5 @@
 - `drift_status`: `drifted`
 - `source_mode`: `live`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
-- `degradation`: indicadores freshness is stale: 127.55h since refresh, policy max is 72h
+- `degradation`: indicadores freshness is stale: 247.38h since refresh, policy max is 72h
 - `recommended_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.

@@ -356,6 +356,9 @@ class ChileHubTests(unittest.TestCase):
         self.assertEqual(bundle["health"]["review_terms_count"], self.health["review_terms_count"])
         self.assertEqual(bundle["health"]["partial_coverage_count"], self.health["partial_coverage_count"])
         self.assertEqual(bundle["health"]["drifted_count"], self.health["drifted_count"])
+        self.assertIsNotNone(bundle["top_issue"])
+        self.assertEqual(bundle["top_issue"]["dataset"], "indicadores")
+        self.assertEqual(bundle["health"]["top_issue"]["dataset"], "indicadores")
         self.assertEqual(bundle["packages"][0]["package_type"], "zip")
         self.assertEqual(bundle["packages"][0]["checksum_algorithm"], "sha256")
         self.assertTrue(bundle["packages"][0]["checksum_path"].endswith(".sha256"))
@@ -432,6 +435,11 @@ class ArtifactContractTests(unittest.TestCase):
         cls.normalized_dir = ROOT_DIR / "data" / "normalized"
         cls.catalog = json.loads((cls.normalized_dir / "dataset_catalog.json").read_text())
         cls.manifest = json.loads((cls.normalized_dir / "artifact_manifest.json").read_text())
+        cls.health = json.loads((cls.normalized_dir / "hub_health.json").read_text())
+        cls.bundle = json.loads((cls.normalized_dir / "hub_bundle.json").read_text())
+        cls.overview = json.loads((cls.normalized_dir / "overview.json").read_text())
+        cls.overview_markdown = (cls.normalized_dir / "overview.md").read_text()
+        cls.pipeline_status_markdown = (cls.normalized_dir / "pipeline_status.md").read_text()
 
     def test_catalog_dataset_count(self):
         self.assertEqual(self.catalog["dataset_count"], 4)
@@ -526,6 +534,19 @@ class ArtifactContractTests(unittest.TestCase):
         self.assertIn("data/normalized/hub_bundle.json", names)
         self.assertIn("data/normalized/artifact_manifest.json", names)
         self.assertIn("data/normalized/overview.json", names)
+
+    def test_top_issue_is_persisted_in_shared_artifacts(self):
+        self.assertIsNotNone(self.health["top_issue"])
+        self.assertEqual(self.health["top_issue"]["dataset"], "indicadores")
+        self.assertIsNotNone(self.bundle["top_issue"])
+        self.assertEqual(self.bundle["top_issue"]["dataset"], "indicadores")
+        self.assertEqual(self.bundle["health"]["top_issue"]["dataset"], "indicadores")
+        self.assertIsNotNone(self.overview["top_issue"])
+        self.assertEqual(self.overview["top_issue"]["dataset"], "indicadores")
+
+    def test_top_issue_is_exposed_in_markdown_reports(self):
+        self.assertIn("- `top_issue`: `indicadores`", self.overview_markdown)
+        self.assertIn("- `top_issue`: `indicadores`", self.pipeline_status_markdown)
 
 
 class ChileHubCliTests(unittest.TestCase):

@@ -55,6 +55,22 @@ def load_json(path):
         return json.load(f)
 
 
+def verify_top_issue(top_issue, origin):
+    if not isinstance(top_issue, dict):
+        fail(f"{origin} has invalid top_issue payload: {top_issue}")
+    if top_issue.get("dataset") not in REQUIRED_DATASETS:
+        fail(f"{origin} has invalid top_issue.dataset: {top_issue}")
+    if top_issue.get("build_freshness_status") not in {"fresh", "stale", "unknown"}:
+        fail(f"{origin} has invalid top_issue.build_freshness_status: {top_issue}")
+    if top_issue.get("drift_status") not in {"healthy", "drifted"}:
+        fail(f"{origin} has invalid top_issue.drift_status: {top_issue}")
+    if top_issue.get("degradation_status") not in {"none", "warning", "degraded"}:
+        fail(f"{origin} has invalid top_issue.degradation_status: {top_issue}")
+    warning_count = top_issue.get("warning_count")
+    if not isinstance(warning_count, int) or warning_count < 0:
+        fail(f"{origin} has invalid top_issue.warning_count: {top_issue}")
+
+
 def verify_required_files():
     missing = [str(path.relative_to(ROOT_DIR)) for path in REQUIRED_FILES if not path.exists()]
     if missing:
@@ -413,6 +429,11 @@ def verify_hub_health():
         if entry.get("drift_status") not in {"healthy", "drifted"}:
             fail(f"hub_health.json entry has invalid drift_status: {entry}")
 
+    if health.get("warning_count", 0) > 0:
+        verify_top_issue(health.get("top_issue"), "hub_health.json")
+    elif health.get("top_issue") is not None:
+        verify_top_issue(health.get("top_issue"), "hub_health.json")
+
 
 def verify_hub_bundle():
     bundle_path = NORMALIZED_DIR / "hub_bundle.json"
@@ -422,6 +443,16 @@ def verify_hub_bundle():
         fail(f"hub_bundle.json has unexpected dataset_count: {bundle.get('dataset_count')}")
     if bundle.get("overall_status") not in {"ok", "warn", "error"}:
         fail(f"hub_bundle.json has invalid overall_status: {bundle.get('overall_status')}")
+    health = bundle.get("health", {})
+    if health.get("warning_count") is None:
+        fail("hub_bundle.json is missing health.warning_count")
+    if health.get("warning_count", 0) > 0:
+        verify_top_issue(bundle.get("top_issue"), "hub_bundle.json")
+        verify_top_issue(health.get("top_issue"), "hub_bundle.json health")
+    elif bundle.get("top_issue") is not None:
+        verify_top_issue(bundle.get("top_issue"), "hub_bundle.json")
+    elif health.get("top_issue") is not None:
+        verify_top_issue(health.get("top_issue"), "hub_bundle.json health")
 
     datasets = bundle.get("datasets", [])
     dataset_names = {entry.get("dataset") for entry in datasets}
@@ -578,6 +609,10 @@ def verify_overview():
         fail(f"overview.json has invalid shared_artifact_count: {overview.get('shared_artifact_count')}")
     if overview.get("package_count", 0) <= 0:
         fail(f"overview.json has invalid package_count: {overview.get('package_count')}")
+    if overview.get("warning_count", 0) > 0:
+        verify_top_issue(overview.get("top_issue"), "overview.json")
+    elif overview.get("top_issue") is not None:
+        verify_top_issue(overview.get("top_issue"), "overview.json")
 
     primary_package = overview.get("primary_package")
     if not primary_package:

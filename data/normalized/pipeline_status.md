@@ -1,18 +1,21 @@
 # chile-hub pipeline status
 
-- `generated_at_utc`: `2026-06-06T23:11:44.833453+00:00`
+- `generated_at_utc`: `2026-06-11T23:01:16.584873+00:00`
+- `overall_status`: `warn`
+- `warning_count`: `1`
+- `top_issue`: `indicadores` (freshness=stale, drift=drifted, warnings=1)
 
 | Dataset | Source | Mode | Detail | Freshness | Coverage | Records | Validation | Warnings |
 | :--- | :--- | :--- | :--- | :--- | :--- | ---: | :--- | :--- |
-| `comunas` | BCN ArcGIS | `live` | `bcn_arcgis` | `fresh (127.2h / 2160h)` | `full` | 346 | `ok` | none |
-| `indicadores` | Banco Central de Chile (via mindicador.cl) | `live` | `public_api` | `stale (127.55h / 72h)` | `not_applicable` | 375 | `ok` | indicadores freshness is stale: 127.55h since refresh, policy max is 72h |
-| `provincias` | BCN ArcGIS | `live` | `bcn_arcgis` | `fresh (127.2h / 2160h)` | `full` | 56 | `ok` | none |
-| `regiones` | BCN ArcGIS | `live` | `bcn_arcgis` | `fresh (127.2h / 2160h)` | `full` | 16 | `ok` | none |
+| `comunas` | BCN ArcGIS | `live` | `bcn_arcgis` | `fresh (247.02h / 2160h)` | `full` | 346 | `ok` | none |
+| `indicadores` | Banco Central de Chile (via mindicador.cl) | `live` | `public_api` | `stale (247.38h / 72h)` | `not_applicable` | 375 | `ok` | indicadores freshness is stale: 247.38h since refresh, policy max is 72h |
+| `provincias` | BCN ArcGIS | `live` | `bcn_arcgis` | `fresh (247.02h / 2160h)` | `full` | 56 | `ok` | none |
+| `regiones` | BCN ArcGIS | `live` | `bcn_arcgis` | `fresh (247.02h / 2160h)` | `full` | 16 | `ok` | none |
 
 ## comunas
 
 - `refreshed_at_utc`: `2026-06-01T15:59:50.538076+00:00`
-- `freshness`: `fresh (127.2h / 2160h)`
+- `freshness`: `fresh (247.02h / 2160h)`
 - `coverage`: `Cobertura completa: 346/346 filas respecto del baseline esperado.`
 - `fields`: `codigo_region, nombre_region, abreviatura, codigo_provincia, nombre_provincia, codigo_comuna, nombre_comuna, nombre_comuna_clean, latitud_cabecera, longitud_cabecera, poblacion_estimada`
 - `notes`: bcn_skipped_null_code_records: 1; bcn_supplemented_missing_comunas: 1
@@ -21,16 +24,16 @@
 ## indicadores
 
 - `refreshed_at_utc`: `2026-06-01T15:38:37.668778+00:00`
-- `freshness`: `stale (127.55h / 72h)`
+- `freshness`: `stale (247.38h / 72h)`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
 - `fields`: `fecha, codigo_indicador, valor`
 - `indicator_codes`: `dolar, euro, ipc, uf, utm`
-- `warnings`: indicadores freshness is stale: 127.55h since refresh, policy max is 72h
+- `warnings`: indicadores freshness is stale: 247.38h since refresh, policy max is 72h
 
 ## provincias
 
 - `refreshed_at_utc`: `2026-06-01T15:59:50.538076+00:00`
-- `freshness`: `fresh (127.2h / 2160h)`
+- `freshness`: `fresh (247.02h / 2160h)`
 - `coverage`: `Cobertura completa: 56/56 filas respecto del baseline esperado.`
 - `fields`: `codigo_region, nombre_region, codigo_provincia, nombre_provincia`
 - `notes`: bcn_skipped_null_code_records: 1; bcn_supplemented_missing_comunas: 1
@@ -39,7 +42,7 @@
 ## regiones
 
 - `refreshed_at_utc`: `2026-06-01T15:59:50.538076+00:00`
-- `freshness`: `fresh (127.2h / 2160h)`
+- `freshness`: `fresh (247.02h / 2160h)`
 - `coverage`: `Cobertura completa: 16/16 filas respecto del baseline esperado.`
 - `fields`: `codigo_region, nombre_region`
 - `notes`: bcn_skipped_null_code_records: 1; bcn_supplemented_missing_comunas: 1

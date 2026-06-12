@@ -1,6 +1,6 @@
 # chile-hub health summary
 
-- `generated_at_utc`: `2026-06-06T23:11:44.833453+00:00`
+- `generated_at_utc`: `2026-06-11T23:01:16.584873+00:00`
 - `overall_status`: `warn`
 - `dataset_count`: `4`
 - `ok_count`: `3`
@@ -18,6 +18,7 @@
 - `unknown_coverage_count`: `0`
 - `drifted_count`: `1`
 - `warning_count`: `1`
+- `top_issue`: `indicadores` (freshness=stale, drift=drifted, warnings=1)
 
 | Dataset | Severity | Mode | Freshness | Coverage | Drift | Publishability | Degradation | Validation | Warnings |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | ---: |

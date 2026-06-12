@@ -46,6 +46,36 @@ def format_reuse_policy(reuse_policy):
     return status
 
 
+def compute_top_issue(entries):
+    if not entries:
+        return None
+
+    def attention_priority(entry):
+        warning_count = entry.get("warning_count", 0) or 0
+        freshness_status = entry.get("freshness_status")
+        drift_status = entry.get("drift_status")
+        degradation_status = entry.get("degradation_status")
+        if warning_count > 0 or freshness_status in {"stale", "unknown"}:
+            return 0
+        if drift_status == "drifted" or degradation_status in {"warning", "degraded"}:
+            return 1
+        return 2
+
+    ordered = sorted(entries, key=lambda entry: (attention_priority(entry), entry.get("dataset", "")))
+    top_entry = ordered[0]
+    priority = attention_priority(top_entry)
+    if priority >= 2:
+        return None
+    return {
+        "dataset": top_entry.get("dataset"),
+        "attention_priority": priority,
+        "warning_count": top_entry.get("warning_count", 0),
+        "build_freshness_status": top_entry.get("freshness_status"),
+        "drift_status": top_entry.get("drift_status"),
+        "degradation_status": top_entry.get("degradation_status"),
+    }
+
+
 def build_hub_health(metadata):
     datasets = metadata.get("datasets", {})
     validations = metadata.get("validations", {})
@@ -132,15 +162,30 @@ def build_hub_health(metadata):
         "unknown_coverage_count": sum(1 for entry in entries if entry["coverage_status"] == "unknown"),
         "drifted_count": sum(1 for entry in entries if entry["drift_status"] == "drifted"),
         "warning_count": sum(entry["warning_count"] for entry in entries),
+        "top_issue": compute_top_issue(entries),
         "datasets": entries,
     }
 
 
 def build_status_text(metadata):
+    health = build_hub_health(metadata)
     lines = []
     generated_at = metadata.get("generated_at_utc", "unknown")
     lines.append("chile-hub pipeline status")
     lines.append(f"generated_at_utc: {generated_at}")
+    lines.append(f"overall_status: {health.get('overall_status', 'unknown')}")
+    lines.append(f"warning_count: {health.get('warning_count', 0)}")
+    if health.get("top_issue"):
+        top_issue = health["top_issue"]
+        lines.append(
+            "top_issue: "
+            f"{top_issue.get('dataset')} "
+            f"(freshness={top_issue.get('build_freshness_status')}, "
+            f"drift={top_issue.get('drift_status')}, "
+            f"warnings={top_issue.get('warning_count', 0)})"
+        )
+    else:
+        lines.append("top_issue: none")
     lines.append("")
 
     datasets = metadata.get("datasets", {})
@@ -175,6 +220,7 @@ def build_status_text(metadata):
 
 
 def build_status_markdown(metadata):
+    health = build_hub_health(metadata)
     generated_at = metadata.get("generated_at_utc", "unknown")
     datasets = metadata.get("datasets", {})
     validations = metadata.get("validations", {})
@@ -183,10 +229,26 @@ def build_status_markdown(metadata):
         "# chile-hub pipeline status",
         "",
         f"- `generated_at_utc`: `{generated_at}`",
+        f"- `overall_status`: `{health.get('overall_status', 'unknown')}`",
+        f"- `warning_count`: `{health.get('warning_count', 0)}`",
+    ]
+    if health.get("top_issue"):
+        top_issue = health["top_issue"]
+        lines.append(
+            f"- `top_issue`: `{top_issue.get('dataset')}` "
+            f"(freshness={top_issue.get('build_freshness_status')}, "
+            f"drift={top_issue.get('drift_status')}, "
+            f"warnings={top_issue.get('warning_count', 0)})"
+        )
+    else:
+        lines.append("- `top_issue`: `none`")
+    lines.extend(
+        [
         "",
         "| Dataset | Source | Mode | Detail | Freshness | Coverage | Records | Validation | Warnings |",
         "| :--- | :--- | :--- | :--- | :--- | :--- | ---: | :--- | :--- |",
-    ]
+        ]
+    )
 
     for dataset_name in sorted(datasets.keys()):
         dataset = datasets[dataset_name]
@@ -262,10 +324,24 @@ def build_hub_health_markdown(health):
         f"- `unknown_coverage_count`: `{health.get('unknown_coverage_count', 0)}`",
         f"- `drifted_count`: `{health.get('drifted_count', 0)}`",
         f"- `warning_count`: `{health.get('warning_count', 0)}`",
-        "",
-        "| Dataset | Severity | Mode | Freshness | Coverage | Drift | Publishability | Degradation | Validation | Warnings |",
-        "| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | ---: |",
     ]
+    if health.get("top_issue"):
+        top_issue = health["top_issue"]
+        lines.append(
+            f"- `top_issue`: `{top_issue.get('dataset')}` "
+            f"(freshness={top_issue.get('build_freshness_status')}, "
+            f"drift={top_issue.get('drift_status')}, "
+            f"warnings={top_issue.get('warning_count', 0)})"
+        )
+    else:
+        lines.append("- `top_issue`: `none`")
+    lines.extend(
+        [
+            "",
+            "| Dataset | Severity | Mode | Freshness | Coverage | Drift | Publishability | Degradation | Validation | Warnings |",
+            "| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | ---: |",
+        ]
+    )
 
     for entry in health.get("datasets", []):
         lines.append(
@@ -442,10 +518,24 @@ def build_overview_markdown(overview):
         f"- `warning_count`: `{overview.get('warning_count', 0)}`",
         f"- `shared_artifact_count`: `{overview.get('shared_artifact_count', 0)}`",
         f"- `package_count`: `{overview.get('package_count', 0)}`",
-        "",
-        "| Dataset | Mode | Validation | Freshness | Coverage | Drift |",
-        "| :--- | :--- | :--- | :--- | :--- | :--- |",
     ]
+    if overview.get("top_issue"):
+        top_issue = overview["top_issue"]
+        lines.append(
+            f"- `top_issue`: `{top_issue.get('dataset')}` "
+            f"(freshness={top_issue.get('build_freshness_status')}, "
+            f"drift={top_issue.get('drift_status')}, "
+            f"warnings={top_issue.get('warning_count', 0)})"
+        )
+    else:
+        lines.append("- `top_issue`: `none`")
+    lines.extend(
+        [
+            "",
+            "| Dataset | Mode | Validation | Freshness | Coverage | Drift |",
+            "| :--- | :--- | :--- | :--- | :--- | :--- |",
+        ]
+    )
 
     for entry in overview.get("datasets", []):
         lines.append(

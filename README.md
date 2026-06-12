@@ -269,7 +269,9 @@ También puede emitirse como tabla compacta con `runtime-status --format table`.
 Esa vista también publica `top_issue` para mantener la misma prioridad operativa que usa la landing.
 `top-issue` expone directamente esa capa prioritaria sin tener que leer `overview` o `runtime-status` completos.
 También puede emitirse como tabla compacta con `top-issue --format table`.
-Esa misma vista también se publica como `overview.json` y `overview.md` dentro de `data/normalized/`.
+Esa misma prioridad también queda persistida en `hub_health.json`, `hub_bundle.json` y `overview.json` dentro de `data/normalized/`.
+La variante markdown compacta del overview también se publica como `overview.md`.
+`pipeline_status.md` también replica esa prioridad para que el resumen humano del build y el Job Summary no pierdan la capa que requiere atención.
 `redistribution` entrega un inventario explícito de publicabilidad por capa con licencia, acción recomendada y cautelas de redistribución.
 También puede emitirse como tabla compacta con `redistribution --format table`.
 `provenance` entrega un inventario explícito de procedencia efectiva por capa, incluyendo fuente, modo, detalle y timestamp del último refresh.

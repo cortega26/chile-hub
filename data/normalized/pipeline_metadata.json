@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-06-06T23:11:44.833453+00:00",
+  "generated_at_utc": "2026-06-11T23:01:16.584873+00:00",
   "datasets": {
     "regiones": {
       "dataset": "regiones",
@@ -28,9 +28,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 127.2,
+        "age_hours": 247.02,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-06T23:11:44.833248+00:00"
+        "checked_at_utc": "2026-06-11T23:01:16.584694+00:00"
       },
       "degradation": {
         "status": "none",
@@ -79,9 +79,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 127.2,
+        "age_hours": 247.02,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-06T23:11:44.833273+00:00"
+        "checked_at_utc": "2026-06-11T23:01:16.584717+00:00"
       },
       "degradation": {
         "status": "none",
@@ -137,9 +137,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 127.2,
+        "age_hours": 247.02,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-06T23:11:44.833280+00:00"
+        "checked_at_utc": "2026-06-11T23:01:16.584724+00:00"
       },
       "degradation": {
         "status": "none",
@@ -192,13 +192,13 @@
       },
       "freshness": {
         "status": "stale",
-        "age_hours": 127.55,
+        "age_hours": 247.38,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-06-06T23:11:44.833412+00:00"
+        "checked_at_utc": "2026-06-11T23:01:16.584836+00:00"
       },
       "degradation": {
         "status": "warning",
-        "impact": "indicadores freshness is stale: 127.55h since refresh, policy max is 72h",
+        "impact": "indicadores freshness is stale: 247.38h since refresh, policy max is 72h",
         "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
       },
       "coverage": {
@@ -223,7 +223,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 127.2
+      "freshness_age_hours": 247.02
     },
     "provincias": {
       "dataset": "provincias",
@@ -232,7 +232,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 127.2
+      "freshness_age_hours": 247.02
     },
     "comunas": {
       "dataset": "comunas",
@@ -241,7 +241,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 127.2
+      "freshness_age_hours": 247.02
     },
     "indicadores": {
       "dataset": "indicadores",
@@ -249,7 +249,7 @@
       "record_count": 375,
       "errors": [],
       "warnings": [
-        "indicadores freshness is stale: 127.55h since refresh, policy max is 72h"
+        "indicadores freshness is stale: 247.38h since refresh, policy max is 72h"
       ],
       "indicator_codes": [
         "dolar",
@@ -259,7 +259,7 @@
         "utm"
       ],
       "freshness_status": "stale",
-      "freshness_age_hours": 127.55
+      "freshness_age_hours": 247.38
     }
   }
 }

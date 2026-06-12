@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-06-06T23:11:44.833453+00:00",
+  "generated_at_utc": "2026-06-11T23:01:16.584873+00:00",
   "overall_status": "warn",
   "dataset_count": 4,
   "ok_count": 3,
@@ -18,6 +18,14 @@
   "unknown_coverage_count": 0,
   "drifted_count": 1,
   "warning_count": 1,
+  "top_issue": {
+    "dataset": "indicadores",
+    "attention_priority": 0,
+    "warning_count": 1,
+    "build_freshness_status": "stale",
+    "drift_status": "drifted",
+    "degradation_status": "warning"
+  },
   "datasets": [
     {
       "dataset": "comunas",

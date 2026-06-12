@@ -780,6 +780,7 @@ def build_overview(hub_health, hub_bundle, artifact_manifest):
         "degraded_count": hub_health.get("degraded_count"),
         "partial_coverage_count": hub_health.get("partial_coverage_count"),
         "warning_count": hub_health.get("warning_count"),
+        "top_issue": hub_health.get("top_issue"),
         "shared_artifact_count": len(
             [entry for entry in artifact_manifest.get("artifacts", []) if entry.get("shared_type")]
         ),
@@ -882,7 +883,9 @@ def write_hub_bundle_json(pipeline_metadata, hub_health, dataset_catalog, artifa
             "unknown_coverage_count": hub_health.get("unknown_coverage_count"),
             "drifted_count": hub_health.get("drifted_count"),
             "warning_count": hub_health.get("warning_count"),
+            "top_issue": hub_health.get("top_issue"),
         },
+        "top_issue": hub_health.get("top_issue"),
         "datasets": [],
         "reports": reports,
         "shared_artifacts": shared_artifacts,
