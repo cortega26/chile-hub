@@ -192,6 +192,13 @@
             font-size: 0.9rem;
         }
 
+        .status-meta {
+            color: #cbd5e1;
+            font-size: 0.82rem;
+            line-height: 1.5;
+            max-width: 820px;
+        }
+
         .status-pills {
             display: flex;
             flex-wrap: wrap;
@@ -926,6 +933,7 @@
             <div class="status-copy">
                 <span class="status-title">Estado del pipeline</span>
                 <span class="status-subtitle" id="status-subtitle">Cargando estado operativo de las capas...</span>
+                <span class="status-meta" id="status-meta">Esperando diagnóstico operativo...</span>
             </div>
             <div class="status-pills" id="status-pills">
                 <span class="status-pill">Cargando catálogo…</span>
@@ -1095,6 +1103,7 @@ make hub-list</pre>
         const nextBtn = document.getElementById("next-page-btn");
         const pageInfo = document.getElementById("page-info");
         const statusSubtitle = document.getElementById("status-subtitle");
+        const statusMeta = document.getElementById("status-meta");
         const statusPills = document.getElementById("status-pills");
         const statusActions = document.getElementById("status-actions");
         const packageMeta = document.getElementById("package-meta");
@@ -1357,6 +1366,7 @@ make hub-list</pre>
                 .catch(err => {
                     console.error("Error cargando catálogo:", err);
                     statusSubtitle.textContent = "No se pudo cargar el estado del hub local.";
+                    statusMeta.textContent = "Sin top issue diagnosticado en este momento.";
                     statusPills.innerHTML = `<span class="status-pill">Catálogo no disponible</span>`;
                     statusActions.innerHTML = `
                         <a class="dataset-action muted" href="data/normalized/hub_bundle.json" target="_blank" rel="noopener noreferrer">Bundle JSON</a>
@@ -1380,6 +1390,10 @@ make hub-list</pre>
             const datasets = bundle.datasets || [];
             const health = bundle.health || {};
             const reports = bundle.reports || {};
+            const persistedTopIssue = health.top_issue || bundle.top_issue || null;
+            const datasetsByName = Object.fromEntries(
+                datasets.map(dataset => [dataset.dataset, dataset])
+            );
             const runtimeFreshnessByDataset = Object.fromEntries(
                 datasets.map(dataset => [dataset.dataset, computeRuntimeFreshness(dataset)])
             );
@@ -1420,6 +1434,8 @@ make hub-list</pre>
             catalogGeneratedAt.textContent = `Actualizado: ${formatTimestamp(bundle.generated_at_utc)}`;
 
             const orderedDatasets = [...datasets].sort((left, right) => {
+                if (persistedTopIssue?.dataset && left.dataset === persistedTopIssue.dataset && right.dataset !== persistedTopIssue.dataset) return -1;
+                if (persistedTopIssue?.dataset && right.dataset === persistedTopIssue.dataset && left.dataset !== persistedTopIssue.dataset) return 1;
                 const leftFreshness = runtimeFreshnessByDataset[left.dataset] || { status: "unknown" };
                 const rightFreshness = runtimeFreshnessByDataset[right.dataset] || { status: "unknown" };
                 const leftPriority = computeAttentionPriority(left, leftFreshness);
@@ -1427,15 +1443,41 @@ make hub-list</pre>
                 if (leftPriority !== rightPriority) return leftPriority - rightPriority;
                 return left.dataset.localeCompare(right.dataset, "es");
             });
-            const topAttentionDataset = orderedDatasets.find(dataset => {
+            const fallbackTopAttentionDataset = orderedDatasets.find(dataset => {
                 const runtimeFreshness = runtimeFreshnessByDataset[dataset.dataset] || { status: "unknown" };
                 return computeAttentionPriority(dataset, runtimeFreshness) === 0;
             });
+            const activeTopIssue = persistedTopIssue || (
+                fallbackTopAttentionDataset
+                    ? {
+                        dataset: fallbackTopAttentionDataset.dataset,
+                        diagnostic_summary: fallbackTopAttentionDataset.degradation?.impact
+                            || fallbackTopAttentionDataset.drift?.summary
+                            || "Sin detalle adicional.",
+                        recommended_action: fallbackTopAttentionDataset.degradation?.recommended_action
+                            || fallbackTopAttentionDataset.drift?.recommended_action
+                            || "Ninguna.",
+                    }
+                    : null
+            );
+            const activeTopIssueDatasetName = activeTopIssue?.dataset || null;
+            const activeTopIssueDataset = activeTopIssueDatasetName
+                ? (datasetsByName[activeTopIssueDatasetName] || null)
+                : null;
+            const topIssueReason = activeTopIssue
+                ? (activeTopIssue.diagnostic_summary || "Sin detalle adicional.")
+                : "Sin top issue activo en este build.";
+            const topIssueAction = activeTopIssue
+                ? (activeTopIssue.recommended_action || "Ninguna.")
+                : "Sin top issue activo en este build.";
+            const topIssueSourceDetail = activeTopIssue
+                ? (activeTopIssue.source_detail || activeTopIssueDataset?.source_detail || "unknown")
+                : "unknown";
 
             statusPills.innerHTML = `
                 <span class="status-pill">Estado build: ${buildOverallStatus}</span>
                 <span class="status-pill">Estado actual: ${currentOverallStatus}</span>
-                ${topAttentionDataset ? `<span class="status-pill">Top issue: ${escapeHtml(topAttentionDataset.dataset)}</span>` : ""}
+                ${activeTopIssueDatasetName ? `<span class="status-pill">Top issue: ${escapeHtml(activeTopIssueDatasetName)}</span>` : ""}
                 <span class="status-pill">Capas: ${datasets.length}</span>
                 <span class="status-pill">Live: ${liveCount}</span>
                 <span class="status-pill">Stale: ${staleCount}</span>
@@ -1447,8 +1489,13 @@ make hub-list</pre>
                 <span class="status-pill">Warnings: ${warningCount}</span>
             `;
 
+            statusMeta.textContent = activeTopIssueDatasetName
+                ? `Motivo del top issue (${activeTopIssueDatasetName}): ${topIssueReason} · Procedencia técnica: ${topIssueSourceDetail} · Acción recomendada: ${topIssueAction}`
+                : topIssueReason;
+
             statusActions.innerHTML = `
                 ${buildSimpleLink(findReportPath(reports, "pipeline_status", "markdown", "data/normalized/pipeline_status.md"), "Status")}
+                ${buildSimpleLink(findReportPath(reports, "hub_status", "json", "data/normalized/hub_status.json"), "Status JSON")}
                 ${buildSimpleLink(findReportPath(reports, "hub_health", "json", "data/normalized/hub_health.json"), "Health JSON")}
                 ${buildSimpleLink(findReportPath(reports, "hub_health", "markdown", "data/normalized/hub_health.md"), "Health MD")}
                 ${buildSimpleLink(findReportPath(reports, "hub_bundle", "json", "data/normalized/hub_bundle.json"), "Bundle JSON")}
@@ -1463,12 +1510,13 @@ make hub-list</pre>
                 ${buildSimpleLink(findReportPath(reports, "dataset_catalog", "json", "data/normalized/dataset_catalog.json"), "Catalog JSON")}
                 ${buildSimpleLink(findReportPath(reports, "dataset_catalog", "markdown", "data/normalized/dataset_catalog.md"), "Catalog MD")}
                 ${buildSimpleLink(findReportPath(reports, "artifact_manifest", "json", "data/normalized/artifact_manifest.json"), "Manifest")}
-                ${topAttentionDataset ? `<a class="dataset-action muted" href="#dataset-${escapeHtml(topAttentionDataset.dataset)}">Ver top issue</a>` : ""}
+                ${activeTopIssueDatasetName ? `<a class="dataset-action muted" href="#dataset-${escapeHtml(activeTopIssueDatasetName)}">Ver top issue</a>` : ""}
             `;
 
             catalogGrid.innerHTML = orderedDatasets.map(dataset => {
                 const runtimeFreshness = runtimeFreshnessByDataset[dataset.dataset] || { status: "unknown" };
-                const needsAttention = (dataset.warning_count ?? 0) > 0
+                const needsAttention = dataset.dataset === activeTopIssueDataset?.dataset
+                    || (dataset.warning_count ?? 0) > 0
                     || runtimeFreshness.status === "stale"
                     || runtimeFreshness.status === "unknown"
                     || dataset.drift?.status === "drifted"

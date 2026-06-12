@@ -5,12 +5,15 @@ from pathlib import Path
 
 import polars as pl
 
+from src.pipeline_status_utils import format_top_issue_summary
+
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 NORMALIZED_DIR = ROOT_DIR / "data" / "normalized"
 DATASET_CATALOG_PATH = NORMALIZED_DIR / "dataset_catalog.json"
 ARTIFACT_MANIFEST_PATH = NORMALIZED_DIR / "artifact_manifest.json"
 HUB_HEALTH_PATH = NORMALIZED_DIR / "hub_health.json"
+HUB_STATUS_PATH = NORMALIZED_DIR / "hub_status.json"
 HUB_BUNDLE_PATH = NORMALIZED_DIR / "hub_bundle.json"
 REDISTRIBUTION_REPORT_PATH = NORMALIZED_DIR / "redistribution_report.json"
 PROVENANCE_REPORT_PATH = NORMALIZED_DIR / "provenance_report.json"
@@ -33,6 +36,10 @@ class ChileHub:
 
     def _load_hub_health(self):
         with HUB_HEALTH_PATH.open("r", encoding="utf-8") as f:
+            return json.load(f)
+
+    def _load_hub_status(self):
+        with HUB_STATUS_PATH.open("r", encoding="utf-8") as f:
             return json.load(f)
 
     def _load_hub_bundle(self):
@@ -89,9 +96,17 @@ class ChileHub:
         freshness_by_dataset = {
             entry.get("dataset"): entry for entry in self.freshness_audit().get("datasets", [])
         }
+        provenance_by_dataset = {
+            entry.get("dataset"): entry for entry in self.provenance().get("datasets", [])
+        }
+        drift_by_dataset = {
+            entry.get("dataset"): entry for entry in self.drift().get("datasets", [])
+        }
         candidates = []
         for entry in self.summary():
             runtime = freshness_by_dataset.get(entry.get("dataset"), {})
+            provenance = provenance_by_dataset.get(entry.get("dataset"), {})
+            drift = drift_by_dataset.get(entry.get("dataset"), {})
             current_status = runtime.get("current_freshness_status", "unknown")
             priority = self._attention_priority_for_dataset(entry, current_status)
             candidates.append(
@@ -103,6 +118,12 @@ class ChileHub:
                     "current_freshness_status": current_status,
                     "drift_status": entry.get("drift_status"),
                     "degradation_status": entry.get("degradation_status"),
+                    "source_detail": provenance.get("source_detail", "unknown"),
+                    "diagnostic_summary": drift.get(
+                        "diagnostic_summary",
+                        provenance.get("diagnostic_summary", "Sin observaciones operativas."),
+                    ),
+                    "recommended_action": drift.get("recommended_action", "Ninguna."),
                 }
             )
 
@@ -128,6 +149,9 @@ class ChileHub:
             ("drift_status", top_issue.get("drift_status", "unknown")),
             ("degradation_status", top_issue.get("degradation_status", "unknown")),
             ("warning_count", str(top_issue.get("warning_count", 0))),
+            ("source_detail", top_issue.get("source_detail", "unknown")),
+            ("diagnostic_summary", top_issue.get("diagnostic_summary", "unknown")),
+            ("recommended_action", top_issue.get("recommended_action", "unknown")),
         ]
         label_width = max(len(label) for label, _ in rows)
         lines.extend(f"{label.ljust(label_width)} : {value}" for label, value in rows)
@@ -246,6 +270,12 @@ class ChileHub:
                 f"drift={top_issue.get('drift_status', 'unknown')} | "
                 f"warnings={top_issue.get('warning_count', 0)}"
             )
+            lines.append(
+                f"top_issue_reason: {top_issue.get('diagnostic_summary', 'unknown')}"
+            )
+            lines.append(
+                f"top_issue_action: {top_issue.get('recommended_action', 'unknown')}"
+            )
 
         if package:
             lines.append(
@@ -300,6 +330,9 @@ class ChileHub:
                     ("top_issue_build", top_issue.get("build_freshness_status", "unknown")),
                     ("top_issue_current", top_issue.get("current_freshness_status", "unknown")),
                     ("top_issue_drift", top_issue.get("drift_status", "unknown")),
+                    ("top_issue_reason", top_issue.get("diagnostic_summary", "unknown")),
+                    ("top_issue_action", top_issue.get("recommended_action", "unknown")),
+                    ("top_issue_summary", overview.get("top_issue_summary", format_top_issue_summary(top_issue))),
                 ]
             )
 
@@ -453,6 +486,7 @@ class ChileHub:
             "current_unknown_count": runtime_status.get("unknown_count"),
             "current_checked_at_utc": runtime_status.get("checked_at_utc"),
             "top_issue": top_issue,
+            "top_issue_summary": format_top_issue_summary(top_issue),
             "shared_artifact_count": len(shared_artifacts),
             "package_count": len(packages),
             "primary_package": {
@@ -508,6 +542,9 @@ class ChileHub:
                     ("top_issue_build", top_issue.get("build_freshness_status", "unknown")),
                     ("top_issue_current", top_issue.get("current_freshness_status", "unknown")),
                     ("top_issue_drift", top_issue.get("drift_status", "unknown")),
+                    ("top_issue_reason", top_issue.get("diagnostic_summary", "unknown")),
+                    ("top_issue_action", top_issue.get("recommended_action", "unknown")),
+                    ("top_issue_summary", overview.get("top_issue_summary", format_top_issue_summary(top_issue))),
                 ]
             )
 
@@ -617,7 +654,44 @@ class ChileHub:
         return "\n".join(lines) + "\n"
 
     def health(self):
-        return self._load_hub_health()
+        health = self._load_hub_health()
+        if "top_issue_summary" not in health:
+            health["top_issue_summary"] = format_top_issue_summary(health.get("top_issue"))
+        return health
+
+    def status(self):
+        status = self._load_hub_status()
+        if "top_issue_summary" not in status:
+            status["top_issue_summary"] = format_top_issue_summary(status.get("top_issue"))
+        return status
+
+    def status_table(self):
+        status = self.status()
+        rows = [
+            ("generated_at_utc", status.get("generated_at_utc", "unknown")),
+            ("overall_status", status.get("overall_status", "unknown")),
+            ("dataset_count", str(status.get("dataset_count", 0))),
+            ("live_count", str(status.get("live_count", 0))),
+            ("fallback_count", str(status.get("fallback_count", 0))),
+            ("stale_count", str(status.get("stale_count", 0))),
+            ("drifted_count", str(status.get("drifted_count", 0))),
+            ("degraded_count", str(status.get("degraded_count", 0))),
+            ("warning_count", str(status.get("warning_count", 0))),
+        ]
+        top_issue = status.get("top_issue")
+        if top_issue:
+            rows.extend(
+                [
+                    ("top_issue", top_issue.get("dataset", "unknown")),
+                    ("top_issue_reason", top_issue.get("diagnostic_summary", "unknown")),
+                    ("top_issue_action", top_issue.get("recommended_action", "unknown")),
+                    ("top_issue_summary", status.get("top_issue_summary", format_top_issue_summary(top_issue))),
+                ]
+            )
+        label_width = max(len(label) for label, _ in rows)
+        lines = ["chile-hub status", ""]
+        lines.extend(f"{label.ljust(label_width)} : {value}" for label, value in rows)
+        return "\n".join(lines) + "\n"
 
     def health_table(self):
         health = self.health()
@@ -752,6 +826,7 @@ class ChileHub:
             "warning_count": health.get("warning_count"),
             "checked_at_utc": runtime_audit.get("checked_at_utc"),
             "top_issue": top_issue,
+            "top_issue_summary": format_top_issue_summary(top_issue),
             "datasets": datasets,
         }
 
@@ -778,6 +853,15 @@ class ChileHub:
                 f"current={top_issue.get('current_freshness_status', 'unknown')} | "
                 f"drift={top_issue.get('drift_status', 'unknown')} | "
                 f"warnings={top_issue.get('warning_count', 0)}"
+            )
+            lines.append(
+                f"top_issue_reason={top_issue.get('diagnostic_summary', 'unknown')}"
+            )
+            lines.append(
+                f"top_issue_action={top_issue.get('recommended_action', 'unknown')}"
+            )
+            lines.append(
+                f"top_issue_summary={runtime.get('top_issue_summary', format_top_issue_summary(top_issue))}"
             )
         lines.append("")
         lines.append("dataset      mode      severity  build      current    age_h   max_h   coverage        drift     warnings")
@@ -918,14 +1002,15 @@ class ChileHub:
             f"fallback={report.get('fallback_count', 0)}"
         )
         lines.append("")
-        lines.append("dataset      mode      source                 freshness  refreshed_at_utc")
-        lines.append("-----------  --------  ---------------------  ---------  --------------------------------")
+        lines.append("dataset      mode      source                        freshness  warnings  refreshed_at_utc")
+        lines.append("-----------  --------  ----------------------------  ---------  --------  --------------------------------")
         for entry in report.get("datasets", []):
             lines.append(
                 f"{entry.get('dataset', 'unknown'):<11}  "
                 f"{entry.get('source_mode', 'unknown'):<8}  "
-                f"{entry.get('source_detail', 'unknown'):<21}  "
+                f"{entry.get('source_detail', 'unknown'):<28}  "
                 f"{entry.get('freshness_status', 'unknown'):<9}  "
+                f"{entry.get('warning_count', 0):<8}  "
                 f"{entry.get('refreshed_at_utc', 'unknown')}"
             )
         return "\n".join(lines) + "\n"
@@ -945,15 +1030,16 @@ class ChileHub:
             f"degraded={report.get('degraded_count', 0)}"
         )
         lines.append("")
-        lines.append("dataset      drift      mode      coverage        degradation")
-        lines.append("-----------  ---------  --------  --------------  -----------")
+        lines.append("dataset      drift      mode      coverage        degradation  warnings")
+        lines.append("-----------  ---------  --------  --------------  -----------  --------")
         for entry in report.get("datasets", []):
             lines.append(
                 f"{entry.get('dataset', 'unknown'):<11}  "
                 f"{entry.get('drift_status', 'unknown'):<9}  "
                 f"{entry.get('source_mode', 'unknown'):<8}  "
                 f"{entry.get('coverage_status', 'unknown'):<14}  "
-                f"{entry.get('degradation_status', 'unknown')}"
+                f"{entry.get('degradation_status', 'unknown'):<11}  "
+                f"{entry.get('warning_count', 0)}"
             )
         return "\n".join(lines) + "\n"
 
@@ -1032,6 +1118,13 @@ def build_parser():
         choices=["json", "table"],
         default="json",
         help="Formato de salida de overview",
+    )
+    status_parser = subparsers.add_parser("status", help="Mostrar status operativo compacto del hub")
+    status_parser.add_argument(
+        "--format",
+        choices=["json", "table"],
+        default="json",
+        help="Formato de salida de status",
     )
     health_parser = subparsers.add_parser("health", help="Mostrar salud agregada del hub")
     health_parser.add_argument(
@@ -1188,6 +1281,13 @@ def main():
             print(json.dumps(hub.overview(), ensure_ascii=False, indent=2))
         return
 
+    if args.command == "status":
+        if args.format == "table":
+            print(hub.status_table(), end="")
+        else:
+            print(json.dumps(hub.status(), ensure_ascii=False, indent=2))
+        return
+
     if args.command == "health":
         if args.format == "table":
             print(hub.health_table(), end="")
@@ -1227,7 +1327,10 @@ def main():
                     f"build={top_issue.get('build_freshness_status', 'unknown')} | "
                     f"current={top_issue.get('current_freshness_status', 'unknown')} | "
                     f"drift={top_issue.get('drift_status', 'unknown')} | "
-                    f"warnings={top_issue.get('warning_count', 0)}\n",
+                    f"warnings={top_issue.get('warning_count', 0)} | "
+                    f"source_detail={top_issue.get('source_detail', 'unknown')} | "
+                    f"reason={top_issue.get('diagnostic_summary', 'unknown')} | "
+                    f"action={top_issue.get('recommended_action', 'unknown')}\n",
                     end="",
                 )
         else:

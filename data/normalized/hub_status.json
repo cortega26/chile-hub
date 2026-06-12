@@ -1,0 +1,23 @@
+{
+  "generated_at_utc": "2026-06-12T15:58:17.707652+00:00",
+  "overall_status": "warn",
+  "dataset_count": 4,
+  "live_count": 4,
+  "fallback_count": 0,
+  "stale_count": 0,
+  "drifted_count": 1,
+  "degraded_count": 0,
+  "warning_count": 2,
+  "top_issue": {
+    "dataset": "indicadores",
+    "attention_priority": 0,
+    "warning_count": 2,
+    "build_freshness_status": "fresh",
+    "drift_status": "drifted",
+    "degradation_status": "warning",
+    "source_detail": "public_api_with_published_backfill",
+    "diagnostic_summary": "indicadores live refresh returned empty series for: ipc/2026",
+    "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
+  },
+  "top_issue_summary": "indicadores: indicadores live refresh returned empty series for: ipc/2026 [source_detail=public_api_with_published_backfill; warnings=2; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]"
+}

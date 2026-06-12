@@ -1,16 +1,16 @@
 # chile-hub provenance report
 
-- `generated_at_utc`: `2026-06-11T23:01:16.584873+00:00`
+- `generated_at_utc`: `2026-06-12T15:58:17.707652+00:00`
 - `dataset_count`: `4`
 - `live_count`: `4`
 - `fallback_count`: `0`
 
-| Dataset | Source | Mode | Detail | Refreshed | Freshness | Reuse |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `regiones` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-01T15:59:50.538076+00:00` | `fresh (247.02h / 2160h)` | `open-attribution` |
-| `provincias` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-01T15:59:50.538076+00:00` | `fresh (247.02h / 2160h)` | `open-attribution` |
-| `comunas` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-01T15:59:50.538076+00:00` | `fresh (247.02h / 2160h)` | `open-attribution` |
-| `indicadores` | Banco Central de Chile (via mindicador.cl) | `live` | `public_api` | `2026-06-01T15:38:37.668778+00:00` | `stale (247.38h / 72h)` | `open-attribution` |
+| Dataset | Source | Mode | Detail | Refreshed | Freshness | Warnings | Reuse |
+| :--- | :--- | :--- | :--- | :--- | :--- | ---: | :--- |
+| `regiones` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-01T15:59:50.538076+00:00` | `fresh (263.97h / 2160h)` | 0 | `open-attribution` |
+| `provincias` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-01T15:59:50.538076+00:00` | `fresh (263.97h / 2160h)` | 0 | `open-attribution` |
+| `comunas` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-01T15:59:50.538076+00:00` | `fresh (263.97h / 2160h)` | 0 | `open-attribution` |
+| `indicadores` | Banco Central de Chile (via mindicador.cl) | `live` | `public_api_with_published_backfill` | `2026-06-12T03:14:30.733498+00:00` | `fresh (12.73h / 72h)` | 2 | `open-attribution` |
 
 ## regiones
 
@@ -19,7 +19,9 @@
 - `source_mode`: `live`
 - `source_detail`: `bcn_arcgis`
 - `refreshed_at_utc`: `2026-06-01T15:59:50.538076+00:00`
-- `freshness`: `fresh (247.02h / 2160h)`
+- `freshness`: `fresh (263.97h / 2160h)`
+- `warning_count`: `0`
+- `diagnostic_summary`: bcn_skipped_null_code_records: 1
 - `reuse_status`: `open-attribution`
 - `documentation`: `docs/datasets/regiones.md`
 
@@ -30,7 +32,9 @@
 - `source_mode`: `live`
 - `source_detail`: `bcn_arcgis`
 - `refreshed_at_utc`: `2026-06-01T15:59:50.538076+00:00`
-- `freshness`: `fresh (247.02h / 2160h)`
+- `freshness`: `fresh (263.97h / 2160h)`
+- `warning_count`: `0`
+- `diagnostic_summary`: bcn_skipped_null_code_records: 1
 - `reuse_status`: `open-attribution`
 - `documentation`: `docs/datasets/provincias.md`
 
@@ -41,7 +45,9 @@
 - `source_mode`: `live`
 - `source_detail`: `bcn_arcgis`
 - `refreshed_at_utc`: `2026-06-01T15:59:50.538076+00:00`
-- `freshness`: `fresh (247.02h / 2160h)`
+- `freshness`: `fresh (263.97h / 2160h)`
+- `warning_count`: `0`
+- `diagnostic_summary`: bcn_skipped_null_code_records: 1
 - `reuse_status`: `open-attribution`
 - `documentation`: `docs/datasets/comunas.md`
 
@@ -50,8 +56,10 @@
 - `source_name`: Banco Central de Chile (via mindicador.cl)
 - `source_url`: https://mindicador.cl/api
 - `source_mode`: `live`
-- `source_detail`: `public_api`
-- `refreshed_at_utc`: `2026-06-01T15:38:37.668778+00:00`
-- `freshness`: `stale (247.38h / 72h)`
+- `source_detail`: `public_api_with_published_backfill`
+- `refreshed_at_utc`: `2026-06-12T03:14:30.733498+00:00`
+- `freshness`: `fresh (12.73h / 72h)`
+- `warning_count`: `2`
+- `diagnostic_summary`: indicadores live refresh returned empty series for: ipc/2026
 - `reuse_status`: `open-attribution`
 - `documentation`: `docs/datasets/indicadores.md`

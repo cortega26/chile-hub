@@ -16,6 +16,7 @@ import os
 import json
 import time
 import datetime
+from pathlib import Path
 import requests
 import polars as pl
 
@@ -23,8 +24,10 @@ import polars as pl
 DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data"))
 RAW_DIR = os.path.join(DATA_DIR, "raw")
 STAGING_DIR = os.path.join(DATA_DIR, "staging")
+NORMALIZED_DIR = os.path.join(DATA_DIR, "normalized")
 METADATA_PATH = os.path.join(STAGING_DIR, "indicadores.metadata.json")
 STAGING_CSV_PATH = os.path.join(STAGING_DIR, "indicadores.csv")
+PUBLISHED_INDICATORS_PATH = os.path.join(NORMALIZED_DIR, "indicadores.parquet")
 
 # ── Configuración ─────────────────────────────────────────────────────────────
 MINDICADOR_BASE = "https://mindicador.cl/api"
@@ -71,6 +74,31 @@ def save_raw_snapshot(payload: dict, codigo: str, year: int) -> None:
         json.dump(payload, f, ensure_ascii=False, indent=2)
 
 
+def parse_indicator_payload(payload: dict, codigo: str) -> list:
+    records = []
+    for item in payload.get("serie", []):
+        raw_date = item.get("fecha", "")[:10]   # YYYY-MM-DD
+        valor = item.get("valor")
+        if raw_date and valor is not None:
+            records.append({
+                "fecha": raw_date,
+                "codigo_indicador": codigo,
+                "valor": float(valor),
+            })
+    return records
+
+
+def load_latest_raw_snapshot(codigo: str, year: int) -> list:
+    pattern = f"mindicador_{codigo}_{year}_*.json"
+    candidates = sorted(Path(RAW_DIR).glob(pattern))
+    if not candidates:
+        return []
+    latest_snapshot = candidates[-1]
+    with latest_snapshot.open("r", encoding="utf-8") as f:
+        payload = json.load(f)
+    return parse_indicator_payload(payload, codigo)
+
+
 # ── Fetch ─────────────────────────────────────────────────────────────────────
 
 def fetch_indicator_year(codigo: str, year: int) -> list:
@@ -87,36 +115,41 @@ def fetch_indicator_year(codigo: str, year: int) -> list:
     response.raise_for_status()
     payload = response.json()
     save_raw_snapshot(payload, codigo, year)
-
-    records = []
-    for item in payload.get("serie", []):
-        raw_date = item.get("fecha", "")[:10]   # YYYY-MM-DD
-        valor = item.get("valor")
-        if raw_date and valor is not None:
-            records.append({
-                "fecha": raw_date,
-                "codigo_indicador": codigo,
-                "valor": float(valor),
-            })
-    return records
+    return parse_indicator_payload(payload, codigo)
 
 
 def load_existing_staging():
     """
     Lee el CSV de staging existente para la estrategia incremental.
-    Retorna (DataFrame, año_mínimo_a_re-fetch) o (None, None) si no existe.
+    Retorna `(DataFrame, año_a_refrescar, published_backfills)` o
+    `(None, None, [])` si no existe o no puede leerse.
     """
     if not os.path.exists(STAGING_CSV_PATH):
-        return None, None
+        return None, None, []
     try:
         df = pl.read_csv(
             STAGING_CSV_PATH,
             schema_overrides={"fecha": pl.String},
         ).with_columns(pl.col("fecha").str.to_date("%Y-%m-%d"))
-        return df, datetime.date.today().year
+        missing_codes = sorted(set(INDICATOR_CODES) - set(df["codigo_indicador"].unique().to_list()))
+        published_backfills = []
+        if missing_codes and os.path.exists(PUBLISHED_INDICATORS_PATH):
+            published_df = pl.read_parquet(PUBLISHED_INDICATORS_PATH).filter(
+                pl.col("codigo_indicador").is_in(missing_codes)
+            )
+            if published_df.height > 0:
+                df = (
+                    pl.concat([df, published_df], how="vertical")
+                    .unique(subset=["fecha", "codigo_indicador"], keep="last")
+                    .sort(["fecha", "codigo_indicador"])
+                )
+                published_backfills = sorted(
+                    published_df["codigo_indicador"].unique().to_list()
+                )
+        return df, datetime.date.today().year, published_backfills
     except Exception as e:
         print(f"Advertencia: no se pudo leer el staging existente: {e}. Se hará fetch completo.")
-        return None, None
+        return None, None, []
 
 
 def fetch_all_history():
@@ -126,10 +159,18 @@ def fetch_all_history():
     - Si no existe staging: descarga desde HISTORY_START_YEAR hasta hoy.
     - Si existe staging  : re-fetcha solo el año en curso para incluir valores recientes.
 
-    Retorna un DataFrame ordenado y deduplicado, o None si la API falla.
+    Retorna `(DataFrame, diagnostics)` ordenado y deduplicado, o `(None, diagnostics)`
+    si no fue posible construir un dataset usable.
     """
-    existing_df, _ = load_existing_staging()
+    existing_df, _, published_backfills = load_existing_staging()
     current_year = datetime.date.today().year
+    diagnostics = {
+        "fetch_failures": [],
+        "raw_recoveries": [],
+        "preserved_existing_pairs": [],
+        "empty_live_pairs": [],
+        "published_backfills": published_backfills,
+    }
 
     if existing_df is not None:
         years_to_fetch = [current_year]
@@ -141,6 +182,7 @@ def fetch_all_history():
     total_calls = len(INDICATOR_CODES) * len(years_to_fetch)
     call_n = 0
     new_records = []
+    refreshed_pairs = set()
 
     for codigo in INDICATOR_CODES:
         for year in years_to_fetch:
@@ -148,14 +190,27 @@ def fetch_all_history():
             print(f"  [{call_n}/{total_calls}] Descargando {codigo}/{year}…")
             try:
                 records = fetch_indicator_year(codigo, year)
-                new_records.extend(records)
+                if records:
+                    new_records.extend(records)
+                    refreshed_pairs.add((codigo, year))
+                else:
+                    diagnostics["empty_live_pairs"].append(f"{codigo}/{year}")
             except Exception as e:
+                diagnostics["fetch_failures"].append(f"{codigo}/{year}: {e}")
                 print(f"  Advertencia: no se pudo obtener {codigo}/{year}: {e}")
+                raw_records = load_latest_raw_snapshot(codigo, year)
+                if raw_records:
+                    print(f"  Recuperando {codigo}/{year} desde snapshot raw local…")
+                    new_records.extend(raw_records)
+                    refreshed_pairs.add((codigo, year))
+                    diagnostics["raw_recoveries"].append(f"{codigo}/{year}")
+                elif existing_df is not None:
+                    diagnostics["preserved_existing_pairs"].append(f"{codigo}/{year}")
             time.sleep(REQUEST_DELAY_SECONDS)
 
     if not new_records:
         print("Error: no se obtuvieron datos de mindicador.cl.")
-        return None
+        return None, diagnostics
 
     new_df = pl.DataFrame(new_records).with_columns(
         pl.col("fecha").str.to_date("%Y-%m-%d"),
@@ -164,10 +219,18 @@ def fetch_all_history():
     )
 
     if existing_df is not None:
-        # Eliminar el año re-fetcheado del staging previo, luego concatenar
-        existing_trimmed = existing_df.filter(
-            ~pl.col("fecha").dt.year().is_in(years_to_fetch)
-        )
+        # Reemplazar solo los pares codigo/año que fueron refrescados o recuperados.
+        if refreshed_pairs:
+            refreshed_codes = sorted({codigo for codigo, _ in refreshed_pairs})
+            refreshed_years = sorted({year for _, year in refreshed_pairs})
+            existing_trimmed = existing_df.filter(
+                ~(
+                    pl.col("codigo_indicador").is_in(refreshed_codes)
+                    & pl.col("fecha").dt.year().is_in(refreshed_years)
+                )
+            )
+        else:
+            existing_trimmed = existing_df
         combined_df = pl.concat([existing_trimmed, new_df], how="vertical")
     else:
         combined_df = new_df
@@ -175,7 +238,8 @@ def fetch_all_history():
     return (
         combined_df
         .unique(subset=["fecha", "codigo_indicador"], keep="last")
-        .sort(["fecha", "codigo_indicador"])
+        .sort(["fecha", "codigo_indicador"]),
+        diagnostics,
     )
 
 
@@ -216,13 +280,52 @@ def process_indicators() -> str:
     ensure_directories()
     source_mode = "live"
     notes: list = []
+    source_detail = "public_api"
 
-    df = fetch_all_history()
+    df, diagnostics = fetch_all_history()
 
     if df is None:
         df = generate_fallback_indicators()
         source_mode = "fallback"
+        source_detail = "generated_fallback"
         notes.append("fallback_due_to_live_fetch_failure")
+        diagnostics = diagnostics or {
+            "fetch_failures": [],
+            "raw_recoveries": [],
+            "preserved_existing_pairs": [],
+            "empty_live_pairs": [],
+        }
+
+    if source_mode == "live" and diagnostics.get("raw_recoveries"):
+        source_detail = "public_api_with_raw_recovery"
+        notes.append(
+            "raw_recovery_used_for_pairs: " + ", ".join(diagnostics["raw_recoveries"])
+        )
+    if source_mode == "live" and diagnostics.get("preserved_existing_pairs"):
+        source_detail = "public_api_partial"
+        notes.append(
+            "preserved_existing_pairs_due_to_fetch_failure: "
+            + ", ".join(diagnostics["preserved_existing_pairs"])
+        )
+    if source_mode == "live" and diagnostics.get("empty_live_pairs"):
+        notes.append(
+            "empty_live_pairs: " + ", ".join(diagnostics["empty_live_pairs"])
+        )
+    if source_mode == "live" and diagnostics.get("published_backfills"):
+        source_detail = "public_api_with_published_backfill"
+        notes.append(
+            "published_backfills_used_for_codes: "
+            + ", ".join(diagnostics["published_backfills"])
+        )
+
+    indicator_codes = sorted(df["codigo_indicador"].unique().to_list())
+    indicator_delivery = {code: "live" for code in indicator_codes}
+    for pair in diagnostics.get("raw_recoveries", []):
+        indicator_delivery[pair.split("/", 1)[0]] = "raw_recovery"
+    for pair in diagnostics.get("preserved_existing_pairs", []):
+        indicator_delivery[pair.split("/", 1)[0]] = "preserved_existing"
+    for code in diagnostics.get("published_backfills", []):
+        indicator_delivery[code] = "published_backfill"
 
     df.write_csv(STAGING_CSV_PATH)
 
@@ -232,13 +335,19 @@ def process_indicators() -> str:
         "source_url": MINDICADOR_BASE,
         "source_origin_url": "https://www.bcentral.cl/web/banco-central/estadisticas",
         "source_mode": source_mode,
-        "source_detail": "public_api" if source_mode == "live" else "generated_fallback",
+        "source_detail": source_detail,
         "refreshed_at_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "record_count": df.height,
         "fields": df.columns,
-        "indicator_codes": sorted(df["codigo_indicador"].unique().to_list()),
+        "indicator_codes": indicator_codes,
+        "indicator_delivery": indicator_delivery,
         "history_start_year": HISTORY_START_YEAR,
         "notes": notes,
+        "fetch_failures": diagnostics.get("fetch_failures", []),
+        "raw_recoveries": diagnostics.get("raw_recoveries", []),
+        "preserved_existing_pairs": diagnostics.get("preserved_existing_pairs", []),
+        "empty_live_pairs": diagnostics.get("empty_live_pairs", []),
+        "published_backfills": diagnostics.get("published_backfills", []),
         "reuse_policy": REUSE_POLICY,
     }
     write_metadata(metadata)

@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-06-11T23:01:16.584873+00:00",
+  "generated_at_utc": "2026-06-12T15:58:17.707652+00:00",
   "dataset_count": 4,
   "datasets": [
     {
@@ -15,6 +15,8 @@
         "codigo_region",
         "nombre_region"
       ],
+      "indicator_codes": [],
+      "indicator_delivery": {},
       "join_keys": [
         "codigo_region"
       ],
@@ -29,9 +31,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 247.02,
+        "age_hours": 263.97,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-11T23:01:16.584694+00:00"
+        "checked_at_utc": "2026-06-12T15:58:17.707452+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -89,6 +91,8 @@
         "codigo_provincia",
         "nombre_provincia"
       ],
+      "indicator_codes": [],
+      "indicator_delivery": {},
       "join_keys": [
         "codigo_provincia",
         "codigo_region"
@@ -104,9 +108,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 247.02,
+        "age_hours": 263.97,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-11T23:01:16.584717+00:00"
+        "checked_at_utc": "2026-06-12T15:58:17.707471+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -171,6 +175,8 @@
         "longitud_cabecera",
         "poblacion_estimada"
       ],
+      "indicator_codes": [],
+      "indicator_delivery": {},
       "join_keys": [
         "codigo_comuna",
         "codigo_region"
@@ -186,9 +192,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 247.02,
+        "age_hours": 263.97,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-11T23:01:16.584724+00:00"
+        "checked_at_utc": "2026-06-12T15:58:17.707478+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -237,14 +243,28 @@
       "source_name": "Banco Central de Chile (via mindicador.cl)",
       "source_url": "https://mindicador.cl/api",
       "source_mode": "live",
-      "source_detail": "public_api",
-      "refreshed_at_utc": "2026-06-01T15:38:37.668778+00:00",
-      "record_count": 375,
+      "source_detail": "public_api_with_published_backfill",
+      "refreshed_at_utc": "2026-06-12T03:14:30.733498+00:00",
+      "record_count": 424,
       "fields": [
         "fecha",
         "codigo_indicador",
         "valor"
       ],
+      "indicator_codes": [
+        "dolar",
+        "euro",
+        "ipc",
+        "uf",
+        "utm"
+      ],
+      "indicator_delivery": {
+        "dolar": "live",
+        "euro": "live",
+        "ipc": "published_backfill",
+        "uf": "live",
+        "utm": "live"
+      },
       "join_keys": [
         "fecha",
         "codigo_indicador"
@@ -259,10 +279,10 @@
         "summary": "Datos del Banco Central de Chile (BCCh) e INE. Libre reproducción con citación. Acceso vía mindicador.cl (API pública de la comunidad)."
       },
       "freshness": {
-        "status": "stale",
-        "age_hours": 247.38,
+        "status": "fresh",
+        "age_hours": 12.73,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-06-11T23:01:16.584836+00:00"
+        "checked_at_utc": "2026-06-12T15:58:17.707618+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 72,
@@ -271,7 +291,7 @@
       "coverage": {
         "status": "not_applicable",
         "expected_record_count": null,
-        "actual_record_count": 375,
+        "actual_record_count": 424,
         "coverage_ratio": null,
         "summary": "Sin baseline de cobertura por cardinalidad para esta capa."
       },
@@ -295,14 +315,18 @@
       "documentation": "docs/datasets/indicadores.md",
       "validation_status": "ok",
       "warnings": [
-        "indicadores freshness is stale: 247.38h since refresh, policy max is 72h"
+        "indicadores live refresh returned empty series for: ipc/2026",
+        "indicadores live refresh reused last published artifact for missing codes: ipc"
       ],
       "degradation": {
         "status": "warning",
-        "impact": "indicadores freshness is stale: 247.38h since refresh, policy max is 72h",
+        "impact": "indicadores live refresh returned empty series for: ipc/2026; indicadores live refresh reused last published artifact for missing codes: ipc",
         "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
       },
-      "notes": []
+      "notes": [
+        "empty_live_pairs: ipc/2026",
+        "published_backfills_used_for_codes: ipc"
+      ]
     }
   ]
 }

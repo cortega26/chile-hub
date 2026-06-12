@@ -46,6 +46,24 @@ def format_reuse_policy(reuse_policy):
     return status
 
 
+def format_top_issue_summary(top_issue):
+    if not top_issue:
+        return "Sin top issue activo."
+    dataset = top_issue.get("dataset", "unknown")
+    source_detail = top_issue.get("source_detail", "unknown")
+    diagnostic_summary = top_issue.get("diagnostic_summary", "unknown")
+    recommended_action = top_issue.get("recommended_action", "unknown")
+    warning_count = top_issue.get("warning_count", 0)
+    build_freshness_status = top_issue.get("build_freshness_status", "unknown")
+    drift_status = top_issue.get("drift_status", "unknown")
+    return (
+        f"{dataset}: {diagnostic_summary} "
+        f"[source_detail={source_detail}; warnings={warning_count}; "
+        f"freshness={build_freshness_status}; drift={drift_status}; "
+        f"action={recommended_action}]"
+    )
+
+
 def compute_top_issue(entries):
     if not entries:
         return None
@@ -73,6 +91,9 @@ def compute_top_issue(entries):
         "build_freshness_status": top_entry.get("freshness_status"),
         "drift_status": top_entry.get("drift_status"),
         "degradation_status": top_entry.get("degradation_status"),
+        "source_detail": top_entry.get("source_detail"),
+        "diagnostic_summary": top_entry.get("diagnostic_summary"),
+        "recommended_action": top_entry.get("recommended_action"),
     }
 
 
@@ -96,6 +117,12 @@ def build_hub_health(metadata):
         coverage_status = coverage.get("status", "unknown")
         coverage_ratio = coverage.get("coverage_ratio")
         drift_status = dataset.get("drift", {}).get("status", "healthy")
+        warnings = validation.get("warnings", [])
+        diagnostic_summary = "Sin observaciones operativas."
+        if warnings:
+            diagnostic_summary = warnings[0]
+        elif dataset.get("degradation", {}).get("impact"):
+            diagnostic_summary = dataset.get("degradation", {}).get("impact")
 
         severity = "ok"
         if validation_status != "ok":
@@ -126,6 +153,11 @@ def build_hub_health(metadata):
                 "coverage_status": coverage_status,
                 "coverage_ratio": coverage_ratio,
                 "drift_status": drift_status,
+                "source_detail": dataset.get("source_detail"),
+                "diagnostic_summary": diagnostic_summary,
+                "recommended_action": dataset.get("drift", {}).get("recommended_action")
+                or dataset.get("degradation", {}).get("recommended_action")
+                or "Ninguna.",
             }
         )
 
@@ -133,6 +165,8 @@ def build_hub_health(metadata):
     warn_count = sum(1 for entry in entries if entry["severity"] == "warn")
     ok_count = sum(1 for entry in entries if entry["severity"] == "ok")
     overall_status = "error" if error_count else "warn" if warn_count else "ok"
+
+    top_issue = compute_top_issue(entries)
 
     return {
         "generated_at_utc": metadata.get("generated_at_utc"),
@@ -162,7 +196,8 @@ def build_hub_health(metadata):
         "unknown_coverage_count": sum(1 for entry in entries if entry["coverage_status"] == "unknown"),
         "drifted_count": sum(1 for entry in entries if entry["drift_status"] == "drifted"),
         "warning_count": sum(entry["warning_count"] for entry in entries),
-        "top_issue": compute_top_issue(entries),
+        "top_issue": top_issue,
+        "top_issue_summary": format_top_issue_summary(top_issue),
         "datasets": entries,
     }
 
@@ -184,8 +219,21 @@ def build_status_text(metadata):
             f"drift={top_issue.get('drift_status')}, "
             f"warnings={top_issue.get('warning_count', 0)})"
         )
+        lines.append(
+            "top_issue_reason: "
+            f"{top_issue.get('diagnostic_summary', 'unknown')}"
+        )
+        lines.append(
+            "top_issue_action: "
+            f"{top_issue.get('recommended_action', 'unknown')}"
+        )
+        lines.append(
+            "top_issue_summary: "
+            f"{format_top_issue_summary(top_issue)}"
+        )
     else:
         lines.append("top_issue: none")
+    lines.append("hub_status_json: data/normalized/hub_status.json")
     lines.append("")
 
     datasets = metadata.get("datasets", {})
@@ -240,8 +288,12 @@ def build_status_markdown(metadata):
             f"drift={top_issue.get('drift_status')}, "
             f"warnings={top_issue.get('warning_count', 0)})"
         )
+        lines.append(f"- `top_issue_reason`: {top_issue.get('diagnostic_summary', 'unknown')}")
+        lines.append(f"- `top_issue_action`: {top_issue.get('recommended_action', 'unknown')}")
+        lines.append(f"- `top_issue_summary`: {format_top_issue_summary(top_issue)}")
     else:
         lines.append("- `top_issue`: `none`")
+    lines.append("- `hub_status_json`: `data/normalized/hub_status.json`")
     lines.extend(
         [
         "",
@@ -333,6 +385,9 @@ def build_hub_health_markdown(health):
             f"drift={top_issue.get('drift_status')}, "
             f"warnings={top_issue.get('warning_count', 0)})"
         )
+        lines.append(f"- `top_issue_reason`: {top_issue.get('diagnostic_summary', 'unknown')}")
+        lines.append(f"- `top_issue_action`: {top_issue.get('recommended_action', 'unknown')}")
+        lines.append(f"- `top_issue_summary`: {format_top_issue_summary(top_issue)}")
     else:
         lines.append("- `top_issue`: `none`")
     lines.extend(
@@ -420,8 +475,8 @@ def build_provenance_report_markdown(report):
         f"- `live_count`: `{report.get('live_count', 0)}`",
         f"- `fallback_count`: `{report.get('fallback_count', 0)}`",
         "",
-        "| Dataset | Source | Mode | Detail | Refreshed | Freshness | Reuse |",
-        "| :--- | :--- | :--- | :--- | :--- | :--- | :--- |",
+        "| Dataset | Source | Mode | Detail | Refreshed | Freshness | Warnings | Reuse |",
+        "| :--- | :--- | :--- | :--- | :--- | :--- | ---: | :--- |",
     ]
 
     for entry in report.get("datasets", []):
@@ -433,6 +488,7 @@ def build_provenance_report_markdown(report):
             f"`{entry.get('source_detail', 'unknown')}` | "
             f"`{entry.get('refreshed_at_utc', 'unknown')}` | "
             f"`{entry.get('freshness_label', 'unknown')}` | "
+            f"{entry.get('warning_count', 0)} | "
             f"`{entry.get('reuse_status', 'unknown')}` |"
         )
 
@@ -446,6 +502,8 @@ def build_provenance_report_markdown(report):
         lines.append(f"- `source_detail`: `{entry.get('source_detail', 'unknown')}`")
         lines.append(f"- `refreshed_at_utc`: `{entry.get('refreshed_at_utc', 'unknown')}`")
         lines.append(f"- `freshness`: `{entry.get('freshness_label', 'unknown')}`")
+        lines.append(f"- `warning_count`: `{entry.get('warning_count', 0)}`")
+        lines.append(f"- `diagnostic_summary`: {entry.get('diagnostic_summary', 'unknown')}")
         lines.append(f"- `reuse_status`: `{entry.get('reuse_status', 'unknown')}`")
         lines.append(f"- `documentation`: `{entry.get('documentation', 'unknown')}`")
         lines.append("")
@@ -469,8 +527,8 @@ def build_drift_report_markdown(report):
         f"- `partial_coverage_count`: `{report.get('partial_coverage_count', 0)}`",
         f"- `degraded_count`: `{report.get('degraded_count', 0)}`",
         "",
-        "| Dataset | Drift | Mode | Coverage | Degradation | Action |",
-        "| :--- | :--- | :--- | :--- | :--- | :--- |",
+        "| Dataset | Drift | Mode | Coverage | Degradation | Warnings | Action |",
+        "| :--- | :--- | :--- | :--- | :--- | ---: | :--- |",
     ]
 
     for entry in report.get("datasets", []):
@@ -481,6 +539,7 @@ def build_drift_report_markdown(report):
             f"`{entry.get('source_mode', 'unknown')}` | "
             f"`{entry.get('coverage_status', 'unknown')}` | "
             f"`{entry.get('degradation_status', 'unknown')}` | "
+            f"{entry.get('warning_count', 0)} | "
             f"{entry.get('recommended_action', 'unknown')} |"
         )
 
@@ -492,6 +551,8 @@ def build_drift_report_markdown(report):
         lines.append(f"- `source_mode`: `{entry.get('source_mode', 'unknown')}`")
         lines.append(f"- `coverage`: `{entry.get('coverage_summary', 'unknown')}`")
         lines.append(f"- `degradation`: {entry.get('degradation_impact', 'unknown')}")
+        lines.append(f"- `warning_count`: `{entry.get('warning_count', 0)}`")
+        lines.append(f"- `diagnostic_summary`: {entry.get('diagnostic_summary', 'unknown')}")
         lines.append(f"- `recommended_action`: {entry.get('recommended_action', 'unknown')}")
         lines.append("")
 
@@ -527,6 +588,9 @@ def build_overview_markdown(overview):
             f"drift={top_issue.get('drift_status')}, "
             f"warnings={top_issue.get('warning_count', 0)})"
         )
+        lines.append(f"- `top_issue_reason`: {top_issue.get('diagnostic_summary', 'unknown')}")
+        lines.append(f"- `top_issue_action`: {top_issue.get('recommended_action', 'unknown')}")
+        lines.append(f"- `top_issue_summary`: {format_top_issue_summary(top_issue)}")
     else:
         lines.append("- `top_issue`: `none`")
     lines.extend(
@@ -616,6 +680,14 @@ def build_dataset_catalog_markdown(catalog):
             f"- `reuse_policy`: `{json.dumps(entry.get('reuse_policy', {}), ensure_ascii=False)}`"
         )
         lines.append(f"- `fields`: `{', '.join(entry.get('fields', []))}`")
+        indicator_codes = entry.get("indicator_codes", [])
+        if indicator_codes:
+            lines.append(f"- `indicator_codes`: `{', '.join(indicator_codes)}`")
+        indicator_delivery = entry.get("indicator_delivery", {})
+        if indicator_delivery:
+            lines.append(
+                f"- `indicator_delivery`: `{json.dumps(indicator_delivery, ensure_ascii=False, sort_keys=True)}`"
+            )
         lines.append(f"- `join_keys`: `{', '.join(entry.get('join_keys', []))}`")
         lines.append(f"- `outputs`: `{json.dumps(entry.get('outputs', {}), ensure_ascii=False)}`")
         usage_examples = entry.get("usage_examples", {})

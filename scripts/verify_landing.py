@@ -88,6 +88,10 @@ def verify_landing():
     bundle = json.loads(BUNDLE_PATH.read_text(encoding="utf-8"))
     health = bundle.get("health", {})
     datasets = bundle.get("datasets", [])
+    datasets_by_name = {dataset.get("dataset"): dataset for dataset in datasets}
+    top_issue = health.get("top_issue") or bundle.get("top_issue") or {}
+    top_issue_dataset = top_issue.get("dataset")
+    top_issue_source_detail = top_issue.get("source_detail") or datasets_by_name.get(top_issue_dataset, {}).get("source_detail")
     runtime_freshness = {dataset["dataset"]: compute_runtime_freshness(dataset) for dataset in datasets}
     live_count = health.get("live_count", 0)
     stale_count = sum(1 for freshness in runtime_freshness.values() if freshness["status"] == "stale")
@@ -99,6 +103,9 @@ def verify_landing():
     drifted_count = health.get("drifted_count", 0)
     review_terms_count = health.get("review_terms_count", 0)
     warning_count = health.get("warning_count", 0)
+    top_issue_warning_count = datasets_by_name.get(top_issue_dataset, {}).get("warning_count", 0)
+    top_issue_reason = top_issue.get("diagnostic_summary")
+    top_issue_action = top_issue.get("recommended_action")
     build_overall_status = bundle.get("overall_status", "unknown")
     current_overall_status = compute_runtime_overall_status(build_overall_status, runtime_freshness)
     zip_package = next(
@@ -133,23 +140,31 @@ def verify_landing():
             fail(f"Unexpected repo href: {repo_href}")
 
         status_actions = page.locator("#status-actions .dataset-action").all_inner_texts()
-        expected_status_actions = ["Status", "Health JSON", "Health MD", "Bundle JSON", "Reuse JSON", "Reuse MD", "Provenance JSON", "Provenance MD", "Drift JSON", "Drift MD", "Overview JSON", "Overview MD", "Catalog JSON", "Catalog MD", "Manifest", "Ver top issue"]
+        expected_status_actions = ["Status", "Status JSON", "Health JSON", "Health MD", "Bundle JSON", "Reuse JSON", "Reuse MD", "Provenance JSON", "Provenance MD", "Drift JSON", "Drift MD", "Overview JSON", "Overview MD", "Catalog JSON", "Catalog MD", "Manifest", "Ver top issue"]
         if status_actions != expected_status_actions:
             fail(f"Unexpected status actions: {status_actions}")
         top_issue_href = page.get_by_role("link", name="Ver top issue").get_attribute("href")
-        if top_issue_href != "#dataset-indicadores":
+        if top_issue_href != f"#dataset-{top_issue_dataset}":
             fail(f"Unexpected top issue href: {top_issue_href}")
 
         status_subtitle = page.locator("#status-subtitle").inner_text()
         if status_subtitle != expected_status_subtitle:
             fail(f"Unexpected status subtitle: {status_subtitle}")
+        status_meta = page.locator("#status-meta").inner_text()
+        expected_status_meta = (
+            f"Motivo del top issue ({top_issue_dataset}): {top_issue_reason} · Procedencia técnica: {top_issue_source_detail} · Acción recomendada: {top_issue_action}"
+            if top_issue_dataset and top_issue_reason and top_issue_action and top_issue_source_detail
+            else "Sin top issue activo en este build."
+        )
+        if status_meta != expected_status_meta:
+            fail(f"Unexpected status meta: {status_meta}")
 
         status_pills = page.locator("#status-pills .status-pill").all_inner_texts()
         if f"Estado build: {build_overall_status}" not in status_pills:
             fail(f"Build status pill not found: {status_pills}")
         if f"Estado actual: {current_overall_status}" not in status_pills:
             fail(f"Current status pill not found: {status_pills}")
-        if "Top issue: indicadores" not in status_pills:
+        if f"Top issue: {top_issue_dataset}" not in status_pills:
             fail(f"Top issue pill not found: {status_pills}")
         if f"Review terms: {review_terms_count}" not in status_pills:
             fail(f"Review terms pill not found: {status_pills}")
@@ -190,7 +205,7 @@ def verify_landing():
 
         first_card = page.locator(".dataset-card").first
         first_card_name = first_card.locator(".dataset-name").inner_text()
-        if first_card_name != "indicadores":
+        if first_card_name != top_issue_dataset:
             fail(f"Unexpected first dataset card: {first_card_name}")
 
         first_card_actions = first_card.locator(".dataset-action").all_inner_texts()
@@ -202,7 +217,7 @@ def verify_landing():
             fail(f"Unexpected artifact metadata: {artifact_meta}")
 
         first_card_facts = first_card.locator(".dataset-fact").all_inner_texts()
-        expected_first_runtime_status = runtime_freshness["indicadores"]["status"]
+        expected_first_runtime_status = runtime_freshness[top_issue_dataset]["status"]
         if f"FRESHNESS\n{expected_first_runtime_status} ·" not in "\n".join(first_card_facts):
             fail(f"Freshness fact not found in first dataset card: {first_card_facts}")
         if "COVERAGE\n" not in "\n".join(first_card_facts):
@@ -218,7 +233,11 @@ def verify_landing():
         if "Requiere atribución: sí" not in first_card_meta:
             fail(f"Reuse attribution metadata not found in first dataset card: {first_card_meta}")
         provenance_meta = first_card.locator(".dataset-meta-line").nth(1).inner_text()
-        if "Procedencia técnica:" not in provenance_meta or "public_api" not in provenance_meta or "Warnings: 1" not in provenance_meta:
+        if (
+            "Procedencia técnica:" not in provenance_meta
+            or "public_api" not in provenance_meta
+            or f"Warnings: {top_issue_warning_count}" not in provenance_meta
+        ):
             fail(f"Technical provenance metadata not found in first dataset card: {provenance_meta}")
         freshness_meta = first_card.locator(".dataset-meta-line").nth(2).inner_text()
         if "Freshness build:" not in freshness_meta or "Freshness actual:" not in freshness_meta:
@@ -249,25 +268,25 @@ def verify_landing():
         if not copied_class:
             fail("Dataset example copy button did not activate copied class")
 
-        indicadores_card = page.locator(".dataset-card").filter(
-            has=page.locator(".dataset-name", has_text="indicadores")
+        top_issue_card = page.locator(".dataset-card").filter(
+            has=page.locator(".dataset-name", has_text=top_issue_dataset)
         ).first
         page.get_by_role("link", name="Ver top issue").click()
         page.wait_for_timeout(100)
         hash_value = page.evaluate("() => window.location.hash")
-        if hash_value != "#dataset-indicadores":
+        if hash_value != f"#dataset-{top_issue_dataset}":
             fail(f"Unexpected hash after top issue click: {hash_value}")
-        indicadores_attention = indicadores_card.evaluate("el => el.classList.contains('attention')")
-        if not indicadores_attention:
-            fail("Indicadores card is missing attention visual state")
-        indicadores_badges = indicadores_card.locator(".dataset-badge").all_inner_texts()
-        if "ATENCIÓN" not in indicadores_badges:
-            fail(f"Attention badge not found in indicadores card: {indicadores_badges}")
-        indicadores_meta = indicadores_card.locator(".dataset-meta-line").all_inner_texts()
-        if not any("Warnings: 1" in line for line in indicadores_meta):
-            fail(f"Warning count not found in indicadores card metadata: {indicadores_meta}")
-        if not any("Acción recomendada:" in line for line in indicadores_meta):
-            fail(f"Recommended action not found in indicadores card metadata: {indicadores_meta}")
+        top_issue_attention = top_issue_card.evaluate("el => el.classList.contains('attention')")
+        if not top_issue_attention:
+            fail(f"Top issue card is missing attention visual state: {top_issue_dataset}")
+        top_issue_badges = top_issue_card.locator(".dataset-badge").all_inner_texts()
+        if "ATENCIÓN" not in top_issue_badges:
+            fail(f"Attention badge not found in top issue card: {top_issue_badges}")
+        top_issue_meta = top_issue_card.locator(".dataset-meta-line").all_inner_texts()
+        if not any(f"Warnings: {top_issue_warning_count}" in line for line in top_issue_meta):
+            fail(f"Warning count not found in top issue card metadata: {top_issue_meta}")
+        if not any("Acción recomendada:" in line for line in top_issue_meta):
+            fail(f"Recommended action not found in top issue card metadata: {top_issue_meta}")
 
         browser.close()
 

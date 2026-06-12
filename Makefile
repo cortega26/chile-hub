@@ -1,7 +1,7 @@
 PYTHON ?= $(if $(wildcard .venv/bin/python),.venv/bin/python,python3)
 VENV_DIR ?= .venv
 
-.PHONY: help bootstrap install-browsers doctor extract build verify verify-landing test check refresh status catalog hub-list hub-summary hub-summary-table hub-example hub-artifacts hub-shared-artifacts hub-shared-artifacts-table hub-reports hub-reports-table hub-report hub-inventory hub-inventory-table hub-snapshot hub-snapshot-table hub-overview hub-overview-table hub-health hub-health-table hub-bundle hub-freshness-audit hub-freshness-audit-table hub-runtime-status hub-runtime-status-table hub-top-issue hub-top-issue-text hub-top-issue-table hub-packages hub-packages-table hub-package hub-package-verify hub-redistribution hub-redistribution-table hub-provenance hub-provenance-table hub-drift hub-drift-table package-bundle clean-publishable
+.PHONY: help bootstrap install-browsers doctor extract build verify verify-landing test check refresh status catalog hub-list hub-summary hub-summary-table hub-example hub-artifacts hub-shared-artifacts hub-shared-artifacts-table hub-reports hub-reports-table hub-report hub-inventory hub-inventory-table hub-snapshot hub-snapshot-table hub-overview hub-overview-table hub-status hub-status-table hub-health hub-health-table hub-bundle hub-freshness-audit hub-freshness-audit-table hub-runtime-status hub-runtime-status-table hub-top-issue hub-top-issue-text hub-top-issue-table hub-packages hub-packages-table hub-package hub-package-verify hub-redistribution hub-redistribution-table hub-provenance hub-provenance-table hub-drift hub-drift-table package-bundle clean-publishable
 
 help:
 	@printf "Targets disponibles:\n"
@@ -33,6 +33,8 @@ help:
 	@printf "  make hub-snapshot-table Muestra snapshot tabular del hub\n"
 	@printf "  make hub-overview     Muestra vista agregada compacta del hub\n"
 	@printf "  make hub-overview-table Muestra overview tabular del hub\n"
+	@printf "  make hub-status       Muestra status operativo compacto del hub\n"
+	@printf "  make hub-status-table Muestra status operativo en tabla compacta\n"
 	@printf "  make hub-health       Muestra salud agregada del hub\n"
 	@printf "  make hub-health-table Muestra salud agregada en tabla compacta\n"
 	@printf "  make hub-bundle       Muestra bundle consolidado del hub\n"
@@ -144,6 +146,12 @@ hub-overview:
 hub-overview-table:
 	$(PYTHON) -m src.chile_hub overview --format table
 
+hub-status:
+	$(PYTHON) -m src.chile_hub status
+
+hub-status-table:
+	$(PYTHON) -m src.chile_hub status --format table
+
 hub-health:
 	$(PYTHON) -m src.chile_hub health
 
@@ -208,4 +216,4 @@ package-bundle:
 	$(PYTHON) scripts/package_publishable_bundle.py
 
 clean-publishable:
-	rm -f data/normalized/*.json data/normalized/*.md data/normalized/*.parquet data/normalized/*.zip
+	$(PYTHON) scripts/package_publishable_bundle.py --clean

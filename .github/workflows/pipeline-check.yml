@@ -47,6 +47,10 @@ jobs:
 
       - name: Publish job summary
         run: |
+          printf "## Quick Status Entry Points\n\n" >> "$GITHUB_STEP_SUMMARY"
+          printf -- "- \`data/normalized/hub_status.json\`: compact status for polling, dashboards and CI checks.\n" >> "$GITHUB_STEP_SUMMARY"
+          printf -- "- \`data/normalized/hub_health.json\`: aggregated health report with per-dataset breakdown.\n" >> "$GITHUB_STEP_SUMMARY"
+          printf -- "- \`data/normalized/hub_bundle.json\`: consolidated machine-readable index of datasets, reports and artifacts.\n\n" >> "$GITHUB_STEP_SUMMARY"
           cat data/normalized/overview.md >> "$GITHUB_STEP_SUMMARY"
           printf "\n\n" >> "$GITHUB_STEP_SUMMARY"
           cat data/normalized/hub_health.md >> "$GITHUB_STEP_SUMMARY"
@@ -78,6 +82,7 @@ jobs:
             data/normalized/pipeline_status.md
             data/normalized/hub_health.json
             data/normalized/hub_health.md
+            data/normalized/hub_status.json
             data/normalized/hub_bundle.json
             data/normalized/redistribution_report.json
             data/normalized/redistribution_report.md

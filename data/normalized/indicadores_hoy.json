@@ -1836,8 +1836,28 @@
   },
   {
     "fecha": "2026-06-02",
+    "codigo_indicador": "dolar",
+    "valor": 892.91
+  },
+  {
+    "fecha": "2026-06-02",
+    "codigo_indicador": "euro",
+    "valor": 1038.75
+  },
+  {
+    "fecha": "2026-06-02",
     "codigo_indicador": "uf",
     "valor": 40644.55
+  },
+  {
+    "fecha": "2026-06-03",
+    "codigo_indicador": "dolar",
+    "valor": 888.36
+  },
+  {
+    "fecha": "2026-06-03",
+    "codigo_indicador": "euro",
+    "valor": 1032.5
   },
   {
     "fecha": "2026-06-03",
@@ -1846,8 +1866,28 @@
   },
   {
     "fecha": "2026-06-04",
+    "codigo_indicador": "dolar",
+    "valor": 894.29
+  },
+  {
+    "fecha": "2026-06-04",
+    "codigo_indicador": "euro",
+    "valor": 1037.1
+  },
+  {
+    "fecha": "2026-06-04",
     "codigo_indicador": "uf",
     "valor": 40678.43
+  },
+  {
+    "fecha": "2026-06-05",
+    "codigo_indicador": "dolar",
+    "valor": 894.99
+  },
+  {
+    "fecha": "2026-06-05",
+    "codigo_indicador": "euro",
+    "valor": 1039.72
   },
   {
     "fecha": "2026-06-05",
@@ -1866,12 +1906,217 @@
   },
   {
     "fecha": "2026-06-08",
+    "codigo_indicador": "dolar",
+    "valor": 910.29
+  },
+  {
+    "fecha": "2026-06-08",
+    "codigo_indicador": "euro",
+    "valor": 1048.84
+  },
+  {
+    "fecha": "2026-06-08",
     "codigo_indicador": "uf",
     "valor": 40746.28
   },
   {
     "fecha": "2026-06-09",
+    "codigo_indicador": "dolar",
+    "valor": 918.91
+  },
+  {
+    "fecha": "2026-06-09",
+    "codigo_indicador": "euro",
+    "valor": 1060.12
+  },
+  {
+    "fecha": "2026-06-09",
     "codigo_indicador": "uf",
     "valor": 40763.26
+  },
+  {
+    "fecha": "2026-06-10",
+    "codigo_indicador": "dolar",
+    "valor": 916.39
+  },
+  {
+    "fecha": "2026-06-10",
+    "codigo_indicador": "euro",
+    "valor": 1058.43
+  },
+  {
+    "fecha": "2026-06-10",
+    "codigo_indicador": "uf",
+    "valor": 40765.97
+  },
+  {
+    "fecha": "2026-06-11",
+    "codigo_indicador": "dolar",
+    "valor": 915.97
+  },
+  {
+    "fecha": "2026-06-11",
+    "codigo_indicador": "euro",
+    "valor": 1057.95
+  },
+  {
+    "fecha": "2026-06-11",
+    "codigo_indicador": "uf",
+    "valor": 40768.69
+  },
+  {
+    "fecha": "2026-06-12",
+    "codigo_indicador": "dolar",
+    "valor": 909.02
+  },
+  {
+    "fecha": "2026-06-12",
+    "codigo_indicador": "euro",
+    "valor": 1050.53
+  },
+  {
+    "fecha": "2026-06-12",
+    "codigo_indicador": "uf",
+    "valor": 40771.41
+  },
+  {
+    "fecha": "2026-06-13",
+    "codigo_indicador": "uf",
+    "valor": 40774.12
+  },
+  {
+    "fecha": "2026-06-14",
+    "codigo_indicador": "uf",
+    "valor": 40776.84
+  },
+  {
+    "fecha": "2026-06-15",
+    "codigo_indicador": "uf",
+    "valor": 40779.55
+  },
+  {
+    "fecha": "2026-06-16",
+    "codigo_indicador": "uf",
+    "valor": 40782.27
+  },
+  {
+    "fecha": "2026-06-17",
+    "codigo_indicador": "uf",
+    "valor": 40784.98
+  },
+  {
+    "fecha": "2026-06-18",
+    "codigo_indicador": "uf",
+    "valor": 40787.7
+  },
+  {
+    "fecha": "2026-06-19",
+    "codigo_indicador": "uf",
+    "valor": 40790.42
+  },
+  {
+    "fecha": "2026-06-20",
+    "codigo_indicador": "uf",
+    "valor": 40793.13
+  },
+  {
+    "fecha": "2026-06-21",
+    "codigo_indicador": "uf",
+    "valor": 40795.85
+  },
+  {
+    "fecha": "2026-06-22",
+    "codigo_indicador": "uf",
+    "valor": 40798.57
+  },
+  {
+    "fecha": "2026-06-23",
+    "codigo_indicador": "uf",
+    "valor": 40801.29
+  },
+  {
+    "fecha": "2026-06-24",
+    "codigo_indicador": "uf",
+    "valor": 40804.0
+  },
+  {
+    "fecha": "2026-06-25",
+    "codigo_indicador": "uf",
+    "valor": 40806.72
+  },
+  {
+    "fecha": "2026-06-26",
+    "codigo_indicador": "uf",
+    "valor": 40809.44
+  },
+  {
+    "fecha": "2026-06-27",
+    "codigo_indicador": "uf",
+    "valor": 40812.16
+  },
+  {
+    "fecha": "2026-06-28",
+    "codigo_indicador": "uf",
+    "valor": 40814.87
+  },
+  {
+    "fecha": "2026-06-29",
+    "codigo_indicador": "uf",
+    "valor": 40817.59
+  },
+  {
+    "fecha": "2026-06-30",
+    "codigo_indicador": "uf",
+    "valor": 40820.31
+  },
+  {
+    "fecha": "2026-07-01",
+    "codigo_indicador": "uf",
+    "valor": 40823.03
+  },
+  {
+    "fecha": "2026-07-01",
+    "codigo_indicador": "utm",
+    "valor": 71649.0
+  },
+  {
+    "fecha": "2026-07-02",
+    "codigo_indicador": "uf",
+    "valor": 40825.75
+  },
+  {
+    "fecha": "2026-07-03",
+    "codigo_indicador": "uf",
+    "valor": 40828.47
+  },
+  {
+    "fecha": "2026-07-04",
+    "codigo_indicador": "uf",
+    "valor": 40831.19
+  },
+  {
+    "fecha": "2026-07-05",
+    "codigo_indicador": "uf",
+    "valor": 40833.91
+  },
+  {
+    "fecha": "2026-07-06",
+    "codigo_indicador": "uf",
+    "valor": 40836.63
+  },
+  {
+    "fecha": "2026-07-07",
+    "codigo_indicador": "uf",
+    "valor": 40839.35
+  },
+  {
+    "fecha": "2026-07-08",
+    "codigo_indicador": "uf",
+    "valor": 40842.07
+  },
+  {
+    "fecha": "2026-07-09",
+    "codigo_indicador": "uf",
+    "valor": 40844.79
   }
 ]

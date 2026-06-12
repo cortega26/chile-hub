@@ -11,7 +11,7 @@ Es una capa de conveniencia: evita que cada proyecto tenga que consultar o parse
 - `status`: activo en MVP
 - `confidence`: Tier A/B
 - `primary_join_key`: `fecha` + `codigo_indicador`
-- `update_mode`: automatizado con fallback
+- `update_mode`: automatizado con refresh incremental, recuperación parcial y fallback
 
 ## Fuente
 
@@ -21,7 +21,31 @@ Es una capa de conveniencia: evita que cada proyecto tenga que consultar o parse
 ## Método de acceso actual
 
 - llamada HTTP a `https://mindicador.cl/api`
-- si falla, generación local de registros de fallback
+- refresh incremental del año en curso cuando ya existe staging
+- si una serie falla, recuperación desde `data/raw` cuando hay snapshot utilizable
+- si un código esperado ya no está en staging, reuso del último artifact publicado para no degradar silenciosamente la capa
+- si no se logra construir un dataset usable, generación local de registros de fallback
+
+## Señales operativas publicadas
+
+El estado efectivo del último refresh ya no queda solo en staging; también se publica en los artifacts compartidos del hub.
+
+Campos relevantes:
+
+- `source_mode`: `live` o `fallback`
+- `source_detail`: distingue live sano de recuperación parcial
+- `indicator_codes`: lista de códigos esperados presentes en el artifact
+- `indicator_delivery`: mapa compacto por código con estado `live`, `raw_recovery`, `preserved_existing` o `published_backfill`
+- `warnings`: explica fallas parciales detectadas durante el refresh
+- `notes`: deja trazabilidad compacta de series vacías, backfills y recuperaciones
+- `degradation`, `drift` y `top_issue`: consolidan la acción operativa sugerida
+
+Ejemplo real del estado actual:
+
+- `source_mode`: `live`
+- `source_detail`: `public_api_with_published_backfill`
+- `indicator_delivery`: `ipc` quedó como `published_backfill`, mientras `dolar`, `euro`, `uf` y `utm` siguieron `live`
+- `warnings`: la API devolvió serie vacía para `ipc/2026` y el hub reutilizó el último artifact publicado para ese código
 
 ## Por qué existe esta capa
 
@@ -74,11 +98,12 @@ Cruces sugeridos:
 
 ## Caveats
 
-- el output puede provenir de datos reales o de fallback local si la API falla
+- el output puede provenir de datos live, de una mezcla live + recuperación parcial o de fallback local
 - `indicadores_hoy.json` es un nombre orientado a consumo, pero el dataset puede incluir más de una fecha
-- la cobertura histórica es limitada; hoy no es una serie larga oficial curada
+- la cobertura histórica sigue siendo oportunista; no es todavía un archivo histórico oficial curado capa por capa
 - la capa sirve bien para conveniencia operativa, pero no aún como fuente definitiva de archivo histórico
 - el modo efectivo del último refresh queda registrado en `data/staging/indicadores.metadata.json` y consolidado en `data/normalized/pipeline_metadata.json`
+- cuando una serie viene vacía desde la fuente, el hub prioriza no perder cobertura ya publicada y deja ese hecho visible en `warnings`, `notes`, `drift` y `top_issue`
 
 ## Notas legales
 
@@ -87,8 +112,8 @@ Cruces sugeridos:
 
 ## Recomendación de evolución
 
-Esta capa puede seguir en MVP, pero debería mejorar en:
+Esta capa puede seguir en MVP, pero todavía conviene mejorar en:
 
-1. separación explícita entre modo live y modo fallback
-2. metadata de frescura y origen del último refresh
-3. política clara para series históricas frente a snapshot diario
+1. una estrategia más robusta para series que la API devuelve vacías aunque el resto del refresh siga sano
+2. una política explícita para distinguir backfill desde raw local versus backfill desde artifact publicado
+3. una estrategia histórica más clara para IPC y UTM frente a snapshots parciales del agregador

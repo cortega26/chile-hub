@@ -1,4 +1,5 @@
 import json
+import zipfile
 from pathlib import Path
 
 
@@ -26,6 +27,7 @@ REQUIRED_FILES = [
     NORMALIZED_DIR / "pipeline_status.md",
     NORMALIZED_DIR / "hub_health.json",
     NORMALIZED_DIR / "hub_health.md",
+    NORMALIZED_DIR / "hub_status.json",
     NORMALIZED_DIR / "hub_bundle.json",
     NORMALIZED_DIR / "redistribution_report.json",
     NORMALIZED_DIR / "redistribution_report.md",
@@ -55,6 +57,90 @@ def load_json(path):
         return json.load(f)
 
 
+def verify_indicadores_diagnostics(dataset_metadata, validation, origin):
+    source_detail = dataset_metadata.get("source_detail")
+    allowed_source_details = {
+        "public_api",
+        "public_api_with_raw_recovery",
+        "public_api_partial",
+        "public_api_with_published_backfill",
+        "generated_fallback",
+    }
+    if source_detail not in allowed_source_details:
+        fail(f"{origin} has invalid indicadores source_detail: {source_detail}")
+
+    notes = dataset_metadata.get("notes", [])
+    warnings = validation.get("warnings", [])
+    fetch_failures = dataset_metadata.get("fetch_failures", [])
+    raw_recoveries = dataset_metadata.get("raw_recoveries", [])
+    preserved_existing_pairs = dataset_metadata.get("preserved_existing_pairs", [])
+    empty_live_pairs = dataset_metadata.get("empty_live_pairs", [])
+    published_backfills = dataset_metadata.get("published_backfills", [])
+
+    if source_detail == "generated_fallback":
+        if dataset_metadata.get("source_mode") != "fallback":
+            fail(f"{origin} fallback source_detail must use source_mode=fallback")
+        return
+
+    if dataset_metadata.get("source_mode") != "live":
+        fail(f"{origin} live indicadores diagnostics require source_mode=live")
+
+    if raw_recoveries:
+        if source_detail not in {"public_api_with_raw_recovery", "public_api_with_published_backfill"}:
+            fail(f"{origin} raw_recoveries require a recovery-aware source_detail")
+        expected_note = "raw_recovery_used_for_pairs: " + ", ".join(raw_recoveries)
+        if expected_note not in notes:
+            fail(f"{origin} is missing raw recovery note: {expected_note}")
+        expected_warning = "indicadores live refresh reused raw snapshots for: " + ", ".join(raw_recoveries)
+        if expected_warning not in warnings:
+            fail(f"{origin} is missing raw recovery warning: {expected_warning}")
+
+    if preserved_existing_pairs:
+        if source_detail not in {"public_api_partial", "public_api_with_published_backfill"}:
+            fail(f"{origin} preserved_existing_pairs require a partial-aware source_detail")
+        expected_note = (
+            "preserved_existing_pairs_due_to_fetch_failure: "
+            + ", ".join(preserved_existing_pairs)
+        )
+        if expected_note not in notes:
+            fail(f"{origin} is missing preserved-existing note: {expected_note}")
+        expected_warning = (
+            "indicadores live refresh preserved previous staging rows for: "
+            + ", ".join(preserved_existing_pairs)
+        )
+        if expected_warning not in warnings:
+            fail(f"{origin} is missing preserved-existing warning: {expected_warning}")
+
+    if empty_live_pairs:
+        expected_note = "empty_live_pairs: " + ", ".join(empty_live_pairs)
+        if expected_note not in notes:
+            fail(f"{origin} is missing empty-live note: {expected_note}")
+        expected_warning = "indicadores live refresh returned empty series for: " + ", ".join(empty_live_pairs)
+        if expected_warning not in warnings:
+            fail(f"{origin} is missing empty-live warning: {expected_warning}")
+
+    if published_backfills:
+        if source_detail != "public_api_with_published_backfill":
+            fail(f"{origin} published_backfills require source_detail=public_api_with_published_backfill")
+        expected_note = "published_backfills_used_for_codes: " + ", ".join(published_backfills)
+        if expected_note not in notes:
+            fail(f"{origin} is missing published-backfill note: {expected_note}")
+        expected_warning = (
+            "indicadores live refresh reused last published artifact for missing codes: "
+            + ", ".join(published_backfills)
+        )
+        if expected_warning not in warnings:
+            fail(f"{origin} is missing published-backfill warning: {expected_warning}")
+
+    if (
+        fetch_failures
+        and not raw_recoveries
+        and not preserved_existing_pairs
+        and dataset_metadata.get("source_mode") != "fallback"
+    ):
+        fail(f"{origin} recorded fetch_failures without any recovery path")
+
+
 def verify_top_issue(top_issue, origin):
     if not isinstance(top_issue, dict):
         fail(f"{origin} has invalid top_issue payload: {top_issue}")
@@ -69,6 +155,20 @@ def verify_top_issue(top_issue, origin):
     warning_count = top_issue.get("warning_count")
     if not isinstance(warning_count, int) or warning_count < 0:
         fail(f"{origin} has invalid top_issue.warning_count: {top_issue}")
+    if not top_issue.get("source_detail"):
+        fail(f"{origin} is missing top_issue.source_detail: {top_issue}")
+    if not top_issue.get("diagnostic_summary"):
+        fail(f"{origin} is missing top_issue.diagnostic_summary: {top_issue}")
+    if not top_issue.get("recommended_action"):
+        fail(f"{origin} is missing top_issue.recommended_action: {top_issue}")
+
+
+def verify_top_issue_summary(summary, top_issue, origin):
+    if not isinstance(summary, str) or not summary.strip():
+        fail(f"{origin} is missing top_issue_summary")
+    dataset = top_issue.get("dataset") if isinstance(top_issue, dict) else None
+    if dataset and dataset not in summary:
+        fail(f"{origin} top_issue_summary does not mention dataset '{dataset}': {summary}")
 
 
 def verify_required_files():
@@ -162,6 +262,7 @@ def verify_pipeline_metadata():
                     "indicadores validation has unexpected indicator_codes: "
                     f"{validation.get('indicator_codes')}"
                 )
+            verify_indicadores_diagnostics(dataset_metadata, validation, "pipeline_metadata.json")
         if dataset_name == "regiones":
             if dataset_metadata.get("source_mode") == "live" and validation.get("record_count") < 16:
                 fail("regiones validation record_count looks too small for live mode")
@@ -199,6 +300,24 @@ def verify_dataset_catalog():
     for entry in datasets:
         if not entry.get("outputs"):
             fail(f"{entry.get('dataset')} catalog entry is missing outputs")
+        if entry.get("dataset") == "indicadores":
+            expected_codes = ["dolar", "euro", "ipc", "uf", "utm"]
+            if entry.get("indicator_codes") != expected_codes:
+                fail(f"indicadores catalog entry has unexpected indicator_codes: {entry.get('indicator_codes')}")
+            indicator_delivery = entry.get("indicator_delivery", {})
+            if sorted(indicator_delivery.keys()) != expected_codes:
+                fail(
+                    "indicadores catalog entry has unexpected indicator_delivery keys: "
+                    f"{sorted(indicator_delivery.keys())}"
+                )
+            allowed_delivery_statuses = {"live", "raw_recovery", "preserved_existing", "published_backfill"}
+            invalid_statuses = {
+                code: status
+                for code, status in indicator_delivery.items()
+                if status not in allowed_delivery_statuses
+            }
+            if invalid_statuses:
+                fail(f"indicadores catalog entry has invalid indicator_delivery statuses: {invalid_statuses}")
         if not entry.get("join_keys"):
             fail(f"{entry.get('dataset')} catalog entry is missing join_keys")
         reuse_policy = entry.get("reuse_policy", {})
@@ -279,6 +398,7 @@ def verify_artifact_manifest():
         "data/normalized/pipeline_status.md",
         "data/normalized/hub_health.json",
         "data/normalized/hub_health.md",
+        "data/normalized/hub_status.json",
         "data/normalized/hub_bundle.json",
         "data/normalized/redistribution_report.json",
         "data/normalized/redistribution_report.md",
@@ -304,6 +424,7 @@ def verify_artifact_manifest():
             if path.endswith((".parquet", ".json")) and path not in {
                 "data/normalized/pipeline_metadata.json",
                 "data/normalized/hub_health.json",
+                "data/normalized/hub_status.json",
                 "data/normalized/hub_bundle.json",
                 "data/normalized/redistribution_report.json",
                 "data/normalized/provenance_report.json",
@@ -317,6 +438,7 @@ def verify_artifact_manifest():
             if path.endswith((".parquet", ".json")) and path not in {
                 "data/normalized/pipeline_metadata.json",
                 "data/normalized/hub_health.json",
+                "data/normalized/hub_status.json",
                 "data/normalized/hub_bundle.json",
                 "data/normalized/redistribution_report.json",
                 "data/normalized/provenance_report.json",
@@ -329,6 +451,7 @@ def verify_artifact_manifest():
         if path in {
             "data/normalized/pipeline_metadata.json",
             "data/normalized/hub_health.json",
+            "data/normalized/hub_status.json",
             "data/normalized/hub_bundle.json",
             "data/normalized/redistribution_report.json",
             "data/normalized/provenance_report.json",
@@ -431,8 +554,52 @@ def verify_hub_health():
 
     if health.get("warning_count", 0) > 0:
         verify_top_issue(health.get("top_issue"), "hub_health.json")
+        verify_top_issue_summary(
+            health.get("top_issue_summary"),
+            health.get("top_issue"),
+            "hub_health.json",
+        )
     elif health.get("top_issue") is not None:
         verify_top_issue(health.get("top_issue"), "hub_health.json")
+        verify_top_issue_summary(
+            health.get("top_issue_summary"),
+            health.get("top_issue"),
+            "hub_health.json",
+        )
+
+
+def verify_hub_status():
+    status_path = NORMALIZED_DIR / "hub_status.json"
+    status = load_json(status_path)
+
+    if status.get("dataset_count") != len(REQUIRED_DATASETS):
+        fail(f"hub_status.json has unexpected dataset_count: {status.get('dataset_count')}")
+    if status.get("overall_status") not in {"ok", "warn", "error"}:
+        fail(f"hub_status.json has invalid overall_status: {status.get('overall_status')}")
+    for key in (
+        "live_count",
+        "fallback_count",
+        "stale_count",
+        "drifted_count",
+        "degraded_count",
+        "warning_count",
+    ):
+        if status.get(key) is None:
+            fail(f"hub_status.json is missing {key}")
+    if status.get("warning_count", 0) > 0:
+        verify_top_issue(status.get("top_issue"), "hub_status.json")
+        verify_top_issue_summary(
+            status.get("top_issue_summary"),
+            status.get("top_issue"),
+            "hub_status.json",
+        )
+    elif status.get("top_issue") is not None:
+        verify_top_issue(status.get("top_issue"), "hub_status.json")
+        verify_top_issue_summary(
+            status.get("top_issue_summary"),
+            status.get("top_issue"),
+            "hub_status.json",
+        )
 
 
 def verify_hub_bundle():
@@ -449,10 +616,30 @@ def verify_hub_bundle():
     if health.get("warning_count", 0) > 0:
         verify_top_issue(bundle.get("top_issue"), "hub_bundle.json")
         verify_top_issue(health.get("top_issue"), "hub_bundle.json health")
+        verify_top_issue_summary(
+            bundle.get("top_issue_summary"),
+            bundle.get("top_issue"),
+            "hub_bundle.json",
+        )
+        verify_top_issue_summary(
+            health.get("top_issue_summary"),
+            health.get("top_issue"),
+            "hub_bundle.json health",
+        )
     elif bundle.get("top_issue") is not None:
         verify_top_issue(bundle.get("top_issue"), "hub_bundle.json")
+        verify_top_issue_summary(
+            bundle.get("top_issue_summary"),
+            bundle.get("top_issue"),
+            "hub_bundle.json",
+        )
     elif health.get("top_issue") is not None:
         verify_top_issue(health.get("top_issue"), "hub_bundle.json health")
+        verify_top_issue_summary(
+            health.get("top_issue_summary"),
+            health.get("top_issue"),
+            "hub_bundle.json health",
+        )
 
     datasets = bundle.get("datasets", [])
     dataset_names = {entry.get("dataset") for entry in datasets}
@@ -463,6 +650,7 @@ def verify_hub_bundle():
         "status_markdown": ("pipeline_status", "markdown"),
         "health_json": ("hub_health", "json"),
         "health_markdown": ("hub_health", "markdown"),
+        "status_json": ("hub_status", "json"),
         "bundle_json": ("hub_bundle", "json"),
         "redistribution_json": ("redistribution_report", "json"),
         "redistribution_markdown": ("redistribution_report", "markdown"),
@@ -565,6 +753,10 @@ def verify_provenance_report():
             fail(f"provenance_report.json is missing refreshed_at_utc: {entry}")
         if entry.get("freshness_status") not in {"fresh", "stale", "unknown"}:
             fail(f"provenance_report.json has invalid freshness_status: {entry}")
+        if not isinstance(entry.get("warning_count"), int) or entry.get("warning_count") < 0:
+            fail(f"provenance_report.json has invalid warning_count: {entry}")
+        if not entry.get("diagnostic_summary"):
+            fail(f"provenance_report.json is missing diagnostic_summary: {entry}")
 
 
 def verify_drift_report():
@@ -593,6 +785,10 @@ def verify_drift_report():
             fail(f"drift_report.json has invalid degradation_status: {entry}")
         if not entry.get("coverage_summary"):
             fail(f"drift_report.json is missing coverage_summary: {entry}")
+        if not isinstance(entry.get("warning_count"), int) or entry.get("warning_count") < 0:
+            fail(f"drift_report.json has invalid warning_count: {entry}")
+        if not entry.get("diagnostic_summary"):
+            fail(f"drift_report.json is missing diagnostic_summary: {entry}")
         if not entry.get("recommended_action"):
             fail(f"drift_report.json is missing recommended_action: {entry}")
 
@@ -611,8 +807,18 @@ def verify_overview():
         fail(f"overview.json has invalid package_count: {overview.get('package_count')}")
     if overview.get("warning_count", 0) > 0:
         verify_top_issue(overview.get("top_issue"), "overview.json")
+        verify_top_issue_summary(
+            overview.get("top_issue_summary"),
+            overview.get("top_issue"),
+            "overview.json",
+        )
     elif overview.get("top_issue") is not None:
         verify_top_issue(overview.get("top_issue"), "overview.json")
+        verify_top_issue_summary(
+            overview.get("top_issue_summary"),
+            overview.get("top_issue"),
+            "overview.json",
+        )
 
     primary_package = overview.get("primary_package")
     if not primary_package:
@@ -629,7 +835,7 @@ def verify_overview():
         fail(f"overview.json has invalid primary_package.verification_command: {primary_package}")
 
     report_keys = overview.get("report_keys", [])
-    if "overview_json" not in report_keys or "health_json" not in report_keys or "drift_json" not in report_keys:
+    if "overview_json" not in report_keys or "health_json" not in report_keys or "drift_json" not in report_keys or "status_json" not in report_keys:
         fail(f"overview.json has incomplete report_keys: {report_keys}")
 
     datasets = overview.get("datasets", [])
@@ -653,6 +859,17 @@ def verify_publishable_zip():
     zip_path = NORMALIZED_DIR / "chile-hub-publishable-bundle.zip"
     if zip_path.stat().st_size <= 0:
         fail("publishable bundle zip is empty")
+    with zipfile.ZipFile(zip_path) as archive:
+        names = set(archive.namelist())
+    required_zip_entries = {
+        "data/normalized/hub_status.json",
+        "data/normalized/hub_bundle.json",
+        "data/normalized/artifact_manifest.json",
+        "data/normalized/overview.json",
+    }
+    missing_entries = sorted(required_zip_entries - names)
+    if missing_entries:
+        fail(f"publishable bundle zip is missing required entries: {missing_entries}")
     checksum_path = NORMALIZED_DIR / "chile-hub-publishable-bundle.zip.sha256"
     checksum_line = checksum_path.read_text(encoding="utf-8").strip()
     if "data/normalized/chile-hub-publishable-bundle.zip" not in checksum_line:
@@ -663,6 +880,7 @@ def main():
     verify_required_files()
     verify_pipeline_metadata()
     verify_hub_health()
+    verify_hub_status()
     verify_hub_bundle()
     verify_redistribution_report()
     verify_provenance_report()

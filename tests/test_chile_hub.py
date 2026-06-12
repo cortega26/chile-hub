@@ -1,4 +1,5 @@
 import json
+import re
 import subprocess
 import sys
 import unittest
@@ -10,8 +11,12 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
+SRC_DIR = ROOT_DIR / "src"
+if str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
 
 from src.chile_hub import ChileHub  # noqa: E402
+from src.build_dev_db import validate_indicadores  # noqa: E402
 
 
 class ChileHubTests(unittest.TestCase):
@@ -99,6 +104,9 @@ class ChileHubTests(unittest.TestCase):
         artifacts = self.hub.shared_artifacts("hub_health", "json")
         self.assertEqual(len(artifacts), 1)
         self.assertEqual(artifacts[0]["path"], "data/normalized/hub_health.json")
+        status_artifacts = self.hub.shared_artifacts("hub_status", "json")
+        self.assertEqual(len(status_artifacts), 1)
+        self.assertEqual(status_artifacts[0]["path"], "data/normalized/hub_status.json")
 
     def test_get_report(self):
         report = self.hub.get_report("drift_report", "markdown")
@@ -109,11 +117,16 @@ class ChileHubTests(unittest.TestCase):
         self.assertEqual(overview_report["shared_type"], "overview")
         self.assertEqual(overview_report["format"], "json")
         self.assertEqual(overview_report["path"], "data/normalized/overview.json")
+        status_report = self.hub.get_report("hub_status", "json")
+        self.assertEqual(status_report["shared_type"], "hub_status")
+        self.assertEqual(status_report["format"], "json")
+        self.assertEqual(status_report["path"], "data/normalized/hub_status.json")
 
     def test_report_index(self):
         report_index = self.hub.report_index()
         report_keys = {entry["report_key"] for entry in report_index}
         self.assertIn("health_json", report_keys)
+        self.assertIn("status_json", report_keys)
         self.assertIn("overview_markdown", report_keys)
         self.assertTrue(all(entry["shared_type"] for entry in report_index))
         self.assertTrue(all(entry["path"] for entry in report_index))
@@ -123,6 +136,7 @@ class ChileHubTests(unittest.TestCase):
         self.assertIn("chile-hub report index", table)
         self.assertIn("report_key", table)
         self.assertIn("health_json", table)
+        self.assertIn("status_json", table)
         self.assertIn("overview_markdown", table)
 
     def test_shared_artifacts_table(self):
@@ -130,6 +144,9 @@ class ChileHubTests(unittest.TestCase):
         self.assertIn("chile-hub shared artifacts", table)
         self.assertIn("hub_health", table)
         self.assertIn("data/normalized/hub_health.json", table)
+        status_table = self.hub.shared_artifacts_table("hub_status", "json")
+        self.assertIn("hub_status", status_table)
+        self.assertIn("data/normalized/hub_status.json", status_table)
 
     def test_overview(self):
         overview = self.hub.overview()
@@ -146,6 +163,8 @@ class ChileHubTests(unittest.TestCase):
         self.assertTrue(overview["current_checked_at_utc"])
         self.assertIsNotNone(overview["top_issue"])
         self.assertEqual(overview["top_issue"]["dataset"], "indicadores")
+        self.assertIn("public_api_with_published_backfill", overview["top_issue_summary"])
+        self.assertIn("empty series", overview["top_issue"]["diagnostic_summary"])
         self.assertEqual(overview["primary_package"]["package_type"], "zip")
         self.assertEqual(
             overview["primary_package"]["checksum_path"],
@@ -156,8 +175,25 @@ class ChileHubTests(unittest.TestCase):
             "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256",
         )
         self.assertIn("health_json", overview["report_keys"])
+        self.assertIn("status_json", overview["report_keys"])
         self.assertIn("drift_json", overview["report_keys"])
         self.assertEqual(len(overview["datasets"]), 4)
+
+    def test_status(self):
+        status = self.hub.status()
+        self.assertIn(status["overall_status"], {"ok", "warn", "error"})
+        self.assertEqual(status["dataset_count"], 4)
+        self.assertIsNotNone(status["top_issue"])
+        self.assertEqual(status["top_issue"]["dataset"], "indicadores")
+        self.assertIn("public_api_with_published_backfill", status["top_issue_summary"])
+
+    def test_status_table(self):
+        table = self.hub.status_table()
+        self.assertIn("chile-hub status", table)
+        self.assertIn("overall_status", table)
+        self.assertIn("top_issue", table)
+        self.assertIn("top_issue_summary", table)
+        self.assertIn("indicadores", table)
 
     def test_overview_table(self):
         table = self.hub.overview_table()
@@ -165,6 +201,9 @@ class ChileHubTests(unittest.TestCase):
         self.assertIn("build_overall_status", table)
         self.assertIn("current_overall_status", table)
         self.assertIn("top_issue", table)
+        self.assertIn("top_issue_reason", table)
+        self.assertIn("top_issue_action", table)
+        self.assertIn("top_issue_summary", table)
         self.assertIn("dataset      mode      validation", table)
         self.assertIn("indicadores", table)
 
@@ -184,6 +223,8 @@ class ChileHubTests(unittest.TestCase):
         self.assertEqual(len(runtime["datasets"]), 4)
         self.assertIsNotNone(runtime["top_issue"])
         self.assertEqual(runtime["top_issue"]["dataset"], "indicadores")
+        self.assertIn("public_api_with_published_backfill", runtime["top_issue_summary"])
+        self.assertIn("empty series", runtime["top_issue"]["diagnostic_summary"])
         indicadores = next(entry for entry in runtime["datasets"] if entry["dataset"] == "indicadores")
         self.assertIn(indicadores["build_freshness_status"], {"fresh", "stale", "unknown"})
         self.assertIn(indicadores["current_freshness_status"], {"fresh", "stale", "unknown"})
@@ -195,6 +236,9 @@ class ChileHubTests(unittest.TestCase):
         self.assertIn("chile-hub runtime status", table)
         self.assertIn("build=", table)
         self.assertIn("current=", table)
+        self.assertIn("top_issue_reason=", table)
+        self.assertIn("top_issue_action=", table)
+        self.assertIn("top_issue_summary=", table)
         self.assertIn("top_issue=indicadores", table)
         self.assertIn("dataset      mode      severity", table)
         self.assertIn("indicadores", table)
@@ -206,11 +250,15 @@ class ChileHubTests(unittest.TestCase):
         self.assertIn(top_issue["build_freshness_status"], {"fresh", "stale", "unknown"})
         self.assertIn(top_issue["current_freshness_status"], {"fresh", "stale", "unknown"})
         self.assertIn(top_issue["drift_status"], {"healthy", "drifted"})
+        self.assertIn("empty series", top_issue["diagnostic_summary"])
 
     def test_top_issue_table(self):
         table = self.hub.top_issue_table()
         self.assertIn("chile-hub top issue", table)
         self.assertIn("dataset", table)
+        self.assertIn("source_detail", table)
+        self.assertIn("diagnostic_summary", table)
+        self.assertIn("recommended_action", table)
         self.assertIn("indicadores", table)
 
     def test_primary_package_and_verification(self):
@@ -239,6 +287,8 @@ class ChileHubTests(unittest.TestCase):
         self.assertIn("status_current:", snapshot)
         self.assertIn("current_freshness:", snapshot)
         self.assertIn("top_issue: indicadores", snapshot)
+        self.assertIn("top_issue_reason:", snapshot)
+        self.assertIn("top_issue_action:", snapshot)
         self.assertIn("package: data/normalized/chile-hub-publishable-bundle.zip", snapshot)
         self.assertIn("verify: shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256", snapshot)
         self.assertIn("- comunas:", snapshot)
@@ -254,6 +304,8 @@ class ChileHubTests(unittest.TestCase):
         self.assertIn("current_stale", snapshot)
         self.assertIn("current_unknown", snapshot)
         self.assertIn("top_issue", snapshot)
+        self.assertIn("top_issue_reason", snapshot)
+        self.assertIn("top_issue_action", snapshot)
         self.assertIn("package_path", snapshot)
         self.assertIn("dataset      mode      validation  build      current", snapshot)
         self.assertIn("comunas", snapshot)
@@ -405,11 +457,15 @@ class ChileHubTests(unittest.TestCase):
         self.assertTrue(comunas["source_name"])
         self.assertTrue(comunas["source_detail"])
         self.assertIn(comunas["freshness_status"], {"fresh", "stale", "unknown"})
+        indicadores = next(entry for entry in report["datasets"] if entry["dataset"] == "indicadores")
+        self.assertEqual(indicadores["warning_count"], 2)
+        self.assertIn("empty series", indicadores["diagnostic_summary"])
 
     def test_provenance_table(self):
         table = self.hub.provenance_table()
         self.assertIn("chile-hub provenance", table)
         self.assertIn("dataset      mode      source", table)
+        self.assertIn("warnings", table)
         self.assertIn("comunas", table)
 
     def test_drift_report(self):
@@ -421,12 +477,36 @@ class ChileHubTests(unittest.TestCase):
         self.assertIn(comunas["coverage_status"], {"full", "partial", "unknown", "not_applicable"})
         self.assertIn(comunas["degradation_status"], {"none", "warning", "degraded"})
         self.assertTrue(comunas["recommended_action"])
+        indicadores = next(entry for entry in report["datasets"] if entry["dataset"] == "indicadores")
+        self.assertEqual(indicadores["warning_count"], 2)
+        self.assertIn("empty series", indicadores["diagnostic_summary"])
 
     def test_drift_table(self):
         table = self.hub.drift_table()
         self.assertIn("chile-hub drift", table)
         self.assertIn("dataset      drift      mode", table)
+        self.assertIn("warnings", table)
         self.assertIn("indicadores", table)
+
+    def test_validate_indicadores_warns_on_partial_live_refresh_recovery(self):
+        df = self.hub.load_polars("indicadores")
+        result = validate_indicadores(
+            df,
+            {
+                "source_mode": "live",
+                "empty_live_pairs": ["ipc/2026"],
+                "published_backfills": ["ipc"],
+            },
+        )
+        self.assertEqual(result["status"], "ok")
+        self.assertIn(
+            "indicadores live refresh returned empty series for: ipc/2026",
+            result["warnings"],
+        )
+        self.assertIn(
+            "indicadores live refresh reused last published artifact for missing codes: ipc",
+            result["warnings"],
+        )
 
 
 class ArtifactContractTests(unittest.TestCase):
@@ -438,6 +518,7 @@ class ArtifactContractTests(unittest.TestCase):
         cls.health = json.loads((cls.normalized_dir / "hub_health.json").read_text())
         cls.bundle = json.loads((cls.normalized_dir / "hub_bundle.json").read_text())
         cls.overview = json.loads((cls.normalized_dir / "overview.json").read_text())
+        cls.health_markdown = (cls.normalized_dir / "hub_health.md").read_text()
         cls.overview_markdown = (cls.normalized_dir / "overview.md").read_text()
         cls.pipeline_status_markdown = (cls.normalized_dir / "pipeline_status.md").read_text()
 
@@ -449,6 +530,7 @@ class ArtifactContractTests(unittest.TestCase):
         self.assertIn("data/normalized/dataset_catalog.json", artifact_paths)
         self.assertIn("data/normalized/pipeline_status.md", artifact_paths)
         self.assertIn("data/normalized/hub_health.json", artifact_paths)
+        self.assertIn("data/normalized/hub_status.json", artifact_paths)
         self.assertIn("data/normalized/hub_health.md", artifact_paths)
         self.assertIn("data/normalized/hub_bundle.json", artifact_paths)
         self.assertIn("data/normalized/redistribution_report.json", artifact_paths)
@@ -471,6 +553,8 @@ class ArtifactContractTests(unittest.TestCase):
         self.assertEqual(by_path["data/normalized/indicadores_hoy.json"]["output_type"], "json")
         self.assertEqual(by_path["data/normalized/hub_health.json"]["shared_type"], "hub_health")
         self.assertEqual(by_path["data/normalized/hub_health.json"]["format"], "json")
+        self.assertEqual(by_path["data/normalized/hub_status.json"]["shared_type"], "hub_status")
+        self.assertEqual(by_path["data/normalized/hub_status.json"]["format"], "json")
         self.assertEqual(by_path["data/normalized/drift_report.md"]["shared_type"], "drift_report")
         self.assertEqual(by_path["data/normalized/drift_report.md"]["format"], "markdown")
         self.assertEqual(by_path["data/normalized/overview.json"]["shared_type"], "overview")
@@ -531,6 +615,7 @@ class ArtifactContractTests(unittest.TestCase):
         self.assertTrue(checksum_path.exists())
         with zipfile.ZipFile(zip_path) as archive:
             names = set(archive.namelist())
+        self.assertIn("data/normalized/hub_status.json", names)
         self.assertIn("data/normalized/hub_bundle.json", names)
         self.assertIn("data/normalized/artifact_manifest.json", names)
         self.assertIn("data/normalized/overview.json", names)
@@ -538,15 +623,61 @@ class ArtifactContractTests(unittest.TestCase):
     def test_top_issue_is_persisted_in_shared_artifacts(self):
         self.assertIsNotNone(self.health["top_issue"])
         self.assertEqual(self.health["top_issue"]["dataset"], "indicadores")
+        self.assertIn("public_api_with_published_backfill", self.health["top_issue_summary"])
+        self.assertIn("empty series", self.health["top_issue"]["diagnostic_summary"])
+        self.assertEqual(
+            self.health["top_issue"]["source_detail"],
+            "public_api_with_published_backfill",
+        )
         self.assertIsNotNone(self.bundle["top_issue"])
         self.assertEqual(self.bundle["top_issue"]["dataset"], "indicadores")
+        self.assertIn("public_api_with_published_backfill", self.bundle["top_issue_summary"])
+        self.assertIn("empty series", self.bundle["top_issue"]["diagnostic_summary"])
         self.assertEqual(self.bundle["health"]["top_issue"]["dataset"], "indicadores")
+        self.assertIn("public_api_with_published_backfill", self.bundle["health"]["top_issue_summary"])
+        self.assertIn("empty series", self.bundle["health"]["top_issue"]["diagnostic_summary"])
         self.assertIsNotNone(self.overview["top_issue"])
         self.assertEqual(self.overview["top_issue"]["dataset"], "indicadores")
+        self.assertIn("public_api_with_published_backfill", self.overview["top_issue_summary"])
+        self.assertIn("empty series", self.overview["top_issue"]["diagnostic_summary"])
 
     def test_top_issue_is_exposed_in_markdown_reports(self):
         self.assertIn("- `top_issue`: `indicadores`", self.overview_markdown)
         self.assertIn("- `top_issue`: `indicadores`", self.pipeline_status_markdown)
+        self.assertIn("- `top_issue_reason`:", self.overview_markdown)
+        self.assertIn("- `top_issue_reason`:", self.health_markdown)
+        self.assertIn("- `top_issue_reason`:", self.pipeline_status_markdown)
+        self.assertIn("- `top_issue_action`:", self.overview_markdown)
+        self.assertIn("- `top_issue_action`:", self.health_markdown)
+        self.assertIn("- `top_issue_action`:", self.pipeline_status_markdown)
+        self.assertIn("- `top_issue_summary`:", self.overview_markdown)
+        self.assertIn("- `top_issue_summary`:", self.health_markdown)
+        self.assertIn("- `top_issue_summary`:", self.pipeline_status_markdown)
+        self.assertIn("- `hub_status_json`: `data/normalized/hub_status.json`", self.pipeline_status_markdown)
+        self.assertIn("- `warning_count`: `2`", self.pipeline_status_markdown or "")
+
+    def test_indicadores_partial_refresh_contract_is_published(self):
+        indicadores_catalog = next(
+            dataset for dataset in self.catalog["datasets"] if dataset["dataset"] == "indicadores"
+        )
+        self.assertEqual(indicadores_catalog["source_detail"], "public_api_with_published_backfill")
+        self.assertEqual(indicadores_catalog["indicator_codes"], ["dolar", "euro", "ipc", "uf", "utm"])
+        self.assertEqual(indicadores_catalog["indicator_delivery"]["ipc"], "published_backfill")
+        self.assertEqual(indicadores_catalog["indicator_delivery"]["uf"], "live")
+        self.assertIn("empty_live_pairs: ipc/2026", indicadores_catalog["notes"])
+        self.assertIn("published_backfills_used_for_codes: ipc", indicadores_catalog["notes"])
+        self.assertIn(
+            "indicadores live refresh returned empty series for: ipc/2026",
+            indicadores_catalog["warnings"],
+        )
+        self.assertIn(
+            "indicadores live refresh reused last published artifact for missing codes: ipc",
+            indicadores_catalog["warnings"],
+        )
+        provenance = self.bundle["reports"]["provenance_json"]["path"]
+        drift = self.bundle["reports"]["drift_json"]["path"]
+        self.assertEqual(provenance, "data/normalized/provenance_report.json")
+        self.assertEqual(drift, "data/normalized/drift_report.json")
 
 
 class ChileHubCliTests(unittest.TestCase):
@@ -557,6 +688,15 @@ class ChileHubCliTests(unittest.TestCase):
     def run_cli(self, *args):
         return subprocess.run(
             [sys.executable, "-m", "src.chile_hub", *args],
+            cwd=ROOT_DIR,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+
+    def run_script(self, script_path):
+        return subprocess.run(
+            [sys.executable, script_path],
             cwd=ROOT_DIR,
             capture_output=True,
             text=True,
@@ -603,12 +743,14 @@ class ChileHubCliTests(unittest.TestCase):
     def test_cli_reports(self):
         result = self.run_cli("reports")
         self.assertIn('"report_key": "health_json"', result.stdout)
+        self.assertIn('"report_key": "status_json"', result.stdout)
         self.assertIn('"report_key": "overview_markdown"', result.stdout)
 
     def test_cli_reports_table(self):
         result = self.run_cli("reports", "--format", "table")
         self.assertIn("chile-hub report index", result.stdout)
         self.assertIn("health_json", result.stdout)
+        self.assertIn("status_json", result.stdout)
         self.assertIn("overview_markdown", result.stdout)
 
     def test_cli_report(self):
@@ -644,8 +786,23 @@ class ChileHubCliTests(unittest.TestCase):
         self.assertIn("status_current:", result.stdout)
         self.assertIn("current_freshness:", result.stdout)
         self.assertIn("top_issue: indicadores", result.stdout)
+        self.assertIn("top_issue_reason:", result.stdout)
+        self.assertIn("top_issue_action:", result.stdout)
         self.assertIn("package: data/normalized/chile-hub-publishable-bundle.zip", result.stdout)
         self.assertIn("verify: shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256", result.stdout)
+
+    def test_cli_status(self):
+        result = self.run_cli("status")
+        self.assertIn('"overall_status":', result.stdout)
+        self.assertIn('"top_issue": {', result.stdout)
+        self.assertIn('"top_issue_summary":', result.stdout)
+
+    def test_cli_status_table(self):
+        result = self.run_cli("status", "--format", "table")
+        self.assertIn("chile-hub status", result.stdout)
+        self.assertIn("overall_status", result.stdout)
+        self.assertIn("top_issue", result.stdout)
+        self.assertIn("top_issue_summary", result.stdout)
 
     def test_cli_snapshot_table(self):
         result = self.run_cli("snapshot", "--format", "table")
@@ -672,6 +829,9 @@ class ChileHubCliTests(unittest.TestCase):
         self.assertIn("build_overall_status", result.stdout)
         self.assertIn("current_overall_status", result.stdout)
         self.assertIn("top_issue", result.stdout)
+        self.assertIn("top_issue_reason", result.stdout)
+        self.assertIn("top_issue_action", result.stdout)
+        self.assertIn("top_issue_summary", result.stdout)
         self.assertIn("dataset      mode      validation", result.stdout)
         self.assertIn("indicadores", result.stdout)
 
@@ -688,6 +848,14 @@ class ChileHubCliTests(unittest.TestCase):
         self.assertIn("chile-hub health", result.stdout)
         self.assertIn(f"overall={self.health['overall_status']}", result.stdout)
         self.assertIn("dataset      severity  mode", result.stdout)
+
+    def test_pipeline_status_script_text(self):
+        result = self.run_script("scripts/pipeline_status.py")
+        self.assertIn("chile-hub pipeline status", result.stdout)
+        self.assertIn("top_issue: indicadores", result.stdout)
+        self.assertIn("top_issue_reason:", result.stdout)
+        self.assertIn("top_issue_action:", result.stdout)
+        self.assertIn("hub_status_json: data/normalized/hub_status.json", result.stdout)
 
     def test_cli_bundle(self):
         result = self.run_cli("bundle")
@@ -714,6 +882,9 @@ class ChileHubCliTests(unittest.TestCase):
         self.assertIn("chile-hub runtime status", result.stdout)
         self.assertIn("build=", result.stdout)
         self.assertIn("current=", result.stdout)
+        self.assertIn("top_issue_reason=", result.stdout)
+        self.assertIn("top_issue_action=", result.stdout)
+        self.assertIn("top_issue_summary=", result.stdout)
         self.assertIn("dataset      mode      severity", result.stdout)
         self.assertIn("indicadores", result.stdout)
 
@@ -726,6 +897,9 @@ class ChileHubCliTests(unittest.TestCase):
         result = self.run_cli("top-issue", "--format", "text")
         self.assertIn("chile-hub top issue", result.stdout)
         self.assertIn("dataset=indicadores", result.stdout)
+        self.assertIn("source_detail=public_api_with_published_backfill", result.stdout)
+        self.assertIn("reason=", result.stdout)
+        self.assertIn("action=", result.stdout)
 
     def test_cli_top_issue_table(self):
         result = self.run_cli("top-issue", "--format", "table")
@@ -749,7 +923,6 @@ class ChileHubCliTests(unittest.TestCase):
     def test_cli_package(self):
         result = self.run_cli("package")
         self.assertIn('"package_type": "zip"', result.stdout)
-        self.assertIn('"path": "data/normalized/chile-hub-publishable-bundle.zip"', result.stdout)
 
     def test_cli_verify_package(self):
         result = self.run_cli("verify-package")
@@ -789,6 +962,150 @@ class ChileHubCliTests(unittest.TestCase):
         self.assertIn("chile-hub drift", result.stdout)
         self.assertIn("dataset      drift      mode", result.stdout)
         self.assertIn("indicadores", result.stdout)
+
+
+class WorkflowContractTests(unittest.TestCase):
+    CRITICAL_UPLOAD_PATHS = {
+        "data/normalized/pipeline_status.md",
+        "data/normalized/hub_status.json",
+        "data/normalized/hub_health.json",
+        "data/normalized/hub_bundle.json",
+        "data/normalized/overview.json",
+        "data/normalized/overview.md",
+        "data/normalized/redistribution_report.json",
+        "data/normalized/provenance_report.json",
+        "data/normalized/drift_report.json",
+        "data/normalized/dataset_catalog.json",
+        "data/normalized/artifact_manifest.json",
+        "data/normalized/chile-hub-publishable-bundle.zip",
+        "data/normalized/chile-hub-publishable-bundle.zip.sha256",
+    }
+    QUICK_STATUS_PATHS = {
+        "data/normalized/hub_status.json",
+        "data/normalized/hub_health.json",
+        "data/normalized/hub_bundle.json",
+    }
+    HUMAN_SUMMARY_PATHS_IN_ORDER = [
+        "data/normalized/overview.md",
+        "data/normalized/hub_health.md",
+        "data/normalized/redistribution_report.md",
+        "data/normalized/provenance_report.md",
+        "data/normalized/drift_report.md",
+        "data/normalized/pipeline_status.md",
+        "data/normalized/dataset_catalog.md",
+    ]
+    CRITICAL_STEP_NAMES_IN_ORDER = [
+        "Run extractors",
+        "Build outputs",
+        "Verify pipeline artifacts",
+        "Run hub smoke tests",
+        "Run landing smoke verification",
+        "Generate pipeline status",
+        "Publish job summary",
+        "Upload publishable data bundle",
+    ]
+
+    @classmethod
+    def setUpClass(cls):
+        cls.workflow_text = (ROOT_DIR / ".github" / "workflows" / "pipeline-check.yml").read_text()
+        cls.workflow_lines = cls.workflow_text.splitlines()
+        cls.step_names = []
+        cls.upload_paths = set()
+        cls.summary_paths_in_order = []
+        cls.quick_status_header_present = False
+        current_step = None
+        in_upload_paths = False
+
+        for line in cls.workflow_lines:
+            stripped = line.strip()
+
+            if stripped.startswith("- name: "):
+                current_step = stripped.removeprefix("- name: ")
+                cls.step_names.append(current_step)
+                in_upload_paths = False
+                continue
+
+            if current_step == "Upload publishable data bundle" and stripped == "path: |":
+                in_upload_paths = True
+                continue
+
+            if in_upload_paths:
+                if stripped.startswith("data/normalized/"):
+                    cls.upload_paths.add(stripped)
+                    continue
+                if stripped:
+                    in_upload_paths = False
+
+            if current_step == "Publish job summary":
+                if 'printf "## Quick Status Entry Points\\n\\n" >> "$GITHUB_STEP_SUMMARY"' in stripped:
+                    cls.quick_status_header_present = True
+                summary_match = re.search(
+                    r'cat (data/normalized/[^ ]+) >> "\$GITHUB_STEP_SUMMARY"',
+                    stripped,
+                )
+                if summary_match:
+                    cls.summary_paths_in_order.append(summary_match.group(1))
+
+    def assertWorkflowMentionsPaths(self, paths):
+        for path in paths:
+            self.assertIn(path, self.workflow_text)
+
+    def assertSequenceContainsOrderedSubsequence(self, actual, expected):
+        positions = []
+        for item in expected:
+            self.assertIn(item, actual)
+            positions.append(actual.index(item))
+        self.assertEqual(
+            positions,
+            sorted(positions),
+            msg=f"Expected ordered subsequence {expected}, got positions {positions} in {actual}",
+        )
+
+    def test_pipeline_check_workflow_publishes_hub_status_artifact(self):
+        self.assertIn("name: chile-hub-publishable-bundle", self.workflow_text)
+        self.assertWorkflowMentionsPaths({"data/normalized/hub_status.json"})
+        self.assertIn("data/normalized/hub_status.json", self.upload_paths)
+        self.assertIn("data/normalized/hub_health.json", self.upload_paths)
+        self.assertIn("data/normalized/hub_bundle.json", self.upload_paths)
+        self.assertIn("data/normalized/artifact_manifest.json", self.upload_paths)
+
+    def test_pipeline_check_workflow_publishes_critical_artifact_set(self):
+        self.assertTrue(
+            self.CRITICAL_UPLOAD_PATHS.issubset(self.upload_paths),
+            msg=f"Missing critical uploaded artifacts: {sorted(self.CRITICAL_UPLOAD_PATHS - self.upload_paths)}",
+        )
+
+    def test_pipeline_check_workflow_highlights_quick_status_entry_points(self):
+        self.assertTrue(self.quick_status_header_present)
+        self.assertWorkflowMentionsPaths(self.QUICK_STATUS_PATHS)
+
+    def test_pipeline_check_workflow_publishes_human_summary_reports(self):
+        for path in self.HUMAN_SUMMARY_PATHS_IN_ORDER:
+            self.assertIn(path, self.summary_paths_in_order)
+
+    def test_pipeline_check_workflow_orders_human_summary_reports_consistently(self):
+        self.assertSequenceContainsOrderedSubsequence(
+            self.summary_paths_in_order,
+            self.HUMAN_SUMMARY_PATHS_IN_ORDER,
+        )
+
+    def test_pipeline_check_workflow_orders_critical_steps_consistently(self):
+        self.assertSequenceContainsOrderedSubsequence(
+            self.step_names,
+            self.CRITICAL_STEP_NAMES_IN_ORDER,
+        )
+
+
+class MakefileContractTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.makefile_text = (ROOT_DIR / "Makefile").read_text()
+
+    def test_clean_publishable_uses_manifest_driven_cleanup(self):
+        self.assertIn("clean-publishable:", self.makefile_text)
+        self.assertIn("scripts/package_publishable_bundle.py --clean", self.makefile_text)
+        self.assertNotIn("rm -f data/normalized/*.json", self.makefile_text)
+        self.assertNotIn("rm -f data/normalized/*.parquet", self.makefile_text)
 
 
 if __name__ == "__main__":

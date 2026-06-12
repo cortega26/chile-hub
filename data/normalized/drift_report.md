@@ -1,6 +1,6 @@
 # chile-hub drift report
 
-- `generated_at_utc`: `2026-06-11T23:01:16.584873+00:00`
+- `generated_at_utc`: `2026-06-12T15:58:17.707652+00:00`
 - `dataset_count`: `4`
 - `drifted_count`: `1`
 - `healthy_count`: `3`
@@ -8,12 +8,12 @@
 - `partial_coverage_count`: `0`
 - `degraded_count`: `0`
 
-| Dataset | Drift | Mode | Coverage | Degradation | Action |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| `regiones` | `healthy` | `live` | `full` | `none` | Ninguna. |
-| `provincias` | `healthy` | `live` | `full` | `none` | Ninguna. |
-| `comunas` | `healthy` | `live` | `full` | `none` | Ninguna. |
-| `indicadores` | `drifted` | `live` | `not_applicable` | `warning` | Revisar warnings operativos del dataset antes de consumirlo en producción. |
+| Dataset | Drift | Mode | Coverage | Degradation | Warnings | Action |
+| :--- | :--- | :--- | :--- | :--- | ---: | :--- |
+| `regiones` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
+| `provincias` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
+| `comunas` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
+| `indicadores` | `drifted` | `live` | `not_applicable` | `warning` | 2 | Revisar warnings operativos del dataset antes de consumirlo en producción. |
 
 ## regiones
 
@@ -21,6 +21,8 @@
 - `source_mode`: `live`
 - `coverage`: `Cobertura completa: 16/16 filas respecto del baseline esperado.`
 - `degradation`: Sin degradación operativa detectada en este build.
+- `warning_count`: `0`
+- `diagnostic_summary`: Sin degradación operativa detectada en este build.
 - `recommended_action`: Ninguna.
 
 ## provincias
@@ -29,6 +31,8 @@
 - `source_mode`: `live`
 - `coverage`: `Cobertura completa: 56/56 filas respecto del baseline esperado.`
 - `degradation`: Sin degradación operativa detectada en este build.
+- `warning_count`: `0`
+- `diagnostic_summary`: Sin degradación operativa detectada en este build.
 - `recommended_action`: Ninguna.
 
 ## comunas
@@ -37,6 +41,8 @@
 - `source_mode`: `live`
 - `coverage`: `Cobertura completa: 346/346 filas respecto del baseline esperado.`
 - `degradation`: Sin degradación operativa detectada en este build.
+- `warning_count`: `0`
+- `diagnostic_summary`: Sin degradación operativa detectada en este build.
 - `recommended_action`: Ninguna.
 
 ## indicadores
@@ -44,5 +50,7 @@
 - `drift_status`: `drifted`
 - `source_mode`: `live`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
-- `degradation`: indicadores freshness is stale: 247.38h since refresh, policy max is 72h
+- `degradation`: indicadores live refresh returned empty series for: ipc/2026; indicadores live refresh reused last published artifact for missing codes: ipc
+- `warning_count`: `2`
+- `diagnostic_summary`: indicadores live refresh returned empty series for: ipc/2026
 - `recommended_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.

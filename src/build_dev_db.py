@@ -207,6 +207,22 @@ def build_freshness_warnings(dataset_name, freshness):
     return []
 
 
+def build_indicator_delivery(metadata):
+    indicator_codes = metadata.get("indicator_codes", [])
+    delivery = metadata.get("indicator_delivery")
+    if isinstance(delivery, dict) and delivery:
+        return delivery
+
+    delivery = {code: "live" for code in indicator_codes}
+    for pair in metadata.get("raw_recoveries", []):
+        delivery[pair.split("/", 1)[0]] = "raw_recovery"
+    for pair in metadata.get("preserved_existing_pairs", []):
+        delivery[pair.split("/", 1)[0]] = "preserved_existing"
+    for code in metadata.get("published_backfills", []):
+        delivery[code] = "published_backfill"
+    return delivery
+
+
 def build_degradation(dataset_name, dataset_metadata, validation):
     source_mode = dataset_metadata.get("source_mode")
     record_count = dataset_metadata.get("record_count")
@@ -430,6 +446,26 @@ def validate_indicadores(df_indicadores, metadata):
 
     if metadata and metadata.get("source_mode") == "fallback":
         warnings.append("indicadores source_mode is fallback; values are synthetic development data")
+    if metadata and metadata.get("raw_recoveries"):
+        warnings.append(
+            "indicadores live refresh reused raw snapshots for: "
+            + ", ".join(metadata["raw_recoveries"])
+        )
+    if metadata and metadata.get("preserved_existing_pairs"):
+        warnings.append(
+            "indicadores live refresh preserved previous staging rows for: "
+            + ", ".join(metadata["preserved_existing_pairs"])
+        )
+    if metadata and metadata.get("empty_live_pairs"):
+        warnings.append(
+            "indicadores live refresh returned empty series for: "
+            + ", ".join(metadata["empty_live_pairs"])
+        )
+    if metadata and metadata.get("published_backfills"):
+        warnings.append(
+            "indicadores live refresh reused last published artifact for missing codes: "
+            + ", ".join(metadata["published_backfills"])
+        )
 
     return {
         "dataset": "indicadores",
@@ -468,6 +504,8 @@ def write_dataset_catalog(pipeline_metadata):
                 "refreshed_at_utc": dataset_metadata.get("refreshed_at_utc"),
                 "record_count": dataset_metadata.get("record_count"),
                 "fields": dataset_metadata.get("fields", []),
+                "indicator_codes": dataset_metadata.get("indicator_codes", []),
+                "indicator_delivery": dataset_metadata.get("indicator_delivery", {}),
                 "join_keys": config.get("join_keys", []),
                 "confidence_tier": config.get("confidence_tier"),
                 "reuse_policy": config.get("reuse_policy", {}),
@@ -528,6 +566,10 @@ def build_publishable_artifact_index():
         "data/normalized/hub_health.md": {
             "shared_type": "hub_health",
             "format": "markdown",
+        },
+        "data/normalized/hub_status.json": {
+            "shared_type": "hub_status",
+            "format": "json",
         },
         "data/normalized/hub_bundle.json": {
             "shared_type": "hub_bundle",
@@ -623,6 +665,29 @@ def write_hub_health_json(health):
     return output_path
 
 
+def build_hub_status(hub_health):
+    return {
+        "generated_at_utc": hub_health.get("generated_at_utc"),
+        "overall_status": hub_health.get("overall_status"),
+        "dataset_count": hub_health.get("dataset_count"),
+        "live_count": hub_health.get("live_count"),
+        "fallback_count": hub_health.get("fallback_count"),
+        "stale_count": hub_health.get("stale_count"),
+        "drifted_count": hub_health.get("drifted_count"),
+        "degraded_count": hub_health.get("degraded_count"),
+        "warning_count": hub_health.get("warning_count"),
+        "top_issue": hub_health.get("top_issue"),
+        "top_issue_summary": hub_health.get("top_issue_summary"),
+    }
+
+
+def write_hub_status_json(hub_status):
+    output_path = os.path.join(NORMALIZED_DIR, "hub_status.json")
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(hub_status, f, ensure_ascii=False, indent=2)
+    return output_path
+
+
 def build_redistribution_report(dataset_catalog):
     datasets = []
     for entry in dataset_catalog.get("datasets", []):
@@ -686,6 +751,13 @@ def build_provenance_report(dataset_catalog):
             freshness_label = freshness_status
         else:
             freshness_label = f"{freshness_status} ({age_hours}h / {max_age_hours}h)"
+        warnings = entry.get("warnings", [])
+        notes = entry.get("notes", [])
+        diagnostic_summary = "Sin observaciones operativas."
+        if warnings:
+            diagnostic_summary = warnings[0]
+        elif notes:
+            diagnostic_summary = notes[0]
 
         datasets.append(
             {
@@ -698,6 +770,8 @@ def build_provenance_report(dataset_catalog):
                 "freshness_status": freshness_status,
                 "freshness_label": freshness_label,
                 "reuse_status": entry.get("reuse_policy", {}).get("status"),
+                "warning_count": len(warnings),
+                "diagnostic_summary": diagnostic_summary,
                 "documentation": entry.get("documentation"),
             }
         )
@@ -728,6 +802,12 @@ def build_drift_report(dataset_catalog):
         coverage_status = coverage.get("status", "unknown")
         degradation_status = degradation.get("status", "none")
         drift_status = drift.get("status", "healthy")
+        warnings = entry.get("warnings", [])
+        diagnostic_summary = "Sin observaciones operativas."
+        if warnings:
+            diagnostic_summary = warnings[0]
+        elif degradation.get("impact"):
+            diagnostic_summary = degradation.get("impact")
 
         datasets.append(
             {
@@ -740,6 +820,8 @@ def build_drift_report(dataset_catalog):
                 "degradation_status": degradation_status,
                 "degradation_impact": degradation.get("impact"),
                 "drift_summary": drift.get("summary"),
+                "warning_count": len(warnings),
+                "diagnostic_summary": diagnostic_summary,
                 "recommended_action": drift.get("recommended_action"),
                 "documentation": entry.get("documentation"),
             }
@@ -781,6 +863,7 @@ def build_overview(hub_health, hub_bundle, artifact_manifest):
         "partial_coverage_count": hub_health.get("partial_coverage_count"),
         "warning_count": hub_health.get("warning_count"),
         "top_issue": hub_health.get("top_issue"),
+        "top_issue_summary": hub_health.get("top_issue_summary"),
         "shared_artifact_count": len(
             [entry for entry in artifact_manifest.get("artifacts", []) if entry.get("shared_type")]
         ),
@@ -839,6 +922,7 @@ def write_hub_bundle_json(pipeline_metadata, hub_health, dataset_catalog, artifa
         "status_markdown": ("pipeline_status", "markdown"),
         "health_json": ("hub_health", "json"),
         "health_markdown": ("hub_health", "markdown"),
+        "status_json": ("hub_status", "json"),
         "bundle_json": ("hub_bundle", "json"),
         "redistribution_json": ("redistribution_report", "json"),
         "redistribution_markdown": ("redistribution_report", "markdown"),
@@ -884,8 +968,10 @@ def write_hub_bundle_json(pipeline_metadata, hub_health, dataset_catalog, artifa
             "drifted_count": hub_health.get("drifted_count"),
             "warning_count": hub_health.get("warning_count"),
             "top_issue": hub_health.get("top_issue"),
+            "top_issue_summary": hub_health.get("top_issue_summary"),
         },
         "top_issue": hub_health.get("top_issue"),
+        "top_issue_summary": hub_health.get("top_issue_summary"),
         "datasets": [],
         "reports": reports,
         "shared_artifacts": shared_artifacts,
@@ -907,6 +993,8 @@ def write_hub_bundle_json(pipeline_metadata, hub_health, dataset_catalog, artifa
                 "source_detail": dataset.get("source_detail"),
                 "refreshed_at_utc": dataset.get("refreshed_at_utc"),
                 "record_count": dataset.get("record_count"),
+                "indicator_codes": dataset.get("indicator_codes", []),
+                "indicator_delivery": dataset.get("indicator_delivery", {}),
                 "join_keys": dataset.get("join_keys", []),
                 "confidence_tier": dataset.get("confidence_tier"),
                 "reuse_policy": dataset.get("reuse_policy", {}),
@@ -1155,6 +1243,10 @@ def main():
 
     comunas_metadata = load_metadata(COMUNAS_METADATA_PATH)
     indicadores_metadata = load_metadata(INDICADORES_METADATA_PATH)
+    indicadores_metadata["indicator_codes"] = sorted(
+        df_code for df_code in indicadores_metadata.get("indicator_codes", [])
+    )
+    indicadores_metadata["indicator_delivery"] = build_indicator_delivery(indicadores_metadata)
         
     # Cargar datos desde staging
     # Especificamos explícitamente el tipo de dato de los códigos a String para no perder ceros
@@ -1234,6 +1326,14 @@ def main():
             "record_count": df_indicadores.height,
             "fields": df_indicadores.columns,
             "indicator_codes": sorted(df_indicadores["codigo_indicador"].unique().to_list()),
+            "indicator_delivery": build_indicator_delivery(
+                {
+                    **indicadores_metadata,
+                    "indicator_codes": sorted(
+                        df_indicadores["codigo_indicador"].unique().to_list()
+                    ),
+                }
+            ),
             "reuse_policy": DATASET_CATALOG_CONFIG["indicadores"]["reuse_policy"],
             "freshness": build_freshness(
                 indicadores_metadata.get("refreshed_at_utc"),
@@ -1261,6 +1361,8 @@ def main():
     write_status_markdown_file(pipeline_metadata)
     hub_health = build_hub_health(pipeline_metadata)
     hub_health_output = write_hub_health_json(hub_health)
+    hub_status = build_hub_status(hub_health)
+    hub_status_output = write_hub_status_json(hub_status)
     write_hub_health_markdown_file(hub_health)
     catalog_output = write_dataset_catalog(pipeline_metadata)
     with open(catalog_output, "r", encoding="utf-8") as f:
@@ -1308,6 +1410,7 @@ def main():
     write_overview_markdown_file(overview)
     print(f"Metadata y validaciones exportadas a: {metadata_output}")
     print(f"Resumen de salud exportado a: {hub_health_output}")
+    print(f"Status compacto exportado a: {hub_status_output}")
     print(f"Catalogo de datasets exportado a: {catalog_output}")
     print(f"Reporte de redistribucion exportado a: {redistribution_report_output}")
     print(f"Reporte de procedencia exportado a: {provenance_report_output}")

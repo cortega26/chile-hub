@@ -209,6 +209,8 @@ python -m src.chile_hub reports --format table
 python -m src.chile_hub report drift_report --format markdown
 python -m src.chile_hub overview
 python -m src.chile_hub overview --format table
+python -m src.chile_hub status
+python -m src.chile_hub status --format table
 python -m src.chile_hub snapshot
 python -m src.chile_hub snapshot --format table
 python -m src.chile_hub inventory
@@ -240,6 +242,7 @@ python -m src.chile_hub drift --format table
 También exponen `reuse_status`, `reuse_license` y si la capa requiere atribución.
 También exponen `degradation_status` para distinguir una capa sana de una capa operativamente degradada.
 Además incluyen `warning_count`, que sube automáticamente cuando una capa queda `stale`, `unknown` o entra en fallback con advertencias operativas.
+En refreshes parciales de `indicadores`, el hub ahora puede reutilizar snapshots de `data/raw` o el último artifact publicado para no degradar staging silenciosamente; ese estado queda visible en `source_detail`, `notes` y `warnings`.
 `health` entrega una vista agregada del hub con `overall_status`, counts por severidad y breakdown por capa.
 También agrega conteos de publicabilidad: cuántas capas están listas para redistribución y cuántas siguen en `review_terms`.
 Y ahora agrega conteos de degradación operativa y cobertura parcial, para distinguir warnings genéricos de capas realmente degradadas o con regresión de cardinalidad.
@@ -256,6 +259,9 @@ Ahora también puede emitirse como tabla compacta con `--output table`.
 Ahora también incluye un resumen del package principal, con checksum y comando exacto de verificación.
 También puede emitirse como tabla compacta con `overview --format table`.
 También publica `top_issue` cuando existe una capa con atención operativa prioritaria.
+`status` entrega la misma prioridad operativa en una vista todavía más liviana, leyendo `hub_status.json` directamente para polling, dashboards y checks de CI.
+También puede emitirse como tabla compacta con `status --format table`.
+Las vistas rápidas (`overview`, `runtime-status`, `snapshot`, `top-issue`) ahora también publican `top_issue_reason` o `reason` para explicar por qué esa capa quedó priorizada.
 `snapshot` entrega una versión humana y rápida de ese mismo estado para leer desde terminal sin navegar JSON.
 También distingue explícitamente entre `status_build` y `status_current`, para no mezclar la salud persistida del último build con la frescura recalculada contra el reloj actual.
 Ahora también deja explícita la diferencia entre la frescura persistida del último build y la frescura recalculada contra el reloj actual.
@@ -363,6 +369,12 @@ Revisa la salud agregada del hub:
 cat data/normalized/hub_health.json
 ```
 
+O consulta el status compacto para integraciones rápidas:
+
+```bash
+cat data/normalized/hub_status.json
+```
+
 O consume el entrypoint consolidado:
 
 ```bash
@@ -383,6 +395,7 @@ Ese resumen ahora incluye también señales de publicabilidad agregada como `pub
 Además, `redistribution_report.json` y `redistribution_report.md` convierten esas señales en una vista accionable por dataset.
 `provenance_report.json` y `provenance_report.md` hacen lo mismo para la procedencia efectiva del último build.
 Para consumidores externos, `hub_bundle.json` funciona como punto único de entrada para descubrir estado, datasets, outputs, reportes y artefactos sin abrir varios archivos por separado.
+Si necesitas polling liviano o un resumen corto para dashboards, `hub_status.json` expone `overall_status`, contadores clave, `top_issue` y `top_issue_summary` sin cargar el bundle completo.
 La landing local ahora usa `hub_bundle.json` como fuente primaria para renderizar estado global y capas publicadas.
 El contrato del hub publica además `reuse_policy` por dataset para distinguir capas abiertas con atribución de capas públicas cuyo régimen de redistribución todavía conviene revisar.
 
@@ -430,6 +443,8 @@ make hub-snapshot
 make hub-snapshot-table
 make hub-overview
 make hub-overview-table
+make hub-status
+make hub-status-table
 make hub-health
 make hub-health-table
 make hub-bundle
@@ -490,9 +505,9 @@ La landing también se puede smoke-testear en navegador con `make verify-landing
 Ese smoke test cubre estado, quick-start, metadata de artefactos, recetas por dataset y flujos de copia.
 También cubre la presencia de `freshness`, `coverage` y `degradation` en la superficie visible de la landing.
 El workflow `pipeline-check` ejecuta esa verificación de landing además del build, verify y smoke tests del helper.
-El workflow de CI publica un artifact `chile-hub-publishable-bundle` con los outputs ligeros, `hub_health`, `hub_bundle`, `redistribution_report`, `provenance_report`, `drift_report`, el ZIP publicable y su `SHA256`, además del manifest asociado.
+El workflow de CI publica un artifact `chile-hub-publishable-bundle` con los outputs ligeros, `hub_status`, `hub_health`, `hub_bundle`, `redistribution_report`, `provenance_report`, `drift_report`, el ZIP publicable y su `SHA256`, además del manifest asociado.
 Ahora ese artifact también incluye `overview.json` y `overview.md`.
-El `GITHUB_STEP_SUMMARY` también incluye ahora `overview.md` junto a las vistas agregadas de redistribución, procedencia y drift, además del estado técnico del hub.
+El `GITHUB_STEP_SUMMARY` también incluye ahora un bloque de quick links para `hub_status.json`, `hub_health.json` y `hub_bundle.json`, además de `overview.md` y las vistas agregadas de redistribución, procedencia y drift.
 
 ## Criterio para crecer
 

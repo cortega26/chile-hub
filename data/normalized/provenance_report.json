@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-06-11T23:01:16.584873+00:00",
+  "generated_at_utc": "2026-06-12T15:58:17.707652+00:00",
   "dataset_count": 4,
   "live_count": 4,
   "fallback_count": 0,
@@ -12,8 +12,10 @@
       "source_detail": "bcn_arcgis",
       "refreshed_at_utc": "2026-06-01T15:59:50.538076+00:00",
       "freshness_status": "fresh",
-      "freshness_label": "fresh (247.02h / 2160h)",
+      "freshness_label": "fresh (263.97h / 2160h)",
       "reuse_status": "open-attribution",
+      "warning_count": 0,
+      "diagnostic_summary": "bcn_skipped_null_code_records: 1",
       "documentation": "docs/datasets/regiones.md"
     },
     {
@@ -24,8 +26,10 @@
       "source_detail": "bcn_arcgis",
       "refreshed_at_utc": "2026-06-01T15:59:50.538076+00:00",
       "freshness_status": "fresh",
-      "freshness_label": "fresh (247.02h / 2160h)",
+      "freshness_label": "fresh (263.97h / 2160h)",
       "reuse_status": "open-attribution",
+      "warning_count": 0,
+      "diagnostic_summary": "bcn_skipped_null_code_records: 1",
       "documentation": "docs/datasets/provincias.md"
     },
     {
@@ -36,8 +40,10 @@
       "source_detail": "bcn_arcgis",
       "refreshed_at_utc": "2026-06-01T15:59:50.538076+00:00",
       "freshness_status": "fresh",
-      "freshness_label": "fresh (247.02h / 2160h)",
+      "freshness_label": "fresh (263.97h / 2160h)",
       "reuse_status": "open-attribution",
+      "warning_count": 0,
+      "diagnostic_summary": "bcn_skipped_null_code_records: 1",
       "documentation": "docs/datasets/comunas.md"
     },
     {
@@ -45,11 +51,13 @@
       "source_name": "Banco Central de Chile (via mindicador.cl)",
       "source_url": "https://mindicador.cl/api",
       "source_mode": "live",
-      "source_detail": "public_api",
-      "refreshed_at_utc": "2026-06-01T15:38:37.668778+00:00",
-      "freshness_status": "stale",
-      "freshness_label": "stale (247.38h / 72h)",
+      "source_detail": "public_api_with_published_backfill",
+      "refreshed_at_utc": "2026-06-12T03:14:30.733498+00:00",
+      "freshness_status": "fresh",
+      "freshness_label": "fresh (12.73h / 72h)",
       "reuse_status": "open-attribution",
+      "warning_count": 2,
+      "diagnostic_summary": "indicadores live refresh returned empty series for: ipc/2026",
       "documentation": "docs/datasets/indicadores.md"
     }
   ]

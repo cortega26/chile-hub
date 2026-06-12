@@ -1,28 +1,32 @@
 {
-  "generated_at_utc": "2026-06-11T23:01:16.584873+00:00",
+  "generated_at_utc": "2026-06-12T15:58:17.707652+00:00",
   "overall_status": "warn",
   "dataset_count": 4,
   "live_count": 4,
   "fallback_count": 0,
-  "stale_count": 1,
+  "stale_count": 0,
   "drifted_count": 1,
   "degraded_count": 0,
   "partial_coverage_count": 0,
-  "warning_count": 1,
+  "warning_count": 2,
   "top_issue": {
     "dataset": "indicadores",
     "attention_priority": 0,
-    "warning_count": 1,
-    "build_freshness_status": "stale",
+    "warning_count": 2,
+    "build_freshness_status": "fresh",
     "drift_status": "drifted",
-    "degradation_status": "warning"
+    "degradation_status": "warning",
+    "source_detail": "public_api_with_published_backfill",
+    "diagnostic_summary": "indicadores live refresh returned empty series for: ipc/2026",
+    "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
   },
-  "shared_artifact_count": 16,
+  "top_issue_summary": "indicadores: indicadores live refresh returned empty series for: ipc/2026 [source_detail=public_api_with_published_backfill; warnings=2; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]",
+  "shared_artifact_count": 17,
   "package_count": 1,
   "primary_package": {
     "path": "data/normalized/chile-hub-publishable-bundle.zip",
     "package_type": "zip",
-    "size_bytes": 54012,
+    "size_bytes": 57050,
     "checksum_algorithm": "sha256",
     "checksum_path": "data/normalized/chile-hub-publishable-bundle.zip.sha256",
     "verification_command": "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256"
@@ -42,6 +46,7 @@
     "provenance_markdown",
     "redistribution_json",
     "redistribution_markdown",
+    "status_json",
     "status_markdown"
   ],
   "datasets": [
@@ -57,7 +62,7 @@
       "dataset": "indicadores",
       "source_mode": "live",
       "validation_status": "ok",
-      "freshness_status": "stale",
+      "freshness_status": "fresh",
       "coverage_status": "not_applicable",
       "drift_status": "drifted"
     },
