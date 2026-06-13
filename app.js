@@ -699,9 +699,14 @@ function loadKPIs() {
             return res.json();
         })
         .then(data => {
-            // Ordenar por fecha descendente para que find() retorne el valor mas reciente
-            data.sort((a, b) => (b.fecha || "").localeCompare(a.fecha || ""));
-            const findValue = (code) => data.find(i => i.codigo_indicador === code);
+            // Buscar el valor mas reciente que no sea futuro (<= hoy)
+            const today = new Date().toISOString().split("T")[0];
+            const findValue = (code) => {
+                const matches = data
+                    .filter(i => i.codigo_indicador === code && i.fecha <= today)
+                    .sort((a, b) => a.fecha.localeCompare(b.fecha));
+                return matches[matches.length - 1];
+            };
 
             updateKPICard("kpi-uf", findValue("uf"));
             updateKPICard("kpi-dolar", findValue("dolar"), true);
