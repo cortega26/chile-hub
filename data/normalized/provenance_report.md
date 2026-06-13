@@ -1,17 +1,17 @@
 # chile-hub provenance report
 
-- `generated_at_utc`: `2026-06-13T19:11:25.657387+00:00`
+- `generated_at_utc`: `2026-06-13T22:51:50.161729+00:00`
 - `dataset_count`: `5`
 - `live_count`: `5`
 - `fallback_count`: `0`
 
 | Dataset | Source | Mode | Detail | Refreshed | Freshness | Warnings | Reuse |
 | :--- | :--- | :--- | :--- | :--- | :--- | ---: | :--- |
-| `regiones` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-01T15:59:50.538076+00:00` | `fresh (291.19h / 2160h)` | 0 | `open-attribution` |
-| `provincias` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-01T15:59:50.538076+00:00` | `fresh (291.19h / 2160h)` | 0 | `open-attribution` |
-| `comunas` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-01T15:59:50.538076+00:00` | `fresh (291.19h / 2160h)` | 0 | `open-attribution` |
-| `comunas_enriquecidas` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-01T15:59:50.538076+00:00` | `fresh (291.19h / 2160h)` | 0 | `open-attribution` |
-| `indicadores` | Banco Central de Chile (via mindicador.cl) | `live` | `public_api_with_published_backfill` | `2026-06-12T03:14:30.733498+00:00` | `fresh (39.95h / 72h)` | 2 | `open-attribution` |
+| `regiones` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-13T22:02:44.348995+00:00` | `fresh (0.82h / 2160h)` | 0 | `open-attribution` |
+| `provincias` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-13T22:02:44.348995+00:00` | `fresh (0.82h / 2160h)` | 0 | `open-attribution` |
+| `comunas` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-13T22:02:44.348995+00:00` | `fresh (0.82h / 2160h)` | 0 | `open-attribution` |
+| `comunas_enriquecidas` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-13T22:02:44.348995+00:00` | `fresh (0.82h / 2160h)` | 0 | `open-attribution` |
+| `indicadores` | Banco Central de Chile (via mindicador.cl) | `live` | `public_api_with_published_backfill` | `2026-06-13T22:02:50.757821+00:00` | `fresh (0.82h / 72h)` | 1 | `open-attribution` |
 
 ## regiones
 
@@ -19,8 +19,8 @@
 - `source_url`: https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query
 - `source_mode`: `live`
 - `source_detail`: `bcn_arcgis`
-- `refreshed_at_utc`: `2026-06-01T15:59:50.538076+00:00`
-- `freshness`: `fresh (291.19h / 2160h)`
+- `refreshed_at_utc`: `2026-06-13T22:02:44.348995+00:00`
+- `freshness`: `fresh (0.82h / 2160h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: bcn_skipped_null_code_records: 1
 - `reuse_status`: `open-attribution`
@@ -32,8 +32,8 @@
 - `source_url`: https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query
 - `source_mode`: `live`
 - `source_detail`: `bcn_arcgis`
-- `refreshed_at_utc`: `2026-06-01T15:59:50.538076+00:00`
-- `freshness`: `fresh (291.19h / 2160h)`
+- `refreshed_at_utc`: `2026-06-13T22:02:44.348995+00:00`
+- `freshness`: `fresh (0.82h / 2160h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: bcn_skipped_null_code_records: 1
 - `reuse_status`: `open-attribution`
@@ -45,8 +45,8 @@
 - `source_url`: https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query
 - `source_mode`: `live`
 - `source_detail`: `bcn_arcgis`
-- `refreshed_at_utc`: `2026-06-01T15:59:50.538076+00:00`
-- `freshness`: `fresh (291.19h / 2160h)`
+- `refreshed_at_utc`: `2026-06-13T22:02:44.348995+00:00`
+- `freshness`: `fresh (0.82h / 2160h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: bcn_skipped_null_code_records: 1
 - `reuse_status`: `open-attribution`
@@ -58,8 +58,8 @@
 - `source_url`: https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query
 - `source_mode`: `live`
 - `source_detail`: `bcn_arcgis`
-- `refreshed_at_utc`: `2026-06-01T15:59:50.538076+00:00`
-- `freshness`: `fresh (291.19h / 2160h)`
+- `refreshed_at_utc`: `2026-06-13T22:02:44.348995+00:00`
+- `freshness`: `fresh (0.82h / 2160h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: bcn_skipped_null_code_records: 1
 - `reuse_status`: `open-attribution`
@@ -71,9 +71,9 @@
 - `source_url`: https://mindicador.cl/api
 - `source_mode`: `live`
 - `source_detail`: `public_api_with_published_backfill`
-- `refreshed_at_utc`: `2026-06-12T03:14:30.733498+00:00`
-- `freshness`: `fresh (39.95h / 72h)`
-- `warning_count`: `2`
-- `diagnostic_summary`: indicadores live refresh returned empty series for: ipc/2026
+- `refreshed_at_utc`: `2026-06-13T22:02:50.757821+00:00`
+- `freshness`: `fresh (0.82h / 72h)`
+- `warning_count`: `1`
+- `diagnostic_summary`: indicadores live refresh reused last published artifact for missing codes: ipc
 - `reuse_status`: `open-attribution`
 - `documentation`: `docs/datasets/indicadores.md`

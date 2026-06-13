@@ -5,7 +5,11 @@ from pathlib import Path
 
 import polars as pl
 
-from src.pipeline_status_utils import format_top_issue_summary, parse_iso_datetime
+from src.pipeline_status_utils import (
+    compute_freshness,
+    compute_top_issue,
+    format_top_issue_summary,
+)
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 NORMALIZED_DIR = ROOT_DIR / "data" / "normalized"
@@ -68,41 +72,29 @@ class ChileHub:
             return "unknown"
         return max(filtered, key=cls._status_rank)
 
-    @staticmethod
-    def _attention_priority_for_dataset(summary_entry, current_freshness_status):
-        warning_count = summary_entry.get("warning_count", 0) or 0
-        drift_status = summary_entry.get("drift_status")
-        degradation_status = summary_entry.get("degradation_status")
-        if warning_count > 0 or current_freshness_status in {"stale", "unknown"}:
-            return 0
-        if drift_status == "drifted" or degradation_status in {"warning", "degraded"}:
-            return 1
-        return 2
-
     def top_issue(self):
-        freshness_by_dataset = {
-            entry.get("dataset"): entry for entry in self.freshness_audit().get("datasets", [])
-        }
         provenance_by_dataset = {
             entry.get("dataset"): entry for entry in self.provenance().get("datasets", [])
         }
         drift_by_dataset = {
             entry.get("dataset"): entry for entry in self.drift().get("datasets", [])
         }
-        candidates = []
+        freshness_by_dataset = {
+            entry.get("dataset"): entry for entry in self.freshness_audit().get("datasets", [])
+        }
+        entries = []
         for entry in self.summary():
-            runtime = freshness_by_dataset.get(entry.get("dataset"), {})
-            provenance = provenance_by_dataset.get(entry.get("dataset"), {})
-            drift = drift_by_dataset.get(entry.get("dataset"), {})
-            current_status = runtime.get("current_freshness_status", "unknown")
-            priority = self._attention_priority_for_dataset(entry, current_status)
-            candidates.append(
+            dataset_name = entry.get("dataset")
+            freshness_entry = freshness_by_dataset.get(dataset_name, {})
+            provenance = provenance_by_dataset.get(dataset_name, {})
+            drift = drift_by_dataset.get(dataset_name, {})
+            current_freshness_status = freshness_entry.get("current_freshness_status", "unknown")
+            entries.append(
                 {
-                    "dataset": entry.get("dataset"),
-                    "attention_priority": priority,
+                    "dataset": dataset_name,
                     "warning_count": entry.get("warning_count", 0),
+                    "freshness_status": current_freshness_status,
                     "build_freshness_status": entry.get("freshness_status"),
-                    "current_freshness_status": current_status,
                     "drift_status": entry.get("drift_status"),
                     "degradation_status": entry.get("degradation_status"),
                     "source_detail": provenance.get("source_detail", "unknown"),
@@ -114,12 +106,13 @@ class ChileHub:
                 }
             )
 
-        if not candidates:
+        top = compute_top_issue(entries)
+        if not top:
             return None
-        ordered = sorted(candidates, key=lambda item: (item["attention_priority"], item["dataset"]))
-        if ordered[0]["attention_priority"] >= 2:
-            return None
-        return ordered[0]
+        return {
+            **top,
+            "current_freshness_status": top.get("build_freshness_status"),
+        }
 
     def top_issue_table(self):
         top_issue = self.top_issue()
@@ -797,13 +790,9 @@ class ChileHub:
         unknown_count = 0
 
         for entry in self.catalog.get("datasets", []):
-            refreshed_at = parse_iso_datetime(entry.get("refreshed_at_utc"))
             max_age_hours = entry.get("freshness_policy", {}).get("max_age_hours")
-            age_hours = None
-            current_status = "unknown"
-            if refreshed_at is not None and isinstance(max_age_hours, (int, float)):
-                age_hours = round(max((checked_at - refreshed_at).total_seconds() / 3600, 0), 2)
-                current_status = "fresh" if age_hours <= max_age_hours else "stale"
+            freshness = compute_freshness(entry.get("refreshed_at_utc"), max_age_hours, checked_at)
+            current_status = freshness["status"]
 
             if current_status == "fresh":
                 fresh_count += 1
@@ -819,8 +808,8 @@ class ChileHub:
                     "refreshed_at_utc": entry.get("refreshed_at_utc"),
                     "build_freshness_status": entry.get("freshness", {}).get("status"),
                     "current_freshness_status": current_status,
-                    "current_age_hours": age_hours,
-                    "max_age_hours": max_age_hours,
+                    "current_age_hours": freshness["age_hours"],
+                    "max_age_hours": freshness["max_age_hours"],
                     "freshness_label": entry.get("freshness_policy", {}).get("label"),
                 }
             )

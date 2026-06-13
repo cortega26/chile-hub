@@ -16,8 +16,8 @@ SRC_DIR = ROOT_DIR / "src"
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
-from src.build_dev_db import validate_indicadores
 from src.chile_hub import ChileHub
+from src.validation import validate_indicadores
 
 
 class ChileHubTests(unittest.TestCase):

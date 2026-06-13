@@ -18,15 +18,9 @@ if str(SRC_DIR) not in sys.path:
 from scripts import package_publishable_bundle
 from scripts.verify_pipeline import verify_publication_policy
 from src.build_dev_db import (
-    EXPECTED_INDICATOR_CODES,
-    EXPECTED_LIVE_COMUNAS_COUNT,
-    FALLBACK_COMUNAS_COUNT,
     build_coverage,
     build_degradation,
     build_drift,
-    validate_comunas,
-    validate_provincias,
-    validate_regiones,
     write_publishable_bundle_zip,
 )
 from src.build_dev_db import (
@@ -34,6 +28,14 @@ from src.build_dev_db import (
 )
 from src.extractors import bcentral_extractor
 from src.pipeline_status_utils import build_hub_health, build_status_text
+from src.validation import (
+    EXPECTED_INDICATOR_CODES,
+    EXPECTED_LIVE_COMUNAS_COUNT,
+    FALLBACK_COMUNAS_COUNT,
+    validate_comunas,
+    validate_provincias,
+    validate_regiones,
+)
 
 
 class PipelineLogicTests(unittest.TestCase):

@@ -400,7 +400,7 @@ class BCentralExtractor(BaseExtractor):
         return df if df is not None else generate_fallback_indicators()
 
     def validate(self, df, metadata: dict) -> dict:
-        from src.build_dev_db import validate_indicadores
+        from src.validation import validate_indicadores
 
         return validate_indicadores(df, metadata)
 

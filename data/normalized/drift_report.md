@@ -1,6 +1,6 @@
 # chile-hub drift report
 
-- `generated_at_utc`: `2026-06-13T19:11:25.657387+00:00`
+- `generated_at_utc`: `2026-06-13T22:51:50.161729+00:00`
 - `dataset_count`: `5`
 - `drifted_count`: `1`
 - `healthy_count`: `4`
@@ -14,7 +14,7 @@
 | `provincias` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
 | `comunas` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
 | `comunas_enriquecidas` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
-| `indicadores` | `drifted` | `live` | `not_applicable` | `warning` | 2 | Revisar warnings operativos del dataset antes de consumirlo en producción. |
+| `indicadores` | `drifted` | `live` | `not_applicable` | `warning` | 1 | Revisar warnings operativos del dataset antes de consumirlo en producción. |
 
 ## regiones
 
@@ -61,7 +61,7 @@
 - `drift_status`: `drifted`
 - `source_mode`: `live`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
-- `degradation`: indicadores live refresh returned empty series for: ipc/2026; indicadores live refresh reused last published artifact for missing codes: ipc
-- `warning_count`: `2`
-- `diagnostic_summary`: indicadores live refresh returned empty series for: ipc/2026
+- `degradation`: indicadores live refresh reused last published artifact for missing codes: ipc
+- `warning_count`: `1`
+- `diagnostic_summary`: indicadores live refresh reused last published artifact for missing codes: ipc
 - `recommended_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.

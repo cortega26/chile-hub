@@ -35,6 +35,26 @@ def parse_iso_datetime(value):
     return parsed.astimezone(UTC)
 
 
+def compute_freshness(refreshed_at_utc, max_age_hours, checked_at=None):
+    if checked_at is None:
+        checked_at = datetime.now(UTC)
+    refreshed_at = parse_iso_datetime(refreshed_at_utc)
+    if refreshed_at is None or max_age_hours is None:
+        return {
+            "status": "unknown",
+            "age_hours": None,
+            "max_age_hours": max_age_hours,
+            "checked_at_utc": checked_at.isoformat(),
+        }
+    age_hours = max((checked_at - refreshed_at).total_seconds() / 3600, 0)
+    return {
+        "status": "fresh" if age_hours <= max_age_hours else "stale",
+        "age_hours": round(age_hours, 2),
+        "max_age_hours": max_age_hours,
+        "checked_at_utc": checked_at.isoformat(),
+    }
+
+
 def format_warnings(warnings):
     if not warnings:
         return "none"
@@ -80,13 +100,13 @@ def format_top_issue_summary(top_issue):
     )
 
 
-def compute_top_issue(entries):
+def compute_top_issue(entries, freshness_field="freshness_status"):
     if not entries:
         return None
 
     def attention_priority(entry):
         warning_count = entry.get("warning_count", 0) or 0
-        freshness_status = entry.get("freshness_status")
+        freshness_status = entry.get(freshness_field)
         drift_status = entry.get("drift_status")
         degradation_status = entry.get("degradation_status")
         if warning_count > 0 or freshness_status in {"stale", "unknown"}:

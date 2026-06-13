@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-06-13T19:11:25.657387+00:00",
+  "generated_at_utc": "2026-06-13T22:51:50.161729+00:00",
   "dataset_count": 5,
   "datasets": [
     {
@@ -9,7 +9,7 @@
       "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
       "source_mode": "live",
       "source_detail": "bcn_arcgis",
-      "refreshed_at_utc": "2026-06-01T15:59:50.538076+00:00",
+      "refreshed_at_utc": "2026-06-13T22:02:44.348995+00:00",
       "record_count": 16,
       "fields": [
         "codigo_region",
@@ -31,9 +31,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 291.19,
+        "age_hours": 0.82,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-13T19:11:25.656782+00:00"
+        "checked_at_utc": "2026-06-13T22:51:50.161087+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -83,7 +83,7 @@
       "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
       "source_mode": "live",
       "source_detail": "bcn_arcgis",
-      "refreshed_at_utc": "2026-06-01T15:59:50.538076+00:00",
+      "refreshed_at_utc": "2026-06-13T22:02:44.348995+00:00",
       "record_count": 56,
       "fields": [
         "codigo_region",
@@ -108,9 +108,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 291.19,
+        "age_hours": 0.82,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-13T19:11:25.656844+00:00"
+        "checked_at_utc": "2026-06-13T22:51:50.161151+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -160,7 +160,7 @@
       "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
       "source_mode": "live",
       "source_detail": "bcn_arcgis",
-      "refreshed_at_utc": "2026-06-01T15:59:50.538076+00:00",
+      "refreshed_at_utc": "2026-06-13T22:02:44.348995+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -192,9 +192,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 291.19,
+        "age_hours": 0.82,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-13T19:11:25.656856+00:00"
+        "checked_at_utc": "2026-06-13T22:51:50.161170+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -244,7 +244,7 @@
       "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
       "source_mode": "live",
       "source_detail": "bcn_arcgis",
-      "refreshed_at_utc": "2026-06-01T15:59:50.538076+00:00",
+      "refreshed_at_utc": "2026-06-13T22:02:44.348995+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -275,9 +275,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 291.19,
+        "age_hours": 0.82,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-13T19:11:25.656864+00:00"
+        "checked_at_utc": "2026-06-13T22:51:50.161179+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -327,8 +327,8 @@
       "source_url": "https://mindicador.cl/api",
       "source_mode": "live",
       "source_detail": "public_api_with_published_backfill",
-      "refreshed_at_utc": "2026-06-12T03:14:30.733498+00:00",
-      "record_count": 424,
+      "refreshed_at_utc": "2026-06-13T22:02:50.757821+00:00",
+      "record_count": 426,
       "fields": [
         "fecha",
         "codigo_indicador",
@@ -363,9 +363,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 39.95,
+        "age_hours": 0.82,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-06-13T19:11:25.657343+00:00"
+        "checked_at_utc": "2026-06-13T22:51:50.161663+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 72,
@@ -374,7 +374,7 @@
       "coverage": {
         "status": "not_applicable",
         "expected_record_count": null,
-        "actual_record_count": 424,
+        "actual_record_count": 426,
         "coverage_ratio": null,
         "summary": "Sin baseline de cobertura por cardinalidad para esta capa."
       },
@@ -398,16 +398,14 @@
       "documentation": "docs/datasets/indicadores.md",
       "validation_status": "ok",
       "warnings": [
-        "indicadores live refresh returned empty series for: ipc/2026",
         "indicadores live refresh reused last published artifact for missing codes: ipc"
       ],
       "degradation": {
         "status": "warning",
-        "impact": "indicadores live refresh returned empty series for: ipc/2026; indicadores live refresh reused last published artifact for missing codes: ipc",
+        "impact": "indicadores live refresh reused last published artifact for missing codes: ipc",
         "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
       },
       "notes": [
-        "empty_live_pairs: ipc/2026",
         "published_backfills_used_for_codes: ipc"
       ]
     }

@@ -1991,6 +1991,16 @@
   },
   {
     "fecha": "2026-06-15",
+    "codigo_indicador": "dolar",
+    "valor": 899.3
+  },
+  {
+    "fecha": "2026-06-15",
+    "codigo_indicador": "euro",
+    "valor": 1040.98
+  },
+  {
+    "fecha": "2026-06-15",
     "codigo_indicador": "uf",
     "valor": 40779.55
   },

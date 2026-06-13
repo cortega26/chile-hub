@@ -666,7 +666,7 @@ class SubdereExtractor(BaseExtractor):
         return raw_data[0] if isinstance(raw_data, tuple) else raw_data
 
     def validate(self, df, metadata: dict) -> dict:
-        from src.build_dev_db import validate_comunas
+        from src.validation import validate_comunas
 
         return validate_comunas(df, metadata)
 
