@@ -23,6 +23,7 @@ __pycache__/
 *.pyd
 .pytest_cache/
 .mypy_cache/
+.ruff_cache/
 .ipynb_checkpoints/
 
 # IDEs
@@ -35,6 +36,10 @@ __pycache__/
 .DS_Store
 Thumbs.db
 
+# Gestores de paquetes alternativos
+uv.lock
+
 
 #Ignore vscode AI rules
 .github/instructions/codacy.instructions.md
+.claude/

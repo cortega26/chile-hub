@@ -700,7 +700,7 @@ function loadKPIs() {
         })
         .then(data => {
             const findValue = (code) => data.find(i => i.codigo_indicador === code);
-            
+
             updateKPICard("kpi-uf", findValue("uf"));
             updateKPICard("kpi-dolar", findValue("dolar"), true);
             updateKPICard("kpi-euro", findValue("euro"), true);
@@ -720,7 +720,7 @@ function updateKPICard(id, dataObj, isCurrencySymbol = false) {
     if (dataObj) {
         const valueSpan = card.querySelector(".kpi-value");
         const dateSpan = card.querySelector(".kpi-date");
-        
+
         valueSpan.textContent = formatCLP.format(dataObj.valor);
         dateSpan.textContent = `Vigencia: ${dataObj.fecha}`;
     } else {
@@ -764,7 +764,7 @@ function loadComunas() {
 function populateRegionFilter() {
     const regionesUnicas = [];
     const regionesMap = {};
-    
+
     comunas.forEach(c => {
         if (!regionesMap[c.codigo_region]) {
             regionesMap[c.codigo_region] = c.nombre_region;
@@ -774,10 +774,10 @@ function populateRegionFilter() {
             });
         }
     });
-    
+
     // Ordenar regiones por código
     regionesUnicas.sort((a, b) => a.codigo.localeCompare(b.codigo));
-    
+
     regionesUnicas.forEach(r => {
         const opt = document.createElement("option");
         opt.value = r.codigo;
@@ -789,7 +789,7 @@ function populateRegionFilter() {
 // Renderizar la tabla de comunas basándose en filtros y paginación
 function renderTable() {
     tableBody.innerHTML = "";
-    
+
     if (filteredComunas.length === 0) {
         tableBody.innerHTML = `
             <tr>
@@ -803,11 +803,11 @@ function renderTable() {
         nextBtn.disabled = true;
         return;
     }
-    
+
     const startIdx = (currentPage - 1) * rowsPerPage;
     const endIdx = Math.min(startIdx + rowsPerPage, filteredComunas.length);
     const paginatedRows = filteredComunas.slice(startIdx, endIdx);
-    
+
     paginatedRows.forEach(c => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
@@ -820,7 +820,7 @@ function renderTable() {
         `;
         tableBody.appendChild(tr);
     });
-    
+
     // Actualizar estado de paginador
     pageInfo.textContent = `Mostrando ${startIdx + 1} - ${endIdx} de ${filteredComunas.length} comunas`;
     prevBtn.disabled = currentPage === 1;
@@ -831,21 +831,21 @@ function renderTable() {
 function applyFilters() {
     const query = searchInput.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     const selectedRegion = regionFilter.value;
-    
+
     filteredComunas = comunas.filter(c => {
         // Filtro por Región
         const matchRegion = !selectedRegion || c.codigo_region === selectedRegion;
-        
+
         // Filtro de Texto (sobre comuna, provincia y región desnormalizada)
-        const matchText = !query || 
+        const matchText = !query ||
             c.nombre_comuna_clean.includes(query) ||
             c.nombre_provincia.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(query) ||
             c.nombre_region.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(query) ||
             c.codigo_comuna.includes(query);
-            
+
         return matchRegion && matchText;
     });
-    
+
     currentPage = 1; // Reseteamos a la página 1 tras cambiar filtros
     renderTable();
 }
@@ -871,12 +871,12 @@ nextBtn.addEventListener("click", () => {
 // Exportación de datos filtrados a CSV del lado del cliente
 exportBtn.addEventListener("click", () => {
     if (filteredComunas.length === 0) return;
-    
+
     const headers = ["codigo_comuna", "nombre_comuna", "codigo_provincia", "nombre_provincia", "codigo_region", "nombre_region", "poblacion_estimada", "latitud", "longitud"];
-    
+
     let csvContent = "data:text/csv;charset=utf-8,";
     csvContent += headers.join(",") + "\n";
-    
+
     filteredComunas.forEach(c => {
         const row = [
             `"${c.codigo_comuna}"`, // Encapsulado para no perder ceros iniciales
@@ -891,7 +891,7 @@ exportBtn.addEventListener("click", () => {
         ];
         csvContent += row.join(",") + "\n";
     });
-    
+
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);

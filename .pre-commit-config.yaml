@@ -14,3 +14,7 @@ repos:
         exclude: ^data/normalized/
       - id: check-yaml
       - id: check-merge-conflict
+      - id: detect-private-key
+      - id: check-added-large-files
+        args: ['--maxkb=500']
+      - id: check-json
