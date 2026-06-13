@@ -1,8 +1,8 @@
+import datetime
+import json
 import sys
 import tempfile
 import unittest
-import json
-import datetime
 from pathlib import Path
 from unittest.mock import patch
 
@@ -15,7 +15,8 @@ SRC_DIR = ROOT_DIR / "src"
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
-from src.build_dev_db import (  # noqa: E402
+from scripts import package_publishable_bundle
+from src.build_dev_db import (
     EXPECTED_INDICATOR_CODES,
     EXPECTED_LIVE_COMUNAS_COUNT,
     FALLBACK_COMUNAS_COUNT,
@@ -27,9 +28,8 @@ from src.build_dev_db import (  # noqa: E402
     validate_regiones,
     write_publishable_bundle_zip,
 )
-from src.extractors import bcentral_extractor  # noqa: E402
-from src.pipeline_status_utils import build_hub_health, build_status_text  # noqa: E402
-from scripts import package_publishable_bundle  # noqa: E402
+from src.extractors import bcentral_extractor
+from src.pipeline_status_utils import build_hub_health, build_status_text
 
 
 class PipelineLogicTests(unittest.TestCase):
@@ -604,7 +604,9 @@ class IndicatorFallbackTests(unittest.TestCase):
                 df, diagnostics = bcentral_extractor.fetch_all_history()
 
         self.assertEqual(set(df["codigo_indicador"].unique()), EXPECTED_INDICATOR_CODES)
-        self.assertEqual(diagnostics["empty_live_pairs"], [f"ipc/{today.year}"])
+        # ipc es un indicador mensual: una serie vacía en el año en curso es esperada,
+        # por lo que NO debe aparecer en empty_live_pairs (no es un error operativo).
+        self.assertEqual(diagnostics["empty_live_pairs"], [])
         self.assertEqual(diagnostics["published_backfills"], ["ipc"])
 
 

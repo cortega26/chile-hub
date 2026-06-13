@@ -3,7 +3,7 @@ import json
 import socket
 import threading
 from datetime import datetime, timezone
-from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parents[1]

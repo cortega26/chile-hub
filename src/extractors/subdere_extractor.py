@@ -1,14 +1,15 @@
-import os
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
-import requests
+
 import polars as pl
+import requests
 
 try:
-    from src.extractors.base import BaseExtractor
+    from src.extractors.base import BaseExtractor, ensure_staging_directories
 except ModuleNotFoundError:
-    from base import BaseExtractor
+    from base import BaseExtractor, ensure_staging_directories
 
 # curl_cffi impersona el fingerprint TLS de Chrome, evitando bloqueos a nivel de TLS
 # que rechazan al user-agent por defecto de la librería requests de Python.
@@ -320,8 +321,7 @@ DPA_FALLBACK_DATA = [
 
 
 def ensure_directories():
-    os.makedirs(RAW_DIR, exist_ok=True)
-    os.makedirs(STAGING_DIR, exist_ok=True)
+    ensure_staging_directories()
 
 
 def write_metadata(metadata):

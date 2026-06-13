@@ -9,8 +9,8 @@ SRC_DIR = ROOT_DIR / "src"
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
-from src.build_dev_db import DATASET_CATALOG_CONFIG  # noqa: E402
-from src.pipeline_status_utils import load_json  # noqa: E402
+from src.build_dev_db import DATASET_CATALOG_CONFIG
+from src.pipeline_status_utils import load_json
 
 STAGING_DIR = ROOT_DIR / "data" / "staging"
 NORMALIZED_DIR = ROOT_DIR / "data" / "normalized"

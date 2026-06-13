@@ -6,8 +6,8 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from src.pipeline_status_utils import (
-    load_metadata,
     build_status_text,
+    load_metadata,
     write_status_markdown_file,
 )
 

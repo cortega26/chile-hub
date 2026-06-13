@@ -12,18 +12,19 @@ Estrategia de actualización:
     preservando el historial ya descargado en staging.
 """
 
-import os
-import json
-import time
 import datetime
+import json
+import os
+import time
 from pathlib import Path
-import requests
+
 import polars as pl
+import requests
 
 try:
-    from src.extractors.base import BaseExtractor
+    from src.extractors.base import BaseExtractor, ensure_staging_directories
 except ModuleNotFoundError:
-    from base import BaseExtractor
+    from base import BaseExtractor, ensure_staging_directories
 
 # ── Rutas ─────────────────────────────────────────────────────────────────────
 DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data"))
@@ -41,6 +42,10 @@ REQUEST_DELAY_SECONDS = 0.3  # Pausa entre llamadas para no saturar la API
 
 # Indicadores a extraer en orden de prioridad
 INDICATOR_CODES = ["uf", "dolar", "euro", "utm", "ipc"]
+
+# Indicadores de publicación mensual (vs diaria). Pueden devolver vacío para el
+# año en curso si el dato del mes aún no fue publicado — eso es esperado, no un error.
+MONTHLY_INDICATORS = {"utm", "ipc"}
 
 # Política de reutilización: los datos provienen del BCCh/INE (libre reproducción
 # con citación). mindicador.cl es el agregador/punto de acceso, no la fuente original.
@@ -62,8 +67,7 @@ REUSE_POLICY = {
 
 
 def ensure_directories() -> None:
-    os.makedirs(RAW_DIR, exist_ok=True)
-    os.makedirs(STAGING_DIR, exist_ok=True)
+    ensure_staging_directories()
 
 
 def write_metadata(metadata: dict) -> None:
@@ -206,8 +210,14 @@ def fetch_all_history():
                     new_records.extend(records)
                     refreshed_pairs.add((codigo, year))
                 else:
-                    pair = f"{codigo}/{year}"
-                    diagnostics["empty_live_pairs"].append(pair)
+                    # Serie vacía para un indicador mensual en el año en curso:
+                    # el dato aún no fue publicado ese mes — comportamiento esperado.
+                    expected_monthly_gap = (
+                        codigo in MONTHLY_INDICATORS and year == current_year
+                    )
+                    if not expected_monthly_gap:
+                        pair = f"{codigo}/{year}"
+                        diagnostics["empty_live_pairs"].append(pair)
                     if existing_df is not None:
                         has_published_history = (
                             existing_df.filter(pl.col("codigo_indicador") == codigo).height > 0

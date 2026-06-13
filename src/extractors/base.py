@@ -1,7 +1,18 @@
 """Contrato comun para extractores de chile-hub."""
 
+import os
 from abc import ABC, abstractmethod
 from pathlib import Path
+
+_BASE_DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data"))
+_RAW_DIR = os.path.join(_BASE_DATA_DIR, "raw")
+_STAGING_DIR = os.path.join(_BASE_DATA_DIR, "staging")
+
+
+def ensure_staging_directories() -> None:
+    """Crea data/raw/ y data/staging/ si no existen."""
+    os.makedirs(_RAW_DIR, exist_ok=True)
+    os.makedirs(_STAGING_DIR, exist_ok=True)
 
 
 class BaseExtractor(ABC):
