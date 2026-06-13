@@ -1,8 +1,8 @@
 {
-  "generated_at_utc": "2026-06-12T15:58:17.707652+00:00",
+  "generated_at_utc": "2026-06-13T19:11:25.657387+00:00",
   "overall_status": "warn",
-  "dataset_count": 4,
-  "live_count": 4,
+  "dataset_count": 5,
+  "live_count": 5,
   "fallback_count": 0,
   "stale_count": 0,
   "drifted_count": 1,

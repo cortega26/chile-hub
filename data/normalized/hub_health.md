@@ -1,15 +1,15 @@
 # chile-hub health summary
 
-- `generated_at_utc`: `2026-06-12T15:58:17.707652+00:00`
+- `generated_at_utc`: `2026-06-13T19:11:25.657387+00:00`
 - `overall_status`: `warn`
-- `dataset_count`: `4`
-- `ok_count`: `3`
+- `dataset_count`: `5`
+- `ok_count`: `4`
 - `warn_count`: `1`
 - `error_count`: `0`
-- `live_count`: `4`
+- `live_count`: `5`
 - `fallback_count`: `0`
 - `stale_count`: `0`
-- `publishable_count`: `4`
+- `publishable_count`: `5`
 - `review_terms_count`: `0`
 - `unknown_reuse_count`: `0`
 - `degraded_count`: `0`
@@ -26,6 +26,7 @@
 | Dataset | Severity | Mode | Freshness | Coverage | Drift | Publishability | Degradation | Validation | Warnings |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | ---: |
 | `comunas` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
+| `comunas_enriquecidas` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `indicadores` | `warn` | `live` | `fresh` | `not_applicable` | `drifted` | `ready` | `warning` | `ok` | 2 |
 | `provincias` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `regiones` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |

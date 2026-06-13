@@ -1,6 +1,6 @@
 {
-  "generated_at_utc": "2026-06-12T15:58:17.707652+00:00",
-  "dataset_count": 4,
+  "generated_at_utc": "2026-06-13T19:11:25.657387+00:00",
+  "dataset_count": 5,
   "datasets": [
     {
       "dataset": "regiones",
@@ -31,9 +31,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 263.97,
+        "age_hours": 291.19,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-12T15:58:17.707452+00:00"
+        "checked_at_utc": "2026-06-13T19:11:25.656782+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -108,9 +108,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 263.97,
+        "age_hours": 291.19,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-12T15:58:17.707471+00:00"
+        "checked_at_utc": "2026-06-13T19:11:25.656844+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -192,9 +192,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 263.97,
+        "age_hours": 291.19,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-12T15:58:17.707478+00:00"
+        "checked_at_utc": "2026-06-13T19:11:25.656856+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -225,6 +225,89 @@
         "excel_sheet": "Comunas y Regiones"
       },
       "documentation": "docs/datasets/comunas.md",
+      "validation_status": "ok",
+      "warnings": [],
+      "degradation": {
+        "status": "none",
+        "impact": "Sin degradación operativa detectada en este build.",
+        "recommended_action": "Ninguna."
+      },
+      "notes": [
+        "bcn_skipped_null_code_records: 1",
+        "bcn_supplemented_missing_comunas: 1"
+      ]
+    },
+    {
+      "dataset": "comunas_enriquecidas",
+      "description": "Comunas con coordenadas de cabecera y poblacion estimada INE, listas para analisis territorial sin joins adicionales.",
+      "source_name": "BCN ArcGIS",
+      "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
+      "source_mode": "live",
+      "source_detail": "bcn_arcgis",
+      "refreshed_at_utc": "2026-06-01T15:59:50.538076+00:00",
+      "record_count": 346,
+      "fields": [
+        "codigo_region",
+        "nombre_region",
+        "abreviatura",
+        "codigo_provincia",
+        "nombre_provincia",
+        "codigo_comuna",
+        "nombre_comuna",
+        "nombre_comuna_clean",
+        "latitud_cabecera",
+        "longitud_cabecera",
+        "poblacion_estimada"
+      ],
+      "indicator_codes": [],
+      "indicator_delivery": {},
+      "join_keys": [
+        "codigo_comuna"
+      ],
+      "confidence_tier": "Tier B",
+      "reuse_policy": {
+        "status": "open-attribution",
+        "license": "CC BY",
+        "license_url": "https://datos.bcn.cl/es/informacion/lo-que-esta-haciendo-bcn",
+        "attribution_required": true,
+        "redistribution_ok": true,
+        "summary": "Derivada de datos abiertos BCN con coordenadas e informacion INE."
+      },
+      "freshness": {
+        "status": "fresh",
+        "age_hours": 291.19,
+        "max_age_hours": 2160,
+        "checked_at_utc": "2026-06-13T19:11:25.656864+00:00"
+      },
+      "freshness_policy": {
+        "max_age_hours": 2160,
+        "label": "estable"
+      },
+      "coverage": {
+        "status": "full",
+        "expected_record_count": 346,
+        "actual_record_count": 346,
+        "coverage_ratio": 1.0,
+        "summary": "Cobertura completa: 346/346 filas respecto del baseline esperado."
+      },
+      "drift": {
+        "status": "healthy",
+        "summary": "Sin drift operativo detectado en este build.",
+        "recommended_action": "Ninguna."
+      },
+      "usage_examples": {
+        "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('comunas_enriquecidas')",
+        "duckdb": "SELECT codigo_comuna, nombre_comuna, latitud_cabecera, longitud_cabecera, poblacion_estimada\nFROM 'data/normalized/comunas_enriquecidas.parquet'\nORDER BY poblacion_estimada DESC LIMIT 10;",
+        "cli": "python -m src.chile_hub show comunas_enriquecidas"
+      },
+      "outputs": {
+        "parquet": "data/normalized/comunas_enriquecidas.parquet",
+        "json": "data/normalized/comunas_enriquecidas.json",
+        "duckdb_table": "comunas_enriquecidas",
+        "sqlite_table": "comunas_enriquecidas",
+        "excel_sheet": "ComunasEnriquecidas"
+      },
+      "documentation": "docs/datasets/comunas_enriquecidas.md",
       "validation_status": "ok",
       "warnings": [],
       "degradation": {
@@ -280,9 +363,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 12.73,
+        "age_hours": 39.95,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-06-12T15:58:17.707618+00:00"
+        "checked_at_utc": "2026-06-13T19:11:25.657343+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 72,

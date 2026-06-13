@@ -1,8 +1,8 @@
 # chile-hub redistribution report
 
-- `generated_at_utc`: `2026-06-12T15:58:17.707652+00:00`
-- `dataset_count`: `4`
-- `ready_count`: `4`
+- `generated_at_utc`: `2026-06-13T19:11:25.657387+00:00`
+- `dataset_count`: `5`
+- `ready_count`: `5`
 - `review_terms_count`: `0`
 - `unknown_count`: `0`
 
@@ -11,6 +11,7 @@
 | `regiones` | `ready` | CC BY | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
 | `provincias` | `ready` | CC BY | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
 | `comunas` | `ready` | CC BY | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
+| `comunas_enriquecidas` | `ready` | CC BY | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
 | `indicadores` | `ready` | Reproducción libre con citación (BCCh / INE) | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
 
 ## regiones
@@ -42,6 +43,16 @@
 - `redistribution_ok`: `True`
 - `recommended_action`: Publicable con atribucion y referencia de fuente.
 - `summary`: Fuente operativa BCN dentro de su superficie de datos abiertos; atribucion requerida.
+
+## comunas_enriquecidas
+
+- `publishability_status`: `ready`
+- `license`: `CC BY`
+- `license_url`: https://datos.bcn.cl/es/informacion/lo-que-esta-haciendo-bcn
+- `attribution_required`: `True`
+- `redistribution_ok`: `True`
+- `recommended_action`: Publicable con atribucion y referencia de fuente.
+- `summary`: Derivada de datos abiertos BCN con coordenadas e informacion INE.
 
 ## indicadores
 

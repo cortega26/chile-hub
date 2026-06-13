@@ -1,7 +1,12 @@
 import sys
 import tempfile
 import unittest
+import json
+import datetime
 from pathlib import Path
+from unittest.mock import patch
+
+import polars as pl
 
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
@@ -11,13 +16,43 @@ SRC_DIR = ROOT_DIR / "src"
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
-from src.build_dev_db import build_coverage, build_degradation, build_drift  # noqa: E402
+from src.build_dev_db import (  # noqa: E402
+    EXPECTED_INDICATOR_CODES,
+    EXPECTED_LIVE_COMUNAS_COUNT,
+    FALLBACK_COMUNAS_COUNT,
+    build_coverage,
+    build_degradation,
+    build_drift,
+    validate_comunas,
+    validate_provincias,
+    validate_regiones,
+    write_publishable_bundle_zip,
+)
 from src.extractors import bcentral_extractor  # noqa: E402
 from src.pipeline_status_utils import build_hub_health, build_status_text  # noqa: E402
 from scripts import package_publishable_bundle  # noqa: E402
 
 
 class PipelineLogicTests(unittest.TestCase):
+    def test_write_publishable_bundle_zip_fails_before_creating_partial_zip(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            data_dir = Path(tmpdir) / "data"
+            normalized_dir = data_dir / "normalized"
+            normalized_dir.mkdir(parents=True)
+            manifest = {"artifacts": [{"path": "data/normalized/no-existe.parquet"}]}
+            (normalized_dir / "artifact_manifest.json").write_text(
+                json.dumps(manifest), encoding="utf-8"
+            )
+
+            with (
+                patch("src.build_dev_db.NORMALIZED_DIR", str(normalized_dir)),
+                patch("src.build_dev_db.DATA_DIR", str(data_dir)),
+            ):
+                with self.assertRaisesRegex(SystemExit, "no-existe.parquet"):
+                    write_publishable_bundle_zip()
+
+            self.assertFalse((normalized_dir / "chile-hub-publishable-bundle.zip").exists())
+
     def test_clean_publishable_removes_only_manifest_declared_outputs(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
@@ -28,7 +63,14 @@ class PipelineLogicTests(unittest.TestCase):
             checksum = root / "data" / "normalized" / "bundle.zip.sha256"
             unrelated = root / "data" / "normalized" / "keep.me"
 
-            for path in [manifest_file, artifact_one, artifact_two, package_zip, checksum, unrelated]:
+            for path in [
+                manifest_file,
+                artifact_one,
+                artifact_two,
+                package_zip,
+                checksum,
+                unrelated,
+            ]:
                 path.parent.mkdir(parents=True, exist_ok=True)
                 path.write_text("x", encoding="utf-8")
 
@@ -216,7 +258,10 @@ class PipelineLogicTests(unittest.TestCase):
                 "beta": {
                     "source_mode": "fallback",
                     "freshness": {"status": "stale"},
-                    "reuse_policy": {"status": "public-api-review-terms", "redistribution_ok": False},
+                    "reuse_policy": {
+                        "status": "public-api-review-terms",
+                        "redistribution_ok": False,
+                    },
                     "degradation": {"status": "degraded"},
                     "coverage": {"status": "partial", "coverage_ratio": 0.5},
                     "drift": {"status": "drifted"},
@@ -280,8 +325,16 @@ class PipelineLogicTests(unittest.TestCase):
                     "freshness": {"status": "fresh", "summary": "fresh"},
                     "coverage": {"status": "full", "summary": "Cobertura completa"},
                     "reuse_policy": {"status": "open-attribution", "redistribution_ok": True},
-                    "degradation": {"status": "none", "impact": "Sin impacto.", "recommended_action": "Ninguna."},
-                    "drift": {"status": "healthy", "summary": "Sin drift operativo.", "recommended_action": "Ninguna."},
+                    "degradation": {
+                        "status": "none",
+                        "impact": "Sin impacto.",
+                        "recommended_action": "Ninguna.",
+                    },
+                    "drift": {
+                        "status": "healthy",
+                        "summary": "Sin drift operativo.",
+                        "recommended_action": "Ninguna.",
+                    },
                 },
                 "beta": {
                     "source_name": "Beta Source",
@@ -335,6 +388,153 @@ class PipelineLogicTests(unittest.TestCase):
             "hub_status_json: data/normalized/hub_status.json",
             status_text,
         )
+
+
+class ValidatorTests(unittest.TestCase):
+    def test_validate_regiones_accepts_valid_data(self):
+        df = pl.DataFrame(
+            {"codigo_region": ["01", "02"], "nombre_region": ["Tarapaca", "Antofagasta"]}
+        )
+        self.assertEqual(validate_regiones(df)["status"], "ok")
+
+    def test_validate_regiones_rejects_empty_and_duplicate_data(self):
+        empty = pl.DataFrame({"codigo_region": pl.Series([], dtype=pl.String)})
+        duplicate = pl.DataFrame({"codigo_region": ["01", "01"]})
+        self.assertEqual(validate_regiones(empty)["status"], "error")
+        self.assertEqual(validate_regiones(duplicate)["status"], "error")
+
+    def test_validate_provincias_accepts_valid_data(self):
+        df = pl.DataFrame({"codigo_region": ["01", "01"], "codigo_provincia": ["011", "014"]})
+        self.assertEqual(validate_provincias(df)["status"], "ok")
+
+    def test_validate_provincias_rejects_empty_and_duplicate_keys(self):
+        empty = pl.DataFrame(
+            {
+                "codigo_region": pl.Series([], dtype=pl.String),
+                "codigo_provincia": pl.Series([], dtype=pl.String),
+            }
+        )
+        duplicate = pl.DataFrame(
+            {"codigo_region": ["01", "01"], "codigo_provincia": ["011", "011"]}
+        )
+        self.assertEqual(validate_provincias(empty)["status"], "error")
+        self.assertEqual(validate_provincias(duplicate)["status"], "error")
+
+    def test_validate_comunas_accepts_complete_live_data(self):
+        codes = [str(i).zfill(5) for i in range(EXPECTED_LIVE_COMUNAS_COUNT)]
+        result = validate_comunas(pl.DataFrame({"codigo_comuna": codes}), {"source_mode": "live"})
+        self.assertEqual(result["status"], "ok")
+
+    def test_validate_comunas_rejects_incomplete_or_duplicate_live_data(self):
+        incomplete = pl.DataFrame({"codigo_comuna": ["01101", "01102"]})
+        duplicate = pl.DataFrame({"codigo_comuna": ["01101", "01101"]})
+        self.assertEqual(validate_comunas(incomplete, {"source_mode": "live"})["status"], "error")
+        self.assertEqual(validate_comunas(duplicate, {"source_mode": "live"})["status"], "error")
+
+    def test_validate_comunas_warns_for_fallback(self):
+        codes = [str(i).zfill(5) for i in range(FALLBACK_COMUNAS_COUNT)]
+        result = validate_comunas(
+            pl.DataFrame({"codigo_comuna": codes}), {"source_mode": "fallback"}
+        )
+        self.assertEqual(result["status"], "ok")
+        self.assertTrue(any("fallback" in warning for warning in result["warnings"]))
+
+
+class CUTInvariantTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.normalized_dir = ROOT_DIR / "data" / "normalized"
+
+    def _load_parquet(self, name):
+        path = self.normalized_dir / f"{name}.parquet"
+        if not path.exists():
+            self.skipTest(f"{name}.parquet no existe; correr make build primero")
+        return pl.read_parquet(path)
+
+    def test_comunas_cut_codes_are_fixed_width_strings(self):
+        df = self._load_parquet("comunas")
+        for column, width in (("codigo_region", 2), ("codigo_provincia", 3), ("codigo_comuna", 5)):
+            self.assertEqual(df[column].dtype, pl.String)
+            self.assertTrue((df[column].str.len_chars() == width).all())
+
+    def test_comunas_leading_zeros_are_preserved(self):
+        df = self._load_parquet("comunas")
+        self.assertTrue(df["codigo_region"].str.starts_with("0").any())
+
+    def test_region_and_province_codes_are_strings_with_fixed_width(self):
+        regiones = self._load_parquet("regiones")
+        provincias = self._load_parquet("provincias")
+        self.assertEqual(regiones["codigo_region"].dtype, pl.String)
+        self.assertTrue((regiones["codigo_region"].str.len_chars() == 2).all())
+        self.assertEqual(provincias["codigo_provincia"].dtype, pl.String)
+        self.assertTrue((provincias["codigo_provincia"].str.len_chars() == 3).all())
+
+
+class IndicatorFallbackTests(unittest.TestCase):
+    def _make_minimal_df(self):
+        today = datetime.date.today()
+        return pl.DataFrame(
+            [
+                {"fecha": today, "codigo_indicador": code, "valor": 1.0}
+                for code in sorted(EXPECTED_INDICATOR_CODES)
+            ]
+        ).with_columns(pl.col("fecha").cast(pl.Date))
+
+    def _run_process(self, tmpdir, df, diagnostics):
+        staging_path = Path(tmpdir) / "indicadores.csv"
+        metadata_path = Path(tmpdir) / "indicadores.metadata.json"
+        with (
+            patch.object(bcentral_extractor, "STAGING_CSV_PATH", str(staging_path)),
+            patch.object(bcentral_extractor, "METADATA_PATH", str(metadata_path)),
+            patch.object(bcentral_extractor, "fetch_all_history", return_value=(df, diagnostics)),
+        ):
+            bcentral_extractor.process_indicators()
+        return pl.read_csv(staging_path), json.loads(metadata_path.read_text(encoding="utf-8"))
+
+    def test_generate_fallback_returns_all_expected_codes(self):
+        df = bcentral_extractor.generate_fallback_indicators()
+        self.assertGreater(df.height, 0)
+        self.assertTrue(EXPECTED_INDICATOR_CODES.issubset(set(df["codigo_indicador"].unique())))
+
+    def test_process_indicators_uses_fallback_when_fetch_fails(self):
+        diagnostics = {
+            "fetch_failures": ["uf/2026: timeout"],
+            "raw_recoveries": [],
+            "preserved_existing_pairs": [],
+            "empty_live_pairs": [],
+            "published_backfills": [],
+        }
+        with tempfile.TemporaryDirectory() as tmpdir:
+            written, metadata = self._run_process(tmpdir, None, diagnostics)
+        self.assertGreater(written.height, 0)
+        self.assertEqual(metadata["source_mode"], "fallback")
+        self.assertIn("fallback_due_to_live_fetch_failure", metadata["notes"])
+
+    def test_process_indicators_records_raw_recovery(self):
+        diagnostics = {
+            "fetch_failures": ["uf/2026: timeout"],
+            "raw_recoveries": ["uf/2026"],
+            "preserved_existing_pairs": [],
+            "empty_live_pairs": [],
+            "published_backfills": [],
+        }
+        with tempfile.TemporaryDirectory() as tmpdir:
+            _, metadata = self._run_process(tmpdir, self._make_minimal_df(), diagnostics)
+        self.assertEqual(metadata["source_detail"], "public_api_with_raw_recovery")
+        self.assertEqual(metadata["indicator_delivery"]["uf"], "raw_recovery")
+
+    def test_process_indicators_records_published_backfill(self):
+        diagnostics = {
+            "fetch_failures": [],
+            "raw_recoveries": [],
+            "preserved_existing_pairs": [],
+            "empty_live_pairs": [],
+            "published_backfills": ["ipc"],
+        }
+        with tempfile.TemporaryDirectory() as tmpdir:
+            _, metadata = self._run_process(tmpdir, self._make_minimal_df(), diagnostics)
+        self.assertEqual(metadata["source_detail"], "public_api_with_published_backfill")
+        self.assertEqual(metadata["indicator_delivery"]["ipc"], "published_backfill")
 
 
 if __name__ == "__main__":

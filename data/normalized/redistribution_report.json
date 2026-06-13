@@ -1,7 +1,7 @@
 {
-  "generated_at_utc": "2026-06-12T15:58:17.707652+00:00",
-  "dataset_count": 4,
-  "ready_count": 4,
+  "generated_at_utc": "2026-06-13T19:11:25.657387+00:00",
+  "dataset_count": 5,
+  "ready_count": 5,
   "review_terms_count": 0,
   "unknown_count": 0,
   "datasets": [
@@ -40,6 +40,18 @@
       "summary": "Fuente operativa BCN dentro de su superficie de datos abiertos; atribucion requerida.",
       "recommended_action": "Publicable con atribucion y referencia de fuente.",
       "documentation": "docs/datasets/comunas.md"
+    },
+    {
+      "dataset": "comunas_enriquecidas",
+      "publishability_status": "ready",
+      "license": "CC BY",
+      "license_url": "https://datos.bcn.cl/es/informacion/lo-que-esta-haciendo-bcn",
+      "reuse_status": "open-attribution",
+      "attribution_required": true,
+      "redistribution_ok": true,
+      "summary": "Derivada de datos abiertos BCN con coordenadas e informacion INE.",
+      "recommended_action": "Publicable con atribucion y referencia de fuente.",
+      "documentation": "docs/datasets/comunas_enriquecidas.md"
     },
     {
       "dataset": "indicadores",

@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-06-12T15:58:17.707652+00:00",
+  "generated_at_utc": "2026-06-13T19:11:25.657387+00:00",
   "datasets": {
     "regiones": {
       "dataset": "regiones",
@@ -28,9 +28,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 263.97,
+        "age_hours": 291.19,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-12T15:58:17.707452+00:00"
+        "checked_at_utc": "2026-06-13T19:11:25.656782+00:00"
       },
       "degradation": {
         "status": "none",
@@ -79,9 +79,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 263.97,
+        "age_hours": 291.19,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-12T15:58:17.707471+00:00"
+        "checked_at_utc": "2026-06-13T19:11:25.656844+00:00"
       },
       "degradation": {
         "status": "none",
@@ -137,9 +137,67 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 263.97,
+        "age_hours": 291.19,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-12T15:58:17.707478+00:00"
+        "checked_at_utc": "2026-06-13T19:11:25.656856+00:00"
+      },
+      "degradation": {
+        "status": "none",
+        "impact": "Sin degradación operativa detectada en este build.",
+        "recommended_action": "Ninguna."
+      },
+      "coverage": {
+        "status": "full",
+        "expected_record_count": 346,
+        "actual_record_count": 346,
+        "coverage_ratio": 1.0,
+        "summary": "Cobertura completa: 346/346 filas respecto del baseline esperado."
+      },
+      "drift": {
+        "status": "healthy",
+        "summary": "Sin drift operativo detectado en este build.",
+        "recommended_action": "Ninguna."
+      }
+    },
+    "comunas_enriquecidas": {
+      "dataset": "comunas_enriquecidas",
+      "source_name": "BCN ArcGIS",
+      "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
+      "source_mode": "live",
+      "source_detail": "bcn_arcgis",
+      "refreshed_at_utc": "2026-06-01T15:59:50.538076+00:00",
+      "record_count": 346,
+      "fields": [
+        "codigo_region",
+        "nombre_region",
+        "abreviatura",
+        "codigo_provincia",
+        "nombre_provincia",
+        "codigo_comuna",
+        "nombre_comuna",
+        "nombre_comuna_clean",
+        "latitud_cabecera",
+        "longitud_cabecera",
+        "poblacion_estimada"
+      ],
+      "notes": [
+        "bcn_skipped_null_code_records: 1",
+        "bcn_supplemented_missing_comunas: 1"
+      ],
+      "poblacion_source": "BCN ArcGIS Capa_Factores campo ppobing022 (Censo 2022)",
+      "reuse_policy": {
+        "status": "open-attribution",
+        "license": "CC BY",
+        "license_url": "https://datos.bcn.cl/es/informacion/lo-que-esta-haciendo-bcn",
+        "attribution_required": true,
+        "redistribution_ok": true,
+        "summary": "Derivada de datos abiertos BCN con coordenadas e informacion INE."
+      },
+      "freshness": {
+        "status": "fresh",
+        "age_hours": 291.19,
+        "max_age_hours": 2160,
+        "checked_at_utc": "2026-06-13T19:11:25.656864+00:00"
       },
       "degradation": {
         "status": "none",
@@ -211,9 +269,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 12.73,
+        "age_hours": 39.95,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-06-12T15:58:17.707618+00:00"
+        "checked_at_utc": "2026-06-13T19:11:25.657343+00:00"
       },
       "degradation": {
         "status": "warning",
@@ -242,7 +300,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 263.97
+      "freshness_age_hours": 291.19
     },
     "provincias": {
       "dataset": "provincias",
@@ -251,7 +309,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 263.97
+      "freshness_age_hours": 291.19
     },
     "comunas": {
       "dataset": "comunas",
@@ -260,7 +318,16 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 263.97
+      "freshness_age_hours": 291.19
+    },
+    "comunas_enriquecidas": {
+      "dataset": "comunas_enriquecidas",
+      "status": "ok",
+      "record_count": 346,
+      "errors": [],
+      "warnings": [],
+      "freshness_status": "fresh",
+      "freshness_age_hours": 291.19
     },
     "indicadores": {
       "dataset": "indicadores",
@@ -279,7 +346,7 @@
         "utm"
       ],
       "freshness_status": "fresh",
-      "freshness_age_hours": 12.73
+      "freshness_age_hours": 39.95
     }
   }
 }

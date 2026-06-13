@@ -47,8 +47,14 @@ def status_rank(status):
 
 def compute_runtime_overall_status(build_status, runtime_freshness):
     statuses = [entry["status"] for entry in runtime_freshness.values()]
-    runtime_freshness_status = "warn" if any(status in {"stale", "unknown"} for status in statuses) else "ok"
-    return runtime_freshness_status if status_rank(runtime_freshness_status) > status_rank(build_status) else build_status
+    runtime_freshness_status = (
+        "warn" if any(status in {"stale", "unknown"} for status in statuses) else "ok"
+    )
+    return (
+        runtime_freshness_status
+        if status_rank(runtime_freshness_status) > status_rank(build_status)
+        else build_status
+    )
 
 
 def get_free_port():
@@ -79,7 +85,7 @@ def local_server():
 def verify_landing():
     try:
         from playwright.sync_api import sync_playwright
-    except ImportError as exc:
+    except ImportError:
         fail(
             "Playwright no está disponible en el entorno actual. "
             "Instala dependencias con `make bootstrap` o `pip install -r requirements.txt`."
@@ -91,10 +97,16 @@ def verify_landing():
     datasets_by_name = {dataset.get("dataset"): dataset for dataset in datasets}
     top_issue = health.get("top_issue") or bundle.get("top_issue") or {}
     top_issue_dataset = top_issue.get("dataset")
-    top_issue_source_detail = top_issue.get("source_detail") or datasets_by_name.get(top_issue_dataset, {}).get("source_detail")
-    runtime_freshness = {dataset["dataset"]: compute_runtime_freshness(dataset) for dataset in datasets}
+    top_issue_source_detail = top_issue.get("source_detail") or datasets_by_name.get(
+        top_issue_dataset, {}
+    ).get("source_detail")
+    runtime_freshness = {
+        dataset["dataset"]: compute_runtime_freshness(dataset) for dataset in datasets
+    }
     live_count = health.get("live_count", 0)
-    stale_count = sum(1 for freshness in runtime_freshness.values() if freshness["status"] == "stale")
+    stale_count = sum(
+        1 for freshness in runtime_freshness.values() if freshness["status"] == "stale"
+    )
     unknown_freshness_count = sum(
         1 for freshness in runtime_freshness.values() if freshness["status"] == "unknown"
     )
@@ -140,7 +152,25 @@ def verify_landing():
             fail(f"Unexpected repo href: {repo_href}")
 
         status_actions = page.locator("#status-actions .dataset-action").all_inner_texts()
-        expected_status_actions = ["Status", "Status JSON", "Health JSON", "Health MD", "Bundle JSON", "Reuse JSON", "Reuse MD", "Provenance JSON", "Provenance MD", "Drift JSON", "Drift MD", "Overview JSON", "Overview MD", "Catalog JSON", "Catalog MD", "Manifest", "Ver top issue"]
+        expected_status_actions = [
+            "Status",
+            "Status JSON",
+            "Health JSON",
+            "Health MD",
+            "Bundle JSON",
+            "Reuse JSON",
+            "Reuse MD",
+            "Provenance JSON",
+            "Provenance MD",
+            "Drift JSON",
+            "Drift MD",
+            "Overview JSON",
+            "Overview MD",
+            "Catalog JSON",
+            "Catalog MD",
+            "Manifest",
+            "Ver top issue",
+        ]
         if status_actions != expected_status_actions:
             fail(f"Unexpected status actions: {status_actions}")
         top_issue_href = page.get_by_role("link", name="Ver top issue").get_attribute("href")
@@ -153,7 +183,10 @@ def verify_landing():
         status_meta = page.locator("#status-meta").inner_text()
         expected_status_meta = (
             f"Motivo del top issue ({top_issue_dataset}): {top_issue_reason} · Procedencia técnica: {top_issue_source_detail} · Acción recomendada: {top_issue_action}"
-            if top_issue_dataset and top_issue_reason and top_issue_action and top_issue_source_detail
+            if top_issue_dataset
+            and top_issue_reason
+            and top_issue_action
+            and top_issue_source_detail
             else "Sin top issue activo en este build."
         )
         if status_meta != expected_status_meta:
@@ -178,11 +211,19 @@ def verify_landing():
             fail(f"Partial coverage pill not found: {status_pills}")
 
         package_actions = page.locator("#package-actions .dataset-action").all_inner_texts()
-        if len(package_actions) != 4 or not package_actions[0].startswith("Bundle ZIP · ") or package_actions[1:] != ["SHA256", "Bundle JSON", "Manifest"]:
+        if (
+            len(package_actions) != 4
+            or not package_actions[0].startswith("Bundle ZIP · ")
+            or package_actions[1:] != ["SHA256", "Bundle JSON", "Manifest"]
+        ):
             fail(f"Unexpected package actions: {package_actions}")
 
         package_meta = page.locator("#package-meta").inner_text()
-        if "Tamaño:" not in package_meta or "sha256:" not in package_meta or "generado junto al último build" not in package_meta:
+        if (
+            "Tamaño:" not in package_meta
+            or "sha256:" not in package_meta
+            or "generado junto al último build" not in package_meta
+        ):
             fail(f"Unexpected package meta: {package_meta}")
 
         package_verify_title = page.locator(".package-verify-title").inner_text()
@@ -209,11 +250,20 @@ def verify_landing():
             fail(f"Unexpected first dataset card: {first_card_name}")
 
         first_card_actions = first_card.locator(".dataset-action").all_inner_texts()
-        if len(first_card_actions) < 4 or first_card_actions[0:2] != ["Docs", "Fuente"] or not first_card_actions[2].startswith("PARQUET · ") or not first_card_actions[3].startswith("JSON · "):
+        if (
+            len(first_card_actions) < 4
+            or first_card_actions[0:2] != ["Docs", "Fuente"]
+            or not first_card_actions[2].startswith("PARQUET · ")
+            or not first_card_actions[3].startswith("JSON · ")
+        ):
             fail(f"Unexpected first dataset actions: {first_card_actions}")
 
         artifact_meta = first_card.locator(".dataset-artifact-meta").all_inner_texts()
-        if len(artifact_meta) < 2 or not artifact_meta[0].startswith("tipo: parquet · sha256: ") or not artifact_meta[1].startswith("tipo: json · sha256: "):
+        if (
+            len(artifact_meta) < 2
+            or not artifact_meta[0].startswith("tipo: parquet · sha256: ")
+            or not artifact_meta[1].startswith("tipo: json · sha256: ")
+        ):
             fail(f"Unexpected artifact metadata: {artifact_meta}")
 
         first_card_facts = first_card.locator(".dataset-fact").all_inner_texts()
@@ -224,7 +274,10 @@ def verify_landing():
             fail(f"Coverage fact not found in first dataset card: {first_card_facts}")
         if "DRIFT\n" not in "\n".join(first_card_facts):
             fail(f"Drift fact not found in first dataset card: {first_card_facts}")
-        if "REUSO\nopen-attribution · Reproducción libre con citación (BCCh / INE)" not in "\n".join(first_card_facts):
+        if (
+            "REUSO\nopen-attribution · Reproducción libre con citación (BCCh / INE)"
+            not in "\n".join(first_card_facts)
+        ):
             fail(f"Reuse fact not found in first dataset card: {first_card_facts}")
         if "DEGRADACIÓN\n" not in "\n".join(first_card_facts):
             fail(f"Degradation fact not found in first dataset card: {first_card_facts}")
@@ -238,7 +291,9 @@ def verify_landing():
             or "public_api" not in provenance_meta
             or f"Warnings: {top_issue_warning_count}" not in provenance_meta
         ):
-            fail(f"Technical provenance metadata not found in first dataset card: {provenance_meta}")
+            fail(
+                f"Technical provenance metadata not found in first dataset card: {provenance_meta}"
+            )
         freshness_meta = first_card.locator(".dataset-meta-line").nth(2).inner_text()
         if "Freshness build:" not in freshness_meta or "Freshness actual:" not in freshness_meta:
             fail(f"Runtime freshness metadata not found in first dataset card: {freshness_meta}")
@@ -268,9 +323,11 @@ def verify_landing():
         if not copied_class:
             fail("Dataset example copy button did not activate copied class")
 
-        top_issue_card = page.locator(".dataset-card").filter(
-            has=page.locator(".dataset-name", has_text=top_issue_dataset)
-        ).first
+        top_issue_card = (
+            page.locator(".dataset-card")
+            .filter(has=page.locator(".dataset-name", has_text=top_issue_dataset))
+            .first
+        )
         page.get_by_role("link", name="Ver top issue").click()
         page.wait_for_timeout(100)
         hash_value = page.evaluate("() => window.location.hash")

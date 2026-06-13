@@ -20,6 +20,11 @@ from pathlib import Path
 import requests
 import polars as pl
 
+try:
+    from src.extractors.base import BaseExtractor
+except ModuleNotFoundError:
+    from base import BaseExtractor
+
 # ── Rutas ─────────────────────────────────────────────────────────────────────
 DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data"))
 RAW_DIR = os.path.join(DATA_DIR, "raw")
@@ -31,8 +36,8 @@ PUBLISHED_INDICATORS_PATH = os.path.join(NORMALIZED_DIR, "indicadores.parquet")
 
 # ── Configuración ─────────────────────────────────────────────────────────────
 MINDICADOR_BASE = "https://mindicador.cl/api"
-HISTORY_START_YEAR = 2010        # Año de inicio del historial
-REQUEST_DELAY_SECONDS = 0.3      # Pausa entre llamadas para no saturar la API
+HISTORY_START_YEAR = 2010  # Año de inicio del historial
+REQUEST_DELAY_SECONDS = 0.3  # Pausa entre llamadas para no saturar la API
 
 # Indicadores a extraer en orden de prioridad
 INDICATOR_CODES = ["uf", "dolar", "euro", "utm", "ipc"]
@@ -54,6 +59,7 @@ REUSE_POLICY = {
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
+
 
 def ensure_directories() -> None:
     os.makedirs(RAW_DIR, exist_ok=True)
@@ -77,14 +83,16 @@ def save_raw_snapshot(payload: dict, codigo: str, year: int) -> None:
 def parse_indicator_payload(payload: dict, codigo: str) -> list:
     records = []
     for item in payload.get("serie", []):
-        raw_date = item.get("fecha", "")[:10]   # YYYY-MM-DD
+        raw_date = item.get("fecha", "")[:10]  # YYYY-MM-DD
         valor = item.get("valor")
         if raw_date and valor is not None:
-            records.append({
-                "fecha": raw_date,
-                "codigo_indicador": codigo,
-                "valor": float(valor),
-            })
+            records.append(
+                {
+                    "fecha": raw_date,
+                    "codigo_indicador": codigo,
+                    "valor": float(valor),
+                }
+            )
     return records
 
 
@@ -100,6 +108,7 @@ def load_latest_raw_snapshot(codigo: str, year: int) -> list:
 
 
 # ── Fetch ─────────────────────────────────────────────────────────────────────
+
 
 def fetch_indicator_year(codigo: str, year: int) -> list:
     """
@@ -131,7 +140,9 @@ def load_existing_staging():
             STAGING_CSV_PATH,
             schema_overrides={"fecha": pl.String},
         ).with_columns(pl.col("fecha").str.to_date("%Y-%m-%d"))
-        missing_codes = sorted(set(INDICATOR_CODES) - set(df["codigo_indicador"].unique().to_list()))
+        missing_codes = sorted(
+            set(INDICATOR_CODES) - set(df["codigo_indicador"].unique().to_list())
+        )
         published_backfills = []
         if missing_codes and os.path.exists(PUBLISHED_INDICATORS_PATH):
             published_df = pl.read_parquet(PUBLISHED_INDICATORS_PATH).filter(
@@ -143,9 +154,7 @@ def load_existing_staging():
                     .unique(subset=["fecha", "codigo_indicador"], keep="last")
                     .sort(["fecha", "codigo_indicador"])
                 )
-                published_backfills = sorted(
-                    published_df["codigo_indicador"].unique().to_list()
-                )
+                published_backfills = sorted(published_df["codigo_indicador"].unique().to_list())
         return df, datetime.date.today().year, published_backfills
     except Exception as e:
         print(f"Advertencia: no se pudo leer el staging existente: {e}. Se hará fetch completo.")
@@ -236,14 +245,15 @@ def fetch_all_history():
         combined_df = new_df
 
     return (
-        combined_df
-        .unique(subset=["fecha", "codigo_indicador"], keep="last")
-        .sort(["fecha", "codigo_indicador"]),
+        combined_df.unique(subset=["fecha", "codigo_indicador"], keep="last").sort(
+            ["fecha", "codigo_indicador"]
+        ),
         diagnostics,
     )
 
 
 # ── Fallback ──────────────────────────────────────────────────────────────────
+
 
 def generate_fallback_indicators() -> pl.DataFrame:
     """
@@ -254,11 +264,11 @@ def generate_fallback_indicators() -> pl.DataFrame:
     print("Generando dataset de indicadores de fallback (simulación offline)…")
     today = datetime.date.today()
     base_values = {
-        "uf":     40500.00,
-        "dolar":    900.00,
-        "euro":    1040.00,
-        "utm":    70000.00,
-        "ipc":        0.2,
+        "uf": 40500.00,
+        "dolar": 900.00,
+        "euro": 1040.00,
+        "utm": 70000.00,
+        "ipc": 0.2,
     }
     records = []
     for i in range(7):
@@ -275,6 +285,7 @@ def generate_fallback_indicators() -> pl.DataFrame:
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
+
 
 def process_indicators() -> str:
     ensure_directories()
@@ -298,9 +309,7 @@ def process_indicators() -> str:
 
     if source_mode == "live" and diagnostics.get("raw_recoveries"):
         source_detail = "public_api_with_raw_recovery"
-        notes.append(
-            "raw_recovery_used_for_pairs: " + ", ".join(diagnostics["raw_recoveries"])
-        )
+        notes.append("raw_recovery_used_for_pairs: " + ", ".join(diagnostics["raw_recoveries"]))
     if source_mode == "live" and diagnostics.get("preserved_existing_pairs"):
         source_detail = "public_api_partial"
         notes.append(
@@ -308,14 +317,11 @@ def process_indicators() -> str:
             + ", ".join(diagnostics["preserved_existing_pairs"])
         )
     if source_mode == "live" and diagnostics.get("empty_live_pairs"):
-        notes.append(
-            "empty_live_pairs: " + ", ".join(diagnostics["empty_live_pairs"])
-        )
+        notes.append("empty_live_pairs: " + ", ".join(diagnostics["empty_live_pairs"]))
     if source_mode == "live" and diagnostics.get("published_backfills"):
         source_detail = "public_api_with_published_backfill"
         notes.append(
-            "published_backfills_used_for_codes: "
-            + ", ".join(diagnostics["published_backfills"])
+            "published_backfills_used_for_codes: " + ", ".join(diagnostics["published_backfills"])
         )
 
     indicator_codes = sorted(df["codigo_indicador"].unique().to_list())
@@ -352,11 +358,34 @@ def process_indicators() -> str:
     }
     write_metadata(metadata)
 
-    print(
-        f"Indicadores guardados en: {STAGING_CSV_PATH} "
-        f"({df.height} registros, {source_mode})"
-    )
+    print(f"Indicadores guardados en: {STAGING_CSV_PATH} ({df.height} registros, {source_mode})")
     return STAGING_CSV_PATH
+
+
+class BCentralExtractor(BaseExtractor):
+    """Adaptador orientado a objetos para el extractor de indicadores existente."""
+
+    @property
+    def dataset_name(self) -> str:
+        return "indicadores"
+
+    def fetch(self, **kwargs):
+        return fetch_all_history()
+
+    def normalize(self, raw_data):
+        df, _diagnostics = raw_data
+        return df if df is not None else generate_fallback_indicators()
+
+    def validate(self, df, metadata: dict) -> dict:
+        from src.build_dev_db import validate_indicadores
+
+        return validate_indicadores(df, metadata)
+
+    def write_staging(self, df, metadata: dict) -> Path:
+        ensure_directories()
+        output_path = Path(STAGING_CSV_PATH)
+        df.write_csv(output_path)
+        return output_path
 
 
 if __name__ == "__main__":

@@ -1,13 +1,20 @@
 import os
 import json
+import sys
 import sqlite3
 import hashlib
 import zipfile
 from datetime import datetime, timezone
 import polars as pl
 import duckdb
-from pipeline_status_utils import (
+
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
+
+from src.pipeline_status_utils import (  # noqa: E402
     build_hub_health,
+    parse_iso_datetime,
     write_status_markdown_file,
     write_dataset_catalog_markdown_file,
     write_hub_health_markdown_file,
@@ -125,6 +132,45 @@ DATASET_CATALOG_CONFIG = {
         },
         "documentation": "docs/datasets/comunas.md",
     },
+    "comunas_enriquecidas": {
+        "description": (
+            "Comunas con coordenadas de cabecera y poblacion estimada INE, listas para "
+            "analisis territorial sin joins adicionales."
+        ),
+        "join_keys": ["codigo_comuna"],
+        "confidence_tier": "Tier B",
+        "expected_record_count": 346,
+        "reuse_policy": {
+            "status": "open-attribution",
+            "license": "CC BY",
+            "license_url": "https://datos.bcn.cl/es/informacion/lo-que-esta-haciendo-bcn",
+            "attribution_required": True,
+            "redistribution_ok": True,
+            "summary": "Derivada de datos abiertos BCN con coordenadas e informacion INE.",
+        },
+        "freshness_policy": {"max_age_hours": 24 * 90, "label": "estable"},
+        "usage_examples": {
+            "python": (
+                "from src.chile_hub import ChileHub\n\nhub = ChileHub()\n"
+                "df = hub.load_polars('comunas_enriquecidas')"
+            ),
+            "duckdb": (
+                "SELECT codigo_comuna, nombre_comuna, latitud_cabecera, "
+                "longitud_cabecera, poblacion_estimada\n"
+                "FROM 'data/normalized/comunas_enriquecidas.parquet'\n"
+                "ORDER BY poblacion_estimada DESC LIMIT 10;"
+            ),
+            "cli": "python -m src.chile_hub show comunas_enriquecidas",
+        },
+        "outputs": {
+            "parquet": "data/normalized/comunas_enriquecidas.parquet",
+            "json": "data/normalized/comunas_enriquecidas.json",
+            "duckdb_table": "comunas_enriquecidas",
+            "sqlite_table": "comunas_enriquecidas",
+            "excel_sheet": "ComunasEnriquecidas",
+        },
+        "documentation": "docs/datasets/comunas_enriquecidas.md",
+    },
     "indicadores": {
         "description": "Serie de indicadores economicos diarios de referencia para analisis y software.",
         "join_keys": ["fecha", "codigo_indicador"],
@@ -156,18 +202,6 @@ DATASET_CATALOG_CONFIG = {
         "documentation": "docs/datasets/indicadores.md",
     },
 }
-
-
-def parse_iso_datetime(value):
-    if not value:
-        return None
-    try:
-        parsed = datetime.fromisoformat(value)
-    except ValueError:
-        return None
-    if parsed.tzinfo is None:
-        return parsed.replace(tzinfo=timezone.utc)
-    return parsed.astimezone(timezone.utc)
 
 
 def build_freshness(refreshed_at_utc, max_age_hours):
@@ -268,7 +302,9 @@ def build_degradation(dataset_name, dataset_metadata, validation):
 
 
 def build_coverage(dataset_name, dataset_metadata):
-    expected_record_count = DATASET_CATALOG_CONFIG.get(dataset_name, {}).get("expected_record_count")
+    expected_record_count = DATASET_CATALOG_CONFIG.get(dataset_name, {}).get(
+        "expected_record_count"
+    )
     actual_record_count = dataset_metadata.get("record_count")
 
     if expected_record_count is None:
@@ -361,14 +397,17 @@ def enrich_dataset_metadata(dataset_metadata, validations):
         enriched[dataset_name]["drift"] = build_drift(enriched[dataset_name])
     return enriched
 
+
 def ensure_directories():
     os.makedirs(NORMALIZED_DIR, exist_ok=True)
+
 
 def load_metadata(path):
     if not os.path.exists(path):
         return None
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
+
 
 def validate_comunas(df_comunas, metadata):
     errors = []
@@ -379,7 +418,11 @@ def validate_comunas(df_comunas, metadata):
     if duplicate_count > 0:
         errors.append(f"codigo_comuna must be unique, found {duplicate_count} duplicate rows")
 
-    if metadata and metadata.get("source_mode") == "live" and row_count < EXPECTED_LIVE_COMUNAS_COUNT:
+    if (
+        metadata
+        and metadata.get("source_mode") == "live"
+        and row_count < EXPECTED_LIVE_COMUNAS_COUNT
+    ):
         errors.append(
             f"live comunas dataset looks incomplete: {row_count} rows, expected at least {EXPECTED_LIVE_COMUNAS_COUNT}"
         )
@@ -399,6 +442,7 @@ def validate_comunas(df_comunas, metadata):
         "warnings": warnings,
     }
 
+
 def validate_regiones(df_regiones):
     errors = []
     if df_regiones.height == 0:
@@ -414,13 +458,12 @@ def validate_regiones(df_regiones):
         "warnings": [],
     }
 
+
 def validate_provincias(df_provincias):
     errors = []
     if df_provincias.height == 0:
         errors.append("provincias dataset is empty")
-    keys = (
-        df_provincias["codigo_region"] + "-" + df_provincias["codigo_provincia"]
-    ).n_unique()
+    keys = (df_provincias["codigo_region"] + "-" + df_provincias["codigo_provincia"]).n_unique()
     if keys != df_provincias.height:
         errors.append("codigo_region + codigo_provincia must be unique")
     return {
@@ -430,6 +473,7 @@ def validate_provincias(df_provincias):
         "errors": errors,
         "warnings": [],
     }
+
 
 def validate_indicadores(df_indicadores, metadata):
     errors = []
@@ -445,7 +489,9 @@ def validate_indicadores(df_indicadores, metadata):
         errors.append(f"missing expected indicator codes: {', '.join(missing_codes)}")
 
     if metadata and metadata.get("source_mode") == "fallback":
-        warnings.append("indicadores source_mode is fallback; values are synthetic development data")
+        warnings.append(
+            "indicadores source_mode is fallback; values are synthetic development data"
+        )
     if metadata and metadata.get("raw_recoveries"):
         warnings.append(
             "indicadores live refresh reused raw snapshots for: "
@@ -476,6 +522,7 @@ def validate_indicadores(df_indicadores, metadata):
         "indicator_codes": sorted(codes),
     }
 
+
 def write_pipeline_metadata(dataset_metadata, validations):
     pipeline_metadata = {
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
@@ -486,6 +533,7 @@ def write_pipeline_metadata(dataset_metadata, validations):
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(pipeline_metadata, f, ensure_ascii=False, indent=2)
     return output_path
+
 
 def write_dataset_catalog(pipeline_metadata):
     datasets = []
@@ -533,12 +581,14 @@ def write_dataset_catalog(pipeline_metadata):
         json.dump(catalog, f, ensure_ascii=False, indent=2)
     return output_path
 
+
 def compute_sha256(path):
     hasher = hashlib.sha256()
     with open(path, "rb") as f:
         for chunk in iter(lambda: f.read(65536), b""):
             hasher.update(chunk)
     return hasher.hexdigest()
+
 
 def build_publishable_artifact_index():
     artifact_index = {}
@@ -623,6 +673,7 @@ def build_publishable_artifact_index():
     artifact_index.update(shared_artifacts)
     return artifact_index
 
+
 def write_artifact_manifest():
     artifact_index = build_publishable_artifact_index()
     artifacts = []
@@ -694,9 +745,11 @@ def build_redistribution_report(dataset_catalog):
         reuse_policy = entry.get("reuse_policy", {})
         redistribution_ok = reuse_policy.get("redistribution_ok")
         publishability_status = (
-            "ready" if redistribution_ok is True else
-            "review_terms" if redistribution_ok is False else
-            "unknown"
+            "ready"
+            if redistribution_ok is True
+            else "review_terms"
+            if redistribution_ok is False
+            else "unknown"
         )
         if publishability_status == "ready":
             recommended_action = "Publicable con atribucion y referencia de fuente."
@@ -727,7 +780,9 @@ def build_redistribution_report(dataset_catalog):
         "review_terms_count": sum(
             1 for entry in datasets if entry["publishability_status"] == "review_terms"
         ),
-        "unknown_count": sum(1 for entry in datasets if entry["publishability_status"] == "unknown"),
+        "unknown_count": sum(
+            1 for entry in datasets if entry["publishability_status"] == "unknown"
+        ),
         "datasets": datasets,
     }
     return report
@@ -833,7 +888,9 @@ def build_drift_report(dataset_catalog):
         "drifted_count": sum(1 for entry in datasets if entry["drift_status"] == "drifted"),
         "healthy_count": sum(1 for entry in datasets if entry["drift_status"] == "healthy"),
         "fallback_count": sum(1 for entry in datasets if entry["source_mode"] == "fallback"),
-        "partial_coverage_count": sum(1 for entry in datasets if entry["coverage_status"] == "partial"),
+        "partial_coverage_count": sum(
+            1 for entry in datasets if entry["coverage_status"] == "partial"
+        ),
         "degraded_count": sum(1 for entry in datasets if entry["degradation_status"] == "degraded"),
         "datasets": datasets,
     }
@@ -848,7 +905,11 @@ def write_drift_report_json(report):
 
 def build_overview(hub_health, hub_bundle, artifact_manifest):
     primary_package = next(
-        (package for package in artifact_manifest.get("packages", []) if package.get("package_type") == "zip"),
+        (
+            package
+            for package in artifact_manifest.get("packages", [])
+            if package.get("package_type") == "zip"
+        ),
         None,
     )
     return {
@@ -1024,12 +1085,36 @@ def write_publishable_bundle_zip():
     with open(manifest_path, "r", encoding="utf-8") as f:
         manifest = json.load(f)
 
+    artifacts = manifest.get("artifacts", [])
+    missing = []
+    for artifact in artifacts:
+        relative_path = artifact["path"]
+        absolute_path = os.path.join(DATA_DIR, os.path.relpath(relative_path, "data"))
+        if not os.path.exists(absolute_path):
+            missing.append(relative_path)
+    if missing:
+        summary = ", ".join(missing[:5])
+        suffix = " (y mas)" if len(missing) > 5 else ""
+        raise SystemExit(
+            f"Error: no se puede crear el ZIP; faltan {len(missing)} artefactos: {summary}{suffix}"
+        )
+
     output_path = os.path.join(NORMALIZED_DIR, PUBLISHABLE_BUNDLE_ZIP_NAME)
     with zipfile.ZipFile(output_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
-        for artifact in manifest.get("artifacts", []):
+        for artifact in artifacts:
             relative_path = artifact["path"]
             absolute_path = os.path.join(DATA_DIR, os.path.relpath(relative_path, "data"))
             archive.write(absolute_path, arcname=relative_path)
+
+    with zipfile.ZipFile(output_path, "r") as archive:
+        bad_file = archive.testzip()
+        if bad_file is not None:
+            raise SystemExit(f"Error: ZIP corrupto; primer archivo fallido: {bad_file}")
+        if len(archive.namelist()) != len(artifacts):
+            raise SystemExit(
+                f"Error: ZIP incompleto; esperados {len(artifacts)} archivos, "
+                f"encontrados {len(archive.namelist())}"
+            )
     return output_path
 
 
@@ -1065,27 +1150,27 @@ def attach_publishable_package_to_manifest(zip_path, sha256_path):
         json.dump(manifest, f, ensure_ascii=False, indent=2)
     return manifest_path
 
+
 def derive_geography_layers(df_comunas):
     df_regiones = (
-        df_comunas
-        .select(["codigo_region", "nombre_region"])
-        .unique()
-        .sort("codigo_region")
+        df_comunas.select(["codigo_region", "nombre_region"]).unique().sort("codigo_region")
     )
     df_provincias = (
-        df_comunas
-        .select(["codigo_region", "nombre_region", "codigo_provincia", "nombre_provincia"])
+        df_comunas.select(
+            ["codigo_region", "nombre_region", "codigo_provincia", "nombre_provincia"]
+        )
         .unique()
         .sort(["codigo_region", "codigo_provincia"])
     )
     return df_regiones, df_provincias
+
 
 def build_duckdb(df_regiones, df_provincias, df_comunas, df_indicadores, output_path):
     print(f"Compilando base de datos DuckDB en: {output_path}")
     # Si la base de datos ya existe, la eliminamos para reconstruirla limpia
     if os.path.exists(output_path):
         os.remove(output_path)
-        
+
     con = duckdb.connect(output_path)
     try:
         # Registrar los DataFrames de Polars como vistas temporales en DuckDB
@@ -1093,45 +1178,48 @@ def build_duckdb(df_regiones, df_provincias, df_comunas, df_indicadores, output_
         con.register("df_provincias_view", df_provincias)
         con.register("df_comunas_view", df_comunas)
         con.register("df_indicadores_view", df_indicadores)
-        
+
         # Crear tablas físicas en DuckDB
         con.execute("CREATE TABLE regiones AS SELECT * FROM df_regiones_view")
         con.execute("CREATE TABLE provincias AS SELECT * FROM df_provincias_view")
         con.execute("CREATE TABLE comunas AS SELECT * FROM df_comunas_view")
+        con.execute("CREATE TABLE comunas_enriquecidas AS SELECT * FROM df_comunas_view")
         con.execute("CREATE TABLE indicadores AS SELECT * FROM df_indicadores_view")
-        
+
         # Agregar índices básicos para mejorar rendimiento en queries
         con.execute("CREATE UNIQUE INDEX idx_region_code ON regiones (codigo_region)")
         con.execute("CREATE UNIQUE INDEX idx_provincia_code ON provincias (codigo_provincia)")
         con.execute("CREATE UNIQUE INDEX idx_comuna_code ON comunas (codigo_comuna)")
         con.execute("CREATE INDEX idx_indicador_date ON indicadores (fecha, codigo_indicador)")
-        
+
         print("Tablas e índices creados con éxito en DuckDB.")
     finally:
         con.close()
+
 
 def build_sqlite(df_regiones, df_provincias, df_comunas, df_indicadores, output_path):
     print(f"Compilando base de datos SQLite en: {output_path}")
     if os.path.exists(output_path):
         os.remove(output_path)
-        
+
     # Convertimos a Pandas para inserción rápida con to_sql de pandas
     df_regiones_pd = df_regiones.to_pandas()
     df_provincias_pd = df_provincias.to_pandas()
     df_comunas_pd = df_comunas.to_pandas()
     df_indicadores_pd = df_indicadores.to_pandas()
-    
+
     # SQLite no maneja Date de forma nativa como tipo fecha real (los guarda como string ISO)
     # Por lo tanto, convertimos las fechas a string ISO antes de guardar
     df_indicadores_pd["fecha"] = df_indicadores_pd["fecha"].astype(str)
-    
+
     conn = sqlite3.connect(output_path)
     try:
         df_regiones_pd.to_sql("regiones", conn, index=False, if_exists="replace")
         df_provincias_pd.to_sql("provincias", conn, index=False, if_exists="replace")
         df_comunas_pd.to_sql("comunas", conn, index=False, if_exists="replace")
+        df_comunas_pd.to_sql("comunas_enriquecidas", conn, index=False, if_exists="replace")
         df_indicadores_pd.to_sql("indicadores", conn, index=False, if_exists="replace")
-        
+
         # Crear índices en SQLite
         cursor = conn.cursor()
         cursor.execute("CREATE UNIQUE INDEX idx_lite_region ON regiones (codigo_region)")
@@ -1143,6 +1231,7 @@ def build_sqlite(df_regiones, df_provincias, df_comunas, df_indicadores, output_
     finally:
         conn.close()
 
+
 def build_excel(df_regiones, df_provincias, df_comunas, df_indicadores, output_path):
     print(f"Generando archivo Excel consolidado para no técnicos en: {output_path}")
     # Convertir a Pandas para exportar de forma robusta con XlsxWriter
@@ -1150,7 +1239,7 @@ def build_excel(df_regiones, df_provincias, df_comunas, df_indicadores, output_p
     df_provincias_pd = df_provincias.to_pandas()
     df_comunas_pd = df_comunas.to_pandas()
     df_indicadores_pd = df_indicadores.to_pandas()
-    
+
     # Limpieza visual y formateo para Excel
     # En Excel, queremos que el Código Comuna siga siendo un string para que no se pierdan los ceros iniciales
     # XlsxWriter nos permite definir formatos específicos por columna
@@ -1158,64 +1247,69 @@ def build_excel(df_regiones, df_provincias, df_comunas, df_indicadores, output_p
         df_regiones_pd.to_excel(writer, sheet_name="Regiones", index=False)
         df_provincias_pd.to_excel(writer, sheet_name="Provincias", index=False)
         df_comunas_pd.to_excel(writer, sheet_name="Comunas y Regiones", index=False)
+        df_comunas_pd.to_excel(writer, sheet_name="ComunasEnriquecidas", index=False)
         df_indicadores_pd.to_excel(writer, sheet_name="Indicadores Diarios", index=False)
-        
+
         # Acceder a los objetos workbook y worksheet para aplicar formato estético
         worksheet_regiones = writer.sheets["Regiones"]
         worksheet_provincias = writer.sheets["Provincias"]
-        workbook  = writer.book
+        workbook = writer.book
         worksheet_comunas = writer.sheets["Comunas y Regiones"]
         worksheet_indicadores = writer.sheets["Indicadores Diarios"]
-        
+
         # Formato de texto para el código comunal para prevenir pérdida de ceros
-        text_format = workbook.add_format({'num_format': '@'})
-        worksheet_regiones.set_column('A:A', 12, text_format)
-        worksheet_provincias.set_column('A:A', 12, text_format)
-        worksheet_provincias.set_column('C:C', 15, text_format)
-        worksheet_comunas.set_column('A:A', 12, text_format) # Código Comuna
-        worksheet_comunas.set_column('D:D', 15, text_format) # Código Provincia
-        worksheet_comunas.set_column('F:F', 12, text_format) # Código Región
-        
+        text_format = workbook.add_format({"num_format": "@"})
+        worksheet_regiones.set_column("A:A", 12, text_format)
+        worksheet_provincias.set_column("A:A", 12, text_format)
+        worksheet_provincias.set_column("C:C", 15, text_format)
+        worksheet_comunas.set_column("A:A", 12, text_format)  # Código Comuna
+        worksheet_comunas.set_column("D:D", 15, text_format)  # Código Provincia
+        worksheet_comunas.set_column("F:F", 12, text_format)  # Código Región
+
         # Ajustar anchos de columnas comunes para que sea estético
-        worksheet_comunas.set_column('B:B', 22) # Nombre Comuna
-        worksheet_comunas.set_column('G:G', 25) # Nombre Región
-        worksheet_indicadores.set_column('A:A', 15) # Fecha
-        worksheet_indicadores.set_column('B:B', 18) # Código Indicador
-        worksheet_indicadores.set_column('C:C', 15) # Valor
-        
+        worksheet_comunas.set_column("B:B", 22)  # Nombre Comuna
+        worksheet_comunas.set_column("G:G", 25)  # Nombre Región
+        worksheet_indicadores.set_column("A:A", 15)  # Fecha
+        worksheet_indicadores.set_column("B:B", 18)  # Código Indicador
+        worksheet_indicadores.set_column("C:C", 15)  # Valor
+
     print("Archivo Excel multi-pestaña generado con éxito.")
+
 
 def pd_excel_writer(path):
     import pandas as pd
+
     return pd.ExcelWriter(path, engine="xlsxwriter")
+
 
 def build_flat_files(df_regiones, df_provincias, df_comunas, df_indicadores):
     import json
-    
+
     # Generamos archivos Parquet
     regiones_parquet = os.path.join(NORMALIZED_DIR, "regiones.parquet")
     provincias_parquet = os.path.join(NORMALIZED_DIR, "provincias.parquet")
     comunas_parquet = os.path.join(NORMALIZED_DIR, "comunas.parquet")
+    comunas_enriquecidas_parquet = os.path.join(NORMALIZED_DIR, "comunas_enriquecidas.parquet")
     indicadores_parquet = os.path.join(NORMALIZED_DIR, "indicadores.parquet")
-    
+
     df_regiones.write_parquet(regiones_parquet)
     df_provincias.write_parquet(provincias_parquet)
     df_comunas.write_parquet(comunas_parquet)
+    df_comunas.write_parquet(comunas_enriquecidas_parquet)
     df_indicadores.write_parquet(indicadores_parquet)
     print(f"Archivos Parquet exportados a: {NORMALIZED_DIR}")
-    
+
     # Generamos los endpoints JSON simulados
     regiones_json = os.path.join(NORMALIZED_DIR, "regiones.json")
     provincias_json = os.path.join(NORMALIZED_DIR, "provincias.json")
     comunas_json = os.path.join(NORMALIZED_DIR, "comunas.json")
+    comunas_enriquecidas_json = os.path.join(NORMALIZED_DIR, "comunas_enriquecidas.json")
     indicadores_json = os.path.join(NORMALIZED_DIR, "indicadores_hoy.json")
-    
+
     # Para JSON estáticos orientados a frontend, exportamos como lista de diccionarios
     # SQLite/DuckDB maneja fechas como objetos datetime.date, por lo que convertimos a str para serialización JSON
-    df_indicadores_serializable = df_indicadores.with_columns(
-        pl.col("fecha").cast(pl.String)
-    )
-    
+    df_indicadores_serializable = df_indicadores.with_columns(pl.col("fecha").cast(pl.String))
+
     with open(regiones_json, "w", encoding="utf-8") as f:
         json.dump(df_regiones.to_dicts(), f, ensure_ascii=False, indent=2)
 
@@ -1224,19 +1318,23 @@ def build_flat_files(df_regiones, df_provincias, df_comunas, df_indicadores):
 
     with open(comunas_json, "w", encoding="utf-8") as f:
         json.dump(df_comunas.to_dicts(), f, ensure_ascii=False, indent=2)
-        
+
+    with open(comunas_enriquecidas_json, "w", encoding="utf-8") as f:
+        json.dump(df_comunas.to_dicts(), f, ensure_ascii=False, indent=2)
+
     with open(indicadores_json, "w", encoding="utf-8") as f:
         json.dump(df_indicadores_serializable.to_dicts(), f, ensure_ascii=False, indent=2)
-        
+
     print(f"Endpoints JSON de prueba exportados a: {NORMALIZED_DIR}")
+
 
 def main():
     ensure_directories()
-    
+
     # Rutas de origen (Staging)
     comunas_csv = os.path.join(STAGING_DIR, "comunas.csv")
     indicadores_csv = os.path.join(STAGING_DIR, "indicadores.csv")
-    
+
     if not os.path.exists(comunas_csv) or not os.path.exists(indicadores_csv):
         print("Error: No se encuentran los archivos CSV en staging. Corre los extractores primero.")
         return
@@ -1247,27 +1345,31 @@ def main():
         df_code for df_code in indicadores_metadata.get("indicator_codes", [])
     )
     indicadores_metadata["indicator_delivery"] = build_indicator_delivery(indicadores_metadata)
-        
+
     # Cargar datos desde staging
     # Especificamos explícitamente el tipo de dato de los códigos a String para no perder ceros
-    df_comunas = pl.read_csv(comunas_csv, schema_overrides={
-        "codigo_region": pl.String,
-        "codigo_provincia": pl.String,
-        "codigo_comuna": pl.String
-    })
-    
-    df_indicadores = pl.read_csv(indicadores_csv, schema_overrides={
-        "codigo_indicador": pl.String,
-        "valor": pl.Float64
-    }).with_columns(
-        pl.col("fecha").str.to_date("%Y-%m-%d")
+    df_comunas = pl.read_csv(
+        comunas_csv,
+        schema_overrides={
+            "codigo_region": pl.String,
+            "codigo_provincia": pl.String,
+            "codigo_comuna": pl.String,
+        },
     )
+
+    df_indicadores = pl.read_csv(
+        indicadores_csv, schema_overrides={"codigo_indicador": pl.String, "valor": pl.Float64}
+    ).with_columns(pl.col("fecha").str.to_date("%Y-%m-%d"))
     df_regiones, df_provincias = derive_geography_layers(df_comunas)
 
     validations = {
         "regiones": validate_regiones(df_regiones),
         "provincias": validate_provincias(df_provincias),
         "comunas": validate_comunas(df_comunas, comunas_metadata),
+        "comunas_enriquecidas": {
+            **validate_comunas(df_comunas, comunas_metadata),
+            "dataset": "comunas_enriquecidas",
+        },
         "indicadores": validate_indicadores(df_indicadores, indicadores_metadata),
     }
 
@@ -1280,11 +1382,29 @@ def main():
             for error in result["errors"]:
                 print(f" - {result['dataset']}: {error}")
         return
-    
+
     # Compilar entregables
-    build_duckdb(df_regiones, df_provincias, df_comunas, df_indicadores, os.path.join(NORMALIZED_DIR, "chile_data.duckdb"))
-    build_sqlite(df_regiones, df_provincias, df_comunas, df_indicadores, os.path.join(NORMALIZED_DIR, "chile_data.db"))
-    build_excel(df_regiones, df_provincias, df_comunas, df_indicadores, os.path.join(NORMALIZED_DIR, "chile_data_latest.xlsx"))
+    build_duckdb(
+        df_regiones,
+        df_provincias,
+        df_comunas,
+        df_indicadores,
+        os.path.join(NORMALIZED_DIR, "chile_data.duckdb"),
+    )
+    build_sqlite(
+        df_regiones,
+        df_provincias,
+        df_comunas,
+        df_indicadores,
+        os.path.join(NORMALIZED_DIR, "chile_data.db"),
+    )
+    build_excel(
+        df_regiones,
+        df_provincias,
+        df_comunas,
+        df_indicadores,
+        os.path.join(NORMALIZED_DIR, "chile_data_latest.xlsx"),
+    )
     build_flat_files(df_regiones, df_provincias, df_comunas, df_indicadores)
     dataset_metadata = {
         "regiones": {
@@ -1318,6 +1438,17 @@ def main():
             "freshness": build_freshness(
                 comunas_metadata.get("refreshed_at_utc"),
                 DATASET_CATALOG_CONFIG["comunas"]["freshness_policy"]["max_age_hours"],
+            ),
+        },
+        "comunas_enriquecidas": {
+            **comunas_metadata,
+            "dataset": "comunas_enriquecidas",
+            "record_count": df_comunas.height,
+            "fields": df_comunas.columns,
+            "reuse_policy": DATASET_CATALOG_CONFIG["comunas_enriquecidas"]["reuse_policy"],
+            "freshness": build_freshness(
+                comunas_metadata.get("refreshed_at_utc"),
+                DATASET_CATALOG_CONFIG["comunas_enriquecidas"]["freshness_policy"]["max_age_hours"],
             ),
         },
         "indicadores": {
@@ -1420,8 +1551,9 @@ def main():
     print(f"Bundle publicable exportado a: {hub_bundle_output}")
     print(f"ZIP publicable exportado a: {zip_output}")
     print(f"SHA256 publicable exportado a: {sha256_output}")
-    
+
     print("\n--- Compilación del Sprint 0 completada con éxito ---")
+
 
 if __name__ == "__main__":
     main()

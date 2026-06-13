@@ -1,9 +1,9 @@
 # chile-hub drift report
 
-- `generated_at_utc`: `2026-06-12T15:58:17.707652+00:00`
-- `dataset_count`: `4`
+- `generated_at_utc`: `2026-06-13T19:11:25.657387+00:00`
+- `dataset_count`: `5`
 - `drifted_count`: `1`
-- `healthy_count`: `3`
+- `healthy_count`: `4`
 - `fallback_count`: `0`
 - `partial_coverage_count`: `0`
 - `degraded_count`: `0`
@@ -13,6 +13,7 @@
 | `regiones` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
 | `provincias` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
 | `comunas` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
+| `comunas_enriquecidas` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
 | `indicadores` | `drifted` | `live` | `not_applicable` | `warning` | 2 | Revisar warnings operativos del dataset antes de consumirlo en producción. |
 
 ## regiones
@@ -36,6 +37,16 @@
 - `recommended_action`: Ninguna.
 
 ## comunas
+
+- `drift_status`: `healthy`
+- `source_mode`: `live`
+- `coverage`: `Cobertura completa: 346/346 filas respecto del baseline esperado.`
+- `degradation`: Sin degradación operativa detectada en este build.
+- `warning_count`: `0`
+- `diagnostic_summary`: Sin degradación operativa detectada en este build.
+- `recommended_action`: Ninguna.
+
+## comunas_enriquecidas
 
 - `drift_status`: `healthy`
 - `source_mode`: `live`

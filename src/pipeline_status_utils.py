@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 
@@ -14,9 +15,25 @@ DRIFT_REPORT_MARKDOWN_PATH = NORMALIZED_DIR / "drift_report.md"
 OVERVIEW_MARKDOWN_PATH = NORMALIZED_DIR / "overview.md"
 
 
-def load_metadata(path=PIPELINE_METADATA_PATH):
+def load_json(path):
     with Path(path).open("r", encoding="utf-8") as f:
         return json.load(f)
+
+
+def load_metadata(path=PIPELINE_METADATA_PATH):
+    return load_json(path)
+
+
+def parse_iso_datetime(value):
+    if not value:
+        return None
+    try:
+        parsed = datetime.fromisoformat(value)
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        return parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
 
 
 def format_warnings(warnings):
@@ -79,7 +96,9 @@ def compute_top_issue(entries):
             return 1
         return 2
 
-    ordered = sorted(entries, key=lambda entry: (attention_priority(entry), entry.get("dataset", "")))
+    ordered = sorted(
+        entries, key=lambda entry: (attention_priority(entry), entry.get("dataset", ""))
+    )
     top_entry = ordered[0]
     priority = attention_priority(top_entry)
     if priority >= 2:
@@ -181,7 +200,9 @@ def build_hub_health(metadata):
         "unknown_freshness_count": sum(
             1 for entry in entries if entry["freshness_status"] == "unknown"
         ),
-        "publishable_count": sum(1 for entry in entries if entry["publishability_status"] == "ready"),
+        "publishable_count": sum(
+            1 for entry in entries if entry["publishability_status"] == "ready"
+        ),
         "review_terms_count": sum(
             1 for entry in entries if entry["publishability_status"] == "review_terms"
         ),
@@ -192,8 +213,12 @@ def build_hub_health(metadata):
         "degradation_warning_count": sum(
             1 for entry in entries if entry["degradation_status"] == "warning"
         ),
-        "partial_coverage_count": sum(1 for entry in entries if entry["coverage_status"] == "partial"),
-        "unknown_coverage_count": sum(1 for entry in entries if entry["coverage_status"] == "unknown"),
+        "partial_coverage_count": sum(
+            1 for entry in entries if entry["coverage_status"] == "partial"
+        ),
+        "unknown_coverage_count": sum(
+            1 for entry in entries if entry["coverage_status"] == "unknown"
+        ),
         "drifted_count": sum(1 for entry in entries if entry["drift_status"] == "drifted"),
         "warning_count": sum(entry["warning_count"] for entry in entries),
         "top_issue": top_issue,
@@ -219,18 +244,9 @@ def build_status_text(metadata):
             f"drift={top_issue.get('drift_status')}, "
             f"warnings={top_issue.get('warning_count', 0)})"
         )
-        lines.append(
-            "top_issue_reason: "
-            f"{top_issue.get('diagnostic_summary', 'unknown')}"
-        )
-        lines.append(
-            "top_issue_action: "
-            f"{top_issue.get('recommended_action', 'unknown')}"
-        )
-        lines.append(
-            "top_issue_summary: "
-            f"{format_top_issue_summary(top_issue)}"
-        )
+        lines.append(f"top_issue_reason: {top_issue.get('diagnostic_summary', 'unknown')}")
+        lines.append(f"top_issue_action: {top_issue.get('recommended_action', 'unknown')}")
+        lines.append(f"top_issue_summary: {format_top_issue_summary(top_issue)}")
     else:
         lines.append("top_issue: none")
     lines.append("hub_status_json: data/normalized/hub_status.json")
@@ -296,9 +312,9 @@ def build_status_markdown(metadata):
     lines.append("- `hub_status_json`: `data/normalized/hub_status.json`")
     lines.extend(
         [
-        "",
-        "| Dataset | Source | Mode | Detail | Freshness | Coverage | Records | Validation | Warnings |",
-        "| :--- | :--- | :--- | :--- | :--- | :--- | ---: | :--- | :--- |",
+            "",
+            "| Dataset | Source | Mode | Detail | Freshness | Coverage | Records | Validation | Warnings |",
+            "| :--- | :--- | :--- | :--- | :--- | :--- | ---: | :--- | :--- |",
         ]
     )
 
@@ -450,7 +466,9 @@ def build_redistribution_report_markdown(report):
     for entry in report.get("datasets", []):
         lines.append(f"## {entry.get('dataset', 'unknown')}")
         lines.append("")
-        lines.append(f"- `publishability_status`: `{entry.get('publishability_status', 'unknown')}`")
+        lines.append(
+            f"- `publishability_status`: `{entry.get('publishability_status', 'unknown')}`"
+        )
         lines.append(f"- `license`: `{entry.get('license', 'unknown')}`")
         lines.append(f"- `license_url`: {entry.get('license_url', 'unknown')}")
         lines.append(f"- `attribution_required`: `{entry.get('attribution_required')}`")

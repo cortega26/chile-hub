@@ -1,7 +1,7 @@
 PYTHON ?= $(if $(wildcard .venv/bin/python),.venv/bin/python,python3)
 VENV_DIR ?= .venv
 
-.PHONY: help bootstrap install-browsers doctor extract build verify verify-landing test check refresh status catalog hub-list hub-summary hub-summary-table hub-example hub-artifacts hub-shared-artifacts hub-shared-artifacts-table hub-reports hub-reports-table hub-report hub-inventory hub-inventory-table hub-snapshot hub-snapshot-table hub-overview hub-overview-table hub-status hub-status-table hub-health hub-health-table hub-bundle hub-freshness-audit hub-freshness-audit-table hub-runtime-status hub-runtime-status-table hub-top-issue hub-top-issue-text hub-top-issue-table hub-packages hub-packages-table hub-package hub-package-verify hub-redistribution hub-redistribution-table hub-provenance hub-provenance-table hub-drift hub-drift-table package-bundle clean-publishable
+.PHONY: help bootstrap install-browsers doctor extract build verify verify-landing test lint lint-fix format format-check check refresh status catalog hub-list hub-summary hub-summary-table hub-example hub-artifacts hub-shared-artifacts hub-shared-artifacts-table hub-reports hub-reports-table hub-report hub-inventory hub-inventory-table hub-snapshot hub-snapshot-table hub-overview hub-overview-table hub-status hub-status-table hub-health hub-health-table hub-bundle hub-freshness-audit hub-freshness-audit-table hub-runtime-status hub-runtime-status-table hub-top-issue hub-top-issue-text hub-top-issue-table hub-packages hub-packages-table hub-package hub-package-verify hub-redistribution hub-redistribution-table hub-provenance hub-provenance-table hub-drift hub-drift-table package-bundle clean-publishable
 
 help:
 	@printf "Targets disponibles:\n"
@@ -88,7 +88,19 @@ verify-landing:
 test:
 	$(PYTHON) -m unittest discover -s tests
 
-check: build verify test verify-landing
+lint:
+	$(PYTHON) -m ruff check src/ tests/ scripts/
+
+lint-fix:
+	$(PYTHON) -m ruff check --fix src/ tests/ scripts/
+
+format:
+	$(PYTHON) -m ruff format src/ tests/ scripts/
+
+format-check:
+	$(PYTHON) -m ruff format --check src/ tests/ scripts/
+
+check: build verify test verify-landing lint format-check
 
 refresh: extract build verify test verify-landing
 

@@ -1,9 +1,9 @@
 # chile-hub overview
 
-- `generated_at_utc`: `2026-06-12T15:58:17.707652+00:00`
+- `generated_at_utc`: `2026-06-13T19:11:25.657387+00:00`
 - `overall_status`: `warn`
-- `dataset_count`: `4`
-- `live_count`: `4`
+- `dataset_count`: `5`
+- `live_count`: `5`
 - `fallback_count`: `0`
 - `stale_count`: `0`
 - `drifted_count`: `1`
@@ -20,6 +20,7 @@
 | Dataset | Mode | Validation | Freshness | Coverage | Drift |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | `comunas` | `live` | `ok` | `fresh` | `full` | `healthy` |
+| `comunas_enriquecidas` | `live` | `ok` | `fresh` | `full` | `healthy` |
 | `indicadores` | `live` | `ok` | `fresh` | `not_applicable` | `drifted` |
 | `provincias` | `live` | `ok` | `fresh` | `full` | `healthy` |
 | `regiones` | `live` | `ok` | `fresh` | `full` | `healthy` |
@@ -28,7 +29,7 @@
 
 - `path`: `data/normalized/chile-hub-publishable-bundle.zip`
 - `package_type`: `zip`
-- `size_bytes`: `57050`
+- `size_bytes`: `82732`
 - `checksum`: `sha256` via `data/normalized/chile-hub-publishable-bundle.zip.sha256`
 - `verification_command`: `shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256`
 
