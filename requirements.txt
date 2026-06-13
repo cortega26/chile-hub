@@ -2,7 +2,6 @@ polars==1.41.2
 duckdb==1.5.3
 requests==2.34.2
 pandas==3.0.3
-pyarrow==24.0.0
 xlsxwriter==3.2.9
-playwright==1.60.0
-ruff==0.15.17
+pyarrow==24.0.0
+curl_cffi==0.15.0
