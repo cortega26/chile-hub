@@ -436,9 +436,7 @@ class ChileHubTests(unittest.TestCase):
         indicadores = next(
             entry for entry in audit["datasets"] if entry["dataset"] == "indicadores"
         )
-        refreshed_at = datetime.fromisoformat(indicadores["refreshed_at_utc"]).astimezone(
-            UTC
-        )
+        refreshed_at = datetime.fromisoformat(indicadores["refreshed_at_utc"]).astimezone(UTC)
         age_hours = max((datetime.now(UTC) - refreshed_at).total_seconds() / 3600, 0)
         expected_status = "fresh" if age_hours <= indicadores["max_age_hours"] else "stale"
         self.assertEqual(indicadores["current_freshness_status"], expected_status)

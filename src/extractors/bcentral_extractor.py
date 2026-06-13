@@ -215,9 +215,7 @@ def fetch_all_history():
                 else:
                     # Serie vacía para un indicador mensual en el año en curso:
                     # el dato aún no fue publicado ese mes — comportamiento esperado.
-                    expected_monthly_gap = (
-                        codigo in MONTHLY_INDICATORS and year == current_year
-                    )
+                    expected_monthly_gap = codigo in MONTHLY_INDICATORS and year == current_year
                     if not expected_monthly_gap:
                         pair = f"{codigo}/{year}"
                         diagnostics["empty_live_pairs"].append(pair)
