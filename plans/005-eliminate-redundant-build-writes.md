@@ -36,7 +36,7 @@ tres ineficiencias que suman tiempo de build y complejidad innecesaria:
    está en memoria antes del write; la re-lectura es puro overhead de I/O.
 
 3. **build_hub_health() llamado 2 veces** con los mismos datos: directamente
-   en línea 1498 y dentro de `write_status_markdown_file()` → 
+   en línea 1498 y dentro de `write_status_markdown_file()` →
    `build_status_markdown()` → `build_hub_health()`.
 
 La causa raíz es un build de dos fases: Fase 1 crea manifest/bundle/overview

@@ -47,7 +47,7 @@ function loadKPIs() {
         })
         .then(data => {
             const findValue = (code) => data.find(i => i.codigo_indicador === code);
-            
+
             updateKPICard("kpi-uf", findValue("uf"));
             updateKPICard("kpi-dolar", findValue("dolar"), true);
             updateKPICard("kpi-euro", findValue("euro"), true);
