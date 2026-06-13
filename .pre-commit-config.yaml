@@ -9,6 +9,8 @@ repos:
     rev: v5.0.0
     hooks:
       - id: trailing-whitespace
+        exclude: ^data/normalized/
       - id: end-of-file-fixer
+        exclude: ^data/normalized/
       - id: check-yaml
       - id: check-merge-conflict
