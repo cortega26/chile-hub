@@ -1,4 +1,5 @@
 import os
+
 import duckdb
 
 # Rutas del proyecto
