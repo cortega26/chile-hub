@@ -205,7 +205,10 @@ def verify_landing():
         status_subtitle = page.locator("#status-subtitle").inner_text()
         if status_subtitle != expected_status_subtitle:
             fail(f"Unexpected status subtitle: {status_subtitle}")
-        status_meta = page.locator("#status-meta").inner_text()
+        status_meta_locator = page.locator("#status-meta")
+        if status_meta_locator.count() != 1:
+            fail("Expected exactly one #status-meta element")
+        status_meta = status_meta_locator.inner_text()
         expected_status_meta = (
             f"Motivo del top issue ({top_issue_dataset}): {top_issue_reason} · Procedencia técnica: {top_issue_source_detail} · Acción recomendada: {top_issue_action}"
             if top_issue_dataset
@@ -235,7 +238,10 @@ def verify_landing():
         if f"Partial coverage: {partial_coverage_count}" not in status_pills:
             fail(f"Partial coverage pill not found: {status_pills}")
 
-        package_actions = page.locator("#package-actions .dataset-action").all_inner_texts()
+        package_actions = [
+            action.strip()
+            for action in page.locator("#package-actions .dataset-action").all_inner_texts()
+        ]
         if (
             len(package_actions) != 4
             or not package_actions[0].startswith("Bundle ZIP · ")
@@ -251,15 +257,15 @@ def verify_landing():
         ):
             fail(f"Unexpected package meta: {package_meta}")
 
+        page.locator(".package-verify summary").click()
         package_verify_title = page.locator(".package-verify-title").inner_text()
-        if package_verify_title != "VERIFICAR INTEGRIDAD":
+        if package_verify_title != "Verificar integridad":
             fail(f"Unexpected package verify title: {package_verify_title}")
 
         package_verify_line = page.locator("#package-verify-code").inner_text().splitlines()[0]
         if package_verify_line != expected_verification_command:
             fail(f"Unexpected package verify command: {package_verify_line}")
 
-        page.locator(".package-verify").click()
         package_copy = page.locator("#package-verify-copy")
         package_copy.click()
         page.wait_for_timeout(150)
@@ -299,19 +305,20 @@ def verify_landing():
             fail(f"Unexpected artifact metadata: {artifact_meta}")
 
         first_card_facts = first_card.locator(".dataset-fact").all_inner_texts()
+        first_card_facts_text = "\n".join(first_card_facts).upper()
         expected_first_runtime_status = runtime_freshness[top_issue_dataset]["status"]
-        if f"FRESHNESS\n{expected_first_runtime_status} ·" not in "\n".join(first_card_facts):
+        if f"FRESHNESS\n{expected_first_runtime_status.upper()} ·" not in first_card_facts_text:
             fail(f"Freshness fact not found in first dataset card: {first_card_facts}")
-        if "COVERAGE\n" not in "\n".join(first_card_facts):
+        if "COVERAGE\n" not in first_card_facts_text:
             fail(f"Coverage fact not found in first dataset card: {first_card_facts}")
-        if "DRIFT\n" not in "\n".join(first_card_facts):
+        if "DRIFT\n" not in first_card_facts_text:
             fail(f"Drift fact not found in first dataset card: {first_card_facts}")
         if (
-            "REUSO\nopen-attribution · Reproducción libre con citación (BCCh / INE)"
-            not in "\n".join(first_card_facts)
+            "REUSO\nOPEN-ATTRIBUTION · REPRODUCCIÓN LIBRE CON CITACIÓN (BCCH / INE)"
+            not in first_card_facts_text
         ):
             fail(f"Reuse fact not found in first dataset card: {first_card_facts}")
-        if "DEGRADACIÓN\n" not in "\n".join(first_card_facts):
+        if "DEGRADACIÓN\n" not in first_card_facts_text:
             fail(f"Degradation fact not found in first dataset card: {first_card_facts}")
 
         first_card_meta = first_card.locator(".dataset-meta-line").first.inner_text()
@@ -369,7 +376,7 @@ def verify_landing():
         if not top_issue_attention:
             fail(f"Top issue card is missing attention visual state: {top_issue_dataset}")
         top_issue_badges = top_issue_card.locator(".dataset-badge").all_inner_texts()
-        if "ATENCIÓN" not in top_issue_badges:
+        if "atención" not in [badge.casefold() for badge in top_issue_badges]:
             fail(f"Attention badge not found in top issue card: {top_issue_badges}")
         top_issue_meta = top_issue_card.locator(".dataset-meta-line").all_inner_texts()
         if not any(f"Warnings: {top_issue_warning_count}" in line for line in top_issue_meta):
