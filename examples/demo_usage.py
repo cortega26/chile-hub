@@ -10,9 +10,7 @@ PARQUET_PATH = os.path.join(BASE_DIR, "data/normalized/comunas.parquet")
 def run_duckdb_queries():
     print(f"--- 1. Conectando a la base de datos DuckDB local: {DB_PATH} ---")
     if not os.path.exists(DB_PATH):
-        print(
-            f"Error: No existe el archivo {DB_PATH}. Debes correr primero 'src/build_dev_db.py'."
-        )
+        print(f"Error: No existe el archivo {DB_PATH}. Debes correr primero 'src/build_dev_db.py'.")
         return
 
     con = duckdb.connect(DB_PATH)
@@ -20,9 +18,9 @@ def run_duckdb_queries():
         # Consulta A: Cantidad de comunas por región
         print("\n[A] Resumen: Cantidad de comunas mapeadas por Región:")
         res_regiones = con.execute("""
-            SELECT 
-                codigo_region, 
-                nombre_region, 
+            SELECT
+                codigo_region,
+                nombre_region,
                 COUNT(*) as total_comunas,
                 SUM(poblacion_estimada) as poblacion_total
             FROM comunas
@@ -32,9 +30,7 @@ def run_duckdb_queries():
         print(res_regiones)
 
         # Consulta B: Búsqueda flexible de comunas (sin acentos)
-        print(
-            "\n[B] Búsqueda: Buscar comunas por nombre aproximado ('Santiago' o 'antartica'):"
-        )
+        print("\n[B] Búsqueda: Buscar comunas por nombre aproximado ('Santiago' o 'antartica'):")
         res_search = con.execute("""
             SELECT codigo_comuna, nombre_comuna, nombre_provincia, nombre_region
             FROM comunas
@@ -54,11 +50,9 @@ def run_duckdb_queries():
 
         # Consulta D: Cruzar datos simulados de UF con población
         # Simulamos calcular el "Costo de UF por Habitante" de una región
-        print(
-            "\n[D] Análisis: Simulación de cruce (Población Metropolitana vs UF hoy):"
-        )
+        print("\n[D] Análisis: Simulación de cruce (Población Metropolitana vs UF hoy):")
         res_cruce = con.execute("""
-            SELECT 
+            SELECT
                 c.nombre_region,
                 SUM(c.poblacion_estimada) as total_habitantes,
                 (SELECT valor FROM indicadores WHERE codigo_indicador = 'uf' ORDER BY fecha DESC LIMIT 1) as valor_uf_hoy,
@@ -74,9 +68,7 @@ def run_duckdb_queries():
 
 
 def run_direct_parquet_query():
-    print(
-        f"\n--- 2. Consultando directamente el archivo Parquet local: {PARQUET_PATH} ---"
-    )
+    print(f"\n--- 2. Consultando directamente el archivo Parquet local: {PARQUET_PATH} ---")
     if not os.path.exists(PARQUET_PATH):
         print("Error: No existe el archivo Parquet.")
         return
@@ -90,9 +82,7 @@ def run_direct_parquet_query():
             WHERE poblacion_estimada > 300000
             ORDER BY poblacion_estimada DESC
         """).fetch_df()
-        print(
-            "Comunas con más de 300.000 habitantes (Consultado directo desde Parquet):"
-        )
+        print("Comunas con más de 300.000 habitantes (Consultado directo desde Parquet):")
         print(res)
     finally:
         con.close()

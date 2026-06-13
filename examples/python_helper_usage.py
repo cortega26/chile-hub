@@ -18,6 +18,4 @@ print(hub.get_output_path("comunas", "parquet"))
 
 print("\n--- Cargando indicadores con Polars ---")
 df_indicadores = hub.load_polars("indicadores")
-print(
-    df_indicadores.sort(["fecha", "codigo_indicador"], descending=[True, False]).head(5)
-)
+print(df_indicadores.sort(["fecha", "codigo_indicador"], descending=[True, False]).head(5))
