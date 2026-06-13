@@ -8,7 +8,6 @@ from unittest.mock import patch
 
 import polars as pl
 
-
 ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
@@ -51,7 +50,9 @@ class PipelineLogicTests(unittest.TestCase):
                 with self.assertRaisesRegex(SystemExit, "no-existe.parquet"):
                     write_publishable_bundle_zip()
 
-            self.assertFalse((normalized_dir / "chile-hub-publishable-bundle.zip").exists())
+            self.assertFalse(
+                (normalized_dir / "chile-hub-publishable-bundle.zip").exists()
+            )
 
     def test_clean_publishable_removes_only_manifest_declared_outputs(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -136,7 +137,9 @@ class PipelineLogicTests(unittest.TestCase):
 
             self.assertEqual(removed[-1], "data/normalized/artifact_manifest.json")
 
-    def test_clean_publishable_from_manifest_is_idempotent_when_manifest_is_missing(self):
+    def test_clean_publishable_from_manifest_is_idempotent_when_manifest_is_missing(
+        self,
+    ):
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
             manifest_path = root / "data" / "normalized" / "artifact_manifest.json"
@@ -149,7 +152,9 @@ class PipelineLogicTests(unittest.TestCase):
                 [],
             )
 
-    def test_load_existing_staging_returns_consistent_empty_tuple_without_staging_file(self):
+    def test_load_existing_staging_returns_consistent_empty_tuple_without_staging_file(
+        self,
+    ):
         with tempfile.TemporaryDirectory() as tmpdir:
             staging_path = str(Path(tmpdir) / "indicadores.csv")
             published_path = str(Path(tmpdir) / "indicadores.parquet")
@@ -241,7 +246,9 @@ class PipelineLogicTests(unittest.TestCase):
         self.assertIn("mode=fallback", drift["summary"])
         self.assertIn("coverage=partial", drift["summary"])
         self.assertIn("degradation=degraded", drift["summary"])
-        self.assertIn("Revisar fuente, cobertura y warnings", drift["recommended_action"])
+        self.assertIn(
+            "Revisar fuente, cobertura y warnings", drift["recommended_action"]
+        )
 
     def test_build_hub_health_aggregates_severity_and_operational_counts(self):
         metadata = {
@@ -250,7 +257,10 @@ class PipelineLogicTests(unittest.TestCase):
                 "alpha": {
                     "source_mode": "live",
                     "freshness": {"status": "fresh"},
-                    "reuse_policy": {"status": "open-attribution", "redistribution_ok": True},
+                    "reuse_policy": {
+                        "status": "open-attribution",
+                        "redistribution_ok": True,
+                    },
                     "degradation": {"status": "none"},
                     "coverage": {"status": "full", "coverage_ratio": 1.0},
                     "drift": {"status": "healthy"},
@@ -324,7 +334,10 @@ class PipelineLogicTests(unittest.TestCase):
                     "notes": [],
                     "freshness": {"status": "fresh", "summary": "fresh"},
                     "coverage": {"status": "full", "summary": "Cobertura completa"},
-                    "reuse_policy": {"status": "open-attribution", "redistribution_ok": True},
+                    "reuse_policy": {
+                        "status": "open-attribution",
+                        "redistribution_ok": True,
+                    },
                     "degradation": {
                         "status": "none",
                         "impact": "Sin impacto.",
@@ -344,8 +357,14 @@ class PipelineLogicTests(unittest.TestCase):
                     "fields": ["id", "value"],
                     "notes": ["empty_live_pairs: ipc/2026"],
                     "freshness": {"status": "fresh", "summary": "fresh"},
-                    "coverage": {"status": "not_applicable", "summary": "Sin baseline esperado."},
-                    "reuse_policy": {"status": "open-attribution", "redistribution_ok": True},
+                    "coverage": {
+                        "status": "not_applicable",
+                        "summary": "Sin baseline esperado.",
+                    },
+                    "reuse_policy": {
+                        "status": "open-attribution",
+                        "redistribution_ok": True,
+                    },
                     "degradation": {
                         "status": "warning",
                         "impact": "Serie vacia detectada.",
@@ -393,7 +412,10 @@ class PipelineLogicTests(unittest.TestCase):
 class ValidatorTests(unittest.TestCase):
     def test_validate_regiones_accepts_valid_data(self):
         df = pl.DataFrame(
-            {"codigo_region": ["01", "02"], "nombre_region": ["Tarapaca", "Antofagasta"]}
+            {
+                "codigo_region": ["01", "02"],
+                "nombre_region": ["Tarapaca", "Antofagasta"],
+            }
         )
         self.assertEqual(validate_regiones(df)["status"], "ok")
 
@@ -404,7 +426,9 @@ class ValidatorTests(unittest.TestCase):
         self.assertEqual(validate_regiones(duplicate)["status"], "error")
 
     def test_validate_provincias_accepts_valid_data(self):
-        df = pl.DataFrame({"codigo_region": ["01", "01"], "codigo_provincia": ["011", "014"]})
+        df = pl.DataFrame(
+            {"codigo_region": ["01", "01"], "codigo_provincia": ["011", "014"]}
+        )
         self.assertEqual(validate_provincias(df)["status"], "ok")
 
     def test_validate_provincias_rejects_empty_and_duplicate_keys(self):
@@ -422,14 +446,20 @@ class ValidatorTests(unittest.TestCase):
 
     def test_validate_comunas_accepts_complete_live_data(self):
         codes = [str(i).zfill(5) for i in range(EXPECTED_LIVE_COMUNAS_COUNT)]
-        result = validate_comunas(pl.DataFrame({"codigo_comuna": codes}), {"source_mode": "live"})
+        result = validate_comunas(
+            pl.DataFrame({"codigo_comuna": codes}), {"source_mode": "live"}
+        )
         self.assertEqual(result["status"], "ok")
 
     def test_validate_comunas_rejects_incomplete_or_duplicate_live_data(self):
         incomplete = pl.DataFrame({"codigo_comuna": ["01101", "01102"]})
         duplicate = pl.DataFrame({"codigo_comuna": ["01101", "01101"]})
-        self.assertEqual(validate_comunas(incomplete, {"source_mode": "live"})["status"], "error")
-        self.assertEqual(validate_comunas(duplicate, {"source_mode": "live"})["status"], "error")
+        self.assertEqual(
+            validate_comunas(incomplete, {"source_mode": "live"})["status"], "error"
+        )
+        self.assertEqual(
+            validate_comunas(duplicate, {"source_mode": "live"})["status"], "error"
+        )
 
     def test_validate_comunas_warns_for_fallback(self):
         codes = [str(i).zfill(5) for i in range(FALLBACK_COMUNAS_COUNT)]
@@ -453,7 +483,11 @@ class CUTInvariantTests(unittest.TestCase):
 
     def test_comunas_cut_codes_are_fixed_width_strings(self):
         df = self._load_parquet("comunas")
-        for column, width in (("codigo_region", 2), ("codigo_provincia", 3), ("codigo_comuna", 5)):
+        for column, width in (
+            ("codigo_region", 2),
+            ("codigo_provincia", 3),
+            ("codigo_comuna", 5),
+        ):
             self.assertEqual(df[column].dtype, pl.String)
             self.assertTrue((df[column].str.len_chars() == width).all())
 
@@ -486,15 +520,21 @@ class IndicatorFallbackTests(unittest.TestCase):
         with (
             patch.object(bcentral_extractor, "STAGING_CSV_PATH", str(staging_path)),
             patch.object(bcentral_extractor, "METADATA_PATH", str(metadata_path)),
-            patch.object(bcentral_extractor, "fetch_all_history", return_value=(df, diagnostics)),
+            patch.object(
+                bcentral_extractor, "fetch_all_history", return_value=(df, diagnostics)
+            ),
         ):
             bcentral_extractor.process_indicators()
-        return pl.read_csv(staging_path), json.loads(metadata_path.read_text(encoding="utf-8"))
+        return pl.read_csv(staging_path), json.loads(
+            metadata_path.read_text(encoding="utf-8")
+        )
 
     def test_generate_fallback_returns_all_expected_codes(self):
         df = bcentral_extractor.generate_fallback_indicators()
         self.assertGreater(df.height, 0)
-        self.assertTrue(EXPECTED_INDICATOR_CODES.issubset(set(df["codigo_indicador"].unique())))
+        self.assertTrue(
+            EXPECTED_INDICATOR_CODES.issubset(set(df["codigo_indicador"].unique()))
+        )
 
     def test_process_indicators_uses_fallback_when_fetch_fails(self):
         diagnostics = {
@@ -519,7 +559,9 @@ class IndicatorFallbackTests(unittest.TestCase):
             "published_backfills": [],
         }
         with tempfile.TemporaryDirectory() as tmpdir:
-            _, metadata = self._run_process(tmpdir, self._make_minimal_df(), diagnostics)
+            _, metadata = self._run_process(
+                tmpdir, self._make_minimal_df(), diagnostics
+            )
         self.assertEqual(metadata["source_detail"], "public_api_with_raw_recovery")
         self.assertEqual(metadata["indicator_delivery"]["uf"], "raw_recovery")
 
@@ -532,8 +574,12 @@ class IndicatorFallbackTests(unittest.TestCase):
             "published_backfills": ["ipc"],
         }
         with tempfile.TemporaryDirectory() as tmpdir:
-            _, metadata = self._run_process(tmpdir, self._make_minimal_df(), diagnostics)
-        self.assertEqual(metadata["source_detail"], "public_api_with_published_backfill")
+            _, metadata = self._run_process(
+                tmpdir, self._make_minimal_df(), diagnostics
+            )
+        self.assertEqual(
+            metadata["source_detail"], "public_api_with_published_backfill"
+        )
         self.assertEqual(metadata["indicator_delivery"]["ipc"], "published_backfill")
 
     def test_empty_live_series_reuses_published_pair(self):

@@ -2,7 +2,6 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
-
 ROOT_DIR = Path(__file__).resolve().parents[1]
 NORMALIZED_DIR = ROOT_DIR / "data" / "normalized"
 PIPELINE_METADATA_PATH = NORMALIZED_DIR / "pipeline_metadata.json"
@@ -195,8 +194,12 @@ def build_hub_health(metadata):
         "warn_count": warn_count,
         "error_count": error_count,
         "live_count": sum(1 for entry in entries if entry["source_mode"] == "live"),
-        "fallback_count": sum(1 for entry in entries if entry["source_mode"] == "fallback"),
-        "stale_count": sum(1 for entry in entries if entry["freshness_status"] == "stale"),
+        "fallback_count": sum(
+            1 for entry in entries if entry["source_mode"] == "fallback"
+        ),
+        "stale_count": sum(
+            1 for entry in entries if entry["freshness_status"] == "stale"
+        ),
         "unknown_freshness_count": sum(
             1 for entry in entries if entry["freshness_status"] == "unknown"
         ),
@@ -209,7 +212,9 @@ def build_hub_health(metadata):
         "unknown_reuse_count": sum(
             1 for entry in entries if entry["publishability_status"] == "unknown"
         ),
-        "degraded_count": sum(1 for entry in entries if entry["degradation_status"] == "degraded"),
+        "degraded_count": sum(
+            1 for entry in entries if entry["degradation_status"] == "degraded"
+        ),
         "degradation_warning_count": sum(
             1 for entry in entries if entry["degradation_status"] == "warning"
         ),
@@ -219,7 +224,9 @@ def build_hub_health(metadata):
         "unknown_coverage_count": sum(
             1 for entry in entries if entry["coverage_status"] == "unknown"
         ),
-        "drifted_count": sum(1 for entry in entries if entry["drift_status"] == "drifted"),
+        "drifted_count": sum(
+            1 for entry in entries if entry["drift_status"] == "drifted"
+        ),
         "warning_count": sum(entry["warning_count"] for entry in entries),
         "top_issue": top_issue,
         "top_issue_summary": format_top_issue_summary(top_issue),
@@ -244,8 +251,12 @@ def build_status_text(metadata):
             f"drift={top_issue.get('drift_status')}, "
             f"warnings={top_issue.get('warning_count', 0)})"
         )
-        lines.append(f"top_issue_reason: {top_issue.get('diagnostic_summary', 'unknown')}")
-        lines.append(f"top_issue_action: {top_issue.get('recommended_action', 'unknown')}")
+        lines.append(
+            f"top_issue_reason: {top_issue.get('diagnostic_summary', 'unknown')}"
+        )
+        lines.append(
+            f"top_issue_action: {top_issue.get('recommended_action', 'unknown')}"
+        )
         lines.append(f"top_issue_summary: {format_top_issue_summary(top_issue)}")
     else:
         lines.append("top_issue: none")
@@ -266,7 +277,9 @@ def build_status_text(metadata):
         lines.append(f"refreshed_at_utc: {dataset.get('refreshed_at_utc', 'unknown')}")
         lines.append(f"freshness: {format_freshness(dataset.get('freshness'))}")
         lines.append(f"records: {dataset.get('record_count', 'unknown')}")
-        lines.append(f"coverage: {dataset.get('coverage', {}).get('summary', 'unknown')}")
+        lines.append(
+            f"coverage: {dataset.get('coverage', {}).get('summary', 'unknown')}"
+        )
         lines.append(f"validation_status: {validation.get('status', 'unknown')}")
         lines.append(f"warnings: {format_warnings(validation.get('warnings', []))}")
 
@@ -304,8 +317,12 @@ def build_status_markdown(metadata):
             f"drift={top_issue.get('drift_status')}, "
             f"warnings={top_issue.get('warning_count', 0)})"
         )
-        lines.append(f"- `top_issue_reason`: {top_issue.get('diagnostic_summary', 'unknown')}")
-        lines.append(f"- `top_issue_action`: {top_issue.get('recommended_action', 'unknown')}")
+        lines.append(
+            f"- `top_issue_reason`: {top_issue.get('diagnostic_summary', 'unknown')}"
+        )
+        lines.append(
+            f"- `top_issue_action`: {top_issue.get('recommended_action', 'unknown')}"
+        )
         lines.append(f"- `top_issue_summary`: {format_top_issue_summary(top_issue)}")
     else:
         lines.append("- `top_issue`: `none`")
@@ -342,9 +359,13 @@ def build_status_markdown(metadata):
         validation = validations.get(dataset_name, {})
         lines.append(f"## {dataset_name}")
         lines.append("")
-        lines.append(f"- `refreshed_at_utc`: `{dataset.get('refreshed_at_utc', 'unknown')}`")
+        lines.append(
+            f"- `refreshed_at_utc`: `{dataset.get('refreshed_at_utc', 'unknown')}`"
+        )
         lines.append(f"- `freshness`: `{format_freshness(dataset.get('freshness'))}`")
-        lines.append(f"- `coverage`: `{dataset.get('coverage', {}).get('summary', 'unknown')}`")
+        lines.append(
+            f"- `coverage`: `{dataset.get('coverage', {}).get('summary', 'unknown')}`"
+        )
         lines.append(f"- `fields`: `{', '.join(dataset.get('fields', []))}`")
 
         notes = dataset.get("notes", [])
@@ -401,8 +422,12 @@ def build_hub_health_markdown(health):
             f"drift={top_issue.get('drift_status')}, "
             f"warnings={top_issue.get('warning_count', 0)})"
         )
-        lines.append(f"- `top_issue_reason`: {top_issue.get('diagnostic_summary', 'unknown')}")
-        lines.append(f"- `top_issue_action`: {top_issue.get('recommended_action', 'unknown')}")
+        lines.append(
+            f"- `top_issue_reason`: {top_issue.get('diagnostic_summary', 'unknown')}"
+        )
+        lines.append(
+            f"- `top_issue_action`: {top_issue.get('recommended_action', 'unknown')}"
+        )
         lines.append(f"- `top_issue_summary`: {format_top_issue_summary(top_issue)}")
     else:
         lines.append("- `top_issue`: `none`")
@@ -473,15 +498,21 @@ def build_redistribution_report_markdown(report):
         lines.append(f"- `license_url`: {entry.get('license_url', 'unknown')}")
         lines.append(f"- `attribution_required`: `{entry.get('attribution_required')}`")
         lines.append(f"- `redistribution_ok`: `{entry.get('redistribution_ok')}`")
-        lines.append(f"- `recommended_action`: {entry.get('recommended_action', 'unknown')}")
+        lines.append(
+            f"- `recommended_action`: {entry.get('recommended_action', 'unknown')}"
+        )
         lines.append(f"- `summary`: {entry.get('summary', 'unknown')}")
         lines.append("")
 
     return "\n".join(lines).rstrip() + "\n"
 
 
-def write_redistribution_report_markdown_file(report, path=REDISTRIBUTION_REPORT_MARKDOWN_PATH):
-    Path(path).write_text(build_redistribution_report_markdown(report), encoding="utf-8")
+def write_redistribution_report_markdown_file(
+    report, path=REDISTRIBUTION_REPORT_MARKDOWN_PATH
+):
+    Path(path).write_text(
+        build_redistribution_report_markdown(report), encoding="utf-8"
+    )
 
 
 def build_provenance_report_markdown(report):
@@ -518,10 +549,14 @@ def build_provenance_report_markdown(report):
         lines.append(f"- `source_url`: {entry.get('source_url', 'unknown')}")
         lines.append(f"- `source_mode`: `{entry.get('source_mode', 'unknown')}`")
         lines.append(f"- `source_detail`: `{entry.get('source_detail', 'unknown')}`")
-        lines.append(f"- `refreshed_at_utc`: `{entry.get('refreshed_at_utc', 'unknown')}`")
+        lines.append(
+            f"- `refreshed_at_utc`: `{entry.get('refreshed_at_utc', 'unknown')}`"
+        )
         lines.append(f"- `freshness`: `{entry.get('freshness_label', 'unknown')}`")
         lines.append(f"- `warning_count`: `{entry.get('warning_count', 0)}`")
-        lines.append(f"- `diagnostic_summary`: {entry.get('diagnostic_summary', 'unknown')}")
+        lines.append(
+            f"- `diagnostic_summary`: {entry.get('diagnostic_summary', 'unknown')}"
+        )
         lines.append(f"- `reuse_status`: `{entry.get('reuse_status', 'unknown')}`")
         lines.append(f"- `documentation`: `{entry.get('documentation', 'unknown')}`")
         lines.append("")
@@ -570,8 +605,12 @@ def build_drift_report_markdown(report):
         lines.append(f"- `coverage`: `{entry.get('coverage_summary', 'unknown')}`")
         lines.append(f"- `degradation`: {entry.get('degradation_impact', 'unknown')}")
         lines.append(f"- `warning_count`: `{entry.get('warning_count', 0)}`")
-        lines.append(f"- `diagnostic_summary`: {entry.get('diagnostic_summary', 'unknown')}")
-        lines.append(f"- `recommended_action`: {entry.get('recommended_action', 'unknown')}")
+        lines.append(
+            f"- `diagnostic_summary`: {entry.get('diagnostic_summary', 'unknown')}"
+        )
+        lines.append(
+            f"- `recommended_action`: {entry.get('recommended_action', 'unknown')}"
+        )
         lines.append("")
 
     return "\n".join(lines).rstrip() + "\n"
@@ -606,8 +645,12 @@ def build_overview_markdown(overview):
             f"drift={top_issue.get('drift_status')}, "
             f"warnings={top_issue.get('warning_count', 0)})"
         )
-        lines.append(f"- `top_issue_reason`: {top_issue.get('diagnostic_summary', 'unknown')}")
-        lines.append(f"- `top_issue_action`: {top_issue.get('recommended_action', 'unknown')}")
+        lines.append(
+            f"- `top_issue_reason`: {top_issue.get('diagnostic_summary', 'unknown')}"
+        )
+        lines.append(
+            f"- `top_issue_action`: {top_issue.get('recommended_action', 'unknown')}"
+        )
         lines.append(f"- `top_issue_summary`: {format_top_issue_summary(top_issue)}")
     else:
         lines.append("- `top_issue`: `none`")
@@ -636,7 +679,9 @@ def build_overview_markdown(overview):
         lines.append("## Primary Package")
         lines.append("")
         lines.append(f"- `path`: `{primary_package.get('path', 'unknown')}`")
-        lines.append(f"- `package_type`: `{primary_package.get('package_type', 'unknown')}`")
+        lines.append(
+            f"- `package_type`: `{primary_package.get('package_type', 'unknown')}`"
+        )
         lines.append(f"- `size_bytes`: `{primary_package.get('size_bytes', 0)}`")
         lines.append(
             f"- `checksum`: `{primary_package.get('checksum_algorithm', 'unknown')}` "
@@ -707,10 +752,14 @@ def build_dataset_catalog_markdown(catalog):
                 f"- `indicator_delivery`: `{json.dumps(indicator_delivery, ensure_ascii=False, sort_keys=True)}`"
             )
         lines.append(f"- `join_keys`: `{', '.join(entry.get('join_keys', []))}`")
-        lines.append(f"- `outputs`: `{json.dumps(entry.get('outputs', {}), ensure_ascii=False)}`")
+        lines.append(
+            f"- `outputs`: `{json.dumps(entry.get('outputs', {}), ensure_ascii=False)}`"
+        )
         usage_examples = entry.get("usage_examples", {})
         if usage_examples:
-            lines.append(f"- `usage_examples`: `{json.dumps(usage_examples, ensure_ascii=False)}`")
+            lines.append(
+                f"- `usage_examples`: `{json.dumps(usage_examples, ensure_ascii=False)}`"
+            )
 
         warnings = entry.get("warnings", [])
         if warnings:

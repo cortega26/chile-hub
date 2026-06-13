@@ -237,7 +237,9 @@ def build_freshness_warnings(dataset_name, freshness):
             )
         ]
     if status == "unknown":
-        return [f"{dataset_name} freshness is unknown: missing or invalid refreshed_at_utc"]
+        return [
+            f"{dataset_name} freshness is unknown: missing or invalid refreshed_at_utc"
+        ]
     return []
 
 
@@ -416,7 +418,9 @@ def validate_comunas(df_comunas, metadata):
     duplicate_count = row_count - df_comunas["codigo_comuna"].n_unique()
 
     if duplicate_count > 0:
-        errors.append(f"codigo_comuna must be unique, found {duplicate_count} duplicate rows")
+        errors.append(
+            f"codigo_comuna must be unique, found {duplicate_count} duplicate rows"
+        )
 
     if (
         metadata
@@ -432,7 +436,9 @@ def validate_comunas(df_comunas, metadata):
             warnings.append(
                 f"fallback comunas expected about {FALLBACK_COMUNAS_COUNT} rows, found {row_count}"
             )
-        warnings.append("comunas source_mode is fallback; coverage is limited by design")
+        warnings.append(
+            "comunas source_mode is fallback; coverage is limited by design"
+        )
 
     return {
         "dataset": "comunas",
@@ -449,7 +455,9 @@ def validate_regiones(df_regiones):
         errors.append("regiones dataset is empty")
     duplicate_count = df_regiones.height - df_regiones["codigo_region"].n_unique()
     if duplicate_count > 0:
-        errors.append(f"codigo_region must be unique, found {duplicate_count} duplicate rows")
+        errors.append(
+            f"codigo_region must be unique, found {duplicate_count} duplicate rows"
+        )
     return {
         "dataset": "regiones",
         "status": "error" if errors else "ok",
@@ -463,7 +471,9 @@ def validate_provincias(df_provincias):
     errors = []
     if df_provincias.height == 0:
         errors.append("provincias dataset is empty")
-    keys = (df_provincias["codigo_region"] + "-" + df_provincias["codigo_provincia"]).n_unique()
+    keys = (
+        df_provincias["codigo_region"] + "-" + df_provincias["codigo_provincia"]
+    ).n_unique()
     if keys != df_provincias.height:
         errors.append("codigo_region + codigo_provincia must be unique")
     return {
@@ -747,14 +757,14 @@ def build_redistribution_report(dataset_catalog):
         publishability_status = (
             "ready"
             if redistribution_ok is True
-            else "review_terms"
-            if redistribution_ok is False
-            else "unknown"
+            else "review_terms" if redistribution_ok is False else "unknown"
         )
         if publishability_status == "ready":
             recommended_action = "Publicable con atribucion y referencia de fuente."
         elif publishability_status == "review_terms":
-            recommended_action = "Revisar terminos vigentes antes de redistribuir fuera del repo."
+            recommended_action = (
+                "Revisar terminos vigentes antes de redistribuir fuera del repo."
+            )
         else:
             recommended_action = "Aclarar licencia o terminos antes de redistribuir."
 
@@ -776,7 +786,9 @@ def build_redistribution_report(dataset_catalog):
     report = {
         "generated_at_utc": dataset_catalog.get("generated_at_utc"),
         "dataset_count": len(datasets),
-        "ready_count": sum(1 for entry in datasets if entry["publishability_status"] == "ready"),
+        "ready_count": sum(
+            1 for entry in datasets if entry["publishability_status"] == "ready"
+        ),
         "review_terms_count": sum(
             1 for entry in datasets if entry["publishability_status"] == "review_terms"
         ),
@@ -834,8 +846,12 @@ def build_provenance_report(dataset_catalog):
     return {
         "generated_at_utc": dataset_catalog.get("generated_at_utc"),
         "dataset_count": len(datasets),
-        "live_count": sum(1 for entry in datasets if entry.get("source_mode") == "live"),
-        "fallback_count": sum(1 for entry in datasets if entry.get("source_mode") == "fallback"),
+        "live_count": sum(
+            1 for entry in datasets if entry.get("source_mode") == "live"
+        ),
+        "fallback_count": sum(
+            1 for entry in datasets if entry.get("source_mode") == "fallback"
+        ),
         "datasets": datasets,
     }
 
@@ -885,13 +901,21 @@ def build_drift_report(dataset_catalog):
     return {
         "generated_at_utc": dataset_catalog.get("generated_at_utc"),
         "dataset_count": len(datasets),
-        "drifted_count": sum(1 for entry in datasets if entry["drift_status"] == "drifted"),
-        "healthy_count": sum(1 for entry in datasets if entry["drift_status"] == "healthy"),
-        "fallback_count": sum(1 for entry in datasets if entry["source_mode"] == "fallback"),
+        "drifted_count": sum(
+            1 for entry in datasets if entry["drift_status"] == "drifted"
+        ),
+        "healthy_count": sum(
+            1 for entry in datasets if entry["drift_status"] == "healthy"
+        ),
+        "fallback_count": sum(
+            1 for entry in datasets if entry["source_mode"] == "fallback"
+        ),
         "partial_coverage_count": sum(
             1 for entry in datasets if entry["coverage_status"] == "partial"
         ),
-        "degraded_count": sum(1 for entry in datasets if entry["degradation_status"] == "degraded"),
+        "degraded_count": sum(
+            1 for entry in datasets if entry["degradation_status"] == "degraded"
+        ),
         "datasets": datasets,
     }
 
@@ -926,19 +950,25 @@ def build_overview(hub_health, hub_bundle, artifact_manifest):
         "top_issue": hub_health.get("top_issue"),
         "top_issue_summary": hub_health.get("top_issue_summary"),
         "shared_artifact_count": len(
-            [entry for entry in artifact_manifest.get("artifacts", []) if entry.get("shared_type")]
+            [
+                entry
+                for entry in artifact_manifest.get("artifacts", [])
+                if entry.get("shared_type")
+            ]
         ),
         "package_count": len(artifact_manifest.get("packages", [])),
-        "primary_package": {
-            "path": primary_package.get("path"),
-            "package_type": primary_package.get("package_type"),
-            "size_bytes": primary_package.get("size_bytes"),
-            "checksum_algorithm": primary_package.get("checksum_algorithm"),
-            "checksum_path": primary_package.get("checksum_path"),
-            "verification_command": primary_package.get("verification_command"),
-        }
-        if primary_package
-        else None,
+        "primary_package": (
+            {
+                "path": primary_package.get("path"),
+                "package_type": primary_package.get("package_type"),
+                "size_bytes": primary_package.get("size_bytes"),
+                "checksum_algorithm": primary_package.get("checksum_algorithm"),
+                "checksum_path": primary_package.get("checksum_path"),
+                "verification_command": primary_package.get("verification_command"),
+            }
+            if primary_package
+            else None
+        ),
         "report_keys": sorted(hub_bundle.get("reports", {}).keys()),
         "datasets": [
             {
@@ -961,7 +991,9 @@ def write_overview_json(overview):
     return output_path
 
 
-def write_hub_bundle_json(pipeline_metadata, hub_health, dataset_catalog, artifact_manifest):
+def write_hub_bundle_json(
+    pipeline_metadata, hub_health, dataset_catalog, artifact_manifest
+):
     artifacts_by_dataset = {}
     shared_artifacts = []
 
@@ -977,7 +1009,9 @@ def write_hub_bundle_json(pipeline_metadata, hub_health, dataset_catalog, artifa
         shared_type = artifact.get("shared_type")
         artifact_format = artifact.get("format")
         if shared_type and artifact_format:
-            shared_artifacts_by_semantic_key[f"{shared_type}:{artifact_format}"] = artifact
+            shared_artifacts_by_semantic_key[f"{shared_type}:{artifact_format}"] = (
+                artifact
+            )
 
     report_specs = {
         "status_markdown": ("pipeline_status", "markdown"),
@@ -1039,7 +1073,9 @@ def write_hub_bundle_json(pipeline_metadata, hub_health, dataset_catalog, artifa
         "packages": artifact_manifest.get("packages", []),
     }
 
-    health_by_dataset = {entry["dataset"]: entry for entry in hub_health.get("datasets", [])}
+    health_by_dataset = {
+        entry["dataset"]: entry for entry in hub_health.get("datasets", [])
+    }
 
     for dataset in dataset_catalog.get("datasets", []):
         dataset_name = dataset["dataset"]
@@ -1103,7 +1139,9 @@ def write_publishable_bundle_zip():
     with zipfile.ZipFile(output_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for artifact in artifacts:
             relative_path = artifact["path"]
-            absolute_path = os.path.join(DATA_DIR, os.path.relpath(relative_path, "data"))
+            absolute_path = os.path.join(
+                DATA_DIR, os.path.relpath(relative_path, "data")
+            )
             archive.write(absolute_path, arcname=relative_path)
 
     with zipfile.ZipFile(output_path, "r") as archive:
@@ -1153,7 +1191,9 @@ def attach_publishable_package_to_manifest(zip_path, sha256_path):
 
 def derive_geography_layers(df_comunas):
     df_regiones = (
-        df_comunas.select(["codigo_region", "nombre_region"]).unique().sort("codigo_region")
+        df_comunas.select(["codigo_region", "nombre_region"])
+        .unique()
+        .sort("codigo_region")
     )
     df_provincias = (
         df_comunas.select(
@@ -1183,14 +1223,20 @@ def build_duckdb(df_regiones, df_provincias, df_comunas, df_indicadores, output_
         con.execute("CREATE TABLE regiones AS SELECT * FROM df_regiones_view")
         con.execute("CREATE TABLE provincias AS SELECT * FROM df_provincias_view")
         con.execute("CREATE TABLE comunas AS SELECT * FROM df_comunas_view")
-        con.execute("CREATE TABLE comunas_enriquecidas AS SELECT * FROM df_comunas_view")
+        con.execute(
+            "CREATE TABLE comunas_enriquecidas AS SELECT * FROM df_comunas_view"
+        )
         con.execute("CREATE TABLE indicadores AS SELECT * FROM df_indicadores_view")
 
         # Agregar índices básicos para mejorar rendimiento en queries
         con.execute("CREATE UNIQUE INDEX idx_region_code ON regiones (codigo_region)")
-        con.execute("CREATE UNIQUE INDEX idx_provincia_code ON provincias (codigo_provincia)")
+        con.execute(
+            "CREATE UNIQUE INDEX idx_provincia_code ON provincias (codigo_provincia)"
+        )
         con.execute("CREATE UNIQUE INDEX idx_comuna_code ON comunas (codigo_comuna)")
-        con.execute("CREATE INDEX idx_indicador_date ON indicadores (fecha, codigo_indicador)")
+        con.execute(
+            "CREATE INDEX idx_indicador_date ON indicadores (fecha, codigo_indicador)"
+        )
 
         print("Tablas e índices creados con éxito en DuckDB.")
     finally:
@@ -1217,15 +1263,23 @@ def build_sqlite(df_regiones, df_provincias, df_comunas, df_indicadores, output_
         df_regiones_pd.to_sql("regiones", conn, index=False, if_exists="replace")
         df_provincias_pd.to_sql("provincias", conn, index=False, if_exists="replace")
         df_comunas_pd.to_sql("comunas", conn, index=False, if_exists="replace")
-        df_comunas_pd.to_sql("comunas_enriquecidas", conn, index=False, if_exists="replace")
+        df_comunas_pd.to_sql(
+            "comunas_enriquecidas", conn, index=False, if_exists="replace"
+        )
         df_indicadores_pd.to_sql("indicadores", conn, index=False, if_exists="replace")
 
         # Crear índices en SQLite
         cursor = conn.cursor()
-        cursor.execute("CREATE UNIQUE INDEX idx_lite_region ON regiones (codigo_region)")
-        cursor.execute("CREATE UNIQUE INDEX idx_lite_provincia ON provincias (codigo_provincia)")
+        cursor.execute(
+            "CREATE UNIQUE INDEX idx_lite_region ON regiones (codigo_region)"
+        )
+        cursor.execute(
+            "CREATE UNIQUE INDEX idx_lite_provincia ON provincias (codigo_provincia)"
+        )
         cursor.execute("CREATE UNIQUE INDEX idx_lite_comuna ON comunas (codigo_comuna)")
-        cursor.execute("CREATE INDEX idx_lite_indicador ON indicadores (fecha, codigo_indicador)")
+        cursor.execute(
+            "CREATE INDEX idx_lite_indicador ON indicadores (fecha, codigo_indicador)"
+        )
         conn.commit()
         print("Tablas e índices creados con éxito en SQLite.")
     finally:
@@ -1248,7 +1302,9 @@ def build_excel(df_regiones, df_provincias, df_comunas, df_indicadores, output_p
         df_provincias_pd.to_excel(writer, sheet_name="Provincias", index=False)
         df_comunas_pd.to_excel(writer, sheet_name="Comunas y Regiones", index=False)
         df_comunas_pd.to_excel(writer, sheet_name="ComunasEnriquecidas", index=False)
-        df_indicadores_pd.to_excel(writer, sheet_name="Indicadores Diarios", index=False)
+        df_indicadores_pd.to_excel(
+            writer, sheet_name="Indicadores Diarios", index=False
+        )
 
         # Acceder a los objetos workbook y worksheet para aplicar formato estético
         worksheet_regiones = writer.sheets["Regiones"]
@@ -1289,7 +1345,9 @@ def build_flat_files(df_regiones, df_provincias, df_comunas, df_indicadores):
     regiones_parquet = os.path.join(NORMALIZED_DIR, "regiones.parquet")
     provincias_parquet = os.path.join(NORMALIZED_DIR, "provincias.parquet")
     comunas_parquet = os.path.join(NORMALIZED_DIR, "comunas.parquet")
-    comunas_enriquecidas_parquet = os.path.join(NORMALIZED_DIR, "comunas_enriquecidas.parquet")
+    comunas_enriquecidas_parquet = os.path.join(
+        NORMALIZED_DIR, "comunas_enriquecidas.parquet"
+    )
     indicadores_parquet = os.path.join(NORMALIZED_DIR, "indicadores.parquet")
 
     df_regiones.write_parquet(regiones_parquet)
@@ -1303,12 +1361,16 @@ def build_flat_files(df_regiones, df_provincias, df_comunas, df_indicadores):
     regiones_json = os.path.join(NORMALIZED_DIR, "regiones.json")
     provincias_json = os.path.join(NORMALIZED_DIR, "provincias.json")
     comunas_json = os.path.join(NORMALIZED_DIR, "comunas.json")
-    comunas_enriquecidas_json = os.path.join(NORMALIZED_DIR, "comunas_enriquecidas.json")
+    comunas_enriquecidas_json = os.path.join(
+        NORMALIZED_DIR, "comunas_enriquecidas.json"
+    )
     indicadores_json = os.path.join(NORMALIZED_DIR, "indicadores_hoy.json")
 
     # Para JSON estáticos orientados a frontend, exportamos como lista de diccionarios
     # SQLite/DuckDB maneja fechas como objetos datetime.date, por lo que convertimos a str para serialización JSON
-    df_indicadores_serializable = df_indicadores.with_columns(pl.col("fecha").cast(pl.String))
+    df_indicadores_serializable = df_indicadores.with_columns(
+        pl.col("fecha").cast(pl.String)
+    )
 
     with open(regiones_json, "w", encoding="utf-8") as f:
         json.dump(df_regiones.to_dicts(), f, ensure_ascii=False, indent=2)
@@ -1323,7 +1385,9 @@ def build_flat_files(df_regiones, df_provincias, df_comunas, df_indicadores):
         json.dump(df_comunas.to_dicts(), f, ensure_ascii=False, indent=2)
 
     with open(indicadores_json, "w", encoding="utf-8") as f:
-        json.dump(df_indicadores_serializable.to_dicts(), f, ensure_ascii=False, indent=2)
+        json.dump(
+            df_indicadores_serializable.to_dicts(), f, ensure_ascii=False, indent=2
+        )
 
     print(f"Endpoints JSON de prueba exportados a: {NORMALIZED_DIR}")
 
@@ -1336,7 +1400,9 @@ def main():
     indicadores_csv = os.path.join(STAGING_DIR, "indicadores.csv")
 
     if not os.path.exists(comunas_csv) or not os.path.exists(indicadores_csv):
-        print("Error: No se encuentran los archivos CSV en staging. Corre los extractores primero.")
+        print(
+            "Error: No se encuentran los archivos CSV en staging. Corre los extractores primero."
+        )
         return
 
     comunas_metadata = load_metadata(COMUNAS_METADATA_PATH)
@@ -1344,7 +1410,9 @@ def main():
     indicadores_metadata["indicator_codes"] = sorted(
         df_code for df_code in indicadores_metadata.get("indicator_codes", [])
     )
-    indicadores_metadata["indicator_delivery"] = build_indicator_delivery(indicadores_metadata)
+    indicadores_metadata["indicator_delivery"] = build_indicator_delivery(
+        indicadores_metadata
+    )
 
     # Cargar datos desde staging
     # Especificamos explícitamente el tipo de dato de los códigos a String para no perder ceros
@@ -1358,7 +1426,8 @@ def main():
     )
 
     df_indicadores = pl.read_csv(
-        indicadores_csv, schema_overrides={"codigo_indicador": pl.String, "valor": pl.Float64}
+        indicadores_csv,
+        schema_overrides={"codigo_indicador": pl.String, "valor": pl.Float64},
     ).with_columns(pl.col("fecha").str.to_date("%Y-%m-%d"))
     df_regiones, df_provincias = derive_geography_layers(df_comunas)
 
@@ -1374,7 +1443,9 @@ def main():
     }
 
     failed_validations = [
-        result["dataset"] for result in validations.values() if result["status"] == "error"
+        result["dataset"]
+        for result in validations.values()
+        if result["status"] == "error"
     ]
     if failed_validations:
         print(f"Error: Validaciones fallidas para {', '.join(failed_validations)}.")
@@ -1426,7 +1497,9 @@ def main():
             "reuse_policy": DATASET_CATALOG_CONFIG["provincias"]["reuse_policy"],
             "freshness": build_freshness(
                 comunas_metadata.get("refreshed_at_utc"),
-                DATASET_CATALOG_CONFIG["provincias"]["freshness_policy"]["max_age_hours"],
+                DATASET_CATALOG_CONFIG["provincias"]["freshness_policy"][
+                    "max_age_hours"
+                ],
             ),
         },
         "comunas": {
@@ -1445,10 +1518,14 @@ def main():
             "dataset": "comunas_enriquecidas",
             "record_count": df_comunas.height,
             "fields": df_comunas.columns,
-            "reuse_policy": DATASET_CATALOG_CONFIG["comunas_enriquecidas"]["reuse_policy"],
+            "reuse_policy": DATASET_CATALOG_CONFIG["comunas_enriquecidas"][
+                "reuse_policy"
+            ],
             "freshness": build_freshness(
                 comunas_metadata.get("refreshed_at_utc"),
-                DATASET_CATALOG_CONFIG["comunas_enriquecidas"]["freshness_policy"]["max_age_hours"],
+                DATASET_CATALOG_CONFIG["comunas_enriquecidas"]["freshness_policy"][
+                    "max_age_hours"
+                ],
             ),
         },
         "indicadores": {
@@ -1456,7 +1533,9 @@ def main():
             "dataset": "indicadores",
             "record_count": df_indicadores.height,
             "fields": df_indicadores.columns,
-            "indicator_codes": sorted(df_indicadores["codigo_indicador"].unique().to_list()),
+            "indicator_codes": sorted(
+                df_indicadores["codigo_indicador"].unique().to_list()
+            ),
             "indicator_delivery": build_indicator_delivery(
                 {
                     **indicadores_metadata,
@@ -1468,7 +1547,9 @@ def main():
             "reuse_policy": DATASET_CATALOG_CONFIG["indicadores"]["reuse_policy"],
             "freshness": build_freshness(
                 indicadores_metadata.get("refreshed_at_utc"),
-                DATASET_CATALOG_CONFIG["indicadores"]["freshness_policy"]["max_age_hours"],
+                DATASET_CATALOG_CONFIG["indicadores"]["freshness_policy"][
+                    "max_age_hours"
+                ],
             ),
         },
     }
@@ -1476,13 +1557,19 @@ def main():
         dataset_name: {
             **validation,
             "warnings": validation.get("warnings", [])
-            + build_freshness_warnings(dataset_name, dataset_metadata[dataset_name]["freshness"]),
+            + build_freshness_warnings(
+                dataset_name, dataset_metadata[dataset_name]["freshness"]
+            ),
             "freshness_status": dataset_metadata[dataset_name]["freshness"]["status"],
-            "freshness_age_hours": dataset_metadata[dataset_name]["freshness"]["age_hours"],
+            "freshness_age_hours": dataset_metadata[dataset_name]["freshness"][
+                "age_hours"
+            ],
         }
         for dataset_name, validation in validations.items()
     }
-    dataset_metadata = enrich_dataset_metadata(dataset_metadata, validations_with_freshness)
+    dataset_metadata = enrich_dataset_metadata(
+        dataset_metadata, validations_with_freshness
+    )
     metadata_output = write_pipeline_metadata(
         dataset_metadata,
         validations_with_freshness,
@@ -1500,7 +1587,9 @@ def main():
         dataset_catalog = json.load(f)
     write_dataset_catalog_markdown_file(dataset_catalog)
     redistribution_report = build_redistribution_report(dataset_catalog)
-    redistribution_report_output = write_redistribution_report_json(redistribution_report)
+    redistribution_report_output = write_redistribution_report_json(
+        redistribution_report
+    )
     write_redistribution_report_markdown_file(redistribution_report)
     provenance_report = build_provenance_report(dataset_catalog)
     provenance_report_output = write_provenance_report_json(provenance_report)
@@ -1525,7 +1614,9 @@ def main():
     artifact_manifest_output = write_artifact_manifest()
     zip_output = write_publishable_bundle_zip()
     sha256_output = write_publishable_bundle_sha256(zip_output)
-    artifact_manifest_output = attach_publishable_package_to_manifest(zip_output, sha256_output)
+    artifact_manifest_output = attach_publishable_package_to_manifest(
+        zip_output, sha256_output
+    )
     with open(artifact_manifest_output, "r", encoding="utf-8") as f:
         artifact_manifest = json.load(f)
     hub_bundle_output = write_hub_bundle_json(

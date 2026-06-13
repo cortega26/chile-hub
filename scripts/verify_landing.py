@@ -6,7 +6,6 @@ from datetime import datetime, timezone
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
 
-
 ROOT_DIR = Path(__file__).resolve().parents[1]
 BUNDLE_PATH = ROOT_DIR / "data" / "normalized" / "hub_bundle.json"
 PRODUCTION_CSP = (
@@ -47,7 +46,9 @@ def compute_runtime_freshness(dataset):
     max_age_hours = dataset.get("freshness", {}).get("max_age_hours")
     if refreshed_at is None or not isinstance(max_age_hours, (int, float)):
         return {"status": "unknown", "age_hours": None, "max_age_hours": max_age_hours}
-    age_hours = max((datetime.now(timezone.utc) - refreshed_at).total_seconds() / 3600, 0)
+    age_hours = max(
+        (datetime.now(timezone.utc) - refreshed_at).total_seconds() / 3600, 0
+    )
     return {
         "status": "fresh" if age_hours <= max_age_hours else "stale",
         "age_hours": round(age_hours, 2),
@@ -122,20 +123,30 @@ def verify_landing():
         1 for freshness in runtime_freshness.values() if freshness["status"] == "stale"
     )
     unknown_freshness_count = sum(
-        1 for freshness in runtime_freshness.values() if freshness["status"] == "unknown"
+        1
+        for freshness in runtime_freshness.values()
+        if freshness["status"] == "unknown"
     )
     degraded_count = health.get("degraded_count", 0)
     partial_coverage_count = health.get("partial_coverage_count", 0)
     drifted_count = health.get("drifted_count", 0)
     review_terms_count = health.get("review_terms_count", 0)
     warning_count = health.get("warning_count", 0)
-    top_issue_warning_count = datasets_by_name.get(top_issue_dataset, {}).get("warning_count", 0)
+    top_issue_warning_count = datasets_by_name.get(top_issue_dataset, {}).get(
+        "warning_count", 0
+    )
     top_issue_reason = top_issue.get("diagnostic_summary")
     top_issue_action = top_issue.get("recommended_action")
     build_overall_status = bundle.get("overall_status", "unknown")
-    current_overall_status = compute_runtime_overall_status(build_overall_status, runtime_freshness)
+    current_overall_status = compute_runtime_overall_status(
+        build_overall_status, runtime_freshness
+    )
     zip_package = next(
-        (package for package in bundle.get("packages", []) if package.get("package_type") == "zip"),
+        (
+            package
+            for package in bundle.get("packages", [])
+            if package.get("package_type") == "zip"
+        ),
         None,
     )
     expected_verification_command = (
@@ -177,7 +188,9 @@ def verify_landing():
             fail(f"Unexpected repo href: {repo_href}")
 
         page.locator(".technical-details").click()
-        status_actions = page.locator("#status-actions .dataset-action").all_inner_texts()
+        status_actions = page.locator(
+            "#status-actions .dataset-action"
+        ).all_inner_texts()
         expected_status_actions = [
             "Status",
             "Status JSON",
@@ -199,7 +212,9 @@ def verify_landing():
         ]
         if status_actions != expected_status_actions:
             fail(f"Unexpected status actions: {status_actions}")
-        top_issue_href = page.get_by_role("link", name="Ver top issue").get_attribute("href")
+        top_issue_href = page.get_by_role("link", name="Ver top issue").get_attribute(
+            "href"
+        )
         if top_issue_href != f"#dataset-{top_issue_dataset}":
             fail(f"Unexpected top issue href: {top_issue_href}")
 
@@ -236,7 +251,9 @@ def verify_landing():
         if f"Partial coverage: {partial_coverage_count}" not in status_pills:
             fail(f"Partial coverage pill not found: {status_pills}")
 
-        package_actions = page.locator("#package-actions .dataset-action").all_inner_texts()
+        package_actions = page.locator(
+            "#package-actions .dataset-action"
+        ).all_inner_texts()
         if (
             len(package_actions) != 4
             or not package_actions[0].startswith("Bundle ZIP · ")
@@ -256,7 +273,9 @@ def verify_landing():
         if package_verify_title != "VERIFICAR INTEGRIDAD":
             fail(f"Unexpected package verify title: {package_verify_title}")
 
-        package_verify_line = page.locator("#package-verify-code").inner_text().splitlines()[0]
+        package_verify_line = (
+            page.locator("#package-verify-code").inner_text().splitlines()[0]
+        )
         if package_verify_line != expected_verification_command:
             fail(f"Unexpected package verify command: {package_verify_line}")
 
@@ -265,10 +284,16 @@ def verify_landing():
         package_copy.click()
         page.wait_for_timeout(150)
         if package_copy.inner_text() != "Copiado":
-            fail(f"Package verify copy button did not change label: {package_copy.inner_text()}")
+            fail(
+                f"Package verify copy button did not change label: {package_copy.inner_text()}"
+            )
 
         quickstart_titles = page.locator(".quickstart-title").all_inner_texts()
-        if quickstart_titles != ["Python + helper", "DuckDB directo", "CLI y refresh local"]:
+        if quickstart_titles != [
+            "Python + helper",
+            "DuckDB directo",
+            "CLI y refresh local",
+        ]:
             fail(f"Unexpected quickstart titles: {quickstart_titles}")
 
         first_card = page.locator(".dataset-card").first
@@ -297,7 +322,9 @@ def verify_landing():
 
         first_card_facts = first_card.locator(".dataset-fact").all_inner_texts()
         expected_first_runtime_status = runtime_freshness[top_issue_dataset]["status"]
-        if f"FRESHNESS\n{expected_first_runtime_status} ·" not in "\n".join(first_card_facts):
+        if f"FRESHNESS\n{expected_first_runtime_status} ·" not in "\n".join(
+            first_card_facts
+        ):
             fail(f"Freshness fact not found in first dataset card: {first_card_facts}")
         if "COVERAGE\n" not in "\n".join(first_card_facts):
             fail(f"Coverage fact not found in first dataset card: {first_card_facts}")
@@ -309,11 +336,15 @@ def verify_landing():
         ):
             fail(f"Reuse fact not found in first dataset card: {first_card_facts}")
         if "DEGRADACIÓN\n" not in "\n".join(first_card_facts):
-            fail(f"Degradation fact not found in first dataset card: {first_card_facts}")
+            fail(
+                f"Degradation fact not found in first dataset card: {first_card_facts}"
+            )
 
         first_card_meta = first_card.locator(".dataset-meta-line").first.inner_text()
         if "Requiere atribución: sí" not in first_card_meta:
-            fail(f"Reuse attribution metadata not found in first dataset card: {first_card_meta}")
+            fail(
+                f"Reuse attribution metadata not found in first dataset card: {first_card_meta}"
+            )
         provenance_meta = first_card.locator(".dataset-meta-line").nth(1).inner_text()
         if (
             "Procedencia técnica:" not in provenance_meta
@@ -324,20 +355,29 @@ def verify_landing():
                 f"Technical provenance metadata not found in first dataset card: {provenance_meta}"
             )
         freshness_meta = first_card.locator(".dataset-meta-line").nth(2).inner_text()
-        if "Freshness build:" not in freshness_meta or "Freshness actual:" not in freshness_meta:
-            fail(f"Runtime freshness metadata not found in first dataset card: {freshness_meta}")
+        if (
+            "Freshness build:" not in freshness_meta
+            or "Freshness actual:" not in freshness_meta
+        ):
+            fail(
+                f"Runtime freshness metadata not found in first dataset card: {freshness_meta}"
+            )
 
         example_title = first_card.locator(".dataset-example-title").inner_text()
         if example_title.upper() != "RECETA DE USO":
             fail(f"Unexpected dataset example title: {example_title}")
 
-        initial_line = first_card.locator(".dataset-example-code").inner_text().splitlines()[0]
+        initial_line = (
+            first_card.locator(".dataset-example-code").inner_text().splitlines()[0]
+        )
         if initial_line != "from src.chile_hub import ChileHub":
             fail(f"Unexpected initial example line: {initial_line}")
 
         first_card.locator(".dataset-example-tab", has_text="duckdb").click()
         page.wait_for_timeout(100)
-        after_tab_line = first_card.locator(".dataset-example-code").inner_text().splitlines()[0]
+        after_tab_line = (
+            first_card.locator(".dataset-example-code").inner_text().splitlines()[0]
+        )
         if after_tab_line != "SELECT *":
             fail(f"Unexpected duckdb example line: {after_tab_line}")
 
@@ -347,7 +387,9 @@ def verify_landing():
         copy_button.click()
         page.wait_for_timeout(150)
         if copy_button.inner_text() != "Copiado":
-            fail(f"Dataset example copy button did not change label: {copy_button.inner_text()}")
+            fail(
+                f"Dataset example copy button did not change label: {copy_button.inner_text()}"
+            )
         copied_class = copy_button.evaluate("el => el.classList.contains('copied')")
         if not copied_class:
             fail("Dataset example copy button did not activate copied class")
@@ -362,17 +404,27 @@ def verify_landing():
         hash_value = page.evaluate("() => window.location.hash")
         if hash_value != f"#dataset-{top_issue_dataset}":
             fail(f"Unexpected hash after top issue click: {hash_value}")
-        top_issue_attention = top_issue_card.evaluate("el => el.classList.contains('attention')")
+        top_issue_attention = top_issue_card.evaluate(
+            "el => el.classList.contains('attention')"
+        )
         if not top_issue_attention:
-            fail(f"Top issue card is missing attention visual state: {top_issue_dataset}")
+            fail(
+                f"Top issue card is missing attention visual state: {top_issue_dataset}"
+            )
         top_issue_badges = top_issue_card.locator(".dataset-badge").all_inner_texts()
         if "ATENCIÓN" not in top_issue_badges:
             fail(f"Attention badge not found in top issue card: {top_issue_badges}")
         top_issue_meta = top_issue_card.locator(".dataset-meta-line").all_inner_texts()
-        if not any(f"Warnings: {top_issue_warning_count}" in line for line in top_issue_meta):
-            fail(f"Warning count not found in top issue card metadata: {top_issue_meta}")
+        if not any(
+            f"Warnings: {top_issue_warning_count}" in line for line in top_issue_meta
+        ):
+            fail(
+                f"Warning count not found in top issue card metadata: {top_issue_meta}"
+            )
         if not any("Acción recomendada:" in line for line in top_issue_meta):
-            fail(f"Recommended action not found in top issue card metadata: {top_issue_meta}")
+            fail(
+                f"Recommended action not found in top issue card metadata: {top_issue_meta}"
+            )
 
         browser.close()
 

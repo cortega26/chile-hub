@@ -12,7 +12,6 @@ if str(SRC_DIR) not in sys.path:
 from src.build_dev_db import DATASET_CATALOG_CONFIG  # noqa: E402
 from src.pipeline_status_utils import load_json  # noqa: E402
 
-
 STAGING_DIR = ROOT_DIR / "data" / "staging"
 NORMALIZED_DIR = ROOT_DIR / "data" / "normalized"
 
@@ -101,15 +100,21 @@ def verify_indicadores_diagnostics(dataset_metadata, validation, origin):
         expected_note = "raw_recovery_used_for_pairs: " + ", ".join(raw_recoveries)
         if expected_note not in notes:
             fail(f"{origin} is missing raw recovery note: {expected_note}")
-        expected_warning = "indicadores live refresh reused raw snapshots for: " + ", ".join(
-            raw_recoveries
+        expected_warning = (
+            "indicadores live refresh reused raw snapshots for: "
+            + ", ".join(raw_recoveries)
         )
         if expected_warning not in warnings:
             fail(f"{origin} is missing raw recovery warning: {expected_warning}")
 
     if preserved_existing_pairs:
-        if source_detail not in {"public_api_partial", "public_api_with_published_backfill"}:
-            fail(f"{origin} preserved_existing_pairs require a partial-aware source_detail")
+        if source_detail not in {
+            "public_api_partial",
+            "public_api_with_published_backfill",
+        }:
+            fail(
+                f"{origin} preserved_existing_pairs require a partial-aware source_detail"
+            )
         expected_note = "preserved_existing_pairs_due_to_fetch_failure: " + ", ".join(
             preserved_existing_pairs
         )
@@ -126,8 +131,9 @@ def verify_indicadores_diagnostics(dataset_metadata, validation, origin):
         expected_note = "empty_live_pairs: " + ", ".join(empty_live_pairs)
         if expected_note not in notes:
             fail(f"{origin} is missing empty-live note: {expected_note}")
-        expected_warning = "indicadores live refresh returned empty series for: " + ", ".join(
-            empty_live_pairs
+        expected_warning = (
+            "indicadores live refresh returned empty series for: "
+            + ", ".join(empty_live_pairs)
         )
         if expected_warning not in warnings:
             fail(f"{origin} is missing empty-live warning: {expected_warning}")
@@ -137,7 +143,9 @@ def verify_indicadores_diagnostics(dataset_metadata, validation, origin):
             fail(
                 f"{origin} published_backfills require source_detail=public_api_with_published_backfill"
             )
-        expected_note = "published_backfills_used_for_codes: " + ", ".join(published_backfills)
+        expected_note = "published_backfills_used_for_codes: " + ", ".join(
+            published_backfills
+        )
         if expected_note not in notes:
             fail(f"{origin} is missing published-backfill note: {expected_note}")
         expected_warning = (
@@ -183,11 +191,15 @@ def verify_top_issue_summary(summary, top_issue, origin):
         fail(f"{origin} is missing top_issue_summary")
     dataset = top_issue.get("dataset") if isinstance(top_issue, dict) else None
     if dataset and dataset not in summary:
-        fail(f"{origin} top_issue_summary does not mention dataset '{dataset}': {summary}")
+        fail(
+            f"{origin} top_issue_summary does not mention dataset '{dataset}': {summary}"
+        )
 
 
 def verify_required_files():
-    missing = [str(path.relative_to(ROOT_DIR)) for path in REQUIRED_FILES if not path.exists()]
+    missing = [
+        str(path.relative_to(ROOT_DIR)) for path in REQUIRED_FILES if not path.exists()
+    ]
     if missing:
         fail(f"Missing required files: {', '.join(missing)}")
 
@@ -202,7 +214,9 @@ def verify_pipeline_metadata():
     missing_validations = sorted(REQUIRED_DATASETS - set(validations.keys()))
 
     if missing_datasets:
-        fail(f"pipeline_metadata.json is missing dataset entries: {', '.join(missing_datasets)}")
+        fail(
+            f"pipeline_metadata.json is missing dataset entries: {', '.join(missing_datasets)}"
+        )
 
     if missing_validations:
         fail(
@@ -236,14 +250,18 @@ def verify_pipeline_metadata():
 
         freshness = dataset_metadata.get("freshness", {})
         if freshness.get("status") not in {"fresh", "stale", "unknown"}:
-            fail(f"{dataset_name} metadata has invalid freshness status: {freshness.get('status')}")
+            fail(
+                f"{dataset_name} metadata has invalid freshness status: {freshness.get('status')}"
+            )
         if freshness.get("max_age_hours") is None:
             fail(f"{dataset_name} metadata is missing freshness.max_age_hours")
         if not freshness.get("checked_at_utc"):
             fail(f"{dataset_name} metadata is missing freshness.checked_at_utc")
 
         if validation.get("status") != "ok":
-            fail(f"{dataset_name} validation status is not ok: {validation.get('status')}")
+            fail(
+                f"{dataset_name} validation status is not ok: {validation.get('status')}"
+            )
 
         errors = validation.get("errors", [])
         if errors:
@@ -283,7 +301,9 @@ def verify_pipeline_metadata():
                     "indicadores validation has unexpected indicator_codes: "
                     f"{validation.get('indicator_codes')}"
                 )
-            verify_indicadores_diagnostics(dataset_metadata, validation, "pipeline_metadata.json")
+            verify_indicadores_diagnostics(
+                dataset_metadata, validation, "pipeline_metadata.json"
+            )
         if dataset_name == "regiones":
             if (
                 dataset_metadata.get("source_mode") == "live"
@@ -320,7 +340,9 @@ def verify_dataset_catalog():
     catalog = load_json(catalog_path)
 
     if catalog.get("dataset_count") != len(REQUIRED_DATASETS):
-        fail(f"dataset_catalog.json has unexpected dataset_count: {catalog.get('dataset_count')}")
+        fail(
+            f"dataset_catalog.json has unexpected dataset_count: {catalog.get('dataset_count')}"
+        )
 
     datasets = catalog.get("datasets", [])
     dataset_names = {entry.get("dataset") for entry in datasets}
@@ -360,21 +382,30 @@ def verify_dataset_catalog():
         if not entry.get("join_keys"):
             fail(f"{entry.get('dataset')} catalog entry is missing join_keys")
         reuse_policy = entry.get("reuse_policy", {})
-        if reuse_policy.get("status") not in {"open-attribution", "public-api-review-terms"}:
+        if reuse_policy.get("status") not in {
+            "open-attribution",
+            "public-api-review-terms",
+        }:
             fail(
                 f"{entry.get('dataset')} catalog entry has invalid reuse_policy.status: "
                 f"{reuse_policy.get('status')}"
             )
         if not reuse_policy.get("license"):
-            fail(f"{entry.get('dataset')} catalog entry is missing reuse_policy.license")
+            fail(
+                f"{entry.get('dataset')} catalog entry is missing reuse_policy.license"
+            )
         if not reuse_policy.get("summary"):
-            fail(f"{entry.get('dataset')} catalog entry is missing reuse_policy.summary")
+            fail(
+                f"{entry.get('dataset')} catalog entry is missing reuse_policy.summary"
+            )
         if reuse_policy.get("attribution_required") not in {True, False}:
             fail(
                 f"{entry.get('dataset')} catalog entry has invalid reuse_policy.attribution_required"
             )
         if reuse_policy.get("redistribution_ok") not in {True, False}:
-            fail(f"{entry.get('dataset')} catalog entry has invalid reuse_policy.redistribution_ok")
+            fail(
+                f"{entry.get('dataset')} catalog entry has invalid reuse_policy.redistribution_ok"
+            )
         freshness = entry.get("freshness", {})
         if freshness.get("status") not in {"fresh", "stale", "unknown"}:
             fail(
@@ -382,7 +413,12 @@ def verify_dataset_catalog():
                 f"{freshness.get('status')}"
             )
         coverage = entry.get("coverage", {})
-        if coverage.get("status") not in {"full", "partial", "unknown", "not_applicable"}:
+        if coverage.get("status") not in {
+            "full",
+            "partial",
+            "unknown",
+            "not_applicable",
+        }:
             fail(f"{entry.get('dataset')} catalog entry has invalid coverage.status")
         if not coverage.get("summary"):
             fail(f"{entry.get('dataset')} catalog entry is missing coverage.summary")
@@ -392,7 +428,9 @@ def verify_dataset_catalog():
         if not drift.get("summary"):
             fail(f"{entry.get('dataset')} catalog entry is missing drift.summary")
         if not entry.get("freshness_policy", {}).get("max_age_hours"):
-            fail(f"{entry.get('dataset')} catalog entry is missing freshness_policy.max_age_hours")
+            fail(
+                f"{entry.get('dataset')} catalog entry is missing freshness_policy.max_age_hours"
+            )
         usage_examples = entry.get("usage_examples", {})
         for required_example in ("python", "duckdb", "cli"):
             if not usage_examples.get(required_example):
@@ -483,8 +521,13 @@ def verify_artifact_manifest():
                 "data/normalized/dataset_catalog.json",
                 "data/normalized/artifact_manifest.json",
             }:
-                if path.endswith(".parquet") and not entry.get("output_type") == "parquet":
-                    fail(f"artifact manifest entry has invalid output_type for parquet: {entry}")
+                if (
+                    path.endswith(".parquet")
+                    and not entry.get("output_type") == "parquet"
+                ):
+                    fail(
+                        f"artifact manifest entry has invalid output_type for parquet: {entry}"
+                    )
         if path in {
             "data/normalized/pipeline_metadata.json",
             "data/normalized/hub_health.json",
@@ -498,7 +541,9 @@ def verify_artifact_manifest():
             "data/normalized/artifact_manifest.json",
         }:
             if not entry.get("shared_type"):
-                fail(f"artifact manifest shared JSON entry is missing shared_type: {entry}")
+                fail(
+                    f"artifact manifest shared JSON entry is missing shared_type: {entry}"
+                )
             if entry.get("format") != "json":
                 fail(f"artifact manifest shared JSON entry has invalid format: {entry}")
         if path in {
@@ -511,9 +556,13 @@ def verify_artifact_manifest():
             "data/normalized/dataset_catalog.md",
         }:
             if not entry.get("shared_type"):
-                fail(f"artifact manifest shared Markdown entry is missing shared_type: {entry}")
+                fail(
+                    f"artifact manifest shared Markdown entry is missing shared_type: {entry}"
+                )
             if entry.get("format") != "markdown":
-                fail(f"artifact manifest shared Markdown entry has invalid format: {entry}")
+                fail(
+                    f"artifact manifest shared Markdown entry has invalid format: {entry}"
+                )
         if (
             path
             in {
@@ -538,7 +587,10 @@ def verify_artifact_manifest():
         fail(f"artifact_manifest.json has unexpected package path: {package}")
     if package.get("package_type") != "zip":
         fail(f"artifact_manifest.json has invalid package_type: {package}")
-    if package.get("checksum_path") != "data/normalized/chile-hub-publishable-bundle.zip.sha256":
+    if (
+        package.get("checksum_path")
+        != "data/normalized/chile-hub-publishable-bundle.zip.sha256"
+    ):
         fail(f"artifact_manifest.json has invalid checksum_path: {package}")
     if package.get("checksum_algorithm") != "sha256":
         fail(f"artifact_manifest.json has invalid checksum_algorithm: {package}")
@@ -556,10 +608,14 @@ def verify_hub_health():
     health = load_json(health_path)
 
     if health.get("dataset_count") != len(REQUIRED_DATASETS):
-        fail(f"hub_health.json has unexpected dataset_count: {health.get('dataset_count')}")
+        fail(
+            f"hub_health.json has unexpected dataset_count: {health.get('dataset_count')}"
+        )
 
     if health.get("overall_status") not in {"ok", "warn", "error"}:
-        fail(f"hub_health.json has invalid overall_status: {health.get('overall_status')}")
+        fail(
+            f"hub_health.json has invalid overall_status: {health.get('overall_status')}"
+        )
     for key in (
         "publishable_count",
         "review_terms_count",
@@ -587,11 +643,20 @@ def verify_hub_health():
             fail(f"hub_health.json entry has invalid freshness_status: {entry}")
         if entry.get("validation_status") != "ok":
             fail(f"hub_health.json entry has unexpected validation_status: {entry}")
-        if entry.get("publishability_status") not in {"ready", "review_terms", "unknown"}:
+        if entry.get("publishability_status") not in {
+            "ready",
+            "review_terms",
+            "unknown",
+        }:
             fail(f"hub_health.json entry has invalid publishability_status: {entry}")
         if entry.get("degradation_status") not in {"none", "warning", "degraded"}:
             fail(f"hub_health.json entry has invalid degradation_status: {entry}")
-        if entry.get("coverage_status") not in {"full", "partial", "unknown", "not_applicable"}:
+        if entry.get("coverage_status") not in {
+            "full",
+            "partial",
+            "unknown",
+            "not_applicable",
+        }:
             fail(f"hub_health.json entry has invalid coverage_status: {entry}")
         if entry.get("drift_status") not in {"healthy", "drifted"}:
             fail(f"hub_health.json entry has invalid drift_status: {entry}")
@@ -617,9 +682,13 @@ def verify_hub_status():
     status = load_json(status_path)
 
     if status.get("dataset_count") != len(REQUIRED_DATASETS):
-        fail(f"hub_status.json has unexpected dataset_count: {status.get('dataset_count')}")
+        fail(
+            f"hub_status.json has unexpected dataset_count: {status.get('dataset_count')}"
+        )
     if status.get("overall_status") not in {"ok", "warn", "error"}:
-        fail(f"hub_status.json has invalid overall_status: {status.get('overall_status')}")
+        fail(
+            f"hub_status.json has invalid overall_status: {status.get('overall_status')}"
+        )
     for key in (
         "live_count",
         "fallback_count",
@@ -651,9 +720,13 @@ def verify_hub_bundle():
     bundle = load_json(bundle_path)
 
     if bundle.get("dataset_count") != len(REQUIRED_DATASETS):
-        fail(f"hub_bundle.json has unexpected dataset_count: {bundle.get('dataset_count')}")
+        fail(
+            f"hub_bundle.json has unexpected dataset_count: {bundle.get('dataset_count')}"
+        )
     if bundle.get("overall_status") not in {"ok", "warn", "error"}:
-        fail(f"hub_bundle.json has invalid overall_status: {bundle.get('overall_status')}")
+        fail(
+            f"hub_bundle.json has invalid overall_status: {bundle.get('overall_status')}"
+        )
     health = bundle.get("health", {})
     if health.get("warning_count") is None:
         fail("hub_bundle.json is missing health.warning_count")
@@ -716,21 +789,40 @@ def verify_hub_bundle():
         ):
             fail(f"hub_bundle.json has invalid reports.{report_name}: {report_entry}")
         if not report_entry.get("path"):
-            fail(f"hub_bundle.json is missing reports.{report_name}.path: {report_entry}")
+            fail(
+                f"hub_bundle.json is missing reports.{report_name}.path: {report_entry}"
+            )
 
     for entry in datasets:
         if not entry.get("artifacts"):
-            fail(f"hub_bundle.json dataset entry is missing artifacts: {entry.get('dataset')}")
+            fail(
+                f"hub_bundle.json dataset entry is missing artifacts: {entry.get('dataset')}"
+            )
         if entry.get("severity") not in {"ok", "warn", "error"}:
             fail(f"hub_bundle.json dataset entry has invalid severity: {entry}")
         if entry.get("validation_status") != "ok":
-            fail(f"hub_bundle.json dataset entry has unexpected validation_status: {entry}")
+            fail(
+                f"hub_bundle.json dataset entry has unexpected validation_status: {entry}"
+            )
         reuse_policy = entry.get("reuse_policy", {})
-        if reuse_policy.get("status") not in {"open-attribution", "public-api-review-terms"}:
+        if reuse_policy.get("status") not in {
+            "open-attribution",
+            "public-api-review-terms",
+        }:
             fail(f"hub_bundle.json dataset entry has invalid reuse_policy: {entry}")
-        if entry.get("publishability_status") not in {"ready", "review_terms", "unknown"}:
-            fail(f"hub_bundle.json dataset entry has invalid publishability_status: {entry}")
-        if entry.get("degradation", {}).get("status") not in {"none", "warning", "degraded"}:
+        if entry.get("publishability_status") not in {
+            "ready",
+            "review_terms",
+            "unknown",
+        }:
+            fail(
+                f"hub_bundle.json dataset entry has invalid publishability_status: {entry}"
+            )
+        if entry.get("degradation", {}).get("status") not in {
+            "none",
+            "warning",
+            "degraded",
+        }:
             fail(f"hub_bundle.json dataset entry has invalid degradation: {entry}")
         if entry.get("coverage", {}).get("status") not in {
             "full",
@@ -769,10 +861,18 @@ def verify_redistribution_report():
     datasets = report.get("datasets", [])
     dataset_names = {entry.get("dataset") for entry in datasets}
     if dataset_names != REQUIRED_DATASETS:
-        fail(f"redistribution_report.json has unexpected datasets: {sorted(dataset_names)}")
+        fail(
+            f"redistribution_report.json has unexpected datasets: {sorted(dataset_names)}"
+        )
     for entry in datasets:
-        if entry.get("publishability_status") not in {"ready", "review_terms", "unknown"}:
-            fail(f"redistribution_report.json has invalid publishability_status: {entry}")
+        if entry.get("publishability_status") not in {
+            "ready",
+            "review_terms",
+            "unknown",
+        }:
+            fail(
+                f"redistribution_report.json has invalid publishability_status: {entry}"
+            )
         if not entry.get("license"):
             fail(f"redistribution_report.json is missing license: {entry}")
         if not entry.get("recommended_action"):
@@ -786,7 +886,9 @@ def verify_provenance_report():
     report = load_json(report_path)
 
     if report.get("dataset_count") != len(REQUIRED_DATASETS):
-        fail(f"provenance_report.json has unexpected dataset_count: {report.get('dataset_count')}")
+        fail(
+            f"provenance_report.json has unexpected dataset_count: {report.get('dataset_count')}"
+        )
     datasets = report.get("datasets", [])
     dataset_names = {entry.get("dataset") for entry in datasets}
     if dataset_names != REQUIRED_DATASETS:
@@ -802,7 +904,10 @@ def verify_provenance_report():
             fail(f"provenance_report.json is missing refreshed_at_utc: {entry}")
         if entry.get("freshness_status") not in {"fresh", "stale", "unknown"}:
             fail(f"provenance_report.json has invalid freshness_status: {entry}")
-        if not isinstance(entry.get("warning_count"), int) or entry.get("warning_count") < 0:
+        if (
+            not isinstance(entry.get("warning_count"), int)
+            or entry.get("warning_count") < 0
+        ):
             fail(f"provenance_report.json has invalid warning_count: {entry}")
         if not entry.get("diagnostic_summary"):
             fail(f"provenance_report.json is missing diagnostic_summary: {entry}")
@@ -813,7 +918,9 @@ def verify_drift_report():
     report = load_json(report_path)
 
     if report.get("dataset_count") != len(REQUIRED_DATASETS):
-        fail(f"drift_report.json has unexpected dataset_count: {report.get('dataset_count')}")
+        fail(
+            f"drift_report.json has unexpected dataset_count: {report.get('dataset_count')}"
+        )
     for key in (
         "drifted_count",
         "healthy_count",
@@ -834,13 +941,21 @@ def verify_drift_report():
             fail(f"drift_report.json has invalid drift_status: {entry}")
         if entry.get("source_mode") not in {"live", "fallback"}:
             fail(f"drift_report.json has invalid source_mode: {entry}")
-        if entry.get("coverage_status") not in {"full", "partial", "unknown", "not_applicable"}:
+        if entry.get("coverage_status") not in {
+            "full",
+            "partial",
+            "unknown",
+            "not_applicable",
+        }:
             fail(f"drift_report.json has invalid coverage_status: {entry}")
         if entry.get("degradation_status") not in {"none", "warning", "degraded"}:
             fail(f"drift_report.json has invalid degradation_status: {entry}")
         if not entry.get("coverage_summary"):
             fail(f"drift_report.json is missing coverage_summary: {entry}")
-        if not isinstance(entry.get("warning_count"), int) or entry.get("warning_count") < 0:
+        if (
+            not isinstance(entry.get("warning_count"), int)
+            or entry.get("warning_count") < 0
+        ):
             fail(f"drift_report.json has invalid warning_count: {entry}")
         if not entry.get("diagnostic_summary"):
             fail(f"drift_report.json is missing diagnostic_summary: {entry}")
@@ -853,15 +968,21 @@ def verify_overview():
     overview = load_json(overview_path)
 
     if overview.get("dataset_count") != len(REQUIRED_DATASETS):
-        fail(f"overview.json has unexpected dataset_count: {overview.get('dataset_count')}")
+        fail(
+            f"overview.json has unexpected dataset_count: {overview.get('dataset_count')}"
+        )
     if overview.get("overall_status") not in {"ok", "warn", "error"}:
-        fail(f"overview.json has invalid overall_status: {overview.get('overall_status')}")
+        fail(
+            f"overview.json has invalid overall_status: {overview.get('overall_status')}"
+        )
     if overview.get("shared_artifact_count", 0) <= 0:
         fail(
             f"overview.json has invalid shared_artifact_count: {overview.get('shared_artifact_count')}"
         )
     if overview.get("package_count", 0) <= 0:
-        fail(f"overview.json has invalid package_count: {overview.get('package_count')}")
+        fail(
+            f"overview.json has invalid package_count: {overview.get('package_count')}"
+        )
     if overview.get("warning_count", 0) > 0:
         verify_top_issue(overview.get("top_issue"), "overview.json")
         verify_top_issue_summary(
@@ -880,22 +1001,33 @@ def verify_overview():
     primary_package = overview.get("primary_package")
     if not primary_package:
         fail("overview.json is missing primary_package")
-    if primary_package.get("path") != "data/normalized/chile-hub-publishable-bundle.zip":
+    if (
+        primary_package.get("path")
+        != "data/normalized/chile-hub-publishable-bundle.zip"
+    ):
         fail(f"overview.json has invalid primary_package.path: {primary_package}")
     if primary_package.get("package_type") != "zip":
-        fail(f"overview.json has invalid primary_package.package_type: {primary_package}")
+        fail(
+            f"overview.json has invalid primary_package.package_type: {primary_package}"
+        )
     if primary_package.get("checksum_algorithm") != "sha256":
-        fail(f"overview.json has invalid primary_package.checksum_algorithm: {primary_package}")
+        fail(
+            f"overview.json has invalid primary_package.checksum_algorithm: {primary_package}"
+        )
     if (
         primary_package.get("checksum_path")
         != "data/normalized/chile-hub-publishable-bundle.zip.sha256"
     ):
-        fail(f"overview.json has invalid primary_package.checksum_path: {primary_package}")
+        fail(
+            f"overview.json has invalid primary_package.checksum_path: {primary_package}"
+        )
     if (
         primary_package.get("verification_command")
         != "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256"
     ):
-        fail(f"overview.json has invalid primary_package.verification_command: {primary_package}")
+        fail(
+            f"overview.json has invalid primary_package.verification_command: {primary_package}"
+        )
 
     report_keys = overview.get("report_keys", [])
     if (
@@ -917,7 +1049,12 @@ def verify_overview():
             fail(f"overview.json has unexpected validation_status: {entry}")
         if entry.get("freshness_status") not in {"fresh", "stale", "unknown"}:
             fail(f"overview.json has invalid freshness_status: {entry}")
-        if entry.get("coverage_status") not in {"full", "partial", "unknown", "not_applicable"}:
+        if entry.get("coverage_status") not in {
+            "full",
+            "partial",
+            "unknown",
+            "not_applicable",
+        }:
             fail(f"overview.json has invalid coverage_status: {entry}")
         if entry.get("drift_status") not in {"healthy", "drifted"}:
             fail(f"overview.json has invalid drift_status: {entry}")

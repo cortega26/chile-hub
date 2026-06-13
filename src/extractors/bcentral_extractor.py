@@ -157,10 +157,14 @@ def load_existing_staging():
                     .unique(subset=["fecha", "codigo_indicador"], keep="last")
                     .sort(["fecha", "codigo_indicador"])
                 )
-                published_backfills = sorted(published_df["codigo_indicador"].unique().to_list())
+                published_backfills = sorted(
+                    published_df["codigo_indicador"].unique().to_list()
+                )
         return df, datetime.date.today().year, published_backfills
     except Exception as e:
-        print(f"Advertencia: no se pudo leer el staging existente: {e}. Se hará fetch completo.")
+        print(
+            f"Advertencia: no se pudo leer el staging existente: {e}. Se hará fetch completo."
+        )
         return None, None, []
 
 
@@ -186,10 +190,14 @@ def fetch_all_history():
 
     if existing_df is not None:
         years_to_fetch = [current_year]
-        print(f"Staging encontrado — actualizando solo el año {current_year} (incremental).")
+        print(
+            f"Staging encontrado — actualizando solo el año {current_year} (incremental)."
+        )
     else:
         years_to_fetch = list(range(HISTORY_START_YEAR, current_year + 1))
-        print(f"Sin staging previo — descargando historial completo desde {HISTORY_START_YEAR}.")
+        print(
+            f"Sin staging previo — descargando historial completo desde {HISTORY_START_YEAR}."
+        )
 
     total_calls = len(INDICATOR_CODES) * len(years_to_fetch)
     call_n = 0
@@ -209,9 +217,12 @@ def fetch_all_history():
                     pair = f"{codigo}/{year}"
                     diagnostics["empty_live_pairs"].append(pair)
                     if existing_df is not None:
-                        has_published_history = existing_df.filter(
-                            pl.col("codigo_indicador") == codigo
-                        ).height > 0
+                        has_published_history = (
+                            existing_df.filter(
+                                pl.col("codigo_indicador") == codigo
+                            ).height
+                            > 0
+                        )
                         if has_published_history:
                             diagnostics["published_backfills"].append(codigo)
             except Exception as e:
@@ -286,7 +297,9 @@ def generate_fallback_indicators() -> pl.DataFrame:
     for i in range(7):
         fecha = (today - datetime.timedelta(days=i)).strftime("%Y-%m-%d")
         for codigo, base in base_values.items():
-            valor = round(base - i * 5.0, 2) if codigo in ("uf", "dolar", "euro") else base
+            valor = (
+                round(base - i * 5.0, 2) if codigo in ("uf", "dolar", "euro") else base
+            )
             records.append({"fecha": fecha, "codigo_indicador": codigo, "valor": valor})
 
     return (
@@ -321,7 +334,9 @@ def process_indicators() -> str:
 
     if source_mode == "live" and diagnostics.get("raw_recoveries"):
         source_detail = "public_api_with_raw_recovery"
-        notes.append("raw_recovery_used_for_pairs: " + ", ".join(diagnostics["raw_recoveries"]))
+        notes.append(
+            "raw_recovery_used_for_pairs: " + ", ".join(diagnostics["raw_recoveries"])
+        )
     if source_mode == "live" and diagnostics.get("preserved_existing_pairs"):
         source_detail = "public_api_partial"
         notes.append(
@@ -333,7 +348,8 @@ def process_indicators() -> str:
     if source_mode == "live" and diagnostics.get("published_backfills"):
         source_detail = "public_api_with_published_backfill"
         notes.append(
-            "published_backfills_used_for_codes: " + ", ".join(diagnostics["published_backfills"])
+            "published_backfills_used_for_codes: "
+            + ", ".join(diagnostics["published_backfills"])
         )
 
     indicator_codes = sorted(df["codigo_indicador"].unique().to_list())
@@ -370,7 +386,9 @@ def process_indicators() -> str:
     }
     write_metadata(metadata)
 
-    print(f"Indicadores guardados en: {STAGING_CSV_PATH} ({df.height} registros, {source_mode})")
+    print(
+        f"Indicadores guardados en: {STAGING_CSV_PATH} ({df.height} registros, {source_mode})"
+    )
     return STAGING_CSV_PATH
 
 

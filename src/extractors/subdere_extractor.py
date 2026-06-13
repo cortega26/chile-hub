@@ -48,10 +48,10 @@ METADATA_PATH = os.path.join(STAGING_DIR, "comunas.metadata.json")
 
 # URL Oficial de la Codificación Territorial del INE (DPA 2020/2021)
 # Esta URL oficial puede estar caída o cambiar sin previo aviso.
-SUBDERE_DPA_URL = "https://www.subdere.gov.cl/sites/default/files/documentos/cut_2018_0.xls"
-BCN_COMUNAS_SERVICE_URL = (
-    "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query"
+SUBDERE_DPA_URL = (
+    "https://www.subdere.gov.cl/sites/default/files/documentos/cut_2018_0.xls"
 )
+BCN_COMUNAS_SERVICE_URL = "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query"
 SUPPLEMENTAL_COMUNAS = [
     {
         "codigo_region": "12",
@@ -364,7 +364,9 @@ def extract_coords(feature: dict) -> tuple:
 
 
 def fetch_bcn_comunas():
-    print(f"Intentando descargar base territorial desde BCN ArcGIS: {BCN_COMUNAS_SERVICE_URL}")
+    print(
+        f"Intentando descargar base territorial desde BCN ArcGIS: {BCN_COMUNAS_SERVICE_URL}"
+    )
     params = {
         "where": "1=1",
         "outFields": "nom_reg,nom_prov,nom_com,cod_comuna,codregion",
@@ -391,7 +393,9 @@ def fetch_bcn_comunas():
         if attrs.get("cod_comuna") is None or attrs.get("codregion") is None:
             skipped_null_codes += 1
             continue
-        codigo_comuna = str(int(attrs["cod_comuna"]))  # cod_comuna can arrive as numeric
+        codigo_comuna = str(
+            int(attrs["cod_comuna"])
+        )  # cod_comuna can arrive as numeric
         codigo_comuna = codigo_comuna.rjust(5, "0")
         codigo_region = str(int(attrs["codregion"])).rjust(2, "0")
         codigo_provincia = codigo_comuna[:3]
@@ -419,7 +423,9 @@ def fetch_bcn_comunas():
     supplemental_added = 0
     existing_codes = set(df["codigo_comuna"].to_list())
     missing_records = [
-        record for record in SUPPLEMENTAL_COMUNAS if record["codigo_comuna"] not in existing_codes
+        record
+        for record in SUPPLEMENTAL_COMUNAS
+        if record["codigo_comuna"] not in existing_codes
     ]
     if missing_records:
         df = pl.concat([df, pl.DataFrame(missing_records)], how="vertical")
@@ -449,7 +455,9 @@ def download_subdere_file():
                 f"Error de descarga HTTP: Código {response.status_code}. Se utilizará el fallback local."
             )
     except Exception as e:
-        print(f"Error al descargar la base territorial: {e}. Se utilizará el fallback local.")
+        print(
+            f"Error al descargar la base territorial: {e}. Se utilizará el fallback local."
+        )
     return None
 
 
@@ -589,7 +597,9 @@ def normalize_dpa():
             .drop(["_lat_ref", "_lon_ref"])
         )
         _coords_filled = df_clean.filter(pl.col("latitud_cabecera") != 0.0).height
-        print(f"Coordenadas: {_coords_filled}/{df_clean.height} comunas con coords no-cero.")
+        print(
+            f"Coordenadas: {_coords_filled}/{df_clean.height} comunas con coords no-cero."
+        )
     else:
         print("Advertencia: tabla de referencia de coordenadas no encontrada.")
 
@@ -600,7 +610,10 @@ def normalize_dpa():
     if os.path.exists(_pob_csv):
         pob_ref = pl.read_csv(
             _pob_csv,
-            schema_overrides={"codigo_comuna": pl.String, "poblacion_estimada": pl.Int32},
+            schema_overrides={
+                "codigo_comuna": pl.String,
+                "poblacion_estimada": pl.Int32,
+            },
         ).rename({"poblacion_estimada": "_pob_ref"})
         df_clean = (
             df_clean.with_columns(pl.col("codigo_comuna").cast(pl.String))
@@ -642,7 +655,9 @@ def normalize_dpa():
         ),
     }
     write_metadata(metadata)
-    print(f"Guardada DPA normalizada en: {output_path} (Total registros: {len(df_clean)})")
+    print(
+        f"Guardada DPA normalizada en: {output_path} (Total registros: {len(df_clean)})"
+    )
     return output_path
 
 

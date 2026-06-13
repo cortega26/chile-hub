@@ -7,7 +7,6 @@ import polars as pl
 
 from src.pipeline_status_utils import format_top_issue_summary, parse_iso_datetime
 
-
 ROOT_DIR = Path(__file__).resolve().parents[1]
 NORMALIZED_DIR = ROOT_DIR / "data" / "normalized"
 DATASET_CATALOG_PATH = NORMALIZED_DIR / "dataset_catalog.json"
@@ -82,10 +81,12 @@ class ChileHub:
 
     def top_issue(self):
         freshness_by_dataset = {
-            entry.get("dataset"): entry for entry in self.freshness_audit().get("datasets", [])
+            entry.get("dataset"): entry
+            for entry in self.freshness_audit().get("datasets", [])
         }
         provenance_by_dataset = {
-            entry.get("dataset"): entry for entry in self.provenance().get("datasets", [])
+            entry.get("dataset"): entry
+            for entry in self.provenance().get("datasets", [])
         }
         drift_by_dataset = {
             entry.get("dataset"): entry for entry in self.drift().get("datasets", [])
@@ -109,7 +110,9 @@ class ChileHub:
                     "source_detail": provenance.get("source_detail", "unknown"),
                     "diagnostic_summary": drift.get(
                         "diagnostic_summary",
-                        provenance.get("diagnostic_summary", "Sin observaciones operativas."),
+                        provenance.get(
+                            "diagnostic_summary", "Sin observaciones operativas."
+                        ),
                     ),
                     "recommended_action": drift.get("recommended_action", "Ninguna."),
                 }
@@ -117,7 +120,9 @@ class ChileHub:
 
         if not candidates:
             return None
-        ordered = sorted(candidates, key=lambda item: (item["attention_priority"], item["dataset"]))
+        ordered = sorted(
+            candidates, key=lambda item: (item["attention_priority"], item["dataset"])
+        )
         if ordered[0]["attention_priority"] >= 2:
             return None
         return ordered[0]
@@ -132,8 +137,14 @@ class ChileHub:
         rows = [
             ("dataset", top_issue.get("dataset", "unknown")),
             ("attention_priority", str(top_issue.get("attention_priority", "unknown"))),
-            ("build_freshness_status", top_issue.get("build_freshness_status", "unknown")),
-            ("current_freshness_status", top_issue.get("current_freshness_status", "unknown")),
+            (
+                "build_freshness_status",
+                top_issue.get("build_freshness_status", "unknown"),
+            ),
+            (
+                "current_freshness_status",
+                top_issue.get("current_freshness_status", "unknown"),
+            ),
             ("drift_status", top_issue.get("drift_status", "unknown")),
             ("degradation_status", top_issue.get("degradation_status", "unknown")),
             ("warning_count", str(top_issue.get("warning_count", 0))),
@@ -189,7 +200,9 @@ class ChileHub:
                 "confidence_tier": entry.get("confidence_tier"),
                 "reuse_status": entry.get("reuse_policy", {}).get("status"),
                 "reuse_license": entry.get("reuse_policy", {}).get("license"),
-                "attribution_required": entry.get("reuse_policy", {}).get("attribution_required"),
+                "attribution_required": entry.get("reuse_policy", {}).get(
+                    "attribution_required"
+                ),
                 "freshness_status": entry.get("freshness", {}).get("status"),
                 "freshness_age_hours": entry.get("freshness", {}).get("age_hours"),
                 "coverage_status": entry.get("coverage", {}).get("status"),
@@ -262,8 +275,12 @@ class ChileHub:
                 f"drift={top_issue.get('drift_status', 'unknown')} | "
                 f"warnings={top_issue.get('warning_count', 0)}"
             )
-            lines.append(f"top_issue_reason: {top_issue.get('diagnostic_summary', 'unknown')}")
-            lines.append(f"top_issue_action: {top_issue.get('recommended_action', 'unknown')}")
+            lines.append(
+                f"top_issue_reason: {top_issue.get('diagnostic_summary', 'unknown')}"
+            )
+            lines.append(
+                f"top_issue_action: {top_issue.get('recommended_action', 'unknown')}"
+            )
 
         if package:
             lines.append(
@@ -298,9 +315,14 @@ class ChileHub:
             ("generated_at_utc", overview.get("generated_at_utc", "unknown")),
             (
                 "build_overall_status",
-                overview.get("build_overall_status", overview.get("overall_status", "unknown")),
+                overview.get(
+                    "build_overall_status", overview.get("overall_status", "unknown")
+                ),
             ),
-            ("current_overall_status", overview.get("current_overall_status", "unknown")),
+            (
+                "current_overall_status",
+                overview.get("current_overall_status", "unknown"),
+            ),
             ("datasets", str(overview.get("dataset_count", 0))),
             ("live", str(overview.get("live_count", 0))),
             ("stale", str(overview.get("stale_count", 0))),
@@ -316,14 +338,28 @@ class ChileHub:
             rows.extend(
                 [
                     ("top_issue", top_issue.get("dataset", "unknown")),
-                    ("top_issue_build", top_issue.get("build_freshness_status", "unknown")),
-                    ("top_issue_current", top_issue.get("current_freshness_status", "unknown")),
+                    (
+                        "top_issue_build",
+                        top_issue.get("build_freshness_status", "unknown"),
+                    ),
+                    (
+                        "top_issue_current",
+                        top_issue.get("current_freshness_status", "unknown"),
+                    ),
                     ("top_issue_drift", top_issue.get("drift_status", "unknown")),
-                    ("top_issue_reason", top_issue.get("diagnostic_summary", "unknown")),
-                    ("top_issue_action", top_issue.get("recommended_action", "unknown")),
+                    (
+                        "top_issue_reason",
+                        top_issue.get("diagnostic_summary", "unknown"),
+                    ),
+                    (
+                        "top_issue_action",
+                        top_issue.get("recommended_action", "unknown"),
+                    ),
                     (
                         "top_issue_summary",
-                        overview.get("top_issue_summary", format_top_issue_summary(top_issue)),
+                        overview.get(
+                            "top_issue_summary", format_top_issue_summary(top_issue)
+                        ),
                     ),
                 ]
             )
@@ -376,7 +412,9 @@ class ChileHub:
     def shared_artifacts(self, shared_type=None, format=None):
         artifacts = [entry for entry in self.artifacts() if entry.get("shared_type")]
         if shared_type is not None:
-            artifacts = [entry for entry in artifacts if entry.get("shared_type") == shared_type]
+            artifacts = [
+                entry for entry in artifacts if entry.get("shared_type") == shared_type
+            ]
         if format is not None:
             artifacts = [entry for entry in artifacts if entry.get("format") == format]
         return artifacts
@@ -426,7 +464,9 @@ class ChileHub:
     def report_index_table(self):
         rows = self.report_index()
         lines = ["chile-hub report index", ""]
-        lines.append("report_key              shared_type            format    size      path")
+        lines.append(
+            "report_key              shared_type            format    size      path"
+        )
         lines.append(
             "----------------------  ---------------------  --------  --------  -----------------------------------------------"
         )
@@ -450,9 +490,14 @@ class ChileHub:
 
     def get_report(self, shared_type, format):
         for entry in self.reports().values():
-            if entry.get("shared_type") == shared_type and entry.get("format") == format:
+            if (
+                entry.get("shared_type") == shared_type
+                and entry.get("format") == format
+            ):
                 return entry
-        raise KeyError(f"Reporte '{shared_type}' con formato '{format}' no existe en el bundle.")
+        raise KeyError(
+            f"Reporte '{shared_type}' con formato '{format}' no existe en el bundle."
+        )
 
     def overview(self):
         health = self.health()
@@ -487,16 +532,18 @@ class ChileHub:
             "top_issue_summary": format_top_issue_summary(top_issue),
             "shared_artifact_count": len(shared_artifacts),
             "package_count": len(packages),
-            "primary_package": {
-                "path": primary_package.get("path"),
-                "package_type": primary_package.get("package_type"),
-                "size_bytes": primary_package.get("size_bytes"),
-                "checksum_algorithm": primary_package.get("checksum_algorithm"),
-                "checksum_path": primary_package.get("checksum_path"),
-                "verification_command": primary_package.get("verification_command"),
-            }
-            if primary_package
-            else None,
+            "primary_package": (
+                {
+                    "path": primary_package.get("path"),
+                    "package_type": primary_package.get("package_type"),
+                    "size_bytes": primary_package.get("size_bytes"),
+                    "checksum_algorithm": primary_package.get("checksum_algorithm"),
+                    "checksum_path": primary_package.get("checksum_path"),
+                    "verification_command": primary_package.get("verification_command"),
+                }
+                if primary_package
+                else None
+            ),
             "report_keys": sorted(bundle.get("reports", {}).keys()),
             "datasets": [
                 {
@@ -516,7 +563,10 @@ class ChileHub:
         rows = [
             ("generated_at_utc", overview.get("generated_at_utc", "unknown")),
             ("build_overall_status", overview.get("build_overall_status", "unknown")),
-            ("current_overall_status", overview.get("current_overall_status", "unknown")),
+            (
+                "current_overall_status",
+                overview.get("current_overall_status", "unknown"),
+            ),
             ("datasets", str(overview.get("dataset_count", 0))),
             ("live", str(overview.get("live_count", 0))),
             ("fallback", str(overview.get("fallback_count", 0))),
@@ -537,14 +587,28 @@ class ChileHub:
             rows.extend(
                 [
                     ("top_issue", top_issue.get("dataset", "unknown")),
-                    ("top_issue_build", top_issue.get("build_freshness_status", "unknown")),
-                    ("top_issue_current", top_issue.get("current_freshness_status", "unknown")),
+                    (
+                        "top_issue_build",
+                        top_issue.get("build_freshness_status", "unknown"),
+                    ),
+                    (
+                        "top_issue_current",
+                        top_issue.get("current_freshness_status", "unknown"),
+                    ),
                     ("top_issue_drift", top_issue.get("drift_status", "unknown")),
-                    ("top_issue_reason", top_issue.get("diagnostic_summary", "unknown")),
-                    ("top_issue_action", top_issue.get("recommended_action", "unknown")),
+                    (
+                        "top_issue_reason",
+                        top_issue.get("diagnostic_summary", "unknown"),
+                    ),
+                    (
+                        "top_issue_action",
+                        top_issue.get("recommended_action", "unknown"),
+                    ),
                     (
                         "top_issue_summary",
-                        overview.get("top_issue_summary", format_top_issue_summary(top_issue)),
+                        overview.get(
+                            "top_issue_summary", format_top_issue_summary(top_issue)
+                        ),
                     ),
                 ]
             )
@@ -563,8 +627,12 @@ class ChileHub:
         lines = ["chile-hub overview", ""]
         lines.extend(f"{label.ljust(label_width)} : {value}" for label, value in rows)
         lines.append("")
-        lines.append("dataset      mode      validation  build      coverage        drift")
-        lines.append("-----------  --------  ----------  ---------  --------------  --------")
+        lines.append(
+            "dataset      mode      validation  build      coverage        drift"
+        )
+        lines.append(
+            "-----------  --------  ----------  ---------  --------------  --------"
+        )
         for entry in overview.get("datasets", []):
             lines.append(
                 f"{entry.get('dataset', 'unknown'):<11}  "
@@ -590,10 +658,15 @@ class ChileHub:
             dataset_name = entry["dataset"]
             artifacts = sorted(
                 by_dataset.get(dataset_name, []),
-                key=lambda item: (item.get("output_type") or "", item.get("path") or ""),
+                key=lambda item: (
+                    item.get("output_type") or "",
+                    item.get("path") or "",
+                ),
             )
             published_outputs = [
-                artifact["output_type"] for artifact in artifacts if artifact.get("output_type")
+                artifact["output_type"]
+                for artifact in artifacts
+                if artifact.get("output_type")
             ]
             inventory.append(
                 {
@@ -667,13 +740,17 @@ class ChileHub:
     def health(self):
         health = self._load_hub_health()
         if "top_issue_summary" not in health:
-            health["top_issue_summary"] = format_top_issue_summary(health.get("top_issue"))
+            health["top_issue_summary"] = format_top_issue_summary(
+                health.get("top_issue")
+            )
         return health
 
     def status(self):
         status = self._load_hub_status()
         if "top_issue_summary" not in status:
-            status["top_issue_summary"] = format_top_issue_summary(status.get("top_issue"))
+            status["top_issue_summary"] = format_top_issue_summary(
+                status.get("top_issue")
+            )
         return status
 
     def status_table(self):
@@ -694,11 +771,19 @@ class ChileHub:
             rows.extend(
                 [
                     ("top_issue", top_issue.get("dataset", "unknown")),
-                    ("top_issue_reason", top_issue.get("diagnostic_summary", "unknown")),
-                    ("top_issue_action", top_issue.get("recommended_action", "unknown")),
+                    (
+                        "top_issue_reason",
+                        top_issue.get("diagnostic_summary", "unknown"),
+                    ),
+                    (
+                        "top_issue_action",
+                        top_issue.get("recommended_action", "unknown"),
+                    ),
                     (
                         "top_issue_summary",
-                        status.get("top_issue_summary", format_top_issue_summary(top_issue)),
+                        status.get(
+                            "top_issue_summary", format_top_issue_summary(top_issue)
+                        ),
                     ),
                 ]
             )
@@ -756,7 +841,9 @@ class ChileHub:
             age_hours = None
             current_status = "unknown"
             if refreshed_at is not None and isinstance(max_age_hours, (int, float)):
-                age_hours = round(max((checked_at - refreshed_at).total_seconds() / 3600, 0), 2)
+                age_hours = round(
+                    max((checked_at - refreshed_at).total_seconds() / 3600, 0), 2
+                )
                 current_status = "fresh" if age_hours <= max_age_hours else "stale"
 
             if current_status == "fresh":
@@ -793,9 +880,14 @@ class ChileHub:
         freshness_audit = self.freshness_audit()
         build_overall_status = health.get("overall_status", "unknown")
         runtime_freshness_status = "ok"
-        if freshness_audit.get("unknown_count", 0) > 0 or freshness_audit.get("stale_count", 0) > 0:
+        if (
+            freshness_audit.get("unknown_count", 0) > 0
+            or freshness_audit.get("stale_count", 0) > 0
+        ):
             runtime_freshness_status = "warn"
-        current_overall_status = self._max_status(build_overall_status, runtime_freshness_status)
+        current_overall_status = self._max_status(
+            build_overall_status, runtime_freshness_status
+        )
         return {
             "build_overall_status": build_overall_status,
             "current_overall_status": current_overall_status,
@@ -809,7 +901,8 @@ class ChileHub:
         health = self.health()
         runtime_audit = self.runtime_status_audit()
         freshness_by_dataset = {
-            entry.get("dataset"): entry for entry in self.freshness_audit().get("datasets", [])
+            entry.get("dataset"): entry
+            for entry in self.freshness_audit().get("datasets", [])
         }
         datasets = []
         for entry in health.get("datasets", []):
@@ -874,8 +967,12 @@ class ChileHub:
                 f"drift={top_issue.get('drift_status', 'unknown')} | "
                 f"warnings={top_issue.get('warning_count', 0)}"
             )
-            lines.append(f"top_issue_reason={top_issue.get('diagnostic_summary', 'unknown')}")
-            lines.append(f"top_issue_action={top_issue.get('recommended_action', 'unknown')}")
+            lines.append(
+                f"top_issue_reason={top_issue.get('diagnostic_summary', 'unknown')}"
+            )
+            lines.append(
+                f"top_issue_action={top_issue.get('recommended_action', 'unknown')}"
+            )
             lines.append(
                 f"top_issue_summary={runtime.get('top_issue_summary', format_top_issue_summary(top_issue))}"
             )
@@ -916,8 +1013,12 @@ class ChileHub:
             f"unknown={audit.get('unknown_count', 0)}"
         )
         lines.append("")
-        lines.append("dataset      mode      build      current    age_h   max_h   label")
-        lines.append("-----------  --------  ---------  ---------  ------  ------  --------")
+        lines.append(
+            "dataset      mode      build      current    age_h   max_h   label"
+        )
+        lines.append(
+            "-----------  --------  ---------  ---------  ------  ------  --------"
+        )
         for entry in audit.get("datasets", []):
             age = entry.get("current_age_hours")
             age_label = f"{age:.2f}" if isinstance(age, (int, float)) else "N/D"
@@ -999,7 +1100,9 @@ class ChileHub:
             f"datasets={report.get('dataset_count', 0)}"
         )
         lines.append("")
-        lines.append("dataset      status         reuse_status       attribution  license")
+        lines.append(
+            "dataset      status         reuse_status       attribution  license"
+        )
         lines.append(
             "-----------  -------------  -----------------  -----------  ----------------------------------------"
         )
@@ -1058,8 +1161,12 @@ class ChileHub:
             f"degraded={report.get('degraded_count', 0)}"
         )
         lines.append("")
-        lines.append("dataset      drift      mode      coverage        degradation  warnings")
-        lines.append("-----------  ---------  --------  --------------  -----------  --------")
+        lines.append(
+            "dataset      drift      mode      coverage        degradation  warnings"
+        )
+        lines.append(
+            "-----------  ---------  --------  --------------  -----------  --------"
+        )
         for entry in report.get("datasets", []):
             lines.append(
                 f"{entry.get('dataset', 'unknown'):<11}  "
@@ -1073,7 +1180,9 @@ class ChileHub:
 
 
 def build_parser():
-    parser = argparse.ArgumentParser(description="CLI minima para inspeccionar chile-hub")
+    parser = argparse.ArgumentParser(
+        description="CLI minima para inspeccionar chile-hub"
+    )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     subparsers.add_parser("list", help="Listar datasets disponibles")
@@ -1081,7 +1190,9 @@ def build_parser():
     show_parser = subparsers.add_parser("show", help="Mostrar metadata de un dataset")
     show_parser.add_argument("dataset", help="Nombre del dataset")
 
-    path_parser = subparsers.add_parser("path", help="Resolver path de salida de un dataset")
+    path_parser = subparsers.add_parser(
+        "path", help="Resolver path de salida de un dataset"
+    )
     path_parser.add_argument("dataset", help="Nombre del dataset")
     path_parser.add_argument(
         "--output",
@@ -1089,7 +1200,9 @@ def build_parser():
         help="Tipo de output a resolver, por ejemplo parquet, json o sqlite_table",
     )
 
-    example_parser = subparsers.add_parser("example", help="Mostrar ejemplo de uso de un dataset")
+    example_parser = subparsers.add_parser(
+        "example", help="Mostrar ejemplo de uso de un dataset"
+    )
     example_parser.add_argument("dataset", help="Nombre del dataset")
     example_parser.add_argument(
         "--kind",
@@ -1097,7 +1210,9 @@ def build_parser():
         help="Tipo de ejemplo a mostrar, por ejemplo python, duckdb o cli",
     )
 
-    artifacts_parser = subparsers.add_parser("artifacts", help="Mostrar artefactos publicables")
+    artifacts_parser = subparsers.add_parser(
+        "artifacts", help="Mostrar artefactos publicables"
+    )
     artifacts_parser.add_argument(
         "dataset",
         nargs="?",
@@ -1107,9 +1222,12 @@ def build_parser():
     shared_artifacts_parser = subparsers.add_parser(
         "shared-artifacts", help="Mostrar artefactos compartidos del hub"
     )
-    shared_artifacts_parser.add_argument("--shared-type", help="Filtrar por shared_type")
     shared_artifacts_parser.add_argument(
-        "--artifact-format", help="Filtrar por formato de artifact, por ejemplo json o markdown"
+        "--shared-type", help="Filtrar por shared_type"
+    )
+    shared_artifacts_parser.add_argument(
+        "--artifact-format",
+        help="Filtrar por formato de artifact, por ejemplo json o markdown",
     )
     shared_artifacts_parser.add_argument(
         "--output",
@@ -1118,7 +1236,9 @@ def build_parser():
         help="Formato de salida de shared-artifacts",
     )
 
-    reports_parser = subparsers.add_parser("reports", help="Listar reportes compartidos del hub")
+    reports_parser = subparsers.add_parser(
+        "reports", help="Listar reportes compartidos del hub"
+    )
     reports_parser.add_argument(
         "--format",
         choices=["json", "table"],
@@ -1133,7 +1253,9 @@ def build_parser():
         "shared_type", help="shared_type del reporte, por ejemplo hub_health"
     )
     report_parser.add_argument(
-        "--format", default="json", help="Formato del reporte, por ejemplo json o markdown"
+        "--format",
+        default="json",
+        help="Formato del reporte, por ejemplo json o markdown",
     )
 
     inventory_parser = subparsers.add_parser(
@@ -1172,7 +1294,9 @@ def build_parser():
         default="json",
         help="Formato de salida de status",
     )
-    health_parser = subparsers.add_parser("health", help="Mostrar salud agregada del hub")
+    health_parser = subparsers.add_parser(
+        "health", help="Mostrar salud agregada del hub"
+    )
     health_parser.add_argument(
         "--format",
         choices=["json", "table"],
@@ -1210,14 +1334,18 @@ def build_parser():
         default="json",
         help="Formato de salida de top-issue",
     )
-    packages_parser = subparsers.add_parser("packages", help="Mostrar paquetes publicables del hub")
+    packages_parser = subparsers.add_parser(
+        "packages", help="Mostrar paquetes publicables del hub"
+    )
     packages_parser.add_argument(
         "--format",
         choices=["json", "table"],
         default="json",
         help="Formato de salida de packages",
     )
-    package_parser = subparsers.add_parser("package", help="Mostrar package principal del hub")
+    package_parser = subparsers.add_parser(
+        "package", help="Mostrar package principal del hub"
+    )
     package_parser.add_argument(
         "--type", default="zip", help="package_type a resolver, por ejemplo zip"
     )
@@ -1256,7 +1384,9 @@ def build_parser():
         help="Formato de salida de drift",
     )
 
-    summary_parser = subparsers.add_parser("summary", help="Mostrar resumen breve de datasets")
+    summary_parser = subparsers.add_parser(
+        "summary", help="Mostrar resumen breve de datasets"
+    )
     summary_parser.add_argument(
         "--format",
         choices=["json", "table"],
@@ -1294,7 +1424,10 @@ def main():
 
     if args.command == "shared-artifacts":
         if args.output == "table":
-            print(hub.shared_artifacts_table(args.shared_type, args.artifact_format), end="")
+            print(
+                hub.shared_artifacts_table(args.shared_type, args.artifact_format),
+                end="",
+            )
         else:
             print(
                 json.dumps(
@@ -1314,7 +1447,11 @@ def main():
 
     if args.command == "report":
         print(
-            json.dumps(hub.get_report(args.shared_type, args.format), ensure_ascii=False, indent=2)
+            json.dumps(
+                hub.get_report(args.shared_type, args.format),
+                ensure_ascii=False,
+                indent=2,
+            )
         )
         return
 
@@ -1407,7 +1544,11 @@ def main():
         return
 
     if args.command == "verify-package":
-        print(json.dumps(hub.package_verification(args.type), ensure_ascii=False, indent=2))
+        print(
+            json.dumps(
+                hub.package_verification(args.type), ensure_ascii=False, indent=2
+            )
+        )
         return
 
     if args.command == "redistribution":
