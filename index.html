@@ -397,12 +397,6 @@
             transition: var(--transition);
         }
 
-        .dataset-card.attention {
-            border-color: rgba(251, 191, 36, 0.45);
-            box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.12), 0 16px 32px -20px rgba(251, 191, 36, 0.45);
-            background: linear-gradient(180deg, rgba(120, 53, 15, 0.16), rgba(10, 15, 25, 0.58));
-        }
-
         .dataset-card:target {
             scroll-margin-top: 1.5rem;
             border-color: rgba(34, 211, 238, 0.6);
@@ -451,11 +445,6 @@
         .dataset-badge.fallback {
             color: #3f2500;
             background: rgba(251, 191, 36, 0.85);
-        }
-
-        .dataset-badge.attention {
-            color: #3f2500;
-            background: rgba(251, 191, 36, 0.92);
         }
 
         .dataset-badges {
@@ -1051,11 +1040,10 @@
             gap: 0.8rem;
         }
         .dataset-card:hover { transform: none; border-color: #aaa99f; }
-        .dataset-card.attention { background: #fffcf4; box-shadow: none; border-color: #d3b873; }
         .dataset-desc { min-height: 2.7em; }
         .dataset-badge { border-radius: 4px; text-transform: none; letter-spacing: 0; }
         .dataset-badge.live { color: #174f3f; background: #e4efe9; }
-        .dataset-badge.attention, .dataset-badge.fallback { color: #684b17; background: #f5ead2; }
+        .dataset-badge.fallback { color: #684b17; background: #f5ead2; }
         .dataset-facts { grid-template-columns: repeat(3, minmax(0, 1fr)); }
         .dataset-fact:nth-child(n+4) { display: none; }
         .dataset-details { border-top: 1px solid var(--border-color); padding-top: 0.75rem; }

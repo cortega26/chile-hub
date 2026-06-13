@@ -429,10 +429,7 @@ function renderCatalog(bundle) {
     const verifyCommand = zipPackage?.verification_command
         || (zipPackage?.checksum_path ? `shasum -a 256 -c ${zipPackage.checksum_path}` : "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256");
 
-    const attentionCount = staleCount + unknownFreshnessCount + driftedCount + degradedCount + partialCoverageCount;
-    statusSubtitle.textContent = currentOverallStatus === "ok" && attentionCount === 0
-        ? `${datasets.length} capas disponibles y actualizadas. Último build: ${formatTimestamp(bundle.generated_at_utc)}.`
-        : `${attentionCount} señales requieren revisión en ${datasets.length} capas. Abre los detalles técnicos para ver el diagnóstico.`;
+    statusSubtitle.textContent = `${datasets.length} capas disponibles. Último build: ${formatTimestamp(bundle.generated_at_utc)}.`;
     packageMeta.textContent = zipPackage
         ? `Tamaño: ${formatBytes(zipPackage.size_bytes)} · sha256: ${zipHash} · generado junto al último build`
         : "No hay package ZIP disponible en este build.";
@@ -528,13 +525,6 @@ function renderCatalog(bundle) {
 
     catalogGrid.innerHTML = orderedDatasets.map(dataset => {
         const runtimeFreshness = runtimeFreshnessByDataset[dataset.dataset] || { status: "unknown" };
-        const needsAttention = dataset.dataset === activeTopIssueDataset?.dataset
-            || (dataset.warning_count ?? 0) > 0
-            || runtimeFreshness.status === "stale"
-            || runtimeFreshness.status === "unknown"
-            || dataset.drift?.status === "drifted"
-            || dataset.degradation?.status === "warning"
-            || dataset.degradation?.status === "degraded";
         const outputs = Object.keys(dataset.outputs || {}).map(key => `<span class="dataset-tag">${escapeHtml(key)}</span>`).join("");
         const warnings = (dataset.warning_count && dataset.warning_count > 0)
             ? `<span class="dataset-tag">${escapeHtml(`${dataset.warning_count} warnings`)}</span>`
@@ -549,7 +539,7 @@ function renderCatalog(bundle) {
             : "N/D";
 
         return `
-            <article class="dataset-card ${needsAttention ? "attention" : ""}" id="dataset-${escapeHtml(dataset.dataset)}" data-search="${escapeHtml([dataset.dataset, dataset.description, dataset.source_name, ...(dataset.join_keys || []), ...Object.keys(dataset.outputs || {})].filter(Boolean).join(" "))}">
+            <article class="dataset-card" id="dataset-${escapeHtml(dataset.dataset)}" data-search="${escapeHtml([dataset.dataset, dataset.description, dataset.source_name, ...(dataset.join_keys || []), ...Object.keys(dataset.outputs || {})].filter(Boolean).join(" "))}">
                 <div class="dataset-card-top">
                     <div>
                         <div class="dataset-name">${escapeHtml(dataset.dataset)}</div>
@@ -557,7 +547,6 @@ function renderCatalog(bundle) {
                     </div>
                     <div class="dataset-badges">
                         <span class="dataset-badge ${escapeHtml(dataset.source_mode || "fallback")}">${escapeHtml(dataset.source_mode || "unknown")}</span>
-                        ${needsAttention ? `<span class="dataset-badge attention">atención</span>` : ""}
                     </div>
                 </div>
                 <div class="dataset-facts dataset-facts-primary">
