@@ -21,6 +21,8 @@ const packageActions = document.getElementById("package-actions");
 const packageVerifyCopy = document.getElementById("package-verify-copy");
 const catalogGeneratedAt = document.getElementById("catalog-generated-at");
 const catalogGrid = document.getElementById("catalog-grid");
+const catalogSearchInput = document.getElementById("catalog-search-input");
+const catalogCount = document.getElementById("catalog-count");
 const quickstartCopyButtons = document.querySelectorAll(".quickstart-copy");
 let artifactManifestByPath = {};
 let packageManifestByPath = {};
@@ -231,6 +233,27 @@ function wireDatasetExampleInteractions() {
             });
         }
     });
+}
+
+function filterCatalog() {
+    if (!catalogGrid || !catalogCount) return;
+    const query = (catalogSearchInput?.value || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim();
+    const cards = [...catalogGrid.querySelectorAll(".dataset-card")];
+    let visibleCount = 0;
+    cards.forEach(card => {
+        const haystack = (card.dataset.search || card.textContent)
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "");
+        const visible = !query || haystack.includes(query);
+        card.hidden = !visible;
+        if (visible) visibleCount += 1;
+    });
+    catalogCount.textContent = `${visibleCount} ${visibleCount === 1 ? "capa" : "capas"}`;
 }
 
 function fallbackCopyText(text) {
@@ -445,7 +468,7 @@ function renderCatalog(bundle) {
             : "N/D";
 
         return `
-            <article class="dataset-card ${needsAttention ? "attention" : ""}" id="dataset-${escapeHtml(dataset.dataset)}">
+            <article class="dataset-card ${needsAttention ? "attention" : ""}" id="dataset-${escapeHtml(dataset.dataset)}" data-search="${escapeHtml([dataset.dataset, dataset.description, dataset.source_name, ...(dataset.join_keys || []), ...Object.keys(dataset.outputs || {})].filter(Boolean).join(" "))}">
                 <div class="dataset-card-top">
                     <div>
                         <div class="dataset-name">${escapeHtml(dataset.dataset)}</div>
@@ -533,6 +556,7 @@ function renderCatalog(bundle) {
     }).join("");
 
     wireDatasetExampleInteractions();
+    filterCatalog();
 
     if (packageVerifyCopy && !packageVerifyCopy.dataset.wired) {
         packageVerifyCopy.addEventListener("click", () => {
@@ -540,6 +564,10 @@ function renderCatalog(bundle) {
         });
         packageVerifyCopy.dataset.wired = "true";
     }
+}
+
+if (catalogSearchInput) {
+    catalogSearchInput.addEventListener("input", filterCatalog);
 }
 
 async function copyTextFromTarget(button, targetId) {

@@ -1092,6 +1092,94 @@
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
         }
+
+        .site-nav { display: flex; align-items: center; gap: 1.5rem; }
+        .site-nav a { color: var(--text-secondary); font-size: 0.9rem; font-weight: 550; text-decoration: none; }
+        .site-nav a:hover { color: var(--text-primary); }
+        .site-nav .nav-github { color: var(--text-primary); }
+
+        .intro { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 4rem; max-width: none; }
+        .intro-copy { max-width: 760px; }
+        .intro-proof { align-self: end; border-left: 1px solid var(--border-color); padding-left: 1.5rem; }
+        .intro-proof dl { display: grid; gap: 1rem; }
+        .intro-proof div { display: grid; gap: 0.15rem; }
+        .intro-proof dt { color: var(--text-secondary); font-size: 0.78rem; }
+        .intro-proof dd { font-size: 0.95rem; font-weight: 600; }
+
+        .catalog-toolbar { display: flex; gap: 0.75rem; margin-bottom: 1rem; }
+        .catalog-search { flex: 1; position: relative; }
+        .catalog-search svg { position: absolute; left: 0.9rem; top: 50%; width: 18px; transform: translateY(-50%); fill: var(--text-secondary); }
+        .catalog-search input {
+            width: 100%; min-height: 46px; padding: 0.7rem 1rem 0.7rem 2.7rem;
+            border: 1px solid var(--border-color); border-radius: 6px; background: #fff;
+            color: var(--text-primary); font: inherit;
+        }
+        .catalog-search input:focus { outline: 3px solid rgba(23,79,63,.15); border-color: #174f3f; }
+        .catalog-count { display: flex; align-items: center; color: var(--text-secondary); font-size: 0.85rem; white-space: nowrap; }
+        .dataset-card[hidden] { display: none; }
+
+        .section-shell { padding: 2rem 0; border-top: 1px solid var(--border-color); }
+        .section-heading { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-bottom: 1.5rem; }
+        .section-heading h2 { font-size: 1.65rem; letter-spacing: -0.025em; }
+        .section-heading p { color: var(--text-secondary); line-height: 1.6; }
+
+        .domain-list { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; }
+        .domain-item { min-height: 145px; padding: 1.25rem; background: #fff; border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
+        .domain-item:nth-child(3n) { border-right: 0; }
+        .domain-item:nth-last-child(-n+3) { border-bottom: 0; }
+        .domain-item h3 { font-size: 1rem; margin-bottom: 0.45rem; }
+        .domain-item p { color: var(--text-secondary); font-size: 0.86rem; line-height: 1.5; }
+        .domain-state { display: block; margin-top: 1rem; color: #174f3f; font-size: 0.75rem; font-weight: 650; }
+        .domain-state.planned { color: #76623a; }
+
+        .trust-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+        .trust-item { border-top: 2px solid #174f3f; padding-top: 1rem; }
+        .trust-item h3 { font-size: 0.95rem; margin-bottom: 0.45rem; }
+        .trust-item p { color: var(--text-secondary); font-size: 0.84rem; line-height: 1.55; }
+
+        .manifesto { background: #17211e; color: #f6f4ed; padding: 2.25rem; border-radius: 8px; display: grid; grid-template-columns: 1.1fr .9fr; gap: 4rem; }
+        .manifesto h2 { font-size: 1.75rem; letter-spacing: -0.025em; }
+        .manifesto p { color: #c9d0cc; line-height: 1.65; }
+        .manifesto a { color: #fff; }
+
+        main > .intro { order: 1; }
+        main > .kpi-container { order: 2; }
+        main > .catalog-section { order: 3; }
+        main > #cobertura { order: 4; }
+        main > #confianza { order: 5; }
+        main > .quickstart-section { order: 6; }
+        main > .manifesto { order: 7; }
+        main > .explorer-heading { order: 8; }
+        main > .search-section { order: 9; }
+        main > .table-container { order: 10; }
+        main > .status-banner { order: 11; }
+        main > .package-section { order: 12; }
+
+        .status-banner { margin-top: 1.5rem; }
+        .status-banner .status-title { font-size: 0.95rem; }
+        .status-banner .status-subtitle { font-size: 0.82rem; }
+        .package-section { padding: 0; border: 0; background: transparent; }
+        .package-card { border-top: 1px solid var(--border-color); padding-top: 1.5rem; }
+
+        @media (max-width: 900px) {
+            .site-nav a:not(.nav-github) { display: none; }
+            .intro, .section-heading, .manifesto { grid-template-columns: 1fr; gap: 1.5rem; }
+            .intro-proof { border-left: 0; border-top: 1px solid var(--border-color); padding: 1.25rem 0 0; }
+            .intro-proof dl { grid-template-columns: repeat(3, 1fr); }
+            .domain-list { grid-template-columns: repeat(2, 1fr); }
+            .domain-item, .domain-item:nth-child(3n) { border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
+            .domain-item:nth-child(2n) { border-right: 0; }
+            .domain-item:nth-last-child(-n+2) { border-bottom: 0; }
+            .trust-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 560px) {
+            .intro-proof dl, .domain-list, .trust-grid { grid-template-columns: 1fr; }
+            .domain-item, .domain-item:nth-child(2n), .domain-item:nth-last-child(-n+2) { border-right: 0; border-bottom: 1px solid var(--border-color); }
+            .domain-item:last-child { border-bottom: 0; }
+            .catalog-toolbar { align-items: stretch; flex-direction: column; }
+            .catalog-count { min-height: 24px; }
+        }
     </style>
 </head>
 <body>
@@ -1101,22 +1189,32 @@
             <h1>chile-hub <span class="badge-alpha">Fase 0</span></h1>
             <p>Capas de datos chilenas curadas para análisis, software y cruces confiables</p>
         </div>
-        <div class="actions-group">
-            <a href="https://github.com/cortega26/chile-hub" target="_blank" class="btn btn-secondary">
-                <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"/></svg>
-                GitHub Repo
-            </a>
-        </div>
+        <nav class="site-nav" aria-label="Navegación principal">
+            <a href="#catalogo">Datos</a>
+            <a href="#cobertura">Cobertura</a>
+            <a href="#confianza">Metodología</a>
+            <a href="#uso">Desarrolladores</a>
+            <a class="nav-github" href="https://github.com/cortega26/chile-hub" target="_blank" rel="noopener noreferrer">GitHub Repo</a>
+        </nav>
     </header>
 
     <main>
         <section class="intro">
-            <h2>Datos oficiales de Chile, listos para usar.</h2>
-            <p>División territorial e indicadores económicos en formatos abiertos, con códigos preservados, fuentes documentadas y validación reproducible.</p>
-            <div class="intro-links">
-                <a class="btn btn-primary" href="#package-section">Descargar datos</a>
-                <a class="text-link" href="#catalogo">Explorar capas</a>
+            <div class="intro-copy">
+                <h2>La capa de datos confiable para construir con Chile.</h2>
+                <p>Datos públicos difíciles de encontrar, limpiar y cruzar, transformados en capas estables para software, análisis e investigación.</p>
+                <div class="intro-links">
+                    <a class="btn btn-primary" href="#catalogo">Explorar datos</a>
+                    <a class="text-link" href="#uso">Empezar a construir</a>
+                </div>
             </div>
+            <aside class="intro-proof" aria-label="Características del hub">
+                <dl>
+                    <div><dt>Fuentes</dt><dd>Oficiales y trazables</dd></div>
+                    <div><dt>Formatos</dt><dd>Parquet, JSON, SQL, Excel</dd></div>
+                    <div><dt>Uso</dt><dd>Abierto, versionado y reproducible</dd></div>
+                </dl>
+            </aside>
         </section>
         <!-- KPI Indicators -->
         <section class="kpi-container" id="kpi-container">
@@ -1186,6 +1284,13 @@
                 </div>
                 <div class="catalog-meta" id="catalog-generated-at">Generando resumen...</div>
             </div>
+            <div class="catalog-toolbar">
+                <label class="catalog-search" for="catalog-search-input">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 3a6.5 6.5 0 104.03 11.6L19.94 21 21 19.94l-6.4-6.41A6.5 6.5 0 009.5 3zm0 1.5a5 5 0 110 10 5 5 0 010-10z"/></svg>
+                    <input id="catalog-search-input" type="search" placeholder="Buscar datos por nombre, fuente o campo" autocomplete="off">
+                </label>
+                <div class="catalog-count" id="catalog-count" aria-live="polite">Cargando capas...</div>
+            </div>
             <div class="catalog-grid" id="catalog-grid">
                 <div class="dataset-card">
                     <div class="dataset-name">Cargando catálogo...</div>
@@ -1194,7 +1299,35 @@
             </div>
         </section>
 
-        <section class="quickstart-section">
+        <section class="section-shell" id="cobertura">
+            <div class="section-heading">
+                <h2>Un modelo de datos nacional, capa por capa</h2>
+                <p>La cobertura crece únicamente cuando una fuente supera criterios de utilidad, estabilidad, trazabilidad y reutilización legal. Publicado y planificado nunca se mezclan.</p>
+            </div>
+            <div class="domain-list">
+                <article class="domain-item"><h3>Territorio</h3><p>Regiones, provincias, comunas, códigos CUT, coordenadas y población de referencia.</p><span class="domain-state">Disponible</span></article>
+                <article class="domain-item"><h3>Economía</h3><p>UF, UTM, dólar, euro e IPC en series normalizadas para análisis y productos.</p><span class="domain-state">Disponible</span></article>
+                <article class="domain-item"><h3>Demografía</h3><p>Población, proyecciones, hogares y estructura etaria con claves territoriales comunes.</p><span class="domain-state planned">En evaluación</span></article>
+                <article class="domain-item"><h3>Gobierno local</h3><p>Presupuestos, servicios, infraestructura y directorios municipales reutilizables.</p><span class="domain-state planned">En evaluación</span></article>
+                <article class="domain-item"><h3>Educación y salud</h3><p>Establecimientos e indicadores públicos con cobertura y licencias verificables.</p><span class="domain-state planned">En investigación</span></article>
+                <article class="domain-item"><h3>Medioambiente</h3><p>Clima, agua, energía y territorio para cruces longitudinales y geográficos.</p><span class="domain-state planned">En investigación</span></article>
+            </div>
+        </section>
+
+        <section class="section-shell" id="confianza">
+            <div class="section-heading">
+                <h2>Confianza visible, no asumida</h2>
+                <p>Cada capa publica la evidencia necesaria para decidir si sirve para producción, análisis o investigación.</p>
+            </div>
+            <div class="trust-grid">
+                <article class="trust-item"><h3>Procedencia</h3><p>Fuente primaria, método de acceso, timestamp y snapshot crudo para auditoría.</p></article>
+                <article class="trust-item"><h3>Contratos</h3><p>Esquemas, tipos y claves estables con validaciones que detienen publicaciones inválidas.</p></article>
+                <article class="trust-item"><h3>Reutilización</h3><p>Licencia, atribución y redistribución documentadas por dataset, sin ambigüedad.</p></article>
+                <article class="trust-item"><h3>Integridad</h3><p>Manifest, hashes SHA256, cobertura, freshness y drift disponibles en cada build.</p></article>
+            </div>
+        </section>
+
+        <section class="quickstart-section" id="uso">
             <div class="catalog-header">
                 <div>
                     <div class="catalog-title">Uso rápido</div>
@@ -1234,6 +1367,14 @@ LIMIT 10;</pre>
 make status
 make hub-list</pre>
                 </article>
+            </div>
+        </section>
+
+        <section class="manifesto">
+            <h2>Menos tiempo preparando datos. Más tiempo construyendo con ellos.</h2>
+            <div>
+                <p>chile-hub no reemplaza a las fuentes oficiales. Las vuelve consistentes, comparables y utilizables en los flujos modernos de datos.</p>
+                <p style="margin-top: 1rem;"><a href="https://github.com/cortega26/chile-hub" target="_blank" rel="noopener noreferrer">Revisar el pipeline y contribuir en GitHub</a></p>
             </div>
         </section>
 
