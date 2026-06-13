@@ -282,8 +282,9 @@ def build_status_text(metadata):
     return "\n".join(lines).rstrip() + "\n"
 
 
-def build_status_markdown(metadata):
-    health = build_hub_health(metadata)
+def build_status_markdown(metadata, health=None):
+    if health is None:
+        health = build_hub_health(metadata)
     generated_at = metadata.get("generated_at_utc", "unknown")
     datasets = metadata.get("datasets", {})
     validations = metadata.get("validations", {})
@@ -365,8 +366,8 @@ def build_status_markdown(metadata):
     return "\n".join(lines).rstrip() + "\n"
 
 
-def write_status_markdown_file(metadata, path=STATUS_MARKDOWN_PATH):
-    Path(path).write_text(build_status_markdown(metadata), encoding="utf-8")
+def write_status_markdown_file(metadata, path=STATUS_MARKDOWN_PATH, health=None):
+    Path(path).write_text(build_status_markdown(metadata, health=health), encoding="utf-8")
 
 
 def build_hub_health_markdown(health):

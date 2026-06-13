@@ -524,12 +524,7 @@ def validate_indicadores(df_indicadores, metadata):
     }
 
 
-def write_pipeline_metadata(dataset_metadata, validations):
-    pipeline_metadata = {
-        "generated_at_utc": datetime.now(UTC).isoformat(),
-        "datasets": dataset_metadata,
-        "validations": validations,
-    }
+def write_pipeline_metadata(pipeline_metadata):
     output_path = os.path.join(NORMALIZED_DIR, "pipeline_metadata.json")
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(pipeline_metadata, f, ensure_ascii=False, indent=2)
@@ -580,7 +575,7 @@ def write_dataset_catalog(pipeline_metadata):
     output_path = os.path.join(NORMALIZED_DIR, "dataset_catalog.json")
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(catalog, f, ensure_ascii=False, indent=2)
-    return output_path
+    return output_path, catalog
 
 
 def compute_sha256(path):
@@ -1080,7 +1075,7 @@ def write_hub_bundle_json(pipeline_metadata, hub_health, dataset_catalog, artifa
     output_path = os.path.join(NORMALIZED_DIR, "hub_bundle.json")
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(bundle, f, ensure_ascii=False, indent=2)
-    return output_path
+    return output_path, bundle
 
 
 def write_publishable_bundle_zip():
@@ -1151,7 +1146,7 @@ def attach_publishable_package_to_manifest(zip_path, sha256_path):
 
     with open(manifest_path, "w", encoding="utf-8") as f:
         json.dump(manifest, f, ensure_ascii=False, indent=2)
-    return manifest_path
+    return manifest_path, manifest
 
 
 def derive_geography_layers(df_comunas):
@@ -1488,21 +1483,19 @@ def main():
         for dataset_name, validation in validations.items()
     }
     dataset_metadata = enrich_dataset_metadata(dataset_metadata, validations_with_freshness)
-    metadata_output = write_pipeline_metadata(
-        dataset_metadata,
-        validations_with_freshness,
-    )
-    with open(metadata_output, encoding="utf-8") as f:
-        pipeline_metadata = json.load(f)
-    write_status_markdown_file(pipeline_metadata)
+    pipeline_metadata = {
+        "generated_at_utc": datetime.now(UTC).isoformat(),
+        "datasets": dataset_metadata,
+        "validations": validations_with_freshness,
+    }
+    metadata_output = write_pipeline_metadata(pipeline_metadata)
     hub_health = build_hub_health(pipeline_metadata)
+    write_status_markdown_file(pipeline_metadata, health=hub_health)
     hub_health_output = write_hub_health_json(hub_health)
     hub_status = build_hub_status(hub_health)
     hub_status_output = write_hub_status_json(hub_status)
     write_hub_health_markdown_file(hub_health)
-    catalog_output = write_dataset_catalog(pipeline_metadata)
-    with open(catalog_output, encoding="utf-8") as f:
-        dataset_catalog = json.load(f)
+    catalog_output, dataset_catalog = write_dataset_catalog(pipeline_metadata)
     write_dataset_catalog_markdown_file(dataset_catalog)
     redistribution_report = build_redistribution_report(dataset_catalog)
     redistribution_report_output = write_redistribution_report_json(redistribution_report)
@@ -1514,33 +1507,17 @@ def main():
     drift_report_output = write_drift_report_json(drift_report)
     write_drift_report_markdown_file(drift_report)
     artifact_manifest_output = write_artifact_manifest()
-    with open(artifact_manifest_output, encoding="utf-8") as f:
-        artifact_manifest = json.load(f)
-    hub_bundle_output = write_hub_bundle_json(
-        pipeline_metadata,
-        hub_health,
-        dataset_catalog,
-        artifact_manifest,
-    )
-    with open(hub_bundle_output, encoding="utf-8") as f:
-        hub_bundle = json.load(f)
-    overview = build_overview(hub_health, hub_bundle, artifact_manifest)
-    overview_output = write_overview_json(overview)
-    write_overview_markdown_file(overview)
-    artifact_manifest_output = write_artifact_manifest()
     zip_output = write_publishable_bundle_zip()
     sha256_output = write_publishable_bundle_sha256(zip_output)
-    artifact_manifest_output = attach_publishable_package_to_manifest(zip_output, sha256_output)
-    with open(artifact_manifest_output, encoding="utf-8") as f:
-        artifact_manifest = json.load(f)
-    hub_bundle_output = write_hub_bundle_json(
+    manifest_path, artifact_manifest = attach_publishable_package_to_manifest(
+        zip_output, sha256_output
+    )
+    hub_bundle_output, hub_bundle = write_hub_bundle_json(
         pipeline_metadata,
         hub_health,
         dataset_catalog,
         artifact_manifest,
     )
-    with open(hub_bundle_output, encoding="utf-8") as f:
-        hub_bundle = json.load(f)
     overview = build_overview(hub_health, hub_bundle, artifact_manifest)
     overview_output = write_overview_json(overview)
     write_overview_markdown_file(overview)
