@@ -1344,7 +1344,18 @@ def main():
         )
 
     comunas_metadata = load_metadata(COMUNAS_METADATA_PATH)
+    if comunas_metadata is None:
+        raise SystemExit(
+            "Error: No se encuentra comunas.metadata.json en data/staging/. "
+            "Corre el extractor territorial primero: python src/extractors/subdere_extractor.py"
+        )
+
     indicadores_metadata = load_metadata(INDICADORES_METADATA_PATH)
+    if indicadores_metadata is None:
+        raise SystemExit(
+            "Error: No se encuentra indicadores.metadata.json en data/staging/. "
+            "Corre el extractor de indicadores primero: python src/extractors/bcentral_extractor.py"
+        )
     indicadores_metadata["indicator_codes"] = sorted(
         df_code for df_code in indicadores_metadata.get("indicator_codes", [])
     )
