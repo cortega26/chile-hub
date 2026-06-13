@@ -114,7 +114,6 @@ def verify_landing():
     runtime_freshness = {
         dataset["dataset"]: compute_runtime_freshness(dataset) for dataset in datasets
     }
-    live_count = health.get("live_count", 0)
     stale_count = sum(
         1 for freshness in runtime_freshness.values() if freshness["status"] == "stale"
     )
@@ -125,7 +124,6 @@ def verify_landing():
     partial_coverage_count = health.get("partial_coverage_count", 0)
     drifted_count = health.get("drifted_count", 0)
     review_terms_count = health.get("review_terms_count", 0)
-    warning_count = health.get("warning_count", 0)
     top_issue_warning_count = datasets_by_name.get(top_issue_dataset, {}).get("warning_count", 0)
     top_issue_reason = top_issue.get("diagnostic_summary")
     top_issue_action = top_issue.get("recommended_action")
@@ -140,17 +138,12 @@ def verify_landing():
         if zip_package and zip_package.get("verification_command")
         else "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256"
     )
-    expected_status_subtitle = (
-        f"{live_count}/{len(datasets)} capas operativas en modo live. "
-        f"Estado build: {build_overall_status}. "
-        f"Estado actual: {current_overall_status}. "
-        f"{'Sin capas stale.' if stale_count == 0 else f'{stale_count} capas stale.'} "
-        f"{'Sin capas con freshness unknown.' if unknown_freshness_count == 0 else f'{unknown_freshness_count} capas con freshness unknown.'} "
-        f"{'Sin capas con drift.' if drifted_count == 0 else f'{drifted_count} capas con drift.'} "
-        f"{'Sin capas degradadas.' if degraded_count == 0 else f'{degraded_count} capas degradadas.'} "
-        f"{'Sin regresiones de cobertura.' if partial_coverage_count == 0 else f'{partial_coverage_count} capas con cobertura parcial.'} "
-        f"{'Sin capas en review_terms.' if review_terms_count == 0 else f'{review_terms_count} capas en review_terms.'} "
-        f"{'Sin warnings activos.' if warning_count == 0 else f'{warning_count} warnings activos.'}"
+    attention_count = (
+        stale_count
+        + unknown_freshness_count
+        + drifted_count
+        + degraded_count
+        + partial_coverage_count
     )
 
     with local_server() as url, sync_playwright() as p:
@@ -201,8 +194,14 @@ def verify_landing():
             fail(f"Unexpected top issue href: {top_issue_href}")
 
         status_subtitle = page.locator("#status-subtitle").inner_text()
-        if status_subtitle != expected_status_subtitle:
-            fail(f"Unexpected status subtitle: {status_subtitle}")
+        if current_overall_status == "ok" and attention_count == 0:
+            if f"{len(datasets)} capas disponibles y actualizadas." not in status_subtitle:
+                fail(f"Unexpected healthy status subtitle: {status_subtitle}")
+        elif status_subtitle != (
+            f"{attention_count} señales requieren revisión en {len(datasets)} capas. "
+            "Abre los detalles técnicos para ver el diagnóstico."
+        ):
+            fail(f"Unexpected attention status subtitle: {status_subtitle}")
         status_meta_locator = page.locator("#status-meta")
         if status_meta_locator.count() != 1:
             fail("Expected exactly one #status-meta element")
@@ -272,11 +271,18 @@ def verify_landing():
 
         quickstart_titles = page.locator(".quickstart-title").all_inner_texts()
         if quickstart_titles != [
-            "Python + helper",
+            "Python + Polars",
             "DuckDB directo",
-            "CLI y refresh local",
+            "JSON + curl",
         ]:
             fail(f"Unexpected quickstart titles: {quickstart_titles}")
+
+        quickstart_code = page.locator("#quickstart-python").inner_text()
+        if (
+            "https://cortega26.github.io/chile-hub/data/normalized/comunas.parquet"
+            not in quickstart_code
+        ):
+            fail(f"Public data URL missing from quickstart: {quickstart_code}")
 
         first_card = page.locator(".dataset-card").first
         first_card_name = first_card.locator(".dataset-name").inner_text()
@@ -285,12 +291,22 @@ def verify_landing():
 
         first_card_actions = first_card.locator(".dataset-action").all_inner_texts()
         if (
-            len(first_card_actions) < 3
+            len(first_card_actions) < 4
             or not first_card_actions[0].startswith("PARQUET · ")
             or not first_card_actions[1].startswith("JSON · ")
-            or first_card_actions[2] != "Docs"
+            or first_card_actions[2] != "Vista previa"
+            or first_card_actions[3] != "Ficha técnica"
         ):
             fail(f"Unexpected first dataset actions: {first_card_actions}")
+
+        first_card.get_by_role("button", name="Vista previa").click()
+        preview_rows = first_card.locator(".dataset-preview-table tbody tr")
+        preview_rows.first.wait_for()
+        preview_row_count = preview_rows.count()
+        if preview_row_count > 5:
+            fail(f"Unexpected preview row count: {preview_row_count}")
+        if first_card.locator(".dataset-preview-table th").count() == 0:
+            fail("Dataset preview did not render column headers")
 
         first_card.locator(".dataset-details").click()
 
@@ -340,8 +356,14 @@ def verify_landing():
             fail(f"Unexpected dataset example title: {example_title}")
 
         initial_line = first_card.locator(".dataset-example-code").inner_text().splitlines()[0]
-        if initial_line != "from src.chile_hub import ChileHub":
+        if initial_line != "import polars as pl":
             fail(f"Unexpected initial example line: {initial_line}")
+
+        if (
+            "https://cortega26.github.io/chile-hub/"
+            not in first_card.locator(".dataset-example-code").inner_text()
+        ):
+            fail("Dataset recipe does not use a public URL")
 
         first_card.locator(".dataset-example-tab", has_text="duckdb").click()
         page.wait_for_timeout(100)
@@ -349,7 +371,7 @@ def verify_landing():
         if after_tab_line != "SELECT *":
             fail(f"Unexpected duckdb example line: {after_tab_line}")
 
-        first_card.locator(".dataset-example-tab", has_text="cli").click()
+        first_card.locator(".dataset-example-tab", has_text="curl").click()
         page.wait_for_timeout(100)
         copy_button = first_card.locator(".dataset-example-copy")
         copy_button.click()
@@ -371,6 +393,17 @@ def verify_landing():
         monedario_href = monedario_bridge.get_by_role("link").get_attribute("href")
         if monedario_href != "https://monedario.cl/guias/uf-costo-de-vida/":
             fail(f"Unexpected Monedario href: {monedario_href}")
+
+        request_dataset_href = page.get_by_role("link", name="Solicitar un dataset").get_attribute(
+            "href"
+        )
+        if "github.com/cortega26/chile-hub/issues/new" not in request_dataset_href:
+            fail(f"Unexpected dataset request href: {request_dataset_href}")
+        share_project_href = page.get_by_role("link", name="Compartir un proyecto").get_attribute(
+            "href"
+        )
+        if "github.com/cortega26/chile-hub/issues/new" not in share_project_href:
+            fail(f"Unexpected project sharing href: {share_project_href}")
 
         top_issue_card = (
             page.locator(".dataset-card")
@@ -398,7 +431,7 @@ def verify_landing():
 
     print(
         "Landing verification passed: status, package surface, freshness, coverage, drift, reuse metadata, "
-        "quickstart, artifact metadata, dataset examples and copy interactions are working."
+        "public quickstart, previews, feedback actions, artifact metadata, dataset examples and copy interactions are working."
     )
 
 

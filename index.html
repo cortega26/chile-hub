@@ -1168,12 +1168,27 @@
         main > #cobertura { order: 4; }
         main > #confianza { order: 5; }
         main > .quickstart-section { order: 6; }
-        main > .manifesto { order: 7; }
-        main > .explorer-heading { order: 8; }
-        main > .search-section { order: 9; }
-        main > .table-container { order: 10; }
-        main > .status-banner { order: 11; }
-        main > .package-section { order: 12; }
+        main > .participate-section { order: 7; }
+        main > .manifesto { order: 8; }
+        main > .explorer-heading { order: 9; }
+        main > .search-section { order: 10; }
+        main > .table-container { order: 11; }
+        main > .status-banner { order: 12; }
+        main > .package-section { order: 13; }
+
+        .dataset-action:is(button) { font: inherit; cursor: pointer; }
+        .dataset-preview { border-top: 1px solid var(--border-color); padding-top: 0.8rem; }
+        .dataset-preview-table-wrap { overflow-x: auto; border: 1px solid var(--border-color); border-radius: 6px; }
+        .dataset-preview-table { min-width: 100%; font-size: 0.76rem; }
+        .dataset-preview-table th, .dataset-preview-table td { padding: 0.55rem 0.65rem; white-space: nowrap; text-align: left; }
+        .dataset-preview-table th { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+        .dataset-preview-note, .dataset-preview-state { margin-top: 0.6rem; color: var(--text-secondary); font-size: 0.78rem; }
+        .dataset-preview-state.error { color: #8b3b2f; }
+
+        .participate-section { display: flex; justify-content: space-between; align-items: center; gap: 2rem; padding: 1.5rem 0; border-block: 1px solid var(--border-color); }
+        .participate-section h2 { font-size: 1.35rem; margin-bottom: 0.45rem; }
+        .participate-section p { max-width: 680px; color: var(--text-secondary); line-height: 1.55; }
+        .participate-actions { display: flex; flex-wrap: wrap; gap: 0.65rem; flex-shrink: 0; }
 
         .status-banner { margin-top: 1.5rem; }
         .status-banner .status-title { font-size: 0.95rem; }
@@ -1184,6 +1199,7 @@
         @media (max-width: 900px) {
             .site-nav a:not(.nav-github) { display: none; }
             .intro, .section-heading, .manifesto { grid-template-columns: 1fr; gap: 1.5rem; }
+            .participate-section { align-items: flex-start; flex-direction: column; }
             .intro-proof { border-left: 0; border-top: 1px solid var(--border-color); padding: 1.25rem 0 0; }
             .intro-proof dl { grid-template-columns: repeat(3, 1fr); }
             .domain-list { grid-template-columns: repeat(2, 1fr); }
@@ -1214,6 +1230,7 @@
             <a href="#cobertura">Cobertura</a>
             <a href="#confianza">Metodología</a>
             <a href="#uso">Desarrolladores</a>
+            <a href="#participar">Participar</a>
             <a class="nav-github" href="https://github.com/cortega26/chile-hub" target="_blank" rel="noopener noreferrer">GitHub Repo</a>
         </nav>
     </header>
@@ -1350,42 +1367,51 @@
             <div class="catalog-header">
                 <div>
                     <div class="catalog-title">Uso rápido</div>
-                    <div class="catalog-meta">Recetas mínimas para Python, SQL y CLI.</div>
+                    <div class="catalog-meta">Consume archivos publicados sin clonar el repositorio ni instalar el helper.</div>
                 </div>
             </div>
             <div class="quickstart-grid">
                 <article class="quickstart-card">
                     <div class="quickstart-head">
-                        <div class="quickstart-title">Python + helper</div>
+                        <div class="quickstart-title">Python + Polars</div>
                         <button class="quickstart-copy" data-copy-target="quickstart-python">Copiar</button>
                     </div>
-                    <div class="quickstart-desc">Ideal si quieres descubrir capas y cargar Parquet sin recordar paths manualmente.</div>
-                    <pre class="quickstart-code" id="quickstart-python">from src.chile_hub import ChileHub
+                    <div class="quickstart-desc">Carga el Parquet publicado directamente desde cualquier notebook o servicio.</div>
+                    <pre class="quickstart-code" id="quickstart-python">import polars as pl
 
-hub = ChileHub()
-print(hub.list_datasets())
-df = hub.load_polars("comunas")</pre>
+url = "https://cortega26.github.io/chile-hub/data/normalized/comunas.parquet"
+df = pl.read_parquet(url)</pre>
                 </article>
                 <article class="quickstart-card">
                     <div class="quickstart-head">
                         <div class="quickstart-title">DuckDB directo</div>
                         <button class="quickstart-copy" data-copy-target="quickstart-duckdb">Copiar</button>
                     </div>
-                    <div class="quickstart-desc">Útil para explorar datasets rápido desde SQL sin depender de otro stack.</div>
+                    <div class="quickstart-desc">Consulta el archivo remoto con SQL, sin descargarlo manualmente.</div>
                     <pre class="quickstart-code" id="quickstart-duckdb">SELECT *
-FROM 'data/normalized/comunas.parquet'
+FROM read_parquet('https://cortega26.github.io/chile-hub/data/normalized/comunas.parquet')
 LIMIT 10;</pre>
                 </article>
                 <article class="quickstart-card">
                     <div class="quickstart-head">
-                        <div class="quickstart-title">CLI y refresh local</div>
+                        <div class="quickstart-title">JSON + curl</div>
                         <button class="quickstart-copy" data-copy-target="quickstart-cli">Copiar</button>
                     </div>
-                    <div class="quickstart-desc">La ruta más corta para reconstruir el hub y revisar su estado local.</div>
-                    <pre class="quickstart-code" id="quickstart-cli">make refresh
-make status
-make hub-list</pre>
+                    <div class="quickstart-desc">Descarga un artefacto abierto con una herramienta disponible en cualquier entorno.</div>
+                    <pre class="quickstart-code" id="quickstart-cli">curl -L "https://cortega26.github.io/chile-hub/data/normalized/comunas.json" \
+  -o comunas.json</pre>
                 </article>
+            </div>
+        </section>
+
+        <section class="participate-section" id="participar">
+            <div>
+                <h2>Ayuda a decidir qué mejorar después</h2>
+                <p>Los nuevos datasets y formatos se priorizan con casos de uso reales. Cuéntanos qué dato necesitas o comparte un proyecto construido con chile-hub.</p>
+            </div>
+            <div class="participate-actions">
+                <a class="btn btn-primary" href="https://github.com/cortega26/chile-hub/issues/new?title=Solicitud%20de%20dataset%3A%20&amp;body=%23%23%20Dato%20que%20necesito%0A%0A%23%23%20Caso%20de%20uso%0A%0A%23%23%20Fuente%20oficial%20sugerida%0A" target="_blank" rel="noopener noreferrer">Solicitar un dataset</a>
+                <a class="dataset-action muted" href="https://github.com/cortega26/chile-hub/issues/new?title=Proyecto%20construido%20con%20chile-hub%3A%20&amp;body=%23%23%20Qu%C3%A9%20constru%C3%AD%0A%0A%23%23%20Datasets%20utilizados%0A%0A%23%23%20Enlace%0A" target="_blank" rel="noopener noreferrer">Compartir un proyecto</a>
             </div>
         </section>
 

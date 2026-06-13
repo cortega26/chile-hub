@@ -26,6 +26,8 @@ const catalogCount = document.getElementById("catalog-count");
 const quickstartCopyButtons = document.querySelectorAll(".quickstart-copy");
 let artifactManifestByPath = {};
 let packageManifestByPath = {};
+const PUBLIC_DATA_BASE = "https://cortega26.github.io/chile-hub/data/normalized";
+const PREVIEW_ROW_LIMIT = 5;
 
 // Formateador de moneda en pesos chilenos (CLP)
 const formatCLP = new Intl.NumberFormat("es-CL", {
@@ -181,8 +183,20 @@ function findReportPath(reports, sharedType, format, fallbackPath) {
 }
 
 function buildDatasetExample(dataset, preferredKind = "python") {
-    const examples = dataset.usage_examples || {};
-    const kinds = ["python", "duckdb", "cli"].filter(kind => examples[kind]);
+    const parquetName = dataset.outputs?.parquet?.split("/").pop();
+    const jsonName = dataset.outputs?.json?.split("/").pop();
+    const examples = {
+        python: parquetName
+            ? `import polars as pl\n\ndf = pl.read_parquet("${PUBLIC_DATA_BASE}/${parquetName}")\nprint(df.head())`
+            : null,
+        duckdb: parquetName
+            ? `SELECT *\nFROM read_parquet('${PUBLIC_DATA_BASE}/${parquetName}')\nLIMIT 10;`
+            : null,
+        curl: jsonName
+            ? `curl -L "${PUBLIC_DATA_BASE}/${jsonName}" -o ${jsonName}`
+            : null,
+    };
+    const kinds = ["python", "duckdb", "curl"].filter(kind => examples[kind]);
     if (kinds.length === 0) return "";
 
     const activeKind = kinds.includes(preferredKind) ? preferredKind : kinds[0];
@@ -205,6 +219,58 @@ function buildDatasetExample(dataset, preferredKind = "python") {
             <pre class="dataset-example-code" id="${exampleId}">${escapeHtml(examples[activeKind])}</pre>
         </div>
     `;
+}
+
+function formatPreviewValue(value) {
+    if (value === null || value === undefined) return "N/D";
+    if (typeof value === "number") return formatNum.format(value);
+    if (typeof value === "object") return JSON.stringify(value);
+    return String(value);
+}
+
+function buildPreviewTable(rows) {
+    if (!Array.isArray(rows) || rows.length === 0) {
+        return `<p class="dataset-preview-state">El archivo no contiene filas para mostrar.</p>`;
+    }
+    const columns = Object.keys(rows[0]).slice(0, 6);
+    return `
+        <div class="dataset-preview-table-wrap">
+            <table class="dataset-preview-table">
+                <thead><tr>${columns.map(column => `<th>${escapeHtml(column)}</th>`).join("")}</tr></thead>
+                <tbody>${rows.slice(0, PREVIEW_ROW_LIMIT).map(row => `
+                    <tr>${columns.map(column => `<td>${escapeHtml(formatPreviewValue(row[column]))}</td>`).join("")}</tr>
+                `).join("")}</tbody>
+            </table>
+        </div>
+        <p class="dataset-preview-note">Primeras ${Math.min(rows.length, PREVIEW_ROW_LIMIT)} filas · ${columns.length} columnas visibles</p>
+    `;
+}
+
+async function loadDatasetPreview(button) {
+    const target = document.getElementById(button.dataset.previewTarget);
+    if (!target) return;
+    const expanded = button.getAttribute("aria-expanded") === "true";
+    button.setAttribute("aria-expanded", String(!expanded));
+    target.hidden = expanded;
+    if (expanded || target.dataset.loaded === "true") return;
+
+    target.innerHTML = `<p class="dataset-preview-state">Cargando muestra publicada...</p>`;
+    try {
+        const response = await fetch(button.dataset.previewPath);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const rows = await response.json();
+        target.innerHTML = buildPreviewTable(rows);
+        target.dataset.loaded = "true";
+    } catch (error) {
+        console.error("No se pudo cargar la vista previa:", error);
+        target.innerHTML = `<p class="dataset-preview-state error">No fue posible cargar la muestra. El archivo JSON sigue disponible para descarga.</p>`;
+    }
+}
+
+function wireDatasetPreviewInteractions() {
+    document.querySelectorAll("[data-preview-target]").forEach(button => {
+        button.addEventListener("click", () => loadDatasetPreview(button));
+    });
 }
 
 function buildMonedarioBridge(dataset) {
@@ -363,7 +429,10 @@ function renderCatalog(bundle) {
     const verifyCommand = zipPackage?.verification_command
         || (zipPackage?.checksum_path ? `shasum -a 256 -c ${zipPackage.checksum_path}` : "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256");
 
-    statusSubtitle.textContent = `${liveCount}/${datasets.length} capas operativas en modo live. Estado build: ${buildOverallStatus}. Estado actual: ${currentOverallStatus}. ${staleCount === 0 ? "Sin capas stale." : `${staleCount} capas stale.`} ${unknownFreshnessCount === 0 ? "Sin capas con freshness unknown." : `${unknownFreshnessCount} capas con freshness unknown.`} ${driftedCount === 0 ? "Sin capas con drift." : `${driftedCount} capas con drift.`} ${degradedCount === 0 ? "Sin capas degradadas." : `${degradedCount} capas degradadas.`} ${partialCoverageCount === 0 ? "Sin regresiones de cobertura." : `${partialCoverageCount} capas con cobertura parcial.`} ${reviewTermsCount === 0 ? "Sin capas en review_terms." : `${reviewTermsCount} capas en review_terms.`} ${warningCount === 0 ? "Sin warnings activos." : `${warningCount} warnings activos.`}`;
+    const attentionCount = staleCount + unknownFreshnessCount + driftedCount + degradedCount + partialCoverageCount;
+    statusSubtitle.textContent = currentOverallStatus === "ok" && attentionCount === 0
+        ? `${datasets.length} capas disponibles y actualizadas. Último build: ${formatTimestamp(bundle.generated_at_utc)}.`
+        : `${attentionCount} señales requieren revisión en ${datasets.length} capas. Abre los detalles técnicos para ver el diagnóstico.`;
     packageMeta.textContent = zipPackage
         ? `Tamaño: ${formatBytes(zipPackage.size_bytes)} · sha256: ${zipHash} · generado junto al último build`
         : "No hay package ZIP disponible en este build.";
@@ -474,6 +543,7 @@ function renderCatalog(bundle) {
         const parquetPath = dataset.outputs?.parquet;
         const docsPath = dataset.documentation;
         const sourceUrl = dataset.source_url;
+        const previewId = `dataset-preview-${dataset.dataset}`;
         const recordCount = typeof dataset.record_count === "number"
             ? formatNum.format(dataset.record_count)
             : "N/D";
@@ -507,10 +577,12 @@ function renderCatalog(bundle) {
                 <div class="dataset-actions">
                     ${buildArtifactLink(parquetPath, "Parquet")}
                     ${buildArtifactLink(jsonPath, "JSON")}
-                    ${docsPath ? `<a class="dataset-action muted" href="${escapeHtml(docsPath)}" target="_blank" rel="noopener noreferrer">Docs</a>` : ""}
+                    ${jsonPath ? `<button class="dataset-action muted" type="button" data-preview-target="${escapeHtml(previewId)}" data-preview-path="${escapeHtml(jsonPath)}" aria-expanded="false">Vista previa</button>` : ""}
+                    ${docsPath ? `<a class="dataset-action muted" href="${escapeHtml(docsPath)}" target="_blank" rel="noopener noreferrer">Ficha técnica</a>` : ""}
                 </div>
+                <div class="dataset-preview" id="${escapeHtml(previewId)}" hidden aria-live="polite"></div>
                 <details class="dataset-details">
-                    <summary>Metadatos, fuente y recetas</summary>
+                    <summary>Contrato, procedencia y recetas</summary>
                     <div class="dataset-facts">
                     <div class="dataset-fact">
                         <span class="dataset-fact-label">Join keys</span>
@@ -568,6 +640,7 @@ function renderCatalog(bundle) {
     }).join("");
 
     wireDatasetExampleInteractions();
+    wireDatasetPreviewInteractions();
     filterCatalog();
 
     if (packageVerifyCopy && !packageVerifyCopy.dataset.wired) {
