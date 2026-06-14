@@ -3,8 +3,10 @@ repos:
     rev: v0.15.17
     hooks:
       - id: ruff-check
-        args: [--fix]
+        # Commit hooks must not rewrite partially staged files. Run
+        # `pre-commit run --all-files` after `ruff check --fix` when fixing locally.
       - id: ruff-format
+        args: [--check]
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:

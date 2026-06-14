@@ -1,7 +1,7 @@
 {
-  "generated_at_utc": "2026-06-14T18:08:08.213189+00:00",
-  "dataset_count": 7,
-  "ready_count": 7,
+  "generated_at_utc": "2026-06-14T18:39:25.330840+00:00",
+  "dataset_count": 8,
+  "ready_count": 8,
   "review_terms_count": 0,
   "unknown_count": 0,
   "datasets": [
@@ -88,6 +88,18 @@
       "summary": "Directorio oficial MINSAL publicado en datos.gob.cl bajo CC0.",
       "recommended_action": "Publicable con atribucion y referencia de fuente.",
       "documentation": "docs/datasets/establecimientos_salud.md"
+    },
+    {
+      "dataset": "censo_hogares_viviendas",
+      "publishability_status": "ready",
+      "license": "CC BY 4.0",
+      "license_url": "https://www.ine.gob.cl/terminos-de-uso",
+      "reuse_status": "open-attribution",
+      "attribution_required": true,
+      "redistribution_ok": true,
+      "summary": "Resultados oficiales del Censo 2024 publicados por el INE.",
+      "recommended_action": "Publicable con atribucion y referencia de fuente.",
+      "documentation": "docs/datasets/censo_hogares_viviendas.md"
     }
   ]
 }

@@ -126,6 +126,55 @@ def validate_establecimientos_salud(df_salud, metadata, valid_commune_codes=None
     }
 
 
+def validate_censo_hogares_viviendas(df, metadata, valid_commune_codes=None):
+    errors = []
+    if df.height != 346:
+        errors.append(f"censo_hogares_viviendas expected 346 communes, found {df.height}")
+    if df.height - df["codigo_comuna"].n_unique() > 0:
+        errors.append("codigo_comuna must be unique in censo_hogares_viviendas")
+    if valid_commune_codes is not None:
+        unknown = set(df["codigo_comuna"].to_list()) - set(valid_commune_codes)
+        if unknown:
+            errors.append(f"censo_hogares_viviendas references unknown communes: {sorted(unknown)}")
+    inconsistent = df.filter(
+        pl.col("viviendas_particulares_ocupadas")
+        + pl.col("viviendas_particulares_desocupadas")
+        + pl.col("viviendas_colectivas")
+        != pl.col("viviendas_censadas")
+    ).height
+    if inconsistent:
+        errors.append(f"housing totals are inconsistent for {inconsistent} communes")
+    return {
+        "dataset": "censo_hogares_viviendas",
+        "status": "error" if errors else "ok",
+        "record_count": df.height,
+        "errors": errors,
+        "warnings": [],
+    }
+
+
+def validate_establecimientos_educacionales(df, metadata, valid_commune_codes=None):
+    errors = []
+    if df.height == 0:
+        errors.append("establecimientos_educacionales dataset is empty")
+    if df.height - df["rbd"].n_unique() > 0:
+        errors.append("rbd must be unique")
+    invalid = df.filter(pl.col("codigo_comuna").str.len_chars() != 5).height
+    if invalid:
+        errors.append(f"found {invalid} invalid codigo_comuna values")
+    if valid_commune_codes is not None:
+        unknown = set(df["codigo_comuna"].drop_nulls().to_list()) - set(valid_commune_codes)
+        if unknown:
+            errors.append(f"education facilities reference unknown communes: {sorted(unknown)}")
+    return {
+        "dataset": "establecimientos_educacionales",
+        "status": "error" if errors else "ok",
+        "record_count": df.height,
+        "errors": errors,
+        "warnings": [],
+    }
+
+
 def validate_indicadores(df_indicadores, metadata):
     errors = []
     warnings = []

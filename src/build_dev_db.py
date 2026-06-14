@@ -26,6 +26,7 @@ from src.pipeline_status_utils import (
 )
 from src.validation import (
     validate_censo_comunal,
+    validate_censo_hogares_viviendas,
     validate_comunas,
     validate_establecimientos_salud,
     validate_indicadores,
@@ -41,6 +42,7 @@ COMUNAS_METADATA_PATH = os.path.join(STAGING_DIR, "comunas.metadata.json")
 INDICADORES_METADATA_PATH = os.path.join(STAGING_DIR, "indicadores.metadata.json")
 CENSO_METADATA_PATH = os.path.join(STAGING_DIR, "censo_comunal.metadata.json")
 SALUD_METADATA_PATH = os.path.join(STAGING_DIR, "establecimientos_salud.metadata.json")
+CENSO_HOGARES_METADATA_PATH = os.path.join(STAGING_DIR, "censo_hogares_viviendas.metadata.json")
 PUBLISHABLE_ARTIFACT_SUFFIXES = (".json", ".md", ".parquet")
 PUBLISHABLE_BUNDLE_ZIP_NAME = "chile-hub-publishable-bundle.zip"
 PUBLISHABLE_BUNDLE_SHA256_NAME = "chile-hub-publishable-bundle.zip.sha256"
@@ -235,6 +237,31 @@ DATASET_CATALOG_CONFIG = {
             "excel_sheet": "Censo Comunal",
         },
         "documentation": "docs/datasets/censo_comunal.md",
+    },
+    "censo_hogares_viviendas": {
+        "description": "Viviendas y hogares censados por comuna, ocupacion y tamano medio del hogar.",
+        "join_keys": ["codigo_comuna", "codigo_region"],
+        "confidence_tier": "Tier A",
+        "expected_record_count": 346,
+        "reuse_policy": {
+            "status": "open-attribution",
+            "license": "CC BY 4.0",
+            "license_url": "https://www.ine.gob.cl/terminos-de-uso",
+            "attribution_required": True,
+            "redistribution_ok": True,
+            "summary": "Resultados oficiales del Censo 2024 publicados por el INE.",
+        },
+        "freshness_policy": {"max_age_hours": 87600, "label": "decenal"},
+        "usage_examples": {
+            "python": "from src.chile_hub import ChileHub\nhub = ChileHub()\ndf = hub.load_polars('censo_hogares_viviendas')",
+            "duckdb": "SELECT * FROM 'data/normalized/censo_hogares_viviendas.parquet';",
+            "cli": "python -m src.chile_hub show censo_hogares_viviendas",
+        },
+        "outputs": {
+            "parquet": "data/normalized/censo_hogares_viviendas.parquet",
+            "json": "data/normalized/censo_hogares_viviendas.json",
+        },
+        "documentation": "docs/datasets/censo_hogares_viviendas.md",
     },
     "establecimientos_salud": {
         "description": "Directorio vigente de establecimientos de salud con tipo, dependencia, urgencia y ubicacion.",
@@ -1310,8 +1337,9 @@ def main():
     indicadores_csv = os.path.join(STAGING_DIR, "indicadores.csv")
     censo_csv = os.path.join(STAGING_DIR, "censo_comunal.csv")
     salud_csv = os.path.join(STAGING_DIR, "establecimientos_salud.csv")
+    censo_hogares_csv = os.path.join(STAGING_DIR, "censo_hogares_viviendas.csv")
 
-    required_staging = (comunas_csv, indicadores_csv, censo_csv, salud_csv)
+    required_staging = (comunas_csv, indicadores_csv, censo_csv, salud_csv, censo_hogares_csv)
     if any(not os.path.exists(path) for path in required_staging):
         raise SystemExit(
             "Error: No se encuentran los archivos CSV en staging. Corre los extractores primero."
@@ -1321,6 +1349,7 @@ def main():
     indicadores_metadata = load_metadata(INDICADORES_METADATA_PATH)
     censo_metadata = load_metadata(CENSO_METADATA_PATH)
     salud_metadata = load_metadata(SALUD_METADATA_PATH)
+    censo_hogares_metadata = load_metadata(CENSO_HOGARES_METADATA_PATH)
     indicadores_metadata["indicator_codes"] = sorted(
         df_code for df_code in indicadores_metadata.get("indicator_codes", [])
     )
@@ -1357,6 +1386,14 @@ def main():
             "codigo_comuna": pl.String,
         },
     )
+    df_censo_hogares = pl.read_csv(
+        censo_hogares_csv,
+        schema_overrides={
+            "codigo_region": pl.String,
+            "codigo_provincia": pl.String,
+            "codigo_comuna": pl.String,
+        },
+    )
     df_regiones, df_provincias = derive_geography_layers(df_comunas)
 
     validations = {
@@ -1371,6 +1408,9 @@ def main():
         "censo_comunal": validate_censo_comunal(df_censo, censo_metadata),
         "establecimientos_salud": validate_establecimientos_salud(
             df_salud, salud_metadata, df_comunas["codigo_comuna"].to_list()
+        ),
+        "censo_hogares_viviendas": validate_censo_hogares_viviendas(
+            df_censo_hogares, censo_hogares_metadata, df_comunas["codigo_comuna"].to_list()
         ),
     }
 
@@ -1413,6 +1453,11 @@ def main():
         os.path.join(NORMALIZED_DIR, "chile_data_latest.xlsx"),
     )
     build_flat_files(df_regiones, df_provincias, df_comunas, df_indicadores, df_censo, df_salud)
+    df_censo_hogares.write_parquet(os.path.join(NORMALIZED_DIR, "censo_hogares_viviendas.parquet"))
+    with open(
+        os.path.join(NORMALIZED_DIR, "censo_hogares_viviendas.json"), "w", encoding="utf-8"
+    ) as f:
+        json.dump(df_censo_hogares.to_dicts(), f, ensure_ascii=False, indent=2)
     dataset_metadata = {
         "regiones": {
             **comunas_metadata,
@@ -1498,6 +1543,17 @@ def main():
             "freshness": build_freshness(
                 salud_metadata.get("refreshed_at_utc"),
                 DATASET_CATALOG_CONFIG["establecimientos_salud"]["freshness_policy"][
+                    "max_age_hours"
+                ],
+            ),
+        },
+        "censo_hogares_viviendas": {
+            **censo_hogares_metadata,
+            "record_count": df_censo_hogares.height,
+            "fields": df_censo_hogares.columns,
+            "freshness": build_freshness(
+                censo_hogares_metadata.get("refreshed_at_utc"),
+                DATASET_CATALOG_CONFIG["censo_hogares_viviendas"]["freshness_policy"][
                     "max_age_hours"
                 ],
             ),

@@ -1,8 +1,8 @@
 {
-  "generated_at_utc": "2026-06-14T18:08:08.213189+00:00",
-  "dataset_count": 7,
+  "generated_at_utc": "2026-06-14T18:39:25.330840+00:00",
+  "dataset_count": 8,
   "drifted_count": 1,
-  "healthy_count": 6,
+  "healthy_count": 7,
   "fallback_count": 0,
   "partial_coverage_count": 0,
   "degraded_count": 0,
@@ -111,6 +111,21 @@
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
       "recommended_action": "Ninguna.",
       "documentation": "docs/datasets/establecimientos_salud.md"
+    },
+    {
+      "dataset": "censo_hogares_viviendas",
+      "drift_status": "healthy",
+      "source_mode": "live",
+      "coverage_status": "full",
+      "coverage_ratio": 1.0,
+      "coverage_summary": "Cobertura completa: 346/346 filas respecto del baseline esperado.",
+      "degradation_status": "none",
+      "degradation_impact": "Sin degradación operativa detectada en este build.",
+      "drift_summary": "Sin drift operativo detectado en este build.",
+      "warning_count": 0,
+      "diagnostic_summary": "Sin degradación operativa detectada en este build.",
+      "recommended_action": "Ninguna.",
+      "documentation": "docs/datasets/censo_hogares_viviendas.md"
     }
   ]
 }

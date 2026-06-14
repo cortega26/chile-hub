@@ -61,6 +61,7 @@ class PipelineLogicTests(unittest.TestCase):
                 "comunas_enriquecidas",
                 "indicadores",
                 "censo_comunal",
+                "censo_hogares_viviendas",
                 "establecimientos_salud",
             ]
         }
@@ -84,6 +85,7 @@ class PipelineLogicTests(unittest.TestCase):
                 "comunas_enriquecidas",
                 "indicadores",
                 "censo_comunal",
+                "censo_hogares_viviendas",
                 "establecimientos_salud",
             ]
         }

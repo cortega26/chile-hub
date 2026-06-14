@@ -1,15 +1,15 @@
 # chile-hub health summary
 
-- `generated_at_utc`: `2026-06-14T18:08:08.213189+00:00`
+- `generated_at_utc`: `2026-06-14T18:39:25.330840+00:00`
 - `overall_status`: `warn`
-- `dataset_count`: `7`
-- `ok_count`: `6`
+- `dataset_count`: `8`
+- `ok_count`: `7`
 - `warn_count`: `1`
 - `error_count`: `0`
-- `live_count`: `7`
+- `live_count`: `8`
 - `fallback_count`: `0`
 - `stale_count`: `0`
-- `publishable_count`: `7`
+- `publishable_count`: `8`
 - `review_terms_count`: `0`
 - `unknown_reuse_count`: `0`
 - `degraded_count`: `0`
@@ -26,6 +26,7 @@
 | Dataset | Severity | Mode | Freshness | Coverage | Drift | Publishability | Degradation | Validation | Warnings |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | ---: |
 | `censo_comunal` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
+| `censo_hogares_viviendas` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `comunas` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `comunas_enriquecidas` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `establecimientos_salud` | `ok` | `live` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 0 |

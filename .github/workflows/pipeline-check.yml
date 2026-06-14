@@ -83,6 +83,7 @@ jobs:
           python src/extractors/subdere_extractor.py
           python src/extractors/bcentral_extractor.py
           python src/extractors/censo_extractor.py
+          python src/extractors/censo_hogares_viviendas_extractor.py
           python src/extractors/salud_extractor.py
 
       - name: Build outputs

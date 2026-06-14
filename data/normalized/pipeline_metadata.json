@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-06-14T18:08:08.213189+00:00",
+  "generated_at_utc": "2026-06-14T18:39:25.330840+00:00",
   "datasets": {
     "regiones": {
       "dataset": "regiones",
@@ -28,9 +28,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 20.09,
+        "age_hours": 20.61,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-14T18:08:08.212783+00:00"
+        "checked_at_utc": "2026-06-14T18:39:25.330063+00:00"
       },
       "degradation": {
         "status": "none",
@@ -79,9 +79,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 20.09,
+        "age_hours": 20.61,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-14T18:08:08.212822+00:00"
+        "checked_at_utc": "2026-06-14T18:39:25.330153+00:00"
       },
       "degradation": {
         "status": "none",
@@ -137,9 +137,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 20.09,
+        "age_hours": 20.61,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-14T18:08:08.212831+00:00"
+        "checked_at_utc": "2026-06-14T18:39:25.330178+00:00"
       },
       "degradation": {
         "status": "none",
@@ -195,9 +195,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 20.09,
+        "age_hours": 20.61,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-14T18:08:08.212836+00:00"
+        "checked_at_utc": "2026-06-14T18:39:25.330187+00:00"
       },
       "degradation": {
         "status": "none",
@@ -266,9 +266,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 20.09,
+        "age_hours": 20.61,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-06-14T18:08:08.213090+00:00"
+        "checked_at_utc": "2026-06-14T18:39:25.330707+00:00"
       },
       "degradation": {
         "status": "warning",
@@ -326,9 +326,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.0,
+        "age_hours": 0.52,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-06-14T18:08:08.213104+00:00"
+        "checked_at_utc": "2026-06-14T18:39:25.330733+00:00"
       },
       "degradation": {
         "status": "none",
@@ -383,9 +383,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.02,
+        "age_hours": 0.54,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-06-14T18:08:08.213113+00:00"
+        "checked_at_utc": "2026-06-14T18:39:25.330749+00:00"
       },
       "degradation": {
         "status": "none",
@@ -404,6 +404,61 @@
         "summary": "Sin drift operativo detectado en este build.",
         "recommended_action": "Ninguna."
       }
+    },
+    "censo_hogares_viviendas": {
+      "dataset": "censo_hogares_viviendas",
+      "source_name": "Instituto Nacional de Estadisticas - Censo 2024",
+      "source_url": "https://censo2024.ine.gob.cl/wp-content/uploads/2025/03/V1_Viviendas-y-hogares-censados.xlsx",
+      "source_mode": "live",
+      "source_detail": "official_xlsx",
+      "refreshed_at_utc": "2026-06-14T18:39:22.957446+00:00",
+      "record_count": 346,
+      "fields": [
+        "codigo_region",
+        "nombre_region",
+        "codigo_provincia",
+        "nombre_provincia",
+        "codigo_comuna",
+        "nombre_comuna",
+        "viviendas_censadas",
+        "viviendas_particulares_ocupadas",
+        "viviendas_particulares_desocupadas",
+        "viviendas_colectivas",
+        "hogares_censados",
+        "promedio_personas_hogar"
+      ],
+      "notes": [],
+      "reuse_policy": {
+        "status": "open-attribution",
+        "license": "CC BY 4.0",
+        "license_url": "https://www.ine.gob.cl/terminos-de-uso",
+        "attribution_required": true,
+        "redistribution_ok": true,
+        "summary": "Resultados oficiales del Censo 2024; atribucion requerida."
+      },
+      "freshness": {
+        "status": "fresh",
+        "age_hours": 0.0,
+        "max_age_hours": 87600,
+        "checked_at_utc": "2026-06-14T18:39:25.330759+00:00"
+      },
+      "degradation": {
+        "status": "none",
+        "impact": "Sin degradación operativa detectada en este build.",
+        "recommended_action": "Ninguna."
+      },
+      "coverage": {
+        "status": "full",
+        "expected_record_count": 346,
+        "actual_record_count": 346,
+        "coverage_ratio": 1.0,
+        "summary": "Cobertura completa: 346/346 filas respecto del baseline esperado."
+      },
+      "drift": {
+        "status": "healthy",
+        "summary": "Sin drift operativo detectado en este build.",
+        "recommended_action": "Ninguna."
+      }
     }
   },
   "validations": {
@@ -414,7 +469,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 20.09
+      "freshness_age_hours": 20.61
     },
     "provincias": {
       "dataset": "provincias",
@@ -423,7 +478,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 20.09
+      "freshness_age_hours": 20.61
     },
     "comunas": {
       "dataset": "comunas",
@@ -432,7 +487,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 20.09
+      "freshness_age_hours": 20.61
     },
     "comunas_enriquecidas": {
       "dataset": "comunas_enriquecidas",
@@ -441,7 +496,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 20.09
+      "freshness_age_hours": 20.61
     },
     "indicadores": {
       "dataset": "indicadores",
@@ -459,7 +514,7 @@
         "utm"
       ],
       "freshness_status": "fresh",
-      "freshness_age_hours": 20.09
+      "freshness_age_hours": 20.61
     },
     "censo_comunal": {
       "dataset": "censo_comunal",
@@ -468,7 +523,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.0
+      "freshness_age_hours": 0.52
     },
     "establecimientos_salud": {
       "dataset": "establecimientos_salud",
@@ -477,7 +532,16 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.02
+      "freshness_age_hours": 0.54
+    },
+    "censo_hogares_viviendas": {
+      "dataset": "censo_hogares_viviendas",
+      "status": "ok",
+      "record_count": 346,
+      "errors": [],
+      "warnings": [],
+      "freshness_status": "fresh",
+      "freshness_age_hours": 0.0
     }
   }
 }
