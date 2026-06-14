@@ -60,6 +60,8 @@ class PipelineLogicTests(unittest.TestCase):
                 "comunas",
                 "comunas_enriquecidas",
                 "indicadores",
+                "censo_comunal",
+                "establecimientos_salud",
             ]
         }
         datasets["indicadores"]["indicator_delivery"] = {
@@ -81,6 +83,8 @@ class PipelineLogicTests(unittest.TestCase):
                 "comunas",
                 "comunas_enriquecidas",
                 "indicadores",
+                "censo_comunal",
+                "establecimientos_salud",
             ]
         }
         datasets["indicadores"].update(

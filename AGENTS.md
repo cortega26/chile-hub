@@ -12,13 +12,15 @@ entender la arquitectura, las reglas no negociables y las convenciones del proye
 ## 1. Propósito del proyecto
 
 `chile-hub` es una capa de datos pública, curada y reproducible sobre **datos oficiales de Chile**.
-Actualmente publica cinco capas:
+Actualmente publica siete capas:
 
 | Capa | Fuente | Descripción |
 |:---|:---|:---|
 | **División Político-Administrativa** (regiones, provincias, comunas) | BCN ArcGIS | 16 regiones, 56 provincias, 346 comunas con códigos CUT, coordenadas y abreviaturas |
 | **Comunas Enriquecidas** | BCN ArcGIS + INE | Comunas con coordenadas de cabecera y población estimada INE, listas para análisis territorial |
 | **Indicadores Económicos** | mindicador.cl (datos BCCh / INE) | UF, Dólar, Euro, UTM, IPC — histórico desde 2010, actualización diaria |
+| **Censo Comunal 2024** | INE | Población por sexo y cinco grandes grupos de edad para las 346 comunas |
+| **Establecimientos de Salud** | MINSAL / datos.gob.cl | Directorio vigente con tipo, dependencia, urgencia, estado y coordenadas |
 
 **El objetivo no es tener todos los datos de Chile. Es entregar un número pequeño de datasets
 limpios, versionados, validados y consumibles en una línea de código.**
@@ -35,7 +37,9 @@ chile-hub/
 ├── src/
 │   ├── extractors/
 │   │   ├── subdere_extractor.py   Extrae DPA desde BCN ArcGIS → data/staging/
-│   │   └── bcentral_extractor.py  Extrae indicadores desde mindicador.cl → data/staging/
+│   │   ├── bcentral_extractor.py  Extrae indicadores desde mindicador.cl → data/staging/
+│   │   ├── censo_extractor.py     Extrae perfil comunal Censo 2024 desde INE → data/staging/
+│   │   └── salud_extractor.py     Extrae establecimientos desde MINSAL → data/staging/
 │   ├── build_dev_db.py            Construye todos los artefactos desde staging/
 │   ├── pipeline_status_utils.py   Genera reportes Markdown de salud, catálogo y redistribución
 │   └── chile_hub.py               API Python (ChileHub) + CLI
@@ -64,6 +68,8 @@ chile-hub/
 ```
 1. EXTRACT   src/extractors/subdere_extractor.py
              src/extractors/bcentral_extractor.py
+             src/extractors/censo_extractor.py
+             src/extractors/salud_extractor.py
              → Produce: data/staging/{dataset}.csv + data/staging/{dataset}.metadata.json
              → Produce: data/raw/{source}_{timestamp}.json  (snapshot crudo)
 
@@ -314,6 +320,8 @@ DATA_DIR = "data"
 # Prerequisito: el pipeline debe haber corrido al menos una vez
 python src/extractors/subdere_extractor.py
 python src/extractors/bcentral_extractor.py
+python src/extractors/censo_extractor.py
+python src/extractors/salud_extractor.py
 python src/build_dev_db.py
 
 # Suite completa
@@ -420,6 +428,8 @@ son la última línea de defensa antes de publicar. No bypassear estas validacio
 # Correr el pipeline completo
 python src/extractors/subdere_extractor.py
 python src/extractors/bcentral_extractor.py
+python src/extractors/censo_extractor.py
+python src/extractors/salud_extractor.py
 python src/build_dev_db.py
 
 # Verificar artefactos
@@ -448,5 +458,5 @@ python -m src.chile_hub bundle
 
 ---
 
-*Última actualización: Mayo 2026. Actualizar este documento cuando cambie la arquitectura,
+*Última actualización: Junio 2026. Actualizar este documento cuando cambie la arquitectura,
 se agreguen datasets o se modifiquen invariantes críticas.*

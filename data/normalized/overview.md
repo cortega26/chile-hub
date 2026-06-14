@@ -1,9 +1,9 @@
 # chile-hub overview
 
-- `generated_at_utc`: `2026-06-13T22:57:47.632696+00:00`
+- `generated_at_utc`: `2026-06-14T18:08:08.213189+00:00`
 - `overall_status`: `warn`
-- `dataset_count`: `5`
-- `live_count`: `5`
+- `dataset_count`: `7`
+- `live_count`: `7`
 - `fallback_count`: `0`
 - `stale_count`: `0`
 - `drifted_count`: `1`
@@ -19,8 +19,10 @@
 
 | Dataset | Mode | Validation | Freshness | Coverage | Drift |
 | :--- | :--- | :--- | :--- | :--- | :--- |
+| `censo_comunal` | `live` | `ok` | `fresh` | `full` | `healthy` |
 | `comunas` | `live` | `ok` | `fresh` | `full` | `healthy` |
 | `comunas_enriquecidas` | `live` | `ok` | `fresh` | `full` | `healthy` |
+| `establecimientos_salud` | `live` | `ok` | `fresh` | `not_applicable` | `healthy` |
 | `indicadores` | `live` | `ok` | `fresh` | `not_applicable` | `drifted` |
 | `provincias` | `live` | `ok` | `fresh` | `full` | `healthy` |
 | `regiones` | `live` | `ok` | `fresh` | `full` | `healthy` |
@@ -29,7 +31,7 @@
 
 - `path`: `data/normalized/chile-hub-publishable-bundle.zip`
 - `package_type`: `zip`
-- `size_bytes`: `82460`
+- `size_bytes`: `483235`
 - `checksum`: `sha256` via `data/normalized/chile-hub-publishable-bundle.zip.sha256`
 - `verification_command`: `shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256`
 

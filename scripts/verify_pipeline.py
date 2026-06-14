@@ -29,8 +29,12 @@ def _derive_dataset_artifact_paths():
 _SHARED_FILES = [
     STAGING_DIR / "comunas.csv",
     STAGING_DIR / "indicadores.csv",
+    STAGING_DIR / "censo_comunal.csv",
+    STAGING_DIR / "establecimientos_salud.csv",
     STAGING_DIR / "comunas.metadata.json",
     STAGING_DIR / "indicadores.metadata.json",
+    STAGING_DIR / "censo_comunal.metadata.json",
+    STAGING_DIR / "establecimientos_salud.metadata.json",
     NORMALIZED_DIR / "chile_data.duckdb",
     NORMALIZED_DIR / "chile_data.db",
     NORMALIZED_DIR / "chile_data_latest.xlsx",

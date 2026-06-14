@@ -17,4 +17,5 @@ repos:
       - id: detect-private-key
       - id: check-added-large-files
         args: ['--maxkb=500']
+        exclude: ^data/normalized/
       - id: check-json

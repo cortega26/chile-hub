@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-06-13T22:57:47.632696+00:00",
+  "generated_at_utc": "2026-06-14T18:08:08.213189+00:00",
   "datasets": {
     "regiones": {
       "dataset": "regiones",
@@ -28,9 +28,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.92,
+        "age_hours": 20.09,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-13T22:57:47.632402+00:00"
+        "checked_at_utc": "2026-06-14T18:08:08.212783+00:00"
       },
       "degradation": {
         "status": "none",
@@ -79,9 +79,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.92,
+        "age_hours": 20.09,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-13T22:57:47.632435+00:00"
+        "checked_at_utc": "2026-06-14T18:08:08.212822+00:00"
       },
       "degradation": {
         "status": "none",
@@ -137,9 +137,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.92,
+        "age_hours": 20.09,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-13T22:57:47.632445+00:00"
+        "checked_at_utc": "2026-06-14T18:08:08.212831+00:00"
       },
       "degradation": {
         "status": "none",
@@ -195,9 +195,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.92,
+        "age_hours": 20.09,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-13T22:57:47.632450+00:00"
+        "checked_at_utc": "2026-06-14T18:08:08.212836+00:00"
       },
       "degradation": {
         "status": "none",
@@ -266,9 +266,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.92,
+        "age_hours": 20.09,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-06-13T22:57:47.632655+00:00"
+        "checked_at_utc": "2026-06-14T18:08:08.213090+00:00"
       },
       "degradation": {
         "status": "warning",
@@ -287,6 +287,123 @@
         "summary": "Drift detectado: mode=live, coverage=not_applicable, degradation=warning.",
         "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
       }
+    },
+    "censo_comunal": {
+      "dataset": "censo_comunal",
+      "source_name": "Instituto Nacional de Estadisticas - Censo 2024",
+      "source_url": "https://censo2024.ine.gob.cl/wp-content/uploads/2025/03/D1_Poblacion-censada-por-sexo-y-edad-en-grupos-quinquenales.xlsx",
+      "source_mode": "live",
+      "source_detail": "official_xlsx",
+      "refreshed_at_utc": "2026-06-14T18:08:06.406574+00:00",
+      "record_count": 346,
+      "fields": [
+        "codigo_region",
+        "nombre_region",
+        "codigo_provincia",
+        "nombre_provincia",
+        "codigo_comuna",
+        "nombre_comuna",
+        "poblacion_censada",
+        "hombres",
+        "mujeres",
+        "razon_hombre_mujer",
+        "poblacion_0_14",
+        "poblacion_15_29",
+        "poblacion_30_44",
+        "poblacion_45_64",
+        "poblacion_65_mas"
+      ],
+      "notes": [
+        "age_bands_derived_from_quinquennial_groups"
+      ],
+      "reuse_policy": {
+        "status": "open-attribution",
+        "license": "CC BY 4.0",
+        "license_url": "https://www.ine.gob.cl/terminos-de-uso",
+        "attribution_required": true,
+        "redistribution_ok": true,
+        "summary": "Resultados oficiales del Censo 2024 publicados por el INE."
+      },
+      "freshness": {
+        "status": "fresh",
+        "age_hours": 0.0,
+        "max_age_hours": 87600,
+        "checked_at_utc": "2026-06-14T18:08:08.213104+00:00"
+      },
+      "degradation": {
+        "status": "none",
+        "impact": "Sin degradación operativa detectada en este build.",
+        "recommended_action": "Ninguna."
+      },
+      "coverage": {
+        "status": "full",
+        "expected_record_count": 346,
+        "actual_record_count": 346,
+        "coverage_ratio": 1.0,
+        "summary": "Cobertura completa: 346/346 filas respecto del baseline esperado."
+      },
+      "drift": {
+        "status": "healthy",
+        "summary": "Sin drift operativo detectado en este build.",
+        "recommended_action": "Ninguna."
+      }
+    },
+    "establecimientos_salud": {
+      "dataset": "establecimientos_salud",
+      "source_name": "Ministerio de Salud - Establecimientos de Salud",
+      "source_url": "https://datos.gob.cl/dataset/3bf4cf7c-f638-4735-9a01-f65faae4beca/resource/2c44d782-3365-44e3-aefb-2c8b8363a1bc/download/establecimientos_20260609.csv",
+      "source_mode": "live",
+      "source_detail": "datos_gob_csv",
+      "refreshed_at_utc": "2026-06-14T18:06:51.839082+00:00",
+      "record_count": 5643,
+      "fields": [
+        "codigo_establecimiento",
+        "nombre_establecimiento",
+        "tipo_establecimiento",
+        "dependencia_administrativa",
+        "nivel_atencion",
+        "codigo_region",
+        "nombre_region",
+        "codigo_comuna",
+        "nombre_comuna",
+        "tiene_servicio_urgencia",
+        "tipo_urgencia",
+        "latitud",
+        "longitud",
+        "estado_funcionamiento"
+      ],
+      "notes": [],
+      "reuse_policy": {
+        "status": "open-attribution",
+        "license": "CC0",
+        "license_url": "http://www.opendefinition.org/licenses/cc-zero",
+        "attribution_required": false,
+        "redistribution_ok": true,
+        "summary": "Directorio oficial MINSAL publicado en datos.gob.cl bajo CC0."
+      },
+      "freshness": {
+        "status": "fresh",
+        "age_hours": 0.02,
+        "max_age_hours": 1080,
+        "checked_at_utc": "2026-06-14T18:08:08.213113+00:00"
+      },
+      "degradation": {
+        "status": "none",
+        "impact": "Sin degradación operativa detectada en este build.",
+        "recommended_action": "Ninguna."
+      },
+      "coverage": {
+        "status": "not_applicable",
+        "expected_record_count": null,
+        "actual_record_count": 5643,
+        "coverage_ratio": null,
+        "summary": "Sin baseline de cobertura por cardinalidad para esta capa."
+      },
+      "drift": {
+        "status": "healthy",
+        "summary": "Sin drift operativo detectado en este build.",
+        "recommended_action": "Ninguna."
+      }
     }
   },
   "validations": {
@@ -297,7 +414,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.92
+      "freshness_age_hours": 20.09
     },
     "provincias": {
       "dataset": "provincias",
@@ -306,7 +423,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.92
+      "freshness_age_hours": 20.09
     },
     "comunas": {
       "dataset": "comunas",
@@ -315,7 +432,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.92
+      "freshness_age_hours": 20.09
     },
     "comunas_enriquecidas": {
       "dataset": "comunas_enriquecidas",
@@ -324,7 +441,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.92
+      "freshness_age_hours": 20.09
     },
     "indicadores": {
       "dataset": "indicadores",
@@ -342,7 +459,25 @@
         "utm"
       ],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.92
+      "freshness_age_hours": 20.09
+    },
+    "censo_comunal": {
+      "dataset": "censo_comunal",
+      "status": "ok",
+      "record_count": 346,
+      "errors": [],
+      "warnings": [],
+      "freshness_status": "fresh",
+      "freshness_age_hours": 0.0
+    },
+    "establecimientos_salud": {
+      "dataset": "establecimientos_salud",
+      "status": "ok",
+      "record_count": 5643,
+      "errors": [],
+      "warnings": [],
+      "freshness_status": "fresh",
+      "freshness_age_hours": 0.02
     }
   }
 }

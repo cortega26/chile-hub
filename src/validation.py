@@ -1,3 +1,5 @@
+import polars as pl
+
 EXPECTED_INDICATOR_CODES = {"uf", "dolar", "euro", "utm", "ipc"}
 FALLBACK_COMUNAS_COUNT = 18
 EXPECTED_LIVE_COMUNAS_COUNT = 346
@@ -64,6 +66,61 @@ def validate_provincias(df_provincias):
         "dataset": "provincias",
         "status": "error" if errors else "ok",
         "record_count": df_provincias.height,
+        "errors": errors,
+        "warnings": [],
+    }
+
+
+def validate_censo_comunal(df_censo, metadata):
+    errors = []
+    row_count = df_censo.height
+    if row_count == 0:
+        errors.append("censo_comunal dataset is empty")
+    if row_count != 346:
+        errors.append(f"censo_comunal expected 346 communes, found {row_count}")
+    if row_count - df_censo["codigo_comuna"].n_unique() > 0:
+        errors.append("codigo_comuna must be unique in censo_comunal")
+    age_total = sum(
+        df_censo[column]
+        for column in (
+            "poblacion_0_14",
+            "poblacion_15_29",
+            "poblacion_30_44",
+            "poblacion_45_64",
+            "poblacion_65_mas",
+        )
+    )
+    if df_censo.filter(age_total != df_censo["poblacion_censada"]).height > 0:
+        errors.append("age bands must sum to poblacion_censada")
+    return {
+        "dataset": "censo_comunal",
+        "status": "error" if errors else "ok",
+        "record_count": row_count,
+        "errors": errors,
+        "warnings": [],
+    }
+
+
+def validate_establecimientos_salud(df_salud, metadata, valid_commune_codes=None):
+    errors = []
+    row_count = df_salud.height
+    if row_count == 0:
+        errors.append("establecimientos_salud dataset is empty")
+    if row_count - df_salud["codigo_establecimiento"].n_unique() > 0:
+        errors.append("codigo_establecimiento must be unique")
+    invalid_codes = df_salud.filter(pl.col("codigo_comuna").str.len_chars() != 5).height
+    if invalid_codes:
+        errors.append(f"found {invalid_codes} invalid codigo_comuna values")
+    if valid_commune_codes is not None:
+        unknown = set(df_salud["codigo_comuna"].drop_nulls().to_list()) - set(valid_commune_codes)
+        if unknown:
+            errors.append(
+                f"health facilities reference unknown communes: {', '.join(sorted(unknown))}"
+            )
+    return {
+        "dataset": "establecimientos_salud",
+        "status": "error" if errors else "ok",
+        "record_count": row_count,
         "errors": errors,
         "warnings": [],
     }

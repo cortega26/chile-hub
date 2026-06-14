@@ -1,8 +1,8 @@
 # chile-hub redistribution report
 
-- `generated_at_utc`: `2026-06-13T22:57:47.632696+00:00`
-- `dataset_count`: `5`
-- `ready_count`: `5`
+- `generated_at_utc`: `2026-06-14T18:08:08.213189+00:00`
+- `dataset_count`: `7`
+- `ready_count`: `7`
 - `review_terms_count`: `0`
 - `unknown_count`: `0`
 
@@ -13,6 +13,8 @@
 | `comunas` | `ready` | CC BY | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
 | `comunas_enriquecidas` | `ready` | CC BY | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
 | `indicadores` | `ready` | Reproducción libre con citación (BCCh / INE) | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
+| `censo_comunal` | `ready` | CC BY 4.0 | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
+| `establecimientos_salud` | `ready` | CC0 | `no` | `ok` | Publicable con atribucion y referencia de fuente. |
 
 ## regiones
 
@@ -63,3 +65,23 @@
 - `redistribution_ok`: `True`
 - `recommended_action`: Publicable con atribucion y referencia de fuente.
 - `summary`: Datos del Banco Central de Chile (BCCh) e INE. Libre reproducción con citación. Acceso vía mindicador.cl (API pública de la comunidad).
+
+## censo_comunal
+
+- `publishability_status`: `ready`
+- `license`: `CC BY 4.0`
+- `license_url`: https://www.ine.gob.cl/terminos-de-uso
+- `attribution_required`: `True`
+- `redistribution_ok`: `True`
+- `recommended_action`: Publicable con atribucion y referencia de fuente.
+- `summary`: Resultados oficiales del Censo 2024 publicados por el INE.
+
+## establecimientos_salud
+
+- `publishability_status`: `ready`
+- `license`: `CC0`
+- `license_url`: http://www.opendefinition.org/licenses/cc-zero
+- `attribution_required`: `False`
+- `redistribution_ok`: `True`
+- `recommended_action`: Publicable con atribucion y referencia de fuente.
+- `summary`: Directorio oficial MINSAL publicado en datos.gob.cl bajo CC0.

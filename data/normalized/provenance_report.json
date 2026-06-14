@@ -1,7 +1,7 @@
 {
-  "generated_at_utc": "2026-06-13T22:57:47.632696+00:00",
-  "dataset_count": 5,
-  "live_count": 5,
+  "generated_at_utc": "2026-06-14T18:08:08.213189+00:00",
+  "dataset_count": 7,
+  "live_count": 7,
   "fallback_count": 0,
   "datasets": [
     {
@@ -12,7 +12,7 @@
       "source_detail": "bcn_arcgis",
       "refreshed_at_utc": "2026-06-13T22:02:44.348995+00:00",
       "freshness_status": "fresh",
-      "freshness_label": "fresh (0.92h / 2160h)",
+      "freshness_label": "fresh (20.09h / 2160h)",
       "reuse_status": "open-attribution",
       "warning_count": 0,
       "diagnostic_summary": "bcn_skipped_null_code_records: 1",
@@ -26,7 +26,7 @@
       "source_detail": "bcn_arcgis",
       "refreshed_at_utc": "2026-06-13T22:02:44.348995+00:00",
       "freshness_status": "fresh",
-      "freshness_label": "fresh (0.92h / 2160h)",
+      "freshness_label": "fresh (20.09h / 2160h)",
       "reuse_status": "open-attribution",
       "warning_count": 0,
       "diagnostic_summary": "bcn_skipped_null_code_records: 1",
@@ -40,7 +40,7 @@
       "source_detail": "bcn_arcgis",
       "refreshed_at_utc": "2026-06-13T22:02:44.348995+00:00",
       "freshness_status": "fresh",
-      "freshness_label": "fresh (0.92h / 2160h)",
+      "freshness_label": "fresh (20.09h / 2160h)",
       "reuse_status": "open-attribution",
       "warning_count": 0,
       "diagnostic_summary": "bcn_skipped_null_code_records: 1",
@@ -54,7 +54,7 @@
       "source_detail": "bcn_arcgis",
       "refreshed_at_utc": "2026-06-13T22:02:44.348995+00:00",
       "freshness_status": "fresh",
-      "freshness_label": "fresh (0.92h / 2160h)",
+      "freshness_label": "fresh (20.09h / 2160h)",
       "reuse_status": "open-attribution",
       "warning_count": 0,
       "diagnostic_summary": "bcn_skipped_null_code_records: 1",
@@ -68,11 +68,39 @@
       "source_detail": "public_api_with_published_backfill",
       "refreshed_at_utc": "2026-06-13T22:02:50.757821+00:00",
       "freshness_status": "fresh",
-      "freshness_label": "fresh (0.92h / 72h)",
+      "freshness_label": "fresh (20.09h / 72h)",
       "reuse_status": "open-attribution",
       "warning_count": 1,
       "diagnostic_summary": "indicadores live refresh reused last published artifact for missing codes: ipc",
       "documentation": "docs/datasets/indicadores.md"
+    },
+    {
+      "dataset": "censo_comunal",
+      "source_name": "Instituto Nacional de Estadisticas - Censo 2024",
+      "source_url": "https://censo2024.ine.gob.cl/wp-content/uploads/2025/03/D1_Poblacion-censada-por-sexo-y-edad-en-grupos-quinquenales.xlsx",
+      "source_mode": "live",
+      "source_detail": "official_xlsx",
+      "refreshed_at_utc": "2026-06-14T18:08:06.406574+00:00",
+      "freshness_status": "fresh",
+      "freshness_label": "fresh (0.0h / 87600h)",
+      "reuse_status": "open-attribution",
+      "warning_count": 0,
+      "diagnostic_summary": "age_bands_derived_from_quinquennial_groups",
+      "documentation": "docs/datasets/censo_comunal.md"
+    },
+    {
+      "dataset": "establecimientos_salud",
+      "source_name": "Ministerio de Salud - Establecimientos de Salud",
+      "source_url": "https://datos.gob.cl/dataset/3bf4cf7c-f638-4735-9a01-f65faae4beca/resource/2c44d782-3365-44e3-aefb-2c8b8363a1bc/download/establecimientos_20260609.csv",
+      "source_mode": "live",
+      "source_detail": "datos_gob_csv",
+      "refreshed_at_utc": "2026-06-14T18:06:51.839082+00:00",
+      "freshness_status": "fresh",
+      "freshness_label": "fresh (0.02h / 1080h)",
+      "reuse_status": "open-attribution",
+      "warning_count": 0,
+      "diagnostic_summary": "Sin observaciones operativas.",
+      "documentation": "docs/datasets/establecimientos_salud.md"
     }
   ]
 }

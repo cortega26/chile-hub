@@ -7,8 +7,15 @@ from unittest.mock import MagicMock, patch
 
 from requests import HTTPError
 
-from src.extractors import bcentral_extractor, subdere_extractor
+from src.extractors import (
+    bcentral_extractor,
+    censo_extractor,
+    salud_extractor,
+    subdere_extractor,
+)
 from src.extractors.base import BaseExtractor
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
 
 
 class _MinimalExtractor(BaseExtractor):
@@ -204,6 +211,22 @@ class BaseExtractorContractTests(unittest.TestCase):
     def test_concrete_extractors_publish_dataset_names(self):
         self.assertEqual(subdere_extractor.SubdereExtractor().dataset_name, "comunas")
         self.assertEqual(bcentral_extractor.BCentralExtractor().dataset_name, "indicadores")
+        self.assertEqual(censo_extractor.CensoExtractor().dataset_name, "censo_comunal")
+        self.assertEqual(salud_extractor.SaludExtractor().dataset_name, "establecimientos_salud")
+
+    def test_censo_parser_preserves_cut_codes_and_age_totals(self):
+        workbook = sorted((ROOT_DIR / "data" / "raw").glob("ine_censo2024_comunal_*.xlsx"))[-1]
+        df = censo_extractor.parse_workbook(workbook)
+        self.assertEqual(df.height, 346)
+        self.assertEqual(df["codigo_comuna"].str.len_chars().min(), 5)
+        age_total = sum(df[column] for column in censo_extractor.AGE_BANDS)
+        self.assertEqual(df.filter(age_total != df["poblacion_censada"]).height, 0)
+
+    def test_salud_parser_preserves_cut_codes(self):
+        source = sorted((ROOT_DIR / "data" / "raw").glob("minsal_establecimientos_salud_*.csv"))[-1]
+        df = salud_extractor.parse_csv(source)
+        self.assertGreater(df.height, 5000)
+        self.assertEqual(df["codigo_comuna"].str.len_chars().min(), 5)
 
     def test_concrete_write_staging_persists_csv_and_metadata(self):
         df = bcentral_extractor.generate_fallback_indicators()

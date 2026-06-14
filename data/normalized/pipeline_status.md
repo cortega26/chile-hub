@@ -1,6 +1,6 @@
 # chile-hub pipeline status
 
-- `generated_at_utc`: `2026-06-13T22:57:47.632696+00:00`
+- `generated_at_utc`: `2026-06-14T18:08:08.213189+00:00`
 - `overall_status`: `warn`
 - `warning_count`: `1`
 - `top_issue`: `indicadores` (freshness=fresh, drift=drifted, warnings=1)
@@ -11,16 +11,27 @@
 
 | Dataset | Source | Mode | Detail | Freshness | Coverage | Records | Validation | Warnings |
 | :--- | :--- | :--- | :--- | :--- | :--- | ---: | :--- | :--- |
-| `comunas` | BCN ArcGIS | `live` | `bcn_arcgis` | `fresh (0.92h / 2160h)` | `full` | 346 | `ok` | none |
-| `comunas_enriquecidas` | BCN ArcGIS | `live` | `bcn_arcgis` | `fresh (0.92h / 2160h)` | `full` | 346 | `ok` | none |
-| `indicadores` | Banco Central de Chile (via mindicador.cl) | `live` | `public_api_with_published_backfill` | `fresh (0.92h / 72h)` | `not_applicable` | 426 | `ok` | indicadores live refresh reused last published artifact for missing codes: ipc |
-| `provincias` | BCN ArcGIS | `live` | `bcn_arcgis` | `fresh (0.92h / 2160h)` | `full` | 56 | `ok` | none |
-| `regiones` | BCN ArcGIS | `live` | `bcn_arcgis` | `fresh (0.92h / 2160h)` | `full` | 16 | `ok` | none |
+| `censo_comunal` | Instituto Nacional de Estadisticas - Censo 2024 | `live` | `official_xlsx` | `fresh (0.0h / 87600h)` | `full` | 346 | `ok` | none |
+| `comunas` | BCN ArcGIS | `live` | `bcn_arcgis` | `fresh (20.09h / 2160h)` | `full` | 346 | `ok` | none |
+| `comunas_enriquecidas` | BCN ArcGIS | `live` | `bcn_arcgis` | `fresh (20.09h / 2160h)` | `full` | 346 | `ok` | none |
+| `establecimientos_salud` | Ministerio de Salud - Establecimientos de Salud | `live` | `datos_gob_csv` | `fresh (0.02h / 1080h)` | `not_applicable` | 5643 | `ok` | none |
+| `indicadores` | Banco Central de Chile (via mindicador.cl) | `live` | `public_api_with_published_backfill` | `fresh (20.09h / 72h)` | `not_applicable` | 426 | `ok` | indicadores live refresh reused last published artifact for missing codes: ipc |
+| `provincias` | BCN ArcGIS | `live` | `bcn_arcgis` | `fresh (20.09h / 2160h)` | `full` | 56 | `ok` | none |
+| `regiones` | BCN ArcGIS | `live` | `bcn_arcgis` | `fresh (20.09h / 2160h)` | `full` | 16 | `ok` | none |
+
+## censo_comunal
+
+- `refreshed_at_utc`: `2026-06-14T18:08:06.406574+00:00`
+- `freshness`: `fresh (0.0h / 87600h)`
+- `coverage`: `Cobertura completa: 346/346 filas respecto del baseline esperado.`
+- `fields`: `codigo_region, nombre_region, codigo_provincia, nombre_provincia, codigo_comuna, nombre_comuna, poblacion_censada, hombres, mujeres, razon_hombre_mujer, poblacion_0_14, poblacion_15_29, poblacion_30_44, poblacion_45_64, poblacion_65_mas`
+- `notes`: age_bands_derived_from_quinquennial_groups
+- `warnings`: none
 
 ## comunas
 
 - `refreshed_at_utc`: `2026-06-13T22:02:44.348995+00:00`
-- `freshness`: `fresh (0.92h / 2160h)`
+- `freshness`: `fresh (20.09h / 2160h)`
 - `coverage`: `Cobertura completa: 346/346 filas respecto del baseline esperado.`
 - `fields`: `codigo_region, nombre_region, abreviatura, codigo_provincia, nombre_provincia, codigo_comuna, nombre_comuna, nombre_comuna_clean, latitud_cabecera, longitud_cabecera, poblacion_estimada`
 - `notes`: bcn_skipped_null_code_records: 1; bcn_supplemented_missing_comunas: 1
@@ -29,16 +40,24 @@
 ## comunas_enriquecidas
 
 - `refreshed_at_utc`: `2026-06-13T22:02:44.348995+00:00`
-- `freshness`: `fresh (0.92h / 2160h)`
+- `freshness`: `fresh (20.09h / 2160h)`
 - `coverage`: `Cobertura completa: 346/346 filas respecto del baseline esperado.`
 - `fields`: `codigo_region, nombre_region, abreviatura, codigo_provincia, nombre_provincia, codigo_comuna, nombre_comuna, nombre_comuna_clean, latitud_cabecera, longitud_cabecera, poblacion_estimada`
 - `notes`: bcn_skipped_null_code_records: 1; bcn_supplemented_missing_comunas: 1
 - `warnings`: none
 
+## establecimientos_salud
+
+- `refreshed_at_utc`: `2026-06-14T18:06:51.839082+00:00`
+- `freshness`: `fresh (0.02h / 1080h)`
+- `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
+- `fields`: `codigo_establecimiento, nombre_establecimiento, tipo_establecimiento, dependencia_administrativa, nivel_atencion, codigo_region, nombre_region, codigo_comuna, nombre_comuna, tiene_servicio_urgencia, tipo_urgencia, latitud, longitud, estado_funcionamiento`
+- `warnings`: none
+
 ## indicadores
 
 - `refreshed_at_utc`: `2026-06-13T22:02:50.757821+00:00`
-- `freshness`: `fresh (0.92h / 72h)`
+- `freshness`: `fresh (20.09h / 72h)`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
 - `fields`: `fecha, codigo_indicador, valor`
 - `notes`: published_backfills_used_for_codes: ipc
@@ -48,7 +67,7 @@
 ## provincias
 
 - `refreshed_at_utc`: `2026-06-13T22:02:44.348995+00:00`
-- `freshness`: `fresh (0.92h / 2160h)`
+- `freshness`: `fresh (20.09h / 2160h)`
 - `coverage`: `Cobertura completa: 56/56 filas respecto del baseline esperado.`
 - `fields`: `codigo_region, nombre_region, codigo_provincia, nombre_provincia`
 - `notes`: bcn_skipped_null_code_records: 1; bcn_supplemented_missing_comunas: 1
@@ -57,7 +76,7 @@
 ## regiones
 
 - `refreshed_at_utc`: `2026-06-13T22:02:44.348995+00:00`
-- `freshness`: `fresh (0.92h / 2160h)`
+- `freshness`: `fresh (20.09h / 2160h)`
 - `coverage`: `Cobertura completa: 16/16 filas respecto del baseline esperado.`
 - `fields`: `codigo_region, nombre_region`
 - `notes`: bcn_skipped_null_code_records: 1; bcn_supplemented_missing_comunas: 1
