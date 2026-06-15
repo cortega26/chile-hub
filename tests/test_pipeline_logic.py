@@ -63,6 +63,8 @@ class PipelineLogicTests(unittest.TestCase):
                 "censo_comunal",
                 "censo_hogares_viviendas",
                 "establecimientos_salud",
+                "establecimientos_educacionales",
+                "distritos_electorales",
             ]
         }
         datasets["indicadores"]["indicator_delivery"] = {
@@ -87,6 +89,8 @@ class PipelineLogicTests(unittest.TestCase):
                 "censo_comunal",
                 "censo_hogares_viviendas",
                 "establecimientos_salud",
+                "establecimientos_educacionales",
+                "distritos_electorales",
             ]
         }
         datasets["indicadores"].update(

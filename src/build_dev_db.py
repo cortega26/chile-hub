@@ -28,6 +28,8 @@ from src.validation import (
     validate_censo_comunal,
     validate_censo_hogares_viviendas,
     validate_comunas,
+    validate_distritos_electorales,
+    validate_establecimientos_educacionales,
     validate_establecimientos_salud,
     validate_indicadores,
     validate_provincias,
@@ -43,6 +45,7 @@ INDICADORES_METADATA_PATH = os.path.join(STAGING_DIR, "indicadores.metadata.json
 CENSO_METADATA_PATH = os.path.join(STAGING_DIR, "censo_comunal.metadata.json")
 SALUD_METADATA_PATH = os.path.join(STAGING_DIR, "establecimientos_salud.metadata.json")
 CENSO_HOGARES_METADATA_PATH = os.path.join(STAGING_DIR, "censo_hogares_viviendas.metadata.json")
+ELECTORAL_METADATA_PATH = os.path.join(STAGING_DIR, "distritos_electorales.metadata.json")
 PUBLISHABLE_ARTIFACT_SUFFIXES = (".json", ".md", ".parquet")
 PUBLISHABLE_BUNDLE_ZIP_NAME = "chile-hub-publishable-bundle.zip"
 PUBLISHABLE_BUNDLE_SHA256_NAME = "chile-hub-publishable-bundle.zip.sha256"
@@ -289,6 +292,58 @@ DATASET_CATALOG_CONFIG = {
             "excel_sheet": "Establecimientos Salud",
         },
         "documentation": "docs/datasets/establecimientos_salud.md",
+    },
+    "distritos_electorales": {
+        "description": "Asociación de comunas a distritos electorales (diputados) y circunscripciones senatoriales.",
+        "join_keys": ["codigo_comuna"],
+        "confidence_tier": "Tier A",
+        "expected_record_count": 346,
+        "reuse_policy": {
+            "status": "open-attribution",
+            "license": "CC0",
+            "license_url": "http://www.opendefinition.org/licenses/cc-zero",
+            "attribution_required": False,
+            "redistribution_ok": True,
+            "summary": "Asociación comunal a distritos y circunscripciones electorales basada en Ley N° 20.840.",
+        },
+        "freshness_policy": {"max_age_hours": 87600, "label": "estable"},
+        "usage_examples": {
+            "python": "from src.chile_hub import ChileHub\nhub = ChileHub()\ndf = hub.load_polars('distritos_electorales')",
+            "duckdb": "SELECT * FROM 'data/normalized/distritos_electorales.parquet';",
+            "cli": "python -m src.chile_hub show distritos_electorales",
+        },
+        "outputs": {
+            "parquet": "data/normalized/distritos_electorales.parquet",
+            "json": "data/normalized/distritos_electorales.json",
+        },
+        "documentation": "docs/datasets/distritos_electorales.md",
+    },
+    "establecimientos_educacionales": {
+        "description": "Directorio oficial del Ministerio de Educación (MINEDUC) con Rol Base de Datos (RBD), ubicación y dependencia administrativa.",
+        "join_keys": ["codigo_comuna"],
+        "confidence_tier": "Tier A",
+        "reuse_policy": {
+            "status": "open-attribution",
+            "license": "CC-BY-3.0",
+            "license_url": "https://creativecommons.org/licenses/by/3.0/cl/",
+            "attribution_required": True,
+            "redistribution_ok": True,
+            "summary": "Directorio oficial MINEDUC publicado por el Centro de Estudios del Ministerio de Educación de Chile bajo licencia CC BY.",
+        },
+        "freshness_policy": {"max_age_hours": 24 * 365, "label": "anual"},
+        "usage_examples": {
+            "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('establecimientos_educacionales')",
+            "duckdb": "SELECT nombre_establecimiento, dependencia_administrativa FROM 'data/normalized/establecimientos_educacionales.parquet' LIMIT 10;",
+            "cli": "python -m src.chile_hub show establecimientos_educacionales",
+        },
+        "outputs": {
+            "parquet": "data/normalized/establecimientos_educacionales.parquet",
+            "json": "data/normalized/establecimientos_educacionales.json",
+            "duckdb_table": "establecimientos_educacionales",
+            "sqlite_table": "establecimientos_educacionales",
+            "excel_sheet": "Establecimientos Educacionales",
+        },
+        "documentation": "docs/datasets/establecimientos_educacionales.md",
     },
 }
 
@@ -1127,7 +1182,14 @@ def derive_geography_layers(df_comunas):
 
 
 def build_duckdb(
-    df_regiones, df_provincias, df_comunas, df_indicadores, df_censo, df_salud, output_path
+    df_regiones,
+    df_provincias,
+    df_comunas,
+    df_indicadores,
+    df_censo,
+    df_salud,
+    df_educacionales,
+    output_path,
 ):
     print(f"Compilando base de datos DuckDB en: {output_path}")
     # Si la base de datos ya existe, la eliminamos para reconstruirla limpia
@@ -1143,6 +1205,7 @@ def build_duckdb(
         con.register("df_indicadores_view", df_indicadores)
         con.register("df_censo_view", df_censo)
         con.register("df_salud_view", df_salud)
+        con.register("df_educacionales_view", df_educacionales)
 
         # Crear tablas físicas en DuckDB
         con.execute("CREATE TABLE regiones AS SELECT * FROM df_regiones_view")
@@ -1152,6 +1215,9 @@ def build_duckdb(
         con.execute("CREATE TABLE indicadores AS SELECT * FROM df_indicadores_view")
         con.execute("CREATE TABLE censo_comunal AS SELECT * FROM df_censo_view")
         con.execute("CREATE TABLE establecimientos_salud AS SELECT * FROM df_salud_view")
+        con.execute(
+            "CREATE TABLE establecimientos_educacionales AS SELECT * FROM df_educacionales_view"
+        )
 
         # Agregar índices básicos para mejorar rendimiento en queries
         con.execute("CREATE UNIQUE INDEX idx_region_code ON regiones (codigo_region)")
@@ -1160,6 +1226,10 @@ def build_duckdb(
         con.execute("CREATE INDEX idx_indicador_date ON indicadores (fecha, codigo_indicador)")
         con.execute("CREATE UNIQUE INDEX idx_censo_comuna ON censo_comunal (codigo_comuna)")
         con.execute("CREATE INDEX idx_salud_comuna ON establecimientos_salud (codigo_comuna)")
+        con.execute("CREATE UNIQUE INDEX idx_educ_rbd ON establecimientos_educacionales (rbd)")
+        con.execute(
+            "CREATE INDEX idx_educ_comuna ON establecimientos_educacionales (codigo_comuna)"
+        )
 
         print("Tablas e índices creados con éxito en DuckDB.")
     finally:
@@ -1167,7 +1237,14 @@ def build_duckdb(
 
 
 def build_sqlite(
-    df_regiones, df_provincias, df_comunas, df_indicadores, df_censo, df_salud, output_path
+    df_regiones,
+    df_provincias,
+    df_comunas,
+    df_indicadores,
+    df_censo,
+    df_salud,
+    df_educacionales,
+    output_path,
 ):
     print(f"Compilando base de datos SQLite en: {output_path}")
     if os.path.exists(output_path):
@@ -1180,6 +1257,7 @@ def build_sqlite(
     df_indicadores_pd = df_indicadores.to_pandas()
     df_censo_pd = df_censo.to_pandas()
     df_salud_pd = df_salud.to_pandas()
+    df_educacionales_pd = df_educacionales.to_pandas()
 
     # SQLite no maneja Date de forma nativa como tipo fecha real (los guarda como string ISO)
     # Por lo tanto, convertimos las fechas a string ISO antes de guardar
@@ -1194,6 +1272,9 @@ def build_sqlite(
         df_indicadores_pd.to_sql("indicadores", conn, index=False, if_exists="replace")
         df_censo_pd.to_sql("censo_comunal", conn, index=False, if_exists="replace")
         df_salud_pd.to_sql("establecimientos_salud", conn, index=False, if_exists="replace")
+        df_educacionales_pd.to_sql(
+            "establecimientos_educacionales", conn, index=False, if_exists="replace"
+        )
 
         # Crear índices en SQLite
         cursor = conn.cursor()
@@ -1203,6 +1284,12 @@ def build_sqlite(
         cursor.execute("CREATE INDEX idx_lite_indicador ON indicadores (fecha, codigo_indicador)")
         cursor.execute("CREATE UNIQUE INDEX idx_lite_censo ON censo_comunal (codigo_comuna)")
         cursor.execute("CREATE INDEX idx_lite_salud ON establecimientos_salud (codigo_comuna)")
+        cursor.execute(
+            "CREATE UNIQUE INDEX idx_lite_educ_rbd ON establecimientos_educacionales (rbd)"
+        )
+        cursor.execute(
+            "CREATE INDEX idx_lite_educ_comuna ON establecimientos_educacionales (codigo_comuna)"
+        )
         conn.commit()
         print("Tablas e índices creados con éxito en SQLite.")
     finally:
@@ -1210,7 +1297,14 @@ def build_sqlite(
 
 
 def build_excel(
-    df_regiones, df_provincias, df_comunas, df_indicadores, df_censo, df_salud, output_path
+    df_regiones,
+    df_provincias,
+    df_comunas,
+    df_indicadores,
+    df_censo,
+    df_salud,
+    df_educacionales,
+    output_path,
 ):
     print(f"Generando archivo Excel consolidado para no técnicos en: {output_path}")
     # Convertir a Pandas para exportar de forma robusta con XlsxWriter
@@ -1220,6 +1314,7 @@ def build_excel(
     df_indicadores_pd = df_indicadores.to_pandas()
     df_censo_pd = df_censo.to_pandas()
     df_salud_pd = df_salud.to_pandas()
+    df_educacionales_pd = df_educacionales.to_pandas()
 
     # Limpieza visual y formateo para Excel
     # En Excel, queremos que el Código Comuna siga siendo un string para que no se pierdan los ceros iniciales
@@ -1232,6 +1327,9 @@ def build_excel(
         df_indicadores_pd.to_excel(writer, sheet_name="Indicadores Diarios", index=False)
         df_censo_pd.to_excel(writer, sheet_name="Censo Comunal", index=False)
         df_salud_pd.to_excel(writer, sheet_name="Establecimientos Salud", index=False)
+        df_educacionales_pd.to_excel(
+            writer, sheet_name="Establecimientos Educacionales", index=False
+        )
 
         # Acceder a los objetos workbook y worksheet para aplicar formato estético
         worksheet_regiones = writer.sheets["Regiones"]
@@ -1241,6 +1339,7 @@ def build_excel(
         worksheet_indicadores = writer.sheets["Indicadores Diarios"]
         worksheet_censo = writer.sheets["Censo Comunal"]
         worksheet_salud = writer.sheets["Establecimientos Salud"]
+        worksheet_educacionales = writer.sheets["Establecimientos Educacionales"]
 
         # Formato de texto para el código comunal para prevenir pérdida de ceros
         text_format = workbook.add_format({"num_format": "@"})
@@ -1263,6 +1362,10 @@ def build_excel(
         worksheet_salud.set_column("A:A", 20, text_format)
         worksheet_salud.set_column("F:F", 12, text_format)
         worksheet_salud.set_column("H:H", 15, text_format)
+        worksheet_educacionales.set_column("A:A", 12, text_format)  # rbd
+        worksheet_educacionales.set_column("B:B", 10, text_format)  # dv_rbd
+        worksheet_educacionales.set_column("D:D", 12, text_format)  # codigo_region
+        worksheet_educacionales.set_column("E:E", 12, text_format)  # codigo_comuna
 
     print("Archivo Excel multi-pestaña generado con éxito.")
 
@@ -1273,7 +1376,9 @@ def pd_excel_writer(path):
     return pd.ExcelWriter(path, engine="xlsxwriter")
 
 
-def build_flat_files(df_regiones, df_provincias, df_comunas, df_indicadores, df_censo, df_salud):
+def build_flat_files(
+    df_regiones, df_provincias, df_comunas, df_indicadores, df_censo, df_salud, df_educacionales
+):
     import json
 
     # Generamos archivos Parquet
@@ -1290,6 +1395,9 @@ def build_flat_files(df_regiones, df_provincias, df_comunas, df_indicadores, df_
     df_indicadores.write_parquet(indicadores_parquet)
     df_censo.write_parquet(os.path.join(NORMALIZED_DIR, "censo_comunal.parquet"))
     df_salud.write_parquet(os.path.join(NORMALIZED_DIR, "establecimientos_salud.parquet"))
+    df_educacionales.write_parquet(
+        os.path.join(NORMALIZED_DIR, "establecimientos_educacionales.parquet")
+    )
     print(f"Archivos Parquet exportados a: {NORMALIZED_DIR}")
 
     # Generamos los endpoints JSON simulados
@@ -1326,6 +1434,11 @@ def build_flat_files(df_regiones, df_provincias, df_comunas, df_indicadores, df_
     ) as f:
         json.dump(df_salud.to_dicts(), f, ensure_ascii=False, indent=2)
 
+    with open(
+        os.path.join(NORMALIZED_DIR, "establecimientos_educacionales.json"), "w", encoding="utf-8"
+    ) as f:
+        json.dump(df_educacionales.to_dicts(), f, ensure_ascii=False, indent=2)
+
     print(f"Endpoints JSON de prueba exportados a: {NORMALIZED_DIR}")
 
 
@@ -1338,8 +1451,18 @@ def main():
     censo_csv = os.path.join(STAGING_DIR, "censo_comunal.csv")
     salud_csv = os.path.join(STAGING_DIR, "establecimientos_salud.csv")
     censo_hogares_csv = os.path.join(STAGING_DIR, "censo_hogares_viviendas.csv")
+    electoral_csv = os.path.join(STAGING_DIR, "distritos_electorales.csv")
+    educacionales_csv = os.path.join(STAGING_DIR, "establecimientos_educacionales.csv")
 
-    required_staging = (comunas_csv, indicadores_csv, censo_csv, salud_csv, censo_hogares_csv)
+    required_staging = (
+        comunas_csv,
+        indicadores_csv,
+        censo_csv,
+        salud_csv,
+        censo_hogares_csv,
+        electoral_csv,
+        educacionales_csv,
+    )
     if any(not os.path.exists(path) for path in required_staging):
         raise SystemExit(
             "Error: No se encuentran los archivos CSV en staging. Corre los extractores primero."
@@ -1350,6 +1473,10 @@ def main():
     censo_metadata = load_metadata(CENSO_METADATA_PATH)
     salud_metadata = load_metadata(SALUD_METADATA_PATH)
     censo_hogares_metadata = load_metadata(CENSO_HOGARES_METADATA_PATH)
+    electoral_metadata = load_metadata(ELECTORAL_METADATA_PATH)
+    educacionales_metadata = load_metadata(
+        os.path.join(STAGING_DIR, "establecimientos_educacionales.metadata.json")
+    )
     indicadores_metadata["indicator_codes"] = sorted(
         df_code for df_code in indicadores_metadata.get("indicator_codes", [])
     )
@@ -1394,6 +1521,23 @@ def main():
             "codigo_comuna": pl.String,
         },
     )
+    df_electoral = pl.read_csv(
+        electoral_csv,
+        schema_overrides={
+            "codigo_comuna": pl.String,
+            "distrito_electoral": pl.String,
+            "circunscripcion_senatorial": pl.String,
+        },
+    )
+    df_educacionales = pl.read_csv(
+        educacionales_csv,
+        schema_overrides={
+            "rbd": pl.String,
+            "dv_rbd": pl.String,
+            "codigo_region": pl.String,
+            "codigo_comuna": pl.String,
+        },
+    )
     df_regiones, df_provincias = derive_geography_layers(df_comunas)
 
     validations = {
@@ -1411,6 +1555,12 @@ def main():
         ),
         "censo_hogares_viviendas": validate_censo_hogares_viviendas(
             df_censo_hogares, censo_hogares_metadata, df_comunas["codigo_comuna"].to_list()
+        ),
+        "distritos_electorales": validate_distritos_electorales(
+            df_electoral, electoral_metadata, df_comunas["codigo_comuna"].to_list()
+        ),
+        "establecimientos_educacionales": validate_establecimientos_educacionales(
+            df_educacionales, educacionales_metadata, df_comunas["codigo_comuna"].to_list()
         ),
     }
 
@@ -1432,6 +1582,7 @@ def main():
         df_indicadores,
         df_censo,
         df_salud,
+        df_educacionales,
         os.path.join(NORMALIZED_DIR, "chile_data.duckdb"),
     )
     build_sqlite(
@@ -1441,6 +1592,7 @@ def main():
         df_indicadores,
         df_censo,
         df_salud,
+        df_educacionales,
         os.path.join(NORMALIZED_DIR, "chile_data.db"),
     )
     build_excel(
@@ -1450,14 +1602,24 @@ def main():
         df_indicadores,
         df_censo,
         df_salud,
+        df_educacionales,
         os.path.join(NORMALIZED_DIR, "chile_data_latest.xlsx"),
     )
-    build_flat_files(df_regiones, df_provincias, df_comunas, df_indicadores, df_censo, df_salud)
+    build_flat_files(
+        df_regiones, df_provincias, df_comunas, df_indicadores, df_censo, df_salud, df_educacionales
+    )
     df_censo_hogares.write_parquet(os.path.join(NORMALIZED_DIR, "censo_hogares_viviendas.parquet"))
     with open(
         os.path.join(NORMALIZED_DIR, "censo_hogares_viviendas.json"), "w", encoding="utf-8"
     ) as f:
         json.dump(df_censo_hogares.to_dicts(), f, ensure_ascii=False, indent=2)
+
+    df_electoral.write_parquet(os.path.join(NORMALIZED_DIR, "distritos_electorales.parquet"))
+    with open(
+        os.path.join(NORMALIZED_DIR, "distritos_electorales.json"), "w", encoding="utf-8"
+    ) as f:
+        json.dump(df_electoral.to_dicts(), f, ensure_ascii=False, indent=2)
+
     dataset_metadata = {
         "regiones": {
             **comunas_metadata,
@@ -1547,6 +1709,21 @@ def main():
                 ],
             ),
         },
+        "establecimientos_educacionales": {
+            **educacionales_metadata,
+            "dataset": "establecimientos_educacionales",
+            "record_count": df_educacionales.height,
+            "fields": df_educacionales.columns,
+            "reuse_policy": DATASET_CATALOG_CONFIG["establecimientos_educacionales"][
+                "reuse_policy"
+            ],
+            "freshness": build_freshness(
+                educacionales_metadata.get("refreshed_at_utc"),
+                DATASET_CATALOG_CONFIG["establecimientos_educacionales"]["freshness_policy"][
+                    "max_age_hours"
+                ],
+            ),
+        },
         "censo_hogares_viviendas": {
             **censo_hogares_metadata,
             "record_count": df_censo_hogares.height,
@@ -1554,6 +1731,17 @@ def main():
             "freshness": build_freshness(
                 censo_hogares_metadata.get("refreshed_at_utc"),
                 DATASET_CATALOG_CONFIG["censo_hogares_viviendas"]["freshness_policy"][
+                    "max_age_hours"
+                ],
+            ),
+        },
+        "distritos_electorales": {
+            **electoral_metadata,
+            "record_count": df_electoral.height,
+            "fields": df_electoral.columns,
+            "freshness": build_freshness(
+                electoral_metadata.get("refreshed_at_utc"),
+                DATASET_CATALOG_CONFIG["distritos_electorales"]["freshness_policy"][
                     "max_age_hours"
                 ],
             ),

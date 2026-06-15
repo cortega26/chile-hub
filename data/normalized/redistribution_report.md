@@ -1,8 +1,8 @@
 # chile-hub redistribution report
 
-- `generated_at_utc`: `2026-06-15T23:12:54.621471+00:00`
-- `dataset_count`: `8`
-- `ready_count`: `8`
+- `generated_at_utc`: `2026-06-15T23:39:29.359352+00:00`
+- `dataset_count`: `10`
+- `ready_count`: `10`
 - `review_terms_count`: `0`
 - `unknown_count`: `0`
 
@@ -15,7 +15,9 @@
 | `indicadores` | `ready` | Reproducción libre con citación (BCCh / INE) | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
 | `censo_comunal` | `ready` | CC BY 4.0 | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
 | `establecimientos_salud` | `ready` | CC0 | `no` | `ok` | Publicable con atribucion y referencia de fuente. |
+| `establecimientos_educacionales` | `ready` | CC-BY-3.0 | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
 | `censo_hogares_viviendas` | `ready` | CC BY 4.0 | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
+| `distritos_electorales` | `ready` | CC0 | `no` | `ok` | Publicable con atribucion y referencia de fuente. |
 
 ## regiones
 
@@ -87,6 +89,16 @@
 - `recommended_action`: Publicable con atribucion y referencia de fuente.
 - `summary`: Directorio oficial MINSAL publicado en datos.gob.cl bajo CC0.
 
+## establecimientos_educacionales
+
+- `publishability_status`: `ready`
+- `license`: `CC-BY-3.0`
+- `license_url`: https://creativecommons.org/licenses/by/3.0/cl/
+- `attribution_required`: `True`
+- `redistribution_ok`: `True`
+- `recommended_action`: Publicable con atribucion y referencia de fuente.
+- `summary`: Directorio oficial MINEDUC publicado por el Centro de Estudios del Ministerio de Educación de Chile bajo licencia CC BY.
+
 ## censo_hogares_viviendas
 
 - `publishability_status`: `ready`
@@ -96,3 +108,13 @@
 - `redistribution_ok`: `True`
 - `recommended_action`: Publicable con atribucion y referencia de fuente.
 - `summary`: Resultados oficiales del Censo 2024 publicados por el INE.
+
+## distritos_electorales
+
+- `publishability_status`: `ready`
+- `license`: `CC0`
+- `license_url`: http://www.opendefinition.org/licenses/cc-zero
+- `attribution_required`: `False`
+- `redistribution_ok`: `True`
+- `recommended_action`: Publicable con atribucion y referencia de fuente.
+- `summary`: Asociación comunal a distritos y circunscripciones electorales basada en Ley N° 20.840.

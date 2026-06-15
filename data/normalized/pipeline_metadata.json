@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-06-15T23:12:54.621471+00:00",
+  "generated_at_utc": "2026-06-15T23:39:29.359352+00:00",
   "datasets": {
     "regiones": {
       "dataset": "regiones",
@@ -28,9 +28,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 49.17,
+        "age_hours": 49.61,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-15T23:12:54.620614+00:00"
+        "checked_at_utc": "2026-06-15T23:39:29.358432+00:00"
       },
       "degradation": {
         "status": "none",
@@ -79,9 +79,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 49.17,
+        "age_hours": 49.61,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-15T23:12:54.620721+00:00"
+        "checked_at_utc": "2026-06-15T23:39:29.358547+00:00"
       },
       "degradation": {
         "status": "none",
@@ -137,9 +137,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 49.17,
+        "age_hours": 49.61,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-15T23:12:54.620739+00:00"
+        "checked_at_utc": "2026-06-15T23:39:29.358564+00:00"
       },
       "degradation": {
         "status": "none",
@@ -195,9 +195,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 49.17,
+        "age_hours": 49.61,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-15T23:12:54.620751+00:00"
+        "checked_at_utc": "2026-06-15T23:39:29.358576+00:00"
       },
       "degradation": {
         "status": "none",
@@ -266,9 +266,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 49.17,
+        "age_hours": 49.61,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-06-15T23:12:54.621329+00:00"
+        "checked_at_utc": "2026-06-15T23:39:29.359149+00:00"
       },
       "degradation": {
         "status": "warning",
@@ -326,9 +326,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 29.08,
+        "age_hours": 29.52,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-06-15T23:12:54.621357+00:00"
+        "checked_at_utc": "2026-06-15T23:39:29.359196+00:00"
       },
       "degradation": {
         "status": "none",
@@ -383,9 +383,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 29.1,
+        "age_hours": 29.54,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-06-15T23:12:54.621370+00:00"
+        "checked_at_utc": "2026-06-15T23:39:29.359214+00:00"
       },
       "degradation": {
         "status": "none",
@@ -396,6 +396,58 @@
         "status": "not_applicable",
         "expected_record_count": null,
         "actual_record_count": 5643,
+        "coverage_ratio": null,
+        "summary": "Sin baseline de cobertura por cardinalidad para esta capa."
+      },
+      "drift": {
+        "status": "healthy",
+        "summary": "Sin drift operativo detectado en este build.",
+        "recommended_action": "Ninguna."
+      }
+    },
+    "establecimientos_educacionales": {
+      "dataset": "establecimientos_educacionales",
+      "source_name": "Ministerio de Educación - Directorio Oficial de Establecimientos",
+      "source_url": "https://datosabiertos.mineduc.cl/wp-content/uploads/2025/11/Directorio-Oficial-EE-2025.rar",
+      "source_mode": "live",
+      "source_detail": "mineduc_datos_abiertos_rar",
+      "refreshed_at_utc": "2026-06-15T23:35:37.946512+00:00",
+      "record_count": 12898,
+      "fields": [
+        "rbd",
+        "dv_rbd",
+        "nombre_establecimiento",
+        "codigo_region",
+        "codigo_comuna",
+        "dependencia_administrativa",
+        "latitud",
+        "longitud",
+        "estado_funcionamiento"
+      ],
+      "notes": [],
+      "reuse_policy": {
+        "status": "open-attribution",
+        "license": "CC-BY-3.0",
+        "license_url": "https://creativecommons.org/licenses/by/3.0/cl/",
+        "attribution_required": true,
+        "redistribution_ok": true,
+        "summary": "Directorio oficial MINEDUC publicado por el Centro de Estudios del Ministerio de Educación de Chile bajo licencia CC BY."
+      },
+      "freshness": {
+        "status": "fresh",
+        "age_hours": 0.06,
+        "max_age_hours": 8760,
+        "checked_at_utc": "2026-06-15T23:39:29.359226+00:00"
+      },
+      "degradation": {
+        "status": "none",
+        "impact": "Sin degradación operativa detectada en este build.",
+        "recommended_action": "Ninguna."
+      },
+      "coverage": {
+        "status": "not_applicable",
+        "expected_record_count": null,
+        "actual_record_count": 12898,
         "coverage_ratio": null,
         "summary": "Sin baseline de cobertura por cardinalidad para esta capa."
       },
@@ -438,9 +490,56 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 28.56,
+        "age_hours": 29.0,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-06-15T23:12:54.621381+00:00"
+        "checked_at_utc": "2026-06-15T23:39:29.359243+00:00"
+      },
+      "degradation": {
+        "status": "none",
+        "impact": "Sin degradación operativa detectada en este build.",
+        "recommended_action": "Ninguna."
+      },
+      "coverage": {
+        "status": "full",
+        "expected_record_count": 346,
+        "actual_record_count": 346,
+        "coverage_ratio": 1.0,
+        "summary": "Cobertura completa: 346/346 filas respecto del baseline esperado."
+      },
+      "drift": {
+        "status": "healthy",
+        "summary": "Sin drift operativo detectado en este build.",
+        "recommended_action": "Ninguna."
+      }
+    },
+    "distritos_electorales": {
+      "dataset": "distritos_electorales",
+      "source_name": "BCN / Biblioteca del Congreso Nacional de Chile",
+      "source_url": "https://www.bcn.cl/siit/observatorio/ley20840",
+      "source_mode": "live",
+      "source_detail": "bcn_electoral_mapping_generated",
+      "refreshed_at_utc": "2026-06-15T23:28:09.928013+00:00",
+      "record_count": 346,
+      "fields": [
+        "codigo_comuna",
+        "nombre_comuna",
+        "distrito_electoral",
+        "circunscripcion_senatorial"
+      ],
+      "notes": [],
+      "reuse_policy": {
+        "status": "open-attribution",
+        "license": "CC0",
+        "license_url": "http://www.opendefinition.org/licenses/cc-zero",
+        "attribution_required": false,
+        "redistribution_ok": true,
+        "summary": "Asociación comunal a distritos y circunscripciones electorales basada en Ley N° 20.840."
+      },
+      "freshness": {
+        "status": "fresh",
+        "age_hours": 0.19,
+        "max_age_hours": 87600,
+        "checked_at_utc": "2026-06-15T23:39:29.359251+00:00"
       },
       "degradation": {
         "status": "none",
@@ -469,7 +568,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 49.17
+      "freshness_age_hours": 49.61
     },
     "provincias": {
       "dataset": "provincias",
@@ -478,7 +577,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 49.17
+      "freshness_age_hours": 49.61
     },
     "comunas": {
       "dataset": "comunas",
@@ -487,7 +586,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 49.17
+      "freshness_age_hours": 49.61
     },
     "comunas_enriquecidas": {
       "dataset": "comunas_enriquecidas",
@@ -496,7 +595,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 49.17
+      "freshness_age_hours": 49.61
     },
     "indicadores": {
       "dataset": "indicadores",
@@ -514,7 +613,7 @@
         "utm"
       ],
       "freshness_status": "fresh",
-      "freshness_age_hours": 49.17
+      "freshness_age_hours": 49.61
     },
     "censo_comunal": {
       "dataset": "censo_comunal",
@@ -523,7 +622,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 29.08
+      "freshness_age_hours": 29.52
     },
     "establecimientos_salud": {
       "dataset": "establecimientos_salud",
@@ -532,7 +631,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 29.1
+      "freshness_age_hours": 29.54
     },
     "censo_hogares_viviendas": {
       "dataset": "censo_hogares_viviendas",
@@ -541,7 +640,25 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 28.56
+      "freshness_age_hours": 29.0
+    },
+    "distritos_electorales": {
+      "dataset": "distritos_electorales",
+      "status": "ok",
+      "record_count": 346,
+      "errors": [],
+      "warnings": [],
+      "freshness_status": "fresh",
+      "freshness_age_hours": 0.19
+    },
+    "establecimientos_educacionales": {
+      "dataset": "establecimientos_educacionales",
+      "status": "ok",
+      "record_count": 12898,
+      "errors": [],
+      "warnings": [],
+      "freshness_status": "fresh",
+      "freshness_age_hours": 0.06
     }
   }
 }

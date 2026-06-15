@@ -1,9 +1,9 @@
 # chile-hub drift report
 
-- `generated_at_utc`: `2026-06-15T23:12:54.621471+00:00`
-- `dataset_count`: `8`
+- `generated_at_utc`: `2026-06-15T23:39:29.359352+00:00`
+- `dataset_count`: `10`
 - `drifted_count`: `1`
-- `healthy_count`: `7`
+- `healthy_count`: `9`
 - `fallback_count`: `0`
 - `partial_coverage_count`: `0`
 - `degraded_count`: `0`
@@ -17,7 +17,9 @@
 | `indicadores` | `drifted` | `live` | `not_applicable` | `warning` | 1 | Revisar warnings operativos del dataset antes de consumirlo en producción. |
 | `censo_comunal` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
 | `establecimientos_salud` | `healthy` | `live` | `not_applicable` | `none` | 0 | Ninguna. |
+| `establecimientos_educacionales` | `healthy` | `live` | `not_applicable` | `none` | 0 | Ninguna. |
 | `censo_hogares_viviendas` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
+| `distritos_electorales` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
 
 ## regiones
 
@@ -89,7 +91,27 @@
 - `diagnostic_summary`: Sin degradación operativa detectada en este build.
 - `recommended_action`: Ninguna.
 
+## establecimientos_educacionales
+
+- `drift_status`: `healthy`
+- `source_mode`: `live`
+- `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
+- `degradation`: Sin degradación operativa detectada en este build.
+- `warning_count`: `0`
+- `diagnostic_summary`: Sin degradación operativa detectada en este build.
+- `recommended_action`: Ninguna.
+
 ## censo_hogares_viviendas
+
+- `drift_status`: `healthy`
+- `source_mode`: `live`
+- `coverage`: `Cobertura completa: 346/346 filas respecto del baseline esperado.`
+- `degradation`: Sin degradación operativa detectada en este build.
+- `warning_count`: `0`
+- `diagnostic_summary`: Sin degradación operativa detectada en este build.
+- `recommended_action`: Ninguna.
+
+## distritos_electorales
 
 - `drift_status`: `healthy`
 - `source_mode`: `live`

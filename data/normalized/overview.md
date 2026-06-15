@@ -1,9 +1,9 @@
 # chile-hub overview
 
-- `generated_at_utc`: `2026-06-15T23:12:54.621471+00:00`
+- `generated_at_utc`: `2026-06-15T23:39:29.359352+00:00`
 - `overall_status`: `warn`
-- `dataset_count`: `8`
-- `live_count`: `8`
+- `dataset_count`: `10`
+- `live_count`: `10`
 - `fallback_count`: `0`
 - `stale_count`: `0`
 - `drifted_count`: `1`
@@ -23,6 +23,8 @@
 | `censo_hogares_viviendas` | `live` | `ok` | `fresh` | `full` | `healthy` |
 | `comunas` | `live` | `ok` | `fresh` | `full` | `healthy` |
 | `comunas_enriquecidas` | `live` | `ok` | `fresh` | `full` | `healthy` |
+| `distritos_electorales` | `live` | `ok` | `fresh` | `full` | `healthy` |
+| `establecimientos_educacionales` | `live` | `ok` | `fresh` | `not_applicable` | `healthy` |
 | `establecimientos_salud` | `live` | `ok` | `fresh` | `not_applicable` | `healthy` |
 | `indicadores` | `live` | `ok` | `fresh` | `not_applicable` | `drifted` |
 | `provincias` | `live` | `ok` | `fresh` | `full` | `healthy` |
@@ -32,7 +34,7 @@
 
 - `path`: `data/normalized/chile-hub-publishable-bundle.zip`
 - `package_type`: `zip`
-- `size_bytes`: `508474`
+- `size_bytes`: `1280058`
 - `checksum`: `sha256` via `data/normalized/chile-hub-publishable-bundle.zip.sha256`
 - `verification_command`: `shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256`
 

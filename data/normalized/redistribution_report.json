@@ -1,7 +1,7 @@
 {
-  "generated_at_utc": "2026-06-15T23:12:54.621471+00:00",
-  "dataset_count": 8,
-  "ready_count": 8,
+  "generated_at_utc": "2026-06-15T23:39:29.359352+00:00",
+  "dataset_count": 10,
+  "ready_count": 10,
   "review_terms_count": 0,
   "unknown_count": 0,
   "datasets": [
@@ -90,6 +90,18 @@
       "documentation": "docs/datasets/establecimientos_salud.md"
     },
     {
+      "dataset": "establecimientos_educacionales",
+      "publishability_status": "ready",
+      "license": "CC-BY-3.0",
+      "license_url": "https://creativecommons.org/licenses/by/3.0/cl/",
+      "reuse_status": "open-attribution",
+      "attribution_required": true,
+      "redistribution_ok": true,
+      "summary": "Directorio oficial MINEDUC publicado por el Centro de Estudios del Ministerio de Educación de Chile bajo licencia CC BY.",
+      "recommended_action": "Publicable con atribucion y referencia de fuente.",
+      "documentation": "docs/datasets/establecimientos_educacionales.md"
+    },
+    {
       "dataset": "censo_hogares_viviendas",
       "publishability_status": "ready",
       "license": "CC BY 4.0",
@@ -100,6 +112,18 @@
       "summary": "Resultados oficiales del Censo 2024 publicados por el INE.",
       "recommended_action": "Publicable con atribucion y referencia de fuente.",
       "documentation": "docs/datasets/censo_hogares_viviendas.md"
+    },
+    {
+      "dataset": "distritos_electorales",
+      "publishability_status": "ready",
+      "license": "CC0",
+      "license_url": "http://www.opendefinition.org/licenses/cc-zero",
+      "reuse_status": "open-attribution",
+      "attribution_required": false,
+      "redistribution_ok": true,
+      "summary": "Asociación comunal a distritos y circunscripciones electorales basada en Ley N° 20.840.",
+      "recommended_action": "Publicable con atribucion y referencia de fuente.",
+      "documentation": "docs/datasets/distritos_electorales.md"
     }
   ]
 }

@@ -1,0 +1,2078 @@
+[
+  {
+    "codigo_comuna": "01101",
+    "nombre_comuna": "Iquique",
+    "distrito_electoral": "2",
+    "circunscripcion_senatorial": "2"
+  },
+  {
+    "codigo_comuna": "01107",
+    "nombre_comuna": "Alto Hospicio",
+    "distrito_electoral": "2",
+    "circunscripcion_senatorial": "2"
+  },
+  {
+    "codigo_comuna": "01401",
+    "nombre_comuna": "Pozo Almonte",
+    "distrito_electoral": "2",
+    "circunscripcion_senatorial": "2"
+  },
+  {
+    "codigo_comuna": "01402",
+    "nombre_comuna": "Camiña",
+    "distrito_electoral": "2",
+    "circunscripcion_senatorial": "2"
+  },
+  {
+    "codigo_comuna": "01403",
+    "nombre_comuna": "Colchane",
+    "distrito_electoral": "2",
+    "circunscripcion_senatorial": "2"
+  },
+  {
+    "codigo_comuna": "01404",
+    "nombre_comuna": "Huara",
+    "distrito_electoral": "2",
+    "circunscripcion_senatorial": "2"
+  },
+  {
+    "codigo_comuna": "01405",
+    "nombre_comuna": "Pica",
+    "distrito_electoral": "2",
+    "circunscripcion_senatorial": "2"
+  },
+  {
+    "codigo_comuna": "02101",
+    "nombre_comuna": "Antofagasta",
+    "distrito_electoral": "3",
+    "circunscripcion_senatorial": "3"
+  },
+  {
+    "codigo_comuna": "02102",
+    "nombre_comuna": "Mejillones",
+    "distrito_electoral": "3",
+    "circunscripcion_senatorial": "3"
+  },
+  {
+    "codigo_comuna": "02103",
+    "nombre_comuna": "Sierra Gorda",
+    "distrito_electoral": "3",
+    "circunscripcion_senatorial": "3"
+  },
+  {
+    "codigo_comuna": "02104",
+    "nombre_comuna": "Taltal",
+    "distrito_electoral": "3",
+    "circunscripcion_senatorial": "3"
+  },
+  {
+    "codigo_comuna": "02201",
+    "nombre_comuna": "Calama",
+    "distrito_electoral": "3",
+    "circunscripcion_senatorial": "3"
+  },
+  {
+    "codigo_comuna": "02202",
+    "nombre_comuna": "Ollagüe",
+    "distrito_electoral": "3",
+    "circunscripcion_senatorial": "3"
+  },
+  {
+    "codigo_comuna": "02203",
+    "nombre_comuna": "San Pedro de Atacama",
+    "distrito_electoral": "3",
+    "circunscripcion_senatorial": "3"
+  },
+  {
+    "codigo_comuna": "02301",
+    "nombre_comuna": "Tocopilla",
+    "distrito_electoral": "3",
+    "circunscripcion_senatorial": "3"
+  },
+  {
+    "codigo_comuna": "02302",
+    "nombre_comuna": "María Elena",
+    "distrito_electoral": "3",
+    "circunscripcion_senatorial": "3"
+  },
+  {
+    "codigo_comuna": "03101",
+    "nombre_comuna": "Copiapó",
+    "distrito_electoral": "4",
+    "circunscripcion_senatorial": "4"
+  },
+  {
+    "codigo_comuna": "03102",
+    "nombre_comuna": "Caldera",
+    "distrito_electoral": "4",
+    "circunscripcion_senatorial": "4"
+  },
+  {
+    "codigo_comuna": "03103",
+    "nombre_comuna": "Tierra Amarilla",
+    "distrito_electoral": "4",
+    "circunscripcion_senatorial": "4"
+  },
+  {
+    "codigo_comuna": "03201",
+    "nombre_comuna": "Chañaral",
+    "distrito_electoral": "4",
+    "circunscripcion_senatorial": "4"
+  },
+  {
+    "codigo_comuna": "03202",
+    "nombre_comuna": "Diego de Almagro",
+    "distrito_electoral": "4",
+    "circunscripcion_senatorial": "4"
+  },
+  {
+    "codigo_comuna": "03301",
+    "nombre_comuna": "Vallenar",
+    "distrito_electoral": "4",
+    "circunscripcion_senatorial": "4"
+  },
+  {
+    "codigo_comuna": "03302",
+    "nombre_comuna": "Alto del Carmen",
+    "distrito_electoral": "4",
+    "circunscripcion_senatorial": "4"
+  },
+  {
+    "codigo_comuna": "03303",
+    "nombre_comuna": "Freirina",
+    "distrito_electoral": "4",
+    "circunscripcion_senatorial": "4"
+  },
+  {
+    "codigo_comuna": "03304",
+    "nombre_comuna": "Huasco",
+    "distrito_electoral": "4",
+    "circunscripcion_senatorial": "4"
+  },
+  {
+    "codigo_comuna": "04101",
+    "nombre_comuna": "La Serena",
+    "distrito_electoral": "5",
+    "circunscripcion_senatorial": "5"
+  },
+  {
+    "codigo_comuna": "04102",
+    "nombre_comuna": "Coquimbo",
+    "distrito_electoral": "5",
+    "circunscripcion_senatorial": "5"
+  },
+  {
+    "codigo_comuna": "04103",
+    "nombre_comuna": "Andacollo",
+    "distrito_electoral": "5",
+    "circunscripcion_senatorial": "5"
+  },
+  {
+    "codigo_comuna": "04104",
+    "nombre_comuna": "La Higuera",
+    "distrito_electoral": "5",
+    "circunscripcion_senatorial": "5"
+  },
+  {
+    "codigo_comuna": "04105",
+    "nombre_comuna": "Paihuano",
+    "distrito_electoral": "5",
+    "circunscripcion_senatorial": "5"
+  },
+  {
+    "codigo_comuna": "04106",
+    "nombre_comuna": "Vicuña",
+    "distrito_electoral": "5",
+    "circunscripcion_senatorial": "5"
+  },
+  {
+    "codigo_comuna": "04201",
+    "nombre_comuna": "Illapel",
+    "distrito_electoral": "5",
+    "circunscripcion_senatorial": "5"
+  },
+  {
+    "codigo_comuna": "04202",
+    "nombre_comuna": "Canela",
+    "distrito_electoral": "5",
+    "circunscripcion_senatorial": "5"
+  },
+  {
+    "codigo_comuna": "04203",
+    "nombre_comuna": "Los Vilos",
+    "distrito_electoral": "5",
+    "circunscripcion_senatorial": "5"
+  },
+  {
+    "codigo_comuna": "04204",
+    "nombre_comuna": "Salamanca",
+    "distrito_electoral": "5",
+    "circunscripcion_senatorial": "5"
+  },
+  {
+    "codigo_comuna": "04301",
+    "nombre_comuna": "Ovalle",
+    "distrito_electoral": "5",
+    "circunscripcion_senatorial": "5"
+  },
+  {
+    "codigo_comuna": "04302",
+    "nombre_comuna": "Combarbalá",
+    "distrito_electoral": "5",
+    "circunscripcion_senatorial": "5"
+  },
+  {
+    "codigo_comuna": "04303",
+    "nombre_comuna": "Monte Patria",
+    "distrito_electoral": "5",
+    "circunscripcion_senatorial": "5"
+  },
+  {
+    "codigo_comuna": "04304",
+    "nombre_comuna": "Punitaqui",
+    "distrito_electoral": "5",
+    "circunscripcion_senatorial": "5"
+  },
+  {
+    "codigo_comuna": "04305",
+    "nombre_comuna": "Río Hurtado",
+    "distrito_electoral": "5",
+    "circunscripcion_senatorial": "5"
+  },
+  {
+    "codigo_comuna": "05101",
+    "nombre_comuna": "Valparaíso",
+    "distrito_electoral": "7",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05102",
+    "nombre_comuna": "Casablanca",
+    "distrito_electoral": "7",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05103",
+    "nombre_comuna": "Concón",
+    "distrito_electoral": "7",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05104",
+    "nombre_comuna": "Juan Fernández",
+    "distrito_electoral": "7",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05105",
+    "nombre_comuna": "Puchuncaví",
+    "distrito_electoral": "6",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05107",
+    "nombre_comuna": "Quintero",
+    "distrito_electoral": "6",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05109",
+    "nombre_comuna": "Viña del Mar",
+    "distrito_electoral": "7",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05201",
+    "nombre_comuna": "Isla de Pascua",
+    "distrito_electoral": "7",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05301",
+    "nombre_comuna": "Los Andes",
+    "distrito_electoral": "6",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05302",
+    "nombre_comuna": "Calle Larga",
+    "distrito_electoral": "6",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05303",
+    "nombre_comuna": "Rinconada",
+    "distrito_electoral": "6",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05304",
+    "nombre_comuna": "San Esteban",
+    "distrito_electoral": "6",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05401",
+    "nombre_comuna": "La Ligua",
+    "distrito_electoral": "6",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05402",
+    "nombre_comuna": "Cabildo",
+    "distrito_electoral": "6",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05403",
+    "nombre_comuna": "Papudo",
+    "distrito_electoral": "6",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05404",
+    "nombre_comuna": "Petorca",
+    "distrito_electoral": "6",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05405",
+    "nombre_comuna": "Zapallar",
+    "distrito_electoral": "6",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05501",
+    "nombre_comuna": "Quillota",
+    "distrito_electoral": "6",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05502",
+    "nombre_comuna": "Calera",
+    "distrito_electoral": "6",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05503",
+    "nombre_comuna": "Hijuelas",
+    "distrito_electoral": "6",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05504",
+    "nombre_comuna": "La Cruz",
+    "distrito_electoral": "6",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05506",
+    "nombre_comuna": "Nogales",
+    "distrito_electoral": "6",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05601",
+    "nombre_comuna": "San Antonio",
+    "distrito_electoral": "7",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05602",
+    "nombre_comuna": "Algarrobo",
+    "distrito_electoral": "7",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05603",
+    "nombre_comuna": "Cartagena",
+    "distrito_electoral": "7",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05604",
+    "nombre_comuna": "El Quisco",
+    "distrito_electoral": "7",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05605",
+    "nombre_comuna": "El Tabo",
+    "distrito_electoral": "7",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05606",
+    "nombre_comuna": "Santo Domingo",
+    "distrito_electoral": "7",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05701",
+    "nombre_comuna": "San Felipe",
+    "distrito_electoral": "6",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05702",
+    "nombre_comuna": "Catemu",
+    "distrito_electoral": "6",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05703",
+    "nombre_comuna": "Llaillay",
+    "distrito_electoral": "6",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05704",
+    "nombre_comuna": "Panquehue",
+    "distrito_electoral": "6",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05705",
+    "nombre_comuna": "Putaendo",
+    "distrito_electoral": "6",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05706",
+    "nombre_comuna": "Santa María",
+    "distrito_electoral": "6",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05801",
+    "nombre_comuna": "Quilpué",
+    "distrito_electoral": "6",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05802",
+    "nombre_comuna": "Limache",
+    "distrito_electoral": "6",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05803",
+    "nombre_comuna": "Olmué",
+    "distrito_electoral": "6",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "05804",
+    "nombre_comuna": "Villa Alemana",
+    "distrito_electoral": "6",
+    "circunscripcion_senatorial": "6"
+  },
+  {
+    "codigo_comuna": "06101",
+    "nombre_comuna": "Rancagua",
+    "distrito_electoral": "15",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "06102",
+    "nombre_comuna": "Codegua",
+    "distrito_electoral": "15",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "06103",
+    "nombre_comuna": "Coinco",
+    "distrito_electoral": "15",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "06104",
+    "nombre_comuna": "Coltauco",
+    "distrito_electoral": "15",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "06105",
+    "nombre_comuna": "Doñihue",
+    "distrito_electoral": "15",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "06106",
+    "nombre_comuna": "Graneros",
+    "distrito_electoral": "15",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "06107",
+    "nombre_comuna": "Las Cabras",
+    "distrito_electoral": "16",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "06108",
+    "nombre_comuna": "Machalí",
+    "distrito_electoral": "15",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "06109",
+    "nombre_comuna": "Malloa",
+    "distrito_electoral": "15",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "06110",
+    "nombre_comuna": "Mostazal",
+    "distrito_electoral": "15",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "06111",
+    "nombre_comuna": "Olivar",
+    "distrito_electoral": "15",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "06112",
+    "nombre_comuna": "Peumo",
+    "distrito_electoral": "16",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "06113",
+    "nombre_comuna": "Pichidegua",
+    "distrito_electoral": "16",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "06114",
+    "nombre_comuna": "Quinta de Tilcoco",
+    "distrito_electoral": "15",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "06115",
+    "nombre_comuna": "Rengo",
+    "distrito_electoral": "15",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "06116",
+    "nombre_comuna": "Requínoa",
+    "distrito_electoral": "15",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "06117",
+    "nombre_comuna": "San Vicente",
+    "distrito_electoral": "16",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "06201",
+    "nombre_comuna": "Pichilemu",
+    "distrito_electoral": "16",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "06202",
+    "nombre_comuna": "La Estrella",
+    "distrito_electoral": "16",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "06203",
+    "nombre_comuna": "Litueche",
+    "distrito_electoral": "16",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "06204",
+    "nombre_comuna": "Marchigüe",
+    "distrito_electoral": "16",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "06205",
+    "nombre_comuna": "Navidad",
+    "distrito_electoral": "16",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "06206",
+    "nombre_comuna": "Paredones",
+    "distrito_electoral": "16",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "06301",
+    "nombre_comuna": "San Fernando",
+    "distrito_electoral": "16",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "06302",
+    "nombre_comuna": "Chépica",
+    "distrito_electoral": "16",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "06303",
+    "nombre_comuna": "Chimbarongo",
+    "distrito_electoral": "16",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "06304",
+    "nombre_comuna": "Lolol",
+    "distrito_electoral": "16",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "06305",
+    "nombre_comuna": "Nancagua",
+    "distrito_electoral": "16",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "06306",
+    "nombre_comuna": "Palmilla",
+    "distrito_electoral": "16",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "06307",
+    "nombre_comuna": "Peralillo",
+    "distrito_electoral": "16",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "06308",
+    "nombre_comuna": "Placilla",
+    "distrito_electoral": "16",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "06309",
+    "nombre_comuna": "Pumanque",
+    "distrito_electoral": "16",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "06310",
+    "nombre_comuna": "Santa Cruz",
+    "distrito_electoral": "16",
+    "circunscripcion_senatorial": "8"
+  },
+  {
+    "codigo_comuna": "07101",
+    "nombre_comuna": "Talca",
+    "distrito_electoral": "17",
+    "circunscripcion_senatorial": "9"
+  },
+  {
+    "codigo_comuna": "07102",
+    "nombre_comuna": "Constitución",
+    "distrito_electoral": "17",
+    "circunscripcion_senatorial": "9"
+  },
+  {
+    "codigo_comuna": "07103",
+    "nombre_comuna": "Curepto",
+    "distrito_electoral": "17",
+    "circunscripcion_senatorial": "9"
+  },
+  {
+    "codigo_comuna": "07104",
+    "nombre_comuna": "Empedrado",
+    "distrito_electoral": "17",
+    "circunscripcion_senatorial": "9"
+  },
+  {
+    "codigo_comuna": "07105",
+    "nombre_comuna": "Maule",
+    "distrito_electoral": "17",
+    "circunscripcion_senatorial": "9"
+  },
+  {
+    "codigo_comuna": "07106",
+    "nombre_comuna": "Pelarco",
+    "distrito_electoral": "17",
+    "circunscripcion_senatorial": "9"
+  },
+  {
+    "codigo_comuna": "07107",
+    "nombre_comuna": "Pencahue",
+    "distrito_electoral": "17",
+    "circunscripcion_senatorial": "9"
+  },
+  {
+    "codigo_comuna": "07108",
+    "nombre_comuna": "Río Claro",
+    "distrito_electoral": "17",
+    "circunscripcion_senatorial": "9"
+  },
+  {
+    "codigo_comuna": "07109",
+    "nombre_comuna": "San Clemente",
+    "distrito_electoral": "17",
+    "circunscripcion_senatorial": "9"
+  },
+  {
+    "codigo_comuna": "07110",
+    "nombre_comuna": "San Rafael",
+    "distrito_electoral": "17",
+    "circunscripcion_senatorial": "9"
+  },
+  {
+    "codigo_comuna": "07201",
+    "nombre_comuna": "Cauquenes",
+    "distrito_electoral": "18",
+    "circunscripcion_senatorial": "9"
+  },
+  {
+    "codigo_comuna": "07202",
+    "nombre_comuna": "Chanco",
+    "distrito_electoral": "18",
+    "circunscripcion_senatorial": "9"
+  },
+  {
+    "codigo_comuna": "07203",
+    "nombre_comuna": "Pelluhue",
+    "distrito_electoral": "18",
+    "circunscripcion_senatorial": "9"
+  },
+  {
+    "codigo_comuna": "07301",
+    "nombre_comuna": "Curicó",
+    "distrito_electoral": "17",
+    "circunscripcion_senatorial": "9"
+  },
+  {
+    "codigo_comuna": "07302",
+    "nombre_comuna": "Hualañé",
+    "distrito_electoral": "17",
+    "circunscripcion_senatorial": "9"
+  },
+  {
+    "codigo_comuna": "07303",
+    "nombre_comuna": "Licantén",
+    "distrito_electoral": "17",
+    "circunscripcion_senatorial": "9"
+  },
+  {
+    "codigo_comuna": "07304",
+    "nombre_comuna": "Molina",
+    "distrito_electoral": "17",
+    "circunscripcion_senatorial": "9"
+  },
+  {
+    "codigo_comuna": "07305",
+    "nombre_comuna": "Rauco",
+    "distrito_electoral": "17",
+    "circunscripcion_senatorial": "9"
+  },
+  {
+    "codigo_comuna": "07306",
+    "nombre_comuna": "Romeral",
+    "distrito_electoral": "17",
+    "circunscripcion_senatorial": "9"
+  },
+  {
+    "codigo_comuna": "07307",
+    "nombre_comuna": "Sagrada Familia",
+    "distrito_electoral": "17",
+    "circunscripcion_senatorial": "9"
+  },
+  {
+    "codigo_comuna": "07308",
+    "nombre_comuna": "Teno",
+    "distrito_electoral": "17",
+    "circunscripcion_senatorial": "9"
+  },
+  {
+    "codigo_comuna": "07309",
+    "nombre_comuna": "Vichuquén",
+    "distrito_electoral": "17",
+    "circunscripcion_senatorial": "9"
+  },
+  {
+    "codigo_comuna": "07401",
+    "nombre_comuna": "Linares",
+    "distrito_electoral": "18",
+    "circunscripcion_senatorial": "9"
+  },
+  {
+    "codigo_comuna": "07402",
+    "nombre_comuna": "Colbún",
+    "distrito_electoral": "18",
+    "circunscripcion_senatorial": "9"
+  },
+  {
+    "codigo_comuna": "07403",
+    "nombre_comuna": "Longaví",
+    "distrito_electoral": "18",
+    "circunscripcion_senatorial": "9"
+  },
+  {
+    "codigo_comuna": "07404",
+    "nombre_comuna": "Parral",
+    "distrito_electoral": "18",
+    "circunscripcion_senatorial": "9"
+  },
+  {
+    "codigo_comuna": "07405",
+    "nombre_comuna": "Retiro",
+    "distrito_electoral": "18",
+    "circunscripcion_senatorial": "9"
+  },
+  {
+    "codigo_comuna": "07406",
+    "nombre_comuna": "San Javier",
+    "distrito_electoral": "18",
+    "circunscripcion_senatorial": "9"
+  },
+  {
+    "codigo_comuna": "07407",
+    "nombre_comuna": "Villa Alegre",
+    "distrito_electoral": "18",
+    "circunscripcion_senatorial": "9"
+  },
+  {
+    "codigo_comuna": "07408",
+    "nombre_comuna": "Yerbas Buenas",
+    "distrito_electoral": "18",
+    "circunscripcion_senatorial": "9"
+  },
+  {
+    "codigo_comuna": "08101",
+    "nombre_comuna": "Concepción",
+    "distrito_electoral": "20",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "08102",
+    "nombre_comuna": "Coronel",
+    "distrito_electoral": "20",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "08103",
+    "nombre_comuna": "Chiguayante",
+    "distrito_electoral": "20",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "08104",
+    "nombre_comuna": "Florida",
+    "distrito_electoral": "20",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "08105",
+    "nombre_comuna": "Hualqui",
+    "distrito_electoral": "20",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "08106",
+    "nombre_comuna": "Lota",
+    "distrito_electoral": "20",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "08107",
+    "nombre_comuna": "Penco",
+    "distrito_electoral": "20",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "08108",
+    "nombre_comuna": "San Pedro de la Paz",
+    "distrito_electoral": "20",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "08109",
+    "nombre_comuna": "Santa Juana",
+    "distrito_electoral": "21",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "08110",
+    "nombre_comuna": "Talcahuano",
+    "distrito_electoral": "20",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "08111",
+    "nombre_comuna": "Tomé",
+    "distrito_electoral": "20",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "08112",
+    "nombre_comuna": "Hualpén",
+    "distrito_electoral": "20",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "08201",
+    "nombre_comuna": "Lebu",
+    "distrito_electoral": "21",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "08202",
+    "nombre_comuna": "Arauco",
+    "distrito_electoral": "21",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "08203",
+    "nombre_comuna": "Cañete",
+    "distrito_electoral": "21",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "08204",
+    "nombre_comuna": "Contulmo",
+    "distrito_electoral": "21",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "08205",
+    "nombre_comuna": "Curanilahue",
+    "distrito_electoral": "21",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "08206",
+    "nombre_comuna": "Los Alamos",
+    "distrito_electoral": "21",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "08207",
+    "nombre_comuna": "Tirúa",
+    "distrito_electoral": "21",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "08301",
+    "nombre_comuna": "Los Ángeles",
+    "distrito_electoral": "21",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "08302",
+    "nombre_comuna": "Antuco",
+    "distrito_electoral": "21",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "08303",
+    "nombre_comuna": "Cabrero",
+    "distrito_electoral": "21",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "08304",
+    "nombre_comuna": "Laja",
+    "distrito_electoral": "21",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "08305",
+    "nombre_comuna": "Mulchén",
+    "distrito_electoral": "21",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "08306",
+    "nombre_comuna": "Nacimiento",
+    "distrito_electoral": "21",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "08307",
+    "nombre_comuna": "Negrete",
+    "distrito_electoral": "21",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "08308",
+    "nombre_comuna": "Quilaco",
+    "distrito_electoral": "21",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "08309",
+    "nombre_comuna": "Quilleco",
+    "distrito_electoral": "21",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "08310",
+    "nombre_comuna": "San Rosendo",
+    "distrito_electoral": "21",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "08311",
+    "nombre_comuna": "Santa Bárbara",
+    "distrito_electoral": "21",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "08312",
+    "nombre_comuna": "Tucapel",
+    "distrito_electoral": "21",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "08313",
+    "nombre_comuna": "Yumbel",
+    "distrito_electoral": "21",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "08314",
+    "nombre_comuna": "Alto Biobío",
+    "distrito_electoral": "21",
+    "circunscripcion_senatorial": "10"
+  },
+  {
+    "codigo_comuna": "09101",
+    "nombre_comuna": "Temuco",
+    "distrito_electoral": "23",
+    "circunscripcion_senatorial": "11"
+  },
+  {
+    "codigo_comuna": "09102",
+    "nombre_comuna": "Carahue",
+    "distrito_electoral": "23",
+    "circunscripcion_senatorial": "11"
+  },
+  {
+    "codigo_comuna": "09103",
+    "nombre_comuna": "Cunco",
+    "distrito_electoral": "23",
+    "circunscripcion_senatorial": "11"
+  },
+  {
+    "codigo_comuna": "09104",
+    "nombre_comuna": "Curarrehue",
+    "distrito_electoral": "23",
+    "circunscripcion_senatorial": "11"
+  },
+  {
+    "codigo_comuna": "09105",
+    "nombre_comuna": "Freire",
+    "distrito_electoral": "23",
+    "circunscripcion_senatorial": "11"
+  },
+  {
+    "codigo_comuna": "09106",
+    "nombre_comuna": "Galvarino",
+    "distrito_electoral": "22",
+    "circunscripcion_senatorial": "11"
+  },
+  {
+    "codigo_comuna": "09107",
+    "nombre_comuna": "Gorbea",
+    "distrito_electoral": "23",
+    "circunscripcion_senatorial": "11"
+  },
+  {
+    "codigo_comuna": "09108",
+    "nombre_comuna": "Lautaro",
+    "distrito_electoral": "22",
+    "circunscripcion_senatorial": "11"
+  },
+  {
+    "codigo_comuna": "09109",
+    "nombre_comuna": "Loncoche",
+    "distrito_electoral": "23",
+    "circunscripcion_senatorial": "11"
+  },
+  {
+    "codigo_comuna": "09110",
+    "nombre_comuna": "Melipeuco",
+    "distrito_electoral": "22",
+    "circunscripcion_senatorial": "11"
+  },
+  {
+    "codigo_comuna": "09111",
+    "nombre_comuna": "Nueva Imperial",
+    "distrito_electoral": "23",
+    "circunscripcion_senatorial": "11"
+  },
+  {
+    "codigo_comuna": "09112",
+    "nombre_comuna": "Padre Las Casas",
+    "distrito_electoral": "23",
+    "circunscripcion_senatorial": "11"
+  },
+  {
+    "codigo_comuna": "09113",
+    "nombre_comuna": "Perquenco",
+    "distrito_electoral": "22",
+    "circunscripcion_senatorial": "11"
+  },
+  {
+    "codigo_comuna": "09114",
+    "nombre_comuna": "Pitrufquén",
+    "distrito_electoral": "23",
+    "circunscripcion_senatorial": "11"
+  },
+  {
+    "codigo_comuna": "09115",
+    "nombre_comuna": "Pucón",
+    "distrito_electoral": "23",
+    "circunscripcion_senatorial": "11"
+  },
+  {
+    "codigo_comuna": "09116",
+    "nombre_comuna": "Saavedra",
+    "distrito_electoral": "23",
+    "circunscripcion_senatorial": "11"
+  },
+  {
+    "codigo_comuna": "09117",
+    "nombre_comuna": "Teodoro Schmidt",
+    "distrito_electoral": "23",
+    "circunscripcion_senatorial": "11"
+  },
+  {
+    "codigo_comuna": "09118",
+    "nombre_comuna": "Toltén",
+    "distrito_electoral": "23",
+    "circunscripcion_senatorial": "11"
+  },
+  {
+    "codigo_comuna": "09119",
+    "nombre_comuna": "Vilcún",
+    "distrito_electoral": "22",
+    "circunscripcion_senatorial": "11"
+  },
+  {
+    "codigo_comuna": "09120",
+    "nombre_comuna": "Villarrica",
+    "distrito_electoral": "23",
+    "circunscripcion_senatorial": "11"
+  },
+  {
+    "codigo_comuna": "09121",
+    "nombre_comuna": "Cholchol",
+    "distrito_electoral": "23",
+    "circunscripcion_senatorial": "11"
+  },
+  {
+    "codigo_comuna": "09201",
+    "nombre_comuna": "Angol",
+    "distrito_electoral": "22",
+    "circunscripcion_senatorial": "11"
+  },
+  {
+    "codigo_comuna": "09202",
+    "nombre_comuna": "Collipulli",
+    "distrito_electoral": "22",
+    "circunscripcion_senatorial": "11"
+  },
+  {
+    "codigo_comuna": "09203",
+    "nombre_comuna": "Curacautín",
+    "distrito_electoral": "22",
+    "circunscripcion_senatorial": "11"
+  },
+  {
+    "codigo_comuna": "09204",
+    "nombre_comuna": "Ercilla",
+    "distrito_electoral": "22",
+    "circunscripcion_senatorial": "11"
+  },
+  {
+    "codigo_comuna": "09205",
+    "nombre_comuna": "Lonquimay",
+    "distrito_electoral": "22",
+    "circunscripcion_senatorial": "11"
+  },
+  {
+    "codigo_comuna": "09206",
+    "nombre_comuna": "Los Sauces",
+    "distrito_electoral": "22",
+    "circunscripcion_senatorial": "11"
+  },
+  {
+    "codigo_comuna": "09207",
+    "nombre_comuna": "Lumaco",
+    "distrito_electoral": "22",
+    "circunscripcion_senatorial": "11"
+  },
+  {
+    "codigo_comuna": "09208",
+    "nombre_comuna": "Purén",
+    "distrito_electoral": "22",
+    "circunscripcion_senatorial": "11"
+  },
+  {
+    "codigo_comuna": "09209",
+    "nombre_comuna": "Renaico",
+    "distrito_electoral": "22",
+    "circunscripcion_senatorial": "11"
+  },
+  {
+    "codigo_comuna": "09210",
+    "nombre_comuna": "Traiguén",
+    "distrito_electoral": "22",
+    "circunscripcion_senatorial": "11"
+  },
+  {
+    "codigo_comuna": "09211",
+    "nombre_comuna": "Victoria",
+    "distrito_electoral": "22",
+    "circunscripcion_senatorial": "11"
+  },
+  {
+    "codigo_comuna": "10101",
+    "nombre_comuna": "Puerto Montt",
+    "distrito_electoral": "26",
+    "circunscripcion_senatorial": "13"
+  },
+  {
+    "codigo_comuna": "10102",
+    "nombre_comuna": "Calbuco",
+    "distrito_electoral": "26",
+    "circunscripcion_senatorial": "13"
+  },
+  {
+    "codigo_comuna": "10103",
+    "nombre_comuna": "Cochamó",
+    "distrito_electoral": "26",
+    "circunscripcion_senatorial": "13"
+  },
+  {
+    "codigo_comuna": "10104",
+    "nombre_comuna": "Fresia",
+    "distrito_electoral": "25",
+    "circunscripcion_senatorial": "13"
+  },
+  {
+    "codigo_comuna": "10105",
+    "nombre_comuna": "Frutillar",
+    "distrito_electoral": "25",
+    "circunscripcion_senatorial": "13"
+  },
+  {
+    "codigo_comuna": "10106",
+    "nombre_comuna": "Los Muermos",
+    "distrito_electoral": "25",
+    "circunscripcion_senatorial": "13"
+  },
+  {
+    "codigo_comuna": "10107",
+    "nombre_comuna": "Llanquihue",
+    "distrito_electoral": "25",
+    "circunscripcion_senatorial": "13"
+  },
+  {
+    "codigo_comuna": "10108",
+    "nombre_comuna": "Maullín",
+    "distrito_electoral": "26",
+    "circunscripcion_senatorial": "13"
+  },
+  {
+    "codigo_comuna": "10109",
+    "nombre_comuna": "Puerto Varas",
+    "distrito_electoral": "25",
+    "circunscripcion_senatorial": "13"
+  },
+  {
+    "codigo_comuna": "10201",
+    "nombre_comuna": "Castro",
+    "distrito_electoral": "26",
+    "circunscripcion_senatorial": "13"
+  },
+  {
+    "codigo_comuna": "10202",
+    "nombre_comuna": "Ancud",
+    "distrito_electoral": "26",
+    "circunscripcion_senatorial": "13"
+  },
+  {
+    "codigo_comuna": "10203",
+    "nombre_comuna": "Chonchi",
+    "distrito_electoral": "26",
+    "circunscripcion_senatorial": "13"
+  },
+  {
+    "codigo_comuna": "10204",
+    "nombre_comuna": "Curaco de Vélez",
+    "distrito_electoral": "26",
+    "circunscripcion_senatorial": "13"
+  },
+  {
+    "codigo_comuna": "10205",
+    "nombre_comuna": "Dalcahue",
+    "distrito_electoral": "26",
+    "circunscripcion_senatorial": "13"
+  },
+  {
+    "codigo_comuna": "10206",
+    "nombre_comuna": "Puqueldón",
+    "distrito_electoral": "26",
+    "circunscripcion_senatorial": "13"
+  },
+  {
+    "codigo_comuna": "10207",
+    "nombre_comuna": "Queilén",
+    "distrito_electoral": "26",
+    "circunscripcion_senatorial": "13"
+  },
+  {
+    "codigo_comuna": "10208",
+    "nombre_comuna": "Quellón",
+    "distrito_electoral": "26",
+    "circunscripcion_senatorial": "13"
+  },
+  {
+    "codigo_comuna": "10209",
+    "nombre_comuna": "Quemchi",
+    "distrito_electoral": "26",
+    "circunscripcion_senatorial": "13"
+  },
+  {
+    "codigo_comuna": "10210",
+    "nombre_comuna": "Quinchao",
+    "distrito_electoral": "26",
+    "circunscripcion_senatorial": "13"
+  },
+  {
+    "codigo_comuna": "10301",
+    "nombre_comuna": "Osorno",
+    "distrito_electoral": "25",
+    "circunscripcion_senatorial": "13"
+  },
+  {
+    "codigo_comuna": "10302",
+    "nombre_comuna": "Puerto Octay",
+    "distrito_electoral": "25",
+    "circunscripcion_senatorial": "13"
+  },
+  {
+    "codigo_comuna": "10303",
+    "nombre_comuna": "Purranque",
+    "distrito_electoral": "25",
+    "circunscripcion_senatorial": "13"
+  },
+  {
+    "codigo_comuna": "10304",
+    "nombre_comuna": "Puyehue",
+    "distrito_electoral": "25",
+    "circunscripcion_senatorial": "13"
+  },
+  {
+    "codigo_comuna": "10305",
+    "nombre_comuna": "Río Negro",
+    "distrito_electoral": "25",
+    "circunscripcion_senatorial": "13"
+  },
+  {
+    "codigo_comuna": "10306",
+    "nombre_comuna": "San Juan de la Costa",
+    "distrito_electoral": "25",
+    "circunscripcion_senatorial": "13"
+  },
+  {
+    "codigo_comuna": "10307",
+    "nombre_comuna": "San Pablo",
+    "distrito_electoral": "25",
+    "circunscripcion_senatorial": "13"
+  },
+  {
+    "codigo_comuna": "10401",
+    "nombre_comuna": "Chaitén",
+    "distrito_electoral": "26",
+    "circunscripcion_senatorial": "13"
+  },
+  {
+    "codigo_comuna": "10402",
+    "nombre_comuna": "Futaleufú",
+    "distrito_electoral": "26",
+    "circunscripcion_senatorial": "13"
+  },
+  {
+    "codigo_comuna": "10403",
+    "nombre_comuna": "Hualaihué",
+    "distrito_electoral": "26",
+    "circunscripcion_senatorial": "13"
+  },
+  {
+    "codigo_comuna": "10404",
+    "nombre_comuna": "Palena",
+    "distrito_electoral": "26",
+    "circunscripcion_senatorial": "13"
+  },
+  {
+    "codigo_comuna": "11101",
+    "nombre_comuna": "Coyhaique",
+    "distrito_electoral": "27",
+    "circunscripcion_senatorial": "14"
+  },
+  {
+    "codigo_comuna": "11102",
+    "nombre_comuna": "Lago Verde",
+    "distrito_electoral": "27",
+    "circunscripcion_senatorial": "14"
+  },
+  {
+    "codigo_comuna": "11201",
+    "nombre_comuna": "Aysén",
+    "distrito_electoral": "27",
+    "circunscripcion_senatorial": "14"
+  },
+  {
+    "codigo_comuna": "11202",
+    "nombre_comuna": "Cisnes",
+    "distrito_electoral": "27",
+    "circunscripcion_senatorial": "14"
+  },
+  {
+    "codigo_comuna": "11203",
+    "nombre_comuna": "Guaitecas",
+    "distrito_electoral": "27",
+    "circunscripcion_senatorial": "14"
+  },
+  {
+    "codigo_comuna": "11301",
+    "nombre_comuna": "Cochrane",
+    "distrito_electoral": "27",
+    "circunscripcion_senatorial": "14"
+  },
+  {
+    "codigo_comuna": "11302",
+    "nombre_comuna": "O'Higgins",
+    "distrito_electoral": "27",
+    "circunscripcion_senatorial": "14"
+  },
+  {
+    "codigo_comuna": "11303",
+    "nombre_comuna": "Tortel",
+    "distrito_electoral": "27",
+    "circunscripcion_senatorial": "14"
+  },
+  {
+    "codigo_comuna": "11401",
+    "nombre_comuna": "Chile Chico",
+    "distrito_electoral": "27",
+    "circunscripcion_senatorial": "14"
+  },
+  {
+    "codigo_comuna": "11402",
+    "nombre_comuna": "Río Ibáñez",
+    "distrito_electoral": "27",
+    "circunscripcion_senatorial": "14"
+  },
+  {
+    "codigo_comuna": "12101",
+    "nombre_comuna": "Punta Arenas",
+    "distrito_electoral": "28",
+    "circunscripcion_senatorial": "15"
+  },
+  {
+    "codigo_comuna": "12102",
+    "nombre_comuna": "Laguna Blanca",
+    "distrito_electoral": "28",
+    "circunscripcion_senatorial": "15"
+  },
+  {
+    "codigo_comuna": "12103",
+    "nombre_comuna": "Río Verde",
+    "distrito_electoral": "28",
+    "circunscripcion_senatorial": "15"
+  },
+  {
+    "codigo_comuna": "12104",
+    "nombre_comuna": "San Gregorio",
+    "distrito_electoral": "28",
+    "circunscripcion_senatorial": "15"
+  },
+  {
+    "codigo_comuna": "12201",
+    "nombre_comuna": "Cabo de Hornos",
+    "distrito_electoral": "28",
+    "circunscripcion_senatorial": "15"
+  },
+  {
+    "codigo_comuna": "12202",
+    "nombre_comuna": "Antártica",
+    "distrito_electoral": "28",
+    "circunscripcion_senatorial": "15"
+  },
+  {
+    "codigo_comuna": "12301",
+    "nombre_comuna": "Porvenir",
+    "distrito_electoral": "28",
+    "circunscripcion_senatorial": "15"
+  },
+  {
+    "codigo_comuna": "12302",
+    "nombre_comuna": "Primavera",
+    "distrito_electoral": "28",
+    "circunscripcion_senatorial": "15"
+  },
+  {
+    "codigo_comuna": "12303",
+    "nombre_comuna": "Timaukel",
+    "distrito_electoral": "28",
+    "circunscripcion_senatorial": "15"
+  },
+  {
+    "codigo_comuna": "12401",
+    "nombre_comuna": "Natales",
+    "distrito_electoral": "28",
+    "circunscripcion_senatorial": "15"
+  },
+  {
+    "codigo_comuna": "12402",
+    "nombre_comuna": "Torres del Paine",
+    "distrito_electoral": "28",
+    "circunscripcion_senatorial": "15"
+  },
+  {
+    "codigo_comuna": "13101",
+    "nombre_comuna": "Santiago",
+    "distrito_electoral": "10",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13102",
+    "nombre_comuna": "Cerrillos",
+    "distrito_electoral": "8",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13103",
+    "nombre_comuna": "Cerro Navia",
+    "distrito_electoral": "9",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13104",
+    "nombre_comuna": "Conchalí",
+    "distrito_electoral": "9",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13105",
+    "nombre_comuna": "El Bosque",
+    "distrito_electoral": "13",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13106",
+    "nombre_comuna": "Estación Central",
+    "distrito_electoral": "8",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13107",
+    "nombre_comuna": "Huechuraba",
+    "distrito_electoral": "9",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13108",
+    "nombre_comuna": "Independencia",
+    "distrito_electoral": "9",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13109",
+    "nombre_comuna": "La Cisterna",
+    "distrito_electoral": "13",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13110",
+    "nombre_comuna": "La Florida",
+    "distrito_electoral": "12",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13111",
+    "nombre_comuna": "La Granja",
+    "distrito_electoral": "10",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13112",
+    "nombre_comuna": "La Pintana",
+    "distrito_electoral": "12",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13113",
+    "nombre_comuna": "La Reina",
+    "distrito_electoral": "11",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13114",
+    "nombre_comuna": "Las Condes",
+    "distrito_electoral": "11",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13115",
+    "nombre_comuna": "Lo Barnechea",
+    "distrito_electoral": "11",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13116",
+    "nombre_comuna": "Lo Espejo",
+    "distrito_electoral": "13",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13117",
+    "nombre_comuna": "Lo Prado",
+    "distrito_electoral": "9",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13118",
+    "nombre_comuna": "Macul",
+    "distrito_electoral": "10",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13119",
+    "nombre_comuna": "Maipú",
+    "distrito_electoral": "8",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13120",
+    "nombre_comuna": "Ñuñoa",
+    "distrito_electoral": "10",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13121",
+    "nombre_comuna": "Pedro Aguirre Cerda",
+    "distrito_electoral": "13",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13122",
+    "nombre_comuna": "Peñalolén",
+    "distrito_electoral": "11",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13123",
+    "nombre_comuna": "Providencia",
+    "distrito_electoral": "10",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13124",
+    "nombre_comuna": "Pudahuel",
+    "distrito_electoral": "8",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13125",
+    "nombre_comuna": "Quilicura",
+    "distrito_electoral": "8",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13126",
+    "nombre_comuna": "Quinta Normal",
+    "distrito_electoral": "9",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13127",
+    "nombre_comuna": "Recoleta",
+    "distrito_electoral": "9",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13128",
+    "nombre_comuna": "Renca",
+    "distrito_electoral": "9",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13129",
+    "nombre_comuna": "San Joaquín",
+    "distrito_electoral": "10",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13130",
+    "nombre_comuna": "San Miguel",
+    "distrito_electoral": "13",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13131",
+    "nombre_comuna": "San Ramón",
+    "distrito_electoral": "13",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13132",
+    "nombre_comuna": "Vitacura",
+    "distrito_electoral": "11",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13201",
+    "nombre_comuna": "Puente Alto",
+    "distrito_electoral": "12",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13202",
+    "nombre_comuna": "Pirque",
+    "distrito_electoral": "12",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13203",
+    "nombre_comuna": "San José de Maipo",
+    "distrito_electoral": "12",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13301",
+    "nombre_comuna": "Colina",
+    "distrito_electoral": "8",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13302",
+    "nombre_comuna": "Lampa",
+    "distrito_electoral": "8",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13303",
+    "nombre_comuna": "Tiltil",
+    "distrito_electoral": "8",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13401",
+    "nombre_comuna": "San Bernardo",
+    "distrito_electoral": "14",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13402",
+    "nombre_comuna": "Buin",
+    "distrito_electoral": "14",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13403",
+    "nombre_comuna": "Calera de Tango",
+    "distrito_electoral": "14",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13404",
+    "nombre_comuna": "Paine",
+    "distrito_electoral": "14",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13501",
+    "nombre_comuna": "Melipilla",
+    "distrito_electoral": "14",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13502",
+    "nombre_comuna": "Alhué",
+    "distrito_electoral": "14",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13503",
+    "nombre_comuna": "Curacaví",
+    "distrito_electoral": "14",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13504",
+    "nombre_comuna": "María Pinto",
+    "distrito_electoral": "14",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13505",
+    "nombre_comuna": "San Pedro",
+    "distrito_electoral": "14",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13601",
+    "nombre_comuna": "Talagante",
+    "distrito_electoral": "14",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13602",
+    "nombre_comuna": "El Monte",
+    "distrito_electoral": "14",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13603",
+    "nombre_comuna": "Isla de Maipo",
+    "distrito_electoral": "14",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13604",
+    "nombre_comuna": "Padre Hurtado",
+    "distrito_electoral": "14",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "13605",
+    "nombre_comuna": "Peñaflor",
+    "distrito_electoral": "14",
+    "circunscripcion_senatorial": "7"
+  },
+  {
+    "codigo_comuna": "14101",
+    "nombre_comuna": "Valdivia",
+    "distrito_electoral": "24",
+    "circunscripcion_senatorial": "12"
+  },
+  {
+    "codigo_comuna": "14102",
+    "nombre_comuna": "Corral",
+    "distrito_electoral": "24",
+    "circunscripcion_senatorial": "12"
+  },
+  {
+    "codigo_comuna": "14103",
+    "nombre_comuna": "Lanco",
+    "distrito_electoral": "24",
+    "circunscripcion_senatorial": "12"
+  },
+  {
+    "codigo_comuna": "14104",
+    "nombre_comuna": "Los Lagos",
+    "distrito_electoral": "24",
+    "circunscripcion_senatorial": "12"
+  },
+  {
+    "codigo_comuna": "14105",
+    "nombre_comuna": "Máfil",
+    "distrito_electoral": "24",
+    "circunscripcion_senatorial": "12"
+  },
+  {
+    "codigo_comuna": "14106",
+    "nombre_comuna": "Mariquina",
+    "distrito_electoral": "24",
+    "circunscripcion_senatorial": "12"
+  },
+  {
+    "codigo_comuna": "14107",
+    "nombre_comuna": "Paillaco",
+    "distrito_electoral": "24",
+    "circunscripcion_senatorial": "12"
+  },
+  {
+    "codigo_comuna": "14108",
+    "nombre_comuna": "Panguipulli",
+    "distrito_electoral": "24",
+    "circunscripcion_senatorial": "12"
+  },
+  {
+    "codigo_comuna": "14201",
+    "nombre_comuna": "La Unión",
+    "distrito_electoral": "24",
+    "circunscripcion_senatorial": "12"
+  },
+  {
+    "codigo_comuna": "14202",
+    "nombre_comuna": "Futrono",
+    "distrito_electoral": "24",
+    "circunscripcion_senatorial": "12"
+  },
+  {
+    "codigo_comuna": "14203",
+    "nombre_comuna": "Lago Ranco",
+    "distrito_electoral": "24",
+    "circunscripcion_senatorial": "12"
+  },
+  {
+    "codigo_comuna": "14204",
+    "nombre_comuna": "Río Bueno",
+    "distrito_electoral": "24",
+    "circunscripcion_senatorial": "12"
+  },
+  {
+    "codigo_comuna": "15101",
+    "nombre_comuna": "Arica",
+    "distrito_electoral": "1",
+    "circunscripcion_senatorial": "1"
+  },
+  {
+    "codigo_comuna": "15102",
+    "nombre_comuna": "Camarones",
+    "distrito_electoral": "1",
+    "circunscripcion_senatorial": "1"
+  },
+  {
+    "codigo_comuna": "15201",
+    "nombre_comuna": "Putre",
+    "distrito_electoral": "1",
+    "circunscripcion_senatorial": "1"
+  },
+  {
+    "codigo_comuna": "15202",
+    "nombre_comuna": "General Lagos",
+    "distrito_electoral": "1",
+    "circunscripcion_senatorial": "1"
+  },
+  {
+    "codigo_comuna": "16101",
+    "nombre_comuna": "Chillán",
+    "distrito_electoral": "19",
+    "circunscripcion_senatorial": "16"
+  },
+  {
+    "codigo_comuna": "16102",
+    "nombre_comuna": "Bulnes",
+    "distrito_electoral": "19",
+    "circunscripcion_senatorial": "16"
+  },
+  {
+    "codigo_comuna": "16103",
+    "nombre_comuna": "Chillán Viejo",
+    "distrito_electoral": "19",
+    "circunscripcion_senatorial": "16"
+  },
+  {
+    "codigo_comuna": "16104",
+    "nombre_comuna": "El Carmen",
+    "distrito_electoral": "19",
+    "circunscripcion_senatorial": "16"
+  },
+  {
+    "codigo_comuna": "16105",
+    "nombre_comuna": "Pemuco",
+    "distrito_electoral": "19",
+    "circunscripcion_senatorial": "16"
+  },
+  {
+    "codigo_comuna": "16106",
+    "nombre_comuna": "Pinto",
+    "distrito_electoral": "19",
+    "circunscripcion_senatorial": "16"
+  },
+  {
+    "codigo_comuna": "16107",
+    "nombre_comuna": "Quillón",
+    "distrito_electoral": "19",
+    "circunscripcion_senatorial": "16"
+  },
+  {
+    "codigo_comuna": "16108",
+    "nombre_comuna": "San Ignacio",
+    "distrito_electoral": "19",
+    "circunscripcion_senatorial": "16"
+  },
+  {
+    "codigo_comuna": "16109",
+    "nombre_comuna": "Yungay",
+    "distrito_electoral": "19",
+    "circunscripcion_senatorial": "16"
+  },
+  {
+    "codigo_comuna": "16201",
+    "nombre_comuna": "Quirihue",
+    "distrito_electoral": "19",
+    "circunscripcion_senatorial": "16"
+  },
+  {
+    "codigo_comuna": "16202",
+    "nombre_comuna": "Cobquecura",
+    "distrito_electoral": "19",
+    "circunscripcion_senatorial": "16"
+  },
+  {
+    "codigo_comuna": "16203",
+    "nombre_comuna": "Coelemu",
+    "distrito_electoral": "19",
+    "circunscripcion_senatorial": "16"
+  },
+  {
+    "codigo_comuna": "16204",
+    "nombre_comuna": "Ninhue",
+    "distrito_electoral": "19",
+    "circunscripcion_senatorial": "16"
+  },
+  {
+    "codigo_comuna": "16205",
+    "nombre_comuna": "Portezuelo",
+    "distrito_electoral": "19",
+    "circunscripcion_senatorial": "16"
+  },
+  {
+    "codigo_comuna": "16206",
+    "nombre_comuna": "Ranquil",
+    "distrito_electoral": "19",
+    "circunscripcion_senatorial": "16"
+  },
+  {
+    "codigo_comuna": "16207",
+    "nombre_comuna": "Treguaco",
+    "distrito_electoral": "19",
+    "circunscripcion_senatorial": "16"
+  },
+  {
+    "codigo_comuna": "16301",
+    "nombre_comuna": "San Carlos",
+    "distrito_electoral": "19",
+    "circunscripcion_senatorial": "16"
+  },
+  {
+    "codigo_comuna": "16302",
+    "nombre_comuna": "Coihueco",
+    "distrito_electoral": "19",
+    "circunscripcion_senatorial": "16"
+  },
+  {
+    "codigo_comuna": "16303",
+    "nombre_comuna": "Ñiquén",
+    "distrito_electoral": "19",
+    "circunscripcion_senatorial": "16"
+  },
+  {
+    "codigo_comuna": "16304",
+    "nombre_comuna": "San Fabián",
+    "distrito_electoral": "19",
+    "circunscripcion_senatorial": "16"
+  },
+  {
+    "codigo_comuna": "16305",
+    "nombre_comuna": "San Nicolás",
+    "distrito_electoral": "19",
+    "circunscripcion_senatorial": "16"
+  }
+]

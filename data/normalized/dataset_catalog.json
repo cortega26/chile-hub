@@ -1,6 +1,6 @@
 {
-  "generated_at_utc": "2026-06-15T23:12:54.621471+00:00",
-  "dataset_count": 8,
+  "generated_at_utc": "2026-06-15T23:39:29.359352+00:00",
+  "dataset_count": 10,
   "datasets": [
     {
       "dataset": "regiones",
@@ -31,9 +31,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 49.17,
+        "age_hours": 49.61,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-15T23:12:54.620614+00:00"
+        "checked_at_utc": "2026-06-15T23:39:29.358432+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -108,9 +108,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 49.17,
+        "age_hours": 49.61,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-15T23:12:54.620721+00:00"
+        "checked_at_utc": "2026-06-15T23:39:29.358547+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -192,9 +192,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 49.17,
+        "age_hours": 49.61,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-15T23:12:54.620739+00:00"
+        "checked_at_utc": "2026-06-15T23:39:29.358564+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -275,9 +275,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 49.17,
+        "age_hours": 49.61,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-15T23:12:54.620751+00:00"
+        "checked_at_utc": "2026-06-15T23:39:29.358576+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -363,9 +363,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 49.17,
+        "age_hours": 49.61,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-06-15T23:12:54.621329+00:00"
+        "checked_at_utc": "2026-06-15T23:39:29.359149+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 72,
@@ -452,9 +452,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 29.08,
+        "age_hours": 29.52,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-06-15T23:12:54.621357+00:00"
+        "checked_at_utc": "2026-06-15T23:39:29.359196+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -538,9 +538,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 29.1,
+        "age_hours": 29.54,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-06-15T23:12:54.621370+00:00"
+        "checked_at_utc": "2026-06-15T23:39:29.359214+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 1080,
@@ -571,6 +571,84 @@
         "excel_sheet": "Establecimientos Salud"
       },
       "documentation": "docs/datasets/establecimientos_salud.md",
+      "validation_status": "ok",
+      "warnings": [],
+      "degradation": {
+        "status": "none",
+        "impact": "Sin degradación operativa detectada en este build.",
+        "recommended_action": "Ninguna."
+      },
+      "notes": []
+    },
+    {
+      "dataset": "establecimientos_educacionales",
+      "description": "Directorio oficial del Ministerio de Educación (MINEDUC) con Rol Base de Datos (RBD), ubicación y dependencia administrativa.",
+      "source_name": "Ministerio de Educación - Directorio Oficial de Establecimientos",
+      "source_url": "https://datosabiertos.mineduc.cl/wp-content/uploads/2025/11/Directorio-Oficial-EE-2025.rar",
+      "source_mode": "live",
+      "source_detail": "mineduc_datos_abiertos_rar",
+      "refreshed_at_utc": "2026-06-15T23:35:37.946512+00:00",
+      "record_count": 12898,
+      "fields": [
+        "rbd",
+        "dv_rbd",
+        "nombre_establecimiento",
+        "codigo_region",
+        "codigo_comuna",
+        "dependencia_administrativa",
+        "latitud",
+        "longitud",
+        "estado_funcionamiento"
+      ],
+      "indicator_codes": [],
+      "indicator_delivery": {},
+      "join_keys": [
+        "codigo_comuna"
+      ],
+      "confidence_tier": "Tier A",
+      "reuse_policy": {
+        "status": "open-attribution",
+        "license": "CC-BY-3.0",
+        "license_url": "https://creativecommons.org/licenses/by/3.0/cl/",
+        "attribution_required": true,
+        "redistribution_ok": true,
+        "summary": "Directorio oficial MINEDUC publicado por el Centro de Estudios del Ministerio de Educación de Chile bajo licencia CC BY."
+      },
+      "freshness": {
+        "status": "fresh",
+        "age_hours": 0.06,
+        "max_age_hours": 8760,
+        "checked_at_utc": "2026-06-15T23:39:29.359226+00:00"
+      },
+      "freshness_policy": {
+        "max_age_hours": 8760,
+        "label": "anual"
+      },
+      "coverage": {
+        "status": "not_applicable",
+        "expected_record_count": null,
+        "actual_record_count": 12898,
+        "coverage_ratio": null,
+        "summary": "Sin baseline de cobertura por cardinalidad para esta capa."
+      },
+      "drift": {
+        "status": "healthy",
+        "summary": "Sin drift operativo detectado en este build.",
+        "recommended_action": "Ninguna."
+      },
+      "usage_examples": {
+        "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('establecimientos_educacionales')",
+        "duckdb": "SELECT nombre_establecimiento, dependencia_administrativa FROM 'data/normalized/establecimientos_educacionales.parquet' LIMIT 10;",
+        "cli": "python -m src.chile_hub show establecimientos_educacionales"
+      },
+      "outputs": {
+        "parquet": "data/normalized/establecimientos_educacionales.parquet",
+        "json": "data/normalized/establecimientos_educacionales.json",
+        "duckdb_table": "establecimientos_educacionales",
+        "sqlite_table": "establecimientos_educacionales",
+        "excel_sheet": "Establecimientos Educacionales"
+      },
+      "documentation": "docs/datasets/establecimientos_educacionales.md",
       "validation_status": "ok",
       "warnings": [],
       "degradation": {
@@ -620,9 +698,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 28.56,
+        "age_hours": 29.0,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-06-15T23:12:54.621381+00:00"
+        "checked_at_utc": "2026-06-15T23:39:29.359243+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -650,6 +728,76 @@
         "json": "data/normalized/censo_hogares_viviendas.json"
       },
       "documentation": "docs/datasets/censo_hogares_viviendas.md",
+      "validation_status": "ok",
+      "warnings": [],
+      "degradation": {
+        "status": "none",
+        "impact": "Sin degradación operativa detectada en este build.",
+        "recommended_action": "Ninguna."
+      },
+      "notes": []
+    },
+    {
+      "dataset": "distritos_electorales",
+      "description": "Asociación de comunas a distritos electorales (diputados) y circunscripciones senatoriales.",
+      "source_name": "BCN / Biblioteca del Congreso Nacional de Chile",
+      "source_url": "https://www.bcn.cl/siit/observatorio/ley20840",
+      "source_mode": "live",
+      "source_detail": "bcn_electoral_mapping_generated",
+      "refreshed_at_utc": "2026-06-15T23:28:09.928013+00:00",
+      "record_count": 346,
+      "fields": [
+        "codigo_comuna",
+        "nombre_comuna",
+        "distrito_electoral",
+        "circunscripcion_senatorial"
+      ],
+      "indicator_codes": [],
+      "indicator_delivery": {},
+      "join_keys": [
+        "codigo_comuna"
+      ],
+      "confidence_tier": "Tier A",
+      "reuse_policy": {
+        "status": "open-attribution",
+        "license": "CC0",
+        "license_url": "http://www.opendefinition.org/licenses/cc-zero",
+        "attribution_required": false,
+        "redistribution_ok": true,
+        "summary": "Asociación comunal a distritos y circunscripciones electorales basada en Ley N° 20.840."
+      },
+      "freshness": {
+        "status": "fresh",
+        "age_hours": 0.19,
+        "max_age_hours": 87600,
+        "checked_at_utc": "2026-06-15T23:39:29.359251+00:00"
+      },
+      "freshness_policy": {
+        "max_age_hours": 87600,
+        "label": "estable"
+      },
+      "coverage": {
+        "status": "full",
+        "expected_record_count": 346,
+        "actual_record_count": 346,
+        "coverage_ratio": 1.0,
+        "summary": "Cobertura completa: 346/346 filas respecto del baseline esperado."
+      },
+      "drift": {
+        "status": "healthy",
+        "summary": "Sin drift operativo detectado en este build.",
+        "recommended_action": "Ninguna."
+      },
+      "usage_examples": {
+        "python": "from src.chile_hub import ChileHub\nhub = ChileHub()\ndf = hub.load_polars('distritos_electorales')",
+        "duckdb": "SELECT * FROM 'data/normalized/distritos_electorales.parquet';",
+        "cli": "python -m src.chile_hub show distritos_electorales"
+      },
+      "outputs": {
+        "parquet": "data/normalized/distritos_electorales.parquet",
+        "json": "data/normalized/distritos_electorales.json"
+      },
+      "documentation": "docs/datasets/distritos_electorales.md",
       "validation_status": "ok",
       "warnings": [],
       "degradation": {

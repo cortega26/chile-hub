@@ -1,20 +1,22 @@
 # chile-hub provenance report
 
-- `generated_at_utc`: `2026-06-15T23:12:54.621471+00:00`
-- `dataset_count`: `8`
-- `live_count`: `8`
+- `generated_at_utc`: `2026-06-15T23:39:29.359352+00:00`
+- `dataset_count`: `10`
+- `live_count`: `10`
 - `fallback_count`: `0`
 
 | Dataset | Source | Mode | Detail | Refreshed | Freshness | Warnings | Reuse |
 | :--- | :--- | :--- | :--- | :--- | :--- | ---: | :--- |
-| `regiones` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-13T22:02:44.348995+00:00` | `fresh (49.17h / 2160h)` | 0 | `open-attribution` |
-| `provincias` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-13T22:02:44.348995+00:00` | `fresh (49.17h / 2160h)` | 0 | `open-attribution` |
-| `comunas` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-13T22:02:44.348995+00:00` | `fresh (49.17h / 2160h)` | 0 | `open-attribution` |
-| `comunas_enriquecidas` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-13T22:02:44.348995+00:00` | `fresh (49.17h / 2160h)` | 0 | `open-attribution` |
-| `indicadores` | Banco Central de Chile (via mindicador.cl) | `live` | `public_api_with_published_backfill` | `2026-06-13T22:02:50.757821+00:00` | `fresh (49.17h / 72h)` | 1 | `open-attribution` |
-| `censo_comunal` | Instituto Nacional de Estadisticas - Censo 2024 | `live` | `official_xlsx` | `2026-06-14T18:08:06.406574+00:00` | `fresh (29.08h / 87600h)` | 0 | `open-attribution` |
-| `establecimientos_salud` | Ministerio de Salud - Establecimientos de Salud | `live` | `datos_gob_csv` | `2026-06-14T18:06:51.839082+00:00` | `fresh (29.1h / 1080h)` | 0 | `open-attribution` |
-| `censo_hogares_viviendas` | Instituto Nacional de Estadisticas - Censo 2024 | `live` | `official_xlsx` | `2026-06-14T18:39:22.957446+00:00` | `fresh (28.56h / 87600h)` | 0 | `open-attribution` |
+| `regiones` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-13T22:02:44.348995+00:00` | `fresh (49.61h / 2160h)` | 0 | `open-attribution` |
+| `provincias` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-13T22:02:44.348995+00:00` | `fresh (49.61h / 2160h)` | 0 | `open-attribution` |
+| `comunas` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-13T22:02:44.348995+00:00` | `fresh (49.61h / 2160h)` | 0 | `open-attribution` |
+| `comunas_enriquecidas` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-13T22:02:44.348995+00:00` | `fresh (49.61h / 2160h)` | 0 | `open-attribution` |
+| `indicadores` | Banco Central de Chile (via mindicador.cl) | `live` | `public_api_with_published_backfill` | `2026-06-13T22:02:50.757821+00:00` | `fresh (49.61h / 72h)` | 1 | `open-attribution` |
+| `censo_comunal` | Instituto Nacional de Estadisticas - Censo 2024 | `live` | `official_xlsx` | `2026-06-14T18:08:06.406574+00:00` | `fresh (29.52h / 87600h)` | 0 | `open-attribution` |
+| `establecimientos_salud` | Ministerio de Salud - Establecimientos de Salud | `live` | `datos_gob_csv` | `2026-06-14T18:06:51.839082+00:00` | `fresh (29.54h / 1080h)` | 0 | `open-attribution` |
+| `establecimientos_educacionales` | Ministerio de Educación - Directorio Oficial de Establecimientos | `live` | `mineduc_datos_abiertos_rar` | `2026-06-15T23:35:37.946512+00:00` | `fresh (0.06h / 8760h)` | 0 | `open-attribution` |
+| `censo_hogares_viviendas` | Instituto Nacional de Estadisticas - Censo 2024 | `live` | `official_xlsx` | `2026-06-14T18:39:22.957446+00:00` | `fresh (29.0h / 87600h)` | 0 | `open-attribution` |
+| `distritos_electorales` | BCN / Biblioteca del Congreso Nacional de Chile | `live` | `bcn_electoral_mapping_generated` | `2026-06-15T23:28:09.928013+00:00` | `fresh (0.19h / 87600h)` | 0 | `open-attribution` |
 
 ## regiones
 
@@ -23,7 +25,7 @@
 - `source_mode`: `live`
 - `source_detail`: `bcn_arcgis`
 - `refreshed_at_utc`: `2026-06-13T22:02:44.348995+00:00`
-- `freshness`: `fresh (49.17h / 2160h)`
+- `freshness`: `fresh (49.61h / 2160h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: bcn_skipped_null_code_records: 1
 - `reuse_status`: `open-attribution`
@@ -36,7 +38,7 @@
 - `source_mode`: `live`
 - `source_detail`: `bcn_arcgis`
 - `refreshed_at_utc`: `2026-06-13T22:02:44.348995+00:00`
-- `freshness`: `fresh (49.17h / 2160h)`
+- `freshness`: `fresh (49.61h / 2160h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: bcn_skipped_null_code_records: 1
 - `reuse_status`: `open-attribution`
@@ -49,7 +51,7 @@
 - `source_mode`: `live`
 - `source_detail`: `bcn_arcgis`
 - `refreshed_at_utc`: `2026-06-13T22:02:44.348995+00:00`
-- `freshness`: `fresh (49.17h / 2160h)`
+- `freshness`: `fresh (49.61h / 2160h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: bcn_skipped_null_code_records: 1
 - `reuse_status`: `open-attribution`
@@ -62,7 +64,7 @@
 - `source_mode`: `live`
 - `source_detail`: `bcn_arcgis`
 - `refreshed_at_utc`: `2026-06-13T22:02:44.348995+00:00`
-- `freshness`: `fresh (49.17h / 2160h)`
+- `freshness`: `fresh (49.61h / 2160h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: bcn_skipped_null_code_records: 1
 - `reuse_status`: `open-attribution`
@@ -75,7 +77,7 @@
 - `source_mode`: `live`
 - `source_detail`: `public_api_with_published_backfill`
 - `refreshed_at_utc`: `2026-06-13T22:02:50.757821+00:00`
-- `freshness`: `fresh (49.17h / 72h)`
+- `freshness`: `fresh (49.61h / 72h)`
 - `warning_count`: `1`
 - `diagnostic_summary`: indicadores live refresh reused last published artifact for missing codes: ipc
 - `reuse_status`: `open-attribution`
@@ -88,7 +90,7 @@
 - `source_mode`: `live`
 - `source_detail`: `official_xlsx`
 - `refreshed_at_utc`: `2026-06-14T18:08:06.406574+00:00`
-- `freshness`: `fresh (29.08h / 87600h)`
+- `freshness`: `fresh (29.52h / 87600h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: age_bands_derived_from_quinquennial_groups
 - `reuse_status`: `open-attribution`
@@ -101,11 +103,24 @@
 - `source_mode`: `live`
 - `source_detail`: `datos_gob_csv`
 - `refreshed_at_utc`: `2026-06-14T18:06:51.839082+00:00`
-- `freshness`: `fresh (29.1h / 1080h)`
+- `freshness`: `fresh (29.54h / 1080h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: Sin observaciones operativas.
 - `reuse_status`: `open-attribution`
 - `documentation`: `docs/datasets/establecimientos_salud.md`
+
+## establecimientos_educacionales
+
+- `source_name`: Ministerio de Educación - Directorio Oficial de Establecimientos
+- `source_url`: https://datosabiertos.mineduc.cl/wp-content/uploads/2025/11/Directorio-Oficial-EE-2025.rar
+- `source_mode`: `live`
+- `source_detail`: `mineduc_datos_abiertos_rar`
+- `refreshed_at_utc`: `2026-06-15T23:35:37.946512+00:00`
+- `freshness`: `fresh (0.06h / 8760h)`
+- `warning_count`: `0`
+- `diagnostic_summary`: Sin observaciones operativas.
+- `reuse_status`: `open-attribution`
+- `documentation`: `docs/datasets/establecimientos_educacionales.md`
 
 ## censo_hogares_viviendas
 
@@ -114,8 +129,21 @@
 - `source_mode`: `live`
 - `source_detail`: `official_xlsx`
 - `refreshed_at_utc`: `2026-06-14T18:39:22.957446+00:00`
-- `freshness`: `fresh (28.56h / 87600h)`
+- `freshness`: `fresh (29.0h / 87600h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: Sin observaciones operativas.
 - `reuse_status`: `open-attribution`
 - `documentation`: `docs/datasets/censo_hogares_viviendas.md`
+
+## distritos_electorales
+
+- `source_name`: BCN / Biblioteca del Congreso Nacional de Chile
+- `source_url`: https://www.bcn.cl/siit/observatorio/ley20840
+- `source_mode`: `live`
+- `source_detail`: `bcn_electoral_mapping_generated`
+- `refreshed_at_utc`: `2026-06-15T23:28:09.928013+00:00`
+- `freshness`: `fresh (0.19h / 87600h)`
+- `warning_count`: `0`
+- `diagnostic_summary`: Sin observaciones operativas.
+- `reuse_status`: `open-attribution`
+- `documentation`: `docs/datasets/distritos_electorales.md`

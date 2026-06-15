@@ -1,8 +1,8 @@
 {
-  "generated_at_utc": "2026-06-15T23:12:54.621471+00:00",
+  "generated_at_utc": "2026-06-15T23:39:29.359352+00:00",
   "overall_status": "warn",
-  "dataset_count": 8,
-  "live_count": 8,
+  "dataset_count": 10,
+  "live_count": 10,
   "fallback_count": 0,
   "stale_count": 0,
   "drifted_count": 1,
@@ -26,7 +26,7 @@
   "primary_package": {
     "path": "data/normalized/chile-hub-publishable-bundle.zip",
     "package_type": "zip",
-    "size_bytes": 508474,
+    "size_bytes": 1280058,
     "checksum_algorithm": "sha256",
     "checksum_path": "data/normalized/chile-hub-publishable-bundle.zip.sha256",
     "verification_command": "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256"
@@ -80,6 +80,22 @@
       "validation_status": "ok",
       "freshness_status": "fresh",
       "coverage_status": "full",
+      "drift_status": "healthy"
+    },
+    {
+      "dataset": "distritos_electorales",
+      "source_mode": "live",
+      "validation_status": "ok",
+      "freshness_status": "fresh",
+      "coverage_status": "full",
+      "drift_status": "healthy"
+    },
+    {
+      "dataset": "establecimientos_educacionales",
+      "source_mode": "live",
+      "validation_status": "ok",
+      "freshness_status": "fresh",
+      "coverage_status": "not_applicable",
       "drift_status": "healthy"
     },
     {

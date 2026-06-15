@@ -221,3 +221,27 @@ def validate_indicadores(df_indicadores, metadata):
         "warnings": warnings,
         "indicator_codes": sorted(codes),
     }
+
+
+def validate_distritos_electorales(df, metadata, valid_commune_codes=None):
+    errors = []
+    if df.height == 0:
+        errors.append("distritos_electorales dataset is empty")
+    if df.height != 346:
+        errors.append(f"distritos_electorales expected 346 communes, found {df.height}")
+    if df.height - df["codigo_comuna"].n_unique() > 0:
+        errors.append("codigo_comuna must be unique in distritos_electorales")
+    invalid = df.filter(pl.col("codigo_comuna").str.len_chars() != 5).height
+    if invalid:
+        errors.append(f"found {invalid} invalid codigo_comuna values")
+    if valid_commune_codes is not None:
+        unknown = set(df["codigo_comuna"].drop_nulls().to_list()) - set(valid_commune_codes)
+        if unknown:
+            errors.append(f"distritos_electorales references unknown communes: {sorted(unknown)}")
+    return {
+        "dataset": "distritos_electorales",
+        "status": "error" if errors else "ok",
+        "record_count": df.height,
+        "errors": errors,
+        "warnings": [],
+    }

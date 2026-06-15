@@ -20,6 +20,7 @@ Cada ficha busca responder cinco preguntas rápido:
 - [censo_comunal](./censo_comunal.md)
 - [censo_hogares_viviendas](./censo_hogares_viviendas.md)
 - [establecimientos_salud](./establecimientos_salud.md)
+- [distritos_electorales](./distritos_electorales.md)
 
 ## Convenciones de confianza
 
