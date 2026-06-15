@@ -2006,6 +2006,11 @@
   },
   {
     "fecha": "2026-06-16",
+    "codigo_indicador": "dolar",
+    "valor": 890.13
+  },
+  {
+    "fecha": "2026-06-16",
     "codigo_indicador": "uf",
     "valor": 40782.27
   },

@@ -92,6 +92,11 @@ jobs:
           python -m pip install --requirement requirements.txt
           python -m pip install --requirement dev-requirements.txt
 
+      - name: Install unrar
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y unrar
+
       - name: Extract source data
         run: |
           python src/extractors/subdere_extractor.py
