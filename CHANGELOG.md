@@ -12,3 +12,6 @@ represent software releases and are intentionally excluded from release notes.
 
 - Added `pytest-cov` to the development toolchain, with local `make coverage`
   support and CI coverage reporting for the `src/` package.
+- Updated development and release tooling pins to their latest compatible stable
+  versions, including `build`, `pre-commit`, `pytest-cov`, and
+  `python-semantic-release`.
