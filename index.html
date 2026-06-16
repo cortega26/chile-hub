@@ -1267,12 +1267,12 @@
         <section class="status-banner" id="status-banner">
             <div class="status-copy">
                 <span class="status-title">Estado del pipeline</span>
-                <span class="status-subtitle" id="status-subtitle">Cargando estado operativo de las capas...</span>
+                <span class="status-subtitle" id="status-subtitle">Cargando estado del hub...</span>
             </div>
             <details class="technical-details">
                 <summary>Detalles técnicos y reportes</summary>
-                <div class="status-meta" id="status-meta">Esperando diagnóstico operativo...</div>
-                <div class="status-pills" id="status-pills"><span class="status-pill">Cargando catálogo…</span></div>
+                <div class="status-meta" id="status-meta">Cargando...</div>
+                <div class="status-pills" id="status-pills"><span class="status-pill">Cargando...</span></div>
                 <div class="status-actions" id="status-actions"></div>
             </details>
         </section>
@@ -1282,7 +1282,7 @@
                 <div class="package-copy">
                     <div class="package-title">Paquete descargable</div>
                     <div class="package-desc">ZIP reproducible del hub listo para mover, adjuntar o consumir fuera del repo.</div>
-                    <div class="package-meta" id="package-meta">Generando package metadata...</div>
+                    <div class="package-meta" id="package-meta">Cargando...</div>
                     <details class="package-verify">
                         <summary>Verificar integridad del archivo</summary>
                         <div class="package-verify-head">
@@ -1305,7 +1305,7 @@
                     <div class="catalog-title">Capas publicadas</div>
                     <div class="catalog-meta">Formatos abiertos, procedencia y ejemplos de uso por dataset.</div>
                 </div>
-                <div class="catalog-meta" id="catalog-generated-at">Generando resumen...</div>
+                <div class="catalog-meta" id="catalog-generated-at">Cargando...</div>
             </div>
             <div class="catalog-toolbar">
                 <label class="catalog-search" for="catalog-search-input">
@@ -1317,7 +1317,7 @@
             <div class="catalog-grid" id="catalog-grid">
                 <div class="dataset-card">
                     <div class="dataset-name">Cargando catálogo...</div>
-                    <div class="dataset-desc">Esperando `data/normalized/dataset_catalog.json`.</div>
+                    <div class="dataset-desc">Compilando los datasets disponibles.</div>
                 </div>
             </div>
         </section>
@@ -1325,7 +1325,7 @@
         <section class="section-shell" id="cobertura">
             <div class="section-heading">
                 <h2>Un modelo de datos nacional, capa por capa</h2>
-                <p>La cobertura crece únicamente cuando una fuente supera criterios de utilidad, estabilidad, trazabilidad y reutilización legal. Publicado y planificado nunca se mezclan.</p>
+                <p>Cada capa nueva pasa un filtro de utilidad real, estabilidad de la fuente y licencia verificable. Lo que está publicado funciona; lo que está en evaluación, todavía no.</p>
             </div>
             <div class="domain-list">
                 <article class="domain-item"><h3>Territorio</h3><p>Regiones, provincias, comunas, códigos CUT, coordenadas y población de referencia.</p><span class="domain-state">Disponible</span></article>
@@ -1339,8 +1339,8 @@
 
         <section class="section-shell" id="confianza">
             <div class="section-heading">
-                <h2>Confianza visible, no asumida</h2>
-                <p>Cada capa publica la evidencia necesaria para decidir si sirve para producción, análisis o investigación.</p>
+                <h2>Los datos son tan buenos como su procedencia</h2>
+                <p>Cada capa incluye la información que necesitas para decidir si sirve en producción, análisis o investigación.</p>
             </div>
             <div class="trust-grid">
                 <article class="trust-item"><h3>Procedencia</h3><p>Fuente primaria, método de acceso, timestamp y snapshot crudo para auditoría.</p></article>
@@ -1455,7 +1455,7 @@ LIMIT 10;</pre>
                     <tbody id="table-body">
                         <tr>
                             <td colspan="6" class="no-results">
-                                <div class="spinner"></div><br><br>Cargando registros territoriales...
+                                <div class="spinner"></div><br><br>Cargando comunas...
                             </td>
                         </tr>
                     </tbody>

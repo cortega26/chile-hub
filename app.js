@@ -254,7 +254,7 @@ async function loadDatasetPreview(button) {
     target.hidden = expanded;
     if (expanded || target.dataset.loaded === "true") return;
 
-    target.innerHTML = `<p class="dataset-preview-state">Cargando muestra publicada...</p>`;
+    target.innerHTML = `<p class="dataset-preview-state">Cargando muestra...</p>`;
     try {
         const response = await fetch(button.dataset.previewPath);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -263,7 +263,7 @@ async function loadDatasetPreview(button) {
         target.dataset.loaded = "true";
     } catch (error) {
         console.error("No se pudo cargar la vista previa:", error);
-        target.innerHTML = `<p class="dataset-preview-state error">No fue posible cargar la muestra. El archivo JSON sigue disponible para descarga.</p>`;
+        target.innerHTML = `<p class="dataset-preview-state error">No se pudo cargar la muestra. El archivo JSON sigue disponible para descarga.</p>`;
     }
 }
 
@@ -375,22 +375,22 @@ function loadCatalog() {
         })
         .catch(err => {
             console.error("Error cargando catálogo:", err);
-            statusSubtitle.textContent = "No se pudo cargar el estado del hub local.";
-            statusMeta.textContent = "Sin top issue diagnosticado en este momento.";
+            statusSubtitle.textContent = "No se pudo cargar el estado del hub.";
+            statusMeta.textContent = "Sin información de estado disponible.";
             statusPills.innerHTML = `<span class="status-pill">Catálogo no disponible</span>`;
             statusActions.innerHTML = `
                 <a class="dataset-action muted" href="data/normalized/hub_bundle.json" target="_blank" rel="noopener noreferrer">Bundle JSON</a>
             `;
-            packageMeta.textContent = "Sin package metadata local";
+            packageMeta.textContent = "Bundle no disponible.";
             packageActions.innerHTML = `
                 <a class="dataset-action muted" href="data/normalized/hub_bundle.json" target="_blank" rel="noopener noreferrer">Bundle JSON</a>
             `;
             document.getElementById("package-verify-code").textContent = "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256";
-            catalogGeneratedAt.textContent = "Sin metadata local";
+            catalogGeneratedAt.textContent = "";
             catalogGrid.innerHTML = `
                 <div class="dataset-card">
                     <div class="dataset-name">Catálogo no disponible</div>
-                    <div class="dataset-desc">Compila el pipeline para generar \`data/normalized/hub_bundle.json\`.</div>
+                    <div class="dataset-desc">Compila el pipeline para ver los datasets aquí.</div>
                 </div>
             `;
         });
@@ -463,10 +463,10 @@ function renderCatalog(bundle) {
                 dataset: fallbackTopAttentionDataset.dataset,
                 diagnostic_summary: fallbackTopAttentionDataset.degradation?.impact
                     || fallbackTopAttentionDataset.drift?.summary
-                    || "Sin detalle adicional.",
+                    || "",
                 recommended_action: fallbackTopAttentionDataset.degradation?.recommended_action
                     || fallbackTopAttentionDataset.drift?.recommended_action
-                    || "Ninguna.",
+                    || "",
             }
             : null
     );
@@ -475,11 +475,11 @@ function renderCatalog(bundle) {
         ? (datasetsByName[activeTopIssueDatasetName] || null)
         : null;
     const topIssueReason = activeTopIssue
-        ? (activeTopIssue.diagnostic_summary || "Sin detalle adicional.")
-        : "Sin top issue activo en este build.";
+        ? (activeTopIssue.diagnostic_summary || "")
+        : "";
     const topIssueAction = activeTopIssue
-        ? (activeTopIssue.recommended_action || "Ninguna.")
-        : "Sin top issue activo en este build.";
+        ? (activeTopIssue.recommended_action || "")
+        : "";
     const topIssueSourceDetail = activeTopIssue
         ? (activeTopIssue.source_detail || activeTopIssueDataset?.source_detail || "unknown")
         : "unknown";
@@ -500,8 +500,8 @@ function renderCatalog(bundle) {
     `;
 
     statusMeta.textContent = activeTopIssueDatasetName
-        ? `Motivo del top issue (${activeTopIssueDatasetName}): ${topIssueReason} · Procedencia técnica: ${topIssueSourceDetail} · Acción recomendada: ${topIssueAction}`
-        : topIssueReason;
+        ? `${activeTopIssueDatasetName}: ${topIssueReason}${topIssueAction ? ` · ${topIssueAction}` : ""}${topIssueSourceDetail && topIssueSourceDetail !== "unknown" ? ` · Fuente: ${topIssueSourceDetail}` : ""}`
+        : "";
 
     statusActions.innerHTML = `
         ${buildSimpleLink(findReportPath(reports, "pipeline_status", "markdown", "data/normalized/pipeline_status.md"), "Status")}
@@ -543,7 +543,7 @@ function renderCatalog(bundle) {
                 <div class="dataset-card-top">
                     <div>
                         <div class="dataset-name">${escapeHtml(dataset.dataset)}</div>
-                        <div class="dataset-desc">${escapeHtml(dataset.description || "Sin descripción")}</div>
+                        <div class="dataset-desc">${escapeHtml(dataset.description || "")}</div>
                     </div>
                     <div class="dataset-badges">
                         <span class="dataset-badge ${escapeHtml(dataset.source_mode || "fallback")}">${escapeHtml(dataset.source_mode || "unknown")}</span>
@@ -727,7 +727,7 @@ function updateKPICard(id, dataObj, isCurrencySymbol = false) {
 function showKPIError(id, label) {
     const card = document.getElementById(id);
     card.querySelector(".kpi-value").textContent = "N/D";
-    card.querySelector(".kpi-date").textContent = "Sin datos hoy";
+    card.querySelector(".kpi-date").textContent = "Sin datos disponibles";
     card.querySelector(".kpi-value").style.color = "var(--text-secondary)";
 }
 
@@ -749,7 +749,7 @@ function loadComunas() {
             tableBody.innerHTML = `
                 <tr>
                     <td colspan="6" class="no-results" style="color: #f87171;">
-                        Error al cargar los datos territoriales locales. Asegúrate de levantar un servidor web local y compilar los datos en data/normalized/.
+                        Error al cargar los datos territoriales. Levanta un servidor local y compila los datos en data/normalized/.
                     </td>
                 </tr>
             `;
