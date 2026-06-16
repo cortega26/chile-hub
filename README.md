@@ -10,6 +10,8 @@
 [![Formats](https://img.shields.io/badge/Formats-Parquet%20%7C%20DuckDB%20%7C%20SQLite%20%7C%20JSON%20%7C%20Excel-orange.svg)]()
 [![Datasets](https://img.shields.io/badge/Datasets-10%20capas-16a34a.svg)]()
 [![Comunas](https://img.shields.io/badge/Comunas-346-8b5cf6.svg)]()
+[![GitHub Sponsors](https://img.shields.io/badge/Sponsor-%E2%9D%A4-ea4aaa?logo=github-sponsors)](https://github.com/sponsors/cortega26)
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-☕-FFDD00?logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/cortega26)
 
 </div>
 
@@ -510,6 +512,20 @@ El roadmap actual prioriza **fortalecer la estabilidad operacional** de las 10 c
 Revisa [`AGENTS.md`](./AGENTS.md) para entender la arquitectura, las reglas no negociables y el flujo de trabajo. El punto de partida rápido es [`SOURCE_OF_TRUTH.md`](./SOURCE_OF_TRUTH.md).
 
 **¿Encontraste un error o tienes un caso de uso?** Abre un [issue](https://github.com/cortega26/chile-hub/issues) — ayuda a priorizar el roadmap.
+
+---
+
+## Apoya el proyecto
+
+Si chile-hub te ahorra tiempo o lo usas en tu trabajo, considera apoyar su desarrollo:
+
+<div align="center">
+
+[![GitHub Sponsors](https://img.shields.io/badge/Sponsor-%E2%9D%A4-ea4aaa?logo=github-sponsors&style=for-the-badge)](https://github.com/sponsors/cortega26)
+&nbsp;&nbsp;
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-☕-FFDD00?logo=buy-me-a-coffee&logoColor=black&style=for-the-badge)](https://www.buymeacoffee.com/cortega26)
+
+</div>
 
 ---
 
