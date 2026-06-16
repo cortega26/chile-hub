@@ -449,6 +449,11 @@ sin mantener una segunda lista manual de archivos.
 Los archivos en `data/normalized/` son artefactos generados. Editarlos a mano rompe
 la reproducibilidad y los hashes del manifest. Siempre regenerar desde el pipeline.
 
+### ❌ Modificar la versión en index.html manualmente
+
+La versión en el navbar de `index.html` (etiqueta `<span class="badge-alpha">v...</span>`) se sincroniza automáticamente con la versión declarada en `pyproject.toml` durante el proceso de compilación (`make build`). No la edites a mano.
+
+
 ### ❌ Usar `pd.read_excel()` con columnas de código numérico sin dtype override
 
 ```python

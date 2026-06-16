@@ -153,6 +153,21 @@ def verify_landing():
         if browser_errors:
             fail(f"Browser errors while rendering landing: {browser_errors}")
 
+        # Version Verification
+        import tomllib
+
+        with open(ROOT_DIR / "pyproject.toml", "rb") as f:
+            pyproject_data = tomllib.load(f)
+        expected_version = pyproject_data.get("project", {}).get("version")
+        navbar_badge = page.locator(".badge-alpha")
+        if navbar_badge.count() != 1:
+            fail("Expected exactly one .badge-alpha version badge in the navbar")
+        navbar_badge_text = navbar_badge.inner_text()
+        if navbar_badge_text != f"v{expected_version}":
+            fail(
+                f"Version badge mismatch: expected 'v{expected_version}', got '{navbar_badge_text}'"
+            )
+
         # SEO Verification
         canonical = page.locator("link[rel='canonical']").get_attribute("href")
         if canonical != "https://cortega26.github.io/chile-hub/":

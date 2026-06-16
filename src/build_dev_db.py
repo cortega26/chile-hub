@@ -1,8 +1,10 @@
 import hashlib
 import json
 import os
+import re
 import sqlite3
 import sys
+import tomllib
 import zipfile
 from datetime import UTC, datetime
 
@@ -576,8 +578,39 @@ def write_json_atomic(data, path, **kwargs):
     os.replace(tmp_path, path)
 
 
+def sync_navbar_version(version):
+    index_path = os.path.join(ROOT_DIR, "index.html")
+    if not os.path.exists(index_path):
+        return
+    try:
+        with open(index_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        pattern = r'(<span class="badge-alpha">)v[^<]+(</span>)'
+        replacement = rf"\g<1>v{version}\g<2>"
+        new_content, count = re.subn(pattern, replacement, content)
+        if count > 0 and new_content != content:
+            with open(index_path, "w", encoding="utf-8") as f:
+                f.write(new_content)
+            print(f"Sincronización de Versión: index.html actualizado a v{version}")
+    except Exception as e:
+        print(f"Advertencia: No se pudo actualizar index.html con la versión: {e}")
+
+
 def write_pipeline_metadata(dataset_metadata, validations):
+    version = "unknown"
+    try:
+        pyproject_path = os.path.join(ROOT_DIR, "pyproject.toml")
+        with open(pyproject_path, "rb") as f:
+            pyproject_data = tomllib.load(f)
+        version = pyproject_data.get("project", {}).get("version", "unknown")
+    except Exception as e:
+        print(f"Advertencia: No se pudo obtener la versión de pyproject.toml: {e}")
+
+    if version != "unknown":
+        sync_navbar_version(version)
+
     pipeline_metadata = {
+        "version": version,
         "generated_at_utc": datetime.now(UTC).isoformat(),
         "datasets": dataset_metadata,
         "validations": validations,
@@ -1055,6 +1088,7 @@ def write_hub_bundle_json(pipeline_metadata, hub_health, dataset_catalog, artifa
         )
 
     bundle = {
+        "version": pipeline_metadata.get("version", "unknown"),
         "generated_at_utc": pipeline_metadata.get("generated_at_utc"),
         "overall_status": hub_health.get("overall_status"),
         "dataset_count": dataset_catalog.get("dataset_count"),

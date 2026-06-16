@@ -1,22 +1,22 @@
 # chile-hub provenance report
 
-- `generated_at_utc`: `2026-06-16T01:34:42.043357+00:00`
+- `generated_at_utc`: `2026-06-16T19:40:24.888324+00:00`
 - `dataset_count`: `10`
 - `live_count`: `10`
 - `fallback_count`: `0`
 
 | Dataset | Source | Mode | Detail | Refreshed | Freshness | Warnings | Reuse |
 | :--- | :--- | :--- | :--- | :--- | :--- | ---: | :--- |
-| `regiones` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-16T00:13:34.563819+00:00` | `fresh (1.35h / 2160h)` | 0 | `open-attribution` |
-| `provincias` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-16T00:13:34.563819+00:00` | `fresh (1.35h / 2160h)` | 0 | `open-attribution` |
-| `comunas` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-16T00:13:34.563819+00:00` | `fresh (1.35h / 2160h)` | 0 | `open-attribution` |
-| `comunas_enriquecidas` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-16T00:13:34.563819+00:00` | `fresh (1.35h / 2160h)` | 0 | `open-attribution` |
-| `indicadores` | Banco Central de Chile (via mindicador.cl) | `live` | `public_api_with_published_backfill` | `2026-06-16T00:13:40.227426+00:00` | `fresh (1.35h / 72h)` | 1 | `open-attribution` |
-| `censo_comunal` | Instituto Nacional de Estadisticas - Censo 2024 | `live` | `official_xlsx` | `2026-06-16T00:13:40.888741+00:00` | `fresh (1.35h / 87600h)` | 0 | `open-attribution` |
-| `establecimientos_salud` | Ministerio de Salud - Establecimientos de Salud | `live` | `datos_gob_csv` | `2026-06-16T00:13:46.011586+00:00` | `fresh (1.35h / 1080h)` | 0 | `open-attribution` |
-| `establecimientos_educacionales` | Ministerio de Educación - Directorio Oficial de Establecimientos | `live` | `mineduc_datos_abiertos_rar` | `2026-06-16T00:13:46.745216+00:00` | `fresh (1.35h / 8760h)` | 0 | `open-attribution` |
-| `censo_hogares_viviendas` | Instituto Nacional de Estadisticas - Censo 2024 | `live` | `official_xlsx` | `2026-06-16T00:13:41.383766+00:00` | `fresh (1.35h / 87600h)` | 0 | `open-attribution` |
-| `distritos_electorales` | BCN / Biblioteca del Congreso Nacional de Chile | `live` | `bcn_electoral_mapping_generated` | `2026-06-16T00:13:46.156486+00:00` | `fresh (1.35h / 87600h)` | 0 | `open-attribution` |
+| `regiones` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-16T00:13:34.563819+00:00` | `fresh (19.45h / 2160h)` | 0 | `open-attribution` |
+| `provincias` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-16T00:13:34.563819+00:00` | `fresh (19.45h / 2160h)` | 0 | `open-attribution` |
+| `comunas` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-16T00:13:34.563819+00:00` | `fresh (19.45h / 2160h)` | 0 | `open-attribution` |
+| `comunas_enriquecidas` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-06-16T00:13:34.563819+00:00` | `fresh (19.45h / 2160h)` | 0 | `open-attribution` |
+| `indicadores` | Banco Central de Chile (via mindicador.cl) | `live` | `public_api_with_published_backfill` | `2026-06-16T00:13:40.227426+00:00` | `fresh (19.45h / 72h)` | 1 | `open-attribution` |
+| `censo_comunal` | Instituto Nacional de Estadisticas - Censo 2024 | `live` | `official_xlsx` | `2026-06-16T00:13:40.888741+00:00` | `fresh (19.45h / 87600h)` | 0 | `open-attribution` |
+| `establecimientos_salud` | Ministerio de Salud - Establecimientos de Salud | `live` | `datos_gob_csv` | `2026-06-16T00:13:46.011586+00:00` | `fresh (19.44h / 1080h)` | 0 | `open-attribution` |
+| `establecimientos_educacionales` | Ministerio de Educación - Directorio Oficial de Establecimientos | `live` | `mineduc_datos_abiertos_rar` | `2026-06-16T00:13:46.745216+00:00` | `fresh (19.44h / 8760h)` | 0 | `open-attribution` |
+| `censo_hogares_viviendas` | Instituto Nacional de Estadisticas - Censo 2024 | `live` | `official_xlsx` | `2026-06-16T00:13:41.383766+00:00` | `fresh (19.45h / 87600h)` | 0 | `open-attribution` |
+| `distritos_electorales` | BCN / Biblioteca del Congreso Nacional de Chile | `live` | `bcn_electoral_mapping_generated` | `2026-06-16T00:13:46.156486+00:00` | `fresh (19.44h / 87600h)` | 0 | `open-attribution` |
 
 ## regiones
 
@@ -25,7 +25,7 @@
 - `source_mode`: `live`
 - `source_detail`: `bcn_arcgis`
 - `refreshed_at_utc`: `2026-06-16T00:13:34.563819+00:00`
-- `freshness`: `fresh (1.35h / 2160h)`
+- `freshness`: `fresh (19.45h / 2160h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: bcn_skipped_null_code_records: 1
 - `reuse_status`: `open-attribution`
@@ -38,7 +38,7 @@
 - `source_mode`: `live`
 - `source_detail`: `bcn_arcgis`
 - `refreshed_at_utc`: `2026-06-16T00:13:34.563819+00:00`
-- `freshness`: `fresh (1.35h / 2160h)`
+- `freshness`: `fresh (19.45h / 2160h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: bcn_skipped_null_code_records: 1
 - `reuse_status`: `open-attribution`
@@ -51,7 +51,7 @@
 - `source_mode`: `live`
 - `source_detail`: `bcn_arcgis`
 - `refreshed_at_utc`: `2026-06-16T00:13:34.563819+00:00`
-- `freshness`: `fresh (1.35h / 2160h)`
+- `freshness`: `fresh (19.45h / 2160h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: bcn_skipped_null_code_records: 1
 - `reuse_status`: `open-attribution`
@@ -64,7 +64,7 @@
 - `source_mode`: `live`
 - `source_detail`: `bcn_arcgis`
 - `refreshed_at_utc`: `2026-06-16T00:13:34.563819+00:00`
-- `freshness`: `fresh (1.35h / 2160h)`
+- `freshness`: `fresh (19.45h / 2160h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: bcn_skipped_null_code_records: 1
 - `reuse_status`: `open-attribution`
@@ -77,7 +77,7 @@
 - `source_mode`: `live`
 - `source_detail`: `public_api_with_published_backfill`
 - `refreshed_at_utc`: `2026-06-16T00:13:40.227426+00:00`
-- `freshness`: `fresh (1.35h / 72h)`
+- `freshness`: `fresh (19.45h / 72h)`
 - `warning_count`: `1`
 - `diagnostic_summary`: indicadores live refresh reused last published artifact for missing codes: ipc
 - `reuse_status`: `open-attribution`
@@ -90,7 +90,7 @@
 - `source_mode`: `live`
 - `source_detail`: `official_xlsx`
 - `refreshed_at_utc`: `2026-06-16T00:13:40.888741+00:00`
-- `freshness`: `fresh (1.35h / 87600h)`
+- `freshness`: `fresh (19.45h / 87600h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: age_bands_derived_from_quinquennial_groups
 - `reuse_status`: `open-attribution`
@@ -103,7 +103,7 @@
 - `source_mode`: `live`
 - `source_detail`: `datos_gob_csv`
 - `refreshed_at_utc`: `2026-06-16T00:13:46.011586+00:00`
-- `freshness`: `fresh (1.35h / 1080h)`
+- `freshness`: `fresh (19.44h / 1080h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: Sin observaciones operativas.
 - `reuse_status`: `open-attribution`
@@ -116,7 +116,7 @@
 - `source_mode`: `live`
 - `source_detail`: `mineduc_datos_abiertos_rar`
 - `refreshed_at_utc`: `2026-06-16T00:13:46.745216+00:00`
-- `freshness`: `fresh (1.35h / 8760h)`
+- `freshness`: `fresh (19.44h / 8760h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: Sin observaciones operativas.
 - `reuse_status`: `open-attribution`
@@ -129,7 +129,7 @@
 - `source_mode`: `live`
 - `source_detail`: `official_xlsx`
 - `refreshed_at_utc`: `2026-06-16T00:13:41.383766+00:00`
-- `freshness`: `fresh (1.35h / 87600h)`
+- `freshness`: `fresh (19.45h / 87600h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: Sin observaciones operativas.
 - `reuse_status`: `open-attribution`
@@ -142,7 +142,7 @@
 - `source_mode`: `live`
 - `source_detail`: `bcn_electoral_mapping_generated`
 - `refreshed_at_utc`: `2026-06-16T00:13:46.156486+00:00`
-- `freshness`: `fresh (1.35h / 87600h)`
+- `freshness`: `fresh (19.44h / 87600h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: Sin observaciones operativas.
 - `reuse_status`: `open-attribution`
