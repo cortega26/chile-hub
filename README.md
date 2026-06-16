@@ -1,83 +1,220 @@
 # 🇨🇱 chile-hub
 
-[![Status](https://img.shields.io/badge/status-v0.1-0ea5e9.svg)]()
-[![License](https://img.shields.io/badge/license-CC--BY--4.0-blue.svg)]()
-[![Website](https://img.shields.io/badge/website-cortega26.github.io%2Fchile-hub-0ea5e9.svg)](https://cortega26.github.io/chile-hub/)
+[![Build Status](https://github.com/cortega26/chile-hub/actions/workflows/pipeline-check.yml/badge.svg)](https://github.com/cortega26/chile-hub/actions)
+[![License: CC BY 4.0](https://img.shields.io/badge/License-CC_BY_4.0-blue.svg)](https://creativecommons.org/licenses/by/4.0/)
+[![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-3776AB.svg?style=flat&logo=python&logoColor=white)]()
+[![Formats](https://img.shields.io/badge/Formats-Parquet%20%7C%20DuckDB%20%7C%20SQLite%20%7C%20JSON%20%7C%20Excel-orange.svg)]()
+[![Website](https://img.shields.io/badge/Website-cortega26.github.io%2Fchile--hub-0ea5e9.svg)](https://cortega26.github.io/chile-hub/)
 
-Sitio web publicado: [cortega26.github.io/chile-hub](https://cortega26.github.io/chile-hub/)
+Capas de datos chilenas curadas, normalizadas, reproducibles y fáciles de consumir en una sola línea de código, obtenidas a partir de fuentes oficiales chilenas bajo licencias libres o legalmente reutilizables.
 
-Capas de datos chilenas curadas, normalizadas y fáciles de consumir, a partir de fuentes abiertas o legalmente reutilizables.
+> [!NOTE]
+> `chile-hub` no busca "tener todos los datos de Chile". Busca reducir drásticamente el costo técnico de encontrar, limpiar, validar, cruzar y consumir datasets geográficos, demográficos, electorales y económicos críticos de Chile.
 
-`chile-hub` no busca "tener todos los datos de Chile". Busca reducir el costo de encontrar, limpiar, entender, cruzar y consumir datasets confiables de Chile.
+---
 
-## Qué problema resuelve
+## 📌 Tabla de Contenidos
+- [✨ Qué problema resuelve](#-qué-problema-resuelve)
+- [🎯 Filosofía del proyecto](#-filosofía-del-proyecto)
+- [⚙️ Arquitectura del Pipeline](#%EF%B8%8F-arquitectura-del-pipeline)
+- [📊 Relaciones de Datos (CUT Codes)](#-relaciones-de-datos-cut-codes)
+- [📦 Capas de Datos Incluidas (10 Capas)](#-capas-de-datos-incluidas-10-capas)
+- [💿 Formatos y Outputs Generados](#-formatos-y-outputs-generados)
+- [🚀 Uso Rápido](#-uso-rápido)
+  - [DuckDB](#duckdb)
+  - [Python con Polars](#python-con-polars)
+  - [Python Helper (ChileHub API)](#python-helper-chilehub-api)
+  - [Guía de la CLI Local](#guía-de-la-cli-local)
+- [🛠️ Desarrollo y Ejecución Local](#%EF%B8%8F-desarrollo-y-ejecución-local)
+- [⚖️ Fuentes, Licencias y Reuso](#%EF%B8%8F-fuentes-licencias-y-reuso)
+- [🚀 Próximo Foco](#-próximo-foco)
 
-Trabajar con datos chilenos casi siempre parte igual:
+---
 
-- enlaces rotos o poco mantenidos
-- Excels deformes
-- códigos territoriales inconsistentes
-- nombres difíciles de cruzar
-- documentación insuficiente
-- scrapers frágiles para obtener datos básicos
+## ✨ Qué problema resuelve
 
-El valor del proyecto está en transformar esas fuentes en capas listas para usar con:
+Trabajar con datos públicos de Chile suele implicar los mismos obstáculos repetitivos:
+- ❌ **Enlaces rotos** o APIs inconsistentes y propensas a caídas.
+- ❌ **Planillas Excel deformes**, con celdas combinadas y formatos incompatibles con código de producción.
+- ❌ **Códigos territoriales (CUT) inconsistentes** (p. ej., pérdida de ceros a la izquierda al leerlos como números enteros).
+- ❌ **Nombres de comunas difíciles de cruzar** debido a diferencias en acentos, mayúsculas o la letra `ñ` (ej. *Cochamó* vs *Cochamo*, *Ñuñoa* vs *Nunoa*).
+- ❌ **Falta de trazabilidad y documentación** sobre la vigencia, origen legal y validez del dato.
 
-- esquema estable
-- trazabilidad de origen
-- outputs útiles para análisis y software
-- ejemplos de consumo simples
+`chile-hub` soluciona esto proveyendo un flujo automatizado de extracción, normalización e integridad de datos para entregar **tablas listas para análisis y desarrollo** desde el día uno.
 
-## Qué es y qué no es
+---
+
+## 🎯 Filosofía del proyecto
 
 ### Sí es
-
-- un hub de capas de datos reutilizables de Chile
-- un pipeline de extracción, normalización y empaquetado
-- un catálogo técnico con foco en confianza y consumo inmediato
+- **Un hub de capas estructuradas**: Limpias, consistentes y listas para cruces inmediatos.
+- **Un pipeline reproducible**: Código Python e infraestructura en GitHub Actions para compilar los artefactos de forma idéntica en local o en CI/CD.
+- **Un catálogo centrado en la calidad**: Con auditorías automáticas de frescura (`freshness`), cobertura (`coverage`), alertas de drift y degradación operativa.
 
 ### No es
+- Un reemplazo de las plataformas estatales de datos abiertos.
+- Un directorio infinito de enlaces externos sin procesar.
+- Una promesa de cobertura de todos los microdatos del sector público chileno.
+- Un servicio de API compleja obligatoria para el consumo simple de los datos.
 
-- un reemplazo de las fuentes oficiales
-- un catálogo infinito de links
-- una promesa de cobertura universal desde el día uno
-- una API compleja como requisito del MVP
+---
 
-## Estado actual
+## ⚙️ Arquitectura del Pipeline
 
-El repo hoy publica ocho datasets curados:
+El proyecto está diseñado bajo un pipeline lineal y determinista que asegura que ningún dato corrupto llegue a producción:
 
-- regiones, provincias y comunas (DPA territorial con códigos CUT)
-- comunas enriquecidas (coordenadas y población INE, listas para análisis)
-- indicadores económicos diarios (UF, Dólar, Euro, UTM, IPC desde 2010)
-- censo comunal 2024 (población por sexo y cinco grandes grupos de edad)
-- censo 2024: hogares y viviendas (viviendas censadas, particulares, colectivas y hogares)
-- establecimientos de salud (directorio vigente de MINSAL con tipo, dependencia, urgencia y coordenadas)
+```mermaid
+graph TD
+    classDef extract fill:#e0f2fe,stroke:#0284c7,stroke-width:2px;
+    classDef build fill:#fef9c3,stroke:#ca8a04,stroke-width:2px;
+    classDef verify fill:#f0fdf4,stroke:#16a34a,stroke-width:2px;
+    classDef test fill:#fae8ff,stroke:#c084fc,stroke-width:2px;
+    classDef publish fill:#ffe4e6,stroke:#f43f5e,stroke-width:2px;
 
-Eso no define el límite del producto. Define el punto de partida.
+    subgraph 1 [1. EXTRACT]
+        E1[subdere_extractor.py]:::extract
+        E2[bcentral_extractor.py]:::extract
+        E3[censo_extractor.py]:::extract
+        E4[salud_extractor.py]:::extract
+        E5[electoral_extractor.py]:::extract
+        E6[mineduc_extractor.py]:::extract
+    end
 
-La visión de largo plazo es incorporar nuevas capas de datos solo cuando cumplan criterios razonables de:
+    subgraph 2 [2. BUILD]
+        B1[build_dev_db.py]:::build
+    end
 
-- utilidad transversal
-- calidad de fuente
-- claridad legal
-- factibilidad de automatización
-- bajo costo de mantenimiento
+    subgraph 3 [3. VERIFY]
+        V1[verify_pipeline.py]:::verify
+    end
 
-## Capas incluidas hoy
+    subgraph 4 [4. TEST]
+        T1[unittest discover]:::test
+    end
 
-### 1. `regiones`
+    subgraph 5 [5. PUBLISH & SMOKE]
+        L1[verify_landing.py]:::publish
+    end
 
-Capa territorial derivada para filtros, agregaciones y joins de alto nivel.
+    E1 & E2 & E3 & E4 & E5 & E6 -->|data/staging/ | B1
+    B1 -->|data/normalized/ | V1
+    V1 --> T1
+    T1 --> L1
+```
+
+> [!IMPORTANT]
+> **Invariante Crítica:** El pipeline falla de forma ruidosa si una regla de negocio se rompe. Si la cardinalidad de comunas no es exactamente 346, o si los códigos territoriales pierden el formato de texto (`str`), el build se cancela de inmediato para proteger la integridad de los consumidores.
+
+---
+
+## 📊 Relaciones de Datos (CUT Codes)
+
+El valor fundamental de `chile-hub` es que todas sus capas geográficas, demográficas, de salud, educación y electorales se vinculan jerárquicamente a través de los **Códigos Únicos Territoriales (CUT)** definidos por la Subsecretaría de Desarrollo Regional (SUBDERE) y el Instituto Nacional de Estadísticas (INE).
+
+```mermaid
+erDiagram
+    REGIONES {
+        VARCHAR codigo_region PK "Ej: '01' (Tarapacá)"
+        VARCHAR nombre_region
+    }
+    PROVINCIAS {
+        VARCHAR codigo_provincia PK "Ej: '011' (Iquique)"
+        VARCHAR codigo_region FK
+        VARCHAR nombre_provincia
+    }
+    COMUNAS {
+        VARCHAR codigo_comuna PK "Ej: '01101' (Iquique)"
+        VARCHAR codigo_provincia FK
+        VARCHAR codigo_region FK
+        VARCHAR nombre_comuna
+        VARCHAR nombre_comuna_clean "Ej: 'iquique' (sin tildes)"
+    }
+    COMUNAS_ENRIQUECIDAS {
+        VARCHAR codigo_comuna PK
+        VARCHAR nombre_comuna
+        DOUBLE latitud_cabecera
+        DOUBLE longitud_cabecera
+        INTEGER poblacion_estimada
+    }
+    CENSO_COMUNAL {
+        VARCHAR codigo_comuna PK
+        INTEGER poblacion_censada
+        INTEGER hombres
+        INTEGER mujeres
+        INTEGER poblacion_0_14
+    }
+    CENSO_HOGARES_VIVIENDAS {
+        VARCHAR codigo_comuna PK
+        INTEGER viviendas_censadas
+        INTEGER hogares_censados
+        DOUBLE promedio_personas_hogar
+    }
+    ESTABLECIMIENTOS_SALUD {
+        VARCHAR codigo_establecimiento PK
+        VARCHAR codigo_comuna FK
+        VARCHAR nombre_establecimiento
+        VARCHAR tipo_establecimiento
+    }
+    DISTRITOS_ELECTORALES {
+        VARCHAR codigo_comuna PK
+        VARCHAR distrito_electoral
+        VARCHAR circunscripcion_senatorial
+    }
+    ESTABLECIMIENTOS_EDUCACIONALES {
+        VARCHAR rbd PK "Rol Base de Datos"
+        VARCHAR codigo_comuna FK
+        VARCHAR nombre_establecimiento
+    }
+    INDICADORES {
+        DATE fecha PK
+        VARCHAR codigo_indicador PK "Ej: 'uf', 'dolar'"
+        DOUBLE valor
+    }
+
+    REGIONES ||--o{ PROVINCIAS : "contiene"
+    PROVINCIAS ||--o{ COMUNAS : "contiene"
+    COMUNAS ||--|| COMUNAS_ENRIQUECIDAS : "enriquece"
+    COMUNAS ||--o| CENSO_COMUNAL : "demografía"
+    COMUNAS ||--o| CENSO_HOGARES_VIVIENDAS : "hogares"
+    COMUNAS ||--o{ ESTABLECIMIENTOS_SALUD : "salud"
+    COMUNAS ||--o{ ESTABLECIMIENTOS_EDUCACIONALES : "educación"
+    COMUNAS ||--o| DISTRITOS_ELECTORALES : "electoral"
+```
+
+---
+
+## 📦 Capas de Datos Incluidas (10 Capas)
+
+A continuación se detallan las 10 capas procesadas actualmente por el hub:
+
+| Capa | Registros | Origen / Fuente | Licencia | Frecuencia | Descripción |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **`regiones`** | 16 | BCN ArcGIS | CC BY | Estable | Regiones político-administrativas con códigos CUT |
+| **`provincias`** | 56 | BCN ArcGIS | CC BY | Estable | Provincias chilenas asociadas a su región y código CUT |
+| **`comunas`** | 346 | BCN ArcGIS | CC BY | Estable | Comunas de Chile con nombres oficiales y versiones limpias para joins |
+| **`comunas_enriquecidas`** | 346 | BCN + INE | CC BY | Estable | Comunas enriquecidas con coordenadas de cabecera y población |
+| **`indicadores`** | Serie | BCCh / mindicador.cl | Libre con cita | Diaria | Serie de indicadores diarios (UF, Dólar, Euro, UTM, IPC) |
+| **`censo_comunal`** | 346 | INE (Censo 2024) | CC BY 4.0 | Decenal | Demografía por sexo y 5 grandes tramos de edad |
+| **`censo_hogares_viviendas`** | 346 | INE (Censo 2024) | CC BY 4.0 | Decenal | Viviendas (particulares/colectivas), hogares y promedio de personas |
+| **`establecimientos_salud`** | ~5.600 | MINSAL / datos.gob.cl | CC0 | Mensual | Directorio nacional de recintos de salud con urgencia y coordenadas |
+| **`distritos_electorales`** | 346 | BCN / Ley 20.840 | CC0 | Estable | Mapeo de comunas a distritos de diputados y circunscripciones del Senado |
+| **`establecimientos_educacionales`**| ~12.900 | MINEDUC | CC BY 3.0 CL | Anual | Directorio de colegios/liceos vigentes con código RBD y coordenadas |
+
+---
+
+### Detalles del Schema por Capa
+
+<details>
+<summary><b>1. Capa: regiones</b></summary>
 
 | Columna | Tipo | Descripción | Ejemplo |
 | :--- | :--- | :--- | :--- |
 | `codigo_region` | `VARCHAR` | Código CUT de la región (2 chars) | `"01"` |
 | `nombre_region` | `VARCHAR` | Nombre oficial de la región | `"Tarapacá"` |
+</details>
 
-### 2. `provincias`
-
-Capa territorial derivada para cruces intermedios entre región y comuna.
+<details>
+<summary><b>2. Capa: provincias</b></summary>
 
 | Columna | Tipo | Descripción | Ejemplo |
 | :--- | :--- | :--- | :--- |
@@ -85,54 +222,54 @@ Capa territorial derivada para cruces intermedios entre región y comuna.
 | `nombre_region` | `VARCHAR` | Nombre oficial de la región | `"Tarapacá"` |
 | `codigo_provincia` | `VARCHAR` | Código CUT de la provincia (3 chars) | `"011"` |
 | `nombre_provincia` | `VARCHAR` | Nombre oficial de la provincia | `"Iquique"` |
+</details>
 
-### 3. `comunas`
-
-Base territorial normalizada con códigos CUT y campos preparados para cruces.
+<details>
+<summary><b>3. Capa: comunas</b></summary>
 
 | Columna | Tipo | Descripción | Ejemplo |
 | :--- | :--- | :--- | :--- |
 | `codigo_comuna` | `VARCHAR` | Código CUT de la comuna (5 chars) | `"01101"` |
 | `nombre_comuna` | `VARCHAR` | Nombre oficial normalizado con acentos | `"Iquique"` |
-| `nombre_comuna_clean` | `VARCHAR` | Nombre en minúsculas y sin acentos | `"iquique"` |
+| `nombre_comuna_clean` | `VARCHAR` | Nombre en minúsculas, sin tildes ni `ñ` | `"iquique"` |
 | `codigo_provincia` | `VARCHAR` | Código CUT de la provincia (3 chars) | `"011"` |
 | `nombre_provincia` | `VARCHAR` | Nombre oficial de la provincia | `"Iquique"` |
 | `codigo_region` | `VARCHAR` | Código CUT de la región (2 chars) | `"01"` |
 | `nombre_region` | `VARCHAR` | Nombre oficial de la región | `"Tarapacá"` |
 | `latitud_cabecera` | `DOUBLE` | Latitud de la capital comunal | `-20.2138` |
 | `longitud_cabecera` | `DOUBLE` | Longitud de la capital comunal | `-70.1508` |
-| `poblacion_estimada` | `INTEGER` | Proyección o referencia poblacional | `223400` |
+| `poblacion_estimada` | `INTEGER` | Proyección o referencia de población | `223400` |
+</details>
 
-### 4. `indicadores`
-
-Serie de indicadores económicos diarios de referencia.
-
-| Columna | Tipo | Descripción | Ejemplo |
-| :--- | :--- | :--- | :--- |
-| `fecha` | `DATE` | Fecha de aplicación (YYYY-MM-DD) | `2026-05-30` |
-| `codigo_indicador` | `VARCHAR` | Identificador corto (`uf`, `dolar`, `utm`, `euro`) | `"uf"` |
-| `valor` | `DOUBLE` | Valor del indicador | `39420.50` |
-
-### 5. `comunas_enriquecidas`
-
-Capa lista para análisis territorial sin necesidad de joins adicionales. Incluye coordenadas de cabecera y población estimada INE para cada comuna.
+<details>
+<summary><b>4. Capa: comunas_enriquecidas</b></summary>
 
 | Columna | Tipo | Descripción | Ejemplo |
 | :--- | :--- | :--- | :--- |
 | `codigo_comuna` | `VARCHAR` | Código CUT de la comuna (5 chars) | `"01101"` |
 | `nombre_comuna` | `VARCHAR` | Nombre oficial normalizado | `"Iquique"` |
-| `nombre_comuna_clean` | `VARCHAR` | Nombre sin acentos para búsquedas | `"iquique"` |
+| `nombre_comuna_clean` | `VARCHAR` | Nombre sin acentos para búsquedas indexadas | `"iquique"` |
 | `codigo_provincia` | `VARCHAR` | Código CUT de la provincia (3 chars) | `"011"` |
 | `nombre_provincia` | `VARCHAR` | Nombre oficial de la provincia | `"Iquique"` |
 | `codigo_region` | `VARCHAR` | Código CUT de la región (2 chars) | `"01"` |
 | `nombre_region` | `VARCHAR` | Nombre oficial de la región | `"Tarapacá"` |
 | `latitud_cabecera` | `DOUBLE` | Latitud de la capital comunal | `-20.2138` |
 | `longitud_cabecera` | `DOUBLE` | Longitud de la capital comunal | `-70.1508` |
-| `poblacion_estimada` | `INTEGER` | Población estimada INE (base Censo 2017) | `223400` |
+| `poblacion_estimada` | `INTEGER` | Población estimada INE (base Censo) | `223400` |
+</details>
 
-### 6. `censo_comunal`
+<details>
+<summary><b>5. Capa: indicadores</b></summary>
 
-Perfil demográfico por sexo y edad de las 346 comunas de Chile según el Censo de Población y Vivienda 2024 del INE.
+| Columna | Tipo | Descripción | Ejemplo |
+| :--- | :--- | :--- | :--- |
+| `fecha` | `DATE` | Fecha de aplicación (YYYY-MM-DD) | `2026-05-30` |
+| `codigo_indicador` | `VARCHAR` | Identificador corto (`uf`, `dolar`, `utm`, `euro`, `ipc`) | `"uf"` |
+| `valor` | `DOUBLE` | Valor del indicador | `39420.50` |
+</details>
+
+<details>
+<summary><b>6. Capa: censo_comunal</b></summary>
 
 | Columna | Tipo | Descripción | Ejemplo |
 | :--- | :--- | :--- | :--- |
@@ -145,16 +282,16 @@ Perfil demográfico por sexo y edad de las 346 comunas de Chile según el Censo 
 | `poblacion_censada` | `INTEGER` | Población total censada | `223400` |
 | `hombres` | `INTEGER` | Población masculina censada | `111200` |
 | `mujeres` | `INTEGER` | Población femenina censada | `112200` |
-| `razon_hombre_mujer` | `DOUBLE` | Razón de masculinidad | `99.11` |
+| `razon_hombre_mujer` | `DOUBLE` | Razón de masculinidad (hombres por 100 mujeres)| `99.11` |
 | `poblacion_0_14` | `INTEGER` | Población de 0 a 14 años | `45000` |
 | `poblacion_15_29` | `INTEGER` | Población de 15 a 29 años | `50000` |
 | `poblacion_30_44` | `INTEGER` | Población de 30 a 44 años | `52000` |
 | `poblacion_45_64` | `INTEGER` | Población de 45 a 64 años | `48000` |
 | `poblacion_65_mas` | `INTEGER` | Población de 65 años o más | `28400` |
+</details>
 
-### 7. `censo_hogares_viviendas`
-
-Medidas de viviendas y hogares por comuna del Censo de Población y Vivienda 2024 del INE.
+<details>
+<summary><b>7. Capa: censo_hogares_viviendas</b></summary>
 
 | Columna | Tipo | Descripción | Ejemplo |
 | :--- | :--- | :--- | :--- |
@@ -166,456 +303,230 @@ Medidas de viviendas y hogares por comuna del Censo de Población y Vivienda 202
 | `nombre_comuna` | `VARCHAR` | Nombre oficial de la comuna | `"Iquique"` |
 | `viviendas_censadas` | `INTEGER` | Total de viviendas censadas | `85000` |
 | `viviendas_particulares_ocupadas` | `INTEGER` | Viviendas particulares ocupadas | `75000` |
-| `viviendas_particulares_desocupadas` | `INTEGER` | Viviendas particulares desocupadas | `9800` |
-| `viviendas_colectivas` | `INTEGER` | Viviendas colectivas | `200` |
+| `viviendas_particulares_desocupadas`| `INTEGER` | Viviendas particulares desocupadas | `9800` |
+| `viviendas_colectivas` | `INTEGER` | Viviendas colectivas (hoteles, cárceles, etc.) | `200` |
 | `hogares_censados` | `INTEGER` | Total de hogares censados | `73000` |
 | `promedio_personas_hogar` | `DOUBLE` | Promedio de personas por hogar | `3.06` |
+</details>
 
-### 8. `establecimientos_salud`
-
-Directorio nacional de establecimientos de salud del Ministerio de Salud (MINSAL).
+<details>
+<summary><b>8. Capa: establecimientos_salud</b></summary>
 
 | Columna | Tipo | Descripción | Ejemplo |
 | :--- | :--- | :--- | :--- |
 | `codigo_establecimiento` | `VARCHAR` | Código único de establecimiento | `"101101"` |
 | `nombre_establecimiento` | `VARCHAR` | Nombre oficial del establecimiento | `"Hospital Dr. Ernesto Torres Galdames"` |
-| `tipo_establecimiento` | `VARCHAR` | Clasificación / tipo de establecimiento | `"Hospital"` |
-| `dependencia_administrativa` | `VARCHAR` | Dependencia o sostenedor | `"Servicio de Salud Tarapacá"` |
+| `tipo_establecimiento` | `VARCHAR` | Clasificación del establecimiento | `"Hospital"` |
+| `dependencia_administrativa` | `VARCHAR` | Dependencia o sostenedor administrativo | `"Servicio de Salud Tarapacá"` |
 | `nivel_atencion` | `VARCHAR` | Nivel de complejidad / atención | `"Alta Complejidad"` |
 | `codigo_region` | `VARCHAR` | Código CUT de la región (2 chars) | `"01"` |
 | `nombre_region` | `VARCHAR` | Nombre oficial de la región | `"Tarapacá"` |
 | `codigo_comuna` | `VARCHAR` | Código CUT de la comuna (5 chars) | `"01101"` |
 | `nombre_comuna` | `VARCHAR` | Nombre oficial de la comuna | `"Iquique"` |
-| `tiene_servicio_urgencia` | `VARCHAR` | Indica si cuenta con urgencia (`"SI"`/`"NO"`) | `"SI"` |
+| `tiene_servicio_urgencia` | `VARCHAR` | Indica si cuenta con urgencias (`"SI"`/`"NO"`) | `"SI"` |
 | `tipo_urgencia` | `VARCHAR` | Tipo de urgencia si corresponde | `"SAPU"` |
 | `latitud` | `DOUBLE` | Latitud del establecimiento | `-20.2214` |
 | `longitud` | `DOUBLE` | Longitud del establecimiento | `-70.1425` |
-| `estado_funcionamiento` | `VARCHAR` | Estado actual | `"Vigente"` |
+| `estado_funcionamiento` | `VARCHAR` | Estado actual de funcionamiento | `"Vigente"` |
+</details>
 
-## Outputs disponibles
+<details>
+<summary><b>9. Capa: distritos_electorales</b></summary>
 
-El pipeline actual genera entregables locales en [`data/normalized`](/home/carlos/VS_Code_Projects/chile-hub/data/normalized):
+| Columna | Tipo | Descripción | Ejemplo |
+| :--- | :--- | :--- | :--- |
+| `codigo_comuna` | `VARCHAR` | Código CUT de la comuna (5 chars) | `"13114"` |
+| `nombre_comuna` | `VARCHAR` | Nombre oficial de la comuna | `"Las Condes"` |
+| `distrito_electoral` | `VARCHAR` | Identificador / número del distrito electoral | `"11"` |
+| `circunscripcion_senatorial` | `VARCHAR` | Identificador / número de la circunscripción senatorial | `"7"` |
+</details>
 
-- `chile_data.duckdb`
-- `chile_data.db`
-- `chile_data_latest.xlsx`
-- `regiones.parquet`
-- `provincias.parquet`
-- `comunas.parquet`
-- `indicadores.parquet`
-- `regiones.json`
-- `provincias.json`
-- `comunas.json`
-- `indicadores_hoy.json`
-- `pipeline_metadata.json`
-- `pipeline_status.md`
-- `hub_health.json`
-- `hub_health.md`
-- `hub_bundle.json`
-- `redistribution_report.json`
-- `redistribution_report.md`
-- `provenance_report.json`
-- `provenance_report.md`
-- `dataset_catalog.json`
-- `dataset_catalog.md`
-- `artifact_manifest.json`
-- `chile-hub-publishable-bundle.zip`
-- `chile-hub-publishable-bundle.zip.sha256`
+<details>
+<summary><b>10. Capa: establecimientos_educacionales</b></summary>
 
-Además, los extractores dejan metadata intermedia en `data/staging` para dejar trazabilidad de:
+| Columna | Tipo | Descripción | Ejemplo |
+| :--- | :--- | :--- | :--- |
+| `rbd` | `VARCHAR` | Rol Base de Datos (ID único de MINEDUC) | `"1"` |
+| `dv_rbd` | `VARCHAR` | Dígito verificador del RBD | `"4"` |
+| `nombre_establecimiento` | `VARCHAR` | Nombre oficial del establecimiento educativo | `"Liceo Abate Molina"` |
+| `codigo_region` | `VARCHAR` | Código CUT de la región (2 chars) | `"07"` |
+| `codigo_comuna` | `VARCHAR` | Código CUT de la comuna (5 chars) | `"07101"` |
+| `dependencia_administrativa` | `VARCHAR` | Dependencia administrativa (ej. Municipal, SLEP) | `"Municipal"` |
+| `latitud` | `DOUBLE` | Latitud del establecimiento | `-35.4264` |
+| `longitud` | `DOUBLE` | Longitud del establecimiento | `-71.6548` |
+| `estado_funcionamiento` | `VARCHAR` | Estado de funcionamiento del colegio | `"Vigente"` |
+</details>
 
-- origen efectivo (`live` o `fallback`)
-- timestamp de refresh
-- cantidad de registros
-- campos publicados
+---
 
-Política del repo:
+## 💿 Formatos y Outputs Generados
 
-- `data/staging` y binarios pesados locales no deberían versionarse
-- artefactos publicables de `data/normalized` como catálogos, metadata, JSON, Parquet, el ZIP del bundle y su sidecar `.sha256` sí pueden publicarse para hacer visible el estado real del hub
-- `artifact_manifest.json` publica hashes y tamaños para esos artefactos ligeros
-- el ZIP publicable aparece como `package` dentro del manifest, no como `artifact`, para evitar autorreferencia circular
-- el ZIP publica además un sidecar `*.sha256` para verificación directa fuera del repo
+El compilador genera archivos normalizados en [`data/normalized`](./data/normalized):
 
-## Uso rápido
+*   **Bases de Datos Integrales**:
+    *   `chile_data.duckdb` (DuckDB nativo, ideal para analítica a gran escala).
+    *   `chile_data.db` (SQLite clásico, idóneo para aplicaciones embebidas).
+*   **Archivos de Intercambio**:
+    *   `chile_data_latest.xlsx` (Excel multipestaña con formato de texto para códigos territoriales).
+    *   Archivos individuales `.parquet` (optimizados para Polars/Pandas) y `.json` por capa.
+*   **Metadatos y Calidad**:
+    *   `artifact_manifest.json` (Catálogo físico con hashes SHA256 y tamaños).
+    *   `hub_health.json` / `hub_health.md` (Reporte de salud operativa del Hub).
+    *   `redistribution_report.json` / `.md` (Estado legal de reuso de cada dataset).
+    *   `provenance_report.json` / `.md` (Trazabilidad origen: modo live, fallbacks y marcas de tiempo).
+    *   `dataset_catalog.json` / `.md` (Catálogo con schemas y ejemplos copiables).
+    *   `hub_bundle.json` (Entrypoint unificado para automatización).
+    *   `chile-hub-publishable-bundle.zip` (Empaquetado publicable con verificación SHA256 sidecar).
+
+---
+
+## 🚀 Uso Rápido
 
 ### DuckDB
-
+Puedes consultar las capas Parquet directamente desde DuckDB sin descargar nada más:
 ```sql
-SELECT *
-FROM 'data/normalized/regiones.parquet';
+-- Consultar el censo por comuna directamente del archivo Parquet
+SELECT nombre_comuna, poblacion_censada, hombres, mujeres
+FROM 'data/normalized/censo_comunal.parquet'
+ORDER BY poblacion_censada DESC
+LIMIT 5;
 
-SELECT *
-FROM 'data/normalized/provincias.parquet';
-
-SELECT *
-FROM 'data/normalized/comunas.parquet';
-
-SELECT *
-FROM 'data/normalized/indicadores.parquet'
-ORDER BY fecha DESC, codigo_indicador;
+-- Buscar comunas y sus distritos electorales
+SELECT c.nombre_comuna, e.distrito_electoral, e.circunscripcion_senatorial
+FROM 'data/normalized/comunas.parquet' c
+JOIN 'data/normalized/distritos_electorales.parquet' e
+  ON c.codigo_comuna = e.codigo_comuna
+WHERE c.nombre_region = 'Valparaíso';
 ```
 
 ### Python con Polars
-
 ```python
 import polars as pl
 
+# Lectura directa y rápida
 df_comunas = pl.read_parquet("data/normalized/comunas.parquet")
-df_indicadores = pl.read_parquet("data/normalized/indicadores.parquet")
+df_censo = pl.read_parquet("data/normalized/censo_comunal.parquet")
+
+# Cruce de datos territorial garantizado por tipo string en códigos CUT
+df_completo = df_comunas.join(df_censo, on="codigo_comuna")
+print(df_completo.head())
 ```
 
-### Python helper del hub
-
+### Python Helper (ChileHub API)
+El helper provisto por el proyecto simplifica la inicialización del catálogo técnico:
 ```python
 from src.chile_hub import ChileHub
 
 hub = ChileHub()
+
+# Listar las capas disponibles
 print(hub.list_datasets())
-df_comunas = hub.load_polars("comunas")
+
+# Cargar directamente como DataFrame de Polars
+df_salud = hub.load_polars("establecimientos_salud")
 ```
 
-### CLI mínima del hub
+---
 
+### Guía de la CLI Local
+
+El proyecto expone una CLI rica para administrar y validar el estado del hub. Se organiza según el tipo de tarea:
+
+#### 1. Inspección y Consulta de Datos
+| Comando | Descripción |
+| :--- | :--- |
+| `python -m src.chile_hub list` | Lista los datasets registrados en el hub. |
+| `python -m src.chile_hub show [capa]` | Muestra metadatos y schema detallado de una capa. |
+| `python -m src.chile_hub path [capa] --output parquet` | Devuelve la ruta física al archivo de salida especificado. |
+| `python -m src.chile_hub example [capa] --kind duckdb` | Genera una receta de consumo de código interactivo. |
+| `python -m src.chile_hub overview [--format table]` | Muestra el resumen general del build del hub y estado actual. |
+| `python -m src.chile_hub snapshot [--format table]` | Muestra un snapshot rápido del estado de los archivos y frescura. |
+| `python -m src.chile_hub inventory [--format table]` | Lista los archivos en `data/normalized/` con sus tamaños y hashes. |
+
+#### 2. Calidad, Salud y Auditoría
+| Comando | Descripción |
+| :--- | :--- |
+| `python -m src.chile_hub health [--format table]` | Entrega el reporte consolidado de salud y severidad del hub. |
+| `python -m src.chile_hub freshness-audit` | Audita la frescura de los datos contra el reloj actual en vivo. |
+| `python -m src.chile_hub runtime-status` | Combina salud persistida y frescura actual recalculada. |
+| `python -m src.chile_hub top-issue` | Identifica la capa con mayor degradación o problema operativo. |
+| `python -m src.chile_hub drift [--format table]` | Evalúa desvíos, fallbacks activos y regresiones de cobertura. |
+| `python -m src.chile_hub status` | Devuelve un JSON ultraliviano del estado operativo para CI o scripts. |
+
+#### 3. Distribución e Integridad
+| Comando | Descripción |
+| :--- | :--- |
+| `python -m src.chile_hub bundle` | Exporta la metadata consolidada de todo el hub en un único JSON. |
+| `python -m src.chile_hub packages` | Lista los paquetes comprimidos de exportación generados. |
+| `python -m src.chile_hub package` | Devuelve la ruta al paquete ZIP principal de distribución. |
+| `python -m src.chile_hub verify-package` | Genera la instrucción para verificar la integridad del bundle ZIP. |
+| `python -m src.chile_hub redistribution` | Muestra el reporte legal de reuso y licencias de cada capa. |
+| `python -m src.chile_hub provenance` | Lista las URLs de origen exactas y métodos de extracción aplicados. |
+
+---
+
+## 🛠️ Desarrollo y Ejecución Local
+
+### Prerrequisitos de Entorno
+
+Puedes preparar tu entorno automáticamente mediante el `Makefile`:
 ```bash
-python -m src.chile_hub list
-python -m src.chile_hub summary --format table
-python -m src.chile_hub show comunas
-python -m src.chile_hub path comunas --output parquet
-python -m src.chile_hub example indicadores --kind duckdb
-python -m src.chile_hub artifacts comunas
-python -m src.chile_hub shared-artifacts --shared-type hub_health --artifact-format json
-python -m src.chile_hub shared-artifacts --shared-type hub_health --artifact-format json --output table
-python -m src.chile_hub reports
-python -m src.chile_hub reports --format table
-python -m src.chile_hub report drift_report --format markdown
-python -m src.chile_hub overview
-python -m src.chile_hub overview --format table
-python -m src.chile_hub status
-python -m src.chile_hub status --format table
-python -m src.chile_hub snapshot
-python -m src.chile_hub snapshot --format table
-python -m src.chile_hub inventory
-python -m src.chile_hub inventory --format table
-python -m src.chile_hub health
-python -m src.chile_hub health --format table
-python -m src.chile_hub bundle
-python -m src.chile_hub freshness-audit
-python -m src.chile_hub freshness-audit --format table
-python -m src.chile_hub runtime-status
-python -m src.chile_hub runtime-status --format table
-python -m src.chile_hub top-issue
-python -m src.chile_hub top-issue --format text
-python -m src.chile_hub top-issue --format table
-python -m src.chile_hub packages
-python -m src.chile_hub packages --format table
-python -m src.chile_hub package
-python -m src.chile_hub verify-package
-python -m src.chile_hub redistribution
-python -m src.chile_hub redistribution --format table
-python -m src.chile_hub provenance
-python -m src.chile_hub provenance --format table
-python -m src.chile_hub drift
-python -m src.chile_hub drift --format table
-```
-
-`summary` e `inventory` ahora exponen también `freshness_status`, `freshness_age_hours`, `coverage_status` y `coverage_ratio` por capa, para detectar builds envejecidos o con regresión de cobertura sin tener que abrir los JSON crudos.
-`summary` también puede emitirse como tabla compacta con `summary --format table`.
-También exponen `reuse_status`, `reuse_license` y si la capa requiere atribución.
-También exponen `degradation_status` para distinguir una capa sana de una capa operativamente degradada.
-Además incluyen `warning_count`, que sube automáticamente cuando una capa queda `stale`, `unknown` o entra en fallback con advertencias operativas.
-En refreshes parciales de `indicadores`, el hub ahora puede reutilizar snapshots de `data/raw` o el último artifact publicado para no degradar staging silenciosamente; ese estado queda visible en `source_detail`, `notes` y `warnings`.
-`health` entrega una vista agregada del hub con `overall_status`, counts por severidad y breakdown por capa.
-También agrega conteos de publicabilidad: cuántas capas están listas para redistribución y cuántas siguen en `review_terms`.
-Y ahora agrega conteos de degradación operativa y cobertura parcial, para distinguir warnings genéricos de capas realmente degradadas o con regresión de cardinalidad.
-`bundle` entrega un único índice machine-readable que consolida health, catálogo, reportes tipados y artefactos publicables por dataset.
-`packages` expone los paquetes publicables del hub, incluido el ZIP listo para descarga.
-También puede emitirse como tabla compacta con `packages --format table`.
-`package` resuelve directamente el package principal del hub sin tener que inspeccionar una lista completa.
-`verify-package` expone la receta exacta para verificar integridad del package principal usando la metadata publicada del propio hub.
-`shared-artifacts` lista artefactos compartidos del hub usando `shared_type` y `format`, sin depender de nombres de archivo.
-Ahora también puede emitirse como tabla compacta con `--output table`.
-`reports` lista los reportes compartidos del bundle y puede emitirse como tabla compacta para descubrir rápido qué vistas existen.
-`report` resuelve metadata de un reporte compartido específico usando la misma semántica.
-`overview` entrega una vista compacta del estado actual del hub: counts agregados, reportes publicados, `build_overall_status`, `current_overall_status` y estado breve por capa.
-Ahora también incluye un resumen del package principal, con checksum y comando exacto de verificación.
-También puede emitirse como tabla compacta con `overview --format table`.
-También publica `top_issue` cuando existe una capa con atención operativa prioritaria.
-`status` entrega la misma prioridad operativa en una vista todavía más liviana, leyendo `hub_status.json` directamente para polling, dashboards y checks de CI.
-También puede emitirse como tabla compacta con `status --format table`.
-Las vistas rápidas (`overview`, `runtime-status`, `snapshot`, `top-issue`) ahora también publican `top_issue_reason` o `reason` para explicar por qué esa capa quedó priorizada.
-`snapshot` entrega una versión humana y rápida de ese mismo estado para leer desde terminal sin navegar JSON.
-También distingue explícitamente entre `status_build` y `status_current`, para no mezclar la salud persistida del último build con la frescura recalculada contra el reloj actual.
-Ahora también deja explícita la diferencia entre la frescura persistida del último build y la frescura recalculada contra el reloj actual.
-También puede emitirse como tabla compacta con `snapshot --format table`.
-`inventory` también puede emitirse como tabla compacta con `inventory --format table` para inspeccionar outputs, tamaños y estado por capa sin leer JSON largo.
-`health` también puede emitirse como tabla compacta con `health --format table` para revisar estado agregado y severidad por capa sin navegar JSON.
-`freshness-audit` recalcula la frescura contra el reloj actual, sin depender de la evaluación persistida del último build.
-También puede emitirse como tabla compacta con `freshness-audit --format table`.
-`runtime-status` combina en una sola salida el estado global del build, el estado global actual recalculado y una fila breve por dataset con build/current freshness, coverage, drift y warnings.
-También puede emitirse como tabla compacta con `runtime-status --format table`.
-Esa vista también publica `top_issue` para mantener la misma prioridad operativa que usa la landing.
-`top-issue` expone directamente esa capa prioritaria sin tener que leer `overview` o `runtime-status` completos.
-También puede emitirse como tabla compacta con `top-issue --format table`.
-Esa misma prioridad también queda persistida en `hub_health.json`, `hub_bundle.json` y `overview.json` dentro de `data/normalized/`.
-La variante markdown compacta del overview también se publica como `overview.md`.
-`pipeline_status.md` también replica esa prioridad para que el resumen humano del build y el Job Summary no pierdan la capa que requiere atención.
-`redistribution` entrega un inventario explícito de publicabilidad por capa con licencia, acción recomendada y cautelas de redistribución.
-También puede emitirse como tabla compacta con `redistribution --format table`.
-`provenance` entrega un inventario explícito de procedencia efectiva por capa, incluyendo fuente, modo, detalle y timestamp del último refresh.
-También puede emitirse como tabla compacta con `provenance --format table`.
-`drift` entrega una vista explícita de drift operativo por capa, consolidando fallback, cobertura parcial, degradación y acción recomendada.
-También puede emitirse como tabla compacta con `drift --format table`.
-Además, cada dataset del catálogo y del bundle publica ahora una sección `degradation` con impacto y acción recomendada cuando la capa cae a fallback o warning operativo.
-También publica `coverage`, con baseline esperado, ratio y resumen legible para detectar drift territorial o regresiones de cobertura en el último build.
-
-### SQLite
-
-```bash
-sqlite3 data/normalized/chile_data.db
-```
-
-## Cómo correr el pipeline
-
-Bootstrap recomendado:
-
-```bash
+# Crear .venv, instalar dependencias y browsers para smoke tests
 make bootstrap
+
+# Verificar versión de Python y dependencias críticas
 make doctor
 ```
 
-`make bootstrap` también instala `Chromium` para que `make verify-landing` funcione desde el mismo entorno del proyecto.
-Si ya tienes la `.venv` lista y solo quieres preparar browsers para la landing, usa `make install-browsers`.
-
-Si prefieres hacerlo a mano:
-
+Si prefieres realizar la instalación manualmente:
 ```bash
 python3 -m venv .venv
-./.venv/bin/python -m pip install --upgrade pip
-./.venv/bin/python -m pip install -r requirements.txt
+source .venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
 ```
 
-El `Makefile` usa `./.venv/bin/python` automáticamente cuando existe, así que desde ese punto la ruta más simple es:
+### Ejecutar el Pipeline Completo
 
+Para correr todo el ciclo de integración (extracción, compilación, validaciones, tests y smoke-tests de frontend):
 ```bash
 make refresh
 ```
 
-Eso ejecuta:
-
-- extractores
-- build de outputs
-- verificación de artefactos
-- smoke tests del helper
-- smoke test de la landing en navegador
-
-Si quieres correr pasos sueltos:
-
+O corre los comandos por separado si deseas depurar una etapa en particular:
 ```bash
-make extract
-make build
-make verify
-make verify-landing
-make test
+make extract      # Lanza todos los extractores de src/extractors/
+make build        # Compila los artefactos normalizados
+make verify       # Ejecuta verify_pipeline.py sobre los outputs
+make test         # Ejecuta la suite de pruebas unitarias y contratos de datos
+make verify-landing # Smoke tests de la landing page con Playwright en local
 ```
 
-O si prefieres comandos directos:
-
+La suite de pruebas completa puede lanzarse directamente usando:
 ```bash
-./.venv/bin/python src/extractors/subdere_extractor.py
-./.venv/bin/python src/extractors/bcentral_extractor.py
-./.venv/bin/python src/build_dev_db.py
+./.venv/bin/python -m unittest discover -s tests -v
 ```
 
-Revisa metadata y validaciones:
+---
 
-```bash
-cat data/normalized/pipeline_metadata.json
-```
+## ⚖️ Fuentes, Licencias y Reuso
 
-Explora el catálogo machine-readable:
+### Semáforo de Redistribución Pública
 
-```bash
-cat data/normalized/dataset_catalog.json
-```
+Para evitar contingencias legales, `chile-hub` implementa un semáforo de políticas de reuso en su metadata:
 
-Revisa el manifest de artefactos publicables:
+*   🟢 **`open-attribution`**: Datos bajo CC BY, CC0 o equivalentes del Estado chileno. Se empaquetan en el ZIP público de forma automática.
+*   🟡 **`public-api-review-terms`**: Datos accesibles por API pública pero sin licencia explícita escrita. Se distribuyen tras verificar la naturaleza del origen primario.
+*   🔴 **`restricted`**: Datos protegidos por derechos de autor, términos comerciales o la Ley 19.628 de Protección de Datos Personales (SII, SERVEL, etc.). **Nunca se integran al bundle público**.
 
-```bash
-cat data/normalized/artifact_manifest.json
-```
+### Licencia del Proyecto
+El código del pipeline y los metadatos construidos se distribuyen bajo la licencia **[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.es)**. Al consumir los datos de este hub, debes atribuir también a las fuentes oficiales correspondientes (BCN, INE, MINSAL, MINEDUC o Banco Central de Chile) según se indica en la ficha de cada capa.
 
-Revisa la salud agregada del hub:
+---
 
-```bash
-cat data/normalized/hub_health.json
-```
+## 🚀 Próximo Foco
 
-O consulta el status compacto para integraciones rápidas:
+El roadmap actual de `chile-hub` prioriza robustecer la estabilidad operacional de las 10 capas activas frente a caídas de APIs, antes de agregar volumen de forma descontrolada. El criterio para crecer exige justificar: dolor de usuario recurrente, valor de cruce con la DPA y bajo costo de mantenimiento. 
 
-```bash
-cat data/normalized/hub_status.json
-```
-
-O consume el entrypoint consolidado:
-
-```bash
-cat data/normalized/hub_bundle.json
-```
-
-O genera/redistribuye el paquete descargable:
-
-```bash
-make package-bundle
-```
-
-Ese manifest ahora incluye `dataset` y `output_type` para cada artefacto publicable derivado de una capa.
-La landing reutiliza esa metadata para mostrar tipo de output y hash corto junto a los links de descarga.
-La política de `freshness` también se convierte en warnings operativos dentro de `pipeline_metadata.json` y `dataset_catalog.json` cuando una capa queda envejecida o indeterminada.
-Además se consolida en `hub_health.json` y `hub_health.md` como resumen agregado del estado del hub.
-Ese resumen ahora incluye también señales de publicabilidad agregada como `publishable_count` y `review_terms_count`.
-Además, `redistribution_report.json` y `redistribution_report.md` convierten esas señales en una vista accionable por dataset.
-`provenance_report.json` y `provenance_report.md` hacen lo mismo para la procedencia efectiva del último build.
-Para consumidores externos, `hub_bundle.json` funciona como punto único de entrada para descubrir estado, datasets, outputs, reportes y artefactos sin abrir varios archivos por separado.
-Si necesitas polling liviano o un resumen corto para dashboards, `hub_status.json` expone `overall_status`, contadores clave, `top_issue` y `top_issue_summary` sin cargar el bundle completo.
-La landing local ahora usa `hub_bundle.json` como fuente primaria para renderizar estado global y capas publicadas.
-El contrato del hub publica además `reuse_policy` por dataset para distinguir capas abiertas con atribución de capas públicas cuyo régimen de redistribución todavía conviene revisar.
-
-O usa el verificador local:
-
-```bash
-./.venv/bin/python scripts/verify_pipeline.py
-```
-
-Smoke tests del helper y contratos del catálogo:
-
-```bash
-./.venv/bin/python -m unittest discover -s tests
-```
-
-Secuencia mínima recomendada para validar el hub localmente:
-
-```bash
-make build
-make verify
-make test
-make verify-landing
-```
-
-Atajos del proyecto:
-
-```bash
-make build
-make verify
-make test
-make check
-make status
-make hub-list
-make hub-summary-table
-make hub-example
-make hub-artifacts
-make hub-shared-artifacts
-make hub-shared-artifacts-table
-make hub-reports
-make hub-reports-table
-make hub-report
-make hub-inventory
-make hub-inventory-table
-make hub-snapshot
-make hub-snapshot-table
-make hub-overview
-make hub-overview-table
-make hub-status
-make hub-status-table
-make hub-health
-make hub-health-table
-make hub-bundle
-make hub-freshness-audit
-make hub-freshness-audit-table
-make hub-runtime-status
-make hub-runtime-status-table
-make hub-top-issue
-make hub-top-issue-text
-make hub-top-issue-table
-make hub-packages
-make hub-packages-table
-make hub-package
-make hub-package-verify
-make hub-redistribution
-make hub-redistribution-table
-make hub-provenance
-make hub-provenance-table
-make hub-drift
-make hub-drift-table
-make package-bundle
-```
-
-Y para un resumen humano del último estado:
-
-```bash
-make status
-```
-
-Ese comando también genera `data/normalized/pipeline_status.md`.
-La landing local en `index.html` consume `dataset_catalog.json` para reflejar el estado real de las capas publicadas.
-También expone links directos a documentación y artefactos `JSON`/`Parquet` por dataset usando `dataset_catalog.json` y `artifact_manifest.json`.
-Además deja accesos rápidos a `pipeline_status.md`, `hub_health.json`, `hub_health.md`, `dataset_catalog.json`, `dataset_catalog.md` y `artifact_manifest.json`, junto con la URL fuente de cada capa.
-También expone `hub_bundle.json` como punto de entrada único para consumo automatizado.
-También expone `redistribution_report.json` y `redistribution_report.md` como vista directa de publicabilidad por capa.
-También expone `provenance_report.json` y `provenance_report.md` como vista directa de procedencia efectiva por capa.
-También expone `overview.json` y `overview.md` como snapshot compacto del estado actual del hub.
-Y muestra el `Bundle ZIP` como descarga directa del paquete publicable.
-Además dedica un bloque visible al paquete descargable, con tamaño y hash abreviado del ZIP del último build.
-Ese mismo bloque incluye una receta copiable para verificar la integridad del ZIP con `shasum -a 256`.
-La receta se deriva de la metadata publicada del package (`verification_command`, `checksum_algorithm`, `checksum_path`) para no depender de strings hardcodeados en la UI.
-También muestra `freshness`, `coverage` y `degradation` por dataset, además de conteos agregados de capas `stale`, `degraded` y con cobertura parcial para detectar drifting del hub.
-La `freshness` visible en la landing se recalcula contra el reloj actual del navegador a partir de `refreshed_at_utc` y la política de cada capa, para no depender solo del estado persistido del último build.
-Por la misma razón, el banner principal muestra `Estado build` y `Estado actual` por separado.
-Cada dataset card también expone ahora la `Procedencia técnica` efectiva del último build, por ejemplo `bcn_arcgis` o `public_api`, junto al conteo de warnings de esa capa.
-Cuando una capa tiene warnings activos, la card muestra además una `Acción recomendada` derivada del contrato de degradación/drift para hacer más accionable ese estado desde la propia UI.
-Esas capas también se resaltan visualmente con estado `atención`, para que las señales stale/drift/warning no queden enterradas entre cards sanas.
-Además, el catálogo de la landing prioriza arriba las capas con atención operativa activa, para que el problema más relevante del momento aparezca primero.
-El banner superior también publica `Top issue` y un acceso directo `Ver top issue` hacia esa card priorizada.
-Al seguir ese acceso, la card destino queda además resaltada como `:target` para que el foco visual no se pierda.
-También muestra metadata de reuso por capa, incluyendo licencia o cautela de redistribución y si requiere atribución.
-Y el banner superior resume cuántas capas siguen en `review_terms`.
-También incluye recetas breves de consumo para `Python`, `DuckDB` y la `CLI` local del proyecto.
-Esas recetas en la landing son copiables directamente desde la interfaz.
-Cada dataset card además muestra ejemplos específicos por capa para `python`, `duckdb` y `cli`, tomados desde el catálogo generado.
-Esos ejemplos por dataset también son copiables y responden al tab activo en cada card.
-La landing también se puede smoke-testear en navegador con `make verify-landing`.
-Ese smoke test cubre estado, quick-start, metadata de artefactos, recetas por dataset y flujos de copia.
-También cubre la presencia de `freshness`, `coverage` y `degradation` en la superficie visible de la landing.
-El workflow `pipeline-check` separa calidad, build/contratos, smoke test de landing y publicación.
-Cada ejecución comparte un único artifact `pipeline-output-<run_id>` con `data/normalized/`, evitando listas duplicadas de outputs entre el build y los consumidores posteriores.
-Los refreshes programados y los dispatch manuales con `publish=true` aplican `verify_pipeline.py --require-live`: solo datos frescos y seguros para publicación pueden actualizar `main`. Se rechazan fallbacks, fallas de fetch, recuperación raw y preservación de staging; se admite el último valor publicado de una serie mensual cuando la consulta live fue exitosa pero aún no existe una observación nueva. Ante una caída de fuente, CI conserva la última publicación válida.
-Ahora ese artifact también incluye `overview.json` y `overview.md`.
-El `GITHUB_STEP_SUMMARY` también incluye ahora un bloque de quick links para `hub_status.json`, `hub_health.json` y `hub_bundle.json`, además de `overview.md` y las vistas agregadas de redistribución, procedencia y drift.
-
-## Criterio para crecer
-
-Una nueva capa de datos no debería entrar solo porque "suena útil". Debería justificar:
-
-1. dolor recurrente de usuario
-2. valor de cruce con otras capas
-3. fuente confiable y accesible
-4. licencia clara o reutilización defendible
-5. costo de mantenimiento razonable
-
-La visión y criterios de producto están documentados en [docs/product-spec.md](/home/carlos/VS_Code_Projects/chile-hub/docs/product-spec.md).
-El catálogo de capas actualmente disponibles está en [docs/datasets/README.md](/home/carlos/VS_Code_Projects/chile-hub/docs/datasets/README.md).
-
-## Fuentes actuales
-
-- BCN ArcGIS para la capa territorial operativa actual, con fallback secundario a SUBDERE
-- mindicador.cl como fuente pública de indicadores en esta fase
-
-## Licencia y atribución
-
-Este repo empaqueta transformaciones y datasets derivados de fuentes públicas o reutilizables. La redistribución de cada capa debe evaluarse según su fuente y condiciones específicas.
-
-El código y la estructura del proyecto se distribuyen bajo [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.es). Si reutilizas outputs o transformaciones, atribuye también las fuentes originales cuando corresponda.
-
-## Próximo foco
-
-El próximo objetivo razonable no es abrir el scope sin control, sino convertir este repo en un catálogo confiable de capas de datos chilenas, empezando por pocas capas muy útiles y mantenibles.
+*   *La especificación de producto puede revisarse en [docs/product-spec.md](./docs/product-spec.md).*
+*   *El estado de la última corrida se documenta dinámicamente en `data/normalized/pipeline_status.md` tras cada build.*
