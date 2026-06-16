@@ -18,7 +18,6 @@ if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
 from chile_hub import ChileHub
-
 from src.validation import validate_indicadores
 
 # ── Staleness guard ───────────────────────────────────────────────────────────
