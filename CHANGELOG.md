@@ -15,3 +15,5 @@ represent software releases and are intentionally excluded from release notes.
 - Updated development and release tooling pins to their latest compatible stable
   versions, including `build`, `pre-commit`, `pytest-cov`, and
   `python-semantic-release`.
+- Fixed the PyPI release workflow so `python-semantic-release` skips its
+  internal build step and the pinned job environment performs the package build.
