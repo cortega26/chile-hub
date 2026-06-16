@@ -19,10 +19,44 @@ if str(SRC_DIR) not in sys.path:
 from src.chile_hub import ChileHub
 from src.validation import validate_indicadores
 
+# ── Staleness guard ───────────────────────────────────────────────────────────
+_STAGING_DIR = ROOT_DIR / "data" / "staging"
+_NORMALIZED_SENTINEL = ROOT_DIR / "data" / "normalized" / "pipeline_metadata.json"
+
+
+def _assert_normalized_not_stale():
+    """
+    Fail fast if any staging metadata file is newer than the normalized
+    pipeline_metadata.json sentinel.  This catches the common mistake of
+    running an extractor and then running tests without rebuilding first.
+
+    The check is intentionally lenient (1-second grace) to tolerate
+    sub-second filesystem timestamp rounding on some platforms.
+    """
+    if not _NORMALIZED_SENTINEL.exists():
+        raise AssertionError(
+            "data/normalized/pipeline_metadata.json not found. "
+            "Run 'make build' (or 'python src/build_dev_db.py') before pytest."
+        )
+    sentinel_mtime = _NORMALIZED_SENTINEL.stat().st_mtime
+    stale_files = [
+        p
+        for p in _STAGING_DIR.glob("*.metadata.json")
+        if p.stat().st_mtime > sentinel_mtime + 1  # 1-second grace
+    ]
+    if stale_files:
+        names = ", ".join(sorted(p.name for p in stale_files))
+        raise AssertionError(
+            f"Normalized artifacts are older than staging metadata: [{names}]. "
+            "Run 'make build' (or 'python src/build_dev_db.py') to rebuild, "
+            "then re-run pytest."
+        )
+
 
 class ChileHubTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        _assert_normalized_not_stale()
         cls.hub = ChileHub()
         cls.normalized_dir = ROOT_DIR / "data" / "normalized"
         cls.catalog = cls.hub.catalog
@@ -614,6 +648,7 @@ class ChileHubTests(unittest.TestCase):
 class ArtifactContractTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        _assert_normalized_not_stale()
         cls.normalized_dir = ROOT_DIR / "data" / "normalized"
         cls.catalog = json.loads((cls.normalized_dir / "dataset_catalog.json").read_text())
         cls.manifest = json.loads((cls.normalized_dir / "artifact_manifest.json").read_text())

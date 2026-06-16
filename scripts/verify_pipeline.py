@@ -74,6 +74,36 @@ def fail(message):
     raise SystemExit(1)
 
 
+def verify_staging_not_newer_than_normalized():
+    """
+    Detect the common mistake of running an extractor (which updates
+    data/staging/*.metadata.json) without re-running build_dev_db.py
+    (which would update data/normalized/pipeline_metadata.json).
+
+    If any staging metadata is newer than the normalized sentinel, the
+    tests will fail with cryptic assertion errors instead of the real
+    cause.  Fail loudly here so the fix is obvious.
+    """
+    sentinel = NORMALIZED_DIR / "pipeline_metadata.json"
+    if not sentinel.exists():
+        fail(
+            "data/normalized/pipeline_metadata.json not found. "
+            "Run 'python src/build_dev_db.py' (or 'make build') before verifying."
+        )
+    sentinel_mtime = sentinel.stat().st_mtime
+    stale = [
+        p
+        for p in STAGING_DIR.glob("*.metadata.json")
+        if p.stat().st_mtime > sentinel_mtime + 1  # 1-second grace
+    ]
+    if stale:
+        names = ", ".join(sorted(p.name for p in stale))
+        fail(
+            f"Staging metadata is newer than normalized artifacts: [{names}]. "
+            "Run 'python src/build_dev_db.py' (or 'make build') to rebuild before verifying."
+        )
+
+
 def verify_publication_policy(metadata=None):
     if metadata is None:
         metadata = load_json(NORMALIZED_DIR / "pipeline_metadata.json")
@@ -1057,6 +1087,7 @@ def build_parser():
 
 def main():
     args = build_parser().parse_args()
+    verify_staging_not_newer_than_normalized()
     verify_required_files()
     verify_pipeline_metadata()
     verify_hub_health()
