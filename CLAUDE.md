@@ -41,10 +41,10 @@ python -m src.chile_hub top-issue --format table
 
 ```bash
 # Tests completos (requieren que el pipeline haya corrido al menos una vez)
-./.venv/bin/python -m unittest discover -s tests -v
+./.venv/bin/pytest -v
 
 # Test individual
-./.venv/bin/python -m unittest tests.test_chile_hub.ChileHubTests.test_load_polars -v
+./.venv/bin/pytest tests/test_chile_hub.py::ChileHubTests::test_load_polars -v
 ```
 
 Los tests leen de `data/normalized/` — **no ejecutan el pipeline**. Si fallan por datos ausentes, correr `make build` antes de los tests.

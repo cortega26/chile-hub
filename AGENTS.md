@@ -90,7 +90,7 @@ chile-hub/
              Lee: data/normalized/
              → Valida integridad de artefactos y contratos de datos
 
-4. TEST      python -m unittest discover -s tests
+4. TEST      pytest
              → Suite completa de tests unitarios y de contrato
 
 5. LANDING   scripts/verify_landing.py
@@ -337,10 +337,10 @@ python src/extractors/mineduc_establecimientos_extractor.py
 python src/build_dev_db.py
 
 # Suite completa
-python -m unittest discover -s tests -v
+pytest -v
 
 # Test individual
-python -m unittest tests.test_chile_hub.ChileHubTests.test_load_polars -v
+pytest tests/test_chile_hub.py::ChileHubTests::test_load_polars -v
 ```
 
 ### Qué cubren los tests
@@ -451,7 +451,7 @@ python src/build_dev_db.py
 python scripts/verify_pipeline.py
 
 # Correr tests
-python -m unittest discover -s tests -v
+pytest -v
 
 # Usar la API Python
 from src.chile_hub import ChileHub

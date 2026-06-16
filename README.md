@@ -92,7 +92,7 @@ graph TD
     end
 
     subgraph 4 [4. TEST]
-        T1[unittest discover]:::test
+        T1[pytest]:::test
     end
 
     subgraph 5 [5. PUBLISH & SMOKE]
@@ -530,7 +530,7 @@ make verify-landing # Smoke tests de la landing page con Playwright en local
 La suite de pruebas completa puede lanzarse directamente usando:
 
 ```bash
-./.venv/bin/python -m unittest discover -s tests -v
+./.venv/bin/pytest -v
 ```
 
 ---

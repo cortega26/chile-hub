@@ -1,8 +1,14 @@
 import datetime
 import json
+import sys
 import tempfile
 import unittest
 from pathlib import Path
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
 from unittest.mock import MagicMock, patch
 
 from requests import HTTPError
@@ -16,7 +22,7 @@ from src.extractors import (
 )
 from src.extractors.base import BaseExtractor
 
-ROOT_DIR = Path(__file__).resolve().parents[1]
+# ROOT_DIR is defined above
 
 
 class _MinimalExtractor(BaseExtractor):
@@ -283,4 +289,6 @@ class BaseExtractorContractTests(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    import sys
+    import pytest
+    sys.exit(pytest.main(sys.argv))

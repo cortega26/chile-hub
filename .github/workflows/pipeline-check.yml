@@ -119,7 +119,7 @@ jobs:
           python scripts/verify_pipeline.py "${args[@]}"
 
       - name: Run unit and contract tests
-        run: python -m unittest discover -s tests -v
+        run: python -m pytest -v
 
       - name: Generate pipeline status
         run: python scripts/pipeline_status.py

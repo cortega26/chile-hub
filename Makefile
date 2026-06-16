@@ -97,7 +97,7 @@ verify-landing:
 	$(PYTHON) scripts/verify_landing.py
 
 test:
-	$(PYTHON) -m unittest discover -s tests
+	$(PYTHON) -m pytest
 
 lint:
 	$(PYTHON) -m ruff check src/ tests/ scripts/
