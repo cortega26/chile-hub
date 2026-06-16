@@ -131,17 +131,21 @@ def compute_top_issue(entries, freshness_field="freshness_status"):
     priority = attention_priority(top_entry)
     if priority >= 2:
         return None
-    return {
+    res = {
         "dataset": top_entry.get("dataset"),
         "attention_priority": priority,
         "warning_count": top_entry.get("warning_count", 0),
-        "build_freshness_status": top_entry.get("freshness_status"),
+        "build_freshness_status": top_entry.get("build_freshness_status")
+        or top_entry.get("freshness_status"),
         "drift_status": top_entry.get("drift_status"),
         "degradation_status": top_entry.get("degradation_status"),
         "source_detail": top_entry.get("source_detail"),
         "diagnostic_summary": top_entry.get("diagnostic_summary"),
         "recommended_action": top_entry.get("recommended_action"),
     }
+    if "current_freshness_status" in top_entry:
+        res["current_freshness_status"] = top_entry["current_freshness_status"]
+    return res
 
 
 def build_hub_health(metadata):

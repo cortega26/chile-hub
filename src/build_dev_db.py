@@ -575,6 +575,7 @@ def write_json_atomic(data, path, **kwargs):
     tmp_path = path + ".tmp"
     with open(tmp_path, "w", encoding="utf-8") as f:
         json.dump(data, f, **kwargs)
+        f.write("\n")
     os.replace(tmp_path, path)
 
 
@@ -617,7 +618,7 @@ def write_pipeline_metadata(dataset_metadata, validations):
     }
     output_path = os.path.join(NORMALIZED_DIR, "pipeline_metadata.json")
     write_json_atomic(pipeline_metadata, output_path, ensure_ascii=False, indent=2)
-    return output_path
+    return output_path, pipeline_metadata
 
 
 def write_dataset_catalog(pipeline_metadata):
@@ -663,7 +664,7 @@ def write_dataset_catalog(pipeline_metadata):
     }
     output_path = os.path.join(NORMALIZED_DIR, "dataset_catalog.json")
     write_json_atomic(catalog, output_path, ensure_ascii=False, indent=2)
-    return output_path
+    return output_path, catalog
 
 
 def compute_sha256(path):
@@ -789,7 +790,7 @@ def write_artifact_manifest():
     }
     output_path = os.path.join(NORMALIZED_DIR, "artifact_manifest.json")
     write_json_atomic(manifest, output_path, ensure_ascii=False, indent=2)
-    return output_path
+    return output_path, manifest
 
 
 def write_hub_health_json(health):
@@ -1037,7 +1038,7 @@ def build_overview(hub_health, hub_bundle, artifact_manifest):
 def write_overview_json(overview):
     output_path = os.path.join(NORMALIZED_DIR, "overview.json")
     write_json_atomic(overview, output_path, ensure_ascii=False, indent=2)
-    return output_path
+    return output_path, overview
 
 
 def write_hub_bundle_json(pipeline_metadata, hub_health, dataset_catalog, artifact_manifest):
@@ -1156,7 +1157,7 @@ def write_hub_bundle_json(pipeline_metadata, hub_health, dataset_catalog, artifa
 
     output_path = os.path.join(NORMALIZED_DIR, "hub_bundle.json")
     write_json_atomic(bundle, output_path, ensure_ascii=False, indent=2)
-    return output_path
+    return output_path, bundle
 
 
 def write_publishable_bundle_zip():
@@ -1210,10 +1211,11 @@ def write_publishable_bundle_sha256(zip_path):
     return output_path
 
 
-def attach_publishable_package_to_manifest(zip_path, sha256_path):
+def attach_publishable_package_to_manifest(zip_path, sha256_path, manifest=None):
     manifest_path = os.path.join(NORMALIZED_DIR, "artifact_manifest.json")
-    with open(manifest_path, encoding="utf-8") as f:
-        manifest = json.load(f)
+    if manifest is None:
+        with open(manifest_path, encoding="utf-8") as f:
+            manifest = json.load(f)
 
     relative_path = f"data/normalized/{os.path.basename(zip_path)}"
     checksum_path = f"data/normalized/{os.path.basename(sha256_path)}"
@@ -1230,7 +1232,7 @@ def attach_publishable_package_to_manifest(zip_path, sha256_path):
     ]
 
     write_json_atomic(manifest, manifest_path, ensure_ascii=False, indent=2)
-    return manifest_path
+    return manifest_path, manifest
 
 
 def derive_geography_layers(df_comunas):
@@ -1578,6 +1580,26 @@ def main():
     educacionales_metadata = load_metadata(
         os.path.join(STAGING_DIR, "establecimientos_educacionales.metadata.json")
     )
+
+    metadata_files = [
+        ("comunas", comunas_metadata, "subdere_extractor.py"),
+        ("indicadores", indicadores_metadata, "bcentral_extractor.py"),
+        ("censo_comunal", censo_metadata, "censo_extractor.py"),
+        ("establecimientos_salud", salud_metadata, "salud_extractor.py"),
+        ("censo_hogares_viviendas", censo_hogares_metadata, "censo_hogares_viviendas_extractor.py"),
+        ("distritos_electorales", electoral_metadata, "electoral_extractor.py"),
+        (
+            "establecimientos_educacionales",
+            educacionales_metadata,
+            "mineduc_establecimientos_extractor.py",
+        ),
+    ]
+    for name, meta, extractor in metadata_files:
+        if meta is None:
+            raise SystemExit(
+                f"Error: No se encuentran los metadatos para {name} en data/staging/. "
+                f"Corre el extractor primero: python src/extractors/{extractor}"
+            )
     indicadores_metadata["indicator_codes"] = sorted(
         df_code for df_code in indicadores_metadata.get("indicator_codes", [])
     )
@@ -1867,21 +1889,17 @@ def main():
         for dataset_name, validation in validations.items()
     }
     dataset_metadata = enrich_dataset_metadata(dataset_metadata, validations_with_freshness)
-    metadata_output = write_pipeline_metadata(
+    metadata_output, pipeline_metadata = write_pipeline_metadata(
         dataset_metadata,
         validations_with_freshness,
     )
-    with open(metadata_output, encoding="utf-8") as f:
-        pipeline_metadata = json.load(f)
-    write_status_markdown_file(pipeline_metadata)
     hub_health = build_hub_health(pipeline_metadata)
+    write_status_markdown_file(pipeline_metadata, health=hub_health)
     hub_health_output = write_hub_health_json(hub_health)
     hub_status = build_hub_status(hub_health)
     hub_status_output = write_hub_status_json(hub_status)
     write_hub_health_markdown_file(hub_health)
-    catalog_output = write_dataset_catalog(pipeline_metadata)
-    with open(catalog_output, encoding="utf-8") as f:
-        dataset_catalog = json.load(f)
+    catalog_output, dataset_catalog = write_dataset_catalog(pipeline_metadata)
     write_dataset_catalog_markdown_file(dataset_catalog)
     redistribution_report = build_redistribution_report(dataset_catalog)
     redistribution_report_output = write_redistribution_report_json(redistribution_report)
@@ -1892,36 +1910,30 @@ def main():
     drift_report = build_drift_report(dataset_catalog)
     drift_report_output = write_drift_report_json(drift_report)
     write_drift_report_markdown_file(drift_report)
-    artifact_manifest_output = write_artifact_manifest()
-    with open(artifact_manifest_output, encoding="utf-8") as f:
-        artifact_manifest = json.load(f)
-    hub_bundle_output = write_hub_bundle_json(
+    artifact_manifest_output, artifact_manifest = write_artifact_manifest()
+    hub_bundle_output, hub_bundle = write_hub_bundle_json(
         pipeline_metadata,
         hub_health,
         dataset_catalog,
         artifact_manifest,
     )
-    with open(hub_bundle_output, encoding="utf-8") as f:
-        hub_bundle = json.load(f)
     overview = build_overview(hub_health, hub_bundle, artifact_manifest)
-    overview_output = write_overview_json(overview)
+    overview_output, overview = write_overview_json(overview)
     write_overview_markdown_file(overview)
-    artifact_manifest_output = write_artifact_manifest()
+    artifact_manifest_output, artifact_manifest = write_artifact_manifest()
     zip_output = write_publishable_bundle_zip()
     sha256_output = write_publishable_bundle_sha256(zip_output)
-    artifact_manifest_output = attach_publishable_package_to_manifest(zip_output, sha256_output)
-    with open(artifact_manifest_output, encoding="utf-8") as f:
-        artifact_manifest = json.load(f)
-    hub_bundle_output = write_hub_bundle_json(
+    artifact_manifest_output, artifact_manifest = attach_publishable_package_to_manifest(
+        zip_output, sha256_output, artifact_manifest
+    )
+    hub_bundle_output, hub_bundle = write_hub_bundle_json(
         pipeline_metadata,
         hub_health,
         dataset_catalog,
         artifact_manifest,
     )
-    with open(hub_bundle_output, encoding="utf-8") as f:
-        hub_bundle = json.load(f)
     overview = build_overview(hub_health, hub_bundle, artifact_manifest)
-    overview_output = write_overview_json(overview)
+    overview_output, overview = write_overview_json(overview)
     write_overview_markdown_file(overview)
     print(f"Metadata y validaciones exportadas a: {metadata_output}")
     print(f"Resumen de salud exportado a: {hub_health_output}")

@@ -47,7 +47,7 @@ Comprehensive accessibility guidelines based on WCAG 2.2 and Lighthouse accessib
 
 <!-- ✅ Complex image with longer description -->
 <figure>
-  <img src="infographic.png" alt="2024 market trends infographic" 
+  <img src="infographic.png" alt="2024 market trends infographic"
        aria-describedby="infographic-desc">
   <figcaption id="infographic-desc">
     <!-- Detailed description -->

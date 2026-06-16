@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'self' https://formspree.io; object-src 'none'; script-src 'self' https://analytics.ahrefs.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://analytics.ahrefs.com https://formspree.io; manifest-src 'self'; media-src 'self'; worker-src 'self' blob:; upgrade-insecure-requests">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>chile-hub — Capas de Datos de Chile</title>
     <meta name="description" content="chile-hub es una capa de datos oficial, curada y reproducible sobre datos de Chile. Accede a datasets limpios de la DPA, economía, demografía, salud y educación en formatos Parquet, JSON, Excel y DuckDB.">
@@ -67,11 +68,11 @@
             --border-color-dark: #b8b5a6;
             --text-primary: #1a221f;
             --text-secondary: #5c6560;
-            
+
             --accent-green: #123d30;
             --accent-green-hover: #0a241c;
             --accent-green-light: #e4efe9;
-            
+
             --accent-warm: #a6522c;
             --accent-warm-hover: #8c4220;
             --accent-warm-bg: #fbf3ed;
@@ -81,11 +82,11 @@
             --accent-cyan: var(--accent-green); /* legacy map */
             --accent-green-dark: var(--accent-green);
             --accent-gradient: var(--accent-green); /* legacy map */
-            
+
             --font-display: 'Lora', Georgia, serif;
             --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
-            
+
             --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -104,7 +105,7 @@
             flex-direction: column;
             overflow-x: hidden;
             /* Subtly pattern the background to feel like vintage drafting paper */
-            background-image: 
+            background-image:
                 linear-gradient(rgba(18, 61, 48, 0.025) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(18, 61, 48, 0.025) 1px, transparent 1px);
             background-size: 24px 24px;
@@ -216,7 +217,7 @@
             gap: 3rem;
             flex: 1;
         }
-        
+
         main#main-content:focus {
             outline: none;
         }

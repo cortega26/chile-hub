@@ -95,6 +95,7 @@ class ChileHub:
                     "warning_count": entry.get("warning_count", 0),
                     "freshness_status": current_freshness_status,
                     "build_freshness_status": entry.get("freshness_status"),
+                    "current_freshness_status": current_freshness_status,
                     "drift_status": entry.get("drift_status"),
                     "degradation_status": entry.get("degradation_status"),
                     "source_detail": provenance.get("source_detail", "unknown"),
@@ -106,13 +107,7 @@ class ChileHub:
                 }
             )
 
-        top = compute_top_issue(entries)
-        if not top:
-            return None
-        return {
-            **top,
-            "current_freshness_status": top.get("build_freshness_status"),
-        }
+        return compute_top_issue(entries)
 
     def top_issue_table(self):
         top_issue = self.top_issue()

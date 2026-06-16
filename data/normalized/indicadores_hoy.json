@@ -2011,6 +2011,11 @@
   },
   {
     "fecha": "2026-06-16",
+    "codigo_indicador": "euro",
+    "valor": 1032.39
+  },
+  {
+    "fecha": "2026-06-16",
     "codigo_indicador": "uf",
     "valor": 40782.27
   },

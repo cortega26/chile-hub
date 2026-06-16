@@ -60,12 +60,13 @@ help:
 	@printf "  make clean-publishable Elimina artefactos livianos versionables\n"
 
 bootstrap:
-	python3 -c "import sys; v=sys.version_info; ok=v>=(3,13); sys.exit(0 if ok else 'Python 3.13+ requerido, se encontro {}.{}'.format(v.major, v.minor))"
+	@python3 -c "import sys; v=sys.version_info; ok=v>=(3,13); sys.exit(0 if ok else f'Python 3.13+ requerido, se encontró {v.major}.{v.minor}')"
 	python3 -m venv $(VENV_DIR)
 	$(VENV_DIR)/bin/python -m pip install --upgrade pip
 	$(VENV_DIR)/bin/python -m pip install -r requirements.txt
 	$(VENV_DIR)/bin/python -m pip install -r dev-requirements.txt
 	$(VENV_DIR)/bin/python -m playwright install chromium
+	$(VENV_DIR)/bin/python -m pre_commit install
 
 install-browsers:
 	$(PYTHON) -m playwright install chromium

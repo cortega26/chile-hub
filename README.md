@@ -39,29 +39,29 @@ Trabajar con datos públicos chilenos implica enfrentar los mismos obstáculos u
 <table>
 <tr><td>
 
-**Curado y validado**  
+**Curado y validado**
 Cada capa pasa por validaciones automáticas de integridad referencial, cardinalidad exacta (346 comunas) y formato de códigos territoriales. El pipeline **falla ruidosamente** antes de publicar datos corruptos.
 
 </td><td>
 
-**Cruzable por diseño**  
+**Cruzable por diseño**
 Todos los datasets se vinculan mediante códigos CUT (`codigo_comuna`, `codigo_provincia`, `codigo_region`). Una sola clave une demografía, salud, educación y distritos electorales.
 
 </td></tr>
 <tr><td>
 
-**Múltiples formatos**  
+**Múltiples formatos**
 Parquet para analítica de alto rendimiento, DuckDB para consultas SQL locales, SQLite para aplicaciones embebidas, JSON para pipelines y Excel para usuarios de planillas. Todos generados desde la misma fuente.
 
 </td><td>
 
-**Trazabilidad total**  
+**Trazabilidad total**
 Cada artefacto incluye: fuente original, fecha de extracción, modo (en vivo/respaldo), hash SHA256, licencia y estatus de redistribución. Sabes exactamente qué estás consumiendo.
 
 </td></tr>
 <tr><td>
 
-**Una línea de código**  
+**Una línea de código**
 ```python
 import polars as pl
 df = pl.read_parquet("data/normalized/comunas.parquet")
@@ -69,7 +69,7 @@ df = pl.read_parquet("data/normalized/comunas.parquet")
 
 </td><td>
 
-**CI/CD transparente**  
+**CI/CD transparente**
 Pipeline determinista en GitHub Actions: extracción → build → verificación → tests → pruebas de humo. Todo reproducible en local con `make refresh`.
 
 </td></tr>
@@ -500,7 +500,7 @@ El roadmap actual prioriza **fortalecer la estabilidad operacional** de las 10 c
 - Valor de cruce con la División Político-Administrativa (CUT)
 - Bajo costo de mantenimiento continuo
 
-> La especificación completa del producto está en [`docs/product-spec.md`](./docs/product-spec.md).  
+> La especificación completa del producto está en [`docs/product-spec.md`](./docs/product-spec.md).
 > El estado de la última corrida se documenta en `data/normalized/pipeline_status.md` tras cada build.
 
 ---
