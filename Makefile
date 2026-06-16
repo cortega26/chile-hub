@@ -66,7 +66,6 @@ bootstrap:
 	$(VENV_DIR)/bin/python -m pip install -r requirements.txt
 	$(VENV_DIR)/bin/python -m pip install -r dev-requirements.txt
 	$(VENV_DIR)/bin/python -m playwright install chromium
-	$(VENV_DIR)/bin/python -m pre_commit install 2>/dev/null || GIT_CONFIG_PARAMETERS="'core.hooksPath='" $(VENV_DIR)/bin/python -m pre_commit install
 
 install-browsers:
 	$(PYTHON) -m playwright install chromium
