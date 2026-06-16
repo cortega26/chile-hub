@@ -575,54 +575,67 @@ function renderCatalog(bundle) {
                 <div class="dataset-preview" id="${escapeHtml(previewId)}" hidden aria-live="polite"></div>
                 <details class="dataset-details">
                     <summary>Contrato, procedencia y recetas</summary>
-                    <div class="dataset-facts">
-                    <div class="dataset-fact">
-                        <span class="dataset-fact-label">Join keys</span>
-                        <span class="dataset-fact-value">${escapeHtml((dataset.join_keys || []).join(", ") || "N/D")}</span>
+                    <div class="dataset-details-body">
+                    <div class="dataset-detail-section">
+                        <div class="dataset-detail-heading">Contrato</div>
+                        <div class="dataset-facts">
+                            <div class="dataset-fact">
+                                <span class="dataset-fact-label">Join keys</span>
+                                <span class="dataset-fact-value">${escapeHtml((dataset.join_keys || []).join(", ") || "N/D")}</span>
+                            </div>
+                            <div class="dataset-fact">
+                                <span class="dataset-fact-label">Confianza</span>
+                                <span class="dataset-fact-value">${escapeHtml(dataset.confidence_tier || "N/D")}</span>
+                            </div>
+                            <div class="dataset-fact">
+                                <span class="dataset-fact-label">Reuso</span>
+                                <span class="dataset-fact-value">${escapeHtml(formatReusePolicy(dataset.reuse_policy))}</span>
+                            </div>
+                            <div class="dataset-fact">
+                                <span class="dataset-fact-label">Coverage</span>
+                                <span class="dataset-fact-value">${escapeHtml(formatCoverage(dataset.coverage))}</span>
+                            </div>
+                            <div class="dataset-fact">
+                                <span class="dataset-fact-label">Drift</span>
+                                <span class="dataset-fact-value">${escapeHtml(dataset.drift?.status || "N/D")}</span>
+                            </div>
+                            <div class="dataset-fact">
+                                <span class="dataset-fact-label">Degradación</span>
+                                <span class="dataset-fact-value">${escapeHtml(dataset.degradation?.status || "N/D")}</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="dataset-fact">
-                        <span class="dataset-fact-label">Confianza</span>
-                        <span class="dataset-fact-value">${escapeHtml(dataset.confidence_tier || "N/D")}</span>
+                    <div class="dataset-detail-section">
+                        <div class="dataset-detail-heading">Procedencia</div>
+                        <div class="dataset-meta-line">
+                            Validación: <strong>${escapeHtml(dataset.validation_status || "N/D")}</strong> ·
+                            Actualizado: ${escapeHtml(formatTimestamp(dataset.refreshed_at_utc))} ·
+                            Requiere atribución: <strong>${dataset.reuse_policy?.attribution_required ? "sí" : "no"}</strong>
+                        </div>
+                        <div class="dataset-meta-line">
+                            Procedencia técnica: <strong>${escapeHtml(dataset.source_detail || "N/D")}</strong> ·
+                            Warnings: <strong>${escapeHtml(String(dataset.warning_count ?? 0))}</strong>
+                        </div>
+                        <div class="dataset-meta-line">Freshness build: ${escapeHtml(formatFreshness(dataset.freshness))} · Freshness actual: ${escapeHtml(formatFreshness(runtimeFreshness))}</div>
+                        ${dataset.warning_count > 0 && (dataset.degradation?.recommended_action || dataset.drift?.recommended_action)
+                            ? `<div class="dataset-meta-line">Acción recomendada: ${escapeHtml(dataset.degradation?.recommended_action || dataset.drift?.recommended_action)}</div>`
+                            : ""}
                     </div>
-                    <div class="dataset-fact">
-                        <span class="dataset-fact-label">Coverage</span>
-                        <span class="dataset-fact-value">${escapeHtml(formatCoverage(dataset.coverage))}</span>
+                    <div class="dataset-detail-section">
+                        <div class="dataset-detail-heading">Artefactos</div>
+                        <div class="dataset-actions">
+                            ${sourceUrl ? `<a class="dataset-action muted" href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">Fuente</a>` : ""}
+                        </div>
+                        <div class="dataset-artifacts">
+                            ${buildArtifactMeta(parquetPath)}
+                            ${buildArtifactMeta(jsonPath)}
+                        </div>
                     </div>
-                    <div class="dataset-fact">
-                        <span class="dataset-fact-label">Drift</span>
-                        <span class="dataset-fact-value">${escapeHtml(dataset.drift?.status || "N/D")}</span>
+                    <div class="dataset-detail-section wide">
+                        <div class="dataset-detail-heading">Receta</div>
+                        ${buildDatasetExample(dataset)}
                     </div>
-                    <div class="dataset-fact">
-                        <span class="dataset-fact-label">Reuso</span>
-                        <span class="dataset-fact-value">${escapeHtml(formatReusePolicy(dataset.reuse_policy))}</span>
                     </div>
-                    <div class="dataset-fact">
-                        <span class="dataset-fact-label">Degradación</span>
-                        <span class="dataset-fact-value">${escapeHtml(dataset.degradation?.status || "N/D")}</span>
-                    </div>
-                </div>
-                <div class="dataset-meta-line">
-                    Validación: <strong>${escapeHtml(dataset.validation_status || "N/D")}</strong> ·
-                    Actualizado: ${escapeHtml(formatTimestamp(dataset.refreshed_at_utc))} ·
-                    Requiere atribución: <strong>${dataset.reuse_policy?.attribution_required ? "sí" : "no"}</strong>
-                </div>
-                <div class="dataset-meta-line">
-                    Procedencia técnica: <strong>${escapeHtml(dataset.source_detail || "N/D")}</strong> ·
-                    Warnings: <strong>${escapeHtml(String(dataset.warning_count ?? 0))}</strong>
-                </div>
-                <div class="dataset-meta-line">Freshness build: ${escapeHtml(formatFreshness(dataset.freshness))} · Freshness actual: ${escapeHtml(formatFreshness(runtimeFreshness))}</div>
-                ${dataset.warning_count > 0 && (dataset.degradation?.recommended_action || dataset.drift?.recommended_action)
-                    ? `<div class="dataset-meta-line">Acción recomendada: ${escapeHtml(dataset.degradation?.recommended_action || dataset.drift?.recommended_action)}</div>`
-                    : ""}
-                ${dataset.drift?.summary ? `<div class="dataset-meta-line">Drift: ${escapeHtml(dataset.drift.summary)}</div>` : ""}
-                ${dataset.coverage?.summary ? `<div class="dataset-meta-line">Cobertura: ${escapeHtml(dataset.coverage.summary)}</div>` : ""}
-                ${dataset.degradation?.impact ? `<div class="dataset-meta-line">Impacto: ${escapeHtml(dataset.degradation.impact)}</div>` : ""}
-                <div class="dataset-actions">
-                    ${sourceUrl ? `<a class="dataset-action muted" href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">Fuente</a>` : ""}
-                </div>
-                ${buildArtifactMeta(parquetPath)}
-                ${buildArtifactMeta(jsonPath)}
-                ${buildDatasetExample(dataset)}
                 ${buildMonedarioBridge(dataset)}
                 <div class="dataset-tags">${outputs}</div>
                 <div class="dataset-tags">${warnings}</div>
