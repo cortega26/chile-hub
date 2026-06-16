@@ -153,6 +153,54 @@ def verify_landing():
         if browser_errors:
             fail(f"Browser errors while rendering landing: {browser_errors}")
 
+        # SEO Verification
+        canonical = page.locator("link[rel='canonical']").get_attribute("href")
+        if canonical != "https://cortega26.github.io/chile-hub/":
+            fail(f"Unexpected canonical link: {canonical}")
+
+        description = page.locator("meta[name='description']").get_attribute("content")
+        if not description or "chile-hub" not in description:
+            fail(f"Unexpected or missing description: {description}")
+
+        robots = page.locator("meta[name='robots']").get_attribute("content")
+        if robots != "index, follow":
+            fail(f"Unexpected robots meta: {robots}")
+
+        og_title = page.locator("meta[property='og:title']").get_attribute("content")
+        if og_title != "chile-hub — Capas de Datos de Chile":
+            fail(f"Unexpected og:title: {og_title}")
+
+        twitter_card = page.locator("meta[name='twitter:card']").get_attribute("content")
+        if twitter_card != "summary_large_image":
+            fail(f"Unexpected twitter:card: {twitter_card}")
+
+        json_ld_count = page.locator("script[type='application/ld+json']").count()
+        if json_ld_count < 2:
+            fail(f"Expected at least 2 JSON-LD script tags, found {json_ld_count}")
+
+        # Accessibility (a11y) Verification
+        skip_link = page.locator("a.skip-link")
+        if skip_link.count() != 1:
+            fail("Expected exactly one skip link element")
+        if skip_link.get_attribute("href") != "#main-content":
+            fail(f"Unexpected skip link href: {skip_link.get_attribute('href')}")
+
+        main_content = page.locator("main#main-content")
+        if main_content.count() != 1:
+            fail("Expected exactly one main element with id='main-content'")
+
+        catalog_label = page.locator("#catalog-search-input").get_attribute("aria-label")
+        if catalog_label != "Filtrar catálogo de capas":
+            fail(f"Unexpected or missing aria-label for #catalog-search-input: {catalog_label}")
+
+        search_label = page.locator("#search-input").get_attribute("aria-label")
+        if search_label != "Buscar comuna, provincia o región":
+            fail(f"Unexpected or missing aria-label for #search-input: {search_label}")
+
+        region_label = page.locator("#region-filter").get_attribute("aria-label")
+        if region_label != "Filtrar comunas por región":
+            fail(f"Unexpected or missing aria-label for #region-filter: {region_label}")
+
         repo_href = page.get_by_role("link", name="GitHub Repo").get_attribute("href")
         if repo_href != "https://github.com/cortega26/chile-hub":
             fail(f"Unexpected repo href: {repo_href}")
@@ -192,14 +240,15 @@ def verify_landing():
         if status_meta_locator.count() != 1:
             fail("Expected exactly one #status-meta element")
         status_meta = status_meta_locator.inner_text()
-        expected_status_meta = (
-            f"Motivo del top issue ({top_issue_dataset}): {top_issue_reason} · Procedencia técnica: {top_issue_source_detail} · Acción recomendada: {top_issue_action}"
-            if top_issue_dataset
-            and top_issue_reason
-            and top_issue_action
-            and top_issue_source_detail
-            else "Sin top issue activo en este build."
-        )
+        if top_issue_dataset:
+            parts = [f"{top_issue_dataset}: {top_issue_reason}"]
+            if top_issue_action:
+                parts.append(top_issue_action)
+            if top_issue_source_detail and top_issue_source_detail != "unknown":
+                parts.append(f"Fuente: {top_issue_source_detail}")
+            expected_status_meta = " · ".join(parts)
+        else:
+            expected_status_meta = ""
         if status_meta != expected_status_meta:
             fail(f"Unexpected status meta: {status_meta}")
 

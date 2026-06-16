@@ -4,8 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>chile-hub — Capas de Datos de Chile</title>
+    <meta name="description" content="chile-hub es una capa de datos oficial, curada y reproducible sobre datos de Chile. Accede a datasets limpios de la DPA, economía, demografía, salud y educación en formatos Parquet, JSON, Excel y DuckDB.">
+    <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://cortega26.github.io/chile-hub/">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b0f19'/%3E%3Cpath d='M18 20h11c9 0 14 5 14 12 0 9-6 14-15 14H18V20zm9 20c6 0 9-3 9-8 0-4-3-7-8-7h-3v15h2z' fill='%2322d3ee'/%3E%3Cpath d='M45 18l4 7 7 4-7 4-4 7-4-7-7-4 7-4 4-7z' fill='%23818cf8'/%3E%3C/svg%3E">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://cortega26.github.io/chile-hub/">
+    <meta property="og:title" content="chile-hub — Capas de Datos de Chile">
+    <meta property="og:description" content="Capa de datos oficial, curada y reproducible sobre Chile. Accede a datasets listos para producción en Parquet, JSON y DuckDB.">
+    <meta property="og:image" content="https://cortega26.github.io/chile-hub/data/normalized/logo.png">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://cortega26.github.io/chile-hub/">
+    <meta name="twitter:title" content="chile-hub — Capas de Datos de Chile">
+    <meta name="twitter:description" content="Capa de datos oficial, curada y reproducible sobre Chile. Accede a datasets listos para producción en Parquet, JSON y DuckDB.">
+    <meta name="twitter:image" content="https://cortega26.github.io/chile-hub/data/normalized/logo.png">
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "chile-hub",
+      "url": "https://cortega26.github.io/chile-hub/",
+      "description": "Capa de datos oficial, curada y reproducible sobre Chile. Datasets limpios en Parquet, JSON, DuckDB y Excel.",
+      "publisher": {
+        "@type": "Organization",
+        "name": "chile-hub"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Dataset",
+      "name": "División Político-Administrativa (DPA) de Chile",
+      "description": "Regiones, provincias y comunas de Chile con códigos CUT oficiales y coordenadas de cabecera.",
+      "url": "https://cortega26.github.io/chile-hub/",
+      "license": "https://creativecommons.org/licenses/by/4.0/deed.es",
+      "creator": {
+        "@type": "Organization",
+        "name": "Biblioteca del Congreso Nacional de Chile (BCN)"
+      }
+    }
+    </script>
 
     <style>
         :root {
@@ -1204,9 +1249,33 @@
             .catalog-toolbar { align-items: stretch; flex-direction: column; }
             .catalog-count { min-height: 24px; }
         }
+
+        /* Accessibility (a11y) */
+        .skip-link {
+            position: absolute;
+            top: -100px;
+            left: 1rem;
+            background: var(--accent-gradient);
+            color: var(--bg-color);
+            padding: 0.75rem 1.5rem;
+            z-index: 1000;
+            transition: top 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 700;
+            text-decoration: none;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .skip-link:focus {
+            top: 0;
+            outline: 2px solid var(--accent-cyan);
+            outline-offset: 2px;
+        }
     </style>
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
 
     <header>
         <div class="logo-section">
@@ -1222,7 +1291,7 @@
         </nav>
     </header>
 
-    <main>
+    <main id="main-content">
         <section class="intro">
             <div class="intro-copy">
                 <h2>Un punto de partida curado para datos abiertos de Chile.</h2>
@@ -1287,7 +1356,7 @@
                         <summary>Verificar integridad del archivo</summary>
                         <div class="package-verify-head">
                             <div class="package-verify-title">Verificar integridad</div>
-                            <button class="quickstart-copy" id="package-verify-copy" data-copy-target="package-verify-code">Copiar</button>
+                            <button class="quickstart-copy" id="package-verify-copy" data-copy-target="package-verify-code" aria-label="Copiar comando de verificación al portapapeles">Copiar</button>
                         </div>
                         <pre class="quickstart-code" id="package-verify-code">shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256</pre>
                     </details>
@@ -1310,7 +1379,7 @@
             <div class="catalog-toolbar">
                 <label class="catalog-search" for="catalog-search-input">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 3a6.5 6.5 0 104.03 11.6L19.94 21 21 19.94l-6.4-6.41A6.5 6.5 0 009.5 3zm0 1.5a5 5 0 110 10 5 5 0 010-10z"/></svg>
-                    <input id="catalog-search-input" type="search" placeholder="Buscar datos por nombre, fuente o campo" autocomplete="off">
+                    <input id="catalog-search-input" type="search" placeholder="Buscar datos por nombre, fuente o campo" autocomplete="off" aria-label="Filtrar catálogo de capas">
                 </label>
                 <div class="catalog-count" id="catalog-count" aria-live="polite">Cargando capas...</div>
             </div>
@@ -1361,7 +1430,7 @@
                 <article class="quickstart-card">
                     <div class="quickstart-head">
                         <div class="quickstart-title">Python + Polars</div>
-                        <button class="quickstart-copy" data-copy-target="quickstart-python">Copiar</button>
+                        <button class="quickstart-copy" data-copy-target="quickstart-python" aria-label="Copiar código de integración para Python y Polars">Copiar</button>
                     </div>
                     <div class="quickstart-desc">Carga el Parquet publicado directamente desde cualquier notebook o servicio.</div>
                     <pre class="quickstart-code" id="quickstart-python">import polars as pl
@@ -1372,7 +1441,7 @@ df = pl.read_parquet(url)</pre>
                 <article class="quickstart-card">
                     <div class="quickstart-head">
                         <div class="quickstart-title">DuckDB directo</div>
-                        <button class="quickstart-copy" data-copy-target="quickstart-duckdb">Copiar</button>
+                        <button class="quickstart-copy" data-copy-target="quickstart-duckdb" aria-label="Copiar consulta SQL para DuckDB">Copiar</button>
                     </div>
                     <div class="quickstart-desc">Consulta el archivo remoto con SQL, sin descargarlo manualmente.</div>
                     <pre class="quickstart-code" id="quickstart-duckdb">SELECT *
@@ -1382,7 +1451,7 @@ LIMIT 10;</pre>
                 <article class="quickstart-card">
                     <div class="quickstart-head">
                         <div class="quickstart-title">JSON + curl</div>
-                        <button class="quickstart-copy" data-copy-target="quickstart-cli">Copiar</button>
+                        <button class="quickstart-copy" data-copy-target="quickstart-cli" aria-label="Copiar comando de terminal curl">Copiar</button>
                     </div>
                     <div class="quickstart-desc">Descarga un artefacto abierto con una herramienta disponible en cualquier entorno.</div>
                     <pre class="quickstart-code" id="quickstart-cli">curl -L "https://cortega26.github.io/chile-hub/data/normalized/comunas.json" \
@@ -1422,10 +1491,10 @@ LIMIT 10;</pre>
             <div class="search-inputs">
                 <div class="input-group">
                     <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-                    <input type="text" id="search-input" placeholder="Buscar comuna, provincia o región...">
+                    <input type="text" id="search-input" placeholder="Buscar comuna, provincia o región..." aria-label="Buscar comuna, provincia o región">
                 </div>
                 <div style="max-width: 220px; flex: 1;">
-                    <select id="region-filter">
+                    <select id="region-filter" aria-label="Filtrar comunas por región">
                         <option value="">Todas las regiones</option>
                     </select>
                 </div>
