@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-06-16T00:13:53.370709+00:00",
+  "generated_at_utc": "2026-06-16T01:34:42.043357+00:00",
   "datasets": {
     "regiones": {
       "dataset": "regiones",
@@ -28,9 +28,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.01,
+        "age_hours": 1.35,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-16T00:13:53.370394+00:00"
+        "checked_at_utc": "2026-06-16T01:34:42.042949+00:00"
       },
       "degradation": {
         "status": "none",
@@ -79,9 +79,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.01,
+        "age_hours": 1.35,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-16T00:13:53.370427+00:00"
+        "checked_at_utc": "2026-06-16T01:34:42.042994+00:00"
       },
       "degradation": {
         "status": "none",
@@ -137,9 +137,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.01,
+        "age_hours": 1.35,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-16T00:13:53.370435+00:00"
+        "checked_at_utc": "2026-06-16T01:34:42.043005+00:00"
       },
       "degradation": {
         "status": "none",
@@ -195,9 +195,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.01,
+        "age_hours": 1.35,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-16T00:13:53.370441+00:00"
+        "checked_at_utc": "2026-06-16T01:34:42.043010+00:00"
       },
       "degradation": {
         "status": "none",
@@ -266,9 +266,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.0,
+        "age_hours": 1.35,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-06-16T00:13:53.370622+00:00"
+        "checked_at_utc": "2026-06-16T01:34:42.043250+00:00"
       },
       "degradation": {
         "status": "warning",
@@ -326,9 +326,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.0,
+        "age_hours": 1.35,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-06-16T00:13:53.370636+00:00"
+        "checked_at_utc": "2026-06-16T01:34:42.043271+00:00"
       },
       "degradation": {
         "status": "none",
@@ -383,9 +383,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.0,
+        "age_hours": 1.35,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-06-16T00:13:53.370642+00:00"
+        "checked_at_utc": "2026-06-16T01:34:42.043279+00:00"
       },
       "degradation": {
         "status": "none",
@@ -435,9 +435,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.0,
+        "age_hours": 1.35,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-06-16T00:13:53.370648+00:00"
+        "checked_at_utc": "2026-06-16T01:34:42.043285+00:00"
       },
       "degradation": {
         "status": "none",
@@ -490,9 +490,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.0,
+        "age_hours": 1.35,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-06-16T00:13:53.370654+00:00"
+        "checked_at_utc": "2026-06-16T01:34:42.043293+00:00"
       },
       "degradation": {
         "status": "none",
@@ -537,9 +537,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.0,
+        "age_hours": 1.35,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-06-16T00:13:53.370658+00:00"
+        "checked_at_utc": "2026-06-16T01:34:42.043298+00:00"
       },
       "degradation": {
         "status": "none",
@@ -568,7 +568,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.01
+      "freshness_age_hours": 1.35
     },
     "provincias": {
       "dataset": "provincias",
@@ -577,7 +577,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.01
+      "freshness_age_hours": 1.35
     },
     "comunas": {
       "dataset": "comunas",
@@ -586,7 +586,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.01
+      "freshness_age_hours": 1.35
     },
     "comunas_enriquecidas": {
       "dataset": "comunas_enriquecidas",
@@ -595,7 +595,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.01
+      "freshness_age_hours": 1.35
     },
     "indicadores": {
       "dataset": "indicadores",
@@ -613,7 +613,7 @@
         "utm"
       ],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.0
+      "freshness_age_hours": 1.35
     },
     "censo_comunal": {
       "dataset": "censo_comunal",
@@ -622,7 +622,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.0
+      "freshness_age_hours": 1.35
     },
     "establecimientos_salud": {
       "dataset": "establecimientos_salud",
@@ -631,7 +631,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.0
+      "freshness_age_hours": 1.35
     },
     "censo_hogares_viviendas": {
       "dataset": "censo_hogares_viviendas",
@@ -640,7 +640,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.0
+      "freshness_age_hours": 1.35
     },
     "distritos_electorales": {
       "dataset": "distritos_electorales",
@@ -649,7 +649,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.0
+      "freshness_age_hours": 1.35
     },
     "establecimientos_educacionales": {
       "dataset": "establecimientos_educacionales",
@@ -658,7 +658,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.0
+      "freshness_age_hours": 1.35
     }
   }
 }
