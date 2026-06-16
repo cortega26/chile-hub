@@ -188,6 +188,7 @@
         .site-nav {
             display: flex;
             align-items: center;
+            flex-wrap: wrap;
             gap: 1.5rem;
         }
 
@@ -615,8 +616,9 @@
 
         .catalog-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 1.25rem;
+            align-items: start;
         }
 
         /* Dataset Card - emulating high-end archive card index */
@@ -630,6 +632,8 @@
             gap: 1rem;
             transition: var(--transition);
             position: relative;
+            min-width: 0;
+            overflow: hidden;
         }
 
         .dataset-card::before {
@@ -664,6 +668,7 @@
             justify-content: space-between;
             align-items: flex-start;
             gap: 1rem;
+            min-width: 0;
         }
 
         .dataset-name {
@@ -671,20 +676,24 @@
             font-size: 1.15rem;
             font-weight: 600;
             color: var(--text-primary);
+            line-height: 1.25;
+            overflow-wrap: anywhere;
         }
 
         .dataset-desc {
             font-size: 0.88rem;
             color: var(--text-secondary);
-            line-height: 1.5;
+            line-height: 1.45;
             margin-top: 0.25rem;
             min-height: 2.7em;
+            overflow-wrap: anywhere;
         }
 
         .dataset-badges {
             display: flex;
             flex-wrap: wrap;
             gap: 0.35rem;
+            flex: 0 0 auto;
         }
 
         .dataset-badge {
@@ -712,16 +721,18 @@
         /* Grid Data Table in card */
         .dataset-facts {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 0.75rem;
             border-block: 1px solid var(--bg-color);
             padding-block: 0.75rem;
+            min-width: 0;
         }
 
         .dataset-fact {
             display: flex;
             flex-direction: column;
             gap: 0.15rem;
+            min-width: 0;
         }
 
         .dataset-fact-label {
@@ -736,6 +747,9 @@
             color: var(--text-primary);
             font-size: 0.88rem;
             font-weight: 550;
+            line-height: 1.15;
+            overflow-wrap: anywhere;
+            word-break: normal;
         }
 
         .dataset-actions {
@@ -743,6 +757,7 @@
             flex-wrap: wrap;
             gap: 0.5rem;
             margin-top: auto;
+            min-width: 0;
         }
 
         .dataset-action {
@@ -759,6 +774,10 @@
             font-weight: 600;
             transition: var(--transition);
             cursor: pointer;
+            line-height: 1.25;
+            max-width: 100%;
+            white-space: normal;
+            text-align: center;
         }
 
         .dataset-action:hover {
@@ -781,6 +800,8 @@
             border-top: 1px solid var(--border-color);
             padding-top: 0.75rem;
             margin-top: 0.5rem;
+            min-width: 0;
+            max-width: 100%;
         }
 
         .dataset-details[open] summary {
@@ -790,8 +811,9 @@
         .dataset-meta-line {
             font-size: 0.78rem;
             color: var(--text-secondary);
-            line-height: 1.5;
+            line-height: 1.55;
             margin-bottom: 0.4rem;
+            overflow-wrap: anywhere;
         }
 
         .dataset-meta-line strong {
@@ -803,6 +825,7 @@
             font-size: 0.7rem;
             color: var(--text-secondary);
             margin-block: 0.5rem 0.25rem;
+            overflow-wrap: anywhere;
         }
 
         .dataset-tags {
@@ -814,16 +837,19 @@
             border-top: 1px solid var(--border-color);
             padding-top: 0.75rem;
             margin-top: 0.75rem;
+            min-width: 0;
         }
 
         .dataset-preview-table-wrap {
             overflow-x: auto;
             border: 1px solid var(--border-color);
             border-radius: 4px;
+            max-width: 100%;
         }
 
         .dataset-preview-table {
-            width: 100%;
+            width: max-content;
+            min-width: 100%;
             border-collapse: collapse;
             font-size: 0.74rem;
             text-align: left;
@@ -864,15 +890,19 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            min-width: 0;
+            max-width: 100%;
         }
 
         .dataset-example-head {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 0.75rem;
             background: #0d1a17;
             padding: 0.4rem 0.75rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            min-width: 0;
         }
 
         .dataset-example-title {
@@ -887,6 +917,8 @@
             display: flex;
             align-items: center;
             gap: 0.35rem;
+            flex-wrap: wrap;
+            justify-content: flex-end;
         }
 
         .dataset-example-tab {
@@ -941,10 +973,11 @@
             padding: 0.85rem 1rem;
             color: #e2ede9;
             font-size: 0.78rem;
-            line-height: 1.5;
+            line-height: 1.55;
             margin: 0;
             overflow-x: auto;
             font-family: var(--font-mono);
+            max-width: 100%;
         }
 
         /* Monedario bridge */
@@ -1091,7 +1124,7 @@
 
         .quickstart-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 1.25rem;
         }
 
@@ -1103,12 +1136,21 @@
             display: flex;
             flex-direction: column;
             gap: 0.75rem;
+            min-width: 0;
+            max-width: 100%;
         }
 
         .quickstart-head {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 0.75rem;
+            min-width: 0;
+        }
+
+        .quickstart-title {
+            line-height: 1.25;
+            overflow-wrap: anywhere;
         }
 
         .quickstart-card .quickstart-copy {
@@ -1132,6 +1174,7 @@
             font-size: 0.84rem;
             color: var(--text-secondary);
             line-height: 1.45;
+            overflow-wrap: anywhere;
         }
 
         .quickstart-code {
@@ -1146,6 +1189,7 @@
             line-height: 1.45;
             overflow-x: auto;
             white-space: pre;
+            max-width: 100%;
         }
 
         /* Contribute Panel */
@@ -1308,15 +1352,18 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            min-width: 0;
         }
 
         .table-wrapper {
             overflow-x: auto;
             width: 100%;
+            max-width: 100%;
         }
 
         table {
             width: 100%;
+            min-width: 680px;
             border-collapse: collapse;
             text-align: left;
             font-size: 0.9rem;
@@ -1519,6 +1566,24 @@
         }
 
         @media (max-width: 580px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+                padding: 1.25rem 1rem;
+            }
+            .site-nav {
+                width: 100%;
+                gap: 0.75rem 1rem;
+            }
+            main {
+                padding: 2rem 1rem;
+            }
+            .catalog-section,
+            .quickstart-section,
+            .table-container {
+                padding: 1.25rem;
+            }
             .intro-proof dl {
                 grid-template-columns: 1fr;
                 gap: 1rem;
