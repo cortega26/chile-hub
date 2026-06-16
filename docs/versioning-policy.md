@@ -6,7 +6,9 @@ Este documento establece la política oficial de versionamiento para el proyecto
 
 ## 1. Reglas de Semantic Versioning (SemVer 2.0.0)
 
-La versión del proyecto se define en la clave `version` del archivo `pyproject.toml` en el formato `MAJOR.MINOR.PATCH` (por ejemplo, `0.1.0`).
+La versión del proyecto se define en la clave `version` del archivo `pyproject.toml`
+en el formato `MAJOR.MINOR.PATCH` (por ejemplo, `0.1.0`). La actualización de
+esa versión se automatiza con Conventional Commits y `python-semantic-release`.
 
 ### 1.1 MAJOR (Mayor): Cambios Disruptivos (Breaking Changes)
 Se incrementa la versión **MAJOR** (ej. `0.1.2` $\rightarrow$ `1.0.0`) cuando se realizan cambios incompatibles con versiones anteriores en la API pública de Python, el CLI o en los esquemas de datos finales expuestos en `data/normalized/`.
@@ -56,6 +58,15 @@ Es fundamental separar la versión de la base de código y estructura (SemVer) d
 
 ## 3. Automatización y Flujo de Publicación
 
-1. **Definir la versión**: Al introducir cambios de esquema o código, el desarrollador/agente actualiza la versión en `pyproject.toml`.
-2. **Sincronización automática**: Al correr `make build` (que ejecuta `src/build_dev_db.py`), el pipeline lee `pyproject.toml` usando `tomllib`, inyecta la versión en los metadatos normalizados (`pipeline_metadata.json` y `hub_bundle.json`) y actualiza el badge HTML en la landing page `index.html`.
-3. **CI/CD**: El pipeline de integración verifica la consistencia de los archivos autogenerados y asegura que no ocurran discrepancias de versión antes de publicar los artefactos.
+1. **Escribir commits convencionales**: `fix:` publica PATCH, `feat:` publica
+   MINOR y `feat!:` o `BREAKING CHANGE:` publica MAJOR.
+2. **Publicación automática**: El workflow `PyPI Release` calcula la siguiente
+   versión, actualiza `pyproject.toml`, crea el tag `vX.Y.Z`, genera GitHub
+   Release y publica wheel/sdist en PyPI con Trusted Publishing.
+3. **Sincronización de artefactos**: Al correr `make build` (que ejecuta
+   `src/build_dev_db.py`), el pipeline lee `pyproject.toml` usando `tomllib`,
+   inyecta la versión en los metadatos normalizados (`pipeline_metadata.json` y
+   `hub_bundle.json`) y actualiza el badge HTML en la landing page `index.html`.
+4. **Datos publicados como assets**: El release adjunta el bundle verificado,
+   su `.sha256` y metadatos livianos. Las actualizaciones diarias de datos no
+   crean una nueva versión PyPI por sí solas.

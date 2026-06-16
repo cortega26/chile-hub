@@ -2,6 +2,7 @@ polars==1.41.2
 duckdb==1.5.3
 pyarrow==24.0.0
 requests==2.34.2
+platformdirs==4.10.0
 pandas==3.0.3
 xlsxwriter==3.2.9
 curl_cffi==0.15.0

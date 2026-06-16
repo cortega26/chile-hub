@@ -17,7 +17,7 @@ Los codigos CUT son strings de longitud fija. Los grupos amplios de edad se deri
 ## Uso
 
 ```python
-from src.chile_hub import ChileHub
+from chile_hub import ChileHub
 
 df = ChileHub().load_polars("censo_comunal")
 ```

@@ -1,11 +1,104 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
 [project]
 name = "chile-hub"
 version = "0.1.0"
-requires-python = ">=3.13"
+description = "Curated, validated, versioned public datasets for Chile."
+readme = "README.md"
+requires-python = ">=3.10,<3.15"
+license = "MIT"
+authors = [
+    { name = "Carlos Ortega" },
+]
+keywords = [
+    "chile",
+    "datasets",
+    "open-data",
+    "polars",
+    "duckdb",
+    "public-data",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Database",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
+dependencies = [
+    "polars==1.41.2",
+    "pyarrow==24.0.0",
+    "requests==2.34.2",
+    "platformdirs==4.10.0",
+]
+
+[project.optional-dependencies]
+pipeline = [
+    "duckdb==1.5.3",
+    "pandas==3.0.3",
+    "xlsxwriter==3.2.9",
+    "curl_cffi==0.15.0",
+    "openpyxl==3.1.5",
+]
+dev = [
+    "build==1.3.0",
+    "twine==6.2.0",
+    "python-semantic-release==10.5.2",
+    "playwright==1.60.0",
+    "ruff==0.15.17",
+    "pytest==9.1.0",
+    "pre-commit==3.8.0",
+]
+
+[project.scripts]
+chile-hub = "chile_hub.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/cortega26/chile-hub"
+Repository = "https://github.com/cortega26/chile-hub"
+Issues = "https://github.com/cortega26/chile-hub/issues"
+Documentation = "https://github.com/cortega26/chile-hub#readme"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/chile_hub"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src/chile_hub",
+    "/src/chile_hub.py",
+    "/README.md",
+    "/LICENSE",
+    "/DATA_LICENSES.md",
+    "/CHANGELOG.md",
+    "/pyproject.toml",
+]
+
+[tool.semantic_release]
+version_toml = ["pyproject.toml:project.version"]
+version_variables = ["src/chile_hub/__init__.py:__version__"]
+branch = "main"
+tag_format = "v{version}"
+build_command = "python -m build"
+upload_to_vcs_release = true
+commit_message = "chore(release): {version} [skip ci]"
+
+[tool.semantic_release.changelog]
+exclude_commit_patterns = [
+    "^chore\\(data\\):",
+]
 
 [tool.ruff]
 line-length = 100
-target-version = "py313"
+target-version = "py310"
 
 [tool.ruff.lint]
 select = ["E", "W", "F", "I"]

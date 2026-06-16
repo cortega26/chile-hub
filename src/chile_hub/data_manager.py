@@ -1,0 +1,202 @@
+"""Runtime access to versioned chile-hub data release assets."""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+import shutil
+import zipfile
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
+
+import requests
+from platformdirs import user_cache_dir
+
+DEFAULT_REPOSITORY = "cortega26/chile-hub"
+DEFAULT_BUNDLE_NAME = "chile-hub-publishable-bundle.zip"
+DEFAULT_CHECKSUM_NAME = "chile-hub-publishable-bundle.zip.sha256"
+ENV_CACHE_DIR = "CHILE_HUB_CACHE_DIR"
+
+
+class ChileHubDataError(RuntimeError):
+    """Raised when release data cannot be resolved or verified."""
+
+
+@dataclass(frozen=True)
+class ReleaseAsset:
+    name: str
+    url: str
+
+
+class ChileHubDataManager:
+    def __init__(
+        self,
+        *,
+        data_version: str = "latest",
+        repository: str = DEFAULT_REPOSITORY,
+        cache_dir: str | Path | None = None,
+        session: requests.Session | None = None,
+    ) -> None:
+        self.data_version = data_version
+        self.repository = repository
+        self.cache_root = Path(
+            cache_dir or os.environ.get(ENV_CACHE_DIR) or user_cache_dir("chile-hub", "chile-hub")
+        )
+        self.session = session or requests.Session()
+
+    @property
+    def version_cache_dir(self) -> Path:
+        return self.cache_root / self.data_version
+
+    @property
+    def normalized_dir(self) -> Path:
+        return self.version_cache_dir / "data" / "normalized"
+
+    @property
+    def marker_path(self) -> Path:
+        return self.version_cache_dir / ".verified.json"
+
+    def status(self) -> dict[str, Any]:
+        catalog_path = self.normalized_dir / "dataset_catalog.json"
+        marker = self._read_json(self.marker_path)
+        return {
+            "cache_root": str(self.cache_root),
+            "data_version": self.data_version,
+            "normalized_dir": str(self.normalized_dir),
+            "is_ready": catalog_path.exists() and self.marker_path.exists(),
+            "dataset_catalog": str(catalog_path),
+            "verified": bool(marker),
+            "release": marker.get("release") if marker else None,
+        }
+
+    def ensure_data_dir(self, *, auto_update: bool = True) -> Path:
+        if (self.normalized_dir / "dataset_catalog.json").exists() and self.marker_path.exists():
+            return self.normalized_dir
+        if not auto_update:
+            raise ChileHubDataError(
+                "No verified chile-hub data cache found. Run `chile-hub cache update` "
+                "or pass ChileHub(data_dir='/path/to/data/normalized')."
+            )
+        self.update()
+        return self.normalized_dir
+
+    def update(self) -> Path:
+        release = self._resolve_release()
+        assets = self._assets_by_name(release)
+        bundle = self._require_asset(assets, DEFAULT_BUNDLE_NAME)
+        checksum = self._require_asset(assets, DEFAULT_CHECKSUM_NAME)
+
+        self.version_cache_dir.mkdir(parents=True, exist_ok=True)
+        bundle_path = self.version_cache_dir / DEFAULT_BUNDLE_NAME
+        checksum_path = self.version_cache_dir / DEFAULT_CHECKSUM_NAME
+
+        self._download(bundle.url, bundle_path)
+        self._download(checksum.url, checksum_path)
+        expected_sha256 = self._read_checksum(checksum_path)
+        actual_sha256 = self._sha256(bundle_path)
+        if actual_sha256 != expected_sha256:
+            bundle_path.unlink(missing_ok=True)
+            raise ChileHubDataError(
+                f"Checksum mismatch for {DEFAULT_BUNDLE_NAME}: "
+                f"expected {expected_sha256}, got {actual_sha256}"
+            )
+
+        self._extract_bundle(bundle_path)
+        if not (self.normalized_dir / "dataset_catalog.json").exists():
+            raise ChileHubDataError(
+                f"Downloaded bundle did not contain {self.normalized_dir / 'dataset_catalog.json'}"
+            )
+
+        self.marker_path.write_text(
+            json.dumps(
+                {
+                    "release": {
+                        "tag_name": release.get("tag_name"),
+                        "html_url": release.get("html_url"),
+                    },
+                    "sha256": actual_sha256,
+                    "bundle": DEFAULT_BUNDLE_NAME,
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        return self.normalized_dir
+
+    def clear(self) -> None:
+        shutil.rmtree(self.cache_root, ignore_errors=True)
+
+    def _resolve_release(self) -> dict[str, Any]:
+        suffix = (
+            "releases/latest"
+            if self.data_version == "latest"
+            else f"releases/tags/{self.data_version}"
+        )
+        url = f"https://api.github.com/repos/{self.repository}/{suffix}"
+        response = self.session.get(
+            url,
+            headers={"Accept": "application/vnd.github+json"},
+            timeout=30,
+        )
+        if response.status_code != 200:
+            raise ChileHubDataError(
+                f"Could not resolve chile-hub release '{self.data_version}' "
+                f"from {url}: HTTP {response.status_code}"
+            )
+        return response.json()
+
+    @staticmethod
+    def _assets_by_name(release: dict[str, Any]) -> dict[str, ReleaseAsset]:
+        return {
+            asset["name"]: ReleaseAsset(
+                name=asset["name"],
+                url=asset["browser_download_url"],
+            )
+            for asset in release.get("assets", [])
+            if asset.get("name") and asset.get("browser_download_url")
+        }
+
+    @staticmethod
+    def _require_asset(assets: dict[str, ReleaseAsset], name: str) -> ReleaseAsset:
+        if name not in assets:
+            available = ", ".join(sorted(assets)) or "none"
+            raise ChileHubDataError(f"Release asset '{name}' not found. Available: {available}")
+        return assets[name]
+
+    def _download(self, url: str, destination: Path) -> None:
+        with self.session.get(url, stream=True, timeout=120) as response:
+            if response.status_code != 200:
+                raise ChileHubDataError(f"Could not download {url}: HTTP {response.status_code}")
+            with destination.open("wb") as f:
+                for chunk in response.iter_content(chunk_size=1024 * 1024):
+                    if chunk:
+                        f.write(chunk)
+
+    def _extract_bundle(self, bundle_path: Path) -> None:
+        if self.normalized_dir.exists():
+            shutil.rmtree(self.normalized_dir)
+        with zipfile.ZipFile(bundle_path) as archive:
+            archive.extractall(self.version_cache_dir)
+
+    @staticmethod
+    def _read_checksum(path: Path) -> str:
+        line = path.read_text(encoding="utf-8").strip().splitlines()[0]
+        return line.split()[0].lower()
+
+    @staticmethod
+    def _sha256(path: Path) -> str:
+        digest = hashlib.sha256()
+        with path.open("rb") as f:
+            for chunk in iter(lambda: f.read(1024 * 1024), b""):
+                digest.update(chunk)
+        return digest.hexdigest()
+
+    @staticmethod
+    def _read_json(path: Path) -> dict[str, Any]:
+        if not path.exists():
+            return {}
+        return json.loads(path.read_text(encoding="utf-8"))

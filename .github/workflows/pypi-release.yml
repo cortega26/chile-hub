@@ -1,0 +1,73 @@
+name: PyPI Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: pypi-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Semantic release and publish
+    if: github.event_name != 'push' || !contains(github.event.head_commit.message, '[skip ci]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0 # v6.0.3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: |
+            pyproject.toml
+            dev-requirements.txt
+
+      - name: Install package build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install build twine
+
+      - name: Python semantic release
+        id: semantic-release
+        uses: python-semantic-release/python-semantic-release@v10.5.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and check released package
+        if: steps.semantic-release.outputs.released == 'true'
+        run: |
+          rm -rf dist/
+          python -m build
+          python -m twine check dist/*
+
+      - name: Publish package to PyPI
+        if: steps.semantic-release.outputs.released == 'true'
+        uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc # v1.13.0
+
+      - name: Attach verified data assets to release
+        if: steps.semantic-release.outputs.released == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag="v${{ steps.semantic-release.outputs.version }}"
+          gh release upload "$tag" \
+            data/normalized/chile-hub-publishable-bundle.zip \
+            data/normalized/chile-hub-publishable-bundle.zip.sha256 \
+            data/normalized/artifact_manifest.json \
+            data/normalized/dataset_catalog.json \
+            data/normalized/hub_bundle.json \
+            --clobber

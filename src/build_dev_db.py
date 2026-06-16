@@ -4,12 +4,12 @@ import os
 import re
 import sqlite3
 import sys
-import tomllib
 import zipfile
 from datetime import UTC, datetime
 
 import duckdb
 import polars as pl
+import tomllib
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if ROOT_DIR not in sys.path:
@@ -71,9 +71,9 @@ DATASET_CATALOG_CONFIG = {
             "label": "estable",
         },
         "usage_examples": {
-            "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('regiones')",
+            "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('regiones')",
             "duckdb": "SELECT *\nFROM 'data/normalized/regiones.parquet'\nORDER BY codigo_region;",
-            "cli": "python -m src.chile_hub show regiones",
+            "cli": "chile-hub show regiones",
         },
         "outputs": {
             "parquet": "data/normalized/regiones.parquet",
@@ -102,9 +102,9 @@ DATASET_CATALOG_CONFIG = {
             "label": "estable",
         },
         "usage_examples": {
-            "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('provincias')",
+            "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('provincias')",
             "duckdb": "SELECT *\nFROM 'data/normalized/provincias.parquet'\nWHERE codigo_region = '13';",
-            "cli": "python -m src.chile_hub show provincias",
+            "cli": "chile-hub show provincias",
         },
         "outputs": {
             "parquet": "data/normalized/provincias.parquet",
@@ -133,9 +133,9 @@ DATASET_CATALOG_CONFIG = {
             "label": "estable",
         },
         "usage_examples": {
-            "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('comunas')",
+            "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('comunas')",
             "duckdb": "SELECT codigo_comuna, nombre_comuna, nombre_region\nFROM 'data/normalized/comunas.parquet'\nLIMIT 10;",
-            "cli": "python -m src.chile_hub path comunas --output parquet",
+            "cli": "chile-hub path comunas --output parquet",
         },
         "outputs": {
             "parquet": "data/normalized/comunas.parquet",
@@ -165,7 +165,7 @@ DATASET_CATALOG_CONFIG = {
         "freshness_policy": {"max_age_hours": 24 * 90, "label": "estable"},
         "usage_examples": {
             "python": (
-                "from src.chile_hub import ChileHub\n\nhub = ChileHub()\n"
+                "from chile_hub import ChileHub\n\nhub = ChileHub()\n"
                 "df = hub.load_polars('comunas_enriquecidas')"
             ),
             "duckdb": (
@@ -174,7 +174,7 @@ DATASET_CATALOG_CONFIG = {
                 "FROM 'data/normalized/comunas_enriquecidas.parquet'\n"
                 "ORDER BY poblacion_estimada DESC LIMIT 10;"
             ),
-            "cli": "python -m src.chile_hub show comunas_enriquecidas",
+            "cli": "chile-hub show comunas_enriquecidas",
         },
         "outputs": {
             "parquet": "data/normalized/comunas_enriquecidas.parquet",
@@ -202,9 +202,9 @@ DATASET_CATALOG_CONFIG = {
             "label": "diaria",
         },
         "usage_examples": {
-            "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('indicadores')",
+            "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('indicadores')",
             "duckdb": "SELECT *\nFROM 'data/normalized/indicadores.parquet'\nORDER BY fecha DESC, codigo_indicador;",
-            "cli": "python -m src.chile_hub show indicadores",
+            "cli": "chile-hub show indicadores",
         },
         "outputs": {
             "parquet": "data/normalized/indicadores.parquet",
@@ -230,9 +230,9 @@ DATASET_CATALOG_CONFIG = {
         },
         "freshness_policy": {"max_age_hours": 24 * 365 * 10, "label": "decenal"},
         "usage_examples": {
-            "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('censo_comunal')",
+            "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('censo_comunal')",
             "duckdb": "SELECT * FROM 'data/normalized/censo_comunal.parquet' ORDER BY poblacion_censada DESC;",
-            "cli": "python -m src.chile_hub show censo_comunal",
+            "cli": "chile-hub show censo_comunal",
         },
         "outputs": {
             "parquet": "data/normalized/censo_comunal.parquet",
@@ -258,9 +258,9 @@ DATASET_CATALOG_CONFIG = {
         },
         "freshness_policy": {"max_age_hours": 87600, "label": "decenal"},
         "usage_examples": {
-            "python": "from src.chile_hub import ChileHub\nhub = ChileHub()\ndf = hub.load_polars('censo_hogares_viviendas')",
+            "python": "from chile_hub import ChileHub\nhub = ChileHub()\ndf = hub.load_polars('censo_hogares_viviendas')",
             "duckdb": "SELECT * FROM 'data/normalized/censo_hogares_viviendas.parquet';",
-            "cli": "python -m src.chile_hub show censo_hogares_viviendas",
+            "cli": "chile-hub show censo_hogares_viviendas",
         },
         "outputs": {
             "parquet": "data/normalized/censo_hogares_viviendas.parquet",
@@ -282,9 +282,9 @@ DATASET_CATALOG_CONFIG = {
         },
         "freshness_policy": {"max_age_hours": 24 * 45, "label": "mensual"},
         "usage_examples": {
-            "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('establecimientos_salud')",
+            "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('establecimientos_salud')",
             "duckdb": "SELECT codigo_comuna, count(*) FROM 'data/normalized/establecimientos_salud.parquet' GROUP BY 1;",
-            "cli": "python -m src.chile_hub show establecimientos_salud",
+            "cli": "chile-hub show establecimientos_salud",
         },
         "outputs": {
             "parquet": "data/normalized/establecimientos_salud.parquet",
@@ -310,9 +310,9 @@ DATASET_CATALOG_CONFIG = {
         },
         "freshness_policy": {"max_age_hours": 87600, "label": "estable"},
         "usage_examples": {
-            "python": "from src.chile_hub import ChileHub\nhub = ChileHub()\ndf = hub.load_polars('distritos_electorales')",
+            "python": "from chile_hub import ChileHub\nhub = ChileHub()\ndf = hub.load_polars('distritos_electorales')",
             "duckdb": "SELECT * FROM 'data/normalized/distritos_electorales.parquet';",
-            "cli": "python -m src.chile_hub show distritos_electorales",
+            "cli": "chile-hub show distritos_electorales",
         },
         "outputs": {
             "parquet": "data/normalized/distritos_electorales.parquet",
@@ -334,9 +334,9 @@ DATASET_CATALOG_CONFIG = {
         },
         "freshness_policy": {"max_age_hours": 24 * 365, "label": "anual"},
         "usage_examples": {
-            "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('establecimientos_educacionales')",
+            "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('establecimientos_educacionales')",
             "duckdb": "SELECT nombre_establecimiento, dependencia_administrativa FROM 'data/normalized/establecimientos_educacionales.parquet' LIMIT 10;",
-            "cli": "python -m src.chile_hub show establecimientos_educacionales",
+            "cli": "chile-hub show establecimientos_educacionales",
         },
         "outputs": {
             "parquet": "data/normalized/establecimientos_educacionales.parquet",

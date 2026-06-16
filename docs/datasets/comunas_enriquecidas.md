@@ -29,7 +29,7 @@ analisis geoespacial y demografico.
 ## Uso
 
 ```python
-from src.chile_hub import ChileHub
+from chile_hub import ChileHub
 
 hub = ChileHub()
 df = hub.load_polars("comunas_enriquecidas")

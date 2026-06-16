@@ -1,7 +1,7 @@
 PYTHON ?= $(if $(wildcard .venv/bin/python),.venv/bin/python,python3)
 VENV_DIR ?= .venv
 
-.PHONY: help bootstrap install-browsers doctor extract build verify verify-live verify-landing test lint lint-fix format format-check check refresh status catalog hub-list hub-summary hub-summary-table hub-example hub-artifacts hub-shared-artifacts hub-shared-artifacts-table hub-reports hub-reports-table hub-report hub-inventory hub-inventory-table hub-snapshot hub-snapshot-table hub-overview hub-overview-table hub-status hub-status-table hub-health hub-health-table hub-bundle hub-freshness-audit hub-freshness-audit-table hub-runtime-status hub-runtime-status-table hub-top-issue hub-top-issue-text hub-top-issue-table hub-packages hub-packages-table hub-package hub-package-verify hub-redistribution hub-redistribution-table hub-provenance hub-provenance-table hub-drift hub-drift-table package-bundle clean-publishable
+.PHONY: help bootstrap install-browsers doctor extract build verify verify-live verify-landing test lint lint-fix format format-check package package-check package-smoke check refresh status catalog hub-list hub-summary hub-summary-table hub-example hub-artifacts hub-shared-artifacts hub-shared-artifacts-table hub-reports hub-reports-table hub-report hub-inventory hub-inventory-table hub-snapshot hub-snapshot-table hub-overview hub-overview-table hub-status hub-status-table hub-health hub-health-table hub-bundle hub-freshness-audit hub-freshness-audit-table hub-runtime-status hub-runtime-status-table hub-top-issue hub-top-issue-text hub-top-issue-table hub-packages hub-packages-table hub-package hub-package-verify hub-redistribution hub-redistribution-table hub-provenance hub-provenance-table hub-drift hub-drift-table package-bundle clean-publishable
 
 help:
 	@printf "Targets disponibles:\n"
@@ -14,6 +14,9 @@ help:
 	@printf "  make verify-live      Exige datos live y frescos aptos para publicación\n"
 	@printf "  make verify-landing   Corre smoke check de la landing en navegador\n"
 	@printf "  make test             Corre smoke tests\n"
+	@printf "  make package          Construye wheel + sdist\n"
+	@printf "  make package-check    Valida dist/* con twine\n"
+	@printf "  make package-smoke    Instala wheel local y prueba import + CLI\n"
 	@printf "  make check            Ejecuta build + verify + test + verify-landing\n"
 	@printf "  make refresh          Ejecuta extract + build + verify + test + verify-landing + lint + format-check\n"
 	@printf "  make status           Imprime resumen humano del pipeline\n"
@@ -112,6 +115,17 @@ format:
 format-check:
 	$(PYTHON) -m ruff format --check src/ tests/ scripts/
 
+package:
+	$(PYTHON) -m build
+
+package-check: package
+	$(PYTHON) -m twine check dist/*
+
+package-smoke: package-check
+	$(PYTHON) -m pip install --force-reinstall dist/*.whl
+	$(PYTHON) -c "from chile_hub import ChileHub; print(ChileHub)"
+	chile-hub --help
+
 check: build verify test verify-landing lint format-check
 
 refresh: extract build verify test verify-landing lint format-check
@@ -123,118 +137,118 @@ catalog:
 	@cat data/normalized/dataset_catalog.json
 
 hub-list:
-	$(PYTHON) -m src.chile_hub list
+	PYTHONPATH=src $(PYTHON) -m chile_hub list
 
 hub-summary:
-	$(PYTHON) -m src.chile_hub summary
+	PYTHONPATH=src $(PYTHON) -m chile_hub summary
 
 hub-summary-table:
-	$(PYTHON) -m src.chile_hub summary --format table
+	PYTHONPATH=src $(PYTHON) -m chile_hub summary --format table
 
 hub-example:
-	$(PYTHON) -m src.chile_hub example comunas --kind python
+	PYTHONPATH=src $(PYTHON) -m chile_hub example comunas --kind python
 
 hub-artifacts:
-	$(PYTHON) -m src.chile_hub artifacts comunas
+	PYTHONPATH=src $(PYTHON) -m chile_hub artifacts comunas
 
 hub-shared-artifacts:
-	$(PYTHON) -m src.chile_hub shared-artifacts --shared-type hub_health --artifact-format json
+	PYTHONPATH=src $(PYTHON) -m chile_hub shared-artifacts --shared-type hub_health --artifact-format json
 
 hub-shared-artifacts-table:
-	$(PYTHON) -m src.chile_hub shared-artifacts --shared-type hub_health --artifact-format json --output table
+	PYTHONPATH=src $(PYTHON) -m chile_hub shared-artifacts --shared-type hub_health --artifact-format json --output table
 
 hub-reports:
-	$(PYTHON) -m src.chile_hub reports
+	PYTHONPATH=src $(PYTHON) -m chile_hub reports
 
 hub-reports-table:
-	$(PYTHON) -m src.chile_hub reports --format table
+	PYTHONPATH=src $(PYTHON) -m chile_hub reports --format table
 
 hub-report:
-	$(PYTHON) -m src.chile_hub report hub_health --format json
+	PYTHONPATH=src $(PYTHON) -m chile_hub report hub_health --format json
 
 hub-inventory:
-	$(PYTHON) -m src.chile_hub inventory
+	PYTHONPATH=src $(PYTHON) -m chile_hub inventory
 
 hub-inventory-table:
-	$(PYTHON) -m src.chile_hub inventory --format table
+	PYTHONPATH=src $(PYTHON) -m chile_hub inventory --format table
 
 hub-snapshot:
-	$(PYTHON) -m src.chile_hub snapshot
+	PYTHONPATH=src $(PYTHON) -m chile_hub snapshot
 
 hub-snapshot-table:
-	$(PYTHON) -m src.chile_hub snapshot --format table
+	PYTHONPATH=src $(PYTHON) -m chile_hub snapshot --format table
 
 hub-overview:
-	$(PYTHON) -m src.chile_hub overview
+	PYTHONPATH=src $(PYTHON) -m chile_hub overview
 
 hub-overview-table:
-	$(PYTHON) -m src.chile_hub overview --format table
+	PYTHONPATH=src $(PYTHON) -m chile_hub overview --format table
 
 hub-status:
-	$(PYTHON) -m src.chile_hub status
+	PYTHONPATH=src $(PYTHON) -m chile_hub status
 
 hub-status-table:
-	$(PYTHON) -m src.chile_hub status --format table
+	PYTHONPATH=src $(PYTHON) -m chile_hub status --format table
 
 hub-health:
-	$(PYTHON) -m src.chile_hub health
+	PYTHONPATH=src $(PYTHON) -m chile_hub health
 
 hub-health-table:
-	$(PYTHON) -m src.chile_hub health --format table
+	PYTHONPATH=src $(PYTHON) -m chile_hub health --format table
 
 hub-bundle:
-	$(PYTHON) -m src.chile_hub bundle
+	PYTHONPATH=src $(PYTHON) -m chile_hub bundle
 
 hub-freshness-audit:
-	$(PYTHON) -m src.chile_hub freshness-audit
+	PYTHONPATH=src $(PYTHON) -m chile_hub freshness-audit
 
 hub-freshness-audit-table:
-	$(PYTHON) -m src.chile_hub freshness-audit --format table
+	PYTHONPATH=src $(PYTHON) -m chile_hub freshness-audit --format table
 
 hub-runtime-status:
-	$(PYTHON) -m src.chile_hub runtime-status
+	PYTHONPATH=src $(PYTHON) -m chile_hub runtime-status
 
 hub-runtime-status-table:
-	$(PYTHON) -m src.chile_hub runtime-status --format table
+	PYTHONPATH=src $(PYTHON) -m chile_hub runtime-status --format table
 
 hub-top-issue:
-	$(PYTHON) -m src.chile_hub top-issue
+	PYTHONPATH=src $(PYTHON) -m chile_hub top-issue
 
 hub-top-issue-text:
-	$(PYTHON) -m src.chile_hub top-issue --format text
+	PYTHONPATH=src $(PYTHON) -m chile_hub top-issue --format text
 
 hub-top-issue-table:
-	$(PYTHON) -m src.chile_hub top-issue --format table
+	PYTHONPATH=src $(PYTHON) -m chile_hub top-issue --format table
 
 hub-packages:
-	$(PYTHON) -m src.chile_hub packages
+	PYTHONPATH=src $(PYTHON) -m chile_hub packages
 
 hub-packages-table:
-	$(PYTHON) -m src.chile_hub packages --format table
+	PYTHONPATH=src $(PYTHON) -m chile_hub packages --format table
 
 hub-package:
-	$(PYTHON) -m src.chile_hub package
+	PYTHONPATH=src $(PYTHON) -m chile_hub package
 
 hub-package-verify:
-	$(PYTHON) -m src.chile_hub verify-package
+	PYTHONPATH=src $(PYTHON) -m chile_hub verify-package
 
 hub-redistribution:
-	$(PYTHON) -m src.chile_hub redistribution
+	PYTHONPATH=src $(PYTHON) -m chile_hub redistribution
 
 hub-redistribution-table:
-	$(PYTHON) -m src.chile_hub redistribution --format table
+	PYTHONPATH=src $(PYTHON) -m chile_hub redistribution --format table
 
 hub-provenance:
-	$(PYTHON) -m src.chile_hub provenance
+	PYTHONPATH=src $(PYTHON) -m chile_hub provenance
 
 hub-provenance-table:
-	$(PYTHON) -m src.chile_hub provenance --format table
+	PYTHONPATH=src $(PYTHON) -m chile_hub provenance --format table
 
 hub-drift:
-	$(PYTHON) -m src.chile_hub drift
+	PYTHONPATH=src $(PYTHON) -m chile_hub drift
 
 hub-drift-table:
-	$(PYTHON) -m src.chile_hub drift --format table
+	PYTHONPATH=src $(PYTHON) -m chile_hub drift --format table
 
 package-bundle:
 	$(PYTHON) scripts/package_publishable_bundle.py

@@ -16,7 +16,7 @@ Directorio vigente de establecimientos de salud publicado por el Ministerio de S
 ## Uso
 
 ```python
-from src.chile_hub import ChileHub
+from chile_hub import ChileHub
 
 df = ChileHub().load_polars("establecimientos_salud")
 ```

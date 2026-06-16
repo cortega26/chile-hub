@@ -5,7 +5,9 @@
 **Datos públicos de Chile — curados, normalizados y listos para consumir en una línea de código.**
 
 [![CI/CD](https://github.com/cortega26/chile-hub/actions/workflows/pipeline-check.yml/badge.svg)](https://github.com/cortega26/chile-hub/actions)
-[![License: CC BY 4.0](https://img.shields.io/badge/License-CC_BY_4.0-blue.svg)](https://creativecommons.org/licenses/by/4.0/)
+[![PyPI](https://img.shields.io/pypi/v/chile-hub.svg)](https://pypi.org/project/chile-hub/)
+[![Wheel](https://img.shields.io/pypi/wheel/chile-hub.svg)](https://pypi.org/project/chile-hub/)
+[![License: MIT](https://img.shields.io/badge/Code%20License-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-3776AB.svg?style=flat&logo=python&logoColor=white)]()
 [![Formats](https://img.shields.io/badge/Formats-Parquet%20%7C%20DuckDB%20%7C%20SQLite%20%7C%20JSON%20%7C%20Excel-orange.svg)]()
 [![Datasets](https://img.shields.io/badge/Datasets-10%20capas-16a34a.svg)]()
@@ -63,8 +65,10 @@ Cada artefacto incluye: fuente original, fecha de extracción, modo (en vivo/res
 
 **Una línea de código**
 ```python
-import polars as pl
-df = pl.read_parquet("data/normalized/comunas.parquet")
+from chile_hub import ChileHub
+
+hub = ChileHub()
+df = hub.load_polars("comunas")
 ```
 
 </td><td>
@@ -204,21 +208,38 @@ Pipeline determinista en GitHub Actions: extracción → build → verificación
 
 ## Inicio rápido
 
-### 1. Clonar y preparar el entorno
+### 1. Instalar desde PyPI
+
+```bash
+pip install chile-hub
+```
+
+### 2. Consumir datos en Python
+
+```python
+from chile_hub import ChileHub
+
+hub = ChileHub()
+comunas = hub.load_polars("comunas")
+print(comunas.head())
+```
+
+La primera ejecución descarga el bundle validado desde GitHub Releases, verifica
+su SHA256 y lo deja en cache local. También puedes prepararlo explícitamente:
+
+```bash
+chile-hub cache update
+chile-hub cache status
+```
+
+### 3. Desarrollo local del pipeline
 
 ```bash
 git clone https://github.com/cortega26/chile-hub.git
 cd chile-hub
-make bootstrap    # Crea .venv, instala dependencias y Playwright
-```
-
-### 2. Ejecutar el pipeline completo
-
-```bash
+make bootstrap
 make refresh      # extract → build → verify → test → pruebas de humo
 ```
-
-### 3. Consumir los datos
 
 **DuckDB** — consultas SQL directas sobre Parquet:
 
@@ -254,7 +275,7 @@ print(df.head())
 **Python API (ChileHub)** — módulo oficial del proyecto:
 
 ```python
-from src.chile_hub import ChileHub
+from chile_hub import ChileHub
 
 hub = ChileHub()
 
@@ -423,32 +444,36 @@ El proyecto expone una CLI completa para administrar y diagnosticar el hub:
 
 | Comando | Descripción |
 |:---|:---|
-| `python -m src.chile_hub list` | Lista todos los datasets registrados |
-| `python -m src.chile_hub show <capa>` | Schema y metadatos detallados de una capa |
-| `python -m src.chile_hub path <capa> --output parquet` | Ruta física al archivo de una capa |
-| `python -m src.chile_hub example <capa> --kind duckdb` | Receta de consumo lista para copiar y pegar |
-| `python -m src.chile_hub overview` | Resumen general del build y estado actual |
-| `python -m src.chile_hub inventory` | Archivos en `data/normalized/` con tamaños y hashes |
+| `chile-hub list` | Lista todos los datasets registrados |
+| `chile-hub version` | Muestra la versión instalada del paquete |
+| `chile-hub cache status` | Muestra ubicación y estado del cache local |
+| `chile-hub cache update` | Descarga y verifica el bundle publicado |
+| `chile-hub cache clear` | Elimina el cache local |
+| `chile-hub show <capa>` | Schema y metadatos detallados de una capa |
+| `chile-hub path <capa> --output parquet` | Ruta física al archivo de una capa |
+| `chile-hub example <capa> --kind duckdb` | Receta de consumo lista para copiar y pegar |
+| `chile-hub overview` | Resumen general del build y estado actual |
+| `chile-hub inventory` | Archivos en `data/normalized/` con tamaños y hashes |
 
 ### Calidad, salud y auditoría
 
 | Comando | Descripción |
 |:---|:---|
-| `python -m src.chile_hub health` | Reporte consolidado de salud del hub |
-| `python -m src.chile_hub freshness-audit` | Auditoría de frescura contra el reloj actual |
-| `python -m src.chile_hub runtime-status` | Salud registrada + vigencia en vivo |
-| `python -m src.chile_hub top-issue` | Capa con mayor degradación operativa |
-| `python -m src.chile_hub drift` | Desvíos, fallbacks activos y regresiones |
-| `python -m src.chile_hub status` | JSON ultraliviano para CI/CD |
+| `chile-hub health` | Reporte consolidado de salud del hub |
+| `chile-hub freshness-audit` | Auditoría de frescura contra el reloj actual |
+| `chile-hub runtime-status` | Salud registrada + vigencia en vivo |
+| `chile-hub top-issue` | Capa con mayor degradación operativa |
+| `chile-hub drift` | Desvíos, fallbacks activos y regresiones |
+| `chile-hub status` | JSON ultraliviano para CI/CD |
 
 ### Distribución e integridad
 
 | Comando | Descripción |
 |:---|:---|
-| `python -m src.chile_hub bundle` | Metadata consolidada en un solo JSON |
-| `python -m src.chile_hub redistribution` | Reporte legal de reúso por capa |
-| `python -m src.chile_hub provenance` | URLs de origen y métodos de extracción |
-| `python -m src.chile_hub verify-package` | Instrucción de verificación de integridad del ZIP |
+| `chile-hub bundle` | Metadata consolidada en un solo JSON |
+| `chile-hub redistribution` | Reporte legal de reúso por capa |
+| `chile-hub provenance` | URLs de origen y métodos de extracción |
+| `chile-hub verify-package` | Instrucción de verificación de integridad del ZIP |
 
 ---
 
@@ -488,7 +513,10 @@ make verify-landing     # Pruebas de humo de landing page con Playwright
 
 ### Licencia del proyecto
 
-El código del pipeline y los metadatos se distribuyen bajo **[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.es)**. Al consumir estos datos, debes atribuir también a las fuentes oficiales correspondientes (BCN, INE, MINSAL, MINEDUC, Banco Central de Chile) según la ficha de cada capa.
+El código Python se distribuye bajo **[MIT](LICENSE)**. Los datasets conservan
+las licencias, permisos y requisitos de atribución de sus fuentes oficiales.
+Consulta [DATA_LICENSES.md](DATA_LICENSES.md), `chile-hub redistribution` y
+`chile-hub provenance` antes de redistribuir artefactos derivados.
 
 ---
 

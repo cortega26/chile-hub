@@ -1,4 +1,5 @@
 import json
+import os
 import subprocess
 import sys
 import unittest
@@ -16,7 +17,8 @@ SRC_DIR = ROOT_DIR / "src"
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
-from src.chile_hub import ChileHub
+from chile_hub import ChileHub
+
 from src.validation import validate_indicadores
 
 # ── Staleness guard ───────────────────────────────────────────────────────────
@@ -835,9 +837,12 @@ class ChileHubCliTests(unittest.TestCase):
         cls.health = ChileHub().health()
 
     def run_cli(self, *args):
+        env = os.environ.copy()
+        env["PYTHONPATH"] = str(SRC_DIR)
         return subprocess.run(
-            [sys.executable, "-m", "src.chile_hub", *args],
+            [sys.executable, "-m", "chile_hub", *args],
             cwd=ROOT_DIR,
+            env=env,
             capture_output=True,
             text=True,
             check=True,
@@ -1191,9 +1196,9 @@ class WorkflowContractTests(unittest.TestCase):
         )
 
     def test_pipeline_check_workflow_uses_split_bounded_jobs(self):
-        for job in ("quality:", "build-and-test:", "landing:", "publish:"):
+        for job in ("quality:", "build-and-test:", "package-quality:", "landing:", "publish:"):
             self.assertIn(job, self.workflow_text)
-        self.assertEqual(self.workflow_text.count("timeout-minutes:"), 4)
+        self.assertEqual(self.workflow_text.count("timeout-minutes:"), 5)
         self.assertIn("concurrency:", self.workflow_text)
 
     def test_pipeline_check_workflow_uses_one_generated_output_artifact(self):
@@ -1224,6 +1229,32 @@ class WorkflowContractTests(unittest.TestCase):
             self.step_names,
             self.CRITICAL_STEP_NAMES_IN_ORDER,
         )
+
+    def test_pipeline_check_workflow_builds_installable_package_matrix(self):
+        self.assertIn(
+            'python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]', self.workflow_text
+        )
+        self.assertIn("python -m build", self.workflow_text)
+        self.assertIn("python -m twine check dist/*", self.workflow_text)
+        self.assertIn(
+            'python -c "from chile_hub import ChileHub; print(ChileHub)"', self.workflow_text
+        )
+        self.assertIn("chile-hub cache status", self.workflow_text)
+
+    def test_pypi_release_workflow_uses_trusted_publishing_and_release_assets(self):
+        release_text = (ROOT_DIR / ".github" / "workflows" / "pypi-release.yml").read_text()
+        self.assertIn("id-token: write", release_text)
+        self.assertIn("python-semantic-release/python-semantic-release@v10.5.2", release_text)
+        self.assertIn("pypa/gh-action-pypi-publish", release_text)
+        self.assertIn("data/normalized/chile-hub-publishable-bundle.zip", release_text)
+        self.assertIn("data/normalized/dataset_catalog.json", release_text)
+
+    def test_testpypi_workflow_smoke_tests_installed_console_script(self):
+        testpypi_text = (ROOT_DIR / ".github" / "workflows" / "testpypi.yml").read_text()
+        self.assertIn("repository-url: https://test.pypi.org/legacy/", testpypi_text)
+        self.assertIn("python -m build", testpypi_text)
+        self.assertIn("from chile_hub import ChileHub", testpypi_text)
+        self.assertIn("chile-hub --help", testpypi_text)
 
 
 class MakefileContractTests(unittest.TestCase):

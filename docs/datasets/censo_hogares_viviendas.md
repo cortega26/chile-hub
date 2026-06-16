@@ -16,7 +16,7 @@ La clave primaria es `codigo_comuna` (`str`, cinco caracteres). Incluye tambien 
 ## Uso
 
 ```python
-from src.chile_hub import ChileHub
+from chile_hub import ChileHub
 
 df = ChileHub().load_polars("censo_hogares_viviendas")
 ```

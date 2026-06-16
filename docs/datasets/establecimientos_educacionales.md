@@ -16,7 +16,7 @@ Directorio oficial de establecimientos educacionales vigentes en Chile, publicad
 ## Uso
 
 ```python
-from src.chile_hub import ChileHub
+from chile_hub import ChileHub
 
 df = ChileHub().load_polars("establecimientos_educacionales")
 ```
