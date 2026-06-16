@@ -79,7 +79,7 @@ Pipeline determinista en GitHub Actions: extracción → build → verificación
 
 ## Las 10 capas de datos
 
-| # | Capa | Registros | Fuente | Licencia | Free. |
+| # | Capa | Registros | Fuente | Licencia | Actualización |
 |:--:|:---|:---|:---|:---|:--:|
 | 1 | **Regiones** | 16 | BCN ArcGIS | CC BY | — |
 | 2 | **Provincias** | 56 | BCN ArcGIS | CC BY | — |
