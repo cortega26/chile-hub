@@ -5,3 +5,10 @@ release notes for PyPI releases.
 
 Data-only refresh commits such as `chore(data): daily refresh [skip ci]` do not
 represent software releases and are intentionally excluded from release notes.
+
+## Unreleased
+
+### Added
+
+- Added `pytest-cov` to the development toolchain, with local `make coverage`
+  support and CI coverage reporting for the `src/` package.

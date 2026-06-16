@@ -24,6 +24,13 @@ release for a major packaging change. It builds the package, publishes to
 TestPyPI, installs the wheel in a clean environment, imports `chile_hub`, and
 runs `chile-hub --help`.
 
+## Coverage
+
+Local coverage checks use `make coverage`, which runs `pytest-cov` against
+`src/` and writes both a terminal `term-missing` report and `coverage.xml`.
+The main pipeline workflow runs the same coverage command during unit and
+contract tests, so release candidates include the coverage signal used locally.
+
 ## Production PyPI
 
 The `PyPI Release` workflow runs on pushes to `main`. It skips `[skip ci]`
