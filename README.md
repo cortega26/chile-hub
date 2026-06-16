@@ -13,25 +13,25 @@ Capas de datos chilenas curadas, normalizadas, reproducibles y fáciles de consu
 
 ---
 
-## 📌 Tabla de Contenidos
-- [✨ Qué problema resuelve](#-qué-problema-resuelve)
-- [🎯 Filosofía del proyecto](#-filosofía-del-proyecto)
-- [⚙️ Arquitectura del Pipeline](#%EF%B8%8F-arquitectura-del-pipeline)
-- [📊 Relaciones de Datos (CUT Codes)](#-relaciones-de-datos-cut-codes)
-- [📦 Capas de Datos Incluidas (10 Capas)](#-capas-de-datos-incluidas-10-capas)
-- [💿 Formatos y Outputs Generados](#-formatos-y-outputs-generados)
-- [🚀 Uso Rápido](#-uso-rápido)
+## Tabla de Contenidos
+- [Qué problema resuelve](#qué-problema-resuelve)
+- [Filosofía del proyecto](#filosofía-del-proyecto)
+- [Arquitectura del Pipeline](#arquitectura-del-pipeline)
+- [Relaciones de Datos (CUT Codes)](#relaciones-de-datos-cut-codes)
+- [Capas de Datos Incluidas (10 Capas)](#capas-de-datos-incluidas-10-capas)
+- [Formatos y Outputs Generados](#formatos-y-outputs-generados)
+- [Uso Rápido](#uso-rápido)
   - [DuckDB](#duckdb)
   - [Python con Polars](#python-con-polars)
   - [Python Helper (ChileHub API)](#python-helper-chilehub-api)
   - [Guía de la CLI Local](#guía-de-la-cli-local)
-- [🛠️ Desarrollo y Ejecución Local](#%EF%B8%8F-desarrollo-y-ejecución-local)
-- [⚖️ Fuentes, Licencias y Reuso](#%EF%B8%8F-fuentes-licencias-y-reuso)
-- [🚀 Próximo Foco](#-próximo-foco)
+- [Desarrollo y Ejecución Local](#desarrollo-y-ejecución-local)
+- [Fuentes, Licencias y Reuso](#fuentes-licencias-y-reuso)
+- [Próximo Foco](#próximo-foco)
 
 ---
 
-## ✨ Qué problema resuelve
+## Qué problema resuelve
 
 Trabajar con datos públicos de Chile suele implicar los mismos obstáculos repetitivos:
 - ❌ **Enlaces rotos** o APIs inconsistentes y propensas a caídas.
@@ -44,7 +44,7 @@ Trabajar con datos públicos de Chile suele implicar los mismos obstáculos repe
 
 ---
 
-## 🎯 Filosofía del proyecto
+## Filosofía del proyecto
 
 ### Sí es
 - **Un hub de capas estructuradas**: Limpias, consistentes y listas para cruces inmediatos.
@@ -59,7 +59,7 @@ Trabajar con datos públicos de Chile suele implicar los mismos obstáculos repe
 
 ---
 
-## ⚙️ Arquitectura del Pipeline
+## Arquitectura del Pipeline
 
 El proyecto está diseñado bajo un pipeline lineal y determinista que asegura que ningún dato corrupto llegue a producción:
 
@@ -107,7 +107,7 @@ graph TD
 
 ---
 
-## 📊 Relaciones de Datos (CUT Codes)
+## Relaciones de Datos (CUT Codes)
 
 El valor fundamental de `chile-hub` es que todas sus capas geográficas, demográficas, de salud, educación y electorales se vinculan jerárquicamente a través de los **Códigos Únicos Territoriales (CUT)** definidos por la Subsecretaría de Desarrollo Regional (SUBDERE) y el Instituto Nacional de Estadísticas (INE).
 
@@ -183,7 +183,7 @@ erDiagram
 
 ---
 
-## 📦 Capas de Datos Incluidas (10 Capas)
+## Capas de Datos Incluidas (10 Capas)
 
 A continuación se detallan las 10 capas procesadas actualmente por el hub:
 
@@ -359,7 +359,7 @@ A continuación se detallan las 10 capas procesadas actualmente por el hub:
 
 ---
 
-## 💿 Formatos y Outputs Generados
+## Formatos y Outputs Generados
 
 El compilador genera archivos normalizados en [`data/normalized`](./data/normalized):
 
@@ -380,7 +380,7 @@ El compilador genera archivos normalizados en [`data/normalized`](./data/normali
 
 ---
 
-## 🚀 Uso Rápido
+## Uso Rápido
 
 ### DuckDB
 Puedes consultar las capas Parquet directamente desde DuckDB sin descargar nada más:
@@ -465,7 +465,7 @@ El proyecto expone una CLI rica para administrar y validar el estado del hub. Se
 
 ---
 
-## 🛠️ Desarrollo y Ejecución Local
+## Desarrollo y Ejecución Local
 
 ### Prerrequisitos de Entorno
 
@@ -509,7 +509,7 @@ La suite de pruebas completa puede lanzarse directamente usando:
 
 ---
 
-## ⚖️ Fuentes, Licencias y Reuso
+## Fuentes, Licencias y Reuso
 
 ### Semáforo de Redistribución Pública
 
@@ -524,7 +524,7 @@ El código del pipeline y los metadatos construidos se distribuyen bajo la licen
 
 ---
 
-## 🚀 Próximo Foco
+## Próximo Foco
 
 El roadmap actual de `chile-hub` prioriza robustecer la estabilidad operacional de las 10 capas activas frente a caídas de APIs, antes de agregar volumen de forma descontrolada. El criterio para crecer exige justificar: dolor de usuario recurrente, valor de cruce con la DPA y bajo costo de mantenimiento. 
 
