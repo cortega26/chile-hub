@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'self' https://formspree.io; object-src 'none'; script-src 'self' https://analytics.ahrefs.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://analytics.ahrefs.com https://formspree.io; manifest-src 'self'; media-src 'self'; worker-src 'self' blob:; upgrade-insecure-requests">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>chile-hub — Capas de Datos de Chile</title>
-    <meta name="description" content="chile-hub es una capa de datos oficial, curada y reproducible sobre datos de Chile. Accede a datasets limpios de la DPA, economía, demografía, salud y educación en formatos Parquet, JSON, Excel y DuckDB.">
+    <meta name="description" content="chile-hub es una capa de datos oficial y curada de Chile. Accede a datasets listos de la DPA, economía, salud, educación y más en Parquet, JSON y DuckDB.">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://tooltician.com/chile-hub/">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b0f19'/%3E%3Cpath d='M18 20h11c9 0 14 5 14 12 0 9-6 14-15 14H18V20zm9 20c6 0 9-3 9-8 0-4-3-7-8-7h-3v15h2z' fill='%2322d3ee'/%3E%3Cpath d='M45 18l4 7 7 4-7 4-4 7-4-7-7-4 7-4 4-7z' fill='%23818cf8'/%3E%3C/svg%3E">
@@ -41,15 +41,104 @@
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "Dataset",
-      "name": "División Político-Administrativa (DPA) de Chile",
-      "description": "Regiones, provincias y comunas de Chile con códigos CUT oficiales y coordenadas de cabecera.",
+      "@type": "DataCatalog",
+      "name": "chile-hub",
       "url": "https://tooltician.com/chile-hub/",
-      "license": "https://creativecommons.org/licenses/by/4.0/deed.es",
-      "creator": {
+      "description": "Capa de datos oficial, curada y reproducible sobre Chile. Datasets limpios en Parquet, JSON, DuckDB y Excel.",
+      "publisher": {
         "@type": "Organization",
-        "name": "Biblioteca del Congreso Nacional de Chile (BCN)"
-      }
+        "name": "chile-hub"
+      },
+      "dataset": [
+        {
+          "@type": "Dataset",
+          "name": "División Político-Administrativa (DPA) de Chile",
+          "description": "Regiones, provincias y comunas de Chile con códigos CUT oficiales y coordenadas de cabecera.",
+          "url": "https://tooltician.com/chile-hub/#dataset-comunas",
+          "license": "https://creativecommons.org/licenses/by/4.0/",
+          "creator": {
+            "@type": "Organization",
+            "name": "Biblioteca del Congreso Nacional de Chile (BCN)"
+          }
+        },
+        {
+          "@type": "Dataset",
+          "name": "Comunas Enriquecidas de Chile",
+          "description": "Comunas de Chile enriquecidas con coordenadas de cabecera y población estimada INE.",
+          "url": "https://tooltician.com/chile-hub/#dataset-comunas_enriquecidas",
+          "license": "https://creativecommons.org/licenses/by/4.0/",
+          "creator": {
+            "@type": "Organization",
+            "name": "Biblioteca del Congreso Nacional de Chile (BCN) e Instituto Nacional de Estadísticas (INE)"
+          }
+        },
+        {
+          "@type": "Dataset",
+          "name": "Indicadores Económicos de Chile",
+          "description": "Serie histórica diaria de UF, dólar, euro, UTM e IPC de Chile desde 2010.",
+          "url": "https://tooltician.com/chile-hub/#dataset-indicadores",
+          "license": "https://www.bcentral.cl/web/banco-central/terminos-y-condiciones",
+          "creator": {
+            "@type": "Organization",
+            "name": "Banco Central de Chile e Instituto Nacional de Estadísticas (INE)"
+          }
+        },
+        {
+          "@type": "Dataset",
+          "name": "Censo Comunal de Chile 2024",
+          "description": "Población por sexo y cinco grandes grupos de edad para las 346 comunas de Chile.",
+          "url": "https://tooltician.com/chile-hub/#dataset-censo_comunal",
+          "license": "https://www.ine.gob.cl/terminos-de-uso",
+          "creator": {
+            "@type": "Organization",
+            "name": "Instituto Nacional de Estadísticas (INE)"
+          }
+        },
+        {
+          "@type": "Dataset",
+          "name": "Censo Hogares y Viviendas de Chile 2024",
+          "description": "Hogares y viviendas por comuna, incluyendo promedios de personas por hogar.",
+          "url": "https://tooltician.com/chile-hub/#dataset-censo_hogares_viviendas",
+          "license": "https://www.ine.gob.cl/terminos-de-uso",
+          "creator": {
+            "@type": "Organization",
+            "name": "Instituto Nacional de Estadísticas (INE)"
+          }
+        },
+        {
+          "@type": "Dataset",
+          "name": "Establecimientos de Salud de Chile",
+          "description": "Directorio oficial vigente de establecimientos de salud públicos y privados en Chile con coordenadas y dependencias.",
+          "url": "https://tooltician.com/chile-hub/#dataset-establecimientos_salud",
+          "license": "https://creativecommons.org/publicdomain/zero/1.0/",
+          "creator": {
+            "@type": "Organization",
+            "name": "Ministerio de Salud de Chile (MINSAL)"
+          }
+        },
+        {
+          "@type": "Dataset",
+          "name": "Distritos Electorales de Chile",
+          "description": "Asociación de comunas chilenas a distritos electorales de diputados y circunscripciones senatoriales.",
+          "url": "https://tooltician.com/chile-hub/#dataset-distritos_electorales",
+          "license": "https://creativecommons.org/publicdomain/zero/1.0/",
+          "creator": {
+            "@type": "Organization",
+            "name": "Biblioteca del Congreso Nacional de Chile (BCN) y Servicio Electoral de Chile (SERVEL)"
+          }
+        },
+        {
+          "@type": "Dataset",
+          "name": "Establecimientos Educacionales de Chile",
+          "description": "Directorio oficial de establecimientos educacionales de Chile (colegios y escuelas) con RBD, dependencia, ubicación y estado.",
+          "url": "https://tooltician.com/chile-hub/#dataset-establecimientos_educacionales",
+          "license": "https://creativecommons.org/licenses/by/3.0/cl/",
+          "creator": {
+            "@type": "Organization",
+            "name": "Ministerio de Educación de Chile (MINEDUC)"
+          }
+        }
+      ]
     }
     </script>
 

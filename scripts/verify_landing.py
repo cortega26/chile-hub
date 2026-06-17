@@ -27,7 +27,7 @@ def load_project_metadata():
     public_site_url = (
         pyproject_data.get("tool", {})
         .get("chile_hub", {})
-        .get("public_site_url", "https://cortega26.github.io/chile-hub/")
+        .get("public_site_url", "https://tooltician.com/chile-hub/")
     )
     return pyproject_data.get("project", {}), public_site_url.rstrip("/") + "/"
 

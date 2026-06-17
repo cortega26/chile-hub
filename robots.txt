@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://cortega26.github.io/chile-hub/sitemap.xml
+Sitemap: https://tooltician.com/chile-hub/sitemap.xml

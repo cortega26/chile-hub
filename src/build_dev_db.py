@@ -628,7 +628,7 @@ def sync_landing_metadata(version, public_site_url):
 
 def write_pipeline_metadata(dataset_metadata, validations):
     version = "unknown"
-    public_site_url = "https://cortega26.github.io/chile-hub/"
+    public_site_url = "https://tooltician.com/chile-hub/"
     try:
         pyproject_path = os.path.join(ROOT_DIR, "pyproject.toml")
         with open(pyproject_path, "rb") as f:
