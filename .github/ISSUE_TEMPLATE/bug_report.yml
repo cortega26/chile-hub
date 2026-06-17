@@ -1,0 +1,37 @@
+name: Bug report
+description: Report incorrect behavior, broken artifacts, or validation problems.
+title: "bug: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What is broken or surprising?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction
+      description: Include commands, dataset names, artifact paths, and exact output when possible.
+      placeholder: |
+        python -m src.chile_hub show comunas
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: chile-hub version or release tag
+      placeholder: v1.0.2
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Link any source data, CI run, or artifact manifest that helps diagnose the issue.

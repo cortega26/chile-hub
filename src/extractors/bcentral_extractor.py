@@ -339,11 +339,23 @@ def process_indicators() -> str:
             "empty_live_pairs": [],
         }
 
-    if source_mode == "live" and diagnostics.get("raw_recoveries"):
+    if (
+        source_mode == "live"
+        and diagnostics.get("raw_recoveries")
+        and diagnostics.get("preserved_existing_pairs")
+    ):
+        source_detail = "public_api_with_raw_recovery_partial"
+    elif source_mode == "live" and diagnostics.get("raw_recoveries"):
         source_detail = "public_api_with_raw_recovery"
+    if source_mode == "live" and diagnostics.get("raw_recoveries"):
         notes.append("raw_recovery_used_for_pairs: " + ", ".join(diagnostics["raw_recoveries"]))
-    if source_mode == "live" and diagnostics.get("preserved_existing_pairs"):
+    if (
+        source_mode == "live"
+        and diagnostics.get("preserved_existing_pairs")
+        and not diagnostics.get("raw_recoveries")
+    ):
         source_detail = "public_api_partial"
+    if source_mode == "live" and diagnostics.get("preserved_existing_pairs"):
         notes.append(
             "preserved_existing_pairs_due_to_fetch_failure: "
             + ", ".join(diagnostics["preserved_existing_pairs"])

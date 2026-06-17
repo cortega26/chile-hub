@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-06-16T20:24:31.852447+00:00",
+  "generated_at_utc": "2026-06-17T00:26:13.614202+00:00",
   "dataset_count": 10,
   "datasets": [
     {
@@ -9,7 +9,7 @@
       "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
       "source_mode": "live",
       "source_detail": "bcn_arcgis",
-      "refreshed_at_utc": "2026-06-16T20:24:16.914195+00:00",
+      "refreshed_at_utc": "2026-06-17T00:22:35.289319+00:00",
       "record_count": 16,
       "fields": [
         "codigo_region",
@@ -31,9 +31,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.0,
+        "age_hours": 0.06,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-16T20:24:31.851419+00:00"
+        "checked_at_utc": "2026-06-17T00:26:13.612930+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -52,9 +52,9 @@
         "recommended_action": "Ninguna."
       },
       "usage_examples": {
-        "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('regiones')",
+        "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('regiones')",
         "duckdb": "SELECT *\nFROM 'data/normalized/regiones.parquet'\nORDER BY codigo_region;",
-        "cli": "python -m src.chile_hub show regiones"
+        "cli": "chile-hub show regiones"
       },
       "outputs": {
         "parquet": "data/normalized/regiones.parquet",
@@ -83,7 +83,7 @@
       "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
       "source_mode": "live",
       "source_detail": "bcn_arcgis",
-      "refreshed_at_utc": "2026-06-16T20:24:16.914195+00:00",
+      "refreshed_at_utc": "2026-06-17T00:22:35.289319+00:00",
       "record_count": 56,
       "fields": [
         "codigo_region",
@@ -108,9 +108,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.0,
+        "age_hours": 0.06,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-16T20:24:31.851465+00:00"
+        "checked_at_utc": "2026-06-17T00:26:13.612963+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -129,9 +129,9 @@
         "recommended_action": "Ninguna."
       },
       "usage_examples": {
-        "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('provincias')",
+        "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('provincias')",
         "duckdb": "SELECT *\nFROM 'data/normalized/provincias.parquet'\nWHERE codigo_region = '13';",
-        "cli": "python -m src.chile_hub show provincias"
+        "cli": "chile-hub show provincias"
       },
       "outputs": {
         "parquet": "data/normalized/provincias.parquet",
@@ -160,7 +160,7 @@
       "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
       "source_mode": "live",
       "source_detail": "bcn_arcgis",
-      "refreshed_at_utc": "2026-06-16T20:24:16.914195+00:00",
+      "refreshed_at_utc": "2026-06-17T00:22:35.289319+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -192,9 +192,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.0,
+        "age_hours": 0.06,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-16T20:24:31.851476+00:00"
+        "checked_at_utc": "2026-06-17T00:26:13.612973+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -213,9 +213,9 @@
         "recommended_action": "Ninguna."
       },
       "usage_examples": {
-        "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('comunas')",
+        "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('comunas')",
         "duckdb": "SELECT codigo_comuna, nombre_comuna, nombre_region\nFROM 'data/normalized/comunas.parquet'\nLIMIT 10;",
-        "cli": "python -m src.chile_hub path comunas --output parquet"
+        "cli": "chile-hub path comunas --output parquet"
       },
       "outputs": {
         "parquet": "data/normalized/comunas.parquet",
@@ -244,7 +244,7 @@
       "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
       "source_mode": "live",
       "source_detail": "bcn_arcgis",
-      "refreshed_at_utc": "2026-06-16T20:24:16.914195+00:00",
+      "refreshed_at_utc": "2026-06-17T00:22:35.289319+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -275,9 +275,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.0,
+        "age_hours": 0.06,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-16T20:24:31.851482+00:00"
+        "checked_at_utc": "2026-06-17T00:26:13.612979+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -296,9 +296,9 @@
         "recommended_action": "Ninguna."
       },
       "usage_examples": {
-        "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('comunas_enriquecidas')",
+        "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('comunas_enriquecidas')",
         "duckdb": "SELECT codigo_comuna, nombre_comuna, latitud_cabecera, longitud_cabecera, poblacion_estimada\nFROM 'data/normalized/comunas_enriquecidas.parquet'\nORDER BY poblacion_estimada DESC LIMIT 10;",
-        "cli": "python -m src.chile_hub show comunas_enriquecidas"
+        "cli": "chile-hub show comunas_enriquecidas"
       },
       "outputs": {
         "parquet": "data/normalized/comunas_enriquecidas.parquet",
@@ -326,8 +326,8 @@
       "source_name": "Banco Central de Chile (via mindicador.cl)",
       "source_url": "https://mindicador.cl/api",
       "source_mode": "live",
-      "source_detail": "public_api_with_published_backfill",
-      "refreshed_at_utc": "2026-06-16T20:24:23.281851+00:00",
+      "source_detail": "public_api_with_raw_recovery_partial",
+      "refreshed_at_utc": "2026-06-17T00:26:10.930862+00:00",
       "record_count": 428,
       "fields": [
         "fecha",
@@ -342,11 +342,11 @@
         "utm"
       ],
       "indicator_delivery": {
-        "dolar": "live",
-        "euro": "live",
-        "ipc": "published_backfill",
-        "uf": "live",
-        "utm": "live"
+        "dolar": "raw_recovery",
+        "euro": "raw_recovery",
+        "ipc": "preserved_existing",
+        "uf": "raw_recovery",
+        "utm": "raw_recovery"
       },
       "join_keys": [
         "fecha",
@@ -365,7 +365,7 @@
         "status": "fresh",
         "age_hours": 0.0,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-06-16T20:24:31.851773+00:00"
+        "checked_at_utc": "2026-06-17T00:26:13.613194+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 72,
@@ -384,9 +384,9 @@
         "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
       },
       "usage_examples": {
-        "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('indicadores')",
+        "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('indicadores')",
         "duckdb": "SELECT *\nFROM 'data/normalized/indicadores.parquet'\nORDER BY fecha DESC, codigo_indicador;",
-        "cli": "python -m src.chile_hub show indicadores"
+        "cli": "chile-hub show indicadores"
       },
       "outputs": {
         "parquet": "data/normalized/indicadores.parquet",
@@ -398,15 +398,17 @@
       "documentation": "docs/datasets/indicadores.md",
       "validation_status": "ok",
       "warnings": [
-        "indicadores live refresh reused last published artifact for missing codes: ipc"
+        "indicadores live refresh reused raw snapshots for: uf/2026, dolar/2026, euro/2026, utm/2026",
+        "indicadores live refresh preserved previous staging rows for: ipc/2026"
       ],
       "degradation": {
         "status": "warning",
-        "impact": "indicadores live refresh reused last published artifact for missing codes: ipc",
+        "impact": "indicadores live refresh reused raw snapshots for: uf/2026, dolar/2026, euro/2026, utm/2026; indicadores live refresh preserved previous staging rows for: ipc/2026",
         "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
       },
       "notes": [
-        "published_backfills_used_for_codes: ipc"
+        "raw_recovery_used_for_pairs: uf/2026, dolar/2026, euro/2026, utm/2026",
+        "preserved_existing_pairs_due_to_fetch_failure: ipc/2026"
       ]
     },
     {
@@ -416,7 +418,7 @@
       "source_url": "https://censo2024.ine.gob.cl/wp-content/uploads/2025/03/D1_Poblacion-censada-por-sexo-y-edad-en-grupos-quinquenales.xlsx",
       "source_mode": "live",
       "source_detail": "official_xlsx",
-      "refreshed_at_utc": "2026-06-16T20:24:24.124863+00:00",
+      "refreshed_at_utc": "2026-06-17T00:23:55.779208+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -452,9 +454,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.0,
+        "age_hours": 0.04,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-06-16T20:24:31.851797+00:00"
+        "checked_at_utc": "2026-06-17T00:26:13.613210+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -473,9 +475,9 @@
         "recommended_action": "Ninguna."
       },
       "usage_examples": {
-        "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('censo_comunal')",
+        "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('censo_comunal')",
         "duckdb": "SELECT * FROM 'data/normalized/censo_comunal.parquet' ORDER BY poblacion_censada DESC;",
-        "cli": "python -m src.chile_hub show censo_comunal"
+        "cli": "chile-hub show censo_comunal"
       },
       "outputs": {
         "parquet": "data/normalized/censo_comunal.parquet",
@@ -503,7 +505,7 @@
       "source_url": "https://datos.gob.cl/dataset/3bf4cf7c-f638-4735-9a01-f65faae4beca/resource/2c44d782-3365-44e3-aefb-2c8b8363a1bc/download/establecimientos_20260609.csv",
       "source_mode": "live",
       "source_detail": "datos_gob_csv",
-      "refreshed_at_utc": "2026-06-16T20:24:28.139467+00:00",
+      "refreshed_at_utc": "2026-06-17T00:24:00.166497+00:00",
       "record_count": 5643,
       "fields": [
         "codigo_establecimiento",
@@ -538,9 +540,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.0,
+        "age_hours": 0.04,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-06-16T20:24:31.851807+00:00"
+        "checked_at_utc": "2026-06-17T00:26:13.613219+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 1080,
@@ -559,9 +561,9 @@
         "recommended_action": "Ninguna."
       },
       "usage_examples": {
-        "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('establecimientos_salud')",
+        "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('establecimientos_salud')",
         "duckdb": "SELECT codigo_comuna, count(*) FROM 'data/normalized/establecimientos_salud.parquet' GROUP BY 1;",
-        "cli": "python -m src.chile_hub show establecimientos_salud"
+        "cli": "chile-hub show establecimientos_salud"
       },
       "outputs": {
         "parquet": "data/normalized/establecimientos_salud.parquet",
@@ -587,7 +589,7 @@
       "source_url": "https://datosabiertos.mineduc.cl/wp-content/uploads/2025/11/Directorio-Oficial-EE-2025.rar",
       "source_mode": "live",
       "source_detail": "mineduc_datos_abiertos_rar",
-      "refreshed_at_utc": "2026-06-16T20:24:28.839180+00:00",
+      "refreshed_at_utc": "2026-06-17T00:24:00.953531+00:00",
       "record_count": 12898,
       "fields": [
         "rbd",
@@ -616,9 +618,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.0,
+        "age_hours": 0.04,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-06-16T20:24:31.851816+00:00"
+        "checked_at_utc": "2026-06-17T00:26:13.613225+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -637,9 +639,9 @@
         "recommended_action": "Ninguna."
       },
       "usage_examples": {
-        "python": "from src.chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('establecimientos_educacionales')",
+        "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('establecimientos_educacionales')",
         "duckdb": "SELECT nombre_establecimiento, dependencia_administrativa FROM 'data/normalized/establecimientos_educacionales.parquet' LIMIT 10;",
-        "cli": "python -m src.chile_hub show establecimientos_educacionales"
+        "cli": "chile-hub show establecimientos_educacionales"
       },
       "outputs": {
         "parquet": "data/normalized/establecimientos_educacionales.parquet",
@@ -665,7 +667,7 @@
       "source_url": "https://censo2024.ine.gob.cl/wp-content/uploads/2025/03/V1_Viviendas-y-hogares-censados.xlsx",
       "source_mode": "live",
       "source_detail": "official_xlsx",
-      "refreshed_at_utc": "2026-06-16T20:24:24.994197+00:00",
+      "refreshed_at_utc": "2026-06-17T00:23:56.289406+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -698,9 +700,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.0,
+        "age_hours": 0.04,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-06-16T20:24:31.851826+00:00"
+        "checked_at_utc": "2026-06-17T00:26:13.613231+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -719,9 +721,9 @@
         "recommended_action": "Ninguna."
       },
       "usage_examples": {
-        "python": "from src.chile_hub import ChileHub\nhub = ChileHub()\ndf = hub.load_polars('censo_hogares_viviendas')",
+        "python": "from chile_hub import ChileHub\nhub = ChileHub()\ndf = hub.load_polars('censo_hogares_viviendas')",
         "duckdb": "SELECT * FROM 'data/normalized/censo_hogares_viviendas.parquet';",
-        "cli": "python -m src.chile_hub show censo_hogares_viviendas"
+        "cli": "chile-hub show censo_hogares_viviendas"
       },
       "outputs": {
         "parquet": "data/normalized/censo_hogares_viviendas.parquet",
@@ -744,7 +746,7 @@
       "source_url": "https://www.bcn.cl/siit/observatorio/ley20840",
       "source_mode": "live",
       "source_detail": "bcn_electoral_mapping_generated",
-      "refreshed_at_utc": "2026-06-16T20:24:28.310540+00:00",
+      "refreshed_at_utc": "2026-06-17T00:24:00.361726+00:00",
       "record_count": 346,
       "fields": [
         "codigo_comuna",
@@ -768,9 +770,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.0,
+        "age_hours": 0.04,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-06-16T20:24:31.851832+00:00"
+        "checked_at_utc": "2026-06-17T00:26:13.613236+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -789,9 +791,9 @@
         "recommended_action": "Ninguna."
       },
       "usage_examples": {
-        "python": "from src.chile_hub import ChileHub\nhub = ChileHub()\ndf = hub.load_polars('distritos_electorales')",
+        "python": "from chile_hub import ChileHub\nhub = ChileHub()\ndf = hub.load_polars('distritos_electorales')",
         "duckdb": "SELECT * FROM 'data/normalized/distritos_electorales.parquet';",
-        "cli": "python -m src.chile_hub show distritos_electorales"
+        "cli": "chile-hub show distritos_electorales"
       },
       "outputs": {
         "parquet": "data/normalized/distritos_electorales.parquet",

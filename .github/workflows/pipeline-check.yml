@@ -33,8 +33,6 @@ jobs:
     if: github.event_name != 'push' || !contains(github.event.head_commit.message, '[skip ci]')
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    permissions:
-      contents: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0 # v6.0.3
@@ -53,20 +51,11 @@ jobs:
       - name: Install Ruff
         run: python -m pip install "$(grep '^ruff==' dev-requirements.txt)"
 
-      - name: Auto-fix Python style
-        run: |
-          python -m ruff check --fix src/ tests/ scripts/ || true
-          python -m ruff format src/ tests/ scripts/ || true
+      - name: Check Python lint
+        run: python -m ruff check src/ tests/ scripts/
 
-      - name: Commit and push style fixes
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/ tests/ scripts/
-          if ! git diff --cached --quiet; then
-            git commit -m "style: auto-fix linting and formatting [skip ci]"
-            git push origin HEAD:${{ github.head_ref || github.ref_name }}
-          fi
+      - name: Check Python format
+        run: python -m ruff format --check src/ tests/ scripts/
 
   build-and-test:
     name: Build and verify data
@@ -109,6 +98,14 @@ jobs:
 
       - name: Build outputs
         run: python src/build_dev_db.py
+
+      - name: Ensure build-synced files are committed
+        run: |
+          if ! git diff --quiet -- index.html app.js; then
+            git diff -- index.html app.js
+            echo "Build-synced files are stale. Run 'make build' and commit the result."
+            exit 1
+          fi
 
       - name: Verify pipeline artifacts
         run: |
@@ -175,7 +172,7 @@ jobs:
       - name: Build wheel and source distribution
         run: |
           python -m pip install --upgrade pip
-          python -m pip install build twine
+          python -m pip install "$(grep '^build==' dev-requirements.txt)" "$(grep '^twine==' dev-requirements.txt)"
           python -m build
           python -m twine check dist/*
 
@@ -209,7 +206,7 @@ jobs:
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('requirements.txt', 'dev-requirements.txt') }}
           restore-keys: playwright-chromium-${{ runner.os }}-
 
       - name: Install Chromium system dependencies

@@ -64,7 +64,7 @@ dev = [
 chile-hub = "chile_hub.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/cortega26/chile-hub"
+Homepage = "https://tooltician.com/chile-hub/"
 Repository = "https://github.com/cortega26/chile-hub"
 Issues = "https://github.com/cortega26/chile-hub/issues"
 Documentation = "https://github.com/cortega26/chile-hub#readme"
@@ -96,6 +96,9 @@ commit_message = "chore(release): {version} [skip ci]"
 exclude_commit_patterns = [
     "^chore\\(data\\):",
 ]
+
+[tool.chile_hub]
+public_site_url = "https://tooltician.com/chile-hub/"
 
 [tool.ruff]
 line-length = 100

@@ -1,8 +1,10 @@
 name: PyPI Release
 
 on:
-  push:
+  workflow_run:
+    workflows: ["Pipeline Check"]
     branches: [main]
+    types: [completed]
   workflow_dispatch:
 
 permissions:
@@ -16,7 +18,7 @@ concurrency:
 jobs:
   release:
     name: Semantic release and publish
-    if: github.event_name != 'push' || !contains(github.event.head_commit.message, '[skip ci]')
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -39,9 +41,20 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install "$(grep '^build==' dev-requirements.txt)" "$(grep '^twine==' dev-requirements.txt)"
 
+      - name: Download verified pipeline data assets
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          rm -rf data/normalized
+          mkdir -p data/normalized
+          gh run download "${{ github.event.workflow_run.id }}" \
+            --name "pipeline-output-${{ github.event.workflow_run.id }}" \
+            --dir data/normalized
+
       - name: Python semantic release
         id: semantic-release
-        uses: python-semantic-release/python-semantic-release@v10.5.3
+        uses: python-semantic-release/python-semantic-release@350c48fcb3ffcdfd2e0a235206bc2ecea6b69df0 # v10.5.3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

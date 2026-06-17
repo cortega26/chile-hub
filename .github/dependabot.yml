@@ -1,0 +1,49 @@
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: America/Santiago
+    open-pull-requests-limit: 5
+    groups:
+      python-runtime:
+        patterns:
+          - polars
+          - pyarrow
+          - requests
+          - platformdirs
+      python-pipeline:
+        patterns:
+          - duckdb
+          - pandas
+          - xlsxwriter
+          - curl_cffi
+          - openpyxl
+      python-dev:
+        dependency-type: development
+        patterns:
+          - "*"
+    labels:
+      - dependencies
+      - python
+    commit-message:
+      prefix: chore
+      include: scope
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:30"
+      timezone: America/Santiago
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - github-actions
+    commit-message:
+      prefix: chore
+      include: scope

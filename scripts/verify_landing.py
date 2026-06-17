@@ -6,6 +6,8 @@ from datetime import datetime, timezone
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
+import tomllib
+
 ROOT_DIR = Path(__file__).resolve().parents[1]
 UTC = timezone.utc
 BUNDLE_PATH = ROOT_DIR / "data" / "normalized" / "hub_bundle.json"
@@ -17,6 +19,17 @@ PRODUCTION_CSP = (
     "connect-src 'self' https://analytics.ahrefs.com https://formspree.io; "
     "manifest-src 'self'; media-src 'self'; worker-src 'self' blob:; upgrade-insecure-requests"
 )
+
+
+def load_project_metadata():
+    with open(ROOT_DIR / "pyproject.toml", "rb") as f:
+        pyproject_data = tomllib.load(f)
+    public_site_url = (
+        pyproject_data.get("tool", {})
+        .get("chile_hub", {})
+        .get("public_site_url", "https://cortega26.github.io/chile-hub/")
+    )
+    return pyproject_data.get("project", {}), public_site_url.rstrip("/") + "/"
 
 
 class LandingRequestHandler(SimpleHTTPRequestHandler):
@@ -154,12 +167,10 @@ def verify_landing():
         if browser_errors:
             fail(f"Browser errors while rendering landing: {browser_errors}")
 
-        # Version Verification
-        import tomllib
-
-        with open(ROOT_DIR / "pyproject.toml", "rb") as f:
-            pyproject_data = tomllib.load(f)
-        expected_version = pyproject_data.get("project", {}).get("version")
+        # Version and public URL verification
+        project_metadata, public_site_url = load_project_metadata()
+        public_data_base = public_site_url + "data/normalized"
+        expected_version = project_metadata.get("version")
         navbar_badge = page.locator(".badge-alpha")
         if navbar_badge.count() != 1:
             fail("Expected exactly one .badge-alpha version badge in the navbar")
@@ -171,7 +182,7 @@ def verify_landing():
 
         # SEO Verification
         canonical = page.locator("link[rel='canonical']").get_attribute("href")
-        if canonical != "https://cortega26.github.io/chile-hub/":
+        if canonical != public_site_url:
             fail(f"Unexpected canonical link: {canonical}")
 
         description = page.locator("meta[name='description']").get_attribute("content")
@@ -329,10 +340,7 @@ def verify_landing():
             fail(f"Unexpected quickstart titles: {quickstart_titles}")
 
         quickstart_code = page.locator("#quickstart-python").inner_text()
-        if (
-            "https://cortega26.github.io/chile-hub/data/normalized/comunas.parquet"
-            not in quickstart_code
-        ):
+        if f"{public_data_base}/comunas.parquet" not in quickstart_code:
             fail(f"Public data URL missing from quickstart: {quickstart_code}")
 
         first_card = page.locator(".dataset-card").first
@@ -410,10 +418,7 @@ def verify_landing():
         if initial_line != "import polars as pl":
             fail(f"Unexpected initial example line: {initial_line}")
 
-        if (
-            "https://cortega26.github.io/chile-hub/"
-            not in first_card.locator(".dataset-example-code").inner_text()
-        ):
+        if public_site_url not in first_card.locator(".dataset-example-code").inner_text():
             fail("Dataset recipe does not use a public URL")
 
         first_card.locator(".dataset-example-tab", has_text="duckdb").click()

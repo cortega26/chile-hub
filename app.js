@@ -26,7 +26,7 @@ const catalogCount = document.getElementById("catalog-count");
 const quickstartCopyButtons = document.querySelectorAll(".quickstart-copy");
 let artifactManifestByPath = {};
 let packageManifestByPath = {};
-const PUBLIC_DATA_BASE = "https://cortega26.github.io/chile-hub/data/normalized";
+const PUBLIC_DATA_BASE = "https://tooltician.com/chile-hub/data/normalized";
 const PREVIEW_ROW_LIMIT = 5;
 
 // Formateador de moneda en pesos chilenos (CLP)

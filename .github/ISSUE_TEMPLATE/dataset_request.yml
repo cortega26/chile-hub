@@ -1,0 +1,41 @@
+name: Dataset request
+description: Propose a new official Chile dataset for the curated hub.
+title: "dataset: "
+labels: ["enhancement", "dataset"]
+body:
+  - type: input
+    id: source
+    attributes:
+      label: Official source URL
+      description: Prefer a JSON API or stable CSV/XLSX/ZIP download URL.
+    validations:
+      required: true
+  - type: dropdown
+    id: license
+    attributes:
+      label: Reuse/licensing status
+      options:
+        - Open attribution
+        - Public API, terms need review
+        - Restricted or unclear
+    validations:
+      required: true
+  - type: textarea
+    id: value
+    attributes:
+      label: Use case
+      description: What user workflow or analysis does this unlock?
+    validations:
+      required: true
+  - type: textarea
+    id: keys
+    attributes:
+      label: Join keys
+      description: Does it join to DPA by codigo_comuna, codigo_region, or another stable identifier?
+    validations:
+      required: true
+  - type: textarea
+    id: maintenance
+    attributes:
+      label: Maintenance notes
+      description: Known update cadence, schema changes, or source reliability concerns.

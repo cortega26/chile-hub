@@ -1,6 +1,6 @@
 # chile-hub overview
 
-- `generated_at_utc`: `2026-06-16T20:24:31.852447+00:00`
+- `generated_at_utc`: `2026-06-17T00:26:13.614202+00:00`
 - `overall_status`: `warn`
 - `dataset_count`: `10`
 - `live_count`: `10`
@@ -9,13 +9,13 @@
 - `drifted_count`: `1`
 - `degraded_count`: `0`
 - `partial_coverage_count`: `0`
-- `warning_count`: `1`
+- `warning_count`: `2`
 - `shared_artifact_count`: `17`
 - `package_count`: `1`
-- `top_issue`: `indicadores` (freshness=fresh, drift=drifted, warnings=1)
-- `top_issue_reason`: indicadores live refresh reused last published artifact for missing codes: ipc
+- `top_issue`: `indicadores` (freshness=fresh, drift=drifted, warnings=2)
+- `top_issue_reason`: indicadores live refresh reused raw snapshots for: uf/2026, dolar/2026, euro/2026, utm/2026
 - `top_issue_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.
-- `top_issue_summary`: indicadores: indicadores live refresh reused last published artifact for missing codes: ipc [source_detail=public_api_with_published_backfill; warnings=1; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]
+- `top_issue_summary`: indicadores: indicadores live refresh reused raw snapshots for: uf/2026, dolar/2026, euro/2026, utm/2026 [source_detail=public_api_with_raw_recovery_partial; warnings=2; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]
 
 | Dataset | Mode | Validation | Freshness | Coverage | Drift |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -34,7 +34,7 @@
 
 - `path`: `data/normalized/chile-hub-publishable-bundle.zip`
 - `package_type`: `zip`
-- `size_bytes`: `1279810`
+- `size_bytes`: `1280627`
 - `checksum`: `sha256` via `data/normalized/chile-hub-publishable-bundle.zip.sha256`
 - `verification_command`: `shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256`
 

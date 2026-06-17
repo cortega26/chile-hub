@@ -581,39 +581,73 @@ def write_json_atomic(data, path, **kwargs):
     os.replace(tmp_path, path)
 
 
-def sync_navbar_version(version):
+def sync_landing_metadata(version, public_site_url):
     index_path = os.path.join(ROOT_DIR, "index.html")
-    if not os.path.exists(index_path):
-        return
+    app_path = os.path.join(ROOT_DIR, "app.js")
+    public_site_url = public_site_url.rstrip("/") + "/"
+    public_data_base = public_site_url + "data/normalized"
     try:
-        with open(index_path, "r", encoding="utf-8") as f:
-            content = f.read()
-        pattern = r'(<span class="badge-alpha">)v[^<]+(</span>)'
-        replacement = rf"\g<1>v{version}\g<2>"
-        new_content, count = re.subn(pattern, replacement, content)
-        if count > 0 and new_content != content:
-            with open(index_path, "w", encoding="utf-8") as f:
-                f.write(new_content)
-            print(f"Sincronización de Versión: index.html actualizado a v{version}")
+        if os.path.exists(index_path):
+            with open(index_path, "r", encoding="utf-8") as f:
+                content = f.read()
+            replacements = [
+                (
+                    r'(<span class="badge-alpha">)v[^<]+(</span>)',
+                    rf"\g<1>v{version}\g<2>",
+                ),
+                (
+                    r"https://cortega26\.github\.io/chile-hub/",
+                    public_site_url,
+                ),
+            ]
+            new_content = content
+            for pattern, replacement in replacements:
+                new_content = re.sub(pattern, replacement, new_content)
+            if new_content != content:
+                with open(index_path, "w", encoding="utf-8") as f:
+                    f.write(new_content)
+                print(
+                    "Sincronización Landing: "
+                    f"index.html actualizado a v{version} y {public_site_url}"
+                )
+        if os.path.exists(app_path):
+            with open(app_path, "r", encoding="utf-8") as f:
+                content = f.read()
+            new_content = re.sub(
+                r'const PUBLIC_DATA_BASE = "[^"]+";',
+                f'const PUBLIC_DATA_BASE = "{public_data_base}";',
+                content,
+            )
+            if new_content != content:
+                with open(app_path, "w", encoding="utf-8") as f:
+                    f.write(new_content)
+                print(f"Sincronización Landing: app.js actualizado a {public_data_base}")
     except Exception as e:
-        print(f"Advertencia: No se pudo actualizar index.html con la versión: {e}")
+        print(f"Advertencia: No se pudo actualizar la landing: {e}")
 
 
 def write_pipeline_metadata(dataset_metadata, validations):
     version = "unknown"
+    public_site_url = "https://cortega26.github.io/chile-hub/"
     try:
         pyproject_path = os.path.join(ROOT_DIR, "pyproject.toml")
         with open(pyproject_path, "rb") as f:
             pyproject_data = tomllib.load(f)
         version = pyproject_data.get("project", {}).get("version", "unknown")
+        public_site_url = (
+            pyproject_data.get("tool", {})
+            .get("chile_hub", {})
+            .get("public_site_url", public_site_url)
+        )
     except Exception as e:
         print(f"Advertencia: No se pudo obtener la versión de pyproject.toml: {e}")
 
     if version != "unknown":
-        sync_navbar_version(version)
+        sync_landing_metadata(version, public_site_url)
 
     pipeline_metadata = {
         "version": version,
+        "public_site_url": public_site_url,
         "generated_at_utc": datetime.now(UTC).isoformat(),
         "datasets": dataset_metadata,
         "validations": validations,

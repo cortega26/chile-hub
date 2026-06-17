@@ -155,6 +155,7 @@ def verify_indicadores_diagnostics(dataset_metadata, validation, origin):
     allowed_source_details = {
         "public_api",
         "public_api_with_raw_recovery",
+        "public_api_with_raw_recovery_partial",
         "public_api_partial",
         "public_api_with_published_backfill",
         "generated_fallback",
@@ -181,6 +182,7 @@ def verify_indicadores_diagnostics(dataset_metadata, validation, origin):
     if raw_recoveries:
         if source_detail not in {
             "public_api_with_raw_recovery",
+            "public_api_with_raw_recovery_partial",
             "public_api_with_published_backfill",
         }:
             fail(f"{origin} raw_recoveries require a recovery-aware source_detail")
@@ -196,6 +198,7 @@ def verify_indicadores_diagnostics(dataset_metadata, validation, origin):
     if preserved_existing_pairs:
         if source_detail not in {
             "public_api_partial",
+            "public_api_with_raw_recovery_partial",
             "public_api_with_published_backfill",
         }:
             fail(f"{origin} preserved_existing_pairs require a partial-aware source_detail")

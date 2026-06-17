@@ -699,6 +699,20 @@ class IndicatorFallbackTests(unittest.TestCase):
         self.assertEqual(metadata["source_detail"], "public_api_with_published_backfill")
         self.assertEqual(metadata["indicator_delivery"]["ipc"], "published_backfill")
 
+    def test_process_indicators_records_combined_raw_recovery_and_partial_refresh(self):
+        diagnostics = {
+            "fetch_failures": ["uf/2026: timeout", "ipc/2026: timeout"],
+            "raw_recoveries": ["uf/2026"],
+            "preserved_existing_pairs": ["ipc/2026"],
+            "empty_live_pairs": [],
+            "published_backfills": [],
+        }
+        with tempfile.TemporaryDirectory() as tmpdir:
+            _, metadata = self._run_process(tmpdir, self._make_minimal_df(), diagnostics)
+        self.assertEqual(metadata["source_detail"], "public_api_with_raw_recovery_partial")
+        self.assertEqual(metadata["indicator_delivery"]["uf"], "raw_recovery")
+        self.assertEqual(metadata["indicator_delivery"]["ipc"], "preserved_existing")
+
     def test_empty_live_series_reuses_published_pair(self):
         today = datetime.date.today()
         published = self._make_minimal_df()

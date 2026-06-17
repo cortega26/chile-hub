@@ -1,6 +1,6 @@
 # chile-hub drift report
 
-- `generated_at_utc`: `2026-06-16T20:24:31.852447+00:00`
+- `generated_at_utc`: `2026-06-17T00:26:13.614202+00:00`
 - `dataset_count`: `10`
 - `drifted_count`: `1`
 - `healthy_count`: `9`
@@ -14,7 +14,7 @@
 | `provincias` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
 | `comunas` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
 | `comunas_enriquecidas` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
-| `indicadores` | `drifted` | `live` | `not_applicable` | `warning` | 1 | Revisar warnings operativos del dataset antes de consumirlo en producción. |
+| `indicadores` | `drifted` | `live` | `not_applicable` | `warning` | 2 | Revisar warnings operativos del dataset antes de consumirlo en producción. |
 | `censo_comunal` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
 | `establecimientos_salud` | `healthy` | `live` | `not_applicable` | `none` | 0 | Ninguna. |
 | `establecimientos_educacionales` | `healthy` | `live` | `not_applicable` | `none` | 0 | Ninguna. |
@@ -66,9 +66,9 @@
 - `drift_status`: `drifted`
 - `source_mode`: `live`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
-- `degradation`: indicadores live refresh reused last published artifact for missing codes: ipc
-- `warning_count`: `1`
-- `diagnostic_summary`: indicadores live refresh reused last published artifact for missing codes: ipc
+- `degradation`: indicadores live refresh reused raw snapshots for: uf/2026, dolar/2026, euro/2026, utm/2026; indicadores live refresh preserved previous staging rows for: ipc/2026
+- `warning_count`: `2`
+- `diagnostic_summary`: indicadores live refresh reused raw snapshots for: uf/2026, dolar/2026, euro/2026, utm/2026
 - `recommended_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.
 
 ## censo_comunal

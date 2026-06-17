@@ -246,7 +246,7 @@ class ChileHubTests(unittest.TestCase):
         self.assertTrue(overview["current_checked_at_utc"])
         self.assertIsNotNone(overview["top_issue"])
         self.assertEqual(overview["top_issue"]["dataset"], "indicadores")
-        self.assertIn("public_api_with_published_backfill", overview["top_issue_summary"])
+        self.assertIn("public_api_with_raw_recovery_partial", overview["top_issue_summary"])
         self.assertTrue(overview["top_issue"]["diagnostic_summary"])
         self.assertEqual(overview["primary_package"]["package_type"], "zip")
         self.assertEqual(
@@ -268,7 +268,7 @@ class ChileHubTests(unittest.TestCase):
         self.assertEqual(status["dataset_count"], 10)
         self.assertIsNotNone(status["top_issue"])
         self.assertEqual(status["top_issue"]["dataset"], "indicadores")
-        self.assertIn("public_api_with_published_backfill", status["top_issue_summary"])
+        self.assertIn("public_api_with_raw_recovery_partial", status["top_issue_summary"])
 
     def test_status_table(self):
         table = self.hub.status_table()
@@ -309,7 +309,7 @@ class ChileHubTests(unittest.TestCase):
         self.assertEqual(len(runtime["datasets"]), 10)
         self.assertIsNotNone(runtime["top_issue"])
         self.assertEqual(runtime["top_issue"]["dataset"], "indicadores")
-        self.assertIn("public_api_with_published_backfill", runtime["top_issue_summary"])
+        self.assertIn("public_api_with_raw_recovery_partial", runtime["top_issue_summary"])
         self.assertTrue(runtime["top_issue"]["diagnostic_summary"])
         indicadores = next(
             entry for entry in runtime["datasets"] if entry["dataset"] == "indicadores"
@@ -766,25 +766,25 @@ class ArtifactContractTests(unittest.TestCase):
     def test_top_issue_is_persisted_in_shared_artifacts(self):
         self.assertIsNotNone(self.health["top_issue"])
         self.assertEqual(self.health["top_issue"]["dataset"], "indicadores")
-        self.assertIn("public_api_with_published_backfill", self.health["top_issue_summary"])
+        self.assertIn("public_api_with_raw_recovery_partial", self.health["top_issue_summary"])
         self.assertTrue(self.health["top_issue"]["diagnostic_summary"])
         self.assertEqual(
             self.health["top_issue"]["source_detail"],
-            "public_api_with_published_backfill",
+            "public_api_with_raw_recovery_partial",
         )
         self.assertIsNotNone(self.bundle["top_issue"])
         self.assertEqual(self.bundle["top_issue"]["dataset"], "indicadores")
-        self.assertIn("public_api_with_published_backfill", self.bundle["top_issue_summary"])
+        self.assertIn("public_api_with_raw_recovery_partial", self.bundle["top_issue_summary"])
         self.assertTrue(self.bundle["top_issue"]["diagnostic_summary"])
         self.assertEqual(self.bundle["health"]["top_issue"]["dataset"], "indicadores")
         self.assertIn(
-            "public_api_with_published_backfill",
+            "public_api_with_raw_recovery_partial",
             self.bundle["health"]["top_issue_summary"],
         )
         self.assertTrue(self.bundle["health"]["top_issue"]["diagnostic_summary"])
         self.assertIsNotNone(self.overview["top_issue"])
         self.assertEqual(self.overview["top_issue"]["dataset"], "indicadores")
-        self.assertIn("public_api_with_published_backfill", self.overview["top_issue_summary"])
+        self.assertIn("public_api_with_raw_recovery_partial", self.overview["top_issue_summary"])
         self.assertTrue(self.overview["top_issue"]["diagnostic_summary"])
 
     def test_top_issue_is_exposed_in_markdown_reports(self):
@@ -809,21 +809,26 @@ class ArtifactContractTests(unittest.TestCase):
         indicadores_catalog = next(
             dataset for dataset in self.catalog["datasets"] if dataset["dataset"] == "indicadores"
         )
-        self.assertEqual(indicadores_catalog["source_detail"], "public_api_with_published_backfill")
+        self.assertEqual(
+            indicadores_catalog["source_detail"], "public_api_with_raw_recovery_partial"
+        )
         self.assertEqual(
             indicadores_catalog["indicator_codes"],
             ["dolar", "euro", "ipc", "uf", "utm"],
         )
-        self.assertEqual(indicadores_catalog["indicator_delivery"]["ipc"], "published_backfill")
+        self.assertEqual(indicadores_catalog["indicator_delivery"]["ipc"], "preserved_existing")
         # "uf" must not be synthetic fallback data; "preserved_existing" is acceptable
         # when the live fetch had a transient failure for that indicator-year pair.
         self.assertIn(
             indicadores_catalog["indicator_delivery"]["uf"],
             {"live", "raw_recovery", "preserved_existing"},
         )
-        self.assertIn("published_backfills_used_for_codes: ipc", indicadores_catalog["notes"])
         self.assertIn(
-            "indicadores live refresh reused last published artifact for missing codes: ipc",
+            "preserved_existing_pairs_due_to_fetch_failure: ipc/2026",
+            indicadores_catalog["notes"],
+        )
+        self.assertIn(
+            "indicadores live refresh preserved previous staging rows for: ipc/2026",
             indicadores_catalog["warnings"],
         )
         provenance = self.bundle["reports"]["provenance_json"]["path"]
@@ -1083,7 +1088,7 @@ class ChileHubCliTests(unittest.TestCase):
         result = self.run_cli("top-issue", "--format", "text")
         self.assertIn("chile-hub top issue", result.stdout)
         self.assertIn("dataset=indicadores", result.stdout)
-        self.assertIn("source_detail=public_api_with_published_backfill", result.stdout)
+        self.assertIn("source_detail=public_api_with_raw_recovery_partial", result.stdout)
         self.assertIn("reason=", result.stdout)
         self.assertIn("action=", result.stdout)
 
@@ -1245,7 +1250,8 @@ class WorkflowContractTests(unittest.TestCase):
     def test_pypi_release_workflow_uses_trusted_publishing_and_release_assets(self):
         release_text = (ROOT_DIR / ".github" / "workflows" / "pypi-release.yml").read_text()
         self.assertIn("id-token: write", release_text)
-        self.assertIn("python-semantic-release/python-semantic-release@v10.5.3", release_text)
+        self.assertIn("python-semantic-release/python-semantic-release@", release_text)
+        self.assertIn("# v10.5.3", release_text)
         self.assertIn("pypa/gh-action-pypi-publish", release_text)
         self.assertIn("data/normalized/chile-hub-publishable-bundle.zip", release_text)
         self.assertIn("data/normalized/dataset_catalog.json", release_text)
