@@ -5,7 +5,8 @@
 **Datos públicos de Chile — curados, normalizados y listos para consumir en una línea de código.**
 
 [![CI/CD](https://github.com/cortega26/chile-hub/actions/workflows/pipeline-check.yml/badge.svg)](https://github.com/cortega26/chile-hub/actions)
-[![PyPI](https://img.shields.io/pypi/v/chile-hub.svg)](https://pypi.org/project/chile-hub/)
+[![PyPI version](https://img.shields.io/pypi/v/chile-hub.svg)](https://pypi.org/project/chile-hub/)
+[![PyPI downloads](https://img.shields.io/pypi/dm/chile-hub.svg)](https://pypi.org/project/chile-hub/)
 [![Coverage](https://img.shields.io/badge/coverage-pytest--cov-16a34a.svg)](#desarrollo-local)
 [![License: MIT](https://img.shields.io/badge/Code%20License-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-3776AB.svg?style=flat&logo=python&logoColor=white)]()
@@ -16,6 +17,35 @@
 </div>
 
 ---
+
+## ⚡ Instalar y usar en segundos
+
+```bash
+pip install chile-hub
+```
+
+```python
+from chile_hub import ChileHub
+
+hub = ChileHub()
+comunas = hub.load_polars("comunas")      # 346 comunas como DataFrame
+indicadores = hub.load_polars("indicadores")  # Serie histórica UF, Dólar, Euro, UTM, IPC
+
+# Cruce territorial garantizado — códigos CUT siempre VARCHAR
+censo = hub.load_polars("censo_comunal")
+df = comunas.join(censo, on="codigo_comuna")
+print(df.head())
+```
+
+La primera ejecución descarga automáticamente el bundle validado desde GitHub Releases, verifica su integridad SHA256 y lo deja en cache local. A partir de ahí, todo corre contra el cache. También puedes administrarlo explícitamente:
+
+```bash
+chile-hub cache update     # Forzar descarga del bundle más reciente
+chile-hub cache status     # Ubicación y estado del cache local
+chile-hub cache clear      # Liberar espacio
+```
+
+> **Variante para desarrolladores del pipeline:** `pip install chile-hub[pipeline]` agrega DuckDB, Pandas, XlsxWriter y curl_cffi para ejecutar el pipeline completo de extracción y build. La instalación mínima solo incluye Polars, PyArrow, requests y platformdirs — suficiente para consumir datos.
 
 > [!NOTE]
 > **chile-hub** no busca "tener todos los datos de Chile". Busca **reducir drásticamente el costo técnico** de encontrar, limpiar, validar, cruzar y consumir datasets geográficos, demográficos, electorales y económicos críticos de Chile.
@@ -206,42 +236,45 @@ Pipeline determinista en GitHub Actions: extracción → build → verificación
 
 ---
 
-## Inicio rápido
+## Guía de uso
 
-### 1. Instalar desde PyPI
+### Consumir datos (instalación desde PyPI)
 
 ```bash
 pip install chile-hub
 ```
 
-### 2. Consumir datos en Python
-
 ```python
 from chile_hub import ChileHub
 
 hub = ChileHub()
+
+# Catálogo de capas disponibles
+print(hub.list_datasets())
+
+# Cargar cualquier capa como Polars DataFrame
 comunas = hub.load_polars("comunas")
-print(comunas.head())
+censo = hub.load_polars("censo_comunal")
+salud = hub.load_polars("establecimientos_salud")
+
+# Cruce garantizado: códigos CUT son VARCHAR, no int
+df = comunas.join(censo, on="codigo_comuna")
+print(df.head())
+
+# Salud operativa del hub
+print(hub.health())
 ```
 
 La primera ejecución descarga el bundle validado desde GitHub Releases, verifica
-su SHA256 y lo deja en cache local. También puedes prepararlo explícitamente:
+su integridad SHA256 y lo deja en cache local. También puedes prepararlo explícitamente:
 
 ```bash
-chile-hub cache update
-chile-hub cache status
+chile-hub cache update     # Descargar el bundle más reciente
+chile-hub cache status     # Ver ubicación y estado del cache
+chile-hub cache clear      # Liberar espacio en disco
 ```
 
-### 3. Desarrollo local del pipeline
-
-```bash
-git clone https://github.com/cortega26/chile-hub.git
-cd chile-hub
-make bootstrap
-make refresh      # extract → build → verify → test → pruebas de humo
-```
-
-**DuckDB** — consultas SQL directas sobre Parquet:
+### Consultas SQL con DuckDB
 
 ```sql
 -- Top 10 comunas por población censada
@@ -259,7 +292,7 @@ JOIN 'data/normalized/distritos_electorales.parquet' e
 WHERE c.nombre_region = 'Valparaíso';
 ```
 
-**Python + Polars** — dataframes tipados y rápidos:
+### Usar en scripts y producción
 
 ```python
 import polars as pl
@@ -272,23 +305,26 @@ df = comunas.join(censo, on="codigo_comuna")
 print(df.head())
 ```
 
-**Python API (ChileHub)** — módulo oficial del proyecto:
+> **Versionado:** Para entornos productivos, fija la versión exacta en `requirements.txt`:
+> ```
+> chile-hub==1.0.2
+> ```
+> El bundle de datos se publica con cada release. La API del módulo `ChileHub` sigue
+> versionado semántico: cambios de interfaz pública solo en _major releases_.
 
-```python
-from chile_hub import ChileHub
+### Desarrollo local del pipeline
 
-hub = ChileHub()
+Si necesitas ejecutar el pipeline de extracción y build en tu máquina:
 
-# Explorar catálogo
-print(hub.list_datasets())
-
-# Cargar cualquier capa como Polars DataFrame
-df_salud = hub.load_polars("establecimientos_salud")
-df_censo = hub.load_polars("censo_comunal")
-
-# Salud operativa del hub
-print(hub.health())
+```bash
+git clone https://github.com/cortega26/chile-hub.git
+cd chile-hub
+make bootstrap          # Crea .venv, instala dependencias + Playwright
+make refresh            # extract → build → verify → test → pruebas de humo
 ```
+
+> Usa `pip install chile-hub[pipeline]` si quieres las dependencias completas del pipeline
+> (DuckDB, Pandas, XlsxWriter, curl_cffi) pero sin clonar el repositorio.
 
 ---
 
@@ -438,7 +474,8 @@ Cada ejecución del pipeline genera en `data/normalized/`:
 
 ## CLI de referencia
 
-El proyecto expone una CLI completa para administrar y diagnosticar el hub:
+El paquete instala el comando `chile-hub` en el `PATH`. Todos los subcomandos
+funcionan tanto desde PyPI como desde el entorno de desarrollo.
 
 ### Inspección y consulta
 
@@ -475,9 +512,16 @@ El proyecto expone una CLI completa para administrar y diagnosticar el hub:
 | `chile-hub provenance` | URLs de origen y métodos de extracción |
 | `chile-hub verify-package` | Instrucción de verificación de integridad del ZIP |
 
+> En entorno de desarrollo, usa `python -m chile_hub` o `python -m src.chile_hub`
+> como alternativa al comando `chile-hub` si el paquete no está instalado en modo editable.
+
 ---
 
 ## Desarrollo local
+
+Esta sección es para contribuidores que necesitan ejecutar el pipeline completo
+de extracción, build y verificación en su máquina. Si solo necesitas consumir
+los datos, usa `pip install chile-hub` (ver [Guía de uso](#guía-de-uso)).
 
 ```bash
 # Entorno
@@ -488,7 +532,7 @@ make doctor             # Verifica versión de Python y dependencias críticas
 make refresh            # extract → build → verify → test → landing
 
 # Pasos individuales
-make extract            # Ejecuta los 8 extractores → data/staging/
+make extract            # Ejecuta los extractores → data/staging/
 make build              # Compila artefactos → data/normalized/
 make verify             # Verifica integridad (SHA256, conteos, schema)
 make test               # pytest (lee data/normalized/, no corre el pipeline)
