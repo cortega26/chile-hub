@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-06-17T00:26:13.614202+00:00",
+  "generated_at_utc": "2026-06-17T11:35:00.029190+00:00",
   "overall_status": "warn",
   "dataset_count": 10,
   "ok_count": 9,
@@ -17,19 +17,19 @@
   "partial_coverage_count": 0,
   "unknown_coverage_count": 0,
   "drifted_count": 1,
-  "warning_count": 2,
+  "warning_count": 1,
   "top_issue": {
     "dataset": "indicadores",
     "attention_priority": 0,
-    "warning_count": 2,
+    "warning_count": 1,
     "build_freshness_status": "fresh",
     "drift_status": "drifted",
     "degradation_status": "warning",
-    "source_detail": "public_api_with_raw_recovery_partial",
-    "diagnostic_summary": "indicadores live refresh reused raw snapshots for: uf/2026, dolar/2026, euro/2026, utm/2026",
+    "source_detail": "public_api_with_published_backfill",
+    "diagnostic_summary": "indicadores live refresh reused last published artifact for missing codes: ipc",
     "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
   },
-  "top_issue_summary": "indicadores: indicadores live refresh reused raw snapshots for: uf/2026, dolar/2026, euro/2026, utm/2026 [source_detail=public_api_with_raw_recovery_partial; warnings=2; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]",
+  "top_issue_summary": "indicadores: indicadores live refresh reused last published artifact for missing codes: ipc [source_detail=public_api_with_published_backfill; warnings=1; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]",
   "datasets": [
     {
       "dataset": "censo_comunal",
@@ -163,7 +163,7 @@
       "source_mode": "live",
       "freshness_status": "fresh",
       "validation_status": "ok",
-      "warning_count": 2,
+      "warning_count": 1,
       "reuse_status": "open-attribution",
       "redistribution_ok": true,
       "publishability_status": "ready",
@@ -171,8 +171,8 @@
       "coverage_status": "not_applicable",
       "coverage_ratio": null,
       "drift_status": "drifted",
-      "source_detail": "public_api_with_raw_recovery_partial",
-      "diagnostic_summary": "indicadores live refresh reused raw snapshots for: uf/2026, dolar/2026, euro/2026, utm/2026",
+      "source_detail": "public_api_with_published_backfill",
+      "diagnostic_summary": "indicadores live refresh reused last published artifact for missing codes: ipc",
       "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
     },
     {
