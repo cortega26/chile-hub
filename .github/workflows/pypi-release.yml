@@ -45,15 +45,27 @@ jobs:
             "$(grep '^python-semantic-release==' dev-requirements.txt)"
 
       - name: Download verified pipeline data assets
-        if: github.event_name == 'workflow_run'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           rm -rf data/normalized
           mkdir -p data/normalized
-          gh run download "${{ github.event.workflow_run.id }}" \
-            --name "pipeline-output-${{ github.event.workflow_run.id }}" \
-            --dir data/normalized
+
+          if [[ "${{ github.event_name }}" == "workflow_run" ]]; then
+            run_id="${{ github.event.workflow_run.id }}"
+          else
+            # Find the last successful run of Pipeline Check on main branch
+            run_id=$(gh run list --workflow "Pipeline Check" --branch main --status success --limit 1 --json databaseId --jq '.[0].databaseId' || true)
+          fi
+
+          if [[ -n "$run_id" ]]; then
+            gh run download "$run_id" \
+              --name "pipeline-output-$run_id" \
+              --dir data/normalized
+          else
+            echo "Error: No verified pipeline data assets found."
+            exit 1
+          fi
 
       - name: Python semantic release
         id: semantic-release
@@ -64,7 +76,11 @@ jobs:
           before="$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")"
           python -m semantic_release version --skip-build
           after="$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")"
-          if [[ "$before" != "$after" ]]; then
+
+          # Detect if this is a tagged release, a manual run, or version bumped by semantic-release
+          has_matching_tag="$(git tag --points-at HEAD | grep -E "^v${after}$" || true)"
+
+          if [[ "$before" != "$after" || -n "$has_matching_tag" || "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             echo "released=true" >> "$GITHUB_OUTPUT"
             echo "version=$after" >> "$GITHUB_OUTPUT"
           else
@@ -82,6 +98,8 @@ jobs:
       - name: Publish package to PyPI
         if: steps.semantic-release.outputs.released == 'true'
         uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # v1.13.0
+        with:
+          skip-existing: true
 
       - name: Attach verified data assets to release
         if: steps.semantic-release.outputs.released == 'true'
@@ -89,6 +107,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           tag="v${{ steps.semantic-release.outputs.version }}"
+          gh release create "$tag" --notes "Release $tag" || true
           gh release upload "$tag" \
             data/normalized/chile-hub-publishable-bundle.zip \
             data/normalized/chile-hub-publishable-bundle.zip.sha256 \
