@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "chile-hub"
 version = "1.0.2"
-description = "Curated, validated, versioned public datasets for Chile."
+description = "Datos públicos de Chile curados, normalizados y validados: geografía, demografía, economía, salud, educación y distritos electorales. Listos para consumir en una línea de código con Polars, DuckDB, SQLite y Excel."
 readme = "README.md"
 requires-python = ">=3.10,<3.15"
 license = "MIT"
