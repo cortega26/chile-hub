@@ -16,6 +16,7 @@ Los planes 005–007 tienen dependencias.
 | 005 | [Eliminar escrituras redundantes del build](005-eliminate-redundant-build-writes.md) | S | LOW | 003 (idealmente) | TODO |
 | 006 | [Consolidar lógica duplicada y corregir violación de capas](006-consolidate-duplicated-logic.md) | S | LOW | — | TODO |
 | 007 | [Mejoras de tooling — pre-commit, editorconfig, CI](007-tooling-improvements.md) | S | LOW | 004 | TODO |
+| 008 | [Hardening de source readiness, schema contracts y quality gates](008-hardening-source-readiness-schema-contracts-quality.md) | L | MED | — | TODO |
 
 ## Grafo de dependencias
 
@@ -25,6 +26,7 @@ Los planes 005–007 tienen dependencias.
 003  (independiente) ──► 005
 004  (independiente) ──► 007
 006  (independiente)
+008  (independiente; arquitectura de hardening para las 14 capas actuales)
 ```
 
 ## Hallazgos considerados y rechazados
