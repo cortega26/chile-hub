@@ -1,8 +1,10 @@
-# 🇨🇱 chile-hub
-
 <div align="center">
 
-**Datos públicos de Chile — curados, normalizados y listos para consumir en una línea de código.**
+<h1>🇨🇱 chile-hub</h1>
+
+<p><strong>Datos públicos de Chile, curados y listos para análisis en una línea de código.</strong></p>
+
+<p><strong>15 capas oficiales y derivadas · 346 comunas · CUT preservado como texto · Parquet, DuckDB, SQLite, JSON y Excel</strong></p>
 
 [![CI/CD](https://github.com/cortega26/chile-hub/actions/workflows/pipeline-check.yml/badge.svg)](https://github.com/cortega26/chile-hub/actions)
 [![PyPI version](https://img.shields.io/pypi/v/chile-hub.svg)](https://pypi.org/project/chile-hub/)
@@ -13,6 +15,14 @@
 [![Formats](https://img.shields.io/badge/Formats-Parquet%20%7C%20DuckDB%20%7C%20SQLite%20%7C%20JSON%20%7C%20Excel-orange.svg)]()
 [![Datasets](https://img.shields.io/badge/Datasets-15%20capas-16a34a.svg)]()
 [![Comunas](https://img.shields.io/badge/Comunas-346-8b5cf6.svg)]()
+
+<p>
+  <a href="#-instalar-y-usar-en-segundos">Instalación</a> ·
+  <a href="#las-15-capas-de-datos">Capas</a> ·
+  <a href="#arquitectura-del-pipeline">Arquitectura</a> ·
+  <a href="#cli-de-referencia">CLI</a> ·
+  <a href="#fuentes-licencias-y-reúso">Licencias</a>
+</p>
 
 </div>
 
@@ -28,7 +38,7 @@ pip install chile-hub
 from chile_hub import ChileHub
 
 hub = ChileHub()
-comunas = hub.load_polars("comunas")      # 346 comunas como DataFrame
+comunas = hub.load_polars("comunas")          # 346 comunas como DataFrame
 indicadores = hub.load_polars("indicadores")  # Serie histórica UF, Dólar, Euro, UTM, IPC
 
 # Cruce territorial garantizado — códigos CUT siempre VARCHAR
@@ -52,7 +62,7 @@ chile-hub cache clear      # Liberar espacio
 
 ---
 
-## El problema
+## Por qué existe
 
 Trabajar con datos públicos chilenos implica enfrentar los mismos obstáculos una y otra vez:
 
@@ -63,6 +73,8 @@ Trabajar con datos públicos chilenos implica enfrentar los mismos obstáculos u
 | Códigos CUT que pierden ceros al leerse como `int` | CUT garantizados como `VARCHAR` de largo fijo (`"01101"`) |
 | Nombres de comunas imposibles de cruzar (_Ñuñoa_ vs _Nunoa_) | Columna `nombre_comuna_clean` normalizada para cruces exactos |
 | Cero trazabilidad sobre origen y vigencia del dato | Metadatos con fuente, fecha de extracción, licencia y modo |
+
+chile-hub empaqueta esas decisiones en una capa reproducible: extrae desde fuentes oficiales, normaliza schemas, valida reglas territoriales y publica artefactos listos para consumo local o CI/CD.
 
 ---
 
@@ -386,51 +398,53 @@ make refresh            # extract → build → verify → test → pruebas de h
 El pipeline es **lineal, determinista y estricto**: si una validación falla, el build se cancela antes de publicar datos corruptos.
 
 ```mermaid
-graph TD
+flowchart LR
     classDef extract fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#0f172a;
+    classDef stage fill:#ecfeff,stroke:#0891b2,stroke-width:2px,color:#0f172a;
     classDef build fill:#fef9c3,stroke:#ca8a04,stroke-width:2px,color:#0f172a;
     classDef verify fill:#f0fdf4,stroke:#16a34a,stroke-width:2px,color:#0f172a;
     classDef test fill:#fae8ff,stroke:#c084fc,stroke-width:2px,color:#0f172a;
     classDef publish fill:#ffe4e6,stroke:#f43f5e,stroke-width:2px,color:#0f172a;
 
-    subgraph 1 [1. EXTRACT]
-        E1[subdere_extractor.py]:::extract
-        E2[bcentral_extractor.py]:::extract
-        E3[censo_extractor.py]:::extract
-        E4[censo_hogares_viviendas_extractor.py]:::extract
-        E5[salud_extractor.py]:::extract
-        E6[electoral_extractor.py]:::extract
-        E7[mineduc_establecimientos_extractor.py]:::extract
-        E8[sinim_finanzas_extractor.py]:::extract
-        E9[mineduc_resultados_extractor.py]:::extract
-        E10[siedu_extractor.py]:::extract
-        E11[res_extractor.py]:::extract
+    subgraph EXTRACT["1. EXTRACT - fuentes oficiales"]
+        direction TB
+        X1["Territorio<br/>BCN / SERVEL"]:::extract
+        X2["Demografía 2024<br/>INE"]:::extract
+        X3["Servicios públicos<br/>MINSAL / MINEDUC"]:::extract
+        X4["Economía<br/>BCCh / SINIM / RES"]:::extract
+        X5["Indicadores urbanos<br/>SIEDU"]:::extract
     end
 
-    subgraph 2 [2. BUILD]
-        B1[build_dev_db.py]:::build
-    end
+    S["data/staging/<br/>CSV + metadata.json"]:::stage
+    B["2. BUILD<br/>build_dev_db.py"]:::build
+    N["data/normalized/<br/>artefactos publicables"]:::stage
+    V["3. VERIFY<br/>verify_pipeline.py"]:::verify
+    T["4. TEST<br/>pytest"]:::test
+    L["5. SMOKE + PUBLISH<br/>landing + bundle"]:::publish
 
-    subgraph 3 [3. VERIFY]
-        V1[verify_pipeline.py]:::verify
-    end
-
-    subgraph 4 [4. TEST]
-        T1[pytest]:::test
-    end
-
-    subgraph 5 [5. PUBLISH & SMOKE]
-        L1[verify_landing.py]:::publish
-    end
-
-    E1 & E2 & E3 & E4 & E5 & E6 & E7 & E8 & E9 & E10 & E11 -->|data/staging/| B1
-    B1 -->|data/normalized/| V1
-    V1 --> T1
-    T1 --> L1
+    X1 --> S
+    X2 --> S
+    X3 --> S
+    X4 --> S
+    X5 --> S
+    S --> B --> N --> V --> T --> L
 ```
 
 > [!IMPORTANT]
 > **Invariante crítica:** El pipeline aborta si la cardinalidad de comunas ≠ 346, si los códigos CUT pierden el formato `VARCHAR`, o si alguna regla de negocio se rompe. **Nunca** se publican datos corruptos.
+
+<details>
+<summary><b>Extractores incluidos en el paso 1</b></summary>
+
+| Dominio | Extractores |
+|:---|:---|
+| Territorio | `subdere_extractor.py`, `electoral_extractor.py` |
+| Demografía | `censo_extractor.py`, `censo_hogares_viviendas_extractor.py` |
+| Servicios públicos | `salud_extractor.py`, `mineduc_establecimientos_extractor.py`, `mineduc_resultados_extractor.py` |
+| Economía | `bcentral_extractor.py`, `sinim_finanzas_extractor.py`, `res_extractor.py` |
+| Indicadores urbanos | `siedu_extractor.py` |
+
+</details>
 
 ---
 
