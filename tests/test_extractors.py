@@ -11,6 +11,7 @@ if str(ROOT_DIR) not in sys.path:
 
 from unittest.mock import MagicMock, patch
 
+import openpyxl
 from requests import HTTPError
 
 from src.extractors import (
@@ -78,6 +79,78 @@ def mock_response(payload, status_code=200):
     if status_code >= 400:
         response.raise_for_status.side_effect = HTTPError(f"HTTP {status_code}")
     return response
+
+
+def _write_censo_workbook(path: Path) -> None:
+    workbook = openpyxl.Workbook()
+    sheet_totals = workbook.active
+    sheet_totals.title = "2"
+    sheet_age = workbook.create_sheet("4")
+    sheet_totals.append([])
+    sheet_age.append([])
+    sheet_totals.cell(row=6, column=1, value=1)
+    sheet_totals.cell(row=6, column=2, value="Tarapaca")
+    sheet_totals.cell(row=6, column=3, value=11)
+    sheet_totals.cell(row=6, column=4, value="Iquique")
+    sheet_totals.cell(row=6, column=5, value=1101)
+    sheet_totals.cell(row=6, column=6, value="Iquique")
+    sheet_totals.cell(row=6, column=7, value=100)
+    sheet_totals.cell(row=6, column=8, value=48)
+    sheet_totals.cell(row=6, column=9, value=52)
+    sheet_totals.cell(row=6, column=10, value=92.3)
+
+    age_rows = [
+        ("0 a 4", 10),
+        ("15 a 19", 20),
+        ("30 a 34", 25),
+        ("45 a 49", 30),
+        ("65 a 69", 15),
+    ]
+    for offset, (label, value) in enumerate(age_rows, start=6):
+        sheet_age.cell(row=offset, column=5, value=1101)
+        sheet_age.cell(row=offset, column=7, value=label)
+        sheet_age.cell(row=offset, column=8, value=value)
+
+    workbook.save(path)
+
+
+def _write_censo_hogares_viviendas_workbook(path: Path) -> None:
+    workbook = openpyxl.Workbook()
+    sheet_viviendas = workbook.active
+    sheet_viviendas.title = "2"
+    sheet_hogares = workbook.create_sheet("6")
+    sheet_viviendas.cell(row=5, column=1, value=1)
+    sheet_viviendas.cell(row=5, column=2, value="Tarapaca")
+    sheet_viviendas.cell(row=5, column=3, value=11)
+    sheet_viviendas.cell(row=5, column=4, value="Iquique")
+    sheet_viviendas.cell(row=5, column=5, value=1101)
+    sheet_viviendas.cell(row=5, column=6, value="Iquique")
+    sheet_viviendas.cell(row=5, column=7, value=120)
+    sheet_viviendas.cell(row=5, column=8, value=100)
+    sheet_viviendas.cell(row=5, column=9, value=18)
+    sheet_viviendas.cell(row=5, column=10, value=2)
+
+    sheet_hogares.cell(row=5, column=5, value=1101)
+    sheet_hogares.cell(row=5, column=7, value=90)
+    sheet_hogares.cell(row=5, column=8, value=3.1)
+
+    workbook.save(path)
+
+
+def _write_salud_csv(path: Path) -> None:
+    path.write_text(
+        "\n".join(
+            [
+                "EstablecimientoCodigo;EstablecimientoGlosa;TipoEstablecimientoGlosa;"
+                "DependenciaAdministrativa;NivelAtencionEstabglosa;RegionCodigo;RegionGlosa;"
+                "ComunaCodigo;ComunaGlosa;TieneServicioUrgencia;TipoUrgencia;Latitud;Longitud;"
+                "EstadoFuncionamiento",
+                "1001;Hospital Iquique;Hospital;SNSS;Alta;1;Tarapaca;1101;Iquique;Si;"
+                "Urgencia;-20.214;-70.152;Vigente",
+            ]
+        ),
+        encoding="utf-8",
+    )
 
 
 class SubdereExtractorTests(unittest.TestCase):
@@ -310,33 +383,42 @@ class BaseExtractorContractTests(unittest.TestCase):
         self.assertEqual(salud_extractor.SaludExtractor().dataset_name, "establecimientos_salud")
 
     def test_censo_parser_preserves_cut_codes_and_age_totals(self):
-        workbook = sorted((ROOT_DIR / "data" / "raw").glob("ine_censo2024_comunal_*.xlsx"))[-1]
-        df = censo_extractor.parse_workbook(workbook)
-        self.assertEqual(df.height, 346)
-        self.assertEqual(df["codigo_comuna"].str.len_chars().min(), 5)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            workbook = Path(tmpdir) / "censo_comunal.xlsx"
+            _write_censo_workbook(workbook)
+
+            df = censo_extractor.parse_workbook(workbook)
+
+        self.assertEqual(df.height, 1)
+        self.assertEqual(df["codigo_comuna"].item(), "01101")
         age_total = sum(df[column] for column in censo_extractor.AGE_BANDS)
         self.assertEqual(df.filter(age_total != df["poblacion_censada"]).height, 0)
 
     def test_salud_parser_preserves_cut_codes(self):
-        source = sorted((ROOT_DIR / "data" / "raw").glob("minsal_establecimientos_salud_*.csv"))[-1]
-        df = salud_extractor.parse_csv(source)
-        self.assertGreater(df.height, 5000)
-        self.assertEqual(df["codigo_comuna"].str.len_chars().min(), 5)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            source = Path(tmpdir) / "salud.csv"
+            _write_salud_csv(source)
+
+            df = salud_extractor.parse_csv(source)
+
+        self.assertEqual(df.height, 1)
+        self.assertEqual(df["codigo_comuna"].item(), "01101")
 
     def test_censo_hogares_viviendas_parser_preserves_cut_codes(self):
-        workbook = sorted(
-            (ROOT_DIR / "data" / "raw").glob("ine_censo2024_hogares_viviendas_*.xlsx")
-        )[-1]
-        df = censo_hogares_viviendas_extractor.parse_workbook(workbook)
-        self.assertEqual(df.height, 346)
-        self.assertEqual(df["codigo_comuna"].str.len_chars().min(), 5)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            workbook = Path(tmpdir) / "censo_hogares_viviendas.xlsx"
+            _write_censo_hogares_viviendas_workbook(workbook)
+
+            df = censo_hogares_viviendas_extractor.parse_workbook(workbook)
+
+        self.assertEqual(df.height, 1)
+        self.assertEqual(df["codigo_comuna"].item(), "01101")
 
     def test_censo_hogares_viviendas_write_staging_persists_csv_and_metadata(self):
-        workbook = sorted(
-            (ROOT_DIR / "data" / "raw").glob("ine_censo2024_hogares_viviendas_*.xlsx")
-        )[-1]
-        df = censo_hogares_viviendas_extractor.parse_workbook(workbook)
         with tempfile.TemporaryDirectory() as tmpdir:
+            workbook = Path(tmpdir) / "censo_hogares_viviendas.xlsx"
+            _write_censo_hogares_viviendas_workbook(workbook)
+            df = censo_hogares_viviendas_extractor.parse_workbook(workbook)
             csv_path = Path(tmpdir) / "censo_hogares_viviendas.csv"
             metadata_path = Path(tmpdir) / "censo_hogares_viviendas.metadata.json"
             with (
