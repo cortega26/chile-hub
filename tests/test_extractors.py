@@ -532,6 +532,106 @@ class ResExtractorTests(unittest.TestCase):
         self.assertIn("CC-BY", policy["license"])
 
 
+class SourceAdapterTests(unittest.TestCase):
+    """Tests para los helpers reutilizables de extractores (source_adapter.py)."""
+
+    def test_fetch_url_snapshot_success(self):
+        """fetch_url_snapshot exitoso retorna success=True con contenido."""
+        from src.extractors.source_adapter import fetch_url_snapshot
+
+        mock_content = b"<html><body>datos</body></html>"
+        with patch("src.extractors.source_adapter.requests.get") as mock_get:
+            mock_resp = MagicMock()
+            mock_resp.status_code = 200
+            mock_resp.content = mock_content
+            mock_get.return_value = mock_resp
+
+            with tempfile.TemporaryDirectory() as tmp:
+                raw_dir = Path(tmp) / "raw"
+                success, content, note = fetch_url_snapshot(
+                    "https://example.com/data", raw_dir, "test_dataset"
+                )
+                self.assertTrue(success)
+                self.assertEqual(content, mock_content)
+                self.assertEqual(note, "official_landing_snapshot_saved")
+                # Verifica que el snapshot se guardó en disco
+                snapshots = list(raw_dir.glob("test_dataset_*.html"))
+                self.assertEqual(len(snapshots), 1)
+
+    def test_fetch_url_snapshot_failure(self):
+        """fetch_url_snapshot ante ConnectionError retorna success=False."""
+        from src.extractors.source_adapter import fetch_url_snapshot
+
+        with patch(
+            "src.extractors.source_adapter.requests.get",
+            side_effect=ConnectionError("timeout"),
+        ):
+            with tempfile.TemporaryDirectory() as tmp:
+                raw_dir = Path(tmp) / "raw"
+                success, content, note = fetch_url_snapshot(
+                    "https://example.com/data", raw_dir, "test_dataset"
+                )
+                self.assertFalse(success)
+                self.assertIsNone(content)
+                self.assertIn("official_landing_unavailable", note)
+                self.assertIn("timeout", note)
+
+    def test_source_mode_from_live_success(self):
+        """source_mode_from_live_success: True → live, False → fallback."""
+        from src.extractors.source_adapter import source_mode_from_live_success
+
+        self.assertEqual(source_mode_from_live_success(True), "live")
+        self.assertEqual(source_mode_from_live_success(False), "fallback")
+
+    def test_fallback_metadata_note(self):
+        """fallback_metadata_note produce nota con prefijo estandarizado."""
+        from src.extractors.source_adapter import fallback_metadata_note
+
+        note = fallback_metadata_note("endpoint no disponible")
+        self.assertIn("fallback_curated_rows_used:", note)
+        self.assertIn("endpoint no disponible", note)
+
+    def test_build_standard_metadata(self):
+        """build_standard_metadata produce dict con todos los campos requeridos."""
+        import polars as pl
+
+        from src.extractors.source_adapter import build_standard_metadata
+
+        df = pl.DataFrame({"codigo": ["13101", "13102"], "nombre": ["Santiago", "Iquique"]})
+        meta = build_standard_metadata(
+            dataset="test_dataset",
+            source_name="API de prueba",
+            source_url="https://example.com",
+            source_mode="live",
+            source_detail="public_api",
+            df=df,
+            notes=["prueba"],
+            reuse_policy={"status": "open-attribution", "license": "CC-BY"},
+        )
+        self.assertEqual(meta["dataset"], "test_dataset")
+        self.assertEqual(meta["source_name"], "API de prueba")
+        self.assertEqual(meta["source_url"], "https://example.com")
+        self.assertEqual(meta["source_mode"], "live")
+        self.assertEqual(meta["source_detail"], "public_api")
+        self.assertEqual(meta["record_count"], 2)
+        self.assertEqual(meta["fields"], ["codigo", "nombre"])
+        self.assertIn("prueba", meta["notes"])
+        self.assertEqual(meta["reuse_policy"]["status"], "open-attribution")
+
+
+class BaseExtractorEdgeTests(unittest.TestCase):
+    """Tests de borde para el contrato BaseExtractor."""
+
+    def test_ensure_staging_directories_idempotent(self):
+        """ensure_staging_directories no falla si los directorios ya existen."""
+        from src.extractors.base import ensure_staging_directories
+
+        # Llamar dos veces: la primera crea, la segunda es idempotente
+        ensure_staging_directories()
+        ensure_staging_directories()
+        # Si no lanza excepción, el test pasa
+
+
 if __name__ == "__main__":
     import sys
 

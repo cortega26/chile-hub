@@ -7,6 +7,7 @@ import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import ClassVar
+from unittest.mock import patch
 
 import polars as pl
 
@@ -1389,6 +1390,53 @@ class MakefileContractTests(unittest.TestCase):
         self.assertIn("scripts/package_publishable_bundle.py --clean", self.makefile_text)
         self.assertNotIn("rm -f data/normalized/*.json", self.makefile_text)
         self.assertNotIn("rm -f data/normalized/*.parquet", self.makefile_text)
+
+
+class EntryPointTests(unittest.TestCase):
+    """Smoke tests para puntos de entrada y código de inicialización."""
+
+    def test_module_main_executable(self):
+        """python -m chile_hub --help ejecuta sin errores."""
+        result = subprocess.run(
+            [sys.executable, "-m", "chile_hub", "--help"],
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("chile-hub", result.stdout)
+
+    def test_get_version_fallback_to_hardcoded(self):
+        """_get_version retorna '0.0.0' cuando pyproject.toml no existe
+        e importlib.metadata.version lanza PackageNotFoundError."""
+        from importlib.metadata import PackageNotFoundError
+        from pathlib import Path as _Path
+
+        from src.chile_hub.__init__ import _get_version
+
+        with (
+            patch.object(_Path, "is_file", return_value=False),
+            patch(
+                "importlib.metadata.version",
+                side_effect=PackageNotFoundError("package not found"),
+            ),
+        ):
+            version = _get_version()
+            self.assertEqual(version, "0.0.0")
+
+    def test_chile_hub_key_error_empty_args(self):
+        """_ChileHubKeyError sin args produce string vacío."""
+        from src.chile_hub.exceptions import _ChileHubKeyError
+
+        error = _ChileHubKeyError()
+        self.assertEqual(str(error), "")
+
+    def test_chile_hub_key_error_with_message(self):
+        """_ChileHubKeyError con mensaje produce el mensaje."""
+        from src.chile_hub.exceptions import _ChileHubKeyError
+
+        error = _ChileHubKeyError("dataset no encontrado")
+        self.assertEqual(str(error), "dataset no encontrado")
 
 
 if __name__ == "__main__":
