@@ -5,6 +5,7 @@ import threading
 from datetime import datetime, timezone
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from urllib.parse import urlparse
 
 import tomllib
 
@@ -82,6 +83,24 @@ def compute_runtime_overall_status(build_status, runtime_freshness):
         if status_rank(runtime_freshness_status) > status_rank(build_status)
         else build_status
     )
+
+
+def verify_local_site_asset(url_value, public_site_url, label):
+    if not url_value:
+        fail(f"Missing {label}")
+    parsed_public = urlparse(public_site_url)
+    parsed_url = urlparse(url_value)
+    if parsed_url.scheme not in {"http", "https"}:
+        fail(f"{label} must be an absolute URL: {url_value}")
+    if parsed_url.netloc != parsed_public.netloc:
+        return
+    public_path = parsed_public.path.rstrip("/") + "/"
+    if not parsed_url.path.startswith(public_path):
+        fail(f"{label} is outside public site path: {url_value}")
+    relative_path = parsed_url.path.removeprefix(public_path)
+    asset_path = ROOT_DIR / relative_path
+    if not asset_path.is_file():
+        fail(f"{label} points to missing local asset: {relative_path}")
 
 
 def get_free_port():
@@ -210,9 +229,15 @@ def verify_landing():
         if og_title != "chile-hub — Capas de Datos de Chile":
             fail(f"Unexpected og:title: {og_title}")
 
+        og_image = page.locator("meta[property='og:image']").get_attribute("content")
+        verify_local_site_asset(og_image, public_site_url, "og:image")
+
         twitter_card = page.locator("meta[name='twitter:card']").get_attribute("content")
         if twitter_card != "summary_large_image":
             fail(f"Unexpected twitter:card: {twitter_card}")
+
+        twitter_image = page.locator("meta[name='twitter:image']").get_attribute("content")
+        verify_local_site_asset(twitter_image, public_site_url, "twitter:image")
 
         json_ld_count = page.locator("script[type='application/ld+json']").count()
         if json_ld_count < 2:

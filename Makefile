@@ -64,7 +64,7 @@ help:
 	@printf "  make clean-publishable Elimina artefactos livianos versionables\n"
 
 bootstrap:
-	@python3 -c "import sys; v=sys.version_info; ok=v>=(3,13); sys.exit(0 if ok else f'Python 3.13+ requerido, se encontró {v.major}.{v.minor}')"
+	@python3 -c "import sys; v=sys.version_info; ok=(3,10)<=v<(3,15); sys.exit(0 if ok else f'Python >=3.10,<3.15 requerido, se encontró {v.major}.{v.minor}')"
 	python3 -m venv $(VENV_DIR)
 	$(VENV_DIR)/bin/python -m pip install --upgrade pip
 	$(VENV_DIR)/bin/python -m pip install -r requirements.txt
@@ -79,6 +79,7 @@ doctor:
 	@printf "PYTHON=%s\n" "$(PYTHON)"
 	@$(PYTHON) -c "import sys; print(sys.executable)"
 	@$(PYTHON) -c "import duckdb, polars, pyarrow; from importlib.metadata import version; print('duckdb=' + duckdb.__version__); print('polars=' + polars.__version__); print('pyarrow=' + pyarrow.__version__); print('playwright=' + version('playwright'))"
+	@$(PYTHON) scripts/check_validation_registration.py
 
 extract:
 	$(PYTHON) src/extractors/subdere_extractor.py

@@ -107,7 +107,8 @@ jobs:
         run: |
           if ! git diff --quiet -- index.html app.js; then
             git diff -- index.html app.js
-            echo "::warning::Build-synced files are stale. The publish job will auto-commit them on the next schedule run."
+            echo "::error::Build-synced files are stale. Run python src/build_dev_db.py and commit index.html/app.js."
+            exit 1
           fi
 
       - name: Verify pipeline artifacts
@@ -249,7 +250,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add --all data/normalized/
+          git add --all data/normalized/ index.html app.js
           if git diff --cached --quiet; then
             echo "No publishable data changes."
             exit 0

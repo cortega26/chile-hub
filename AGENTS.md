@@ -297,11 +297,12 @@ Agregar una función `validate_{nombre}(df, metadata)` en **`src/validation.py`*
 Luego importarla en `build_dev_db.py` y llamarla dentro del bloque `validations = {…}` al final del build.
 
 > **Verificación obligatoria:** después de registrar la validación, ejecutar
-> `grep "def validate_" src/validation.py | wc -l` y
-> `grep "validate_" src/build_dev_db.py | grep -v "import\|from\|#" | wc -l`.
-> Ambos conteos deben coincidir. Una validación definida pero no registrada en
-> `build_dev_db.py` se salta silenciosamente: los datos se publican sin pasar
-> por esa verificación. El `make doctor` incluye esta verificación.
+> `python scripts/check_validation_registration.py` o `make doctor`.
+> La verificación compara las funciones `validate_*()` de `src/validation.py`
+> contra las claves del bloque `validations = {…}` de `build_dev_db.py`, con
+> excepciones explícitas para alias semánticos y validadores archivados. Una
+> validación definida pero no registrada se salta silenciosamente: los datos se
+> publican sin pasar por esa verificación.
 
 ### Paso 5 — Agregar tests
 

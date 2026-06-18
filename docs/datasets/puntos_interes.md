@@ -1,5 +1,11 @@
 # Puntos de Interés — OpenStreetMap
 
+> **Estado:** archivado. `puntos_interes` no forma parte del catálogo público actual
+> de `chile-hub`, no está incluido en `data/normalized/` y no debe usarse con
+> `hub.load_polars("puntos_interes")`. El extractor basado en Overpass API fue
+> retirado porque la fuente resultó demasiado inestable para CI; esta ficha queda
+> como referencia histórica hasta que exista una fuente oficial chilena de POIs.
+
 Dataset de puntos de interés (POI) georreferenciados extraídos de
 OpenStreetMap vía Overpass API. Incluye comercios, servicios, oficinas,
 talleres y atracciones turísticas con nombre, dirección postal y coordenadas.
@@ -43,7 +49,10 @@ talleres y atracciones turísticas con nombre, dirección postal y coordenadas.
 | `oficina` | `office=*` | empresa, abogado, contador, arquitecto, notaría |
 | `oficio` | `craft=*` | carpintero, electricista, fontanero, cerrajero |
 
-## Uso
+## Uso histórico
+
+Los ejemplos siguientes se conservan solo como referencia del diseño original.
+No funcionan en la versión actual mientras `puntos_interes` siga archivado.
 
 ### Python
 
@@ -114,13 +123,14 @@ chile-hub path puntos_interes --output parquet
 
 ## Notas de integración
 
-- **Tier:** C — fuente comunitaria con cobertura parcial.
-- **Join keys:** `osm_id` (principal). `codigo_comuna` para cruce territorial.
-- **Bundle:** Incluido en el ZIP público (licencia ODbL con atribución).
-- **Atribución:** Todo uso público de estos datos debe incluir:
+- **Tier histórico:** C — fuente comunitaria con cobertura parcial.
+- **Join keys históricos:** `osm_id` (principal). `codigo_comuna` para cruce territorial.
+- **Bundle:** No incluido en el ZIP público actual.
+- **Atribución histórica:** Todo uso público de estos datos debía incluir:
   "© OpenStreetMap contributors".
 
 ## Registro de cambios
 
+- **2026-06-18:** Dataset archivado; no forma parte del catálogo público actual.
 - **2026-06-17:** Dataset agregado a chile-hub (extractor Overpass API,
   validación, tests, documentación).
