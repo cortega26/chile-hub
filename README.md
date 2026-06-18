@@ -474,7 +474,7 @@ print(resumen.head())
 El pipeline es **lineal, determinista y estricto**: si una validación falla, el build se cancela antes de publicar datos corruptos.
 
 ```mermaid
-flowchart LR
+flowchart TB
     classDef extract fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#0f172a;
     classDef stage fill:#ecfeff,stroke:#0891b2,stroke-width:2px,color:#0f172a;
     classDef build fill:#fef9c3,stroke:#ca8a04,stroke-width:2px,color:#0f172a;
