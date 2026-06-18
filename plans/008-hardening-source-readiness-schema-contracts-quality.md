@@ -19,6 +19,7 @@
 - **Depends on**: none
 - **Category**: direction / architecture / data-quality / dx
 - **Planned at**: commit `4eb79ce`, 2026-06-17
+- **Status update**: 2026-06-18 — split into smaller implemented pieces: checked-in `contracts/datasets/*.schema.json`, `data/source_registry.json`, and `scripts/verify_pipeline.py` contract/registry gates. Generated `source_readiness.*` artifacts and deeper maturity propagation remain future follow-up work.
 
 ## Why This Matters
 

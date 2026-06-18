@@ -1,0 +1,18 @@
+{
+  "dataset": "establecimientos_salud",
+  "primary_key": ["codigo_establecimiento"],
+  "required_columns": ["codigo_establecimiento", "nombre_establecimiento", "tipo_establecimiento", "codigo_region", "codigo_comuna"],
+  "column_types": {
+    "codigo_establecimiento": "string",
+    "codigo_region": "string",
+    "codigo_comuna": "string"
+  },
+  "nullable_columns": [],
+  "fixed_width_columns": {
+    "codigo_region": 2,
+    "codigo_comuna": 5
+  },
+  "expected_record_count": null,
+  "coverage_policy": "not_applicable",
+  "publish_outputs": ["parquet", "json"]
+}

@@ -3,6 +3,11 @@ description: Propose a new official Chile dataset for the curated hub.
 title: "dataset: "
 labels: ["enhancement", "dataset"]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Before proposing a maintained layer, review `docs/dataset-inclusion-criteria.md`.
+        chile-hub prioritizes stable, legally reusable, structured sources with clear join value.
   - type: input
     id: source
     attributes:
@@ -14,10 +19,23 @@ body:
     id: license
     attributes:
       label: Reuse/licensing status
+      description: Choose the most conservative option if the terms are unclear.
       options:
         - Open attribution
         - Public API, terms need review
         - Restricted or unclear
+    validations:
+      required: true
+  - type: dropdown
+    id: source_format
+    attributes:
+      label: Source format
+      description: HTML-only sources usually stay in research unless there is a stable download.
+      options:
+        - API JSON
+        - Stable CSV/XLSX/ZIP download
+        - Official bulk file or open data portal
+        - HTML/PDF or unclear
     validations:
       required: true
   - type: textarea
@@ -35,7 +53,27 @@ body:
     validations:
       required: true
   - type: textarea
+    id: expected_schema
+    attributes:
+      label: Expected schema
+      description: List known columns, primary key candidates, and any CUT code fields.
+      placeholder: |
+        primary key: codigo_comuna + anio
+        columns: codigo_comuna, anio, valor, fuente
+  - type: textarea
     id: maintenance
     attributes:
       label: Maintenance notes
       description: Known update cadence, schema changes, or source reliability concerns.
+    validations:
+      required: true
+  - type: checkboxes
+    id: criteria
+    attributes:
+      label: Inclusion criteria check
+      options:
+        - label: The source is official or clearly authoritative.
+        - label: The source has structured access, not only fragile HTML scraping.
+        - label: The data appears legally reusable or worth formal review.
+        - label: The dataset has clear join value with DPA or another stable identifier.
+        - label: The request describes a concrete user workflow.

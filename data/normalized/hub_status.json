@@ -1,23 +1,23 @@
 {
-  "generated_at_utc": "2026-06-18T00:23:06.004190+00:00",
+  "generated_at_utc": "2026-06-18T15:15:36.658487+00:00",
   "overall_status": "warn",
-  "dataset_count": 14,
-  "live_count": 10,
+  "dataset_count": 15,
+  "live_count": 11,
   "fallback_count": 4,
   "stale_count": 0,
-  "drifted_count": 5,
+  "drifted_count": 6,
   "degraded_count": 0,
-  "warning_count": 6,
+  "warning_count": 9,
   "top_issue": {
-    "dataset": "finanzas_municipales",
+    "dataset": "empresas",
     "attention_priority": 0,
-    "warning_count": 1,
+    "warning_count": 3,
     "build_freshness_status": "fresh",
     "drift_status": "drifted",
     "degradation_status": "warning",
-    "source_detail": "curated_fallback_pending_direct_export",
-    "diagnostic_summary": "finanzas_municipales source_mode is fallback; review before publication",
+    "source_detail": "datos_gob_cl_ckan_api",
+    "diagnostic_summary": "found 1 RUTs with non-standard format (not validated)",
     "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
   },
-  "top_issue_summary": "finanzas_municipales: finanzas_municipales source_mode is fallback; review before publication [source_detail=curated_fallback_pending_direct_export; warnings=1; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]"
+  "top_issue_summary": "empresas: found 1 RUTs with non-standard format (not validated) [source_detail=datos_gob_cl_ckan_api; warnings=3; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]"
 }

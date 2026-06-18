@@ -20,6 +20,7 @@
 - **Depends on**: none (pero 005 toca build_dev_db.py — coordinar orden)
 - **Category**: tech-debt
 - **Planned at**: commit `ba2f434`, 2026-06-13
+- **Resolved**: 2026-06-18 — validation lives in `src/validation.py`, extractors import validators from that neutral module, and `src/chile_hub/core.py` uses shared `compute_top_issue` / freshness helpers.
 
 ## Why this matters
 

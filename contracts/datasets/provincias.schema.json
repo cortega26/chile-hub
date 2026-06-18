@@ -1,0 +1,17 @@
+{
+  "dataset": "provincias",
+  "primary_key": ["codigo_provincia"],
+  "required_columns": ["codigo_region", "nombre_region", "codigo_provincia", "nombre_provincia"],
+  "column_types": {
+    "codigo_region": "string",
+    "codigo_provincia": "string"
+  },
+  "nullable_columns": [],
+  "fixed_width_columns": {
+    "codigo_region": 2,
+    "codigo_provincia": 3
+  },
+  "expected_record_count": 56,
+  "coverage_policy": "full",
+  "publish_outputs": ["parquet", "json"]
+}

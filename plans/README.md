@@ -10,13 +10,13 @@ Los planes 005–007 tienen dependencias.
 | # | Plan | Esfuerzo | Riesgo | Depende de | Estado |
 |---|------|----------|--------|-----------|--------|
 | 001 | [Fix landing page bugs — KPIs antiguos y crash de coordenadas](001-fix-landing-page-bugs.md) | S | LOW | — | DONE |
-| 002 | [Agregar CSP a la landing page](002-csp-landing-page.md) | S | LOW | — | TODO |
-| 003 | [Validar metadata JSON antes del build](003-guard-metadata-json.md) | S | LOW | — | TODO |
-| 004 | [Limpiar dependencias — pyarrow, dev/prod, curl_cffi](004-cleanup-dependencies.md) | S | LOW | — | TODO |
+| 002 | [Agregar CSP a la landing page](002-csp-landing-page.md) | S | LOW | — | DONE (fixed independently; CSP meta tag already in index.html:5) |
+| 003 | [Validar metadata JSON antes del build](003-guard-metadata-json.md) | S | LOW | — | DONE (fixed independently; guardas para 10 datasets en build_dev_db.py:2092-2168) |
+| 004 | [Limpiar dependencias — pyarrow, dev/prod, curl_cffi](004-cleanup-dependencies.md) | S | LOW | — | DONE |
 | 005 | [Eliminar escrituras redundantes del build](005-eliminate-redundant-build-writes.md) | S | LOW | 003 (idealmente) | TODO |
-| 006 | [Consolidar lógica duplicada y corregir violación de capas](006-consolidate-duplicated-logic.md) | S | LOW | — | TODO |
-| 007 | [Mejoras de tooling — pre-commit, editorconfig, CI](007-tooling-improvements.md) | S | LOW | 004 | TODO |
-| 008 | [Hardening de source readiness, schema contracts y quality gates](008-hardening-source-readiness-schema-contracts-quality.md) | L | MED | — | TODO |
+| 006 | [Consolidar lógica duplicada y corregir violación de capas](006-consolidate-duplicated-logic.md) | S | LOW | — | DONE |
+| 007 | [Mejoras de tooling — pre-commit, editorconfig, CI](007-tooling-improvements.md) | S | LOW | 004 | DONE |
+| 008 | [Hardening de source readiness, schema contracts y quality gates](008-hardening-source-readiness-schema-contracts-quality.md) | L | MED | — | PARTIAL (schema contracts + source registry JSON implemented; generated readiness artifacts remain future work) |
 
 ## Grafo de dependencias
 

@@ -1,27 +1,27 @@
 # chile-hub health summary
 
-- `generated_at_utc`: `2026-06-18T00:23:06.004190+00:00`
+- `generated_at_utc`: `2026-06-18T15:15:36.658487+00:00`
 - `overall_status`: `warn`
-- `dataset_count`: `14`
+- `dataset_count`: `15`
 - `ok_count`: `9`
-- `warn_count`: `5`
+- `warn_count`: `6`
 - `error_count`: `0`
-- `live_count`: `10`
+- `live_count`: `11`
 - `fallback_count`: `4`
 - `stale_count`: `0`
-- `publishable_count`: `14`
+- `publishable_count`: `15`
 - `review_terms_count`: `0`
 - `unknown_reuse_count`: `0`
 - `degraded_count`: `0`
-- `degradation_warning_count`: `4`
+- `degradation_warning_count`: `5`
 - `partial_coverage_count`: `1`
 - `unknown_coverage_count`: `0`
-- `drifted_count`: `5`
-- `warning_count`: `6`
-- `top_issue`: `finanzas_municipales` (freshness=fresh, drift=drifted, warnings=1)
-- `top_issue_reason`: finanzas_municipales source_mode is fallback; review before publication
+- `drifted_count`: `6`
+- `warning_count`: `9`
+- `top_issue`: `empresas` (freshness=fresh, drift=drifted, warnings=3)
+- `top_issue_reason`: found 1 RUTs with non-standard format (not validated)
 - `top_issue_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.
-- `top_issue_summary`: finanzas_municipales: finanzas_municipales source_mode is fallback; review before publication [source_detail=curated_fallback_pending_direct_export; warnings=1; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]
+- `top_issue_summary`: empresas: found 1 RUTs with non-standard format (not validated) [source_detail=datos_gob_cl_ckan_api; warnings=3; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]
 
 | Dataset | Severity | Mode | Freshness | Coverage | Drift | Publishability | Degradation | Validation | Warnings |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | ---: |
@@ -30,6 +30,7 @@
 | `comunas` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `comunas_enriquecidas` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `distritos_electorales` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
+| `empresas` | `warn` | `live` | `fresh` | `not_applicable` | `drifted` | `ready` | `warning` | `ok` | 3 |
 | `establecimientos_educacionales` | `ok` | `live` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `establecimientos_salud` | `ok` | `live` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `finanzas_municipales` | `warn` | `fallback` | `fresh` | `not_applicable` | `drifted` | `ready` | `warning` | `ok` | 1 |

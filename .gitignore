@@ -2,6 +2,7 @@
 # Ocultamos por defecto todo `data/` y reabrimos solo artefactos livianos
 # de `data/normalized` que sirven para publicar el estado real del hub.
 data/*
+!data/source_registry.json
 !data/normalized/
 data/normalized/*
 !data/normalized/*.json

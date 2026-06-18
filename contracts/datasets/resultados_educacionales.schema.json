@@ -1,0 +1,17 @@
+{
+  "dataset": "resultados_educacionales",
+  "primary_key": ["anio", "codigo_comuna"],
+  "required_columns": ["anio", "codigo_comuna", "matricula_total", "asistencia_promedio", "tasa_aprobacion"],
+  "column_types": {
+    "anio": "integer",
+    "codigo_comuna": "string",
+    "matricula_total": "integer"
+  },
+  "nullable_columns": [],
+  "fixed_width_columns": {
+    "codigo_comuna": 5
+  },
+  "expected_record_count": null,
+  "coverage_policy": "partial_expected",
+  "publish_outputs": ["parquet", "json"]
+}

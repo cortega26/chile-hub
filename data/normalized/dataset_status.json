@@ -1,6 +1,6 @@
 {
-  "generated_at_utc": "2026-06-18T00:23:06.004190+00:00",
-  "dataset_count": 14,
+  "generated_at_utc": "2026-06-18T15:15:36.658487+00:00",
+  "dataset_count": 15,
   "datasets": [
     {
       "dataset": "censo_comunal",
@@ -8,9 +8,9 @@
       "source_mode": "live",
       "freshness": {
         "status": "fresh",
-        "age_hours": 7.53,
+        "age_hours": 22.4,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-06-18T00:23:06.003236+00:00"
+        "checked_at_utc": "2026-06-18T15:15:36.657581+00:00"
       },
       "record_count": 346,
       "expected_record_count": 346,
@@ -28,9 +28,9 @@
       "source_mode": "live",
       "freshness": {
         "status": "fresh",
-        "age_hours": 7.53,
+        "age_hours": 22.4,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-06-18T00:23:06.003253+00:00"
+        "checked_at_utc": "2026-06-18T15:15:36.657599+00:00"
       },
       "record_count": 346,
       "expected_record_count": 346,
@@ -48,9 +48,9 @@
       "source_mode": "live",
       "freshness": {
         "status": "fresh",
-        "age_hours": 7.54,
+        "age_hours": 22.42,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-18T00:23:06.003058+00:00"
+        "checked_at_utc": "2026-06-18T15:15:36.657377+00:00"
       },
       "record_count": 346,
       "expected_record_count": 346,
@@ -68,9 +68,9 @@
       "source_mode": "live",
       "freshness": {
         "status": "fresh",
-        "age_hours": 7.54,
+        "age_hours": 22.42,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-18T00:23:06.003063+00:00"
+        "checked_at_utc": "2026-06-18T15:15:36.657383+00:00"
       },
       "record_count": 346,
       "expected_record_count": 346,
@@ -88,9 +88,9 @@
       "source_mode": "live",
       "freshness": {
         "status": "fresh",
-        "age_hours": 7.53,
+        "age_hours": 22.4,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-06-18T00:23:06.003257+00:00"
+        "checked_at_utc": "2026-06-18T15:15:36.657604+00:00"
       },
       "record_count": 346,
       "expected_record_count": 346,
@@ -103,14 +103,38 @@
       "recommended_action": "Ninguna."
     },
     {
+      "dataset": "empresas",
+      "validation_status": "ok",
+      "source_mode": "live",
+      "freshness": {
+        "status": "fresh",
+        "age_hours": 0.05,
+        "max_age_hours": 1080,
+        "checked_at_utc": "2026-06-18T15:15:36.657643+00:00"
+      },
+      "record_count": 1572116,
+      "expected_record_count": null,
+      "coverage_status": "not_applicable",
+      "coverage_ratio": null,
+      "redistribution_status": "open-attribution",
+      "redistribution_ok": true,
+      "refreshed_at_utc": "2026-06-18T15:12:32.375088+00:00",
+      "warnings": [
+        "found 1 RUTs with non-standard format (not validated)",
+        "unknown sociedad codes (new types?): ['SpA']",
+        "RES solo cubre constituciones bajo Ley 20.659 (regimen simplificado). No incluye empresas del regimen tradicional (Diario Oficial) ni empresas anteriores a mayo 2013."
+      ],
+      "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
+    },
+    {
       "dataset": "establecimientos_educacionales",
       "validation_status": "ok",
       "source_mode": "live",
       "freshness": {
         "status": "fresh",
-        "age_hours": 7.53,
+        "age_hours": 22.4,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-06-18T00:23:06.003248+00:00"
+        "checked_at_utc": "2026-06-18T15:15:36.657594+00:00"
       },
       "record_count": 12898,
       "expected_record_count": null,
@@ -128,9 +152,9 @@
       "source_mode": "live",
       "freshness": {
         "status": "fresh",
-        "age_hours": 7.53,
+        "age_hours": 22.4,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-06-18T00:23:06.003243+00:00"
+        "checked_at_utc": "2026-06-18T15:15:36.657589+00:00"
       },
       "record_count": 5643,
       "expected_record_count": null,
@@ -148,9 +172,9 @@
       "source_mode": "fallback",
       "freshness": {
         "status": "fresh",
-        "age_hours": 7.53,
+        "age_hours": 22.4,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-06-18T00:23:06.003262+00:00"
+        "checked_at_utc": "2026-06-18T15:15:36.657608+00:00"
       },
       "record_count": 3,
       "expected_record_count": null,
@@ -170,9 +194,9 @@
       "source_mode": "live",
       "freshness": {
         "status": "fresh",
-        "age_hours": 7.53,
+        "age_hours": 22.41,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-06-18T00:23:06.003225+00:00"
+        "checked_at_utc": "2026-06-18T15:15:36.657568+00:00"
       },
       "record_count": 430,
       "expected_record_count": null,
@@ -193,9 +217,9 @@
       "source_mode": "fallback",
       "freshness": {
         "status": "fresh",
-        "age_hours": 7.53,
+        "age_hours": 22.4,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-06-18T00:23:06.003271+00:00"
+        "checked_at_utc": "2026-06-18T15:15:36.657619+00:00"
       },
       "record_count": 6,
       "expected_record_count": null,
@@ -218,7 +242,7 @@
         "status": "fresh",
         "age_hours": 0.0,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-06-18T00:23:06.003286+00:00"
+        "checked_at_utc": "2026-06-18T15:15:36.657635+00:00"
       },
       "record_count": 346,
       "expected_record_count": 346,
@@ -226,7 +250,7 @@
       "coverage_ratio": 1.0,
       "redistribution_status": "open-attribution",
       "redistribution_ok": true,
-      "refreshed_at_utc": "2026-06-18T00:23:06.003278+00:00",
+      "refreshed_at_utc": "2026-06-18T15:15:36.657626+00:00",
       "warnings": [],
       "recommended_action": "Ninguna."
     },
@@ -236,9 +260,9 @@
       "source_mode": "live",
       "freshness": {
         "status": "fresh",
-        "age_hours": 7.54,
+        "age_hours": 22.42,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-18T00:23:06.003049+00:00"
+        "checked_at_utc": "2026-06-18T15:15:36.657368+00:00"
       },
       "record_count": 56,
       "expected_record_count": 56,
@@ -256,9 +280,9 @@
       "source_mode": "live",
       "freshness": {
         "status": "fresh",
-        "age_hours": 7.54,
+        "age_hours": 22.42,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-18T00:23:06.003021+00:00"
+        "checked_at_utc": "2026-06-18T15:15:36.657335+00:00"
       },
       "record_count": 16,
       "expected_record_count": 16,
@@ -276,9 +300,9 @@
       "source_mode": "fallback",
       "freshness": {
         "status": "fresh",
-        "age_hours": 7.53,
+        "age_hours": 22.4,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-06-18T00:23:06.003267+00:00"
+        "checked_at_utc": "2026-06-18T15:15:36.657613+00:00"
       },
       "record_count": 3,
       "expected_record_count": null,

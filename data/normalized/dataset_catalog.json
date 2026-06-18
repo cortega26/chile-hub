@@ -1,6 +1,6 @@
 {
-  "generated_at_utc": "2026-06-18T00:23:06.004190+00:00",
-  "dataset_count": 14,
+  "generated_at_utc": "2026-06-18T15:15:36.658487+00:00",
+  "dataset_count": 15,
   "datasets": [
     {
       "dataset": "regiones",
@@ -31,9 +31,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 7.54,
+        "age_hours": 22.42,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-18T00:23:06.003021+00:00"
+        "checked_at_utc": "2026-06-18T15:15:36.657335+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -108,9 +108,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 7.54,
+        "age_hours": 22.42,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-18T00:23:06.003049+00:00"
+        "checked_at_utc": "2026-06-18T15:15:36.657368+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -192,9 +192,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 7.54,
+        "age_hours": 22.42,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-18T00:23:06.003058+00:00"
+        "checked_at_utc": "2026-06-18T15:15:36.657377+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -275,9 +275,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 7.54,
+        "age_hours": 22.42,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-18T00:23:06.003063+00:00"
+        "checked_at_utc": "2026-06-18T15:15:36.657383+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -363,9 +363,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 7.53,
+        "age_hours": 22.41,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-06-18T00:23:06.003225+00:00"
+        "checked_at_utc": "2026-06-18T15:15:36.657568+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 72,
@@ -454,9 +454,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 7.53,
+        "age_hours": 22.4,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-06-18T00:23:06.003236+00:00"
+        "checked_at_utc": "2026-06-18T15:15:36.657581+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -540,9 +540,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 7.53,
+        "age_hours": 22.4,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-06-18T00:23:06.003243+00:00"
+        "checked_at_utc": "2026-06-18T15:15:36.657589+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 1080,
@@ -618,9 +618,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 7.53,
+        "age_hours": 22.4,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-06-18T00:23:06.003248+00:00"
+        "checked_at_utc": "2026-06-18T15:15:36.657594+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -700,9 +700,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 7.53,
+        "age_hours": 22.4,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-06-18T00:23:06.003253+00:00"
+        "checked_at_utc": "2026-06-18T15:15:36.657599+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -770,9 +770,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 7.53,
+        "age_hours": 22.4,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-06-18T00:23:06.003257+00:00"
+        "checked_at_utc": "2026-06-18T15:15:36.657604+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -846,9 +846,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 7.53,
+        "age_hours": 22.4,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-06-18T00:23:06.003262+00:00"
+        "checked_at_utc": "2026-06-18T15:15:36.657608+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -929,9 +929,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 7.53,
+        "age_hours": 22.4,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-06-18T00:23:06.003267+00:00"
+        "checked_at_utc": "2026-06-18T15:15:36.657613+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -1015,9 +1015,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 7.53,
+        "age_hours": 22.4,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-06-18T00:23:06.003271+00:00"
+        "checked_at_utc": "2026-06-18T15:15:36.657619+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -1071,7 +1071,7 @@
       "source_url": "https://github.com/cortega26/chile-hub",
       "source_mode": "fallback",
       "source_detail": "derived_from_validated_chile_hub_layers",
-      "refreshed_at_utc": "2026-06-18T00:23:06.003278+00:00",
+      "refreshed_at_utc": "2026-06-18T15:15:36.657626+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -1135,7 +1135,7 @@
         "status": "fresh",
         "age_hours": 0.0,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-06-18T00:23:06.003286+00:00"
+        "checked_at_utc": "2026-06-18T15:15:36.657635+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 1080,
@@ -1176,6 +1176,97 @@
       "notes": [
         "derived_dataset",
         "upstreams: comunas,censo_comunal,censo_hogares_viviendas,establecimientos_salud,establecimientos_educacionales,distritos_electorales,finanzas_municipales,resultados_educacionales,indicadores_urbanos_siedu"
+      ]
+    },
+    {
+      "dataset": "empresas",
+      "description": "Registro de Empresas y Sociedades (RES) con RUT, razon social, tipo societario, capital, fecha de constitucion y comuna de domicilio.",
+      "source_name": "Ministerio de Economia, Fomento y Turismo - Registro de Empresas y Sociedades (RES)",
+      "source_url": "https://datos.gob.cl/dataset/registro-de-empresas-y-sociedades",
+      "source_mode": "live",
+      "source_detail": "datos_gob_cl_ckan_api",
+      "refreshed_at_utc": "2026-06-18T15:12:32.375088+00:00",
+      "record_count": 1572116,
+      "fields": [
+        "rut",
+        "razon_social",
+        "codigo_sociedad",
+        "tipo_actuacion",
+        "capital",
+        "fecha_actuacion",
+        "fecha_registro",
+        "fecha_aprobacion_sii",
+        "anio",
+        "mes",
+        "comuna_tributaria",
+        "region_tributaria",
+        "comuna_social",
+        "region_social"
+      ],
+      "indicator_codes": [],
+      "indicator_delivery": {},
+      "join_keys": [
+        "rut"
+      ],
+      "confidence_tier": "Tier B",
+      "reuse_policy": {
+        "status": "open-attribution",
+        "license": "CC-BY",
+        "license_url": "https://creativecommons.org/licenses/by/3.0/cl/",
+        "attribution_required": true,
+        "redistribution_ok": true,
+        "summary": "Registro de Empresas y Sociedades (RES) del Ministerio de Economia, publicado en datos.gob.cl bajo CC-BY. Solo incluye constituciones bajo Ley 20.659 (regimen simplificado) desde 2013."
+      },
+      "freshness": {
+        "status": "fresh",
+        "age_hours": 0.05,
+        "max_age_hours": 1080,
+        "checked_at_utc": "2026-06-18T15:15:36.657643+00:00"
+      },
+      "freshness_policy": {
+        "max_age_hours": 1080,
+        "label": "mensual"
+      },
+      "coverage": {
+        "status": "not_applicable",
+        "expected_record_count": null,
+        "actual_record_count": 1572116,
+        "coverage_ratio": null,
+        "summary": "Sin baseline de cobertura por cardinalidad para esta capa."
+      },
+      "drift": {
+        "status": "drifted",
+        "summary": "Drift detectado: mode=live, coverage=not_applicable, degradation=warning.",
+        "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
+      },
+      "usage_examples": {
+        "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('empresas')\n# Empresas por comuna\ndf.group_by('comuna_tributaria').len().sort('len', descending=True)",
+        "duckdb": "SELECT comuna_tributaria, count(*) AS n\nFROM 'data/normalized/empresas.parquet'\nGROUP BY 1 ORDER BY n DESC LIMIT 10;",
+        "cli": "chile-hub show empresas"
+      },
+      "outputs": {
+        "parquet": "data/normalized/empresas.parquet",
+        "duckdb_table": "empresas",
+        "excel_sheet": "Empresas RES"
+      },
+      "documentation": "docs/datasets/empresas.md",
+      "validation_status": "ok",
+      "warnings": [
+        "found 1 RUTs with non-standard format (not validated)",
+        "unknown sociedad codes (new types?): ['SpA']",
+        "RES solo cubre constituciones bajo Ley 20.659 (regimen simplificado). No incluye empresas del regimen tradicional (Diario Oficial) ni empresas anteriores a mayo 2013."
+      ],
+      "degradation": {
+        "status": "warning",
+        "impact": "found 1 RUTs with non-standard format (not validated); unknown sociedad codes (new types?): ['SpA']; RES solo cubre constituciones bajo Ley 20.659 (regimen simplificado). No incluye empresas del regimen tradicional (Diario Oficial) ni empresas anteriores a mayo 2013.",
+        "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
+      },
+      "notes": [
+        "Solo incluye empresas constituidas bajo el Regimen Simplificado (Ley 20.659) desde mayo 2013.",
+        "No contiene direccion postal (solo comuna y region).",
+        "No contiene actividad economica (giro).",
+        "No refleja cese de actividades ni modificaciones posteriores.",
+        "Los codigos de region usan el formato numerico del SII (1-15), distinto del codigo CUT (01-16). Verificar antes de cruzar con DPA."
       ]
     }
   ]

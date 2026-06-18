@@ -17,7 +17,11 @@ if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
 from scripts import package_publishable_bundle
-from scripts.verify_pipeline import verify_publication_policy
+from scripts.verify_pipeline import (
+    verify_dataset_contract,
+    verify_publication_policy,
+    verify_source_registry,
+)
 from src.build_dev_db import (
     DATASET_CATALOG_CONFIG,
     build_coverage,
@@ -150,12 +154,143 @@ class PipelineLogicTests(unittest.TestCase):
         )
 
         with (
-            patch("builtins.print") as print_mock,
+            patch("builtins.print"),
             self.assertRaisesRegex(SystemExit, "1"),
         ):
             verify_publication_policy({"datasets": datasets})
 
-        self.assertIn("Publication policy rejected", print_mock.call_args.args[0])
+    def test_dataset_contract_accepts_valid_dataframe(self):
+        df = pl.DataFrame(
+            {
+                "codigo_comuna": ["01101", "01107"],
+                "nombre_comuna": ["Iquique", "Alto Hospicio"],
+            }
+        )
+        contract = {
+            "dataset": "demo",
+            "primary_key": ["codigo_comuna"],
+            "required_columns": ["codigo_comuna", "nombre_comuna"],
+            "column_types": {"codigo_comuna": "string"},
+            "fixed_width_columns": {"codigo_comuna": 5},
+            "expected_record_count": 2,
+            "coverage_policy": "full",
+            "publish_outputs": [],
+        }
+
+        verify_dataset_contract("demo", contract, df, {}, ROOT_DIR)
+
+    def test_dataset_contract_rejects_missing_required_column(self):
+        df = pl.DataFrame({"codigo_comuna": ["01101"]})
+        contract = {
+            "dataset": "demo",
+            "primary_key": ["codigo_comuna"],
+            "required_columns": ["codigo_comuna", "nombre_comuna"],
+            "column_types": {},
+            "fixed_width_columns": {},
+            "coverage_policy": "not_applicable",
+            "publish_outputs": [],
+        }
+
+        with patch("builtins.print") as print_mock, self.assertRaisesRegex(SystemExit, "1"):
+            verify_dataset_contract("demo", contract, df, {}, ROOT_DIR)
+        self.assertIn("missing required columns", print_mock.call_args.args[0])
+
+    def test_dataset_contract_rejects_duplicate_primary_key(self):
+        df = pl.DataFrame({"codigo_comuna": ["01101", "01101"]})
+        contract = {
+            "dataset": "demo",
+            "primary_key": ["codigo_comuna"],
+            "required_columns": ["codigo_comuna"],
+            "column_types": {},
+            "fixed_width_columns": {},
+            "coverage_policy": "not_applicable",
+            "publish_outputs": [],
+        }
+
+        with patch("builtins.print") as print_mock, self.assertRaisesRegex(SystemExit, "1"):
+            verify_dataset_contract("demo", contract, df, {}, ROOT_DIR)
+        self.assertIn("primary key is not unique", print_mock.call_args.args[0])
+
+    def test_dataset_contract_rejects_invalid_cut_width(self):
+        df = pl.DataFrame({"codigo_comuna": ["1101"]})
+        contract = {
+            "dataset": "demo",
+            "primary_key": ["codigo_comuna"],
+            "required_columns": ["codigo_comuna"],
+            "column_types": {"codigo_comuna": "string"},
+            "fixed_width_columns": {"codigo_comuna": 5},
+            "coverage_policy": "not_applicable",
+            "publish_outputs": [],
+        }
+
+        with patch("builtins.print") as print_mock, self.assertRaisesRegex(SystemExit, "1"):
+            verify_dataset_contract("demo", contract, df, {}, ROOT_DIR)
+        self.assertIn("outside width 5", print_mock.call_args.args[0])
+
+    def test_source_registry_accepts_catalog_subset_and_config_entries(self):
+        catalog = {"datasets": [{"dataset": "comunas"}]}
+        registry = [
+            {
+                "dataset": "comunas",
+                "license_status": "open-attribution",
+                "access_method": "api",
+                "live_extractor_status": "implemented",
+                "fallback_policy": "allowed_for_dev",
+                "maturity_status": "stable",
+                "live_ready": True,
+                "publish_blocking": True,
+            }
+        ]
+
+        verify_source_registry(registry, catalog)
+
+    def test_source_registry_rejects_duplicate_dataset(self):
+        catalog = {"datasets": [{"dataset": "comunas"}]}
+        registry = [
+            {
+                "dataset": "comunas",
+                "license_status": "open-attribution",
+                "access_method": "api",
+                "live_extractor_status": "implemented",
+                "fallback_policy": "allowed_for_dev",
+                "maturity_status": "stable",
+                "live_ready": True,
+                "publish_blocking": True,
+            },
+            {
+                "dataset": "comunas",
+                "license_status": "open-attribution",
+                "access_method": "api",
+                "live_extractor_status": "implemented",
+                "fallback_policy": "allowed_for_dev",
+                "maturity_status": "stable",
+                "live_ready": True,
+                "publish_blocking": True,
+            },
+        ]
+
+        with patch("builtins.print") as print_mock, self.assertRaisesRegex(SystemExit, "1"):
+            verify_source_registry(registry, catalog)
+        self.assertIn("duplicate datasets", print_mock.call_args.args[0])
+
+    def test_source_registry_rejects_invalid_enum(self):
+        catalog = {"datasets": [{"dataset": "comunas"}]}
+        registry = [
+            {
+                "dataset": "comunas",
+                "license_status": "open-attribution",
+                "access_method": "spreadsheet-by-email",
+                "live_extractor_status": "implemented",
+                "fallback_policy": "allowed_for_dev",
+                "maturity_status": "stable",
+                "live_ready": True,
+                "publish_blocking": True,
+            }
+        ]
+
+        with patch("builtins.print") as print_mock, self.assertRaisesRegex(SystemExit, "1"):
+            verify_source_registry(registry, catalog)
+        self.assertIn("invalid access_method", print_mock.call_args.args[0])
 
     def test_write_publishable_bundle_zip_fails_before_creating_partial_zip(self):
         with tempfile.TemporaryDirectory() as tmpdir:

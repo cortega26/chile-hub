@@ -7,8 +7,24 @@ import sys
 from pathlib import Path
 
 from .core import ChileHub, main
+from .exceptions import (
+    ChileHubDataError,
+    ChileHubDatasetError,
+    ChileHubError,
+    ChileHubExampleError,
+    ChileHubOutputError,
+)
 
-__all__ = ["ChileHub", "__version__", "main"]
+__all__ = [
+    "ChileHub",
+    "ChileHubDataError",
+    "ChileHubDatasetError",
+    "ChileHubError",
+    "ChileHubExampleError",
+    "ChileHubOutputError",
+    "__version__",
+    "main",
+]
 
 
 def _get_version() -> str:

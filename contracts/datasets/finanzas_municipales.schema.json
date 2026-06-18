@@ -1,0 +1,17 @@
+{
+  "dataset": "finanzas_municipales",
+  "primary_key": ["anio", "codigo_comuna"],
+  "required_columns": ["anio", "codigo_comuna", "nombre_comuna", "ingresos_totales", "gastos_totales"],
+  "column_types": {
+    "anio": "integer",
+    "codigo_comuna": "string",
+    "ingresos_totales": "float"
+  },
+  "nullable_columns": [],
+  "fixed_width_columns": {
+    "codigo_comuna": 5
+  },
+  "expected_record_count": null,
+  "coverage_policy": "partial_expected",
+  "publish_outputs": ["parquet", "json"]
+}

@@ -4,8 +4,6 @@
 
 <p><strong>Datos públicos de Chile, curados y listos para análisis en una línea de código.</strong></p>
 
-<p><strong>15 capas oficiales y derivadas · 346 comunas · CUT preservado como texto · Parquet, DuckDB, SQLite, JSON y Excel</strong></p>
-
 [![CI/CD](https://github.com/cortega26/chile-hub/actions/workflows/pipeline-check.yml/badge.svg)](https://github.com/cortega26/chile-hub/actions)
 [![PyPI version](https://img.shields.io/pypi/v/chile-hub.svg)](https://pypi.org/project/chile-hub/)
 [![PyPI downloads](https://img.shields.io/pypi/dm/chile-hub.svg)](https://pypi.org/project/chile-hub/)
@@ -59,6 +57,12 @@ chile-hub cache clear      # Liberar espacio
 
 > [!NOTE]
 > **chile-hub** no busca "tener todos los datos de Chile". Busca **reducir drásticamente el costo técnico** de encontrar, limpiar, validar, cruzar y consumir datasets geográficos, demográficos, electorales y económicos críticos de Chile.
+
+En la práctica, sirve para responder preguntas comunes sin rehacer limpieza base:
+
+- ¿Cómo cruzo mi base de clientes, escuelas o centros de salud con comunas oficiales sin perder ceros en los códigos?
+- ¿Qué comunas concentran población censada, establecimientos públicos o indicadores urbanos?
+- ¿Cómo llevo datos oficiales a Polars, DuckDB, SQLite, Excel o CI sin depender de enlaces cambiantes?
 
 ---
 
@@ -391,6 +395,78 @@ make refresh            # extract → build → verify → test → pruebas de h
 > Usa `pip install chile-hub[pipeline]` si quieres las dependencias completas del pipeline
 > (DuckDB, Pandas, XlsxWriter, curl_cffi) pero sin clonar el repositorio.
 
+### Casos de uso listos para copiar
+
+**1. Ranking comunal con Censo 2024**
+
+```python
+from chile_hub import ChileHub
+
+hub = ChileHub()
+comunas = hub.load_polars("comunas")
+censo = hub.load_polars("censo_comunal")
+
+ranking = (
+    comunas.join(censo, on="codigo_comuna")
+    .select("codigo_comuna", "nombre_comuna", "nombre_region", "poblacion_censada")
+    .sort("poblacion_censada", descending=True)
+    .head(10)
+)
+print(ranking)
+```
+
+**2. Últimos indicadores económicos disponibles**
+
+```python
+from chile_hub import ChileHub
+
+df = ChileHub().load_polars("indicadores")
+ultimos = (
+    df.sort("fecha", descending=True)
+    .group_by("codigo_indicador")
+    .first()
+    .select("codigo_indicador", "fecha", "valor")
+    .sort("codigo_indicador")
+)
+print(ultimos)
+```
+
+**3. Salud y educación por comuna**
+
+```python
+from chile_hub import ChileHub
+
+hub = ChileHub()
+salud = hub.load_polars("establecimientos_salud")
+educacion = hub.load_polars("establecimientos_educacionales")
+
+salud_por_comuna = salud.group_by("codigo_comuna").len("establecimientos_salud")
+educacion_por_comuna = educacion.group_by("codigo_comuna").len("establecimientos_educacionales")
+
+resumen = (
+    hub.load_polars("comunas")
+    .join(salud_por_comuna, on="codigo_comuna", how="left")
+    .join(educacion_por_comuna, on="codigo_comuna", how="left")
+    .fill_null(0)
+    .select("codigo_comuna", "nombre_comuna", "establecimientos_salud", "establecimientos_educacionales")
+)
+print(resumen.head())
+```
+
+### API Python compacta
+
+| API | Uso |
+|:---|:---|
+| `ChileHub()` | Inicializa el helper; descarga y verifica el bundle si no hay cache local. |
+| `ChileHub(data_dir="data/normalized")` | Usa artefactos locales generados por el pipeline. |
+| `hub.list_datasets()` | Lista los nombres canónicos disponibles para `load_polars()`. |
+| `hub.load_polars("comunas")` | Carga una capa como `polars.DataFrame` desde Parquet. |
+| `hub.summary()` / `hub.summary_table()` | Resume modo de fuente, filas, validación, frescura y warnings. |
+| `hub.health()` / `hub.status()` | Reporta salud operativa para personas y CI/CD. |
+| `hub.redistribution()` | Expone estado legal de reúso y atribución por dataset. |
+| `hub.provenance()` | Muestra fuente, URL, modo de extracción y timestamps. |
+| `chile-hub cache update/status/clear` | Administra el cache local del bundle publicado. |
+
 ---
 
 ## Arquitectura del Pipeline
@@ -644,13 +720,16 @@ Consulta [DATA_LICENSES.md](DATA_LICENSES.md), `chile-hub redistribution` y
 
 ## Próximos pasos
 
-El roadmap actual prioriza **fortalecer la estabilidad operacional** de las 15 capas activas frente a caídas de APIs, especialmente las capas nuevas que aún corren en modo `fallback`. El criterio para incorporar nuevas capas exige justificar:
+El roadmap actual prioriza crecer en usabilidad y confianza antes que agregar más capas.
 
-- Dolor de usuario recurrente y documentado
-- Valor de cruce con la División Político-Administrativa (CUT)
-- Bajo costo de mantenimiento continuo
+| Horizonte | Foco | Resultado esperado |
+|:---|:---|:---|
+| Now | Ejemplos, notebooks, errores claros y referencia API | Usuarios cargan y cruzan datos sin leer el pipeline completo. |
+| Next | Contratos de schema, source readiness y criterios públicos | Contribuidores proponen datasets con reglas claras y verificables. |
+| Later | Nuevas capas solo si pasan criterios de inclusión | El catálogo crece sin perder mantenibilidad ni claridad legal. |
 
 > La especificación completa del producto está en [`docs/product-spec.md`](./docs/product-spec.md).
+> Los criterios públicos para solicitar nuevas capas están en [`docs/dataset-inclusion-criteria.md`](./docs/dataset-inclusion-criteria.md).
 > El estado de la última corrida se documenta en `data/normalized/pipeline_status.md` tras cada build.
 
 ---

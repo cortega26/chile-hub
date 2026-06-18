@@ -14,14 +14,12 @@ from typing import Any
 import requests
 from platformdirs import user_cache_dir
 
+from .exceptions import ChileHubDataError
+
 DEFAULT_REPOSITORY = "cortega26/chile-hub"
 DEFAULT_BUNDLE_NAME = "chile-hub-publishable-bundle.zip"
 DEFAULT_CHECKSUM_NAME = "chile-hub-publishable-bundle.zip.sha256"
 ENV_CACHE_DIR = "CHILE_HUB_CACHE_DIR"
-
-
-class ChileHubDataError(RuntimeError):
-    """Raised when release data cannot be resolved or verified."""
 
 
 @dataclass(frozen=True)

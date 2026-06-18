@@ -20,6 +20,7 @@
 - **Depends on**: 004 (dev-requirements.txt debe existir con ruff)
 - **Category**: dx
 - **Planned at**: commit `ba2f434`, 2026-06-13
+- **Resolved**: 2026-06-18 — `.editorconfig`, pre-commit install in `make bootstrap`, lint/format in `make refresh`, and pip cache in CI are present. `uv.lock` is not tracked.
 
 ## Why this matters
 

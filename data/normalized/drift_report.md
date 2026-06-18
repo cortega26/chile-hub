@@ -1,8 +1,8 @@
 # chile-hub drift report
 
-- `generated_at_utc`: `2026-06-18T00:23:06.004190+00:00`
-- `dataset_count`: `14`
-- `drifted_count`: `5`
+- `generated_at_utc`: `2026-06-18T15:15:36.658487+00:00`
+- `dataset_count`: `15`
+- `drifted_count`: `6`
 - `healthy_count`: `9`
 - `fallback_count`: `4`
 - `partial_coverage_count`: `1`
@@ -24,6 +24,7 @@
 | `resultados_educacionales` | `drifted` | `fallback` | `not_applicable` | `warning` | 1 | Revisar warnings operativos del dataset antes de consumirlo en producción. |
 | `indicadores_urbanos_siedu` | `drifted` | `fallback` | `partial` | `warning` | 2 | Revisar warnings operativos del dataset antes de consumirlo en producción. |
 | `perfil_territorial_comunal` | `drifted` | `fallback` | `full` | `none` | 0 | Ninguna. |
+| `empresas` | `drifted` | `live` | `not_applicable` | `warning` | 3 | Revisar warnings operativos del dataset antes de consumirlo en producción. |
 
 ## regiones
 
@@ -164,3 +165,13 @@
 - `warning_count`: `0`
 - `diagnostic_summary`: Sin degradación operativa detectada en este build.
 - `recommended_action`: Ninguna.
+
+## empresas
+
+- `drift_status`: `drifted`
+- `source_mode`: `live`
+- `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
+- `degradation`: found 1 RUTs with non-standard format (not validated); unknown sociedad codes (new types?): ['SpA']; RES solo cubre constituciones bajo Ley 20.659 (regimen simplificado). No incluye empresas del regimen tradicional (Diario Oficial) ni empresas anteriores a mayo 2013.
+- `warning_count`: `3`
+- `diagnostic_summary`: found 1 RUTs with non-standard format (not validated)
+- `recommended_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.

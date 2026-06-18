@@ -1,13 +1,21 @@
 import argparse
 import importlib.metadata
 import json
+import sys
 from datetime import datetime, timezone
+from difflib import get_close_matches
 from pathlib import Path
 from typing import Any
 
 import polars as pl
 
 from .data_manager import ChileHubDataManager
+from .exceptions import (
+    ChileHubDatasetError,
+    ChileHubError,
+    ChileHubExampleError,
+    ChileHubOutputError,
+)
 from .pipeline_status_utils import (
     compute_freshness,
     compute_top_issue,
@@ -19,6 +27,16 @@ UTC = timezone.utc
 ROOT_DIR = Path(__file__).resolve().parents[2]
 NORMALIZED_DIR = ROOT_DIR / "data" / "normalized"
 DATASET_CATALOG_PATH = NORMALIZED_DIR / "dataset_catalog.json"
+
+
+def _format_available(values: list[str], requested: str | None = None) -> str:
+    available = ", ".join(values) if values else "none"
+    if not requested:
+        return f"Disponibles: {available}"
+    matches = get_close_matches(requested, values, n=1)
+    if matches:
+        return f"Disponibles: {available}. Quizas quisiste decir '{matches[0]}'."
+    return f"Disponibles: {available}"
 
 
 class ChileHub:
@@ -53,41 +71,36 @@ class ChileHub:
         with self.catalog_path.open("r", encoding="utf-8") as f:
             return json.load(f)
 
-    def _load_artifact_manifest(self) -> dict[str, Any]:
-        with (self.normalized_dir / "artifact_manifest.json").open("r", encoding="utf-8") as f:
+    def _load_json_artifact(self, filename: str) -> dict[str, Any]:
+        with (self.normalized_dir / filename).open("r", encoding="utf-8") as f:
             return json.load(f)
+
+    def _load_artifact_manifest(self) -> dict[str, Any]:
+        return self._load_json_artifact("artifact_manifest.json")
 
     def _load_hub_health(self) -> dict[str, Any]:
-        with (self.normalized_dir / "hub_health.json").open("r", encoding="utf-8") as f:
-            return json.load(f)
+        return self._load_json_artifact("hub_health.json")
 
     def _load_hub_status(self) -> dict[str, Any]:
-        with (self.normalized_dir / "hub_status.json").open("r", encoding="utf-8") as f:
-            return json.load(f)
+        return self._load_json_artifact("hub_status.json")
 
     def _load_dataset_status(self) -> dict[str, Any]:
-        with (self.normalized_dir / "dataset_status.json").open("r", encoding="utf-8") as f:
-            return json.load(f)
+        return self._load_json_artifact("dataset_status.json")
 
     def _load_dataset_changelog(self) -> dict[str, Any]:
-        with (self.normalized_dir / "dataset_changelog.json").open("r", encoding="utf-8") as f:
-            return json.load(f)
+        return self._load_json_artifact("dataset_changelog.json")
 
     def _load_hub_bundle(self) -> dict[str, Any]:
-        with (self.normalized_dir / "hub_bundle.json").open("r", encoding="utf-8") as f:
-            return json.load(f)
+        return self._load_json_artifact("hub_bundle.json")
 
     def _load_redistribution_report(self) -> dict[str, Any]:
-        with (self.normalized_dir / "redistribution_report.json").open("r", encoding="utf-8") as f:
-            return json.load(f)
+        return self._load_json_artifact("redistribution_report.json")
 
     def _load_provenance_report(self) -> dict[str, Any]:
-        with (self.normalized_dir / "provenance_report.json").open("r", encoding="utf-8") as f:
-            return json.load(f)
+        return self._load_json_artifact("provenance_report.json")
 
     def _load_drift_report(self) -> dict[str, Any]:
-        with (self.normalized_dir / "drift_report.json").open("r", encoding="utf-8") as f:
-            return json.load(f)
+        return self._load_json_artifact("drift_report.json")
 
     @staticmethod
     def _status_rank(status: str) -> int:
@@ -173,16 +186,18 @@ class ChileHub:
         for entry in self.catalog.get("datasets", []):
             if entry["dataset"] == dataset_name:
                 return entry
-        available = ", ".join(self.list_datasets())
-        raise KeyError(f"Dataset '{dataset_name}' no existe. Disponibles: {available}")
+        raise ChileHubDatasetError(
+            f"Dataset '{dataset_name}' no existe. {_format_available(self.list_datasets(), dataset_name)}"
+        )
 
     def get_output_path(self, dataset_name: str, output_type: str = "parquet") -> Path:
         dataset = self.get_dataset(dataset_name)
         outputs = dataset.get("outputs", {})
         if output_type not in outputs:
-            available = ", ".join(sorted(outputs.keys()))
-            raise KeyError(
-                f"Output '{output_type}' no existe para '{dataset_name}'. Disponibles: {available}"
+            available_outputs = sorted(outputs.keys())
+            raise ChileHubOutputError(
+                f"Output '{output_type}' no existe para '{dataset_name}'. "
+                f"{_format_available(available_outputs, output_type)}"
             )
         return self.root_dir / outputs[output_type]
 
@@ -194,9 +209,10 @@ class ChileHub:
         dataset = self.get_dataset(dataset_name)
         examples = dataset.get("usage_examples", {})
         if kind not in examples:
-            available = ", ".join(sorted(examples.keys()))
-            raise KeyError(
-                f"Example '{kind}' no existe para '{dataset_name}'. Disponibles: {available}"
+            available_examples = sorted(examples.keys())
+            raise ChileHubExampleError(
+                f"Example '{kind}' no existe para '{dataset_name}'. "
+                f"{_format_available(available_examples, kind)}"
             )
         return examples[kind]
 
@@ -1350,9 +1366,9 @@ def build_parser():
     return parser
 
 
-def main():
+def _main(argv=None):
     parser = build_parser()
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     if args.command == "version":
         try:
@@ -1561,6 +1577,14 @@ def main():
         else:
             print(json.dumps(hub.summary(), ensure_ascii=False, indent=2))
         return
+
+
+def main(argv=None):
+    try:
+        return _main(argv)
+    except ChileHubError as exc:
+        print(f"Error: {exc}", file=sys.stderr)
+        raise SystemExit(1) from None
 
 
 if __name__ == "__main__":

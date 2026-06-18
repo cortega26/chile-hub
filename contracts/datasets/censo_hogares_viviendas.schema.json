@@ -1,0 +1,20 @@
+{
+  "dataset": "censo_hogares_viviendas",
+  "primary_key": ["codigo_comuna"],
+  "required_columns": ["codigo_region", "codigo_provincia", "codigo_comuna", "nombre_comuna", "viviendas_censadas", "hogares_censados"],
+  "column_types": {
+    "codigo_region": "string",
+    "codigo_provincia": "string",
+    "codigo_comuna": "string",
+    "viviendas_censadas": "integer"
+  },
+  "nullable_columns": [],
+  "fixed_width_columns": {
+    "codigo_region": 2,
+    "codigo_provincia": 3,
+    "codigo_comuna": 5
+  },
+  "expected_record_count": 346,
+  "coverage_policy": "full",
+  "publish_outputs": ["parquet", "json"]
+}

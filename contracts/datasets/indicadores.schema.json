@@ -1,0 +1,15 @@
+{
+  "dataset": "indicadores",
+  "primary_key": ["fecha", "codigo_indicador"],
+  "required_columns": ["fecha", "codigo_indicador", "valor"],
+  "column_types": {
+    "fecha": "date",
+    "codigo_indicador": "string",
+    "valor": "float"
+  },
+  "nullable_columns": [],
+  "fixed_width_columns": {},
+  "expected_record_count": null,
+  "coverage_policy": "not_applicable",
+  "publish_outputs": ["parquet", "json"]
+}

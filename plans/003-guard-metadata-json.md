@@ -19,6 +19,7 @@
 - **Depends on**: none
 - **Category**: bug
 - **Planned at**: commit `ba2f434`, 2026-06-13
+- **Resolved**: 2026-06-17 — fixed independently; metadata guards exist for all 10 datasets at build_dev_db.py:2092-2168, plus schema validation in load_metadata()
 
 ## Why this matters
 

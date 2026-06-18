@@ -10,6 +10,9 @@ Cada ficha busca responder cinco preguntas rápido:
 4. cómo se cruza con otros datos
 5. qué caveats debes conocer antes de usarla
 
+Las propuestas de nuevas capas se evalúan con los criterios públicos de
+[`docs/dataset-inclusion-criteria.md`](../dataset-inclusion-criteria.md).
+
 ## Capas actuales
 
 - [regiones](./regiones.md)

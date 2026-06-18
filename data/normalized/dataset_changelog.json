@@ -1,7 +1,7 @@
 {
-  "generated_at_utc": "2026-06-18T00:23:06.004190+00:00",
-  "previous_generated_at_utc": "2026-06-18T00:15:48.125431+00:00",
-  "dataset_count": 14,
+  "generated_at_utc": "2026-06-18T15:15:36.658487+00:00",
+  "previous_generated_at_utc": "2026-06-18T00:23:06.004190+00:00",
+  "dataset_count": 15,
   "datasets": [
     {
       "dataset": "censo_comunal",
@@ -71,6 +71,35 @@
       "previous_freshness_status": "fresh",
       "current_freshness_status": "fresh",
       "previous_validation_status": "ok",
+      "current_validation_status": "ok"
+    },
+    {
+      "dataset": "empresas",
+      "previous_record_count": null,
+      "current_record_count": 1572116,
+      "record_count_delta": null,
+      "added_fields": [
+        "anio",
+        "capital",
+        "codigo_sociedad",
+        "comuna_social",
+        "comuna_tributaria",
+        "fecha_actuacion",
+        "fecha_aprobacion_sii",
+        "fecha_registro",
+        "mes",
+        "razon_social",
+        "region_social",
+        "region_tributaria",
+        "rut",
+        "tipo_actuacion"
+      ],
+      "removed_fields": [],
+      "previous_source_mode": null,
+      "current_source_mode": "live",
+      "previous_freshness_status": null,
+      "current_freshness_status": "fresh",
+      "previous_validation_status": null,
       "current_validation_status": "ok"
     },
     {

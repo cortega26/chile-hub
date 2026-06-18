@@ -1,0 +1,16 @@
+{
+  "dataset": "distritos_electorales",
+  "primary_key": ["codigo_comuna"],
+  "required_columns": ["codigo_comuna", "nombre_comuna", "distrito_electoral", "circunscripcion_senatorial"],
+  "column_types": {
+    "codigo_comuna": "string",
+    "distrito_electoral": "string"
+  },
+  "nullable_columns": [],
+  "fixed_width_columns": {
+    "codigo_comuna": 5
+  },
+  "expected_record_count": 346,
+  "coverage_policy": "full",
+  "publish_outputs": ["parquet", "json"]
+}

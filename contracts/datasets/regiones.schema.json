@@ -1,0 +1,16 @@
+{
+  "dataset": "regiones",
+  "primary_key": ["codigo_region"],
+  "required_columns": ["codigo_region", "nombre_region"],
+  "column_types": {
+    "codigo_region": "string",
+    "nombre_region": "string"
+  },
+  "nullable_columns": [],
+  "fixed_width_columns": {
+    "codigo_region": 2
+  },
+  "expected_record_count": 16,
+  "coverage_policy": "full",
+  "publish_outputs": ["parquet", "json"]
+}

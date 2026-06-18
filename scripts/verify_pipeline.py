@@ -3,6 +3,8 @@ import sys
 import zipfile
 from pathlib import Path
 
+import polars as pl
+
 ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
@@ -15,6 +17,8 @@ from src.pipeline_status_utils import load_json
 
 STAGING_DIR = ROOT_DIR / "data" / "staging"
 NORMALIZED_DIR = ROOT_DIR / "data" / "normalized"
+CONTRACTS_DIR = ROOT_DIR / "contracts" / "datasets"
+SOURCE_REGISTRY_PATH = ROOT_DIR / "data" / "source_registry.json"
 
 
 def _derive_dataset_artifact_paths():
@@ -80,6 +84,153 @@ REQUIRED_DATASETS = set(DATASET_CATALOG_CONFIG)
 def fail(message):
     print(f"ERROR: {message}")
     raise SystemExit(1)
+
+
+def _contract_type(dtype) -> str:
+    dtype_name = str(dtype)
+    if dtype_name == "String":
+        return "string"
+    if dtype_name in {"Int8", "Int16", "Int32", "Int64", "UInt8", "UInt16", "UInt32", "UInt64"}:
+        return "integer"
+    if dtype_name in {"Float32", "Float64"}:
+        return "float"
+    if dtype_name == "Date":
+        return "date"
+    if dtype_name == "Boolean":
+        return "boolean"
+    return dtype_name.lower()
+
+
+def verify_dataset_contract(dataset_name, contract, df, outputs, root_dir=ROOT_DIR):
+    if contract.get("dataset") != dataset_name:
+        fail(f"{dataset_name} contract has mismatched dataset: {contract.get('dataset')}")
+
+    required_columns = contract.get("required_columns", [])
+    missing_columns = [column for column in required_columns if column not in df.columns]
+    if missing_columns:
+        fail(f"{dataset_name} is missing required columns: {', '.join(missing_columns)}")
+
+    for column, expected_type in contract.get("column_types", {}).items():
+        if column not in df.schema:
+            fail(f"{dataset_name} contract type column is missing from data: {column}")
+        actual_type = _contract_type(df.schema[column])
+        if actual_type != expected_type:
+            fail(f"{dataset_name}.{column} has type {actual_type}; expected {expected_type}")
+
+    primary_key = contract.get("primary_key", [])
+    if primary_key:
+        missing_key_columns = [column for column in primary_key if column not in df.columns]
+        if missing_key_columns:
+            fail(
+                f"{dataset_name} primary key columns are missing: {', '.join(missing_key_columns)}"
+            )
+        if df.select(primary_key).n_unique() != df.height:
+            fail(f"{dataset_name} primary key is not unique: {', '.join(primary_key)}")
+
+    for column, width in contract.get("fixed_width_columns", {}).items():
+        if column not in df.schema:
+            fail(f"{dataset_name} fixed-width column is missing: {column}")
+        if _contract_type(df.schema[column]) != "string":
+            fail(f"{dataset_name}.{column} must be string for fixed-width validation")
+        invalid_count = df.filter(
+            pl.col(column).is_null() | (pl.col(column).str.len_chars() != width)
+        ).height
+        if invalid_count:
+            fail(f"{dataset_name}.{column} has {invalid_count} values outside width {width}")
+
+    coverage_policy = contract.get("coverage_policy")
+    expected_record_count = contract.get("expected_record_count")
+    if coverage_policy == "full" and expected_record_count is not None:
+        if df.height != expected_record_count:
+            fail(f"{dataset_name} has {df.height} records; expected {expected_record_count}")
+
+    for output_type in contract.get("publish_outputs", []):
+        relative_path = outputs.get(output_type)
+        if not relative_path:
+            fail(f"{dataset_name} contract expects missing catalog output: {output_type}")
+        output_path = root_dir / relative_path
+        if not output_path.exists():
+            fail(f"{dataset_name} contract output does not exist: {relative_path}")
+
+
+def verify_schema_contracts():
+    catalog = load_json(NORMALIZED_DIR / "dataset_catalog.json")
+    for entry in catalog.get("datasets", []):
+        dataset_name = entry.get("dataset")
+        contract_path = CONTRACTS_DIR / f"{dataset_name}.schema.json"
+        if not contract_path.exists():
+            fail(f"Missing schema contract for dataset: {dataset_name}")
+        contract = load_json(contract_path)
+        parquet_output = entry.get("outputs", {}).get("parquet")
+        if not parquet_output:
+            fail(f"{dataset_name} catalog entry is missing parquet output")
+        df = pl.read_parquet(ROOT_DIR / parquet_output)
+        verify_dataset_contract(dataset_name, contract, df, entry.get("outputs", {}), ROOT_DIR)
+
+
+def verify_source_registry(registry=None, catalog=None):
+    if registry is None:
+        registry = load_json(SOURCE_REGISTRY_PATH)
+    if catalog is None:
+        catalog = load_json(NORMALIZED_DIR / "dataset_catalog.json")
+
+    if not isinstance(registry, list):
+        fail("source_registry.json must be a list")
+
+    catalog_names = {entry.get("dataset") for entry in catalog.get("datasets", [])}
+    registry_names = [entry.get("dataset") for entry in registry]
+    duplicate_names = sorted({name for name in registry_names if registry_names.count(name) > 1})
+    if duplicate_names:
+        fail(f"source_registry.json has duplicate datasets: {', '.join(duplicate_names)}")
+
+    missing_registry = sorted(catalog_names - set(registry_names))
+    if missing_registry:
+        fail(f"source_registry.json is missing catalog datasets: {', '.join(missing_registry)}")
+
+    valid_access_methods = {"api", "direct_file", "landing_snapshot", "derived"}
+    valid_license_statuses = {"open-attribution", "public-api-review-terms", "restricted"}
+    valid_live_statuses = {"implemented", "fallback_only", "derived"}
+    valid_fallback_policies = {
+        "none",
+        "allowed_for_dev",
+        "allowed_for_dev_blocked_for_publication",
+    }
+    valid_maturity_statuses = {"stable", "candidate", "experimental", "deprecated"}
+
+    for entry in registry:
+        dataset_name = entry.get("dataset")
+        if dataset_name not in DATASET_CATALOG_CONFIG:
+            fail(f"source_registry.json references unknown dataset: {dataset_name}")
+        config = DATASET_CATALOG_CONFIG[dataset_name]
+        expected_license = config.get("reuse_policy", {}).get("status")
+        if entry.get("license_status") != expected_license:
+            fail(
+                f"{dataset_name} registry license_status={entry.get('license_status')} "
+                f"does not match catalog config {expected_license}"
+            )
+        if entry.get("access_method") not in valid_access_methods:
+            fail(f"{dataset_name} has invalid access_method: {entry.get('access_method')}")
+        if entry.get("license_status") not in valid_license_statuses:
+            fail(f"{dataset_name} has invalid license_status: {entry.get('license_status')}")
+        if entry.get("live_extractor_status") not in valid_live_statuses:
+            fail(
+                f"{dataset_name} has invalid live_extractor_status: "
+                f"{entry.get('live_extractor_status')}"
+            )
+        if entry.get("fallback_policy") not in valid_fallback_policies:
+            fail(f"{dataset_name} has invalid fallback_policy: {entry.get('fallback_policy')}")
+        if entry.get("maturity_status") not in valid_maturity_statuses:
+            fail(f"{dataset_name} has invalid maturity_status: {entry.get('maturity_status')}")
+        if entry.get("live_extractor_status") == "fallback_only":
+            if entry.get("live_ready") is not False:
+                fail(f"{dataset_name} fallback_only registry entry must set live_ready=false")
+            if entry.get("publish_blocking") is not True:
+                fail(f"{dataset_name} fallback_only registry entry must set publish_blocking=true")
+        if (
+            entry.get("live_extractor_status") == "derived"
+            and entry.get("access_method") != "derived"
+        ):
+            fail(f"{dataset_name} derived registry entry must set access_method=derived")
 
 
 def verify_staging_not_newer_than_normalized():
@@ -1119,6 +1270,8 @@ def main():
     verify_drift_report()
     verify_overview()
     verify_dataset_catalog()
+    verify_schema_contracts()
+    verify_source_registry()
     verify_artifact_manifest()
     verify_publishable_zip()
     if args.require_live:

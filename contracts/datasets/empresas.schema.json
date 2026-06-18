@@ -1,0 +1,17 @@
+{
+  "dataset": "empresas",
+  "primary_key": ["rut"],
+  "required_columns": ["rut", "razon_social", "codigo_sociedad", "capital", "anio"],
+  "column_types": {
+    "rut": "string",
+    "razon_social": "string",
+    "codigo_sociedad": "string",
+    "capital": "integer",
+    "anio": "integer"
+  },
+  "nullable_columns": [],
+  "fixed_width_columns": {},
+  "expected_record_count": null,
+  "coverage_policy": "not_applicable",
+  "publish_outputs": ["parquet"]
+}

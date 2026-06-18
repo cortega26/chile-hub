@@ -1,8 +1,8 @@
 # chile-hub redistribution report
 
-- `generated_at_utc`: `2026-06-18T00:23:06.004190+00:00`
-- `dataset_count`: `14`
-- `ready_count`: `14`
+- `generated_at_utc`: `2026-06-18T15:15:36.658487+00:00`
+- `dataset_count`: `15`
+- `ready_count`: `15`
 - `review_terms_count`: `0`
 - `unknown_count`: `0`
 
@@ -22,6 +22,7 @@
 | `resultados_educacionales` | `ready` | CC-BY-3.0 | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
 | `indicadores_urbanos_siedu` | `ready` | Licencia de Datos Abiertos INE | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
 | `perfil_territorial_comunal` | `ready` | Derivada de fuentes abiertas con atribución | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
+| `empresas` | `ready` | CC-BY | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
 
 ## regiones
 
@@ -162,3 +163,13 @@
 - `redistribution_ok`: `True`
 - `recommended_action`: Publicable con atribucion y referencia de fuente.
 - `summary`: Capa derivada a partir de datasets validados de chile-hub.
+
+## empresas
+
+- `publishability_status`: `ready`
+- `license`: `CC-BY`
+- `license_url`: https://creativecommons.org/licenses/by/3.0/cl/
+- `attribution_required`: `True`
+- `redistribution_ok`: `True`
+- `recommended_action`: Publicable con atribucion y referencia de fuente.
+- `summary`: Registro de Empresas y Sociedades (RES) del Ministerio de Economia, publicado en datos.gob.cl bajo CC-BY. Solo incluye constituciones bajo Ley 20.659 (regimen simplificado) desde 2013.

@@ -19,6 +19,7 @@
 - **Depends on**: none
 - **Category**: security
 - **Planned at**: commit `ba2f434`, 2026-06-13
+- **Resolved**: 2026-06-17 — fixed independently; CSP meta tag already present in `index.html:5`
 
 ## Why this matters
 

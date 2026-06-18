@@ -1,0 +1,18 @@
+{
+  "dataset": "indicadores_urbanos_siedu",
+  "primary_key": ["anio", "codigo_comuna", "codigo_indicador"],
+  "required_columns": ["anio", "codigo_comuna", "codigo_indicador", "nombre_indicador", "valor", "unidad"],
+  "column_types": {
+    "anio": "integer",
+    "codigo_comuna": "string",
+    "codigo_indicador": "string",
+    "valor": "float"
+  },
+  "nullable_columns": [],
+  "fixed_width_columns": {
+    "codigo_comuna": 5
+  },
+  "expected_record_count": null,
+  "coverage_policy": "partial_expected",
+  "publish_outputs": ["parquet", "json"]
+}

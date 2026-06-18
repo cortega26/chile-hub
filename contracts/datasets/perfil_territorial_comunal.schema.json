@@ -1,0 +1,20 @@
+{
+  "dataset": "perfil_territorial_comunal",
+  "primary_key": ["codigo_comuna"],
+  "required_columns": ["codigo_region", "codigo_provincia", "codigo_comuna", "nombre_comuna", "poblacion_censada", "establecimientos_salud_total", "establecimientos_educacionales_total"],
+  "column_types": {
+    "codigo_region": "string",
+    "codigo_provincia": "string",
+    "codigo_comuna": "string",
+    "poblacion_censada": "integer"
+  },
+  "nullable_columns": [],
+  "fixed_width_columns": {
+    "codigo_region": 2,
+    "codigo_provincia": 3,
+    "codigo_comuna": 5
+  },
+  "expected_record_count": 346,
+  "coverage_policy": "full",
+  "publish_outputs": ["parquet", "json"]
+}

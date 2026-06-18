@@ -1,7 +1,7 @@
 {
-  "generated_at_utc": "2026-06-18T00:23:06.004190+00:00",
-  "dataset_count": 14,
-  "drifted_count": 5,
+  "generated_at_utc": "2026-06-18T15:15:36.658487+00:00",
+  "dataset_count": 15,
+  "drifted_count": 6,
   "healthy_count": 9,
   "fallback_count": 4,
   "partial_coverage_count": 1,
@@ -216,6 +216,21 @@
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
       "recommended_action": "Ninguna.",
       "documentation": "docs/datasets/perfil_territorial_comunal.md"
+    },
+    {
+      "dataset": "empresas",
+      "drift_status": "drifted",
+      "source_mode": "live",
+      "coverage_status": "not_applicable",
+      "coverage_ratio": null,
+      "coverage_summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
+      "degradation_status": "warning",
+      "degradation_impact": "found 1 RUTs with non-standard format (not validated); unknown sociedad codes (new types?): ['SpA']; RES solo cubre constituciones bajo Ley 20.659 (regimen simplificado). No incluye empresas del regimen tradicional (Diario Oficial) ni empresas anteriores a mayo 2013.",
+      "drift_summary": "Drift detectado: mode=live, coverage=not_applicable, degradation=warning.",
+      "warning_count": 3,
+      "diagnostic_summary": "found 1 RUTs with non-standard format (not validated)",
+      "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción.",
+      "documentation": "docs/datasets/empresas.md"
     }
   ]
 }

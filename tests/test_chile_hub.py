@@ -19,7 +19,7 @@ SRC_DIR = ROOT_DIR / "src"
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
-from chile_hub import ChileHub
+from chile_hub import ChileHub, ChileHubDatasetError, ChileHubExampleError, ChileHubOutputError
 from src.validation import validate_indicadores
 
 # ── Staleness guard ───────────────────────────────────────────────────────────
@@ -508,6 +508,22 @@ class ChileHubTests(unittest.TestCase):
         with self.assertRaises(KeyError):
             self.hub.get_dataset("no-existe")
 
+    def test_typed_errors_keep_key_error_compatibility(self):
+        with self.assertRaises(ChileHubDatasetError) as dataset_error:
+            self.hub.get_dataset("comuna")
+        self.assertIsInstance(dataset_error.exception, KeyError)
+        self.assertIn("Quizas quisiste decir 'comunas'", str(dataset_error.exception))
+
+        with self.assertRaises(ChileHubOutputError) as output_error:
+            self.hub.get_output_path("comunas", "csv")
+        self.assertIsInstance(output_error.exception, KeyError)
+        self.assertIn("Output 'csv' no existe", str(output_error.exception))
+
+        with self.assertRaises(ChileHubExampleError) as example_error:
+            self.hub.example_usage("comunas", "sql")
+        self.assertIsInstance(example_error.exception, KeyError)
+        self.assertIn("Example 'sql' no existe", str(example_error.exception))
+
     def test_health_summary(self):
         health = self.health
         self.assertIn(health["overall_status"], {"ok", "warn", "error"})
@@ -917,6 +933,18 @@ class ChileHubCliTests(unittest.TestCase):
             check=True,
         )
 
+    def run_cli_raw(self, *args):
+        env = os.environ.copy()
+        env["PYTHONPATH"] = str(SRC_DIR)
+        return subprocess.run(
+            [sys.executable, "-m", "chile_hub", *args],
+            cwd=ROOT_DIR,
+            env=env,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
     def run_script(self, script_path):
         return subprocess.run(
             [sys.executable, script_path],
@@ -958,6 +986,13 @@ class ChileHubCliTests(unittest.TestCase):
     def test_cli_path(self):
         result = self.run_cli("path", "comunas", "--output", "parquet")
         self.assertTrue(result.stdout.strip().endswith("data/normalized/comunas.parquet"))
+
+    def test_cli_unknown_dataset_prints_clean_error(self):
+        result = self.run_cli_raw("show", "comuna")
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(result.stdout, "")
+        self.assertIn("Error: Dataset 'comuna' no existe", result.stderr)
+        self.assertNotIn("Traceback", result.stderr)
 
     def test_cli_example(self):
         result = self.run_cli("example", "indicadores", "--kind", "duckdb")
