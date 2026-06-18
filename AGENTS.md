@@ -102,11 +102,11 @@ codegraph find <symbol_name>                       # En qué archivo está defin
 **Reglas para acotar lecturas y ahorrar tokens:**
 - Usar `view_file` con `StartLine`/`EndLine` — nunca leer archivos grandes enteros de golpe.
 - `base.py` (59 líneas) es seguro de leer completo. `validation.py` (~760 líneas) — leer por validador individual.
-- `build_dev_db.py` (~2 800 líneas) y `src/chile_hub/core.py` (~1 570 líneas) — usar estas áncoras:
+- `build_dev_db.py` (~3 200 líneas) y `src/chile_hub/core.py` (~1 600 líneas) — usar estas áncoras:
 
 | Archivo | Líneas de interés |
 |---|---|
-| `src/build_dev_db.py` | L31 (imports de validators) · L2327+ (bloque `validations = {…}`) |
+| `src/build_dev_db.py` | L33 (imports de validators) · L2757+ (bloque `validations = {…}`) |
 | `src/chile_hub/core.py` | L24 (clase ChileHub) · L24-200 (superficie pública de la API) |
 | `tests/test_chile_hub.py` | Requiere `data/normalized/` — correr `make build` antes |
 

@@ -6,6 +6,60 @@ notas de lanzamiento para publicaciones en PyPI.
 Los commits de actualización de datos, como `chore(data): daily refresh [skip ci]`, no
 representan lanzamientos de software y se excluyen intencionalmente de las notas de lanzamiento.
 
+## 1.4.0 - 2026-06-18
+
+### Agregado
+
+- Separación de carriles (`publication_track`) en el registro de fuentes: 11 datasets como `stable_publishable` y 4 como `candidate`.
+- Restricción del empaquetado público: los datasets marcados como candidatas son excluidos del manifest oficial, del bundle ZIP público y del indexado general de descargas.
+- Estructuración en `hub_bundle.json` para diferenciar claramente entre datasets públicos listos y datasets candidatos.
+
+### Cambiado
+
+- Refactorización de `verify_pipeline.py` para aplicar políticas de publicación inteligentes dependientes del carril asignado.
+
+## 1.3.1 - 2026-06-18
+
+### Agregado
+
+- Creación de `source_adapter.py` para abstraer y unificar el comportamiento de los extractores de datasets candidatos.
+- Enlaces de soporte y contacto del proyecto en la landing page y documentación.
+
+### Corregido
+
+- Corrección en la suite de pruebas eliminando la dependencia directa en snapshots `raw` locales.
+- Aseguramiento de `pyarrow` como dependencia explícita requerida para la exportación y registro de Polars con DuckDB.
+
+## 1.3.0 - 2026-06-18
+
+### Agregado
+
+- Registro unificado de fuentes (`data/source_registry.json`) con metadatos sobre madurez, políticas de fallback, cronograma de revisión y umbral de estancamiento.
+- Contratos de esquema en formato JSON Schema (`contracts/datasets/*.schema.json`) para los 15 datasets activos.
+- Generación de reportes automáticos de preparación (`source_readiness`) y calidad (`dataset_quality`) en formato JSON/Markdown con sus respectivas integraciones en API y CLI.
+- Sistema de detección de estancamiento de datos (`verify_readiness`) según reglas diferenciadas por tipo de capa.
+- Política de compatibilidad de datasets (`docs/dataset-compatibility-policy.md`) con cálculo automático de severidad de cambios de esquema (major/minor/patch/none).
+
+### Cambiado
+
+- Estandarización de toda la documentación y comentarios del código a español neutro.
+
+## 1.2.2 - 2026-06-17
+
+### Cambiado
+
+- Sincronización dinámica de la insignia de versión en el navbar de la landing page, leyéndola directamente de `hub_bundle.json` en lugar de estar hardcodeada.
+
+## 1.2.1 - 2026-06-17
+
+### Cambiado
+
+- Migración del despliegue de GitHub Pages al flujo moderno basado en GitHub Actions workflow.
+
+### Corregido
+
+- Control de clicks en las pestañas de curl para evitar errores interactivos en datasets que no generan salida JSON.
+
 ## 1.2.0 - 2026-06-17
 
 ### Agregado

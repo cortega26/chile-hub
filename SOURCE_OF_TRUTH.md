@@ -44,12 +44,12 @@ src/
 │   ├── base.py                    ABC BaseExtractor — 59 lineas, leer completo
 │   └── {name}_extractor.py        Un archivo por dataset, extiende BaseExtractor
 ├── validation.py                  TODAS las validate_*() — ~760 lineas, leer por validador
-├── build_dev_db.py                ~2 800 lineas — leer por secciones:
-│   L31        importaciones de validation.py
-│   L2327+     bloque validations = {…} (donde se llaman los validadores)
+├── build_dev_db.py                ~3 200 lineas — leer por secciones:
+│   L33        importaciones de validation.py
+│   L2757+     bloque validations = {…} (donde se llaman los validadores)
 ├── chile_hub.py                   Shim de compatibilidad (21 lineas) — delega al paquete inferior
 ├── chile_hub/
-│   ├── core.py                    Clase ChileHub + API publica completa — ~1 570 lineas
+│   ├── core.py                    Clase ChileHub + API publica completa — ~1 600 lineas
 │   ├── cli.py                     Puntos de entrada de CLI (5 lineas)
 │   ├── data_manager.py            Descarga de bundles, cache, SHA256 — ~200 lineas
 │   └── pipeline_status_utils.py   Constructores de reportes (health, catalog, redistribution) — ~770 lineas

@@ -17,7 +17,7 @@ atribución.
 
 Las familias de fuentes actuales incluyen BCN ArcGIS, Banco Central de Chile vía
 `mindicador.cl`, INE, MINSAL/datos.gob.cl, BCN/SERVEL (mapeos legales), MINEDUC,
-SINIM/SUBDERE, y artefactos derivados de perfil/estado de chile-hub. Antes de
+SINIM/SUBDERE, Ministerio de Economía/datos.gob.cl, y artefactos derivados de perfil/estado de chile-hub. Antes de
 redistribuir artefactos derivados, inspecciona:
 
 ```bash

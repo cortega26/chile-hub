@@ -29,6 +29,7 @@ Las propuestas de nuevas capas se evalúan con los criterios públicos de
 - [resultados_educacionales](./resultados_educacionales.md)
 - [indicadores_urbanos_siedu](./indicadores_urbanos_siedu.md)
 - [perfil_territorial_comunal](./perfil_territorial_comunal.md)
+- [empresas](./empresas.md)
 - [status_changelog](./status_changelog.md)
 
 ## Convenciones de confianza
