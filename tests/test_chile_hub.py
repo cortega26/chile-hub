@@ -1012,9 +1012,9 @@ class ChileHubCliTests(unittest.TestCase):
     def test_cli_dataset_status_and_changelog(self):
         status = self.run_cli("dataset-status")
         changelog = self.run_cli("dataset-changelog")
-        self.assertIn('"dataset_count": 14', status.stdout)
+        self.assertIn('"dataset_count": 15', status.stdout)
         self.assertIn('"dataset": "perfil_territorial_comunal"', status.stdout)
-        self.assertIn('"dataset_count": 14', changelog.stdout)
+        self.assertIn('"dataset_count": 15', changelog.stdout)
         self.assertIn('"record_count_delta"', changelog.stdout)
 
     def test_cli_report(self):
