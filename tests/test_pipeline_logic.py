@@ -48,8 +48,20 @@ from src.validation import (
     EXPECTED_INDICATOR_CODES,
     EXPECTED_LIVE_COMUNAS_COUNT,
     FALLBACK_COMUNAS_COUNT,
+    _duplicate_count,
+    _invalid_fixed_length_count,
+    _missing_columns,
+    _negative_numeric_count,
+    _percentage_out_of_bounds_count,
+    _unknown_codes,
+    validate_censo_comunal,
+    validate_censo_hogares_viviendas,
     validate_comunas,
+    validate_distritos_electorales,
+    validate_establecimientos_educacionales,
+    validate_establecimientos_salud,
     validate_finanzas_municipales,
+    validate_indicadores,
     validate_indicadores_urbanos_siedu,
     validate_perfil_territorial_comunal,
     validate_provincias,
@@ -1532,6 +1544,314 @@ class DatasetChangelogSeverityTests(unittest.TestCase):
         self.assertNotIn("major", entry["change_severity"])
         type_breaks = [b for b in entry["breaking_changes"] if "type changed" in b]
         self.assertEqual(type_breaks, [])
+
+
+class ValidationHelperTests(unittest.TestCase):
+    """Tests para las funciones helper puras de validation.py."""
+
+    def test_missing_columns(self):
+        df = pl.DataFrame({"a": [1], "b": [2]})
+        self.assertEqual(_missing_columns(df, ["a", "b", "c"]), ["c"])
+        self.assertEqual(_missing_columns(df, ["a", "b"]), [])
+
+    def test_duplicate_count(self):
+        df = pl.DataFrame({"x": [1, 1, 2], "y": ["a", "a", "b"]})
+        self.assertEqual(_duplicate_count(df, ["x", "y"]), 1)
+        self.assertEqual(_duplicate_count(df, ["x"]), 1)
+        self.assertEqual(
+            _duplicate_count(pl.DataFrame({"x": []}, schema={"x": pl.Int64}), ["x"]), 0
+        )
+
+    def test_invalid_fixed_length_count(self):
+        df = pl.DataFrame({"c": ["12345", "1234", "12345"]})
+        self.assertEqual(_invalid_fixed_length_count(df, "c", 5), 1)
+
+    def test_unknown_codes(self):
+        df = pl.DataFrame({"c": ["A", "B", "C"]})
+        self.assertEqual(_unknown_codes(df, "c", ["A", "B"]), ["C"])
+        self.assertEqual(_unknown_codes(df, "c", None), [])
+
+    def test_negative_numeric_count(self):
+        df = pl.DataFrame({"a": [1, -1, 0], "b": [5.0, 3.0, -2.0]})
+        self.assertEqual(_negative_numeric_count(df, ["a", "b"]), 2)
+
+    def test_percentage_out_of_bounds_count(self):
+        df = pl.DataFrame({"p": [50, -1, 101, None]})
+        self.assertEqual(_percentage_out_of_bounds_count(df, ["p"]), 2)
+
+
+class RemainingValidatorTests(unittest.TestCase):
+    """Tests para los validadores de dataset que no estaban cubiertos."""
+
+    def test_validate_censo_comunal_accepts_346_rows(self):
+        df = pl.DataFrame(
+            {
+                "codigo_comuna": [f"{i:05d}" for i in range(1, 347)],
+                "poblacion_censada": [100] * 346,
+                "poblacion_0_14": [20] * 346,
+                "poblacion_15_29": [20] * 346,
+                "poblacion_30_44": [20] * 346,
+                "poblacion_45_64": [20] * 346,
+                "poblacion_65_mas": [20] * 346,
+            }
+        )
+        result = validate_censo_comunal(df, {"source_mode": "live"})
+        self.assertEqual(result["status"], "ok")
+
+    def test_validate_censo_comunal_rejects_empty(self):
+        df = pl.DataFrame(
+            schema={
+                "codigo_comuna": pl.String,
+                "poblacion_censada": pl.Int64,
+                "poblacion_0_14": pl.Int64,
+                "poblacion_15_29": pl.Int64,
+                "poblacion_30_44": pl.Int64,
+                "poblacion_45_64": pl.Int64,
+                "poblacion_65_mas": pl.Int64,
+            }
+        )
+        result = validate_censo_comunal(df, None)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("empty" in e for e in result["errors"]))
+
+    def test_validate_censo_comunal_rejects_wrong_row_count(self):
+        df = pl.DataFrame(
+            {
+                "codigo_comuna": ["01101"],
+                "poblacion_censada": [100],
+                "poblacion_0_14": [20],
+                "poblacion_15_29": [20],
+                "poblacion_30_44": [20],
+                "poblacion_45_64": [20],
+                "poblacion_65_mas": [20],
+            }
+        )
+        result = validate_censo_comunal(df, None)
+        self.assertEqual(result["status"], "error")
+
+    def test_validate_censo_comunal_age_bands_must_sum_to_total(self):
+        df = pl.DataFrame(
+            {
+                "codigo_comuna": [f"{i:05d}" for i in range(1, 347)],
+                "poblacion_censada": [100] * 346,
+                "poblacion_0_14": [10] * 346,
+                "poblacion_15_29": [10] * 346,
+                "poblacion_30_44": [10] * 346,
+                "poblacion_45_64": [10] * 346,
+                "poblacion_65_mas": [10] * 346,
+            }
+        )
+        result = validate_censo_comunal(df, None)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("age bands" in e for e in result["errors"]))
+
+    def test_validate_establecimientos_salud_accepts_valid(self):
+        df = pl.DataFrame(
+            {
+                "codigo_establecimiento": ["1001", "1002"],
+                "codigo_comuna": ["13101", "13114"],
+            }
+        )
+        result = validate_establecimientos_salud(df, None)
+        self.assertEqual(result["status"], "ok")
+
+    def test_validate_establecimientos_salud_rejects_duplicates(self):
+        df = pl.DataFrame(
+            {
+                "codigo_establecimiento": ["1001", "1001"],
+                "codigo_comuna": ["13101", "13101"],
+            }
+        )
+        result = validate_establecimientos_salud(df, None)
+        self.assertEqual(result["status"], "error")
+
+    def test_validate_establecimientos_salud_rejects_empty(self):
+        df = pl.DataFrame(schema={"codigo_establecimiento": pl.String, "codigo_comuna": pl.String})
+        result = validate_establecimientos_salud(df, None)
+        self.assertEqual(result["status"], "error")
+
+    def test_validate_establecimientos_salud_rejects_unknown_communes(self):
+        df = pl.DataFrame(
+            {
+                "codigo_establecimiento": ["1001"],
+                "codigo_comuna": ["99999"],
+            }
+        )
+        result = validate_establecimientos_salud(df, None, valid_commune_codes=["13101"])
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("unknown communes" in e for e in result["errors"]))
+
+    def test_validate_establecimientos_salud_rejects_invalid_cut(self):
+        df = pl.DataFrame(
+            {
+                "codigo_establecimiento": ["1001"],
+                "codigo_comuna": ["1310"],
+            }
+        )
+        result = validate_establecimientos_salud(df, None)
+        self.assertEqual(result["status"], "error")
+
+    def test_validate_censo_hogares_viviendas_accepts_346_with_valid_totals(self):
+        df = pl.DataFrame(
+            {
+                "codigo_comuna": [f"{i:05d}" for i in range(1, 347)],
+                "viviendas_censadas": [120] * 346,
+                "viviendas_particulares_ocupadas": [100] * 346,
+                "viviendas_particulares_desocupadas": [18] * 346,
+                "viviendas_colectivas": [2] * 346,
+            }
+        )
+        result = validate_censo_hogares_viviendas(df, None)
+        self.assertEqual(result["status"], "ok")
+
+    def test_validate_censo_hogares_viviendas_rejects_wrong_row_count(self):
+        df = pl.DataFrame(
+            {
+                "codigo_comuna": ["01101"],
+                "viviendas_censadas": [120],
+                "viviendas_particulares_ocupadas": [100],
+                "viviendas_particulares_desocupadas": [18],
+                "viviendas_colectivas": [2],
+            }
+        )
+        result = validate_censo_hogares_viviendas(df, None)
+        self.assertEqual(result["status"], "error")
+
+    def test_validate_censo_hogares_viviendas_rejects_inconsistent_totals(self):
+        df = pl.DataFrame(
+            {
+                "codigo_comuna": [f"{i:05d}" for i in range(1, 347)],
+                "viviendas_censadas": [120] * 346,
+                "viviendas_particulares_ocupadas": [50] * 346,
+                "viviendas_particulares_desocupadas": [10] * 346,
+                "viviendas_colectivas": [3] * 346,
+            }
+        )
+        result = validate_censo_hogares_viviendas(df, None)
+        self.assertEqual(result["status"], "error")
+
+    def test_validate_censo_hogares_viviendas_rejects_unknown_communes(self):
+        df = pl.DataFrame(
+            {
+                "codigo_comuna": [f"{i:05d}" for i in range(1, 347)],
+                "viviendas_censadas": [120] * 346,
+                "viviendas_particulares_ocupadas": [100] * 346,
+                "viviendas_particulares_desocupadas": [18] * 346,
+                "viviendas_colectivas": [2] * 346,
+            }
+        )
+        result = validate_censo_hogares_viviendas(df, None, valid_commune_codes=["01101"])
+        self.assertTrue(any("unknown communes" in e for e in result["errors"]))
+
+    def test_validate_establecimientos_educacionales_accepts_valid(self):
+        df = pl.DataFrame(
+            {
+                "rbd": ["1", "2"],
+                "codigo_comuna": ["13101", "13114"],
+            }
+        )
+        result = validate_establecimientos_educacionales(df, None)
+        self.assertEqual(result["status"], "ok")
+
+    def test_validate_establecimientos_educacionales_rejects_duplicate_rbd(self):
+        df = pl.DataFrame({"rbd": ["1", "1"], "codigo_comuna": ["13101", "13101"]})
+        result = validate_establecimientos_educacionales(df, None)
+        self.assertEqual(result["status"], "error")
+
+    def test_validate_establecimientos_educacionales_rejects_empty(self):
+        df = pl.DataFrame(schema={"rbd": pl.String, "codigo_comuna": pl.String})
+        result = validate_establecimientos_educacionales(df, None)
+        self.assertEqual(result["status"], "error")
+
+    def test_validate_establecimientos_educacionales_rejects_unknown_communes(self):
+        df = pl.DataFrame({"rbd": ["1"], "codigo_comuna": ["99999"]})
+        result = validate_establecimientos_educacionales(df, None, valid_commune_codes=["13101"])
+        self.assertTrue(any("unknown communes" in e for e in result["errors"]))
+
+    def test_validate_distritos_electorales_accepts_346(self):
+        df = pl.DataFrame(
+            {
+                "codigo_comuna": [f"{i:05d}" for i in range(1, 347)],
+                "distrito_electoral": ["10"] * 346,
+                "circunscripcion_senatorial": ["7"] * 346,
+            }
+        )
+        result = validate_distritos_electorales(df, None)
+        self.assertEqual(result["status"], "ok")
+
+    def test_validate_distritos_electorales_rejects_wrong_count(self):
+        df = pl.DataFrame(
+            {
+                "codigo_comuna": ["13101"],
+                "distrito_electoral": ["10"],
+                "circunscripcion_senatorial": ["7"],
+            }
+        )
+        result = validate_distritos_electorales(df, None)
+        self.assertEqual(result["status"], "error")
+
+    def test_validate_distritos_electorales_rejects_duplicates(self):
+        df = pl.DataFrame(
+            {
+                "codigo_comuna": [f"{i:05d}" for i in range(1, 347)],
+                "distrito_electoral": ["10"] * 346,
+                "circunscripcion_senatorial": ["7"] * 346,
+            }
+        )
+        # Duplicate the first row
+        df = pl.concat([df, df.head(1)])
+        result = validate_distritos_electorales(df, None)
+        self.assertEqual(result["status"], "error")
+
+    def test_validate_indicadores_accepts_valid(self):
+        df = pl.DataFrame(
+            {
+                "codigo_indicador": sorted(EXPECTED_INDICATOR_CODES),
+                "fecha": ["2024-01-01"] * len(EXPECTED_INDICATOR_CODES),
+                "valor": [1.0] * len(EXPECTED_INDICATOR_CODES),
+            }
+        )
+        result = validate_indicadores(df, {"source_mode": "live"})
+        self.assertEqual(result["status"], "ok")
+
+    def test_validate_indicadores_rejects_empty(self):
+        df = pl.DataFrame(schema={"codigo_indicador": pl.String})
+        result = validate_indicadores(df, None)
+        self.assertEqual(result["status"], "error")
+
+    def test_validate_indicadores_rejects_missing_codes(self):
+        df = pl.DataFrame(
+            {
+                "codigo_indicador": ["dolar", "uf"],
+                "fecha": ["2024-01-01", "2024-01-01"],
+                "valor": [1.0, 1.0],
+            }
+        )
+        result = validate_indicadores(df, None)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("missing" in e for e in result["errors"]))
+
+    def test_validate_indicadores_warns_on_fallback(self):
+        df = pl.DataFrame(
+            {
+                "codigo_indicador": sorted(EXPECTED_INDICATOR_CODES),
+                "fecha": ["2024-01-01"] * len(EXPECTED_INDICATOR_CODES),
+                "valor": [1.0] * len(EXPECTED_INDICATOR_CODES),
+            }
+        )
+        result = validate_indicadores(df, {"source_mode": "fallback"})
+        self.assertTrue(any("fallback" in w for w in result["warnings"]))
+
+    def test_validate_indicadores_warns_on_raw_recovery(self):
+        df = pl.DataFrame(
+            {
+                "codigo_indicador": sorted(EXPECTED_INDICATOR_CODES),
+                "fecha": ["2024-01-01"] * len(EXPECTED_INDICATOR_CODES),
+                "valor": [1.0] * len(EXPECTED_INDICATOR_CODES),
+            }
+        )
+        result = validate_indicadores(df, {"source_mode": "live", "raw_recoveries": ["uf/2024"]})
+        self.assertTrue(any("raw" in w for w in result["warnings"]))
 
 
 if __name__ == "__main__":
