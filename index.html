@@ -1375,6 +1375,40 @@
             flex-shrink: 0;
         }
 
+        .support-section {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 2rem;
+            align-items: center;
+            padding: 1.5rem;
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        .support-section h2 {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.35rem;
+        }
+
+        .support-section p {
+            max-width: 700px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+
+        .support-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            min-width: 260px;
+        }
+
         /* Manifesto */
         .manifesto {
             background-color: var(--accent-green);
@@ -1782,6 +1816,14 @@
                 align-items: flex-start;
                 gap: 1.5rem;
             }
+            .support-section {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            .support-actions {
+                justify-content: flex-start;
+                min-width: 0;
+            }
             .catalog-toolbar {
                 flex-direction: column;
                 align-items: stretch;
@@ -1857,6 +1899,7 @@
             <a href="#confianza">Metodología</a>
             <a href="#uso">Desarrolladores</a>
             <a href="#participar">Participar</a>
+            <a href="#apoyar">Apoyar</a>
             <a class="nav-github" href="https://github.com/cortega26/chile-hub" target="_blank" rel="noopener noreferrer">GitHub Repo</a>
         </nav>
     </header>
@@ -2042,12 +2085,22 @@ LIMIT 10;</pre>
             </div>
         </section>
 
+        <section class="support-section" id="apoyar" aria-labelledby="support-title">
+            <div>
+                <h2 id="support-title">Apoya el mantenimiento del proyecto</h2>
+                <p>Si chile-hub te ahorra horas de limpieza, puedes ayudar a sostener extractores, validaciones y documentación pública.</p>
+            </div>
+            <div class="support-actions" id="support-actions" aria-label="Fuentes de apoyo al proyecto"></div>
+        </section>
+
         <section class="manifesto">
             <h2>Menos tiempo buscando y limpiando datos. Más tiempo construyendo.</h2>
             <div>
                 <p>chile-hub no reemplaza a las fuentes oficiales. Las vuelve consistentes, comparables y utilizables en flujos modernos de datos.</p>
                 <p style="margin-top: 1rem;">Hecho con <span style="color: #f87171;">&hearts;</span> en Chile ·
                 <a href="https://github.com/cortega26/chile-hub" target="_blank" rel="noopener noreferrer">GitHub</a> ·
+                <a href="https://github.com/sponsors/cortega26" target="_blank" rel="noopener noreferrer">GitHub Sponsors</a> ·
+                <a href="https://www.buymeacoffee.com/cortega26" target="_blank" rel="noopener noreferrer">Buy Me a Coffee</a> ·
                 <a href="https://linkedin.com/in/cortega26" target="_blank" rel="noopener noreferrer">LinkedIn</a></p>
             </div>
         </section>

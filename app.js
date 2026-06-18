@@ -23,11 +23,24 @@ const catalogGeneratedAt = document.getElementById("catalog-generated-at");
 const catalogGrid = document.getElementById("catalog-grid");
 const catalogSearchInput = document.getElementById("catalog-search-input");
 const catalogCount = document.getElementById("catalog-count");
+const supportActions = document.getElementById("support-actions");
 const quickstartCopyButtons = document.querySelectorAll(".quickstart-copy");
 let artifactManifestByPath = {};
 let packageManifestByPath = {};
 const PUBLIC_DATA_BASE = "https://tooltician.com/chile-hub/data/normalized";
 const PREVIEW_ROW_LIMIT = 5;
+const SUPPORT_LINKS = [
+    {
+        label: "GitHub Sponsors",
+        href: "https://github.com/sponsors/cortega26",
+        className: "btn btn-primary",
+    },
+    {
+        label: "Buy Me a Coffee",
+        href: "https://www.buymeacoffee.com/cortega26",
+        className: "dataset-action muted",
+    },
+];
 
 // Formateador de moneda en pesos chilenos (CLP)
 const formatCLP = new Intl.NumberFormat("es-CL", {
@@ -174,6 +187,15 @@ function buildSimpleLink(path, label) {
             ${escapeHtml(label)}
         </a>
     `;
+}
+
+function renderSupportLinks() {
+    if (!supportActions) return;
+    supportActions.innerHTML = SUPPORT_LINKS.map(link => `
+        <a class="${escapeHtml(link.className)}" href="${escapeHtml(link.href)}" target="_blank" rel="noopener noreferrer">
+            ${escapeHtml(link.label)}
+        </a>
+    `).join("");
 }
 
 function findReportPath(reports, sharedType, format, fallbackPath) {
@@ -929,6 +951,7 @@ quickstartCopyButtons.forEach(button => {
 
 // Inicialización
 window.addEventListener("DOMContentLoaded", () => {
+    renderSupportLinks();
     loadKPIs();
     loadCatalog();
     loadComunas();

@@ -270,6 +270,24 @@ def verify_landing():
         if repo_href != "https://github.com/cortega26/chile-hub":
             fail(f"Unexpected repo href: {repo_href}")
 
+        support_nav_href = page.get_by_role("link", name="Apoyar").get_attribute("href")
+        if support_nav_href != "#apoyar":
+            fail(f"Unexpected support nav href: {support_nav_href}")
+
+        support_actions = page.locator("#support-actions a")
+        support_labels = support_actions.all_inner_texts()
+        if support_labels != ["GitHub Sponsors", "Buy Me a Coffee"]:
+            fail(f"Unexpected support actions: {support_labels}")
+        support_hrefs = [
+            support_actions.nth(index).get_attribute("href")
+            for index in range(support_actions.count())
+        ]
+        if support_hrefs != [
+            "https://github.com/sponsors/cortega26",
+            "https://www.buymeacoffee.com/cortega26",
+        ]:
+            fail(f"Unexpected support hrefs: {support_hrefs}")
+
         page.locator(".technical-details").click()
         status_actions = page.locator("#status-actions .dataset-action").all_inner_texts()
         expected_status_actions = [
