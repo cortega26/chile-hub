@@ -1,4 +1,6 @@
 polars==1.41.2
+# Required by Polars DataFrame.to_pandas() during artifact builds.
+pyarrow==24.0.0
 duckdb==1.5.3
 requests==2.34.2
 platformdirs==4.10.0

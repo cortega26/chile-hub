@@ -9,6 +9,11 @@ from unittest.mock import patch
 import polars as pl
 import requests
 
+try:
+    import tomllib
+except ModuleNotFoundError:  # pragma: no cover - Python 3.10 compatibility.
+    import tomli as tomllib
+
 ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
@@ -47,6 +52,28 @@ from src.validation import (
     validate_regiones,
     validate_resultados_educacionales,
 )
+
+
+def _pinned_requirements(path):
+    requirements = {}
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        package_name, version = line.split("==", 1)
+        requirements[package_name.lower().replace("_", "-")] = version
+    return requirements
+
+
+def _pinned_pyproject_dependencies():
+    pyproject = tomllib.loads((ROOT_DIR / "pyproject.toml").read_text(encoding="utf-8"))
+    dependencies = list(pyproject["project"]["dependencies"])
+    dependencies.extend(pyproject["project"]["optional-dependencies"]["pipeline"])
+    pinned = {}
+    for dependency in dependencies:
+        package_name, version = dependency.split("==", 1)
+        pinned[package_name.lower().replace("_", "-")] = version
+    return pinned
 
 
 class PipelineLogicTests(unittest.TestCase):
@@ -1070,6 +1097,20 @@ class IndicatorFallbackTests(unittest.TestCase):
 
         self.assertEqual(set(df["codigo_indicador"].unique()), EXPECTED_INDICATOR_CODES)
         self.assertEqual(diagnostics["published_backfills"], sorted(EXPECTED_INDICATOR_CODES))
+
+
+class DependencyContractTests(unittest.TestCase):
+    def test_requirements_cover_runtime_and_pipeline_dependencies(self):
+        requirements = _pinned_requirements(ROOT_DIR / "requirements.txt")
+        pyproject_dependencies = _pinned_pyproject_dependencies()
+
+        self.assertEqual(
+            requirements,
+            pyproject_dependencies,
+            "requirements.txt must stay aligned with pyproject runtime + pipeline deps. "
+            "CI installs requirements.txt directly; missing indirect deps such as pyarrow "
+            "can break Polars conversions during the build.",
+        )
 
 
 if __name__ == "__main__":
