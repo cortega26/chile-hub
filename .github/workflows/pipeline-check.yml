@@ -25,7 +25,7 @@ env:
 
 concurrency:
   group: pipeline-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.event_name == 'push' }}
 
 jobs:
   quality:
@@ -79,14 +79,16 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --requirement requirements.txt
-          python -m pip install --requirement dev-requirements.txt
+          python -m pip install "$(grep '^pytest==' dev-requirements.txt)" "$(grep '^pytest-cov==' dev-requirements.txt)"
 
       - name: Install unrar
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: |
           sudo apt-get update
           sudo apt-get install -y unrar
 
       - name: Extract source data
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: |
           python src/extractors/subdere_extractor.py
           python src/extractors/bcentral_extractor.py
@@ -101,9 +103,11 @@ jobs:
           python src/extractors/res_extractor.py
 
       - name: Build outputs
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: python src/build_dev_db.py
 
       - name: Check build-synced files
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: |
           if ! git diff --quiet -- index.html app.js; then
             git diff -- index.html app.js
@@ -113,11 +117,12 @@ jobs:
 
       - name: Verify pipeline artifacts
         run: |
-          args=()
           if [[ "${{ github.event_name }}" == "schedule" || "${{ inputs.publish }}" == "true" ]]; then
-            args+=(--require-live)
+            profile=publication
+          else
+            profile=readiness
           fi
-          python scripts/verify_pipeline.py "${args[@]}"
+          python scripts/verify_pipeline.py --profile "$profile"
 
       - name: Run unit and contract tests
         run: python -m pytest -v --cov=src --cov-report=term-missing --cov-report=xml
@@ -201,7 +206,9 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
-          cache-dependency-path: requirements.txt
+          cache-dependency-path: |
+            requirements.txt
+            dev-requirements.txt
 
       - name: Install Playwright
         run: python -m pip install "$(grep '^playwright==' dev-requirements.txt)"

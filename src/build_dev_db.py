@@ -21,11 +21,13 @@ from src.pipeline_status_utils import (
     build_hub_health,
     compute_freshness,
     write_dataset_catalog_markdown_file,
+    write_dataset_quality_markdown_file,
     write_drift_report_markdown_file,
     write_hub_health_markdown_file,
     write_overview_markdown_file,
     write_provenance_report_markdown_file,
     write_redistribution_report_markdown_file,
+    write_source_readiness_markdown_file,
     write_status_markdown_file,
 )
 from src.validation import (
@@ -697,13 +699,41 @@ def enrich_dataset_metadata(dataset_metadata, validations):
         validation = validations.get(dataset_name, {})
         degradation = build_degradation(dataset_name, metadata, validation)
         coverage = build_coverage(dataset_name, metadata)
+        # Incrustar campos del contrato de esquema para comparación de changelog
+        contract = load_schema_contract(dataset_name)
+        contract_fields = {}
+        if contract:
+            contract_fields = {
+                "contract_primary_key": contract.get("primary_key", []),
+                "contract_required_columns": contract.get("required_columns", []),
+                "contract_column_types": contract.get("column_types", {}),
+                "contract_nullable_columns": contract.get("nullable_columns", []),
+                "contract_exists": True,
+            }
         enriched[dataset_name] = {
             **metadata,
             "degradation": degradation,
             "coverage": coverage,
+            **contract_fields,
         }
         enriched[dataset_name]["drift"] = build_drift(enriched[dataset_name])
     return enriched
+
+
+def load_schema_contract(dataset_name):
+    """Carga el contrato de esquema para un dataset.
+
+    Retorna un dict con los campos del contrato, o None si el archivo
+    no existe o no se puede interpretar.
+    """
+    contract_path = os.path.join(ROOT_DIR, "contracts", "datasets", f"{dataset_name}.schema.json")
+    if not os.path.exists(contract_path):
+        return None
+    try:
+        with open(contract_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return None
 
 
 def ensure_directories():
@@ -971,6 +1001,22 @@ def build_publishable_artifact_index():
             "shared_type": "artifact_manifest",
             "format": "json",
         },
+        "data/normalized/source_readiness.json": {
+            "shared_type": "source_readiness",
+            "format": "json",
+        },
+        "data/normalized/source_readiness.md": {
+            "shared_type": "source_readiness",
+            "format": "markdown",
+        },
+        "data/normalized/dataset_quality.json": {
+            "shared_type": "dataset_quality",
+            "format": "json",
+        },
+        "data/normalized/dataset_quality.md": {
+            "shared_type": "dataset_quality",
+            "format": "markdown",
+        },
     }
     artifact_index.update(shared_artifacts)
     return artifact_index
@@ -1075,6 +1121,114 @@ def write_dataset_status_json(dataset_status):
     return output_path
 
 
+def _is_compatible_type_change(old_type, new_type):
+    """Determina si un cambio de tipo de columna es compatible hacia atrás.
+
+    El mismo tipo siempre es compatible.
+    Widening integer → float es compatible.
+    Cualquier otro cambio de tipo es incompatible.
+    """
+    if old_type == new_type:
+        return True
+    if old_type == "integer" and new_type == "float":
+        return True
+    return False
+
+
+def _compute_dataset_change_severity(current, previous, entry, is_new_dataset):
+    """Calcula los campos de severidad para un dataset comparando contratos.
+
+    Usa los campos contract_* incrustados en pipeline_metadata por
+    enrich_dataset_metadata(). Maneja el caso de migración donde previous
+    no tiene campos de contrato.
+    """
+    breaking_changes = []
+    new_columns = []
+    removed_columns = []
+    primary_key_changed = False
+    contract_changed = False
+
+    prev_has_contract = previous.get("contract_exists", False)
+    curr_has_contract = current.get("contract_exists", False)
+
+    if prev_has_contract and curr_has_contract:
+        prev_pk = previous.get("contract_primary_key", [])
+        curr_pk = current.get("contract_primary_key", [])
+        prev_required = set(previous.get("contract_required_columns", []))
+        curr_required = set(current.get("contract_required_columns", []))
+        prev_types = previous.get("contract_column_types", {})
+        curr_types = current.get("contract_column_types", {})
+        prev_nullable = set(previous.get("contract_nullable_columns", []))
+        curr_nullable = set(current.get("contract_nullable_columns", []))
+
+        # 1. Clave primaria cambiada → major
+        if prev_pk != curr_pk:
+            primary_key_changed = True
+            contract_changed = True
+            breaking_changes.append(f"Primary key changed from {prev_pk} to {curr_pk}")
+
+        # 2. Columnas requeridas eliminadas → major
+        removed_required = prev_required - curr_required
+        for col in sorted(removed_required):
+            breaking_changes.append(f"Required column removed: {col}")
+            contract_changed = True
+
+        # 3. Cambios de tipo incompatibles → major
+        for col, prev_type in prev_types.items():
+            curr_type = curr_types.get(col)
+            if curr_type and prev_type != curr_type:
+                if not _is_compatible_type_change(prev_type, curr_type):
+                    breaking_changes.append(
+                        f"Column type changed incompatibly: {col} from {prev_type} to {curr_type}"
+                    )
+                    contract_changed = True
+
+        # 4. Columnas agregadas o eliminadas del contrato
+        prev_contract_cols = set(prev_types.keys()) | prev_required | prev_nullable
+        curr_contract_cols = set(curr_types.keys()) | curr_required | curr_nullable
+        added_cols = curr_contract_cols - prev_contract_cols
+        removed_cols = prev_contract_cols - curr_contract_cols
+
+        for col in sorted(added_cols):
+            if col in curr_nullable:
+                new_columns.append(col)
+            else:
+                breaking_changes.append(f"New non-nullable column added: {col}")
+                contract_changed = True
+        if any(col in curr_nullable for col in added_cols):
+            contract_changed = True
+
+        for col in sorted(removed_cols):
+            removed_columns.append(col)
+            breaking_changes.append(f"Column removed from contract: {col}")
+            contract_changed = True
+
+    # Determinar severidad global
+    if breaking_changes:
+        change_severity = "major"
+    elif contract_changed:
+        change_severity = "minor"
+    elif is_new_dataset:
+        change_severity = "minor"
+    elif (
+        entry.get("added_fields")
+        or entry.get("removed_fields")
+        or entry.get("record_count_delta", 0) != 0
+    ):
+        change_severity = "patch"
+    else:
+        change_severity = "none"
+
+    return {
+        "change_severity": change_severity,
+        "breaking_changes": breaking_changes,
+        "new_columns": new_columns,
+        "removed_columns": removed_columns,
+        "primary_key_changed": primary_key_changed,
+        "contract_changed": contract_changed,
+    }
+
+
 def build_dataset_changelog(current_metadata, previous_metadata=None):
     previous_datasets = (previous_metadata or {}).get("datasets", {})
     current_datasets = current_metadata.get("datasets", {})
@@ -1084,32 +1238,39 @@ def build_dataset_changelog(current_metadata, previous_metadata=None):
         previous = previous_datasets.get(dataset_name, {})
         current_fields = set(current.get("fields", []))
         previous_fields = set(previous.get("fields", []))
-        changes.append(
-            {
-                "dataset": dataset_name,
-                "previous_record_count": previous.get("record_count"),
-                "current_record_count": current.get("record_count"),
-                "record_count_delta": (
-                    current.get("record_count") - previous.get("record_count")
-                    if isinstance(current.get("record_count"), int)
-                    and isinstance(previous.get("record_count"), int)
-                    else None
-                ),
-                "added_fields": sorted(current_fields - previous_fields),
-                "removed_fields": sorted(previous_fields - current_fields),
-                "previous_source_mode": previous.get("source_mode"),
-                "current_source_mode": current.get("source_mode"),
-                "previous_freshness_status": previous.get("freshness", {}).get("status"),
-                "current_freshness_status": current.get("freshness", {}).get("status"),
-                "previous_validation_status": (previous_metadata or {})
-                .get("validations", {})
-                .get(dataset_name, {})
-                .get("status"),
-                "current_validation_status": current_metadata.get("validations", {})
-                .get(dataset_name, {})
-                .get("status"),
-            }
-        )
+
+        entry = {
+            "dataset": dataset_name,
+            "previous_record_count": previous.get("record_count"),
+            "current_record_count": current.get("record_count"),
+            "record_count_delta": (
+                current.get("record_count") - previous.get("record_count")
+                if isinstance(current.get("record_count"), int)
+                and isinstance(previous.get("record_count"), int)
+                else None
+            ),
+            "added_fields": sorted(current_fields - previous_fields),
+            "removed_fields": sorted(previous_fields - current_fields),
+            "previous_source_mode": previous.get("source_mode"),
+            "current_source_mode": current.get("source_mode"),
+            "previous_freshness_status": previous.get("freshness", {}).get("status"),
+            "current_freshness_status": current.get("freshness", {}).get("status"),
+            "previous_validation_status": (previous_metadata or {})
+            .get("validations", {})
+            .get(dataset_name, {})
+            .get("status"),
+            "current_validation_status": current_metadata.get("validations", {})
+            .get(dataset_name, {})
+            .get("status"),
+        }
+
+        # Calcular severidad comparando contratos actual y anterior
+        is_new_dataset = dataset_name not in previous_datasets
+        severity_info = _compute_dataset_change_severity(current, previous, entry, is_new_dataset)
+        entry.update(severity_info)
+
+        changes.append(entry)
+
     return {
         "generated_at_utc": current_metadata.get("generated_at_utc"),
         "previous_generated_at_utc": (previous_metadata or {}).get("generated_at_utc"),
@@ -1344,6 +1505,262 @@ def write_overview_json(overview):
     return output_path, overview
 
 
+def load_source_registry():
+    """Carga el registry de fuentes desde data/source_registry.json."""
+    registry_path = os.path.join(DATA_DIR, "source_registry.json")
+    with open(registry_path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def build_source_readiness(pipeline_metadata):
+    """Construye el reporte de madurez de fuente combinando registry y metadatos."""
+    registry = load_source_registry()
+    datasets_metadata = pipeline_metadata.get("datasets", {})
+
+    entries = []
+    for src in registry:
+        dataset_name = src["dataset"]
+        ds_meta = datasets_metadata.get(dataset_name, {})
+
+        # Derivar URL del contrato de esquema
+        contract_path = f"contracts/datasets/{dataset_name}.schema.json"
+        contract_abs = os.path.join(ROOT_DIR, contract_path)
+        source_contract_url = (
+            f"github:chile-hub/chile-hub/{contract_path}" if os.path.exists(contract_abs) else None
+        )
+
+        # Determinar estancamiento
+        review_by = src.get("review_by")
+        stalled_after_days = src.get("stalled_after_days", 90)
+        stalled = False
+        if review_by:
+            try:
+                review_date = datetime.fromisoformat(review_by).replace(tzinfo=UTC)
+                stalled = datetime.now(UTC) > review_date
+            except (ValueError, TypeError):
+                pass
+
+        # Acción recomendada
+        recommended_action = src.get("next_action", "—")
+        if stalled:
+            recommended_action = f"⚠ ESTANCADO (revisión vencida {review_by}). {recommended_action}"
+
+        entries.append(
+            {
+                "dataset": dataset_name,
+                "maturity_status": src.get("maturity_status", "unknown"),
+                "source_id": src.get("source_id", ""),
+                "source_name": src.get("source_name", ""),
+                "official_url": src.get("official_url", ""),
+                "access_method": src.get("access_method", ""),
+                "license_status": src.get("license_status", ""),
+                "source_mode": ds_meta.get("source_mode", "not_built"),
+                "source_detail": ds_meta.get("source_detail", ""),
+                "live_ready": src.get("live_ready", False),
+                "fallback_allowed": src.get("fallback_allowed", False),
+                "publish_blocking": src.get("publish_blocking", False),
+                "live_extractor_status": src.get("live_extractor_status", "unknown"),
+                "fallback_policy": src.get("fallback_policy", "none"),
+                "source_contract_url": source_contract_url,
+                "stalled_after_days": stalled_after_days,
+                "review_by": review_by,
+                "stalled": stalled,
+                "owner": src.get("owner", "core"),
+                "next_action": src.get("next_action", "—"),
+                "recommended_action": recommended_action,
+            }
+        )
+
+    maturity_counts = {
+        s: sum(1 for e in entries if e["maturity_status"] == s)
+        for s in ("stable", "candidate", "experimental", "deprecated")
+    }
+
+    return {
+        "generated_at_utc": pipeline_metadata.get(
+            "generated_at_utc", datetime.now(UTC).isoformat()
+        ),
+        "dataset_count": len(entries),
+        **{f"{k}_count": v for k, v in maturity_counts.items()},
+        "live_ready_count": sum(1 for e in entries if e["live_ready"]),
+        "fallback_only_count": sum(
+            1 for e in entries if e["live_extractor_status"] == "fallback_only"
+        ),
+        "publish_blocking_count": sum(1 for e in entries if e["publish_blocking"]),
+        "datasets": entries,
+    }
+
+
+def write_source_readiness_json(readiness):
+    output_path = os.path.join(NORMALIZED_DIR, "source_readiness.json")
+    write_json_atomic(readiness, output_path, ensure_ascii=False, indent=2)
+    return output_path, readiness
+
+
+def build_dataset_quality(pipeline_metadata, hub_health, source_readiness):
+    """Construye tarjeta de puntuación de calidad multidimensional por dataset."""
+    health_by_dataset = {entry["dataset"]: entry for entry in hub_health.get("datasets", [])}
+    readiness_by_dataset = {
+        entry["dataset"]: entry for entry in source_readiness.get("datasets", [])
+    }
+
+    # Ponderaciones
+    WEIGHTS = {
+        "validation": 25,
+        "schema_contract": 20,
+        "source_readiness": 20,
+        "freshness": 15,
+        "coverage": 10,
+        "reuse_policy": 10,
+    }
+
+    def _grade(score):
+        if score >= 90:
+            return "A"
+        if score >= 75:
+            return "B"
+        if score >= 60:
+            return "C"
+        if score >= 40:
+            return "D"
+        return "F"
+
+    def _score_validation(health):
+        return 100 if health.get("validation_status") == "ok" else 0
+
+    def _score_schema_contract(dataset_name):
+        contract_path = os.path.join(
+            ROOT_DIR, "contracts", "datasets", f"{dataset_name}.schema.json"
+        )
+        return 100 if os.path.exists(contract_path) else 0
+
+    def _score_source_readiness(readiness):
+        if readiness.get("live_ready") and readiness.get("live_extractor_status") == "implemented":
+            return 100
+        if readiness.get("fallback_allowed"):
+            return 50
+        return 0
+
+    def _score_freshness(health):
+        status = health.get("freshness_status", "unknown")
+        if status == "fresh":
+            return 100
+        if status == "stale":
+            return 50
+        return 0
+
+    def _score_coverage(health):
+        status = health.get("coverage_status", "unknown")
+        if status == "full":
+            return 100
+        if status == "partial":
+            return 70
+        return 0
+
+    def _score_reuse(health):
+        status = health.get("reuse_status", "unknown")
+        if status == "open-attribution":
+            return 100
+        if status == "public-api-review-terms":
+            return 50
+        return 0
+
+    entries = []
+
+    for dataset_name in sorted(set(list(health_by_dataset) + list(readiness_by_dataset))):
+        health = health_by_dataset.get(dataset_name, {})
+        readiness = readiness_by_dataset.get(dataset_name, {})
+
+        dims = {
+            "validation": _score_validation(health),
+            "schema_contract": _score_schema_contract(dataset_name),
+            "source_readiness": _score_source_readiness(readiness),
+            "freshness": _score_freshness(health),
+            "coverage": _score_coverage(health),
+            "reuse_policy": _score_reuse(health),
+        }
+
+        overall = sum(dims[k] * WEIGHTS[k] for k in WEIGHTS) / 100
+
+        blocking_reasons = []
+        if dims["validation"] < 100:
+            blocking_reasons.append(f"Validación: {health.get('validation_status', 'error')}")
+        if dims["schema_contract"] < 100:
+            blocking_reasons.append("Contrato de esquema ausente")
+        if dims["source_readiness"] < 100:
+            rd = readiness
+            if rd.get("live_extractor_status") == "fallback_only":
+                blocking_reasons.append(
+                    f"Fuente en fallback_only — {rd.get('next_action', 'sin acción definida')}"
+                )
+            elif not rd.get("live_ready"):
+                blocking_reasons.append("Fuente no lista para live")
+            else:
+                blocking_reasons.append("Madurez de fuente incompleta")
+        if dims["freshness"] < 100:
+            blocking_reasons.append(f"Datos {health.get('freshness_status', 'desconocidos')}")
+        if dims["coverage"] < 100:
+            blocking_reasons.append(f"Cobertura {health.get('coverage_status', 'desconocida')}")
+        if dims["reuse_policy"] < 100:
+            blocking_reasons.append(f"Reutilización: {health.get('reuse_status', 'desconocida')}")
+
+        # Bloqueo por upstreams candidatos en datasets derivados
+        maturity = readiness.get("maturity_status", "unknown")
+        if maturity == "candidate" and readiness.get("access_method") == "derived":
+            blocking_reasons.append("Capa derivada — depende de datasets upstream no publicables")
+
+        recommended_action = readiness.get(
+            "next_action",
+            health.get("recommended_action", "—"),
+        )
+        if not blocking_reasons:
+            recommended_action = "Mantener monitoreo operativo y actualizaciones periódicas."
+
+        entries.append(
+            {
+                "dataset": dataset_name,
+                "maturity_status": maturity,
+                "overall_score": round(overall, 1),
+                "grade": _grade(overall),
+                "dimensions": dims,
+                "weights": WEIGHTS,
+                "blocking_reasons": blocking_reasons,
+                "recommended_action": recommended_action,
+            }
+        )
+
+    # Aggregate stats
+    grades = {}
+    for e in entries:
+        g = e["grade"]
+        grades[g] = grades.get(g, 0) + 1
+
+    return {
+        "generated_at_utc": pipeline_metadata.get(
+            "generated_at_utc", datetime.now(UTC).isoformat()
+        ),
+        "dataset_count": len(entries),
+        "grade_distribution": {
+            "A": grades.get("A", 0),
+            "B": grades.get("B", 0),
+            "C": grades.get("C", 0),
+            "D": grades.get("D", 0),
+            "F": grades.get("F", 0),
+        },
+        "average_score": round(sum(e["overall_score"] for e in entries) / len(entries), 1)
+        if entries
+        else 0,
+        "weights": WEIGHTS,
+        "datasets": entries,
+    }
+
+
+def write_dataset_quality_json(quality):
+    output_path = os.path.join(NORMALIZED_DIR, "dataset_quality.json")
+    write_json_atomic(quality, output_path, ensure_ascii=False, indent=2)
+    return output_path, quality
+
+
 def write_hub_bundle_json(pipeline_metadata, hub_health, dataset_catalog, artifact_manifest):
     artifacts_by_dataset = {}
     shared_artifacts = []
@@ -1381,6 +1798,10 @@ def write_hub_bundle_json(pipeline_metadata, hub_health, dataset_catalog, artifa
         "catalog_json": ("dataset_catalog", "json"),
         "catalog_markdown": ("dataset_catalog", "markdown"),
         "manifest_json": ("artifact_manifest", "json"),
+        "source_readiness_json": ("source_readiness", "json"),
+        "source_readiness_markdown": ("source_readiness", "markdown"),
+        "dataset_quality_json": ("dataset_quality", "json"),
+        "dataset_quality_markdown": ("dataset_quality", "markdown"),
     }
     reports = {}
     for report_name, (shared_type, artifact_format) in report_specs.items():
@@ -2683,6 +3104,12 @@ def main():
     drift_report = build_drift_report(dataset_catalog)
     drift_report_output = write_drift_report_json(drift_report)
     write_drift_report_markdown_file(drift_report)
+    source_readiness = build_source_readiness(pipeline_metadata)
+    source_readiness_json_output, _ = write_source_readiness_json(source_readiness)
+    write_source_readiness_markdown_file(source_readiness)
+    dataset_quality = build_dataset_quality(pipeline_metadata, hub_health, source_readiness)
+    dataset_quality_json_output, _ = write_dataset_quality_json(dataset_quality)
+    write_dataset_quality_markdown_file(dataset_quality)
     artifact_manifest_output, artifact_manifest = write_artifact_manifest()
     zip_output = write_publishable_bundle_zip()
     sha256_output = write_publishable_bundle_sha256(zip_output)
@@ -2707,6 +3134,8 @@ def main():
     print(f"Reporte de redistribucion exportado a: {redistribution_report_output}")
     print(f"Reporte de procedencia exportado a: {provenance_report_output}")
     print(f"Reporte de drift exportado a: {drift_report_output}")
+    print(f"Madurez de fuente exportada a: {source_readiness_json_output}")
+    print(f"Calidad de datasets exportada a: {dataset_quality_json_output}")
     print(f"Overview exportado a: {overview_output}")
     print(f"Manifest de artefactos exportado a: {artifact_manifest_output}")
     print(f"Bundle publicable exportado a: {hub_bundle_output}")

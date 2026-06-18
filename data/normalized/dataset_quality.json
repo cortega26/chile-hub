@@ -1,0 +1,405 @@
+{
+  "generated_at_utc": "2026-06-18T18:20:03.516188+00:00",
+  "dataset_count": 15,
+  "grade_distribution": {
+    "A": 12,
+    "B": 3,
+    "C": 0,
+    "D": 0,
+    "F": 0
+  },
+  "average_score": 92.1,
+  "weights": {
+    "validation": 25,
+    "schema_contract": 20,
+    "source_readiness": 20,
+    "freshness": 15,
+    "coverage": 10,
+    "reuse_policy": 10
+  },
+  "datasets": [
+    {
+      "dataset": "censo_comunal",
+      "maturity_status": "stable",
+      "overall_score": 100.0,
+      "grade": "A",
+      "dimensions": {
+        "validation": 100,
+        "schema_contract": 100,
+        "source_readiness": 100,
+        "freshness": 100,
+        "coverage": 100,
+        "reuse_policy": 100
+      },
+      "weights": {
+        "validation": 25,
+        "schema_contract": 20,
+        "source_readiness": 20,
+        "freshness": 15,
+        "coverage": 10,
+        "reuse_policy": 10
+      },
+      "blocking_reasons": [],
+      "recommended_action": "Mantener monitoreo operativo y actualizaciones periódicas."
+    },
+    {
+      "dataset": "censo_hogares_viviendas",
+      "maturity_status": "stable",
+      "overall_score": 100.0,
+      "grade": "A",
+      "dimensions": {
+        "validation": 100,
+        "schema_contract": 100,
+        "source_readiness": 100,
+        "freshness": 100,
+        "coverage": 100,
+        "reuse_policy": 100
+      },
+      "weights": {
+        "validation": 25,
+        "schema_contract": 20,
+        "source_readiness": 20,
+        "freshness": 15,
+        "coverage": 10,
+        "reuse_policy": 10
+      },
+      "blocking_reasons": [],
+      "recommended_action": "Mantener monitoreo operativo y actualizaciones periódicas."
+    },
+    {
+      "dataset": "comunas",
+      "maturity_status": "stable",
+      "overall_score": 100.0,
+      "grade": "A",
+      "dimensions": {
+        "validation": 100,
+        "schema_contract": 100,
+        "source_readiness": 100,
+        "freshness": 100,
+        "coverage": 100,
+        "reuse_policy": 100
+      },
+      "weights": {
+        "validation": 25,
+        "schema_contract": 20,
+        "source_readiness": 20,
+        "freshness": 15,
+        "coverage": 10,
+        "reuse_policy": 10
+      },
+      "blocking_reasons": [],
+      "recommended_action": "Mantener monitoreo operativo y actualizaciones periódicas."
+    },
+    {
+      "dataset": "comunas_enriquecidas",
+      "maturity_status": "stable",
+      "overall_score": 90.0,
+      "grade": "A",
+      "dimensions": {
+        "validation": 100,
+        "schema_contract": 100,
+        "source_readiness": 50,
+        "freshness": 100,
+        "coverage": 100,
+        "reuse_policy": 100
+      },
+      "weights": {
+        "validation": 25,
+        "schema_contract": 20,
+        "source_readiness": 20,
+        "freshness": 15,
+        "coverage": 10,
+        "reuse_policy": 10
+      },
+      "blocking_reasons": [
+        "Madurez de fuente incompleta"
+      ],
+      "recommended_action": "Keep derived schema aligned with comunas."
+    },
+    {
+      "dataset": "distritos_electorales",
+      "maturity_status": "stable",
+      "overall_score": 100.0,
+      "grade": "A",
+      "dimensions": {
+        "validation": 100,
+        "schema_contract": 100,
+        "source_readiness": 100,
+        "freshness": 100,
+        "coverage": 100,
+        "reuse_policy": 100
+      },
+      "weights": {
+        "validation": 25,
+        "schema_contract": 20,
+        "source_readiness": 20,
+        "freshness": 15,
+        "coverage": 10,
+        "reuse_policy": 10
+      },
+      "blocking_reasons": [],
+      "recommended_action": "Mantener monitoreo operativo y actualizaciones periódicas."
+    },
+    {
+      "dataset": "empresas",
+      "maturity_status": "stable",
+      "overall_score": 90.0,
+      "grade": "A",
+      "dimensions": {
+        "validation": 100,
+        "schema_contract": 100,
+        "source_readiness": 100,
+        "freshness": 100,
+        "coverage": 0,
+        "reuse_policy": 100
+      },
+      "weights": {
+        "validation": 25,
+        "schema_contract": 20,
+        "source_readiness": 20,
+        "freshness": 15,
+        "coverage": 10,
+        "reuse_policy": 10
+      },
+      "blocking_reasons": [
+        "Cobertura not_applicable"
+      ],
+      "recommended_action": "Keep large-output behavior documented and verify Parquet-first consumption."
+    },
+    {
+      "dataset": "establecimientos_educacionales",
+      "maturity_status": "stable",
+      "overall_score": 90.0,
+      "grade": "A",
+      "dimensions": {
+        "validation": 100,
+        "schema_contract": 100,
+        "source_readiness": 100,
+        "freshness": 100,
+        "coverage": 0,
+        "reuse_policy": 100
+      },
+      "weights": {
+        "validation": 25,
+        "schema_contract": 20,
+        "source_readiness": 20,
+        "freshness": 15,
+        "coverage": 10,
+        "reuse_policy": 10
+      },
+      "blocking_reasons": [
+        "Cobertura not_applicable"
+      ],
+      "recommended_action": "Monitor annual source package and RAR extraction dependency."
+    },
+    {
+      "dataset": "establecimientos_salud",
+      "maturity_status": "stable",
+      "overall_score": 90.0,
+      "grade": "A",
+      "dimensions": {
+        "validation": 100,
+        "schema_contract": 100,
+        "source_readiness": 100,
+        "freshness": 100,
+        "coverage": 0,
+        "reuse_policy": 100
+      },
+      "weights": {
+        "validation": 25,
+        "schema_contract": 20,
+        "source_readiness": 20,
+        "freshness": 15,
+        "coverage": 10,
+        "reuse_policy": 10
+      },
+      "blocking_reasons": [
+        "Cobertura not_applicable"
+      ],
+      "recommended_action": "Monitor monthly source freshness and geocoding coverage."
+    },
+    {
+      "dataset": "finanzas_municipales",
+      "maturity_status": "candidate",
+      "overall_score": 75.0,
+      "grade": "B",
+      "dimensions": {
+        "validation": 100,
+        "schema_contract": 100,
+        "source_readiness": 50,
+        "freshness": 100,
+        "coverage": 0,
+        "reuse_policy": 50
+      },
+      "weights": {
+        "validation": 25,
+        "schema_contract": 20,
+        "source_readiness": 20,
+        "freshness": 15,
+        "coverage": 10,
+        "reuse_policy": 10
+      },
+      "blocking_reasons": [
+        "Fuente en fallback_only — Configure stable direct SINIM export and replace curated fallback rows.",
+        "Cobertura not_applicable",
+        "Reutilización: public-api-review-terms"
+      ],
+      "recommended_action": "Configure stable direct SINIM export and replace curated fallback rows."
+    },
+    {
+      "dataset": "indicadores",
+      "maturity_status": "stable",
+      "overall_score": 90.0,
+      "grade": "A",
+      "dimensions": {
+        "validation": 100,
+        "schema_contract": 100,
+        "source_readiness": 100,
+        "freshness": 100,
+        "coverage": 0,
+        "reuse_policy": 100
+      },
+      "weights": {
+        "validation": 25,
+        "schema_contract": 20,
+        "source_readiness": 20,
+        "freshness": 15,
+        "coverage": 10,
+        "reuse_policy": 10
+      },
+      "blocking_reasons": [
+        "Cobertura not_applicable"
+      ],
+      "recommended_action": "Monitor empty monthly IPC responses and published backfill behavior."
+    },
+    {
+      "dataset": "indicadores_urbanos_siedu",
+      "maturity_status": "candidate",
+      "overall_score": 87.0,
+      "grade": "B",
+      "dimensions": {
+        "validation": 100,
+        "schema_contract": 100,
+        "source_readiness": 50,
+        "freshness": 100,
+        "coverage": 70,
+        "reuse_policy": 100
+      },
+      "weights": {
+        "validation": 25,
+        "schema_contract": 20,
+        "source_readiness": 20,
+        "freshness": 15,
+        "coverage": 10,
+        "reuse_policy": 10
+      },
+      "blocking_reasons": [
+        "Fuente en fallback_only — Replace partial fallback with stable official SIEDU export.",
+        "Cobertura partial"
+      ],
+      "recommended_action": "Replace partial fallback with stable official SIEDU export."
+    },
+    {
+      "dataset": "perfil_territorial_comunal",
+      "maturity_status": "candidate",
+      "overall_score": 90.0,
+      "grade": "A",
+      "dimensions": {
+        "validation": 100,
+        "schema_contract": 100,
+        "source_readiness": 50,
+        "freshness": 100,
+        "coverage": 100,
+        "reuse_policy": 100
+      },
+      "weights": {
+        "validation": 25,
+        "schema_contract": 20,
+        "source_readiness": 20,
+        "freshness": 15,
+        "coverage": 10,
+        "reuse_policy": 10
+      },
+      "blocking_reasons": [
+        "Fuente no lista para live",
+        "Capa derivada — depende de datasets upstream no publicables"
+      ],
+      "recommended_action": "Track readiness inherited from upstream component datasets."
+    },
+    {
+      "dataset": "provincias",
+      "maturity_status": "stable",
+      "overall_score": 100.0,
+      "grade": "A",
+      "dimensions": {
+        "validation": 100,
+        "schema_contract": 100,
+        "source_readiness": 100,
+        "freshness": 100,
+        "coverage": 100,
+        "reuse_policy": 100
+      },
+      "weights": {
+        "validation": 25,
+        "schema_contract": 20,
+        "source_readiness": 20,
+        "freshness": 15,
+        "coverage": 10,
+        "reuse_policy": 10
+      },
+      "blocking_reasons": [],
+      "recommended_action": "Mantener monitoreo operativo y actualizaciones periódicas."
+    },
+    {
+      "dataset": "regiones",
+      "maturity_status": "stable",
+      "overall_score": 100.0,
+      "grade": "A",
+      "dimensions": {
+        "validation": 100,
+        "schema_contract": 100,
+        "source_readiness": 100,
+        "freshness": 100,
+        "coverage": 100,
+        "reuse_policy": 100
+      },
+      "weights": {
+        "validation": 25,
+        "schema_contract": 20,
+        "source_readiness": 20,
+        "freshness": 15,
+        "coverage": 10,
+        "reuse_policy": 10
+      },
+      "blocking_reasons": [],
+      "recommended_action": "Mantener monitoreo operativo y actualizaciones periódicas."
+    },
+    {
+      "dataset": "resultados_educacionales",
+      "maturity_status": "candidate",
+      "overall_score": 80.0,
+      "grade": "B",
+      "dimensions": {
+        "validation": 100,
+        "schema_contract": 100,
+        "source_readiness": 50,
+        "freshness": 100,
+        "coverage": 0,
+        "reuse_policy": 100
+      },
+      "weights": {
+        "validation": 25,
+        "schema_contract": 20,
+        "source_readiness": 20,
+        "freshness": 15,
+        "coverage": 10,
+        "reuse_policy": 10
+      },
+      "blocking_reasons": [
+        "Fuente en fallback_only — Replace curated fallback with stable official aggregate export.",
+        "Cobertura not_applicable"
+      ],
+      "recommended_action": "Replace curated fallback with stable official aggregate export."
+    }
+  ]
+}

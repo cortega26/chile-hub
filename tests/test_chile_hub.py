@@ -1331,7 +1331,8 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("permissions:\n  contents: read", self.workflow_text)
         self.assertIn("contents: write", self.workflow_text)
         self.assertIn("python scripts/verify_pipeline.py", self.workflow_text)
-        self.assertIn("args+=(--require-live)", self.workflow_text)
+        self.assertIn("profile=publication", self.workflow_text)
+        self.assertIn("profile=readiness", self.workflow_text)
         self.assertIn(
             "github.event_name == 'schedule' || inputs.publish == true", self.workflow_text
         )

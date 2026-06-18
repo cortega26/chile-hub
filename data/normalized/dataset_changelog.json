@@ -1,6 +1,6 @@
 {
-  "generated_at_utc": "2026-06-18T16:22:16.898808+00:00",
-  "previous_generated_at_utc": "2026-06-18T15:15:36.658487+00:00",
+  "generated_at_utc": "2026-06-18T18:20:03.516188+00:00",
+  "previous_generated_at_utc": "2026-06-18T18:14:24.622643+00:00",
   "dataset_count": 15,
   "datasets": [
     {
@@ -15,7 +15,13 @@
       "previous_freshness_status": "fresh",
       "current_freshness_status": "fresh",
       "previous_validation_status": "ok",
-      "current_validation_status": "ok"
+      "current_validation_status": "ok",
+      "change_severity": "none",
+      "breaking_changes": [],
+      "new_columns": [],
+      "removed_columns": [],
+      "primary_key_changed": false,
+      "contract_changed": false
     },
     {
       "dataset": "censo_hogares_viviendas",
@@ -29,7 +35,13 @@
       "previous_freshness_status": "fresh",
       "current_freshness_status": "fresh",
       "previous_validation_status": "ok",
-      "current_validation_status": "ok"
+      "current_validation_status": "ok",
+      "change_severity": "none",
+      "breaking_changes": [],
+      "new_columns": [],
+      "removed_columns": [],
+      "primary_key_changed": false,
+      "contract_changed": false
     },
     {
       "dataset": "comunas",
@@ -43,7 +55,13 @@
       "previous_freshness_status": "fresh",
       "current_freshness_status": "fresh",
       "previous_validation_status": "ok",
-      "current_validation_status": "ok"
+      "current_validation_status": "ok",
+      "change_severity": "none",
+      "breaking_changes": [],
+      "new_columns": [],
+      "removed_columns": [],
+      "primary_key_changed": false,
+      "contract_changed": false
     },
     {
       "dataset": "comunas_enriquecidas",
@@ -57,7 +75,13 @@
       "previous_freshness_status": "fresh",
       "current_freshness_status": "fresh",
       "previous_validation_status": "ok",
-      "current_validation_status": "ok"
+      "current_validation_status": "ok",
+      "change_severity": "none",
+      "breaking_changes": [],
+      "new_columns": [],
+      "removed_columns": [],
+      "primary_key_changed": false,
+      "contract_changed": false
     },
     {
       "dataset": "distritos_electorales",
@@ -71,7 +95,13 @@
       "previous_freshness_status": "fresh",
       "current_freshness_status": "fresh",
       "previous_validation_status": "ok",
-      "current_validation_status": "ok"
+      "current_validation_status": "ok",
+      "change_severity": "none",
+      "breaking_changes": [],
+      "new_columns": [],
+      "removed_columns": [],
+      "primary_key_changed": false,
+      "contract_changed": false
     },
     {
       "dataset": "empresas",
@@ -85,7 +115,13 @@
       "previous_freshness_status": "fresh",
       "current_freshness_status": "fresh",
       "previous_validation_status": "ok",
-      "current_validation_status": "ok"
+      "current_validation_status": "ok",
+      "change_severity": "none",
+      "breaking_changes": [],
+      "new_columns": [],
+      "removed_columns": [],
+      "primary_key_changed": false,
+      "contract_changed": false
     },
     {
       "dataset": "establecimientos_educacionales",
@@ -99,7 +135,13 @@
       "previous_freshness_status": "fresh",
       "current_freshness_status": "fresh",
       "previous_validation_status": "ok",
-      "current_validation_status": "ok"
+      "current_validation_status": "ok",
+      "change_severity": "none",
+      "breaking_changes": [],
+      "new_columns": [],
+      "removed_columns": [],
+      "primary_key_changed": false,
+      "contract_changed": false
     },
     {
       "dataset": "establecimientos_salud",
@@ -113,7 +155,13 @@
       "previous_freshness_status": "fresh",
       "current_freshness_status": "fresh",
       "previous_validation_status": "ok",
-      "current_validation_status": "ok"
+      "current_validation_status": "ok",
+      "change_severity": "none",
+      "breaking_changes": [],
+      "new_columns": [],
+      "removed_columns": [],
+      "primary_key_changed": false,
+      "contract_changed": false
     },
     {
       "dataset": "finanzas_municipales",
@@ -127,7 +175,13 @@
       "previous_freshness_status": "fresh",
       "current_freshness_status": "fresh",
       "previous_validation_status": "ok",
-      "current_validation_status": "ok"
+      "current_validation_status": "ok",
+      "change_severity": "none",
+      "breaking_changes": [],
+      "new_columns": [],
+      "removed_columns": [],
+      "primary_key_changed": false,
+      "contract_changed": false
     },
     {
       "dataset": "indicadores",
@@ -141,7 +195,13 @@
       "previous_freshness_status": "fresh",
       "current_freshness_status": "fresh",
       "previous_validation_status": "ok",
-      "current_validation_status": "ok"
+      "current_validation_status": "ok",
+      "change_severity": "none",
+      "breaking_changes": [],
+      "new_columns": [],
+      "removed_columns": [],
+      "primary_key_changed": false,
+      "contract_changed": false
     },
     {
       "dataset": "indicadores_urbanos_siedu",
@@ -155,7 +215,13 @@
       "previous_freshness_status": "fresh",
       "current_freshness_status": "fresh",
       "previous_validation_status": "ok",
-      "current_validation_status": "ok"
+      "current_validation_status": "ok",
+      "change_severity": "none",
+      "breaking_changes": [],
+      "new_columns": [],
+      "removed_columns": [],
+      "primary_key_changed": false,
+      "contract_changed": false
     },
     {
       "dataset": "perfil_territorial_comunal",
@@ -169,7 +235,13 @@
       "previous_freshness_status": "fresh",
       "current_freshness_status": "fresh",
       "previous_validation_status": "ok",
-      "current_validation_status": "ok"
+      "current_validation_status": "ok",
+      "change_severity": "none",
+      "breaking_changes": [],
+      "new_columns": [],
+      "removed_columns": [],
+      "primary_key_changed": false,
+      "contract_changed": false
     },
     {
       "dataset": "provincias",
@@ -183,7 +255,13 @@
       "previous_freshness_status": "fresh",
       "current_freshness_status": "fresh",
       "previous_validation_status": "ok",
-      "current_validation_status": "ok"
+      "current_validation_status": "ok",
+      "change_severity": "none",
+      "breaking_changes": [],
+      "new_columns": [],
+      "removed_columns": [],
+      "primary_key_changed": false,
+      "contract_changed": false
     },
     {
       "dataset": "regiones",
@@ -197,7 +275,13 @@
       "previous_freshness_status": "fresh",
       "current_freshness_status": "fresh",
       "previous_validation_status": "ok",
-      "current_validation_status": "ok"
+      "current_validation_status": "ok",
+      "change_severity": "none",
+      "breaking_changes": [],
+      "new_columns": [],
+      "removed_columns": [],
+      "primary_key_changed": false,
+      "contract_changed": false
     },
     {
       "dataset": "resultados_educacionales",
@@ -211,7 +295,13 @@
       "previous_freshness_status": "fresh",
       "current_freshness_status": "fresh",
       "previous_validation_status": "ok",
-      "current_validation_status": "ok"
+      "current_validation_status": "ok",
+      "change_severity": "none",
+      "breaking_changes": [],
+      "new_columns": [],
+      "removed_columns": [],
+      "primary_key_changed": false,
+      "contract_changed": false
     }
   ]
 }

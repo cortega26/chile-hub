@@ -1,9 +1,12 @@
 import argparse
 import sys
 import zipfile
+from datetime import datetime, timezone
 from pathlib import Path
 
 import polars as pl
+
+UTC = timezone.utc
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
@@ -73,6 +76,10 @@ _SHARED_FILES = [
     NORMALIZED_DIR / "dataset_catalog.json",
     NORMALIZED_DIR / "dataset_catalog.md",
     NORMALIZED_DIR / "artifact_manifest.json",
+    NORMALIZED_DIR / "source_readiness.json",
+    NORMALIZED_DIR / "source_readiness.md",
+    NORMALIZED_DIR / "dataset_quality.json",
+    NORMALIZED_DIR / "dataset_quality.md",
     NORMALIZED_DIR / "chile-hub-publishable-bundle.zip",
     NORMALIZED_DIR / "chile-hub-publishable-bundle.zip.sha256",
 ]
@@ -231,6 +238,88 @@ def verify_source_registry(registry=None, catalog=None):
             and entry.get("access_method") != "derived"
         ):
             fail(f"{dataset_name} derived registry entry must set access_method=derived")
+        review_by = entry.get("review_by")
+        if review_by is not None:
+            try:
+                datetime.fromisoformat(str(review_by))
+            except (ValueError, TypeError):
+                fail(f"{dataset_name} has invalid review_by date: {review_by}")
+        stalled_after = entry.get("stalled_after_days")
+        if stalled_after is not None and (not isinstance(stalled_after, int) or stalled_after < 1):
+            fail(f"{dataset_name} has invalid stalled_after_days: {stalled_after}")
+
+
+def _verify_stagnation(report=None, reference_date=None):
+    """Verifica reglas de estancamiento según maturity_status.
+
+    Reglas:
+    - experimental: estancamiento emite warning (no falla)
+    - candidate: estancamiento hace fallar verify-readiness
+    - stable: regresión en madurez de fuente hace fallar verify-readiness
+    - derivados: pueden marcarse estancados solo por bloqueadores upstream
+    """
+    if report is None:
+        report = load_json(NORMALIZED_DIR / "source_readiness.json")
+    if reference_date is None:
+        reference_date = datetime.now(UTC)
+
+    warnings = []
+    failures = []
+
+    for entry in report.get("datasets", []):
+        dataset = entry["dataset"]
+        maturity = entry.get("maturity_status", "unknown")
+        access_method = entry.get("access_method", "")
+        review_by = entry.get("review_by")
+        stalled_after_days = entry.get("stalled_after_days", 90)
+
+        # Determinar estancamiento contra la fecha de referencia
+        stalled = False
+        if review_by:
+            try:
+                review_date = datetime.fromisoformat(str(review_by))
+                if review_date.tzinfo is None:
+                    review_date = review_date.replace(tzinfo=UTC)
+                stalled = reference_date > review_date
+            except (ValueError, TypeError):
+                pass
+
+        if not stalled:
+            continue
+
+        # Datasets derivados: advertir en lugar de fallar (dependen de upstream)
+        if access_method == "derived" and maturity != "deprecated":
+            warnings.append(
+                f"{dataset}: estancado (derivado) — revisar fuentes upstream. "
+                f"Revisión vencida: {review_by}"
+            )
+            continue
+
+        if maturity == "experimental":
+            warnings.append(
+                f"{dataset}: estancado (experimental, {stalled_after_days}d) — "
+                f"revisión vencida {review_by}"
+            )
+        elif maturity == "candidate":
+            failures.append(
+                f"{dataset}: estancado (candidate, {stalled_after_days}d) — "
+                f"revisión vencida {review_by}. Requiere acción."
+            )
+        elif maturity == "stable":
+            failures.append(
+                f"{dataset}: regresión en madurez estable — "
+                f"revisión vencida {review_by}. Investigar degradación de fuente."
+            )
+        elif maturity == "deprecated":
+            warnings.append(
+                f"{dataset}: estancado y deprecado — considerar eliminación del registry"
+            )
+
+    for w in warnings:
+        print(f"WARNING [stagnation]: {w}")
+
+    if failures:
+        fail("Stagnation policy rejected this build: " + "; ".join(failures))
 
 
 def verify_staging_not_newer_than_normalized():
@@ -1226,6 +1315,77 @@ def verify_overview():
             fail(f"overview.json has invalid drift_status: {entry}")
 
 
+def verify_source_readiness_report():
+    """Verifica que el reporte source_readiness.json existe y cubre todos los datasets."""
+    path = NORMALIZED_DIR / "source_readiness.json"
+    if not path.exists():
+        fail("source_readiness.json not found — run 'make build' first")
+    report = load_json(path)
+    if report.get("dataset_count") != len(REQUIRED_DATASETS):
+        fail(
+            f"source_readiness.json has unexpected dataset_count: "
+            f"{report.get('dataset_count')} vs {len(REQUIRED_DATASETS)}"
+        )
+    readiness_names = {entry.get("dataset") for entry in report.get("datasets", [])}
+    if readiness_names != REQUIRED_DATASETS:
+        fail(f"source_readiness.json has unexpected datasets: {sorted(readiness_names)}")
+    for entry in report.get("datasets", []):
+        if entry.get("maturity_status") not in {
+            "stable",
+            "candidate",
+            "experimental",
+            "deprecated",
+        }:
+            fail(
+                f"source_readiness.json has invalid maturity_status for "
+                f"{entry.get('dataset')}: {entry.get('maturity_status')}"
+            )
+        if not entry.get("source_id"):
+            fail(f"source_readiness.json missing source_id for {entry.get('dataset')}")
+        if not entry.get("next_action"):
+            fail(f"source_readiness.json missing next_action for {entry.get('dataset')}")
+
+
+def verify_dataset_quality_report():
+    """Verifica que el reporte dataset_quality.json existe y cubre todos los datasets."""
+    path = NORMALIZED_DIR / "dataset_quality.json"
+    if not path.exists():
+        fail("dataset_quality.json not found — run 'make build' first")
+    report = load_json(path)
+    if report.get("dataset_count") != len(REQUIRED_DATASETS):
+        fail(
+            f"dataset_quality.json has unexpected dataset_count: "
+            f"{report.get('dataset_count')} vs {len(REQUIRED_DATASETS)}"
+        )
+    quality_names = {entry.get("dataset") for entry in report.get("datasets", [])}
+    if quality_names != REQUIRED_DATASETS:
+        fail(f"dataset_quality.json has unexpected datasets: {sorted(quality_names)}")
+    for entry in report.get("datasets", []):
+        if entry.get("grade") not in {"A", "B", "C", "D", "F"}:
+            fail(
+                f"dataset_quality.json has invalid grade for "
+                f"{entry.get('dataset')}: {entry.get('grade')}"
+            )
+        if entry.get("overall_score", -1) < 0:
+            fail(f"dataset_quality.json missing overall_score for {entry.get('dataset')}")
+        if not entry.get("blocking_reasons") and entry.get("overall_score", 0) < 100:
+            # Permitir puntuación < 100 sin bloqueadores si es por cobertura not_applicable
+            dims = entry.get("dimensions", {})
+            if dims.get("validation", 0) < 100 or dims.get("source_readiness", 0) < 50:
+                fail(
+                    f"dataset_quality.json {entry.get('dataset')} score={entry.get('overall_score')} "
+                    f"but has no blocking_reasons"
+                )
+
+
+def verify_readiness():
+    """Perfil readiness: valida reportes source_readiness, dataset_quality y estancamiento."""
+    verify_source_readiness_report()
+    verify_dataset_quality_report()
+    _verify_stagnation()
+    print("Readiness verification passed: all datasets have source readiness and quality entries.")
+
+
 def verify_publishable_zip():
     zip_path = NORMALIZED_DIR / "chile-hub-publishable-bundle.zip"
     if zip_path.stat().st_size <= 0:
@@ -1250,15 +1410,27 @@ def verify_publishable_zip():
 def build_parser():
     parser = argparse.ArgumentParser(description="Verify generated chile-hub pipeline artifacts.")
     parser.add_argument(
+        "--profile",
+        choices=["dev", "readiness", "publication"],
+        default="dev",
+        help="Perfil de verificación: dev (default), readiness, o publication",
+    )
+    parser.add_argument(
         "--require-live",
         action="store_true",
-        help="Reject fallback, failed recovery, preserved, unexpected-empty, or stale data.",
+        help="[deprecated] Reject fallback, failed recovery, or stale data. "
+        "Use --profile publication instead.",
     )
     return parser
 
 
 def main():
     args = build_parser().parse_args()
+
+    # Compatibilidad hacia atrás: --require-live fuerza perfil publication
+    profile = "publication" if args.require_live else args.profile
+
+    # Verificaciones comunes a todos los perfiles
     verify_staging_not_newer_than_normalized()
     verify_required_files()
     verify_pipeline_metadata()
@@ -1274,7 +1446,11 @@ def main():
     verify_source_registry()
     verify_artifact_manifest()
     verify_publishable_zip()
-    if args.require_live:
+
+    if profile in ("readiness", "publication"):
+        verify_readiness()
+
+    if profile == "publication":
         verify_publication_policy()
 
 

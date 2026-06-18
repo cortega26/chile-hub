@@ -23,6 +23,8 @@ if str(SRC_DIR) not in sys.path:
 
 from scripts import package_publishable_bundle
 from scripts.verify_pipeline import (
+    UTC,
+    _verify_stagnation,
     verify_dataset_contract,
     verify_publication_policy,
     verify_source_registry,
@@ -30,6 +32,7 @@ from scripts.verify_pipeline import (
 from src.build_dev_db import (
     DATASET_CATALOG_CONFIG,
     build_coverage,
+    build_dataset_changelog,
     build_degradation,
     build_drift,
     load_metadata,
@@ -1111,6 +1114,400 @@ class DependencyContractTests(unittest.TestCase):
             "CI installs requirements.txt directly; missing indirect deps such as pyarrow "
             "can break Polars conversions during the build.",
         )
+
+
+class StagnationTests(unittest.TestCase):
+    """Tests para detección de estancamiento según maturity_status."""
+
+    def _make_entry(
+        self,
+        dataset="test_dataset",
+        maturity="candidate",
+        access_method="api",
+        review_by="2026-09-18",
+        stalled_after_days=90,
+    ):
+        return {
+            "dataset": dataset,
+            "maturity_status": maturity,
+            "access_method": access_method,
+            "review_by": review_by,
+            "stalled_after_days": stalled_after_days,
+            "stalled": False,
+        }
+
+    def test_candidate_not_stalled_passes(self):
+        """Candidato con review_by futuro no genera fallo."""
+        report = {
+            "datasets": [
+                self._make_entry(
+                    dataset="finanzas_municipales",
+                    maturity="candidate",
+                    review_by="2026-09-18",
+                )
+            ]
+        }
+        reference_date = datetime.datetime(2026, 6, 18, tzinfo=UTC)
+        # No debe lanzar excepción
+        _verify_stagnation(report=report, reference_date=reference_date)
+
+    def test_candidate_stalled_fails(self):
+        """Candidato con review_by vencido falla verify-readiness."""
+        report = {
+            "datasets": [
+                self._make_entry(
+                    dataset="finanzas_municipales",
+                    maturity="candidate",
+                    review_by="2026-06-01",
+                )
+            ]
+        }
+        reference_date = datetime.datetime(2026, 6, 18, tzinfo=UTC)
+        with patch("builtins.print") as print_mock, self.assertRaisesRegex(SystemExit, "1"):
+            _verify_stagnation(report=report, reference_date=reference_date)
+        self.assertIn("Stagnation policy", print_mock.call_args.args[0])
+
+    def test_experimental_stalled_warns_but_does_not_fail(self):
+        """Experimental estancado emite warning pero no falla."""
+        report = {
+            "datasets": [
+                self._make_entry(
+                    dataset="test_experimental",
+                    maturity="experimental",
+                    review_by="2026-06-01",
+                    stalled_after_days=30,
+                )
+            ]
+        }
+        reference_date = datetime.datetime(2026, 6, 18, tzinfo=UTC)
+        with patch("builtins.print") as print_mock:
+            _verify_stagnation(report=report, reference_date=reference_date)
+        warning_calls = [c for c in print_mock.call_args_list if "WARNING" in str(c.args[0])]
+        self.assertGreater(
+            len(warning_calls),
+            0,
+            "Experimental estancado debe emitir warning",
+        )
+
+    def test_stable_regression_fails(self):
+        """Dataset estable estancado (regresión) falla verify-readiness."""
+        report = {
+            "datasets": [
+                self._make_entry(
+                    dataset="comunas",
+                    maturity="stable",
+                    review_by="2026-06-01",
+                )
+            ]
+        }
+        reference_date = datetime.datetime(2026, 6, 18, tzinfo=UTC)
+        with patch("builtins.print") as print_mock, self.assertRaisesRegex(SystemExit, "1"):
+            _verify_stagnation(report=report, reference_date=reference_date)
+        self.assertIn("regresión", print_mock.call_args.args[0])
+
+    def test_derived_stalled_warns_instead_of_failing(self):
+        """Dataset derivado estancado advierte en lugar de fallar (depende de upstream)."""
+        report = {
+            "datasets": [
+                {
+                    "dataset": "perfil_territorial_comunal",
+                    "maturity_status": "candidate",
+                    "access_method": "derived",
+                    "review_by": "2026-06-01",
+                    "stalled_after_days": 90,
+                    "stalled": True,
+                }
+            ]
+        }
+        reference_date = datetime.datetime(2026, 6, 18, tzinfo=UTC)
+        with patch("builtins.print") as print_mock:
+            _verify_stagnation(report=report, reference_date=reference_date)
+        warning_calls = [c for c in print_mock.call_args_list if "WARNING" in str(c.args[0])]
+        self.assertGreater(
+            len(warning_calls),
+            0,
+            "Derivado estancado debe emitir warning en lugar de fallar",
+        )
+
+    def test_multiple_datasets_mixed_stall_status(self):
+        """Verifica que la política maneja múltiples datasets con distintos estados."""
+        report = {
+            "datasets": [
+                self._make_entry(
+                    dataset="comunas",
+                    maturity="stable",
+                    review_by="2026-12-31",
+                ),
+                self._make_entry(
+                    dataset="finanzas_municipales",
+                    maturity="candidate",
+                    review_by="2026-09-18",
+                ),
+                self._make_entry(
+                    dataset="resultados_educacionales",
+                    maturity="candidate",
+                    review_by="2026-06-01",
+                ),
+                self._make_entry(
+                    dataset="test_experimental",
+                    maturity="experimental",
+                    review_by="2026-05-01",
+                    stalled_after_days=30,
+                ),
+            ]
+        }
+        reference_date = datetime.datetime(2026, 6, 18, tzinfo=UTC)
+        # resultados_educacionales es candidato estancado → debe fallar
+        with patch("builtins.print") as print_mock, self.assertRaisesRegex(SystemExit, "1"):
+            _verify_stagnation(report=report, reference_date=reference_date)
+        # El warning del experimental debe aparecer
+        warning_calls = [c for c in print_mock.call_args_list if "WARNING" in str(c.args[0])]
+        self.assertGreater(len(warning_calls), 0)
+        # El error debe mencionar al candidato estancado
+        self.assertIn("resultados_educacionales", print_mock.call_args.args[0])
+
+    def test_review_by_none_is_never_stalled(self):
+        """Dataset sin review_by nunca se considera estancado."""
+        report = {
+            "datasets": [
+                {
+                    "dataset": "sin_revision",
+                    "maturity_status": "candidate",
+                    "access_method": "api",
+                    "review_by": None,
+                    "stalled_after_days": 90,
+                    "stalled": False,
+                }
+            ]
+        }
+        reference_date = datetime.datetime(2026, 6, 18, tzinfo=UTC)
+        # No debe lanzar excepción
+        _verify_stagnation(report=report, reference_date=reference_date)
+
+    def test_invalid_review_by_is_gracefully_skipped(self):
+        """review_by con formato inválido no rompe la verificación."""
+        report = {
+            "datasets": [
+                {
+                    "dataset": "formato_raro",
+                    "maturity_status": "candidate",
+                    "access_method": "api",
+                    "review_by": "no-es-una-fecha",
+                    "stalled_after_days": 90,
+                    "stalled": False,
+                }
+            ]
+        }
+        reference_date = datetime.datetime(2026, 6, 18, tzinfo=UTC)
+        # No debe lanzar excepción (formato inválido se ignora)
+        _verify_stagnation(report=report, reference_date=reference_date)
+
+
+class DatasetChangelogSeverityTests(unittest.TestCase):
+    """Tests para severidad de cambios en dataset_changelog."""
+
+    def _make_meta(
+        self,
+        dataset="test_ds",
+        record_count=100,
+        fields=None,
+        source_mode="live",
+        freshness="fresh",
+        validation="ok",
+        contract_exists=True,
+        primary_key=None,
+        required_columns=None,
+        column_types=None,
+        nullable_columns=None,
+    ):
+        """Construye un dict de metadata para un dataset."""
+        if fields is None:
+            fields = ["id", "name"]
+        if primary_key is None:
+            primary_key = ["id"]
+        if required_columns is None:
+            required_columns = ["id", "name"]
+        if column_types is None:
+            column_types = {"id": "string", "name": "string"}
+        if nullable_columns is None:
+            nullable_columns = []
+
+        meta = {
+            "dataset": dataset,
+            "record_count": record_count,
+            "fields": fields,
+            "source_mode": source_mode,
+            "freshness": {"status": freshness},
+        }
+        if contract_exists:
+            meta.update(
+                {
+                    "contract_exists": True,
+                    "contract_primary_key": primary_key,
+                    "contract_required_columns": required_columns,
+                    "contract_column_types": column_types,
+                    "contract_nullable_columns": nullable_columns,
+                }
+            )
+        return meta
+
+    def _make_metadata(self, datasets, generated_at="2026-06-18T12:00:00+00:00"):
+        """Construye un dict de pipeline_metadata completo."""
+        validations = {}
+        for ds in datasets:
+            validations[ds["dataset"]] = {
+                "status": ds.get("freshness", {}).get("status", "ok")
+                if isinstance(ds.get("freshness"), dict)
+                else "ok"
+            }
+        return {
+            "generated_at_utc": generated_at,
+            "datasets": {d["dataset"]: d for d in datasets},
+            "validations": {d["dataset"]: {"status": "ok"} for d in datasets},
+        }
+
+    def test_no_changes_is_none(self):
+        """Sin cambios → severity none."""
+        ds = self._make_meta()
+        current = self._make_metadata([ds])
+        previous = self._make_metadata([ds], generated_at="2026-06-17T12:00:00+00:00")
+        result = build_dataset_changelog(current, previous)
+        entry = result["datasets"][0]
+        self.assertEqual(entry["change_severity"], "none")
+        self.assertEqual(entry["breaking_changes"], [])
+        self.assertEqual(entry["new_columns"], [])
+        self.assertEqual(entry["removed_columns"], [])
+        self.assertFalse(entry["primary_key_changed"])
+        self.assertFalse(entry["contract_changed"])
+
+    def test_new_nullable_column_is_minor(self):
+        """Nueva columna anulable → severity minor."""
+        current_ds = self._make_meta(
+            fields=["id", "name", "optional_tag"],
+            required_columns=["id", "name"],
+            column_types={"id": "string", "name": "string", "optional_tag": "string"},
+            nullable_columns=["optional_tag"],
+        )
+        previous_ds = self._make_meta()
+        current = self._make_metadata([current_ds])
+        previous = self._make_metadata([previous_ds], generated_at="2026-06-17T12:00:00+00:00")
+        result = build_dataset_changelog(current, previous)
+        entry = result["datasets"][0]
+        self.assertEqual(entry["change_severity"], "minor")
+        self.assertEqual(entry["new_columns"], ["optional_tag"])
+        self.assertTrue(entry["contract_changed"])
+        self.assertFalse(entry["primary_key_changed"])
+
+    def test_required_column_removed_is_major(self):
+        """Columna requerida eliminada del contrato → severity major."""
+        current_ds = self._make_meta(
+            required_columns=["id"],  # name was required before
+            column_types={"id": "string"},
+        )
+        previous_ds = self._make_meta()
+        current = self._make_metadata([current_ds])
+        previous = self._make_metadata([previous_ds], generated_at="2026-06-17T12:00:00+00:00")
+        result = build_dataset_changelog(current, previous)
+        entry = result["datasets"][0]
+        self.assertEqual(entry["change_severity"], "major")
+        self.assertIn("Required column removed: name", entry["breaking_changes"])
+        self.assertTrue(entry["contract_changed"])
+
+    def test_primary_key_changed_is_major(self):
+        """PK cambiada → severity major."""
+        current_ds = self._make_meta(
+            primary_key=["id", "version"],
+            required_columns=["id", "name", "version"],
+            column_types={"id": "string", "name": "string", "version": "integer"},
+        )
+        previous_ds = self._make_meta()
+        current = self._make_metadata([current_ds])
+        previous = self._make_metadata([previous_ds], generated_at="2026-06-17T12:00:00+00:00")
+        result = build_dataset_changelog(current, previous)
+        entry = result["datasets"][0]
+        self.assertEqual(entry["change_severity"], "major")
+        self.assertTrue(entry["primary_key_changed"])
+        self.assertTrue(entry["contract_changed"])
+
+    def test_incompatible_type_change_is_major(self):
+        """Cambio de tipo incompatible → severity major."""
+        current_ds = self._make_meta(
+            column_types={"id": "integer", "name": "string"},
+        )
+        previous_ds = self._make_meta(
+            column_types={"id": "string", "name": "string"},
+        )
+        current = self._make_metadata([current_ds])
+        previous = self._make_metadata([previous_ds], generated_at="2026-06-17T12:00:00+00:00")
+        result = build_dataset_changelog(current, previous)
+        entry = result["datasets"][0]
+        self.assertEqual(entry["change_severity"], "major")
+        self.assertTrue(any("type changed" in bc for bc in entry["breaking_changes"]))
+        self.assertTrue(entry["contract_changed"])
+
+    def test_new_dataset_is_minor(self):
+        """Dataset nuevo (ausente en previous) → severity minor."""
+        current_ds = self._make_meta()
+        previous = self._make_metadata([], generated_at="2026-06-17T12:00:00+00:00")
+        current = self._make_metadata([current_ds])
+        result = build_dataset_changelog(current, previous)
+        entry = result["datasets"][0]
+        self.assertEqual(entry["change_severity"], "minor")
+
+    def test_data_only_change_is_patch(self):
+        """Solo cambio de datos (campos sin tocar contrato) → severity patch."""
+        current_ds = self._make_meta(
+            fields=["id", "name", "internal_tmp"],
+            record_count=101,
+        )
+        previous_ds = self._make_meta()
+        current = self._make_metadata([current_ds])
+        previous = self._make_metadata([previous_ds], generated_at="2026-06-17T12:00:00+00:00")
+        result = build_dataset_changelog(current, previous)
+        entry = result["datasets"][0]
+        self.assertEqual(entry["change_severity"], "patch")
+        self.assertEqual(entry["added_fields"], ["internal_tmp"])
+        self.assertFalse(entry["contract_changed"])
+
+    def test_migration_no_previous_contract_is_patch_or_none(self):
+        """Migración: previous sin contract_fields → severity según datos."""
+        current_ds = self._make_meta(
+            fields=["id", "name", "nueva_col"],
+            record_count=105,
+        )
+        previous_ds = self._make_meta(contract_exists=False)
+        previous_ds.pop("contract_exists", None)
+        previous_ds.pop("contract_primary_key", None)
+        previous_ds.pop("contract_required_columns", None)
+        previous_ds.pop("contract_column_types", None)
+        previous_ds.pop("contract_nullable_columns", None)
+        current = self._make_metadata([current_ds])
+        previous = self._make_metadata([previous_ds], generated_at="2026-06-17T12:00:00+00:00")
+        result = build_dataset_changelog(current, previous)
+        entry = result["datasets"][0]
+        # Sin contrato previo, la severidad se determina por cambios de datos
+        self.assertIn(entry["change_severity"], ("patch", "none"))
+        # Debe tener los campos de severidad presentes
+        self.assertIn("breaking_changes", entry)
+        self.assertIn("new_columns", entry)
+        self.assertIn("removed_columns", entry)
+
+    def test_integer_to_float_widening_is_not_major(self):
+        """Widening integer → float no es breaking."""
+        current_ds = self._make_meta(
+            column_types={"id": "float", "name": "string"},
+        )
+        previous_ds = self._make_meta(
+            column_types={"id": "integer", "name": "string"},
+        )
+        current = self._make_metadata([current_ds])
+        previous = self._make_metadata([previous_ds], generated_at="2026-06-17T12:00:00+00:00")
+        result = build_dataset_changelog(current, previous)
+        entry = result["datasets"][0]
+        # integer → float es compatible, no debe aparecer en breaking_changes
+        self.assertNotIn("major", entry["change_severity"])
+        type_breaks = [b for b in entry["breaking_changes"] if "type changed" in b]
+        self.assertEqual(type_breaks, [])
 
 
 if __name__ == "__main__":

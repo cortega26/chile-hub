@@ -12,6 +12,8 @@
     "live_ready": true,
     "fallback_allowed": true,
     "publish_blocking": true,
+    "review_by": "2026-12-31",
+    "stalled_after_days": 90,
     "owner": "core",
     "next_action": "Maintain DPA cardinality and CUT format checks."
   },
@@ -28,6 +30,8 @@
     "live_ready": true,
     "fallback_allowed": true,
     "publish_blocking": true,
+    "review_by": "2026-12-31",
+    "stalled_after_days": 90,
     "owner": "core",
     "next_action": "Maintain DPA cardinality and CUT format checks."
   },
@@ -44,6 +48,8 @@
     "live_ready": true,
     "fallback_allowed": true,
     "publish_blocking": true,
+    "review_by": "2026-12-31",
+    "stalled_after_days": 90,
     "owner": "core",
     "next_action": "Maintain 346-comuna invariant and enrichment references."
   },
@@ -60,6 +66,8 @@
     "live_ready": true,
     "fallback_allowed": true,
     "publish_blocking": true,
+    "review_by": "2026-12-31",
+    "stalled_after_days": 90,
     "owner": "core",
     "next_action": "Keep derived schema aligned with comunas."
   },
@@ -76,6 +84,8 @@
     "live_ready": true,
     "fallback_allowed": true,
     "publish_blocking": true,
+    "review_by": "2026-12-31",
+    "stalled_after_days": 90,
     "owner": "core",
     "next_action": "Monitor empty monthly IPC responses and published backfill behavior."
   },
@@ -92,6 +102,8 @@
     "live_ready": true,
     "fallback_allowed": true,
     "publish_blocking": true,
+    "review_by": "2026-12-31",
+    "stalled_after_days": 90,
     "owner": "core",
     "next_action": "Keep decennial source and schema documentation current."
   },
@@ -108,6 +120,8 @@
     "live_ready": true,
     "fallback_allowed": true,
     "publish_blocking": true,
+    "review_by": "2026-12-31",
+    "stalled_after_days": 90,
     "owner": "core",
     "next_action": "Keep decennial source and schema documentation current."
   },
@@ -124,6 +138,8 @@
     "live_ready": true,
     "fallback_allowed": true,
     "publish_blocking": true,
+    "review_by": "2026-12-31",
+    "stalled_after_days": 90,
     "owner": "core",
     "next_action": "Monitor monthly source freshness and geocoding coverage."
   },
@@ -140,6 +156,8 @@
     "live_ready": true,
     "fallback_allowed": false,
     "publish_blocking": true,
+    "review_by": "2026-12-31",
+    "stalled_after_days": 90,
     "owner": "core",
     "next_action": "Update only when electoral district law changes."
   },
@@ -156,6 +174,8 @@
     "live_ready": true,
     "fallback_allowed": true,
     "publish_blocking": true,
+    "review_by": "2026-12-31",
+    "stalled_after_days": 90,
     "owner": "core",
     "next_action": "Monitor annual source package and RAR extraction dependency."
   },
@@ -172,6 +192,8 @@
     "live_ready": false,
     "fallback_allowed": true,
     "publish_blocking": true,
+    "review_by": "2026-09-18",
+    "stalled_after_days": 90,
     "owner": "core",
     "next_action": "Configure stable direct SINIM export and replace curated fallback rows."
   },
@@ -188,6 +210,8 @@
     "live_ready": false,
     "fallback_allowed": true,
     "publish_blocking": true,
+    "review_by": "2026-09-18",
+    "stalled_after_days": 90,
     "owner": "core",
     "next_action": "Replace curated fallback with stable official aggregate export."
   },
@@ -204,6 +228,8 @@
     "live_ready": false,
     "fallback_allowed": true,
     "publish_blocking": true,
+    "review_by": "2026-09-18",
+    "stalled_after_days": 90,
     "owner": "core",
     "next_action": "Replace partial fallback with stable official SIEDU export."
   },
@@ -220,6 +246,8 @@
     "live_ready": false,
     "fallback_allowed": true,
     "publish_blocking": true,
+    "review_by": "2026-09-18",
+    "stalled_after_days": 90,
     "owner": "core",
     "next_action": "Track readiness inherited from upstream component datasets."
   },
@@ -236,6 +264,8 @@
     "live_ready": true,
     "fallback_allowed": false,
     "publish_blocking": true,
+    "review_by": "2026-12-31",
+    "stalled_after_days": 90,
     "owner": "core",
     "next_action": "Keep large-output behavior documented and verify Parquet-first consumption."
   }

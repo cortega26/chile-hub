@@ -1,7 +1,7 @@
 PYTHON ?= $(if $(wildcard .venv/bin/python),.venv/bin/python,python3)
 VENV_DIR ?= .venv
 
-.PHONY: help bootstrap install-browsers doctor extract build verify verify-live verify-landing test coverage lint lint-fix format format-check package package-check package-smoke check refresh status catalog hub-list hub-summary hub-summary-table hub-example hub-artifacts hub-shared-artifacts hub-shared-artifacts-table hub-reports hub-reports-table hub-report hub-inventory hub-inventory-table hub-snapshot hub-snapshot-table hub-overview hub-overview-table hub-status hub-status-table hub-health hub-health-table hub-bundle hub-freshness-audit hub-freshness-audit-table hub-runtime-status hub-runtime-status-table hub-top-issue hub-top-issue-text hub-top-issue-table hub-packages hub-packages-table hub-package hub-package-verify hub-redistribution hub-redistribution-table hub-provenance hub-provenance-table hub-drift hub-drift-table package-bundle clean-publishable
+.PHONY: help bootstrap install-browsers doctor extract build verify verify-dev verify-readiness verify-publication verify-live verify-landing test coverage lint lint-fix format format-check package package-check package-smoke check refresh status catalog hub-list hub-summary hub-summary-table hub-example hub-artifacts hub-shared-artifacts hub-shared-artifacts-table hub-reports hub-reports-table hub-report hub-inventory hub-inventory-table hub-snapshot hub-snapshot-table hub-overview hub-overview-table hub-status hub-status-table hub-health hub-health-table hub-bundle hub-freshness-audit hub-freshness-audit-table hub-runtime-status hub-runtime-status-table hub-top-issue hub-top-issue-text hub-top-issue-table hub-packages hub-packages-table hub-package hub-package-verify hub-redistribution hub-redistribution-table hub-provenance hub-provenance-table hub-drift hub-drift-table hub-source-readiness hub-dataset-quality package-bundle clean-publishable
 
 help:
 	@printf "Targets disponibles:\n"
@@ -10,8 +10,11 @@ help:
 	@printf "  make doctor           Muestra el Python efectivo y dependencias clave\n"
 	@printf "  make extract          Ejecuta extractores\n"
 	@printf "  make build            Compila outputs del hub\n"
-	@printf "  make verify           Verifica artefactos generados\n"
-	@printf "  make verify-live      Exige datos live y frescos aptos para publicación\n"
+	@printf "  make verify           Verifica artefactos generados (perfil dev)\n"
+	@printf "  make verify-dev       Igual que verify (perfil dev explícito)\n"
+	@printf "  make verify-readiness Valida registry, contratos, source_readiness y dataset_quality\n"
+	@printf "  make verify-publication Exige datos live y frescos aptos para publicación\n"
+	@printf "  make verify-live      [obsoleto] Usa verify-publication en su lugar\n"
 	@printf "  make verify-landing   Corre smoke check de la landing en navegador\n"
 	@printf "  make test             Corre smoke tests\n"
 	@printf "  make coverage         Corre tests con reporte de cobertura\n"
@@ -60,6 +63,8 @@ help:
 	@printf "  make hub-provenance-table Muestra procedencia en tabla compacta\n"
 	@printf "  make hub-drift        Muestra inventario de drift operativo del hub\n"
 	@printf "  make hub-drift-table  Muestra drift en tabla compacta\n"
+	@printf "  make hub-source-readiness Muestra madurez de fuente por dataset\n"
+	@printf "  make hub-dataset-quality Muestra puntuacion de calidad por dataset\n"
 	@printf "  make package-bundle   Genera ZIP publicable desde el manifest\n"
 	@printf "  make clean-publishable Elimina artefactos livianos versionables\n"
 
@@ -98,7 +103,16 @@ build:
 	$(PYTHON) src/build_dev_db.py
 
 verify:
-	$(PYTHON) scripts/verify_pipeline.py
+	$(PYTHON) scripts/verify_pipeline.py --profile dev
+
+verify-dev:
+	$(PYTHON) scripts/verify_pipeline.py --profile dev
+
+verify-readiness:
+	$(PYTHON) scripts/verify_pipeline.py --profile readiness
+
+verify-publication:
+	$(PYTHON) scripts/verify_pipeline.py --profile publication
 
 verify-live:
 	$(PYTHON) scripts/verify_pipeline.py --require-live
@@ -258,6 +272,12 @@ hub-drift:
 
 hub-drift-table:
 	PYTHONPATH=src $(PYTHON) -m chile_hub drift --format table
+
+hub-source-readiness:
+	PYTHONPATH=src $(PYTHON) -m chile_hub source-readiness
+
+hub-dataset-quality:
+	PYTHONPATH=src $(PYTHON) -m chile_hub dataset-quality
 
 package-bundle:
 	$(PYTHON) scripts/package_publishable_bundle.py

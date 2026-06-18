@@ -102,6 +102,12 @@ class ChileHub:
     def _load_drift_report(self) -> dict[str, Any]:
         return self._load_json_artifact("drift_report.json")
 
+    def _load_source_readiness(self) -> dict[str, Any]:
+        return self._load_json_artifact("source_readiness.json")
+
+    def _load_dataset_quality(self) -> dict[str, Any]:
+        return self._load_json_artifact("dataset_quality.json")
+
     @staticmethod
     def _status_rank(status: str) -> int:
         return {"ok": 0, "warn": 1, "error": 2}.get(status, 1)
@@ -754,6 +760,14 @@ class ChileHub:
     def dataset_changelog(self):
         return self._load_dataset_changelog()
 
+    def source_readiness(self):
+        """Devuelve el reporte de madurez de fuente por dataset."""
+        return self._load_source_readiness()
+
+    def dataset_quality(self):
+        """Devuelve la tarjeta de puntuación de calidad multidimensional por dataset."""
+        return self._load_dataset_quality()
+
     def status_table(self):
         status = self.status()
         rows = [
@@ -1272,6 +1286,8 @@ def build_parser():
     )
     subparsers.add_parser("dataset-status", help="Mostrar status detallado por dataset")
     subparsers.add_parser("dataset-changelog", help="Mostrar changelog de datasets")
+    subparsers.add_parser("source-readiness", help="Mostrar madurez de fuente por dataset")
+    subparsers.add_parser("dataset-quality", help="Mostrar puntuacion de calidad por dataset")
     health_parser = subparsers.add_parser("health", help="Mostrar salud agregada del hub")
     health_parser.add_argument(
         "--format",
@@ -1484,6 +1500,14 @@ def _main(argv=None):
 
     if args.command == "dataset-changelog":
         print(json.dumps(hub.dataset_changelog(), ensure_ascii=False, indent=2))
+        return
+
+    if args.command == "source-readiness":
+        print(json.dumps(hub.source_readiness(), ensure_ascii=False, indent=2))
+        return
+
+    if args.command == "dataset-quality":
+        print(json.dumps(hub.dataset_quality(), ensure_ascii=False, indent=2))
         return
 
     if args.command == "health":

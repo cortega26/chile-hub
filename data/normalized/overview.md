@@ -1,6 +1,6 @@
 # chile-hub overview
 
-- `generated_at_utc`: `2026-06-18T16:22:16.898808+00:00`
+- `generated_at_utc`: `2026-06-18T18:20:03.516188+00:00`
 - `overall_status`: `warn`
 - `dataset_count`: `15`
 - `live_count`: `11`
@@ -10,7 +10,7 @@
 - `degraded_count`: `0`
 - `partial_coverage_count`: `1`
 - `warning_count`: `9`
-- `shared_artifact_count`: `19`
+- `shared_artifact_count`: `23`
 - `package_count`: `1`
 - `top_issue`: `empresas` (freshness=fresh, drift=drifted, warnings=3)
 - `top_issue_reason`: found 1 RUTs with non-standard format (not validated)
@@ -39,8 +39,8 @@
 
 - `path`: `data/normalized/chile-hub-publishable-bundle.zip`
 - `package_type`: `zip`
-- `size_bytes`: `29145533`
+- `size_bytes`: `29151937`
 - `checksum`: `sha256` via `data/normalized/chile-hub-publishable-bundle.zip.sha256`
 - `verification_command`: `shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256`
 
-- `report_keys`: `bundle_json, catalog_json, catalog_markdown, dataset_changelog_json, dataset_status_json, drift_json, drift_markdown, health_json, health_markdown, manifest_json, overview_json, overview_markdown, provenance_json, provenance_markdown, redistribution_json, redistribution_markdown, status_json, status_markdown`
+- `report_keys`: `bundle_json, catalog_json, catalog_markdown, dataset_changelog_json, dataset_quality_json, dataset_quality_markdown, dataset_status_json, drift_json, drift_markdown, health_json, health_markdown, manifest_json, overview_json, overview_markdown, provenance_json, provenance_markdown, redistribution_json, redistribution_markdown, source_readiness_json, source_readiness_markdown, status_json, status_markdown`
