@@ -348,14 +348,14 @@ def verify_landing():
         if first_card_name != top_issue_dataset:
             fail(f"Unexpected first dataset card: {first_card_name}")
 
-        first_card_actions = first_card.locator(".dataset-action").all_inner_texts()
-        # Algunos datasets (ej. empresas) no tienen JSON por tamaño.
-        # La segunda acción puede ser JSON, DuckDB/SQLite, o estar ausente.
+        first_card_actions = [
+            t for t in first_card.locator(".dataset-action").all_inner_texts() if t
+        ]
+        # Algunos datasets (ej. empresas) no tienen JSON por tamaño →
+        # no hay acción JSON ni botón "Vista previa" (app.js L571-572).
         _has_json = len(first_card_actions) >= 2 and first_card_actions[1].startswith("JSON · ")
         if not first_card_actions[0].startswith("PARQUET · "):
-            fail(f"Unexpected first dataset action 0: {first_card_actions}")
-        if "Vista previa" not in first_card_actions:
-            fail(f"Vista previa action not found: {first_card_actions}")
+            fail(f"Unexpected first dataset action 0 (expected PARQUET): {first_card_actions}")
         if "Ficha técnica" not in first_card_actions:
             fail(f"Ficha técnica action not found: {first_card_actions}")
 
