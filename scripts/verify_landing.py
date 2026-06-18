@@ -426,8 +426,12 @@ def verify_landing():
         if after_tab_line != "SELECT *":
             fail(f"Unexpected duckdb example line: {after_tab_line}")
 
-        first_card.locator(".dataset-example-tab", has_text="curl").click()
-        page.wait_for_timeout(100)
+        # Solo hace clic en curl si el dataset tiene salida JSON
+        # (app.js buildDatasetExample solo renderiza el tab curl cuando jsonName existe).
+        curl_tab = first_card.locator(".dataset-example-tab", has_text="curl")
+        if curl_tab.count() > 0:
+            curl_tab.click()
+            page.wait_for_timeout(100)
         copy_button = first_card.locator(".dataset-example-copy")
         copy_button.click()
         page.wait_for_timeout(150)
