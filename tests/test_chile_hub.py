@@ -2,6 +2,7 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
 import unittest
 import zipfile
 from datetime import datetime, timezone
@@ -1437,6 +1438,90 @@ class EntryPointTests(unittest.TestCase):
 
         error = _ChileHubKeyError("dataset no encontrado")
         self.assertEqual(str(error), "dataset no encontrado")
+
+
+class ChileHubConstructorTests(unittest.TestCase):
+    """Edge cases del constructor ChileHub."""
+
+    def test_rejects_both_catalog_path_and_data_dir(self):
+        """catalog_path + data_dir simultáneos lanza ValueError."""
+        from chile_hub import ChileHub
+
+        with tempfile.TemporaryDirectory() as tmp:
+            with self.assertRaises(ValueError):
+                ChileHub(catalog_path=Path(tmp) / "catalog.json", data_dir=tmp)
+
+    def test_falls_back_to_data_manager_when_no_catalog(self):
+        """Usa el catálogo empaquetado cuando no hay data_dir ni catalog_path explícito."""
+        from chile_hub import ChileHub
+
+        hub = ChileHub()
+        self.assertIsNotNone(hub.catalog)
+        self.assertIn("dataset_count", hub.catalog)
+
+    def test_constructor_with_explicit_catalog_path(self):
+        """Constructor acepta catalog_path directo a un JSON de catálogo."""
+        from chile_hub import ChileHub
+
+        with tempfile.TemporaryDirectory() as tmp:
+            import json
+
+            cat = {"datasets": [], "dataset_count": 0}
+            cat_path = Path(tmp) / "catalog.json"
+            cat_path.write_text(json.dumps(cat))
+            hub = ChileHub(catalog_path=str(cat_path))
+            self.assertEqual(hub.catalog, cat)
+
+    def test_format_available_with_values(self):
+        """_format_available sugiere datasets disponibles."""
+        from src.chile_hub.core import _format_available
+
+        result = _format_available(["comunas", "regiones", "provincias"], "comunas")
+        self.assertIn("Disponibles", result)
+
+    def test_format_available_exact_match(self):
+        """_format_available sin match sugiere valores cercanos."""
+        from src.chile_hub.core import _format_available
+
+        result = _format_available(["comuna", "comunas_enriquecidas"], "comunas")
+        self.assertIn("Quizas", result)
+
+    def test_format_available_empty_values(self):
+        """_format_available con lista vacía."""
+        from src.chile_hub.core import _format_available
+
+        result = _format_available([], "x")
+        self.assertIn("Disponibles", result)
+
+
+class ChileHubReportTablesTests(unittest.TestCase):
+    """Tests de smoke para métodos de tabla de reportes."""
+
+    @classmethod
+    def setUpClass(cls):
+        _assert_normalized_not_stale()
+        cls.hub = ChileHub()
+
+    def test_freshness_audit_table_output(self):
+        table = self.hub.freshness_audit_table()
+        self.assertIn("chile-hub freshness audit", table)
+        self.assertIn("dataset", table)
+
+    def test_redistribution_table_output(self):
+        table = self.hub.redistribution_table()
+        self.assertIn("chile-hub", table)
+
+    def test_provenance_table_output(self):
+        table = self.hub.provenance_table()
+        self.assertIn("chile-hub", table)
+
+    def test_drift_table_output(self):
+        table = self.hub.drift_table()
+        self.assertIn("chile-hub", table)
+
+    def test_overview_table_output(self):
+        table = self.hub.overview_table()
+        self.assertIn("chile-hub", table)
 
 
 if __name__ == "__main__":
