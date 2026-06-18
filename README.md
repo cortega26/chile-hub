@@ -11,7 +11,7 @@
 [![License: MIT](https://img.shields.io/badge/Code%20License-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-3776AB.svg?style=flat&logo=python&logoColor=white)]()
 [![Formats](https://img.shields.io/badge/Formats-Parquet%20%7C%20DuckDB%20%7C%20SQLite%20%7C%20JSON%20%7C%20Excel-orange.svg)]()
-[![Datasets](https://img.shields.io/badge/Datasets-16%20capas-16a34a.svg)]()
+[![Datasets](https://img.shields.io/badge/Datasets-15%20capas-16a34a.svg)]()
 [![Comunas](https://img.shields.io/badge/Comunas-346-8b5cf6.svg)]()
 
 </div>
@@ -111,7 +111,7 @@ Pipeline determinista en GitHub Actions: extracción → build → verificación
 
 ---
 
-## Las 16 capas de datos
+## Las 15 capas de datos
 
 | # | Capa | Registros | Fuente | Licencia | Actualización |
 |:--:|:---|:---|:---|:---|:--:|
@@ -130,7 +130,6 @@ Pipeline determinista en GitHub Actions: extracción → build → verificación
 | 13 | **Indicadores Urbanos SIEDU** | cobertura parcial | INE / SIEDU | Datos abiertos INE | Anual |
 | 14 | **Perfil Territorial Comunal** | 346 | chile-hub derivado | Fuentes abiertas | Derivada |
 | 15 | **Empresas (RES)** | ~1 570 000 | Min. Economía / datos.gob.cl | CC-BY 3.0 CL | Mensual |
-| 16 | **Puntos de Interés (OSM)** | cobertura parcial | OpenStreetMap | ODbL | Mensual |
 
 > **Todas las capas se vinculan por `codigo_comuna`**, el Código Único Territorial de 5 caracteres definido por SUBDERE.
 
@@ -286,17 +285,6 @@ Pipeline determinista en GitHub Actions: extracción → build → verificación
 | `comuna_tributaria` | `VARCHAR` | `"SANTIAGO"` |
 | `region_tributaria` | `VARCHAR` | `"13"` |
 
-**16. puntos_interes** — Comercios y servicios georreferenciados de OpenStreetMap
-| Columna | Tipo | Ejemplo |
-|:---|:---|:---|
-| `osm_id` | `INTEGER` | `123456789` |
-| `nombre` | `VARCHAR` | `"Farmacia Ahumada"` |
-| `categoria` | `VARCHAR` | `"amenidad"` |
-| `tipo` | `VARCHAR` | `"farmacia"` |
-| `direccion` | `VARCHAR` | `"Av. Providencia 1234"` |
-| `codigo_comuna` | `VARCHAR(5)` | `"13101"` |
-| `latitud` / `longitud` | `DOUBLE` | Coordenadas geográficas |
-
 </details>
 
 ---
@@ -417,7 +405,6 @@ graph TD
         E9[mineduc_resultados_extractor.py]:::extract
         E10[siedu_extractor.py]:::extract
         E11[res_extractor.py]:::extract
-        E12[osm_extractor.py]:::extract
     end
 
     subgraph 2 [2. BUILD]
@@ -436,7 +423,7 @@ graph TD
         L1[verify_landing.py]:::publish
     end
 
-    E1 & E2 & E3 & E4 & E5 & E6 & E7 & E8 & E9 & E10 & E11 & E12 -->|data/staging/| B1
+    E1 & E2 & E3 & E4 & E5 & E6 & E7 & E8 & E9 & E10 & E11 -->|data/staging/| B1
     B1 -->|data/normalized/| V1
     V1 --> T1
     T1 --> L1
@@ -643,7 +630,7 @@ Consulta [DATA_LICENSES.md](DATA_LICENSES.md), `chile-hub redistribution` y
 
 ## Próximos pasos
 
-El roadmap actual prioriza **fortalecer la estabilidad operacional** de las 16 capas activas frente a caídas de APIs, especialmente las capas nuevas que aún corren en modo `fallback`. El criterio para incorporar nuevas capas exige justificar:
+El roadmap actual prioriza **fortalecer la estabilidad operacional** de las 15 capas activas frente a caídas de APIs, especialmente las capas nuevas que aún corren en modo `fallback`. El criterio para incorporar nuevas capas exige justificar:
 
 - Dolor de usuario recurrente y documentado
 - Valor de cruce con la División Político-Administrativa (CUT)

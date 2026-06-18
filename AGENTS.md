@@ -12,7 +12,7 @@ entender la arquitectura, las reglas no negociables y las convenciones del proye
 ## 1. Propósito del proyecto
 
 `chile-hub` es una capa de datos pública, curada y reproducible sobre **datos oficiales de Chile**.
-Actualmente publica dieciséis capas:
+Actualmente publica quince capas:
 
 | Capa | Fuente | Descripción |
 |:---|:---|:---|
@@ -29,7 +29,6 @@ Actualmente publica dieciséis capas:
 | **Indicadores Urbanos SIEDU** | INE / SIEDU | Indicadores urbanos en formato largo con cobertura parcial esperada |
 | **Perfil Territorial Comunal** | chile-hub derivado | Una fila por comuna con métricas territoriales consolidadas |
 | **Empresas (RES)** | Ministerio de Economía / datos.gob.cl | Registro de constituciones de empresas bajo Ley 20.659 con RUT, razón social, tipo societario y comuna |
-| **Puntos de Interés (OSM)** | OpenStreetMap contributors | Comercios y servicios georreferenciados con nombre, dirección postal, coordenadas y categoría |
 
 **El objetivo no es tener todos los datos de Chile. Es entregar un número pequeño de datasets
 limpios, versionados, validados y consumibles en una línea de código.**
@@ -56,8 +55,7 @@ chile-hub/
 │   │   ├── sinim_finanzas_extractor.py          Finanzas municipales SINIM → data/staging/
 │   │   ├── mineduc_resultados_extractor.py      Resultados educacionales agregados (MINEDUC) → data/staging/
 │   │   ├── siedu_extractor.py                   Indicadores urbanos SIEDU (INE) → data/staging/
-│   │   ├── res_extractor.py                     Registro de Empresas y Sociedades (datos.gob.cl) → data/staging/
-│   │   └── osm_extractor.py                     Puntos de Interes OSM (OpenStreetMap) → data/staging/
+│   │   └── res_extractor.py                     Registro de Empresas y Sociedades (datos.gob.cl) → data/staging/
 │   ├── validation.py              Todas las funciones validate_*() — módulo independiente (~760 líneas)
 │   ├── build_dev_db.py            Lee staging/, llama validate_*(), escribe todos los artefactos en normalized/
 │   ├── chile_hub.py               Compatibility shim (21 líneas) — delega al paquete
@@ -128,7 +126,6 @@ codegraph find <symbol_name>                       # En qué archivo está defin
              src/extractors/mineduc_resultados_extractor.py
              src/extractors/siedu_extractor.py
              src/extractors/res_extractor.py
-             src/extractors/osm_extractor.py
              → Produce: data/staging/{dataset}.csv + data/staging/{dataset}.metadata.json
              → Produce: data/raw/{source}_{timestamp}.json  (snapshot crudo)
 
@@ -521,7 +518,6 @@ pytest tests/test_chile_hub.py::ChileHubTests::test_load_polars -v
 | `MineducResultadosExtractorTests` | Fetch y normalización del extractor de resultados educacionales |
 | `SieduExtractorTests` | Fetch y normalización del extractor SIEDU |
 | `ResExtractorTests` | Fetch, normalización y staging del extractor RES |
-| `OsmExtractorTests` | Fetch, normalización y staging del extractor OSM |
 | `BaseExtractorContractTests` | Contrato ABC de `BaseExtractor`: interfaz y métodos obligatorios |
 
 **`tests/test_pipeline_logic.py`** — no requiere datos normalizados
@@ -649,7 +645,7 @@ make doctor             # Python efectivo y dependencias clave
 make refresh            # extract → build → verify → test → verify-landing → lint + format-check
 
 # Pasos individuales
-make extract            # Corre los 12 extractores → data/staging/
+make extract            # Corre los 11 extractores → data/staging/
 make build              # Compila todos los artefactos → data/normalized/
 make verify             # Integridad de artefactos (SHA-256, conteos, schema)
 make test               # pytest — lee data/normalized/, NO corre el pipeline

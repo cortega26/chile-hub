@@ -10,33 +10,41 @@ represent software releases and are intentionally excluded from release notes.
 
 ### Added
 
-- Added two new public dataset surfaces: `empresas` (Registro de Empresas y
+- Added new public dataset surface: `empresas` (Registro de Empresas y
   Sociedades del Ministerio de Economía, ~1.57M registros con RUT, razón
-  social, tipo societario y comuna tributaria) and `puntos_interes` (POIs
-  georreferenciados de OpenStreetMap con nombre, dirección, coordenadas y
-  categoría de negocio).
-- Added `res_extractor.py` and `osm_extractor.py` with live fetch,
-  raw snapshot, CSV staging, and metadata generation.
-- Added `validate_empresas()` and `validate_puntos_interes()` in
-  `src/validation.py` with referential integrity checks against the DPA.
+  social, tipo societario y comuna tributaria).
+- Added `res_extractor.py` with live fetch from datos.gob.cl, raw snapshot,
+  CSV staging, and metadata generation.
+- Added `validate_empresas()` in `src/validation.py` with referential
+  integrity checks against the DPA.
 - Added auto-split logic in `build_excel()` for datasets exceeding Excel's
   1,048,576 row limit (`empresas` splits into multiple numbered sheets
   automatically).
-- Added `docs/datasets/empresas.md` and `docs/datasets/puntos_interes.md`
-  with full schema, source, license, and usage examples.
+- Added `docs/datasets/empresas.md` with full schema, source, license, and
+  usage examples.
 
 ### Changed
 
-- Expanded the active catalog from 14 to 16 datasets.
+- Expanded the active catalog from 14 to 15 datasets.
+- Centralized version management: `pyproject.toml` is the single source of
+  truth; `__init__.py` reads it dynamically.
+- Optimized `build_dev_db.py`: single `.to_pandas()` conversion (was 2×),
+  multi-row SQLite inserts, skip JSON for tables >100K rows, progress output.
 - Updated README, SOURCE_OF_TRUTH.md, AGENTS.md, and CHANGELOG to reflect
-  the current 16-capas catalog, package structure, and line counts.
+  the current 15-capas catalog, package structure, and line counts.
+
+### Removed
+
+- `puntos_interes` (OpenStreetMap POIs) — extractor, config, tests, CI, and
+  docs. The Overpass API proved too unreliable for CI; will be reconsidered
+  when an official Chilean POI source becomes available.
+  `validate_puntos_interes()` is preserved in `src/validation.py` for future
+  reuse.
 
 ### Notes
 
 - `empresas` is live-extracted from datos.gob.cl (CC-BY 3.0 CL); the Excel
   output splits into multiple sheets to stay within Excel's row limit.
-- `puntos_interes` has partial (urban-density) coverage by design, sourced
-  from OpenStreetMap via Overpass API under ODbL.
 
 ## 1.1.0 - 2026-06-17
 

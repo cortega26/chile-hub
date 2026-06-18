@@ -41,7 +41,6 @@ from src.validation import (
     validate_indicadores_urbanos_siedu,
     validate_perfil_territorial_comunal,
     validate_provincias,
-    validate_puntos_interes,
     validate_regiones,
     validate_resultados_educacionales,
 )
@@ -62,7 +61,6 @@ RESULTADOS_EDUCACIONALES_METADATA_PATH = os.path.join(
 )
 SIEDU_METADATA_PATH = os.path.join(STAGING_DIR, "indicadores_urbanos_siedu.metadata.json")
 EMPRESAS_METADATA_PATH = os.path.join(STAGING_DIR, "empresas.metadata.json")
-OSM_METADATA_PATH = os.path.join(STAGING_DIR, "puntos_interes.metadata.json")
 EXCEL_MAX_ROWS = 1_048_576  # Límite físico de Excel por hoja
 PUBLISHABLE_ARTIFACT_SUFFIXES = (".json", ".md", ".parquet")
 PUBLISHABLE_BUNDLE_ZIP_NAME = "chile-hub-publishable-bundle.zip"
@@ -514,57 +512,6 @@ DATASET_CATALOG_CONFIG = {
             "excel_sheet": "Empresas RES",
         },
         "documentation": "docs/datasets/empresas.md",
-    },
-    "puntos_interes": {
-        "description": (
-            "Puntos de interes (POI) de OpenStreetMap con nombres, direcciones postales, "
-            "coordenadas y categorias de negocio. Cobertura parcial: mayor densidad urbana."
-        ),
-        "join_keys": ["osm_id"],
-        "confidence_tier": "Tier C",
-        "reuse_policy": {
-            "status": "open-attribution",
-            "license": "ODbL 1.0",
-            "license_url": "https://opendatacommons.org/licenses/odbl/",
-            "attribution_required": True,
-            "redistribution_ok": True,
-            "summary": (
-                "Datos de OpenStreetMap bajo licencia ODbL. "
-                "Atribucion requerida: '© OpenStreetMap contributors'."
-            ),
-        },
-        "freshness_policy": {"max_age_hours": 24 * 14, "label": "quincenal"},
-        "coverage": {
-            "status": "partial",
-            "baseline": 50000,
-            "summary": (
-                "Cobertura desigual: buena en zonas urbanas, "
-                "limitada en zonas rurales. Sin valor censal."
-            ),
-        },
-        "usage_examples": {
-            "python": (
-                "from chile_hub import ChileHub\n\nhub = ChileHub()\n"
-                "df = hub.load_polars('puntos_interes')\n"
-                "# Restaurantes en Providencia\n"
-                "df.filter(pl.col('tipo') == 'restaurante', "
-                "pl.col('codigo_comuna') == '13123')"
-            ),
-            "duckdb": (
-                "SELECT categoria, count(*) AS n\n"
-                "FROM 'data/normalized/puntos_interes.parquet'\n"
-                "GROUP BY 1 ORDER BY n DESC;"
-            ),
-            "cli": "chile-hub show puntos_interes",
-        },
-        "outputs": {
-            "parquet": "data/normalized/puntos_interes.parquet",
-            "json": "data/normalized/puntos_interes.json",
-            "duckdb_table": "puntos_interes",
-            "sqlite_table": "puntos_interes",
-            "excel_sheet": "POIs OSM",
-        },
-        "documentation": "docs/datasets/puntos_interes.md",
     },
 }
 
@@ -1792,14 +1739,15 @@ def build_sqlite(
     df_salud,
     df_educacionales,
     extra_tables,
-    output_path,
+    extra_tables_pd=None,
+    output_path=None,
 ):
     print(f"Compilando base de datos SQLite en: {output_path}")
     tmp_path = output_path + ".tmp"
     if os.path.exists(tmp_path):
         os.remove(tmp_path)
 
-    # Convertimos a Pandas para inserción rápida con to_sql de pandas
+    # Convertimos a Pandas para inserción con to_sql de pandas
     df_regiones_pd = df_regiones.to_pandas()
     df_provincias_pd = df_provincias.to_pandas()
     df_comunas_pd = df_comunas.to_pandas()
@@ -1807,7 +1755,8 @@ def build_sqlite(
     df_censo_pd = df_censo.to_pandas()
     df_salud_pd = df_salud.to_pandas()
     df_educacionales_pd = df_educacionales.to_pandas()
-    extra_tables_pd = {name: df.to_pandas() for name, df in extra_tables.items()}
+    if extra_tables_pd is None:
+        extra_tables_pd = {name: df.to_pandas() for name, df in extra_tables.items()}
 
     # SQLite no maneja Date de forma nativa como tipo fecha real (los guarda como string ISO)
     # Por lo tanto, convertimos las fechas a string ISO antes de guardar
@@ -1826,7 +1775,16 @@ def build_sqlite(
             "establecimientos_educacionales", conn, index=False, if_exists="replace"
         )
         for table_name, df_extra in extra_tables_pd.items():
-            df_extra.to_sql(table_name, conn, index=False, if_exists="replace")
+            # Usar inserts multi-fila para tablas grandes
+            chunksize = 50_000 if len(df_extra) > 100_000 else None
+            df_extra.to_sql(
+                table_name,
+                conn,
+                index=False,
+                if_exists="replace",
+                method="multi" if chunksize else None,
+                chunksize=chunksize,
+            )
 
         # Crear índices en SQLite
         cursor = conn.cursor()
@@ -1864,7 +1822,8 @@ def build_excel(
     df_salud,
     df_educacionales,
     extra_tables,
-    output_path,
+    extra_tables_pd=None,
+    output_path=None,
 ):
     print(f"Generando archivo Excel consolidado para no técnicos en: {output_path}")
     # Convertir a Pandas para exportar de forma robusta con XlsxWriter
@@ -1875,7 +1834,8 @@ def build_excel(
     df_censo_pd = df_censo.to_pandas()
     df_salud_pd = df_salud.to_pandas()
     df_educacionales_pd = df_educacionales.to_pandas()
-    extra_tables_pd = {name: df.to_pandas() for name, df in extra_tables.items()}
+    if extra_tables_pd is None:
+        extra_tables_pd = {name: df.to_pandas() for name, df in extra_tables.items()}
 
     # Limpieza visual y formateo para Excel
     # En Excel, queremos que el Código Comuna siga siendo un string para que no se pierdan los ceros iniciales
@@ -2013,7 +1973,7 @@ def build_flat_files(
     )
     for table_name, df_extra in extra_tables.items():
         write_parquet_atomic(df_extra, os.path.join(NORMALIZED_DIR, f"{table_name}.parquet"))
-    print(f"Archivos Parquet exportados a: {NORMALIZED_DIR}")
+    print(f"  Archivos Parquet exportados a: {NORMALIZED_DIR}")
 
     # Generamos los endpoints JSON simulados
     regiones_json = os.path.join(NORMALIZED_DIR, "regiones.json")
@@ -2053,7 +2013,17 @@ def build_flat_files(
         ensure_ascii=False,
         indent=2,
     )
+    # JSON para tablas extra: omitir las masivas (> 100k filas).
+    # Parquet y DuckDB son los formatos recomendados para grandes volúmenes.
+    _JSON_MAX_ROWS = 100_000
     for table_name, df_extra in extra_tables.items():
+        num_rows = df_extra.height
+        if num_rows > _JSON_MAX_ROWS:
+            print(
+                f"  Omite JSON para {table_name} ({num_rows:,} filas > {_JSON_MAX_ROWS:,}) — "
+                f"usa Parquet en su lugar."
+            )
+            continue
         write_json_atomic(
             df_extra.to_dicts(),
             os.path.join(NORMALIZED_DIR, f"{table_name}.json"),
@@ -2061,7 +2031,7 @@ def build_flat_files(
             indent=2,
         )
 
-    print(f"Endpoints JSON de prueba exportados a: {NORMALIZED_DIR}")
+    print(f"  Endpoints JSON exportados a: {NORMALIZED_DIR}")
 
 
 def main():
@@ -2087,7 +2057,6 @@ def main():
     resultados_educacionales_csv = os.path.join(STAGING_DIR, "resultados_educacionales.csv")
     siedu_csv = os.path.join(STAGING_DIR, "indicadores_urbanos_siedu.csv")
     empresas_csv = os.path.join(STAGING_DIR, "empresas.csv")
-    osm_csv = os.path.join(STAGING_DIR, "puntos_interes.csv")
 
     required_staging = (
         comunas_csv,
@@ -2156,7 +2125,6 @@ def main():
     empresas_metadata = (
         load_metadata(EMPRESAS_METADATA_PATH) if os.path.exists(EMPRESAS_METADATA_PATH) else None
     )
-    osm_metadata = load_metadata(OSM_METADATA_PATH) if os.path.exists(OSM_METADATA_PATH) else None
 
     metadata_files = [
         ("comunas", comunas_metadata, "subdere_extractor.py"),
@@ -2284,29 +2252,6 @@ def main():
     else:
         print("Dataset empresas no encontrado en staging — se omite del build.")
 
-    # Puntos de interes (OSM): dataset opcional
-    df_osm = None
-    if os.path.exists(osm_csv) and osm_metadata is not None:
-        df_osm = pl.read_csv(
-            osm_csv,
-            schema_overrides={
-                "osm_id": pl.Int64,
-                "nombre": pl.String,
-                "categoria": pl.String,
-                "tipo": pl.String,
-                "direccion": pl.String,
-                "comuna": pl.String,
-                "codigo_comuna": pl.String,
-                "codigo_region": pl.String,
-                "telefono": pl.String,
-                "sitio_web": pl.String,
-                "latitud": pl.Float64,
-                "longitud": pl.Float64,
-            },
-        )
-        print(f"Puntos de interes OSM cargados: {df_osm.height} registros.")
-    else:
-        print("Dataset puntos_interes no encontrado en staging — se omite del build.")
     df_regiones, df_provincias = derive_geography_layers(df_comunas)
     df_perfil_territorial = build_perfil_territorial_comunal(
         df_comunas,
@@ -2362,15 +2307,6 @@ def main():
             if df_empresas is not None
             else {}
         ),
-        **(
-            {
-                "puntos_interes": validate_puntos_interes(
-                    df_osm, osm_metadata, df_comunas["codigo_comuna"].to_list()
-                )
-            }
-            if df_osm is not None
-            else {}
-        ),
         "perfil_territorial_comunal": validate_perfil_territorial_comunal(
             df_perfil_territorial,
             {
@@ -2399,10 +2335,13 @@ def main():
     }
     if df_empresas is not None:
         extra_tables["empresas"] = df_empresas
-    if df_osm is not None:
-        extra_tables["puntos_interes"] = df_osm
+
+    # Convertir tablas extra a pandas UNA sola vez para SQLite y Excel.
+    # Empresas tiene ~1.57M filas: la conversión es costosa y no debe duplicarse.
+    extra_tables_pd = {name: df.to_pandas() for name, df in extra_tables.items()}
 
     # Compilar entregables
+    print("Compilando artefactos del build…")
     build_duckdb(
         df_regiones,
         df_provincias,
@@ -2414,6 +2353,7 @@ def main():
         extra_tables,
         os.path.join(NORMALIZED_DIR, "chile_data.duckdb"),
     )
+    print("  [1/4] DuckDB ✓")
     build_sqlite(
         df_regiones,
         df_provincias,
@@ -2423,8 +2363,10 @@ def main():
         df_salud,
         df_educacionales,
         extra_tables,
+        extra_tables_pd,
         os.path.join(NORMALIZED_DIR, "chile_data.db"),
     )
+    print("  [2/4] SQLite ✓")
     build_excel(
         df_regiones,
         df_provincias,
@@ -2434,8 +2376,10 @@ def main():
         df_salud,
         df_educacionales,
         extra_tables,
+        extra_tables_pd,
         os.path.join(NORMALIZED_DIR, "chile_data_latest.xlsx"),
     )
+    print("  [3/4] Excel ✓")
     build_flat_files(
         df_regiones,
         df_provincias,
@@ -2446,6 +2390,7 @@ def main():
         df_educacionales,
         extra_tables,
     )
+    print("  [4/4] Flat files ✓")
     write_parquet_atomic(
         df_censo_hogares, os.path.join(NORMALIZED_DIR, "censo_hogares_viviendas.parquet")
     )
@@ -2688,37 +2633,6 @@ def main():
                 }
             }
             if df_empresas is not None
-            else {}
-        ),
-        **(
-            {
-                "puntos_interes": {
-                    "dataset": "puntos_interes",
-                    "source_name": osm_metadata.get("source_name", ""),
-                    "source_url": osm_metadata.get("source_url", ""),
-                    "source_mode": osm_metadata.get("source_mode", "fallback"),
-                    "source_detail": osm_metadata.get("source_detail", "overpass_api"),
-                    "refreshed_at_utc": osm_metadata.get("refreshed_at_utc", ""),
-                    "record_count": df_osm.height,
-                    "fields": df_osm.columns,
-                    "notes": osm_metadata.get("notes", []),
-                    "coverage": osm_metadata.get(
-                        "coverage",
-                        {
-                            "status": "partial",
-                            "summary": "OSM coverage is partial by design.",
-                        },
-                    ),
-                    "reuse_policy": DATASET_CATALOG_CONFIG["puntos_interes"]["reuse_policy"],
-                    "freshness": build_freshness(
-                        osm_metadata.get("refreshed_at_utc", ""),
-                        DATASET_CATALOG_CONFIG["puntos_interes"]["freshness_policy"][
-                            "max_age_hours"
-                        ],
-                    ),
-                }
-            }
-            if df_osm is not None
             else {}
         ),
     }

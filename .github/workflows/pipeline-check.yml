@@ -99,7 +99,6 @@ jobs:
           python src/extractors/mineduc_resultados_extractor.py
           python src/extractors/siedu_extractor.py
           python src/extractors/res_extractor.py
-          python src/extractors/osm_extractor.py
 
       - name: Build outputs
         run: python src/build_dev_db.py

@@ -162,21 +162,6 @@ class ChileHubTests(unittest.TestCase):
         # Verificar que los RUT son strings con formato esperado
         self.assertEqual(df["rut"].dtype, pl.String)
 
-    def test_load_polars_puntos_interes(self):
-        """Carga condicional de puntos de interes (puede no estar presente)."""
-        if "puntos_interes" not in self.catalog_by_dataset:
-            self.skipTest(
-                "Dataset puntos_interes no esta en el catalogo — extractor no ejecutado aun."
-            )
-        df = self.hub.load_polars("puntos_interes")
-        self.assertGreater(df.height, 0)
-        self.assertIn("osm_id", df.columns)
-        self.assertIn("nombre", df.columns)
-        self.assertIn("categoria", df.columns)
-        self.assertIn("latitud", df.columns)
-        self.assertIn("longitud", df.columns)
-        self.assertEqual(df["osm_id"].dtype, pl.Int64)
-
     def test_summary_statuses(self):
         summary = self.hub.summary()
         statuses = {item["dataset"]: item["validation_status"] for item in summary}
