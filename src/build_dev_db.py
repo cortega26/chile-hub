@@ -1774,17 +1774,24 @@ def build_sqlite(
         df_educacionales_pd.to_sql(
             "establecimientos_educacionales", conn, index=False, if_exists="replace"
         )
+        # SQLite tiene un límite de 999 variables por sentencia.
+        # Calculamos el chunksize para que (columnas × filas) no lo exceda,
+        # con un margen de seguridad de 2× por si Pandas añade columnas internas.
+        _SQLITE_MAX_VARS = 999
         for table_name, df_extra in extra_tables_pd.items():
-            # Usar inserts multi-fila para tablas grandes
-            chunksize = 50_000 if len(df_extra) > 100_000 else None
-            df_extra.to_sql(
-                table_name,
-                conn,
-                index=False,
-                if_exists="replace",
-                method="multi" if chunksize else None,
-                chunksize=chunksize,
-            )
+            num_cols = len(df_extra.columns)
+            if len(df_extra) > 10_000 and num_cols > 0:
+                chunksize = max(50, _SQLITE_MAX_VARS // (num_cols * 2))
+                df_extra.to_sql(
+                    table_name,
+                    conn,
+                    index=False,
+                    if_exists="replace",
+                    method="multi",
+                    chunksize=chunksize,
+                )
+            else:
+                df_extra.to_sql(table_name, conn, index=False, if_exists="replace")
 
         # Crear índices en SQLite
         cursor = conn.cursor()
