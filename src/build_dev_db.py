@@ -507,11 +507,10 @@ DATASET_CATALOG_CONFIG = {
         "outputs": {
             "parquet": "data/normalized/empresas.parquet",
             "duckdb_table": "empresas",
-            "sqlite_table": "empresas",
             "excel_sheet": "Empresas RES",
         },
         "documentation": "docs/datasets/empresas.md",
-        "_notes": "JSON omitido intencionalmente: >1.5M registros. Usa Parquet.",
+        "_notes": "JSON y SQLite omitidos: >1.5M registros. Usa Parquet o DuckDB.",
     },
 }
 
@@ -1774,15 +1773,22 @@ def build_sqlite(
         df_educacionales_pd.to_sql(
             "establecimientos_educacionales", conn, index=False, if_exists="replace"
         )
-        # SQLite tiene un límite de 999 variables por sentencia.
-        # method='multi' genera exactamente (num_cols × chunksize) placeholders.
+        # SQLite no es eficiente para tablas masivas.  Omitimos las que
+        # superen el umbral; DuckDB y Parquet cubren ese caso de uso.
+        _SQLITE_MAX_ROWS = 500_000
         _SQLITE_MAX_VARS = 999
         for table_name, df_extra in extra_tables_pd.items():
-            num_cols = len(df_extra.columns)
             num_rows = len(df_extra)
+            if num_rows > _SQLITE_MAX_ROWS:
+                print(
+                    f"  Omite SQLite para {table_name} ({num_rows:,} filas > "
+                    f"{_SQLITE_MAX_ROWS:,}) — usa DuckDB o Parquet.",
+                    flush=True,
+                )
+                continue
+            num_cols = len(df_extra.columns)
             if num_rows > 10_000 and num_cols > 0:
                 chunksize = _SQLITE_MAX_VARS // num_cols
-                print(f"  Insertando {num_rows:,} filas en SQLite ({table_name})…", flush=True)
                 df_extra.to_sql(
                     table_name,
                     conn,
