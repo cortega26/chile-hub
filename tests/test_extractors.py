@@ -5,6 +5,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
+import polars as pl
+
 ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
@@ -282,6 +284,98 @@ class BCentralExtractorTests(unittest.TestCase):
         self.assertTrue(any(item.startswith("uf/") for item in diagnostics["fetch_failures"]))
         self.assertNotIn("uf", set(df["codigo_indicador"].unique()))
         self.assertEqual(set(df["codigo_indicador"].unique()), {"dolar", "euro", "utm", "ipc"})
+
+    def test_fetch_all_history_incremental_with_monthly_gap_and_empty_series(self):
+        """Incremental: monthly gap (ipc) is silent, non-monthly empty (dolar) logs warning."""
+        import polars as pl
+
+        current_year = datetime.date.today().year
+        existing_df = pl.DataFrame(
+            {
+                "fecha": [datetime.date(current_year - 1, 1, 1)] * 5,
+                "codigo_indicador": ["uf", "dolar", "euro", "utm", "ipc"],
+                "valor": [39000.0, 900.0, 1040.0, 70000.0, 0.2],
+            }
+        ).with_columns(pl.col("fecha").cast(pl.Date))
+
+        def fetch(codigo, year):
+            if codigo == "ipc" and year == current_year:
+                return []
+            if codigo == "dolar":
+                return []
+            return [{"fecha": f"{year}-01-01", "codigo_indicador": codigo, "valor": 1.0}]
+
+        with (
+            patch.object(
+                bcentral_extractor,
+                "load_existing_staging",
+                return_value=(existing_df, None, []),
+            ),
+            patch.object(bcentral_extractor, "fetch_indicator_year", side_effect=fetch),
+            patch.object(bcentral_extractor, "load_latest_raw_snapshot", return_value=[]),
+            patch.object(bcentral_extractor.time, "sleep"),
+        ):
+            df, diagnostics = bcentral_extractor.fetch_all_history()
+
+        self.assertIsNotNone(df)
+        ipc_empty = [p for p in diagnostics["empty_live_pairs"] if p.startswith("ipc/")]
+        self.assertEqual(len(ipc_empty), 0, "ipc monthly gap should not appear in empty_live_pairs")
+        dolar_empty = [p for p in diagnostics["empty_live_pairs"] if p.startswith("dolar/")]
+        self.assertEqual(len(dolar_empty), 1, "dolar empty should appear in empty_live_pairs")
+        self.assertIn("dolar", diagnostics["published_backfills"])
+        self.assertEqual(
+            set(df["codigo_indicador"].unique()),
+            {"uf", "dolar", "euro", "utm", "ipc"},
+        )
+
+    def test_fetch_all_history_raw_recovery_and_preserved_pairs(self):
+        """Incremental with fetch failures: raw recovery for one, preserved existing for another."""
+        import polars as pl
+
+        current_year = datetime.date.today().year
+        existing_df = pl.DataFrame(
+            {
+                "fecha": [datetime.date(current_year - 1, 1, 1)] * 5,
+                "codigo_indicador": ["uf", "dolar", "euro", "utm", "ipc"],
+                "valor": [39000.0, 900.0, 1040.0, 70000.0, 0.2],
+            }
+        ).with_columns(pl.col("fecha").cast(pl.Date))
+
+        def fetch(codigo, year):
+            if codigo == "uf":
+                raise HTTPError("503 for uf")
+            if codigo == "ipc":
+                raise HTTPError("503 for ipc")
+            return [{"fecha": f"{year}-01-01", "codigo_indicador": codigo, "valor": 1.0}]
+
+        def raw_snapshot(codigo, year):
+            if codigo == "uf":
+                return [{"fecha": f"{year}-01-01", "codigo_indicador": "uf", "valor": 39001.0}]
+            return []
+
+        with (
+            patch.object(
+                bcentral_extractor,
+                "load_existing_staging",
+                return_value=(existing_df, None, []),
+            ),
+            patch.object(bcentral_extractor, "fetch_indicator_year", side_effect=fetch),
+            patch.object(bcentral_extractor, "load_latest_raw_snapshot", side_effect=raw_snapshot),
+            patch.object(bcentral_extractor.time, "sleep"),
+        ):
+            df, diagnostics = bcentral_extractor.fetch_all_history()
+
+        self.assertIsNotNone(df)
+        self.assertTrue(any("uf/" in f for f in diagnostics["fetch_failures"]))
+        self.assertTrue(any("uf/" in r for r in diagnostics["raw_recoveries"]))
+        self.assertTrue(any("ipc/" in f for f in diagnostics["fetch_failures"]))
+        self.assertTrue(any("ipc/" in p for p in diagnostics["preserved_existing_pairs"]))
+        self.assertEqual(
+            set(df["codigo_indicador"].unique()),
+            {"uf", "dolar", "euro", "utm", "ipc"},
+        )
+        uf_rows = df.filter(pl.col("codigo_indicador") == "uf")
+        self.assertIn(39001.0, uf_rows["valor"].to_list())
 
 
 class SinimFinanzasExtractorTests(unittest.TestCase):
@@ -781,6 +875,329 @@ class MineducEstablecimientosExtractorTests(unittest.TestCase):
             mineduc_establecimientos_extractor.MineducEstablecimientosExtractor().dataset_name,
             "establecimientos_educacionales",
         )
+
+
+# ── B6: Tests extendidos para extractores con cobertura parcial ──
+
+
+class SaludExtractorExtendedTests(unittest.TestCase):
+    """Fetch/write_staging/dry_run para salud_extractor (43% → +cobertura)."""
+
+    def test_write_staging_persists_csv_and_metadata(self):
+        df = pl.DataFrame(
+            {
+                "codigo_establecimiento": ["1001"],
+                "nombre_establecimiento": ["Hospital Test"],
+                "tipo_establecimiento": ["Hospital"],
+                "dependencia_administrativa": ["SNSS"],
+                "nivel_atencion": ["Alta"],
+                "codigo_region": ["01"],
+                "nombre_region": ["Tarapaca"],
+                "codigo_comuna": ["01101"],
+                "nombre_comuna": ["Iquique"],
+                "tiene_servicio_urgencia": ["Si"],
+                "tipo_urgencia": ["Urgencia"],
+                "latitud": [-20.214],
+                "longitud": [-70.152],
+                "estado_funcionamiento": ["Vigente"],
+            }
+        )
+        metadata = {
+            "dataset": "establecimientos_salud",
+            "source_mode": "live",
+            "record_count": df.height,
+        }
+        with tempfile.TemporaryDirectory() as tmpdir:
+            csv_path = Path(tmpdir) / "establecimientos_salud.csv"
+            metadata_path = Path(tmpdir) / "establecimientos_salud.metadata.json"
+            with (
+                patch.object(salud_extractor, "STAGING_CSV_PATH", str(csv_path)),
+                patch.object(salud_extractor, "METADATA_PATH", str(metadata_path)),
+            ):
+                result = salud_extractor.SaludExtractor().write_staging(df, metadata)
+            self.assertEqual(result, csv_path)
+            self.assertTrue(csv_path.exists())
+            self.assertTrue(metadata_path.exists())
+            saved_meta = json.loads(metadata_path.read_text(encoding="utf-8"))
+            self.assertEqual(saved_meta["record_count"], df.height)
+
+    def test_run_dry_run_returns_validation_without_writing(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            csv_path = Path(tmpdir) / "test_salud.csv"
+            _write_salud_csv(csv_path)
+            staging_csv = Path(tmpdir) / "establecimientos_salud.csv"
+            staging_meta = Path(tmpdir) / "establecimientos_salud.metadata.json"
+            with (
+                patch.object(salud_extractor, "STAGING_CSV_PATH", str(staging_csv)),
+                patch.object(salud_extractor, "METADATA_PATH", str(staging_meta)),
+                patch.object(
+                    salud_extractor,
+                    "fetch_csv",
+                    return_value=(csv_path, "live", "https://example.com"),
+                ),
+            ):
+                extractor = salud_extractor.SaludExtractor()
+                result = extractor.run(dry_run=True)
+            self.assertIn("status", result)
+            self.assertFalse(staging_csv.exists())
+            self.assertFalse(staging_meta.exists())
+
+
+class SieduExtractorExtendedTests(unittest.TestCase):
+    """Tests extendidos para siedu_extractor (52% → +cobertura)."""
+
+    def test_write_staging_persists_csv_and_metadata(self):
+        df = siedu_extractor.normalize_rows(siedu_extractor.FALLBACK_ROWS)
+        metadata = {
+            "dataset": "indicadores_urbanos_siedu",
+            "source_mode": "fallback",
+            "record_count": df.height,
+        }
+        with tempfile.TemporaryDirectory() as tmpdir:
+            csv_path = Path(tmpdir) / "indicadores_urbanos_siedu.csv"
+            metadata_path = Path(tmpdir) / "indicadores_urbanos_siedu.metadata.json"
+            with (
+                patch.object(siedu_extractor, "STAGING_CSV_PATH", csv_path),
+                patch.object(siedu_extractor, "METADATA_PATH", metadata_path),
+            ):
+                result = siedu_extractor.SieduExtractor().write_staging(df, metadata)
+            self.assertEqual(result, csv_path)
+            self.assertTrue(csv_path.exists())
+            saved_meta = json.loads(metadata_path.read_text(encoding="utf-8"))
+            self.assertEqual(saved_meta["record_count"], df.height)
+
+
+class MineducResultadosExtractorExtendedTests(unittest.TestCase):
+    """Tests extendidos para mineduc_resultados_extractor (54% → +cobertura)."""
+
+    def test_fetch_and_normalize_produces_expected_schema(self):
+        with patch.object(
+            mineduc_resultados_extractor,
+            "fetch_data",
+            return_value=(
+                mineduc_resultados_extractor.FALLBACK_ROWS,
+                "fallback",
+                "https://example.com",
+                [],
+            ),
+        ):
+            extractor = mineduc_resultados_extractor.MineducResultadosExtractor()
+            raw = extractor.fetch()
+            df = extractor.normalize(raw)
+        required = {
+            "anio",
+            "codigo_comuna",
+            "matricula_total",
+            "asistencia_promedio",
+            "tasa_aprobacion",
+            "tasa_reprobacion",
+            "tasa_retiro",
+            "establecimientos_reportados",
+        }
+        self.assertTrue(required.issubset(df.columns))
+        self.assertEqual(df["codigo_comuna"].dtype, pl.String)
+
+    def test_run_dry_run_does_not_write_files(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            staging_dir = Path(tmp)
+            csv_path = staging_dir / "resultados_educacionales.csv"
+            meta_path = staging_dir / "resultados_educacionales.metadata.json"
+            with (
+                patch.object(
+                    mineduc_resultados_extractor,
+                    "fetch_data",
+                    return_value=(
+                        mineduc_resultados_extractor.FALLBACK_ROWS,
+                        "fallback",
+                        "url",
+                        [],
+                    ),
+                ),
+                patch.object(mineduc_resultados_extractor, "STAGING_DIR", staging_dir),
+                patch.object(mineduc_resultados_extractor, "STAGING_CSV_PATH", csv_path),
+                patch.object(mineduc_resultados_extractor, "METADATA_PATH", meta_path),
+            ):
+                result = mineduc_resultados_extractor.MineducResultadosExtractor().run(dry_run=True)
+            self.assertEqual(result["status"], "ok")
+            self.assertFalse(csv_path.exists())
+            self.assertFalse(meta_path.exists())
+
+
+class SinimFinanzasExtractorExtendedTests(unittest.TestCase):
+    """Tests extendidos para sinim_finanzas_extractor (54% → +cobertura)."""
+
+    def test_fetch_and_normalize_produces_expected_schema(self):
+        with patch.object(
+            sinim_finanzas_extractor,
+            "fetch_data",
+            return_value=(
+                sinim_finanzas_extractor.FALLBACK_ROWS,
+                "fallback",
+                "https://example.com",
+                [],
+            ),
+        ):
+            extractor = sinim_finanzas_extractor.SinimFinanzasExtractor()
+            raw = extractor.fetch()
+            df = extractor.normalize(raw)
+        required = {
+            "anio",
+            "codigo_comuna",
+            "nombre_comuna",
+            "ingresos_totales",
+            "gastos_totales",
+            "ingresos_propios_permanentes",
+            "fondo_comun_municipal",
+            "gasto_personal",
+            "gasto_inversion",
+        }
+        self.assertTrue(required.issubset(df.columns))
+        self.assertEqual(df["codigo_comuna"].dtype, pl.String)
+
+
+class CensoExtractorExtendedTests(unittest.TestCase):
+    """Tests extendidos para censo_extractor (56% → +cobertura)."""
+
+    def test_dry_run_does_not_write_files(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            workbook = Path(tmpdir) / "censo.xlsx"
+            _write_censo_workbook(workbook)
+            csv_path = Path(tmpdir) / "censo_comunal.csv"
+            meta_path = Path(tmpdir) / "censo_comunal.metadata.json"
+            with (
+                patch.object(censo_extractor, "fetch_workbook", return_value=(workbook, "live")),
+                patch.object(censo_extractor, "STAGING_CSV_PATH", str(csv_path)),
+                patch.object(censo_extractor, "METADATA_PATH", str(meta_path)),
+            ):
+                result = censo_extractor.CensoExtractor().run(dry_run=True)
+            self.assertIn("status", result)
+            self.assertFalse(csv_path.exists())
+            self.assertFalse(meta_path.exists())
+
+
+class CensoHogaresViviendasExtractorExtendedTests(unittest.TestCase):
+    """Tests extendidos para censo_hogares_viviendas (60% → +cobertura)."""
+
+    def test_dry_run_does_not_write_files(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            workbook = Path(tmpdir) / "hogares.xlsx"
+            _write_censo_hogares_viviendas_workbook(workbook)
+            csv_path = Path(tmpdir) / "censo_hogares_viviendas.csv"
+            meta_path = Path(tmpdir) / "censo_hogares_viviendas.metadata.json"
+            with (
+                patch.object(
+                    censo_hogares_viviendas_extractor,
+                    "fetch_workbook",
+                    return_value=(workbook, "live"),
+                ),
+                patch.object(censo_hogares_viviendas_extractor, "STAGING_CSV_PATH", str(csv_path)),
+                patch.object(censo_hogares_viviendas_extractor, "METADATA_PATH", str(meta_path)),
+            ):
+                result = censo_hogares_viviendas_extractor.CensoHogaresViviendasExtractor().run(
+                    dry_run=True
+                )
+            self.assertIn("status", result)
+            self.assertFalse(csv_path.exists())
+
+
+class ResExtractorExtendedTests(unittest.TestCase):
+    """Tests extendidos para res_extractor (60% → +cobertura)."""
+
+    def test_write_staging_persists_csv_and_metadata(self):
+        df = pl.DataFrame(
+            {
+                "rut": ["76286049-K"],
+                "razon_social": ["Test EIRL"],
+                "codigo_sociedad": ["EIRL"],
+                "tipo_actuacion": ["CONSTITUCION"],
+                "capital": [1000000],
+                "fecha_actuacion": [datetime.date(2022, 5, 2)],
+                "fecha_registro": [datetime.date(2022, 5, 2)],
+                "fecha_aprobacion_sii": [datetime.date(2022, 5, 2)],
+                "anio": [2022],
+                "mes": ["Mayo"],
+                "comuna_tributaria": ["Santiago"],
+                "region_tributaria": ["13"],
+                "comuna_social": ["Santiago"],
+                "region_social": ["13"],
+            }
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            csv_path = Path(tmpdir) / "empresas.csv"
+            meta_path = Path(tmpdir) / "empresas.metadata.json"
+            with (
+                patch.object(res_extractor, "STAGING_CSV_PATH", str(csv_path)),
+                patch.object(res_extractor, "METADATA_PATH", str(meta_path)),
+            ):
+                result = res_extractor.ResExtractor().write_staging(df, {"source_mode": "fallback"})
+            self.assertEqual(result, csv_path)
+            self.assertTrue(csv_path.exists())
+            meta = json.loads(meta_path.read_text(encoding="utf-8"))
+            self.assertEqual(meta["dataset"], "empresas")
+
+    def test_dry_run_does_not_write_files(self):
+        csv_content = (
+            "ID;RUT;Razon Social;Fecha de actuacion (1era firma);Fecha de registro (ultima firma);"
+            "Fecha de aprobacion x SII;Anio;Mes;Comuna Tributaria;Region Tributaria;"
+            "Codigo de sociedad;Tipo de actuacion;Capital;Comuna Social;Region Social\n"
+            "1;76286049-K;Test EIRL;02-05-2022;02-05-2022;02-05-2022;"
+            "2022;Mayo;Santiago;13;EIRL;CONSTITUCION;1000000;Santiago;13\n"
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            csv_path = Path(tmpdir) / "empresas.csv"
+            meta_path = Path(tmpdir) / "empresas.metadata.json"
+            with (
+                patch.object(
+                    res_extractor,
+                    "fetch_resources",
+                    return_value=([csv_content.encode("utf-8")], "live", "test"),
+                ),
+                patch.object(res_extractor, "STAGING_CSV_PATH", str(csv_path)),
+                patch.object(res_extractor, "METADATA_PATH", str(meta_path)),
+            ):
+                result = res_extractor.ResExtractor().run(dry_run=True)
+                self.assertIn("status", result)
+                self.assertFalse(csv_path.exists())
+                self.assertFalse(meta_path.exists())
+
+
+class SubdereExtractorExtendedTests(unittest.TestCase):
+    """Tests extendidos para subdere_extractor (54% → +cobertura)."""
+
+    def test_dry_run_does_not_write_files(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            meta_path = Path(tmpdir) / "comunas.metadata.json"
+            with (
+                patch.object(subdere_extractor, "STAGING_DIR", tmpdir),
+                patch.object(subdere_extractor, "METADATA_PATH", str(meta_path)),
+                patch.object(subdere_extractor, "fetch_bcn_comunas") as fetch,
+            ):
+                fetch.return_value = (
+                    pl.DataFrame(subdere_extractor.DPA_FALLBACK_DATA[:2]),
+                    0,
+                    0,
+                    0,
+                )
+                result = subdere_extractor.SubdereExtractor().run(dry_run=True)
+                self.assertIn("status", result)
+                self.assertFalse(meta_path.exists())
+
+    def test_write_staging_persists_csv_and_metadata(self):
+        df = pl.DataFrame(subdere_extractor.DPA_FALLBACK_DATA[:2])
+        with tempfile.TemporaryDirectory() as tmpdir:
+            meta_path = Path(tmpdir) / "comunas.metadata.json"
+            with (
+                patch.object(subdere_extractor, "STAGING_DIR", tmpdir),
+                patch.object(subdere_extractor, "METADATA_PATH", str(meta_path)),
+            ):
+                result = subdere_extractor.SubdereExtractor().write_staging(
+                    df, {"source_mode": "live"}
+                )
+            output_csv = Path(tmpdir) / "comunas.csv"
+            self.assertEqual(result, output_csv)
+            self.assertTrue(output_csv.exists())
+            meta = json.loads(meta_path.read_text(encoding="utf-8"))
+            self.assertEqual(meta["dataset"], "comunas")
 
 
 if __name__ == "__main__":
