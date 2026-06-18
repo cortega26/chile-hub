@@ -2684,16 +2684,6 @@ def main():
     drift_report_output = write_drift_report_json(drift_report)
     write_drift_report_markdown_file(drift_report)
     artifact_manifest_output, artifact_manifest = write_artifact_manifest()
-    hub_bundle_output, hub_bundle = write_hub_bundle_json(
-        pipeline_metadata,
-        hub_health,
-        dataset_catalog,
-        artifact_manifest,
-    )
-    overview = build_overview(hub_health, hub_bundle, artifact_manifest)
-    overview_output, overview = write_overview_json(overview)
-    write_overview_markdown_file(overview)
-    artifact_manifest_output, artifact_manifest = write_artifact_manifest()
     zip_output = write_publishable_bundle_zip()
     sha256_output = write_publishable_bundle_sha256(zip_output)
     artifact_manifest_output, artifact_manifest = attach_publishable_package_to_manifest(

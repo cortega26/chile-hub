@@ -1,6 +1,6 @@
 {
-  "generated_at_utc": "2026-06-18T15:15:36.658487+00:00",
-  "previous_generated_at_utc": "2026-06-18T00:23:06.004190+00:00",
+  "generated_at_utc": "2026-06-18T16:22:16.898808+00:00",
+  "previous_generated_at_utc": "2026-06-18T15:15:36.658487+00:00",
   "dataset_count": 15,
   "datasets": [
     {
@@ -75,31 +75,16 @@
     },
     {
       "dataset": "empresas",
-      "previous_record_count": null,
+      "previous_record_count": 1572116,
       "current_record_count": 1572116,
-      "record_count_delta": null,
-      "added_fields": [
-        "anio",
-        "capital",
-        "codigo_sociedad",
-        "comuna_social",
-        "comuna_tributaria",
-        "fecha_actuacion",
-        "fecha_aprobacion_sii",
-        "fecha_registro",
-        "mes",
-        "razon_social",
-        "region_social",
-        "region_tributaria",
-        "rut",
-        "tipo_actuacion"
-      ],
+      "record_count_delta": 0,
+      "added_fields": [],
       "removed_fields": [],
-      "previous_source_mode": null,
+      "previous_source_mode": "live",
       "current_source_mode": "live",
-      "previous_freshness_status": null,
+      "previous_freshness_status": "fresh",
       "current_freshness_status": "fresh",
-      "previous_validation_status": null,
+      "previous_validation_status": "ok",
       "current_validation_status": "ok"
     },
     {

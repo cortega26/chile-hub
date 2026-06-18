@@ -9,14 +9,15 @@ Los planes 005–007 tienen dependencias.
 
 | # | Plan | Esfuerzo | Riesgo | Depende de | Estado |
 |---|------|----------|--------|-----------|--------|
-| 001 | [Fix landing page bugs — KPIs antiguos y crash de coordenadas](001-fix-landing-page-bugs.md) | S | LOW | — | DONE |
-| 002 | [Agregar CSP a la landing page](002-csp-landing-page.md) | S | LOW | — | DONE (fixed independently; CSP meta tag already in index.html:5) |
-| 003 | [Validar metadata JSON antes del build](003-guard-metadata-json.md) | S | LOW | — | DONE (fixed independently; guardas para 10 datasets en build_dev_db.py:2092-2168) |
-| 004 | [Limpiar dependencias — pyarrow, dev/prod, curl_cffi](004-cleanup-dependencies.md) | S | LOW | — | DONE |
-| 005 | [Eliminar escrituras redundantes del build](005-eliminate-redundant-build-writes.md) | S | LOW | 003 (idealmente) | TODO |
-| 006 | [Consolidar lógica duplicada y corregir violación de capas](006-consolidate-duplicated-logic.md) | S | LOW | — | DONE |
-| 007 | [Mejoras de tooling — pre-commit, editorconfig, CI](007-tooling-improvements.md) | S | LOW | 004 | DONE |
+| 001 | [Fix landing page bugs — KPIs antiguos y crash de coordenadas](archive/001-fix-landing-page-bugs.md) | S | LOW | — | DONE (archivado) |
+| 002 | [Agregar CSP a la landing page](archive/002-csp-landing-page.md) | S | LOW | — | DONE (archivado; CSP meta tag already in index.html:5) |
+| 003 | [Validar metadata JSON antes del build](archive/003-guard-metadata-json.md) | S | LOW | — | DONE (archivado; guardas para metadata en build_dev_db.py) |
+| 004 | [Limpiar dependencias — pyarrow, dev/prod, curl_cffi](archive/004-cleanup-dependencies.md) | S | LOW | — | DONE (archivado) |
+| 005 | [Eliminar escrituras redundantes del build](archive/005-eliminate-redundant-build-writes.md) | S | LOW | 003 (idealmente) | DONE (archivado) |
+| 006 | [Consolidar lógica duplicada y corregir violación de capas](archive/006-consolidate-duplicated-logic.md) | S | LOW | — | DONE (archivado) |
+| 007 | [Mejoras de tooling — pre-commit, editorconfig, CI](archive/007-tooling-improvements.md) | S | LOW | 004 | DONE (archivado) |
 | 008 | [Hardening de source readiness, schema contracts y quality gates](008-hardening-source-readiness-schema-contracts-quality.md) | L | MED | — | PARTIAL (schema contracts + source registry JSON implemented; generated readiness artifacts remain future work) |
+| 009 | [Separar carriles stable_publishable y candidate](009-split-stable-publishable-and-candidate-tracks.md) | M | MED | 008 (partes implementadas) | TODO |
 
 ## Grafo de dependencias
 
@@ -26,7 +27,7 @@ Los planes 005–007 tienen dependencias.
 003  (independiente) ──► 005
 004  (independiente) ──► 007
 006  (independiente)
-008  (independiente; arquitectura de hardening para las 14 capas actuales)
+008  (partes implementadas: source registry + contracts) ──► 009
 ```
 
 ## Hallazgos considerados y rechazados
@@ -53,6 +54,7 @@ Los siguientes hallazgos de la auditoría fueron verificados y rechazados antes 
 
 - `TODO` — pendiente de ejecución
 - `IN PROGRESS` — en ejecución activa
+- `PARTIAL` — implementado parcialmente; quedan criterios pendientes
 - `DONE` — completado
 - `BLOCKED` — bloqueado (indicar por qué)
 - `SKIP` — descartado después de análisis adicional
