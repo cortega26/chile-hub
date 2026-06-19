@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 import shutil
+import tempfile
 import zipfile
 from dataclasses import dataclass
 from pathlib import Path
@@ -90,16 +91,33 @@ class ChileHubDataManager:
         bundle_path = self.version_cache_dir / DEFAULT_BUNDLE_NAME
         checksum_path = self.version_cache_dir / DEFAULT_CHECKSUM_NAME
 
-        self._download(bundle.url, bundle_path)
+        # Descargar checksum primero
         self._download(checksum.url, checksum_path)
         expected_sha256 = self._read_checksum(checksum_path)
-        actual_sha256 = self._sha256(bundle_path)
+
+        # Descargar bundle hasheando en tránsito para eliminar ventana TOCTOU
+        sha256_hash = hashlib.sha256()
+        with self.session.get(bundle.url, stream=True, timeout=120) as response:
+            response.raise_for_status()
+            with tempfile.NamedTemporaryFile(
+                dir=str(self.version_cache_dir), delete=False, suffix=".tmp"
+            ) as tmp:
+                for chunk in response.iter_content(chunk_size=8192):
+                    if chunk:
+                        sha256_hash.update(chunk)
+                        tmp.write(chunk)
+                tmp_path = Path(tmp.name)
+
+        actual_sha256 = sha256_hash.hexdigest()
         if actual_sha256 != expected_sha256:
-            bundle_path.unlink(missing_ok=True)
+            tmp_path.unlink(missing_ok=True)
             raise ChileHubDataError(
                 f"Checksum mismatch for {DEFAULT_BUNDLE_NAME}: "
                 f"expected {expected_sha256}, got {actual_sha256}"
             )
+
+        # Renombrar atómicamente al path final solo si el hash coincide
+        tmp_path.replace(bundle_path)
 
         self._extract_bundle(bundle_path)
         if not (self.normalized_dir / "dataset_catalog.json").exists():
