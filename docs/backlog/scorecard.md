@@ -2,14 +2,14 @@
 
 **Ultima actualizacion:** 2026-06-19
 **Revision semanal:** viernes
-**Version del proyecto:** v1.5.0 (Alpha)
-**Estado general:** En desarrollo activo
+**Version del proyecto:** ver `pyproject.toml` (fuente unica de verdad) · etapa Alpha
+**Estado general:** En desarrollo activo · Progreso total: 21% (1/7 completada, 1/7 en progreso)
 
 ---
 
 ## Resumen ejecutivo
 
-ChileHub (v1.5.0 Alpha) es una libreria Python open-source que cura, normaliza, valida
+ChileHub (Alpha) es una libreria Python open-source que cura, normaliza, valida
 y publica ~15 datasets oficiales de Chile. El proyecto se encuentra en etapa temprana:
 el modulo `build_dev_db.py` concentra 3206 lineas (God module), la validacion de
 contratos JSON Schema existe pero solo se ejecuta en `scripts/verify_pipeline.py`
@@ -28,7 +28,7 @@ Las 5 mejoras que siguen atacan estos puntos en orden de impacto estrategico.
 | 1 | Refactorizar `build_dev_db.py` en modulos `src/builders/` | Alto | Alto | Medio | Pendiente | Q3 2026 | Tests de validacion existentes (`tests/test_pipeline_logic.py`) |
 | 2 | Validacion de contratos JSON Schema en runtime | Alto | Medio | Bajo | Pendiente | Q3 2026 | Quick win tests (`tests/test_validation.py`) |
 | 3 | Constantes de datasets como enum (`Dataset`) | Medio | Medio | Bajo | Pendiente | Q3 2026 | — |
-| 4 | Estabilizacion de datasets en modo fallback | Alto | Alto | Medio | Pendiente | Q3 2026 | Acceso a fuentes origen (URLs externas) |
+| 4 | Estabilizacion de datasets en modo fallback | Alto | Alto | Medio | En progreso | Q3 2026 | Acceso a fuentes origen (URLs externas) |
 | 5 | Dashboard publico de salud operativa del hub | Medio | Medio | Bajo | Pendiente | Q4 2026 | #4 completado (para no mostrar falsos positivos) |
 | 6 | Robustecer manejo de errores en API publica | Medio | Bajo | Bajo | Completado | 2026-06-19 | — |
 | 7 | Nuevas capacidades de API (cruces, validacion, busqueda) | Medio | Medio | Bajo | Pendiente | Futuro | #6 completado |
@@ -42,12 +42,12 @@ Las 5 mejoras que siguen atacan estos puntos en orden de impacto estrategico.
 | 1 | Refactor `build_dev_db.py` | 0% | 0% | 0% | 0% | 0% | 0% |
 | 2 | Validacion contratos runtime | 0% | 0% | 0% | 0% | 0% | 0% |
 | 3 | Constantes datasets | 0% | 0% | 0% | 0% | 0% | 0% |
-| 4 | Estabilizacion fallbacks | 0% | 0% | 0% | 0% | 0% | 0% |
+| 4 | Estabilizacion fallbacks | 80% | 30% | 0% | 0% | 0% | 0% |
 | 5 | Dashboard salud | 0% | 0% | 0% | 0% | 0% | 0% |
 | 6 | API error handling | 100% | 100% | 100% | 100% | 100% | 100% |
 | 7 | API capacidades | 100% | 0% | 0% | 0% | 0% | 0% |
 
-**Progreso total:** 14% (1/7 completadas — #6; #7 tiene plan de diseño completo)
+**Progreso total:** 21% (1/7 completada — #6; #4 en progreso con diagnostico e infraestructura completados; #7 tiene plan de diseno completo)
 
 ---
 
@@ -55,9 +55,19 @@ Las 5 mejoras que siguen atacan estos puntos en orden de impacto estrategico.
 
 ### Semana 1 — 2026-06-18
 - Scorecard creado. Pendiente de planificacion.
-- Proxima revision: 2026-06-25
 
-### Semana 2 — (placeholder)
+### Semana 2 — 2026-06-19
+- **#4 Estabilizacion fallbacks — Diagnostico e infraestructura completados:**
+  - Corregido `source_mode` engañoso en `source_adapter.py` (requiere `data_parsed=True` explicito)
+  - URLs alineadas entre extractores y `source_registry.json`
+  - SINIM `finanzas_municipales` degradado a candidate permanente (portal requiere JS/POST, sin API)
+  - MINEDUC `resultados_educacionales`: URLs de descarga directa confirmadas (Desvinculacion XLSX + Rendimiento RARs)
+  - SIEDU `indicadores_urbanos_siedu`: confirmado que el Excel esta tras JS tabs, inaccesible via HTTP fetch
+  - 4 Issues de GitHub actualizados con diagnosticos corregidos
+  - 358 tests pasan sin regresiones
+  - Ver `docs/backlog/NEXT_STEPS.md` para plan de siguientes pasos.
+- Proxima revision: 2026-06-26
+
 ### Semana 3 — (placeholder)
 ### Semana 4 — (placeholder)
 
@@ -74,3 +84,4 @@ Las 5 mejoras que siguen atacan estos puntos en orden de impacto estrategico.
 | 5 | `docs/backlog/05-dashboard-publico-salud.md` |
 | 6 | `docs/backlog/06-api-error-handling.md` |
 | 7 | `docs/backlog/07-api-capabilities.md` |
+| — | `docs/backlog/NEXT_STEPS.md` — Hoja de ruta y próximos pasos |
