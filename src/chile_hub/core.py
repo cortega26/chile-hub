@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 import polars as pl
+import requests
 
 from .data_manager import ChileHubDataManager
 from .exceptions import (
@@ -764,6 +765,83 @@ class ChileHub:
         """Devuelve el reporte de madurez de fuente por dataset."""
         return self._load_source_readiness()
 
+    def check_sources(self, timeout: int = 5) -> list[dict[str, Any]]:
+        """Verifica la conectividad de red con las fuentes de datos oficiales."""
+        results = []
+        for entry in self.catalog.get("datasets", []):
+            dataset = entry.get("dataset")
+            url = entry.get("source_url")
+            source_name = entry.get("source_name")
+            if not url:
+                results.append(
+                    {
+                        "dataset": dataset,
+                        "source_name": source_name,
+                        "url": "N/A",
+                        "status": "offline",
+                        "status_code": None,
+                        "latency_ms": None,
+                        "error": "No source URL defined",
+                    }
+                )
+                continue
+
+            try:
+                # Intenta HEAD primero
+                response = requests.head(url, timeout=timeout, allow_redirects=True)
+                if response.status_code >= 400:
+                    response = requests.get(url, timeout=timeout, stream=True)
+
+                status = "online" if response.status_code < 400 else "offline"
+                status_code = response.status_code
+                latency_ms = round(response.elapsed.total_seconds() * 1000, 2)
+                error = None
+            except Exception as e:
+                status = "offline"
+                status_code = None
+                latency_ms = None
+                error = type(e).__name__
+
+            results.append(
+                {
+                    "dataset": dataset,
+                    "source_name": source_name,
+                    "url": url,
+                    "status": status,
+                    "status_code": status_code,
+                    "latency_ms": latency_ms,
+                    "error": error,
+                }
+            )
+        return results
+
+    def check_sources_table(self, results: list[dict[str, Any]]) -> str:
+        """Formatea el resultado de check_sources como una tabla amigable para terminal."""
+        lines = ["chile-hub check-sources", ""]
+        lines.append("dataset      status   code  latency    source name         url")
+        lines.append(
+            "-----------  -------  ----  ---------  ------------------  ------------------------------------------------"
+        )
+        for entry in results:
+            status = entry.get("status", "unknown")
+            code = str(entry.get("status_code")) if entry.get("status_code") is not None else "N/A"
+            latency = (
+                f"{entry.get('latency_ms')}ms" if entry.get("latency_ms") is not None else "N/A"
+            )
+            url = entry.get("url", "N/A")
+            if len(url) > 48:
+                url = url[:45] + "..."
+
+            lines.append(
+                f"{entry.get('dataset', 'unknown'):<11}  "
+                f"{status:<7}  "
+                f"{code:<4}  "
+                f"{latency:<9}  "
+                f"{entry.get('source_name', 'unknown'):<18}  "
+                f"{url}"
+            )
+        return "\n".join(lines) + "\n"
+
     def dataset_quality(self):
         """Devuelve la tarjeta de puntuación de calidad multidimensional por dataset."""
         return self._load_dataset_quality()
@@ -1379,6 +1457,39 @@ def build_parser():
         default="json",
         help="Formato de salida del summary",
     )
+
+    export_parser = subparsers.add_parser(
+        "export", help="Exportar un dataset a un archivo (CSV, JSON o Parquet)"
+    )
+    export_parser.add_argument("dataset", help="Nombre del dataset a exportar")
+    export_parser.add_argument(
+        "--format",
+        choices=["csv", "json", "parquet"],
+        required=True,
+        help="Formato del archivo de salida",
+    )
+    export_parser.add_argument(
+        "--output",
+        required=True,
+        help="Ruta de destino del archivo exportado",
+    )
+
+    check_sources_parser = subparsers.add_parser(
+        "check-sources",
+        help="Verificar el estado de conexión de las fuentes externas oficiales",
+    )
+    check_sources_parser.add_argument(
+        "--format",
+        choices=["json", "table"],
+        default="table",
+        help="Formato de salida de check-sources",
+    )
+    check_sources_parser.add_argument(
+        "--timeout",
+        type=int,
+        default=5,
+        help="Timeout en segundos para la conexión HTTP",
+    )
     return parser
 
 
@@ -1411,6 +1522,30 @@ def _main(argv=None):
             return
 
     hub = ChileHub()
+
+    if args.command == "export":
+        df = hub.load_polars(args.dataset)
+        out_path = Path(args.output)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        if args.format == "csv":
+            df.write_csv(out_path)
+        elif args.format == "json":
+            df.write_json(out_path, row_oriented=True)
+        elif args.format == "parquet":
+            df.write_parquet(out_path)
+        print(
+            f"Dataset '{args.dataset}' exportado exitosamente a '{args.output}' ({args.format.upper()})"
+        )
+        return
+
+    if args.command == "check-sources":
+        timeout = getattr(args, "timeout", 5)
+        results = hub.check_sources(timeout=timeout)
+        if args.format == "table":
+            print(hub.check_sources_table(results), end="")
+        else:
+            print(json.dumps(results, ensure_ascii=False, indent=2))
+        return
 
     if args.command == "list":
         for dataset in hub.list_datasets():

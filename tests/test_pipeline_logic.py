@@ -87,7 +87,10 @@ def _pinned_pyproject_dependencies():
     dependencies.extend(pyproject["project"]["optional-dependencies"]["pipeline"])
     pinned = {}
     for dependency in dependencies:
-        package_name, version = dependency.split("==", 1)
+        if ">=" in dependency:
+            package_name, version = dependency.split(">=", 1)
+        else:
+            package_name, version = dependency.split("==", 1)
         pinned[package_name.lower().replace("_", "-")] = version
     return pinned
 

@@ -35,12 +35,13 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Information Analysis",
 ]
 dependencies = [
-    "polars==1.41.2",
+    "polars>=1.41.2",
     # Required by Polars DataFrame.to_pandas() during artifact builds.
-    "pyarrow==24.0.0",
-    "requests==2.34.2",
-    "platformdirs==4.10.0",
+    "pyarrow>=24.0.0",
+    "requests>=2.34.2",
+    "platformdirs>=4.10.0",
 ]
+
 
 [project.optional-dependencies]
 pipeline = [

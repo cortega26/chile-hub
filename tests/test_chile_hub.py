@@ -1293,6 +1293,21 @@ class ChileHubCliTests(unittest.TestCase):
         self.assertIn("dataset      drift      mode", result.stdout)
         self.assertIn("indicadores", result.stdout)
 
+    def test_cli_export(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            out_file = os.path.join(tmpdir, "regiones_export.csv")
+            result = self.run_cli("export", "regiones", "--format", "csv", "--output", out_file)
+            self.assertIn("exportado exitosamente", result.stdout)
+            self.assertTrue(os.path.exists(out_file))
+            with open(out_file, encoding="utf-8") as f:
+                content = f.read()
+            self.assertIn("codigo_region", content)
+
+    def test_cli_check_sources(self):
+        result = self.run_cli("check-sources", "--timeout", "2", "--format", "table")
+        self.assertIn("chile-hub check-sources", result.stdout)
+        self.assertIn("dataset      status", result.stdout)
+
 
 class WorkflowContractTests(unittest.TestCase):
     CRITICAL_STEP_NAMES_IN_ORDER: ClassVar[list[str]] = [
