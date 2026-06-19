@@ -134,6 +134,7 @@ jobs:
           files: coverage.xml
           flags: unittests
           fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Generate pipeline status
         run: python scripts/pipeline_status.py
