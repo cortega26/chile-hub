@@ -84,36 +84,37 @@ def fetch_workbook():
 
 
 def parse_workbook(path):
-    with openpyxl.load_workbook(path, read_only=True, data_only=True) as workbook:
-        records = {}
-        for row in workbook["2"].iter_rows(min_row=5, values_only=True):
-            if not row[4] or int(row[4]) == 0:
-                continue
-            code = str(int(row[4])).zfill(5)
-            records[code] = {
-                "codigo_region": str(int(row[0])).zfill(2),
-                "nombre_region": row[1],
-                "codigo_provincia": str(int(row[2])).zfill(3),
-                "nombre_provincia": row[3],
-                "codigo_comuna": code,
-                "nombre_comuna": row[5],
-                "viviendas_censadas": int(row[6]),
-                "viviendas_particulares_ocupadas": int(row[7]),
-                "viviendas_particulares_desocupadas": int(row[8]),
-                "viviendas_colectivas": int(row[9]),
+    workbook = openpyxl.load_workbook(path, read_only=True, data_only=True)
+    records = {}
+    for row in workbook["2"].iter_rows(min_row=5, values_only=True):
+        if not row[4] or int(row[4]) == 0:
+            continue
+        code = str(int(row[4])).zfill(5)
+        records[code] = {
+            "codigo_region": str(int(row[0])).zfill(2),
+            "nombre_region": row[1],
+            "codigo_provincia": str(int(row[2])).zfill(3),
+            "nombre_provincia": row[3],
+            "codigo_comuna": code,
+            "nombre_comuna": row[5],
+            "viviendas_censadas": int(row[6]),
+            "viviendas_particulares_ocupadas": int(row[7]),
+            "viviendas_particulares_desocupadas": int(row[8]),
+            "viviendas_colectivas": int(row[9]),
+        }
+    for row in workbook["6"].iter_rows(min_row=5, values_only=True):
+        if len(row) < 8:
+            continue
+        if not row[4] or int(row[4]) == 0:
+            continue
+        code = str(int(row[4])).zfill(5)
+        records[code].update(
+            {
+                "hogares_censados": int(row[6]),
+                "promedio_personas_hogar": None if row[7] in ("-", None) else float(row[7]),
             }
-        for row in workbook["6"].iter_rows(min_row=5, values_only=True):
-            if len(row) < 8:
-                continue
-            if not row[4] or int(row[4]) == 0:
-                continue
-            code = str(int(row[4])).zfill(5)
-            records[code].update(
-                {
-                    "hogares_censados": int(row[6]),
-                    "promedio_personas_hogar": None if row[7] in ("-", None) else float(row[7]),
-                }
-            )
+        )
+    workbook.close()
     return pl.DataFrame(list(records.values())).sort("codigo_comuna")
 
 

@@ -78,36 +78,37 @@ def fetch_workbook() -> tuple[Path, str]:
 
 
 def parse_workbook(path: Path) -> pl.DataFrame:
-    with openpyxl.load_workbook(path, read_only=True, data_only=True) as workbook:
-        totals = {}
-        for row in workbook["2"].iter_rows(min_row=6, values_only=True):
-            if not row[4]:
-                continue
-            code = str(int(row[4])).zfill(5)
-            totals[code] = {
-                "codigo_region": str(int(row[0])).zfill(2),
-                "nombre_region": row[1],
-                "codigo_provincia": str(int(row[2])).zfill(3),
-                "nombre_provincia": row[3],
-                "codigo_comuna": code,
-                "nombre_comuna": row[5],
-                "poblacion_censada": int(row[6]),
-                "hombres": int(row[7]),
-                "mujeres": int(row[8]),
-                "razon_hombre_mujer": float(row[9]),
-                **{band: 0 for band in AGE_BANDS},
-            }
+    workbook = openpyxl.load_workbook(path, read_only=True, data_only=True)
+    totals = {}
+    for row in workbook["2"].iter_rows(min_row=6, values_only=True):
+        if not row[4]:
+            continue
+        code = str(int(row[4])).zfill(5)
+        totals[code] = {
+            "codigo_region": str(int(row[0])).zfill(2),
+            "nombre_region": row[1],
+            "codigo_provincia": str(int(row[2])).zfill(3),
+            "nombre_provincia": row[3],
+            "codigo_comuna": code,
+            "nombre_comuna": row[5],
+            "poblacion_censada": int(row[6]),
+            "hombres": int(row[7]),
+            "mujeres": int(row[8]),
+            "razon_hombre_mujer": float(row[9]),
+            **{band: 0 for band in AGE_BANDS},
+        }
 
-        for row in workbook["4"].iter_rows(min_row=6, values_only=True):
-            if not row[4]:
-                continue
-            code = str(int(row[4])).zfill(5)
-            if code not in totals:
-                continue
-            for band, labels in AGE_BANDS.items():
-                if row[6] in labels:
-                    totals[code][band] += int(row[7])
+    for row in workbook["4"].iter_rows(min_row=6, values_only=True):
+        if not row[4]:
+            continue
+        code = str(int(row[4])).zfill(5)
+        if code not in totals:
+            continue
+        for band, labels in AGE_BANDS.items():
+            if row[6] in labels:
+                totals[code][band] += int(row[7])
 
+    workbook.close()
     return pl.DataFrame(list(totals.values())).sort("codigo_comuna")
 
 

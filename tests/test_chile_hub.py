@@ -1311,7 +1311,7 @@ class ChileHubCliTests(unittest.TestCase):
 
 class WorkflowContractTests(unittest.TestCase):
     CRITICAL_STEP_NAMES_IN_ORDER: ClassVar[list[str]] = [
-        "Extract source data",
+        "Extract source data (conditional)",
         "Build outputs",
         "Verify pipeline artifacts",
         "Run unit and contract tests",
