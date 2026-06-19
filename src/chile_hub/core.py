@@ -13,6 +13,7 @@ import requests
 
 from .data_manager import ChileHubDataManager
 from .exceptions import (
+    ChileHubDataError,
     ChileHubDatasetError,
     ChileHubError,
     ChileHubExampleError,
@@ -71,8 +72,16 @@ class ChileHub:
         self._df_cache: dict[str, pl.DataFrame] = {}
 
     def _load_catalog(self) -> dict[str, Any]:
-        with self.catalog_path.open("r", encoding="utf-8") as f:
-            return json.load(f)
+        try:
+            with self.catalog_path.open("r", encoding="utf-8") as f:
+                return json.load(f)
+        except FileNotFoundError:
+            raise ChileHubDataError(
+                f"Catálogo de datasets no encontrado en {self.catalog_path}. "
+                f"Usa ChileHub() sin argumentos para descargar el bundle automáticamente, "
+                f"o asegúrate de que el directorio '{self.catalog_path.parent}' contiene "
+                f"los datos normalizados (ejecuta 'make build' si estás en desarrollo)."
+            )
 
     def _load_json_artifact(self, filename: str) -> dict[str, Any]:
         with (self.normalized_dir / filename).open("r", encoding="utf-8") as f:
@@ -212,6 +221,10 @@ class ChileHub:
 
     def get_output_path(self, dataset_name: str, output_type: str = "parquet") -> Path:
         dataset = self.get_dataset(dataset_name)
+        # Resolver alias: si el dataset apunta a otro, usar el canónico
+        alias_for = dataset.get("alias_for")
+        if alias_for:
+            return self.get_output_path(alias_for, output_type)
         outputs = dataset.get("outputs", {})
         if output_type not in outputs:
             available_outputs = sorted(outputs.keys())
@@ -814,12 +827,14 @@ class ChileHub:
                 # Intenta HEAD primero
                 response = requests.head(url, timeout=timeout, allow_redirects=True)
                 if response.status_code >= 400:
+                    response.close()
                     response = requests.get(url, timeout=timeout, stream=True)
 
                 status = "online" if response.status_code < 400 else "offline"
                 status_code = response.status_code
                 latency_ms = round(response.elapsed.total_seconds() * 1000, 2)
                 error = None
+                response.close()
             except Exception as e:
                 status = "offline"
                 status_code = None
