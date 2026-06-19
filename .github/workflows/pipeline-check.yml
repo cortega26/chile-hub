@@ -139,6 +139,9 @@ jobs:
       - name: Generate pipeline status
         run: python scripts/pipeline_status.py
 
+      - name: Generate freshness badge
+        run: python scripts/generate_freshness_badge.py
+
       - name: Publish job summary
         run: |
           for report in \

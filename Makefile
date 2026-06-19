@@ -151,7 +151,10 @@ package-smoke: package-check
 
 check: build verify test verify-landing lint format-check
 
-refresh: extract build verify test verify-landing lint format-check
+freshness-badge:
+	$(PYTHON) scripts/generate_freshness_badge.py
+
+refresh: extract build verify test verify-landing lint format-check freshness-badge
 
 status:
 	$(PYTHON) scripts/pipeline_status.py
