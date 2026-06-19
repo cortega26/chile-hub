@@ -21,7 +21,14 @@ SRC_DIR = ROOT_DIR / "src"
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
-from chile_hub import ChileHub, ChileHubDatasetError, ChileHubExampleError, ChileHubOutputError
+from chile_hub import (
+    ChileHub,
+    ChileHubDataError,
+    ChileHubDatasetError,
+    ChileHubExampleError,
+    ChileHubOutputError,
+)
+from chile_hub.data_manager import ChileHubDataManager
 from src.validation import validate_indicadores
 
 # ── Staleness guard ───────────────────────────────────────────────────────────
@@ -164,6 +171,60 @@ class ChileHubTests(unittest.TestCase):
         self.assertIn("codigo_sociedad", df.columns)
         # Verificar que los RUT son strings con formato esperado
         self.assertEqual(df["rut"].dtype, pl.String)
+
+    def test_load_polars_missing_dataset(self):
+        """load_polars con dataset inexistente lanza ChileHubDatasetError."""
+        with self.assertRaises(ChileHubDatasetError) as ctx:
+            self.hub.load_polars("dataset_inexistente")
+        self.assertIn("dataset_inexistente", str(ctx.exception))
+
+    def test_load_polars_corrupt_parquet(self):
+        """load_polars con Parquet corrupto lanza ChileHubDatasetError."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            # Crear un catálogo mínimo y un Parquet inválido
+            catalog = {
+                "datasets": [
+                    {
+                        "dataset": "corrupto",
+                        "outputs": {"parquet": "corrupto.parquet"},
+                    }
+                ],
+                "dataset_count": 1,
+            }
+            catalog_path = Path(tmpdir) / "dataset_catalog.json"
+            catalog_path.write_text(json.dumps(catalog))
+            (Path(tmpdir) / "corrupto.parquet").write_text("esto no es parquet")
+
+            hub = ChileHub(data_dir=tmpdir)
+            with self.assertRaises(ChileHubDatasetError) as ctx:
+                hub.load_polars("corrupto")
+            self.assertIn("corrupto", str(ctx.exception))
+
+    def test_init_missing_catalog(self):
+        """Constructor con data_dir inexistente lanza ChileHubDataError."""
+        with self.assertRaises(ChileHubDataError) as ctx:
+            ChileHub(data_dir="/tmp/no_existe_chile_hub_test")
+        self.assertIn("Catálogo de datasets no encontrado", str(ctx.exception))
+
+    def test_cache_clear_safety(self):
+        """clear() con ruta fuera del cache esperado lanza ChileHubDataError."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            os.environ["CHILE_HUB_CACHE_DIR"] = tmpdir
+            try:
+                # Si la ruta no está bajo user_cache_dir, debe lanzar error
+                from platformdirs import user_cache_dir
+
+                expected = user_cache_dir("chile-hub")
+                if not str(Path(tmpdir).resolve()).startswith(str(Path(expected).resolve())):
+                    with self.assertRaises(ChileHubDataError) as ctx:
+                        ChileHubDataManager().clear()
+                    self.assertIn("Por seguridad", str(ctx.exception))
+                else:
+                    # Si por alguna razón está dentro, clear debería funcionar
+                    manager = ChileHubDataManager()
+                    manager.clear()
+            finally:
+                del os.environ["CHILE_HUB_CACHE_DIR"]
 
     def test_summary_statuses(self):
         summary = self.hub.summary()
