@@ -144,7 +144,18 @@ class ChileHubDataManager:
         return self.normalized_dir
 
     def clear(self) -> None:
-        shutil.rmtree(self.cache_root, ignore_errors=True)
+        # Validar que cache_root es un subdirectorio esperado
+        expected_parent = user_cache_dir("chile-hub")
+        cache_path = Path(self.cache_root).resolve()
+        if not str(cache_path).startswith(str(Path(expected_parent).resolve())):
+            raise ChileHubDataError(
+                f"Por seguridad, 'cache clear' solo opera dentro del directorio de cache "
+                f"esperado ({expected_parent}). El directorio configurado es {cache_path}. "
+                f"Verifica la variable de entorno CHILE_HUB_CACHE_DIR."
+            )
+        if not cache_path.exists():
+            return  # nothing to clear
+        shutil.rmtree(str(cache_path))
 
     def _resolve_release(self) -> dict[str, Any]:
         suffix = (
