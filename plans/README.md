@@ -14,9 +14,8 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 | # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
 |---|------|----------|----------|--------|-----------|--------|
 | 011 | [Robustecer manejo de errores en API pública](011-harden-api-error-handling.md) | P1 | S | LOW | — | DONE |
-| 017 | [Nuevas capacidades de API — cruces, validación, exit codes, búsqueda](017-new-api-capabilities.md) | P3 | M | LOW | 011 | BACKLOG |
 
-→ Ver también [`docs/backlog/06-api-error-handling.md`](../docs/backlog/06-api-error-handling.md) y [`docs/backlog/07-api-capabilities.md`](../docs/backlog/07-api-capabilities.md)
+→ Ver también [`docs/backlog/06-api-error-handling.md`](../docs/backlog/06-api-error-handling.md)
 
 ## Planes archivados (auditoría 2026-06-19, ejecutados)
 
@@ -26,6 +25,7 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 | 013 | [Cache en memoria para la API de ChileHub](archive/013-api-performance-caching.md) | S | LOW | DONE |
 | 015 | [Robustez de tests — HTTP mocking, CLI coverage, assertions](archive/015-test-robustness.md) | M | LOW | DONE |
 | 016 | [Cache de staging en CI](archive/016-ci-staging-cache.md) | S | MED | DONE |
+| 017 | [Nuevas capacidades de API — cruces, validación, exit codes, búsqueda](017-new-api-capabilities.md) | M | LOW | DONE |
 
 ## Planes archivados (auditoría 2026-06-13, completados)
 
