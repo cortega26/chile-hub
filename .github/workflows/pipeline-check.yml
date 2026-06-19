@@ -88,20 +88,46 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y unrar
 
-      - name: Extract source data
+      - name: Set date key
+        id: date-key
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: echo "stamp=$(date +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache staging data
+        id: cache-staging
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: |
+            data/staging/
+            data/raw/
+          key: staging-data-${{ steps.date-key.outputs.stamp }}-${{ hashFiles('.github/workflows/pipeline-check.yml') }}
+          restore-keys: |
+            staging-data-${{ steps.date-key.outputs.stamp }}-
+            staging-data-
+
+      - name: Extract source data (conditional)
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: |
-          python src/extractors/subdere_extractor.py
-          python src/extractors/bcentral_extractor.py
-          python src/extractors/censo_extractor.py
-          python src/extractors/censo_hogares_viviendas_extractor.py
-          python src/extractors/salud_extractor.py
-          python src/extractors/electoral_extractor.py
-          python src/extractors/mineduc_establecimientos_extractor.py
-          python src/extractors/sinim_finanzas_extractor.py
-          python src/extractors/mineduc_resultados_extractor.py
-          python src/extractors/siedu_extractor.py
-          python src/extractors/res_extractor.py
+          if [ "${{ steps.cache-staging.outputs.cache-hit }}" = "true" ]; then
+            echo "Cache de staging encontrado. Ejecutando solo extractores de alta frecuencia..."
+            python src/extractors/bcentral_extractor.py
+            python src/extractors/res_extractor.py
+            # Los demás extractores usan datos cacheados de data/staging/ y data/raw/
+          else
+            echo "Cache no encontrado. Ejecutando extracción completa..."
+            python src/extractors/subdere_extractor.py
+            python src/extractors/bcentral_extractor.py
+            python src/extractors/censo_extractor.py
+            python src/extractors/censo_hogares_viviendas_extractor.py
+            python src/extractors/salud_extractor.py
+            python src/extractors/electoral_extractor.py
+            python src/extractors/mineduc_establecimientos_extractor.py
+            python src/extractors/sinim_finanzas_extractor.py
+            python src/extractors/mineduc_resultados_extractor.py
+            python src/extractors/siedu_extractor.py
+            python src/extractors/res_extractor.py
+          fi
 
       - name: Build outputs
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
