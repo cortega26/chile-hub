@@ -40,7 +40,7 @@ RAW_DIR = DATA_DIR / "raw"
 STAGING_DIR = DATA_DIR / "staging"
 STAGING_CSV_PATH = STAGING_DIR / "resultados_educacionales.csv"
 METADATA_PATH = STAGING_DIR / "resultados_educacionales.metadata.json"
-SOURCE_URL = "https://centroestudios.mineduc.cl/datos-abiertos/"
+SOURCE_URL = "https://datosabiertos.mineduc.cl/"
 
 REUSE_POLICY = {
     "status": "open-attribution",
@@ -89,13 +89,17 @@ def fetch_data(source_url: str = SOURCE_URL) -> tuple[list[dict[str, Any]], str,
     """Obtiene datos desde MINEDUC, con fallback a filas curadas."""
     ensure_staging_directories()
     notes: list[str] = ["privacy_safe_comuna_year_aggregation"]
-    success, _content, note = fetch_url_snapshot(source_url, RAW_DIR, "mineduc_resultados")
+    success, _content, note, data_parsed = fetch_url_snapshot(
+        source_url, RAW_DIR, "mineduc_resultados"
+    )
     notes.append(note)
-    if success:
+    # data_parsed es False porque el HTML de la landing page no se procesa.
+    # Se requiere descarga de archivos RAR concretos y agregación estudiante→comuna.
+    if data_parsed:
         notes.append(fallback_metadata_note("until_direct_outcome_dump_is_configured"))
     else:
         notes.append(fallback_metadata_note("official_landing_fetch_failed"))
-    source_mode = source_mode_from_live_success(success)
+    source_mode = source_mode_from_live_success(success, data_parsed)
     return FALLBACK_ROWS, source_mode, source_url, notes
 
 

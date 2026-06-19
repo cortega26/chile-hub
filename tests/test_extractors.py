@@ -646,12 +646,13 @@ class SourceAdapterTests(unittest.TestCase):
 
             with tempfile.TemporaryDirectory() as tmp:
                 raw_dir = Path(tmp) / "raw"
-                success, content, note = fetch_url_snapshot(
+                success, content, note, data_parsed = fetch_url_snapshot(
                     "https://example.com/data", raw_dir, "test_dataset"
                 )
                 self.assertTrue(success)
                 self.assertEqual(content, mock_content)
                 self.assertEqual(note, "official_landing_snapshot_saved")
+                self.assertFalse(data_parsed)  # snapshot crudo, no procesado aún
                 # Verifica que el snapshot se guardó en disco
                 snapshots = list(raw_dir.glob("test_dataset_*.html"))
                 self.assertEqual(len(snapshots), 1)
@@ -666,20 +667,26 @@ class SourceAdapterTests(unittest.TestCase):
         ):
             with tempfile.TemporaryDirectory() as tmp:
                 raw_dir = Path(tmp) / "raw"
-                success, content, note = fetch_url_snapshot(
+                success, content, note, data_parsed = fetch_url_snapshot(
                     "https://example.com/data", raw_dir, "test_dataset"
                 )
                 self.assertFalse(success)
                 self.assertIsNone(content)
                 self.assertIn("official_landing_unavailable", note)
                 self.assertIn("timeout", note)
+                self.assertFalse(data_parsed)
 
     def test_source_mode_from_live_success(self):
         """source_mode_from_live_success: True → live, False → fallback."""
         from src.extractors.source_adapter import source_mode_from_live_success
 
-        self.assertEqual(source_mode_from_live_success(True), "live")
+        # Sin data_parsed, incluso HTTP exitoso es fallback (snapshot no procesado)
+        self.assertEqual(source_mode_from_live_success(True), "fallback")
         self.assertEqual(source_mode_from_live_success(False), "fallback")
+        # Solo cuando success=True Y data_parsed=True se considera live genuino
+        self.assertEqual(source_mode_from_live_success(True, data_parsed=True), "live")
+        self.assertEqual(source_mode_from_live_success(False, data_parsed=True), "fallback")
+        self.assertEqual(source_mode_from_live_success(True, data_parsed=False), "fallback")
 
     def test_fallback_metadata_note(self):
         """fallback_metadata_note produce nota con prefijo estandarizado."""

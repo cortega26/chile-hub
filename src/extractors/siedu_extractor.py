@@ -40,7 +40,7 @@ RAW_DIR = DATA_DIR / "raw"
 STAGING_DIR = DATA_DIR / "staging"
 STAGING_CSV_PATH = STAGING_DIR / "indicadores_urbanos_siedu.csv"
 METADATA_PATH = STAGING_DIR / "indicadores_urbanos_siedu.metadata.json"
-SOURCE_URL = "https://www.ine.gob.cl/herramientas/portal-de-mapas/siedu"
+SOURCE_URL = "https://siedu.ine.cl/"
 
 REUSE_POLICY = {
     "status": "open-attribution",
@@ -125,13 +125,15 @@ def fetch_data(source_url: str = SOURCE_URL) -> tuple[list[dict[str, Any]], str,
     """Obtiene datos desde SIEDU, con fallback a filas curadas."""
     ensure_staging_directories()
     notes: list[str] = ["partial_urban_coverage_expected"]
-    success, _content, note = fetch_url_snapshot(source_url, RAW_DIR, "siedu")
+    success, _content, note, data_parsed = fetch_url_snapshot(source_url, RAW_DIR, "siedu")
     notes.append(note)
-    if success:
+    # data_parsed es False porque el HTML del portal de mapas no se procesa.
+    # Se requiere descarga del Excel Matriz de Indicadores desde siedu.ine.cl.
+    if data_parsed:
         notes.append(fallback_metadata_note("until_download_matrix_is_configured"))
     else:
         notes.append(fallback_metadata_note("official_landing_fetch_failed"))
-    source_mode = source_mode_from_live_success(success)
+    source_mode = source_mode_from_live_success(success, data_parsed)
     return FALLBACK_ROWS, source_mode, source_url, notes
 
 

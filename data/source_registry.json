@@ -215,7 +215,8 @@
     "review_by": "2026-09-18",
     "stalled_after_days": 90,
     "owner": "core",
-    "next_action": "Configure stable direct SINIM export and replace curated fallback rows.",
+    "degradation_reason": "sinim_portal_requires_js_session_no_api_available",
+    "next_action": "Buscar fuente alternativa: SUBDERE directa, Portal de Transparencia, o datos.gob.cl. Ver docs/datasets/finanzas_municipales-degradacion.md.",
     "publication_track": "candidate",
     "public_bundle_eligible": false
   },
@@ -243,7 +244,7 @@
     "source_id": "ine_siedu_indicadores",
     "dataset": "indicadores_urbanos_siedu",
     "source_name": "INE / SIEDU",
-    "official_url": "https://www.ine.gob.cl/",
+    "official_url": "https://siedu.ine.cl/",
     "access_method": "landing_snapshot",
     "license_status": "open-attribution",
     "live_extractor_status": "fallback_only",

@@ -92,13 +92,17 @@ def fetch_data(source_url: str = SOURCE_URL) -> tuple[list[dict[str, Any]], str,
     """Obtiene datos desde SINIM, con fallback a filas curadas."""
     ensure_staging_directories()
     notes: list[str] = []
-    success, _content, note = fetch_url_snapshot(source_url, RAW_DIR, "sinim_finanzas_municipales")
+    success, _content, note, data_parsed = fetch_url_snapshot(
+        source_url, RAW_DIR, "sinim_finanzas_municipales"
+    )
     notes.append(note)
-    if success:
+    # data_parsed es False porque el contenido HTML no se procesa como datos tabulares.
+    # El portal SINIM requiere simulación de formulario JS/POST; no es scrapeable vía GET.
+    if data_parsed:
         notes.append(fallback_metadata_note("until_stable_direct_export_is_configured"))
     else:
         notes.append(fallback_metadata_note("official_landing_fetch_failed"))
-    source_mode = source_mode_from_live_success(success)
+    source_mode = source_mode_from_live_success(success, data_parsed)
     return FALLBACK_ROWS, source_mode, source_url, notes
 
 

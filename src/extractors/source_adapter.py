@@ -23,7 +23,7 @@ def fetch_url_snapshot(
     raw_dir: Path,
     raw_prefix: str,
     timeout: int = 30,
-) -> tuple[bool, bytes | None, str]:
+) -> tuple[bool, bytes | None, str, bool]:
     """Obtiene una URL y guarda el contenido crudo como snapshot con timestamp.
 
     Args:
@@ -33,10 +33,13 @@ def fetch_url_snapshot(
         timeout: Timeout HTTP en segundos.
 
     Returns:
-        Tupla (success, content, note) donde:
+        Tupla (success, content, note, data_parsed) donde:
         - success: True si la descarga y el guardado fueron exitosos.
         - content: Bytes crudos de la respuesta, o None si falló.
         - note: Nota descriptiva para incluir en los metadatos.
+        - data_parsed: False por defecto — el llamador debe sobrescribir
+          este valor si procesa el contenido y extrae datos reales.
+          Solo cuando data_parsed=True se considera extracción live genuina.
     """
     try:
         with requests.get(url, timeout=timeout) as response:
@@ -46,21 +49,26 @@ def fetch_url_snapshot(
         raw_path = raw_dir / f"{raw_prefix}_{stamp}.html"
         raw_path.parent.mkdir(parents=True, exist_ok=True)
         raw_path.write_bytes(content)
-        return True, content, "official_landing_snapshot_saved"
+        # data_parsed=False: el contenido se guardó como snapshot pero
+        # el llamador aún no lo ha procesado para extraer datos tabulares.
+        return True, content, "official_landing_snapshot_saved", False
     except Exception as exc:
-        return False, None, f"official_landing_unavailable: {exc}"
+        return False, None, f"official_landing_unavailable: {exc}", False
 
 
-def source_mode_from_live_success(success: bool) -> str:
+def source_mode_from_live_success(success: bool, data_parsed: bool = False) -> str:
     """Determina el source_mode según el éxito de la extracción live.
 
     Args:
         success: True si la fuente respondió correctamente.
+        data_parsed: True si el contenido se procesó y se extrajeron
+            datos tabulares reales (no solo un snapshot de landing page).
 
     Returns:
-        "live" si la extracción fue exitosa, "fallback" en caso contrario.
+        "live" si la extracción fue exitosa Y los datos fueron procesados,
+        "fallback" en caso contrario.
     """
-    return "live" if success else "fallback"
+    return "live" if (success and data_parsed) else "fallback"
 
 
 def fallback_metadata_note(reason: str) -> str:
