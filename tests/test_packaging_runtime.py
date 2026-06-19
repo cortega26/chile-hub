@@ -27,6 +27,10 @@ class _FakeResponse:
     def __exit__(self, exc_type, exc, tb):
         return False
 
+    def raise_for_status(self):
+        if self.status_code >= 400:
+            raise RuntimeError(f"HTTP {self.status_code}")
+
     def json(self):
         return self._payload
 
@@ -85,13 +89,14 @@ class PackagingRuntimeTests(unittest.TestCase):
                 },
             ],
         }
+        # update() descarga el checksum primero y luego el bundle
         session = _FakeSession(
             [
                 _FakeResponse(payload=release),
-                _FakeResponse(body=bundle),
                 _FakeResponse(
                     body=f"{sha256}  data/normalized/chile-hub-publishable-bundle.zip\n".encode()
                 ),
+                _FakeResponse(body=bundle),
             ]
         )
 
@@ -116,11 +121,12 @@ class PackagingRuntimeTests(unittest.TestCase):
                 },
             ],
         }
+        # update() descarga el checksum primero y luego el bundle
         session = _FakeSession(
             [
                 _FakeResponse(payload=release),
-                _FakeResponse(body=bundle),
                 _FakeResponse(body=b"0  data/normalized/chile-hub-publishable-bundle.zip\n"),
+                _FakeResponse(body=bundle),
             ]
         )
 
