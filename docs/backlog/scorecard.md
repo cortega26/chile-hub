@@ -1,9 +1,9 @@
 # Scorecard de Mejoras Estratégicas — ChileHub
 
-**Ultima actualizacion:** 2026-06-19
+**Ultima actualizacion:** 2026-06-19 (Issue #6 cerrado)
 **Revision semanal:** viernes
 **Version del proyecto:** ver `pyproject.toml` (fuente unica de verdad) · etapa Alpha
-**Estado general:** En desarrollo activo · Progreso total: 21% (1/7 completada, 1/7 en progreso)
+**Estado general:** En desarrollo activo · Progreso total: 29% (2/7 completadas, 1/7 en progreso)
 
 ---
 
@@ -42,12 +42,12 @@ Las 5 mejoras que siguen atacan estos puntos en orden de impacto estrategico.
 | 1 | Refactor `build_dev_db.py` | 0% | 0% | 0% | 0% | 0% | 0% |
 | 2 | Validacion contratos runtime | 0% | 0% | 0% | 0% | 0% | 0% |
 | 3 | Constantes datasets | 0% | 0% | 0% | 0% | 0% | 0% |
-| 4 | Estabilizacion fallbacks | 80% | 30% | 0% | 0% | 0% | 0% |
+| 4 | Estabilizacion fallbacks | 100% | 100% | 80% | 100% | 80% | 80% |
 | 5 | Dashboard salud | 0% | 0% | 0% | 0% | 0% | 0% |
 | 6 | API error handling | 100% | 100% | 100% | 100% | 100% | 100% |
 | 7 | API capacidades | 100% | 0% | 0% | 0% | 0% | 0% |
 
-**Progreso total:** 21% (1/7 completada — #6; #4 en progreso con diagnostico e infraestructura completados; #7 tiene plan de diseno completo)
+**Progreso total:** 29% (2/7 completadas — #6 y #4 MINEDUC; #4 en curso: SIEDU pendiente, `perfil_territorial` derivado live; #7 tiene plan de diseno completo)
 
 ---
 
@@ -66,6 +66,12 @@ Las 5 mejoras que siguen atacan estos puntos en orden de impacto estrategico.
   - 4 Issues de GitHub actualizados con diagnosticos corregidos
   - 358 tests pasan sin regresiones
   - Ver `docs/backlog/NEXT_STEPS.md` para plan de siguientes pasos.
+- **#4 MINEDUC completado — Issue #6 cerrado:**
+  - Extractor live implementado: `Rendimiento_2024.rar` (42MB) → CSV 3.5M filas → 345 registros por comuna
+  - `source_mode: "live"`, todos los campos del contrato cubiertos desde una sola fuente RAR
+  - `hub_health.json`: `fallback_count=0`, `live_count=15`
+  - `resultados_educacionales` promovido a `stable_publishable` en `source_registry.json`
+  - 410 tests pasan sin regresiones
 - Proxima revision: 2026-06-26
 
 ### Semana 3 — (placeholder)
