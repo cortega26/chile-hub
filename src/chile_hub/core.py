@@ -1,4 +1,5 @@
 import argparse
+import functools
 import importlib.metadata
 import json
 import sys
@@ -67,6 +68,7 @@ class ChileHub:
         self.normalized_dir = self.catalog_path.resolve().parent
         self.root_dir = self.normalized_dir.parents[1]
         self.catalog = self._load_catalog()
+        self._df_cache: dict[str, pl.DataFrame] = {}
 
     def _load_catalog(self) -> dict[str, Any]:
         with self.catalog_path.open("r", encoding="utf-8") as f:
@@ -76,36 +78,47 @@ class ChileHub:
         with (self.normalized_dir / filename).open("r", encoding="utf-8") as f:
             return json.load(f)
 
+    @functools.lru_cache(maxsize=1)
     def _load_artifact_manifest(self) -> dict[str, Any]:
         return self._load_json_artifact("artifact_manifest.json")
 
+    @functools.lru_cache(maxsize=1)
     def _load_hub_health(self) -> dict[str, Any]:
         return self._load_json_artifact("hub_health.json")
 
+    @functools.lru_cache(maxsize=1)
     def _load_hub_status(self) -> dict[str, Any]:
         return self._load_json_artifact("hub_status.json")
 
+    @functools.lru_cache(maxsize=1)
     def _load_dataset_status(self) -> dict[str, Any]:
         return self._load_json_artifact("dataset_status.json")
 
+    @functools.lru_cache(maxsize=1)
     def _load_dataset_changelog(self) -> dict[str, Any]:
         return self._load_json_artifact("dataset_changelog.json")
 
+    @functools.lru_cache(maxsize=1)
     def _load_hub_bundle(self) -> dict[str, Any]:
         return self._load_json_artifact("hub_bundle.json")
 
+    @functools.lru_cache(maxsize=1)
     def _load_redistribution_report(self) -> dict[str, Any]:
         return self._load_json_artifact("redistribution_report.json")
 
+    @functools.lru_cache(maxsize=1)
     def _load_provenance_report(self) -> dict[str, Any]:
         return self._load_json_artifact("provenance_report.json")
 
+    @functools.lru_cache(maxsize=1)
     def _load_drift_report(self) -> dict[str, Any]:
         return self._load_json_artifact("drift_report.json")
 
+    @functools.lru_cache(maxsize=1)
     def _load_source_readiness(self) -> dict[str, Any]:
         return self._load_json_artifact("source_readiness.json")
 
+    @functools.lru_cache(maxsize=1)
     def _load_dataset_quality(self) -> dict[str, Any]:
         return self._load_json_artifact("dataset_quality.json")
 
@@ -209,8 +222,19 @@ class ChileHub:
         return self.root_dir / outputs[output_type]
 
     def load_polars(self, dataset_name: str) -> pl.DataFrame:
+        if dataset_name in self._df_cache:
+            return self._df_cache[dataset_name]
         path = self.get_output_path(dataset_name, "parquet")
-        return pl.read_parquet(path)
+        try:
+            df = pl.read_parquet(path)
+        except FileNotFoundError:
+            raise ChileHubDatasetError(
+                f"Archivo Parquet no encontrado para '{dataset_name}': {path}"
+            )
+        except Exception as exc:
+            raise ChileHubDatasetError(f"Error al leer Parquet para '{dataset_name}': {exc}")
+        self._df_cache[dataset_name] = df
+        return df
 
     def example_usage(self, dataset_name: str, kind: str = "python") -> str:
         dataset = self.get_dataset(dataset_name)
