@@ -49,8 +49,11 @@ def registered_validation_keys() -> set[str]:
             isinstance(target, ast.Name) and target.id == "validations" for target in node.targets
         ):
             continue
+        # `validations` se asigna en dos lugares: el literal dict en
+        # `_compute_validations()` y la llamada `validations = _compute_validations(...)`
+        # en `main()`. Solo interesa el dict; las demás asignaciones se ignoran.
         if not isinstance(node.value, ast.Dict):
-            raise SystemExit("ERROR: build_dev_db.py validations assignment is not a dict")
+            continue
         keys.update(collect_validation_keys_from_dict(node.value))
     if not keys:
         raise SystemExit("ERROR: could not find validations = {...} in build_dev_db.py")

@@ -1,9 +1,9 @@
 # Scorecard de Mejoras Estratégicas — ChileHub
 
-**Ultima actualizacion:** 2026-06-19 (Issues #4, #6, #7 cerrados)
+**Ultima actualizacion:** 2026-06-20 (Mejora #1 completada — refactor de `build_dev_db.py`)
 **Revision semanal:** viernes
 **Version del proyecto:** ver `pyproject.toml` (fuente unica de verdad) · etapa Alpha
-**Estado general:** En desarrollo activo · Progreso total: 43% (3/7 completadas)
+**Estado general:** En desarrollo activo · Progreso total: 57% (4/7 completadas)
 
 ---
 
@@ -25,7 +25,7 @@ Las 5 mejoras que siguen atacan estos puntos en orden de impacto estrategico.
 
 | # | Mejora | Impacto | Esfuerzo | Riesgo | Estado | Target | Dependencias |
 |:--:|:---|:--:|:--:|:--:|:---|:---|:---|
-| 1 | Refactorizar `build_dev_db.py` en modulos `src/builders/` | Alto | Alto | Medio | Pendiente | Q3 2026 | Tests de validacion existentes (`tests/test_pipeline_logic.py`) |
+| 1 | Refactorizar `build_dev_db.py` en modulos `src/builders/` | Alto | Alto | Medio | Completado | 2026-06-20 | Tests de validacion existentes (`tests/test_pipeline_logic.py`) |
 | 2 | Validacion de contratos JSON Schema en runtime | Alto | Medio | Bajo | Pendiente | Q3 2026 | Quick win tests (`tests/test_validation.py`) |
 | 3 | Constantes de datasets como enum (`Dataset`) | Medio | Medio | Bajo | Pendiente | Q3 2026 | — |
 | 4 | Estabilizacion de datasets en modo fallback | Alto | Alto | Medio | Completado | 2026-06-19 | Acceso a fuentes origen (URLs externas) |
@@ -39,7 +39,7 @@ Las 5 mejoras que siguen atacan estos puntos en orden de impacto estrategico.
 
 | # | Mejora | Disenio | Prototipo | Implementacion | Tests | Documentacion | Despliegue |
 |:--:|:---|:--:|:--:|:--:|:--:|:--:|:--:|
-| 1 | Refactor `build_dev_db.py` | 0% | 0% | 0% | 0% | 0% | 0% |
+| 1 | Refactor `build_dev_db.py` | 100% | 100% | 100% | 100% | 100% | 100% |
 | 2 | Validacion contratos runtime | 0% | 0% | 0% | 0% | 0% | 0% |
 | 3 | Constantes datasets | 0% | 0% | 0% | 0% | 0% | 0% |
 | 4 | Estabilizacion fallbacks | 100% | 100% | 100% | 100% | 100% | 100% |
@@ -47,7 +47,7 @@ Las 5 mejoras que siguen atacan estos puntos en orden de impacto estrategico.
 | 6 | API error handling | 100% | 100% | 100% | 100% | 100% | 100% |
 | 7 | API capacidades | 100% | 0% | 0% | 0% | 0% | 0% |
 
-**Progreso total:** 43% (3/7 completadas — #6 MINEDUC, #4 Estabilizacion fallbacks, #7 API error handling; #7 API capacidades tiene plan completo)
+**Progreso total:** 57% (4/7 completadas — #4 Estabilizacion fallbacks, #6 API error handling, #1 Refactor `build_dev_db.py`; #7 API capacidades tiene plan completo)
 
 ---
 
@@ -80,7 +80,21 @@ Las 5 mejoras que siguen atacan estos puntos en orden de impacto estrategico.
 - **#4 Issue paraguas cerrado** — todos los datasets estabilizados
 - Proxima revision: 2026-06-26
 
-### Semana 3 — (placeholder)
+### Semana 3 — 2026-06-20
+- **#1 Refactor `build_dev_db.py` — Completado:**
+  - God module descompuesto de 2867 a 668 lineas (solo orquestacion).
+  - 9 modulos nuevos en `src/builders/`: `_shared`, `io_utils`, `formats`, `metadata`,
+    `reports`, `artifacts`, `datasets`, `catalog`, `landing`.
+  - `main()` descompuesto en 5 subfunciones (`_load_inputs`, `_compute_validations`,
+    `_write_data_artifacts`, `build_dataset_metadata`, `_generate_reports`) + orquestador delgado.
+  - Compatibilidad preservada: `DATASET_CATALOG_CONFIG` y funciones publicas re-exportadas
+    desde `build_dev_db` (no se rompe `scripts/verify_pipeline.py` ni los tests).
+  - Verificacion: 410 tests pasan, lint limpio, y el pipeline end-to-end produce
+    artefactos byte-identicos a la linea base salvo timestamps (criterio de aceptacion #5).
+  - Bug atrapado y corregido durante la verificacion: `return` perdido en
+    `attach_publishable_package_to_manifest` (el camino feliz de `main()` no tenia cobertura de tests).
+- Proxima revision: 2026-06-26
+
 ### Semana 4 — (placeholder)
 
 ---

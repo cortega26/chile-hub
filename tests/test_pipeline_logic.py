@@ -665,8 +665,8 @@ class PipelineLogicTests(unittest.TestCase):
             )
 
             with (
-                patch("src.build_dev_db.NORMALIZED_DIR", str(normalized_dir)),
-                patch("src.build_dev_db.DATA_DIR", str(data_dir)),
+                patch("src.builders.artifacts.NORMALIZED_DIR", str(normalized_dir)),
+                patch("src.builders.artifacts.DATA_DIR", str(data_dir)),
                 self.assertRaisesRegex(SystemExit, "no-existe.parquet"),
             ):
                 write_publishable_bundle_zip()

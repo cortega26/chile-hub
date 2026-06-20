@@ -1,7 +1,7 @@
 # Próximos pasos — ChileHub
 
-**Fecha:** 2026-06-19 (actualizado — Issue #7 cerrado)
-**Estado actual:** Alpha · 29% de backlog completado (#6 cerrado, #4 cerrado, #7 cerrado)
+**Fecha:** 2026-06-20 (actualizado — Mejora #1 completada)
+**Estado actual:** Alpha · 57% de backlog completado (#4, #6, #1 completadas)
 **Objetivo:** Cerrar backlogs en orden de impacto estratégico
 
 ---
@@ -11,7 +11,7 @@
 | # | Mejora | Estado actual | Progreso |
 |:--:|:---|:---|:--:|
 | 4 | Estabilización fallbacks | **Completado** ✓ | MINEDUC live (#6), SIEDU live (#7), SINIM degradado (#5) |
-| 1 | Refactor `build_dev_db.py` | Pendiente | 0% — 3206 líneas monolíticas |
+| 1 | Refactor `build_dev_db.py` | **Completado** ✓ | 2867 → 668 líneas; 9 módulos en `src/builders/` |
 | 2 | Contratos JSON Schema en runtime | Pendiente | 0% — contratos existen pero no se ejecutan en pipeline |
 | 3 | Constantes de datasets | Pendiente | 0% — strings mágicos en ~200 ubicaciones |
 | 5 | Dashboard público de salud | Pendiente | 0% — #4 ya completado, puede iniciarse |
@@ -34,32 +34,27 @@
 
 ---
 
-### 2. Refactorizar `build_dev_db.py` (#1) — Prioridad máxima tras #4
+### 2. ~~Refactorizar `build_dev_db.py` (#1)~~ ✅ COMPLETADO
 
-**Archivo:** `src/build_dev_db.py` — 3206 líneas, 60+ funciones, 1 solo módulo.
+**Resultado:** `build_dev_db.py` pasó de **2867 → 668 líneas** (solo orquestación). Se
+extrajeron 9 módulos a `src/builders/`:
 
-**Plan de extracción (de menor a mayor riesgo):**
+| Módulo | Líneas | Contenido |
+|:---|--:|:---|
+| `_shared.py` | 51 | Rutas, constantes, `DATASET_CATALOG_CONFIG` |
+| `io_utils.py` | 37 | Escritura atómica (JSON/Parquet/Excel), SHA-256 |
+| `formats.py` | 379 | `build_duckdb/sqlite/excel/flat_files` |
+| `metadata.py` | ~530 | Carga/validación + builders (freshness, degradación, cobertura, drift, enrich) + `build_dataset_metadata` |
+| `reports.py` | 724 | Builders de reportes/estados del hub |
+| `artifacts.py` | 432 | Índice de artefactos, manifiesto, bundles |
+| `datasets.py` | 128 | Perfil territorial + capas geográficas |
+| `catalog.py` | 89 | Metadata del pipeline + catálogo |
+| `landing.py` | 133 | Sincronización JSON-LD de la landing |
 
-| Módulo nuevo | Líneas origen | Contenido | Riesgo |
-|:---|:--:|:---|:--:|
-| `src/builders/write_parquet.py` | ~80 | `write_parquet_atomic()` | Bajo |
-| `src/builders/write_json.py` | ~60 | `write_json_atomic()` | Bajo |
-| `src/builders/build_duckdb.py` | ~150 | `build_duckdb()` | Bajo |
-| `src/builders/build_sqlite.py` | ~150 | `build_sqlite()` | Bajo |
-| `src/builders/build_excel.py` | ~200 | `build_excel()` | Bajo |
-| `src/builders/build_flat_files.py` | ~200 | `build_flat_files()` (Parquet + JSON) | Medio |
-| `src/builders/build_metadata.py` | ~300 | `validate_metadata_schema()`, metadata helpers | Medio |
-| `src/builders/build_reports.py` | ~500 | `build_hub_status()`, `build_provenance_report()`, etc. | Medio |
-| `src/builders/build_datasets.py` | ~800 | `build_perfil_territorial_comunal()` y builders de datasets derivados | Alto |
-| `src/build_dev_db.py` | ~600 | `main()`, orquestación, catálogo | — |
-
-**Estrategia:** Extraer de a un módulo por vez. Cada extracción:
-1. Mover funciones a `src/builders/<modulo>.py`
-2. Importar desde `build_dev_db.py`
-3. Correr `tests/test_pipeline_logic.py` (157 tests) + `tests/test_extractors.py` (54 tests)
-4. Commit atómico
-
-**Resultado esperado:** `build_dev_db.py` pasa de 3206 → ~600 líneas. Cada builder es testeable por separado.
+`main()` quedó descompuesto en 5 subfunciones (`_load_inputs`, `_compute_validations`,
+`_write_data_artifacts`, `build_dataset_metadata`, `_generate_reports`) más un orquestador
+delgado. Verificación: 410 tests pasan, lint limpio, y el pipeline produce artefactos
+byte-idénticos a la línea base salvo timestamps.
 
 ---
 
