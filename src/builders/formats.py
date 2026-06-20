@@ -55,7 +55,7 @@ def build_duckdb(
             "CREATE TABLE establecimientos_educacionales AS SELECT * FROM df_educacionales_view"
         )
         for table_name in extra_tables:
-            con.execute(f"CREATE TABLE {table_name} AS SELECT * FROM df_{table_name}_view")
+            con.execute(f"CREATE TABLE {table_name} AS SELECT * FROM df_{table_name}_view")  # nosec B608  # table_name from internal catalog dict, not user input
 
         # Agregar índices básicos para mejorar rendimiento en queries
         con.execute("CREATE UNIQUE INDEX idx_region_code ON regiones (codigo_region)")

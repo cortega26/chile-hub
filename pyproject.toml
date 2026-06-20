@@ -64,6 +64,7 @@ dev = [
     "pip-audit==2.10.1",
     "interrogate==1.7.0",
     "pytest-xdist==3.8.0",
+    "bandit==1.9.4",
 ]
 
 [project.scripts]
@@ -184,3 +185,11 @@ ignore-nested-classes = true
 fail-under = 0
 paths = ["src/chile_hub"]
 exclude = ["src/chile_hub/pipeline_status_utils.py", "src/chile_hub/__main__.py"]
+
+[tool.bandit]
+# Los extractores necesitan subprocess/HTTP/filesystem por diseño.
+# La superficie de ataque real está en la librería core y el pipeline.
+exclude_dirs = ["src/extractors", "tests", "scripts", "data"]
+# Umbral mínimo: solo falla en Medium o High.
+severity-level = "medium"
+confidence-level = "medium"

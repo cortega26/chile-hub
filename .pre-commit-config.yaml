@@ -39,3 +39,9 @@ repos:
         language: system
         pass_filenames: false
         files: ^src/chile_hub/
+      - id: bandit
+        name: bandit
+        entry: ./.venv/bin/bandit -c pyproject.toml -r src/
+        language: system
+        pass_filenames: false
+        files: ^src/
