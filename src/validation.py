@@ -479,8 +479,8 @@ def validate_perfil_territorial_comunal(
     metadata: dict[str, Any] | None,
     valid_commune_codes: list[str] | None = None,
 ) -> dict[str, Any]:
-    errors = []
-    warnings = []
+    errors: list[str] = []
+    warnings: list[str] = []
     if df.height != 346:
         errors.append(f"perfil_territorial_comunal expected 346 communes, found {df.height}")
     if df.height and df.height - df["codigo_comuna"].n_unique() > 0:
@@ -522,8 +522,8 @@ def validate_empresas(
     - Fechas dentro de rangos esperados (2013+)
     - Capital no negativo
     """
-    errors = []
-    warnings = []
+    errors: list[str] = []
+    warnings: list[str] = []
     row_count = df.height
 
     required = [
@@ -653,8 +653,8 @@ def validate_puntos_interes(
     - direccion presente (warning si muchas nulas)
     - codigo_comuna con formato CUT (5 caracteres) si está presente
     """
-    errors = []
-    warnings = []
+    errors: list[str] = []
+    warnings: list[str] = []
     row_count = df.height
 
     required = [

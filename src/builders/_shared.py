@@ -45,7 +45,7 @@ def _load_catalog_config() -> dict:
             "Si acabas de clonar, verifica que el archivo no esté en .gitignore."
         )
     with open(path, "r", encoding="utf-8") as f:
-        return json.load(f)
+        return json.load(f)  # type: ignore[no-any-return]  # json.load → dict en runtime
 
 
 DATASET_CATALOG_CONFIG = _load_catalog_config()

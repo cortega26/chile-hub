@@ -17,3 +17,25 @@ repos:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
       - id: ruff-format
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v2.1.0
+    hooks:
+      - id: mypy
+        pass_filenames: false
+        additional_dependencies: [polars>=1.41.2, requests>=2.34.2]
+
+  - repo: local
+    hooks:
+      - id: pip-audit
+        name: pip-audit
+        entry: ./.venv/bin/pip-audit
+        language: system
+        pass_filenames: false
+        files: ^pyproject\.toml$
+      - id: interrogate
+        name: interrogate
+        entry: ./.venv/bin/interrogate
+        language: system
+        pass_filenames: false
+        files: ^src/chile_hub/

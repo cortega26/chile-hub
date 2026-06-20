@@ -60,6 +60,9 @@ dev = [
     "pytest==9.1.0",
     "pytest-cov==7.1.0",
     "pre-commit==4.6.0",
+    "mypy==2.1.0",
+    "pip-audit==2.10.1",
+    "interrogate==1.7.0",
 ]
 
 [project.scripts]
@@ -140,3 +143,42 @@ exclude_also = [
     "def __repr__",
     'if __name__ == "__main__":',
 ]
+
+[tool.mypy]
+python_version = "3.10"
+files = [
+    "src/chile_hub",
+    "src/extractors",
+    "src/validation.py",
+    "src/build_dev_db.py",
+    "src/builders",
+]
+warn_return_any = true
+warn_unused_configs = true
+warn_unused_ignores = true
+check_untyped_defs = true
+ignore_missing_imports = true
+# El shim src/chile_hub.py (21 líneas) colisiona con el paquete src/chile_hub/;
+# mypy lo detecta como módulo duplicado. Lo excluimos porque solo delega al
+# paquete y no contiene lógica que requiera verificación de tipos.
+exclude = ["src/chile_hub\\.py"]
+explicit_package_bases = true
+
+[[tool.mypy.overrides]]
+module = "src.extractors.*"
+disable_error_code = ["no-redef"]
+
+[tool.interrogate]
+ignore-init-method = true
+ignore-init-module = true
+ignore-semiprivate = true
+ignore-private = true
+ignore-property-decorators = true
+ignore-module = true
+ignore-nested-functions = true
+ignore-nested-classes = true
+# Umbral bajo en pre-commit: no bloquea commits, solo informa.
+# Usa 'make docs-coverage' para verificar el umbral estricto (80%).
+fail-under = 0
+paths = ["src/chile_hub"]
+exclude = ["src/chile_hub/pipeline_status_utils.py", "src/chile_hub/__main__.py"]

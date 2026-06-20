@@ -6,7 +6,7 @@ import sys
 from datetime import datetime, timezone
 from difflib import get_close_matches
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import polars as pl
 import requests
@@ -53,7 +53,7 @@ def _print_result(result, fmt="json", output=None):
             elif output == "parquet":
                 result.write_parquet(sys.stdout.buffer)
             elif output == "json":
-                result.write_json(sys.stdout)
+                result.write_json(sys.stdout)  # type: ignore[arg-type]  # TextIO es IOBase; falso positivo en stubs de Polars
             return
     if fmt == "json":
         print(json.dumps(result, ensure_ascii=False, indent=2))
@@ -128,7 +128,7 @@ class ChileHub:
     def _load_catalog(self) -> dict[str, Any]:
         try:
             with self.catalog_path.open("r", encoding="utf-8") as f:
-                return json.load(f)
+                return json.load(f)  # type: ignore[no-any-return]  # json.load → dict en runtime
         except FileNotFoundError:
             raise ChileHubDataError(
                 f"Catálogo de datasets no encontrado en {self.catalog_path}. "
@@ -139,7 +139,7 @@ class ChileHub:
 
     def _load_json_artifact(self, filename: str) -> dict[str, Any]:
         with (self.normalized_dir / filename).open("r", encoding="utf-8") as f:
-            return json.load(f)
+            return json.load(f)  # type: ignore[no-any-return]
 
     @functools.lru_cache(maxsize=1)
     def _load_artifact_manifest(self) -> dict[str, Any]:
@@ -231,7 +231,7 @@ class ChileHub:
                 }
             )
 
-        return compute_top_issue(entries)
+        return compute_top_issue(entries)  # type: ignore[no-any-return]  # dict en runtime
 
     def top_issue_table(self) -> str:
         top_issue = self.top_issue()
@@ -268,7 +268,7 @@ class ChileHub:
     def get_dataset(self, dataset_name: str) -> dict[str, Any]:
         for entry in self.catalog.get("datasets", []):
             if entry["dataset"] == dataset_name:
-                return entry
+                return entry  # type: ignore[no-any-return]  # dict[str, Any] en runtime
         raise ChileHubDatasetError(
             f"Dataset '{dataset_name}' no existe. {_format_available(self.list_datasets(), dataset_name)}"
         )
@@ -286,7 +286,7 @@ class ChileHub:
                 f"Output '{output_type}' no existe para '{dataset_name}'. "
                 f"{_format_available(available_outputs, output_type)}"
             )
-        return self.root_dir / outputs[output_type]
+        return self.root_dir / outputs[output_type]  # type: ignore[no-any-return]  # Path en runtime
 
     def load_polars(self, dataset_name: str) -> pl.DataFrame:
         if dataset_name in self._df_cache:
@@ -304,7 +304,10 @@ class ChileHub:
         return df
 
     def cross_view(
-        self, datasets: list[str], on: str = "codigo_comuna", how: str = "left"
+        self,
+        datasets: list[str],
+        on: str = "codigo_comuna",
+        how: Literal["inner", "left", "right", "full", "semi", "anti", "cross", "outer"] = "left",
     ) -> pl.DataFrame:
         """Retorna un cruce predefinido de datasets vinculados por clave territorial.
 
@@ -493,7 +496,7 @@ class ChileHub:
                 f"Example '{kind}' no existe para '{dataset_name}'. "
                 f"{_format_available(available_examples, kind)}"
             )
-        return examples[kind]
+        return examples[kind]  # type: ignore[no-any-return]  # str en runtime
 
     def summary(self) -> list[dict[str, Any]]:
         return [
@@ -927,7 +930,7 @@ class ChileHub:
     def inventory(self):
         inventory = []
         manifest_artifacts = self.artifacts()
-        by_dataset = {}
+        by_dataset: dict[str, list[dict[str, Any]]] = {}
         for artifact in manifest_artifacts:
             dataset = artifact.get("dataset")
             if not dataset:
@@ -1865,7 +1868,7 @@ def _main(argv=None):  # pragma: no cover — dispatch de CLI, testeado vía smo
         if args.format == "csv":
             df.write_csv(out_path)
         elif args.format == "json":
-            df.write_json(out_path, row_oriented=True)
+            df.write_json(out_path)
         elif args.format == "parquet":
             df.write_parquet(out_path)
         print(

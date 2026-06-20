@@ -94,8 +94,8 @@ def fetch_data() -> tuple[Path, str, str]:
         print("Descarga completada.")
 
         # Intentar extraer usando unrar local
-        unrar_bin = Path(ROOT_DIR) / ".venv" / "bin" / "unrar"
-        if not unrar_bin.exists():
+        unrar_bin: Path | str = Path(ROOT_DIR) / ".venv" / "bin" / "unrar"
+        if isinstance(unrar_bin, Path) and not unrar_bin.exists():
             # Buscar en el PATH por si acaso
             unrar_bin = "unrar"
 

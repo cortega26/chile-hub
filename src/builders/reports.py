@@ -693,7 +693,7 @@ def build_dataset_quality(pipeline_metadata, hub_health, source_readiness):
         )
 
     # Aggregate stats
-    grades = {}
+    grades: dict[str, int] = {}
     for e in entries:
         g = e["grade"]
         grades[g] = grades.get(g, 0) + 1

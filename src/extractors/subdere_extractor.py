@@ -518,9 +518,9 @@ def normalize_dpa():
                 # Aseguramos ceros a la izquierda
                 df = df.with_columns(
                     [
-                        pl.col("codigo_region").str.rjust(2, "0"),
-                        pl.col("codigo_provincia").str.rjust(3, "0"),
-                        pl.col("codigo_comuna").str.rjust(5, "0"),
+                        pl.col("codigo_region").str.pad_start(2, "0"),
+                        pl.col("codigo_provincia").str.pad_start(3, "0"),
+                        pl.col("codigo_comuna").str.pad_start(5, "0"),
                     ]
                 )
 

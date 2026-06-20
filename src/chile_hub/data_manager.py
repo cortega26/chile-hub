@@ -58,6 +58,7 @@ class ChileHubDataManager:
         return self.version_cache_dir / ".verified.json"
 
     def status(self) -> dict[str, Any]:
+        """Estado del caché local de datos: versión, rutas y si está listo para usarse."""
         catalog_path = self.normalized_dir / "dataset_catalog.json"
         marker = self._read_json(self.marker_path)
         return {
@@ -71,6 +72,17 @@ class ChileHubDataManager:
         }
 
     def ensure_data_dir(self, *, auto_update: bool = True) -> Path:
+        """Garantiza que el directorio de datos normalizados existe, descargándolo si es necesario.
+
+        Args:
+            auto_update: Si es True, descarga automáticamente el bundle cuando no hay caché local.
+
+        Returns:
+            Path al directorio normalized/ con los datos listos para consumir.
+
+        Raises:
+            ChileHubDataError: Si auto_update es False y no existe caché local verificado.
+        """
         if (self.normalized_dir / "dataset_catalog.json").exists() and self.marker_path.exists():
             return self.normalized_dir
         if not auto_update:
@@ -82,6 +94,19 @@ class ChileHubDataManager:
         return self.normalized_dir
 
     def update(self) -> Path:
+        """Descarga y verifica el bundle de datos desde GitHub Releases.
+
+        El proceso es: resolver release → descargar checksum → descargar bundle
+        (hasheando en tránsito) → verificar SHA-256 → extraer → escribir marcador
+        de verificación. Si el hash no coincide, el bundle se descarta sin tocar
+        el directorio normalized/.
+
+        Returns:
+            Path al directorio normalized/ con los datos extraídos.
+
+        Raises:
+            ChileHubDataError: Si el checksum no coincide o el bundle no contiene el catálogo.
+        """
         release = self._resolve_release()
         assets = self._assets_by_name(release)
         bundle = self._require_asset(assets, DEFAULT_BUNDLE_NAME)
@@ -144,6 +169,14 @@ class ChileHubDataManager:
         return self.normalized_dir
 
     def clear(self) -> None:
+        """Elimina el caché local de datos, forzando una descarga fresca en el próximo uso.
+
+        Por seguridad, solo opera dentro del directorio de caché esperado (platformdirs).
+        Si el directorio configurado está fuera de ese árbol, levanta ChileHubDataError.
+
+        Raises:
+            ChileHubDataError: Si cache_root no está bajo el directorio de caché esperado.
+        """
         # Validar que cache_root es un subdirectorio esperado
         expected_parent = user_cache_dir("chile-hub")
         cache_path = Path(self.cache_root).resolve()
@@ -174,7 +207,7 @@ class ChileHubDataManager:
                 f"Could not resolve chile-hub release '{self.data_version}' "
                 f"from {url}: HTTP {response.status_code}"
             )
-        return response.json()
+        return response.json()  # type: ignore[no-any-return]  # requests.Response.json → dict en runtime
 
     @staticmethod
     def _assets_by_name(release: dict[str, Any]) -> dict[str, ReleaseAsset]:
@@ -226,4 +259,4 @@ class ChileHubDataManager:
     def _read_json(path: Path) -> dict[str, Any]:
         if not path.exists():
             return {}
-        return json.loads(path.read_text(encoding="utf-8"))
+        return json.loads(path.read_text(encoding="utf-8"))  # type: ignore[no-any-return]

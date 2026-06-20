@@ -8,6 +8,7 @@ import json
 import os
 import zipfile
 from datetime import datetime
+from typing import Any
 
 from src.builders._shared import (
     DATA_DIR,
@@ -190,7 +191,7 @@ def write_artifact_manifest():
 
 
 def write_hub_bundle_json(pipeline_metadata, hub_health, dataset_catalog, artifact_manifest):
-    artifacts_by_dataset = {}
+    artifacts_by_dataset: dict[str, list[dict[str, Any]]] = {}
     shared_artifacts = []
 
     for artifact in artifact_manifest.get("artifacts", []):
