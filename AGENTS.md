@@ -57,7 +57,8 @@ chile-hub/
 │   │   ├── siedu_extractor.py                   Indicadores urbanos SIEDU (INE) → data/staging/
 │   │   └── res_extractor.py                     Registro de Empresas y Sociedades (datos.gob.cl) → data/staging/
 │   ├── validation.py              Todas las funciones validate_*() — módulo independiente (~760 líneas)
-│   ├── build_dev_db.py            Lee staging/, llama validate_*(), escribe todos los artefactos en normalized/
+│   ├── build_dev_db.py            Orquestador (~670 líneas): main() + fases (_load_inputs, _compute_validations, _write_data_artifacts, _generate_reports)
+│   ├── builders/                  Módulos del pipeline extraídos de build_dev_db.py (formats, metadata, reports, artifacts, datasets, catalog, landing, io_utils, _shared)
 │   ├── chile_hub.py               Compatibility shim (21 líneas) — delega al paquete
 │   ├── chile_hub/                 Paquete Python instalable (ChileHub API + CLI + data manager)
 │   │   ├── core.py                ChileHub class + API pública (~1 570 líneas)
@@ -102,11 +103,11 @@ codegraph find <symbol_name>                       # En qué archivo está defin
 **Reglas para acotar lecturas y ahorrar tokens:**
 - Usar `view_file` con `StartLine`/`EndLine` — nunca leer archivos grandes enteros de golpe.
 - `base.py` (59 líneas) es seguro de leer completo. `validation.py` (~760 líneas) — leer por validador individual.
-- `build_dev_db.py` (~3 200 líneas) y `src/chile_hub/core.py` (~1 600 líneas) — usar estas áncoras:
+- `build_dev_db.py` (~670 líneas) y `src/chile_hub/core.py` (~1 600 líneas) — usar estas áncoras:
 
 | Archivo | Líneas de interés |
 |---|---|
-| `src/build_dev_db.py` | L33 (imports de validators) · L2757+ (bloque `validations = {…}`) |
+| `src/build_dev_db.py` | imports de validators (cabecera) · función `_compute_validations()` (bloque `validations = {…}`) · `build_dataset_metadata` se importa de `src/builders/metadata.py` |
 | `src/chile_hub/core.py` | L24 (clase ChileHub) · L24-200 (superficie pública de la API) |
 | `tests/test_chile_hub.py` | Requiere `data/normalized/` — correr `make build` antes |
 
@@ -294,7 +295,7 @@ Agregar una función `validate_{nombre}(df, metadata)` en **`src/validation.py`*
 - Verificar unicidad de la clave primaria.
 - Verificar integridad referencial con la DPA si el dataset tiene `codigo_comuna` o `codigo_region`.
 
-Luego importarla en `build_dev_db.py` y llamarla dentro del bloque `validations = {…}` al final del build.
+Luego importarla en `build_dev_db.py` y llamarla dentro del bloque `validations = {…}` de la función `_compute_validations()`.
 
 > **Verificación obligatoria:** después de registrar la validación, ejecutar
 > `python scripts/check_validation_registration.py` o `make doctor`.

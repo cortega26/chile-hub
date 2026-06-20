@@ -1,11 +1,18 @@
 # [01] Refactorizar `build_dev_db.py` en modulos `src/builders/`
 
 **Scorecard:** `docs/backlog/scorecard.md`
-**Estado:** Pendiente
+**Estado:** ✅ Completado (2026-06-20)
 **Impacto:** Alto
 **Esfuerzo estimado:** Alto
 **Riesgo:** Medio
 **Target:** Q3 2026
+
+> **Resultado:** `build_dev_db.py` pasó de 2867 → 668 líneas (solo orquestación). Se
+> crearon 9 módulos en `src/builders/` (`_shared`, `io_utils`, `formats`, `metadata`,
+> `reports`, `artifacts`, `datasets`, `catalog`, `landing`) y `main()` se descompuso en
+> 5 subfunciones. 410 tests pasan; salida del pipeline byte-idéntica salvo timestamps.
+> Los nombres de módulo propuestos abajo difieren levemente de los finales (se
+> consolidaron módulos relacionados), pero el criterio de aceptación se cumplió.
 
 ---
 
