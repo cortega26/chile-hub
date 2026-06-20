@@ -752,6 +752,84 @@ class ValidateEmpresasTests(unittest.TestCase):
         result = validate_empresas(df, {"source_mode": "live"})
         self.assertTrue(any("null RUT" in e for e in result["errors"]))
 
+    def test_rejects_missing_columns(self):
+        """DataFrame sin columnas requeridas genera error."""
+        df = pl.DataFrame({"rut": ["76286049-K"]})
+        result = validate_empresas(df, {"source_mode": "live"})
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("missing columns" in e for e in result["errors"]))
+
+    def test_warns_duplicate_rut_rows(self):
+        """Filas duplicadas en (rut, razon_social, fecha_registro) generan warning."""
+        df = pl.DataFrame(
+            {
+                "rut": ["76286049-K", "76286049-K"],
+                "razon_social": ["Duplicada SpA", "Duplicada SpA"],
+                "codigo_sociedad": ["SPA", "SPA"],
+                "fecha_registro": [None, None],
+                "anio": [2024, 2024],
+                "comuna_tributaria": ["Santiago", "Santiago"],
+                "region_tributaria": ["13", "13"],
+                "capital": [1000000, 1000000],
+            }
+        )
+        result = validate_empresas(df, {"source_mode": "live"})
+        self.assertTrue(any("duplicate" in w for w in result["warnings"]))
+
+    def test_rejects_invalid_region_tributaria(self):
+        """region_tributaria con largo != 2 genera error."""
+        df = pl.DataFrame(
+            {
+                "rut": ["76286049-K"],
+                "razon_social": ["Test SpA"],
+                "codigo_sociedad": ["SPA"],
+                "fecha_registro": [None],
+                "anio": [2024],
+                "comuna_tributaria": ["Santiago"],
+                "region_tributaria": ["135"],
+                "capital": [1000000],
+            }
+        )
+        result = validate_empresas(df, {"source_mode": "live"})
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("region_tributaria" in e for e in result["errors"]))
+
+    def test_rejects_null_anio(self):
+        """anio nulo genera error."""
+        df = pl.DataFrame(
+            {
+                "rut": ["76286049-K"],
+                "razon_social": ["Test SpA"],
+                "codigo_sociedad": ["SPA"],
+                "fecha_registro": [None],
+                "anio": [None],
+                "comuna_tributaria": ["Santiago"],
+                "region_tributaria": ["13"],
+                "capital": [1000000],
+            }
+        )
+        result = validate_empresas(df, {"source_mode": "live"})
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("anio < 2013" in e for e in result["errors"]))
+
+    def test_warns_fallback_mode(self):
+        """source_mode fallback genera warning."""
+        df = pl.DataFrame(
+            {
+                "rut": ["76286049-K"],
+                "razon_social": ["Fallback SpA"],
+                "codigo_sociedad": ["SPA"],
+                "fecha_registro": [None],
+                "anio": [2024],
+                "comuna_tributaria": ["Santiago"],
+                "region_tributaria": ["13"],
+                "capital": [1000000],
+            }
+        )
+        result = validate_empresas(df, {"source_mode": "fallback"})
+        self.assertEqual(result["status"], "ok")
+        self.assertTrue(any("fallback" in w for w in result["warnings"]))
+
 
 # ── Property-based tests (hypothesis) ──────────────────────────────────────────
 

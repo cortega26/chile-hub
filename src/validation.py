@@ -575,16 +575,23 @@ def validate_empresas(
         "comuna_tributaria",
         "region_tributaria",
     ]
-    missing = _missing_columns(df, required)
-    if missing:
-        errors.append(f"empresas missing columns: {', '.join(missing)}")
-
     if row_count == 0:
         errors.append("empresas dataset is empty")
         return {
             "dataset": "empresas",
             "status": "error",
             "record_count": 0,
+            "errors": errors,
+            "warnings": warnings,
+        }
+
+    missing = _missing_columns(df, required)
+    if missing:
+        errors.append(f"empresas missing columns: {', '.join(missing)}")
+        return {
+            "dataset": "empresas",
+            "status": "error",
+            "record_count": row_count,
             "errors": errors,
             "warnings": warnings,
         }

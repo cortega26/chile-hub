@@ -1,5 +1,7 @@
+import hashlib
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -28,7 +30,7 @@ from chile_hub import (
     ChileHubExampleError,
     ChileHubOutputError,
 )
-from chile_hub.data_manager import ChileHubDataManager
+from chile_hub.data_manager import ChileHubDataManager, ReleaseAsset
 from src.validation import validate_indicadores
 
 # ── Staleness guard ───────────────────────────────────────────────────────────
@@ -1760,6 +1762,102 @@ class ChileHubReportTablesTests(unittest.TestCase):
     def test_overview_table_output(self):
         table = self.hub.overview_table()
         self.assertIn("chile-hub", table)
+
+
+class ChileHubDataManagerUnitTests(unittest.TestCase):
+    """Tests unitarios para métodos internos de ChileHubDataManager."""
+
+    def test_sha256_static_method(self):
+        """_sha256() retorna el hash SHA-256 correcto para un archivo."""
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".txt") as f:
+            f.write(b"contenido de prueba")
+            temp_path = Path(f.name)
+        try:
+            digest = ChileHubDataManager._sha256(temp_path)
+            expected = hashlib.sha256(b"contenido de prueba").hexdigest()
+            self.assertEqual(digest, expected)
+        finally:
+            temp_path.unlink()
+
+    def test_require_asset_missing_raises_error(self):
+        """_require_asset() con nombre ausente lanza ChileHubDataError."""
+        assets = {"bundle.zip": ReleaseAsset(name="bundle.zip", url="http://example.com")}
+        with self.assertRaises(ChileHubDataError) as ctx:
+            ChileHubDataManager._require_asset(assets, "inexistente.zip")
+        self.assertIn("inexistente.zip", str(ctx.exception))
+        self.assertIn("bundle.zip", str(ctx.exception))
+
+    def test_read_json_missing_file_returns_empty_dict(self):
+        """_read_json() con archivo inexistente retorna {}."""
+        result = ChileHubDataManager._read_json(Path("/tmp/no_existe_xyz_123.json"))
+        self.assertEqual(result, {})
+
+    def test_cache_clear_when_not_exists_returns_early(self):
+        """clear() cuando el caché no existe retorna sin error."""
+        from platformdirs import user_cache_dir
+
+        expected_parent = user_cache_dir("chile-hub")
+        # Usar un subdirectorio que no existe dentro del árbol esperado
+        cache_dir = Path(expected_parent) / "_test_clear_nonexistent_xyz"
+        try:
+            cache_dir.mkdir(parents=True, exist_ok=True)
+            # Crear manager con ese cache_dir
+            manager = ChileHubDataManager(cache_dir=cache_dir)
+            # Borrar el directorio para que no exista
+            shutil.rmtree(str(cache_dir))
+            # clear() no debe lanzar error
+            manager.clear()
+        finally:
+            if cache_dir.exists():
+                shutil.rmtree(str(cache_dir))
+
+    def test_cache_clear_when_exists_removes_directory(self):
+        """clear() cuando el caché existe elimina el directorio."""
+        from platformdirs import user_cache_dir
+
+        expected_parent = user_cache_dir("chile-hub")
+        cache_dir = Path(expected_parent) / "_test_clear_exists_xyz"
+        try:
+            cache_dir.mkdir(parents=True, exist_ok=True)
+            (cache_dir / "test_file.txt").write_text("data")
+            self.assertTrue(cache_dir.exists())
+            manager = ChileHubDataManager(cache_dir=cache_dir)
+            manager.clear()
+            self.assertFalse(cache_dir.exists())
+        finally:
+            if cache_dir.exists():
+                shutil.rmtree(str(cache_dir))
+
+    def test_extract_bundle_cleans_existing_normalized_dir(self):
+        """_extract_bundle() elimina normalized_dir existente antes de extraer."""
+        from platformdirs import user_cache_dir
+
+        expected_parent = user_cache_dir("chile-hub")
+        cache_root = Path(expected_parent) / "_test_extract_xyz"
+        try:
+            cache_root.mkdir(parents=True, exist_ok=True)
+            manager = ChileHubDataManager(cache_dir=cache_root, data_version="v0.0.0-test")
+            manager.version_cache_dir.mkdir(parents=True, exist_ok=True)
+            # Crear un normalized_dir falso con un archivo marcador
+            manager.normalized_dir.mkdir(parents=True, exist_ok=True)
+            marker = manager.normalized_dir / "test_sentinel.txt"
+            marker.write_text("old")
+            self.assertTrue(marker.exists())
+
+            # Crear un ZIP mínimo para extraer
+            bundle_path = manager.version_cache_dir / "test_bundle.zip"
+            with zipfile.ZipFile(bundle_path, "w") as zf:
+                zf.writestr("data/normalized/new_file.txt", "new content")
+
+            manager._extract_bundle(bundle_path)
+            # El marcador antiguo debe haber desaparecido
+            self.assertFalse(marker.exists())
+            # El nuevo archivo debe existir
+            new_file = manager.normalized_dir / "new_file.txt"
+            self.assertTrue(new_file.exists())
+        finally:
+            if cache_root.exists():
+                shutil.rmtree(str(cache_root))
 
 
 if __name__ == "__main__":

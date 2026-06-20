@@ -360,5 +360,76 @@ class ChileHubEdgeCaseTests(unittest.TestCase):
             self.assertIn("status", r)
 
 
+class ChileHubInternalHelpersTests(unittest.TestCase):
+    """Tests para funciones internas de core.py no cubiertas por tests existentes."""
+
+    def test_format_available_without_requested(self):
+        """_format_available() sin 'requested' retorna solo la lista de disponibles."""
+        from chile_hub.core import _format_available
+
+        result = _format_available(["comunas", "regiones"])
+        self.assertIn("Disponibles", result)
+        self.assertIn("comunas", result)
+        self.assertIn("regiones", result)
+        self.assertNotIn("Quizás", result)
+
+    def test_max_status_all_unknown(self):
+        """_max_status() sin argumentos retorna 'unknown'."""
+        from chile_hub.core import ChileHub
+
+        result = ChileHub._max_status()
+        self.assertEqual(result, "unknown")
+
+        result_none = ChileHub._max_status(None, "", None)
+        self.assertEqual(result_none, "unknown")
+
+    def test_get_report_missing_raises_keyerror(self):
+        """get_report() con reporte inexistente lanza KeyError."""
+        hub = _hub()
+        with self.assertRaises(KeyError):
+            hub.get_report("no_existe_reporte_xyz", "json")
+
+    def test_primary_package_missing_raises_keyerror(self):
+        """primary_package() con tipo inexistente lanza KeyError."""
+        hub = _hub()
+        with self.assertRaises(KeyError):
+            hub.primary_package("formato_inexistente_xyz")
+
+    def test_validate_user_data_type_mismatch(self):
+        """validate_user_data() con tipo incorrecto reporta error."""
+        hub = _hub()
+        # comunas.codigo_comuna debe ser string; pasar enteros
+        df = pl.DataFrame(
+            {
+                "codigo_comuna": [1, 2, 3],
+                "codigo_region": ["01", "02", "03"],
+                "codigo_provincia": ["011", "021", "031"],
+                "nombre_comuna": ["A", "B", "C"],
+                "nombre_comuna_clean": ["a", "b", "c"],
+                "abreviatura": ["TA", "AN", "AT"],
+            }
+        )
+        result = hub.validate_user_data(df, "comunas")
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("codigo_comuna" in e for e in result["errors"]))
+
+    def test_validate_user_data_null_pk(self):
+        """validate_user_data() con valores nulos en clave primaria reporta error."""
+        hub = _hub()
+        df = pl.DataFrame(
+            {
+                "codigo_comuna": [None, "13102", "13103"],
+                "codigo_region": ["13", "13", "13"],
+                "codigo_provincia": ["131", "131", "131"],
+                "nombre_comuna": [None, "B", "C"],
+                "nombre_comuna_clean": [None, "b", "c"],
+                "abreviatura": ["RM", "RM", "RM"],
+            }
+        )
+        result = hub.validate_user_data(df, "comunas")
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("valores nulos" in e for e in result["errors"]))
+
+
 if __name__ == "__main__":
     unittest.main()
