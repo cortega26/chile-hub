@@ -50,6 +50,7 @@ pipeline = [
     "xlsxwriter==3.2.9",
     "curl_cffi==0.15.0",
     "openpyxl==3.1.5",
+    "structlog==26.1.0",
 ]
 dev = [
     "build==1.5.0",
@@ -65,6 +66,7 @@ dev = [
     "interrogate==1.7.0",
     "pytest-xdist==3.8.0",
     "bandit==1.9.4",
+    "structlog==26.1.0",
 ]
 
 [project.scripts]

@@ -5,6 +5,10 @@ from datetime import timezone
 
 import polars as pl
 
+from src.builders._logging import get_logger
+
+log = get_logger("build_dev_db")
+
 UTC = timezone.utc
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -335,9 +339,9 @@ def _load_inputs():
                 "region_social": pl.String,
             },
         )
-        print(f"Empresas RES cargadas: {df_empresas.height} registros.")
+        log.info("dataset_loaded", dataset="empresas", records=df_empresas.height)
     else:
-        print("Dataset empresas no encontrado en staging — se omite del build.")
+        log.info("dataset_skipped", dataset="empresas", reason="not_found_in_staging")
 
     df_regiones, df_provincias = derive_geography_layers(df_comunas)
     df_perfil_territorial = build_perfil_territorial_comunal(
@@ -507,7 +511,7 @@ def _write_data_artifacts(dfs):
     extra_tables_pd = {name: df.to_pandas() for name, df in extra_tables.items()}
 
     # Compilar entregables
-    print("Compilando artefactos del build…")
+    log.info("artifacts_build_start", total_formats=4)
     build_duckdb(
         df_regiones,
         df_provincias,
@@ -519,7 +523,7 @@ def _write_data_artifacts(dfs):
         extra_tables,
         os.path.join(NORMALIZED_DIR, "chile_data.duckdb"),
     )
-    print("  [1/4] DuckDB ✓")
+    log.info("artifact_format_done", format="duckdb", progress="1/4")
     build_sqlite(
         df_regiones,
         df_provincias,
@@ -532,7 +536,7 @@ def _write_data_artifacts(dfs):
         extra_tables_pd,
         os.path.join(NORMALIZED_DIR, "chile_data.db"),
     )
-    print("  [2/4] SQLite ✓")
+    log.info("artifact_format_done", format="sqlite", progress="2/4")
     build_excel(
         df_regiones,
         df_provincias,
@@ -545,7 +549,7 @@ def _write_data_artifacts(dfs):
         extra_tables_pd,
         os.path.join(NORMALIZED_DIR, "chile_data_latest.xlsx"),
     )
-    print("  [3/4] Excel ✓")
+    log.info("artifact_format_done", format="excel", progress="3/4")
     build_flat_files(
         df_regiones,
         df_provincias,
@@ -556,7 +560,7 @@ def _write_data_artifacts(dfs):
         df_educacionales,
         extra_tables,
     )
-    print("  [4/4] Flat files ✓")
+    log.info("artifact_format_done", format="flat_files", progress="4/4")
     write_parquet_atomic(
         df_censo_hogares, os.path.join(NORMALIZED_DIR, "censo_hogares_viviendas.parquet")
     )
@@ -622,22 +626,25 @@ def _generate_reports(pipeline_metadata, previous_pipeline_metadata, metadata_ou
     overview = build_overview(hub_health, hub_bundle, artifact_manifest)
     overview_output, overview = write_overview_json(overview)
     write_overview_markdown_file(overview)
-    print(f"Metadata y validaciones exportadas a: {metadata_output}")
-    print(f"Resumen de salud exportado a: {hub_health_output}")
-    print(f"Status compacto exportado a: {hub_status_output}")
-    print(f"Status por dataset exportado a: {dataset_status_output}")
-    print(f"Changelog por dataset exportado a: {dataset_changelog_output}")
-    print(f"Catalogo de datasets exportado a: {catalog_output}")
-    print(f"Reporte de redistribucion exportado a: {redistribution_report_output}")
-    print(f"Reporte de procedencia exportado a: {provenance_report_output}")
-    print(f"Reporte de drift exportado a: {drift_report_output}")
-    print(f"Madurez de fuente exportada a: {source_readiness_json_output}")
-    print(f"Calidad de datasets exportada a: {dataset_quality_json_output}")
-    print(f"Overview exportado a: {overview_output}")
-    print(f"Manifest de artefactos exportado a: {artifact_manifest_output}")
-    print(f"Bundle publicable exportado a: {hub_bundle_output}")
-    print(f"ZIP publicable exportado a: {zip_output}")
-    print(f"SHA256 publicable exportado a: {sha256_output}")
+    log.info(
+        "reports_written",
+        metadata=metadata_output,
+        hub_health=hub_health_output,
+        hub_status=hub_status_output,
+        dataset_status=dataset_status_output,
+        dataset_changelog=dataset_changelog_output,
+        catalog=catalog_output,
+        redistribution=redistribution_report_output,
+        provenance=provenance_report_output,
+        drift=drift_report_output,
+        source_readiness=source_readiness_json_output,
+        dataset_quality=dataset_quality_json_output,
+        overview=overview_output,
+        artifact_manifest=artifact_manifest_output,
+        hub_bundle=hub_bundle_output,
+        zip=zip_output,
+        sha256=sha256_output,
+    )
 
 
 def main():
@@ -662,7 +669,7 @@ def main():
         validations_with_freshness,
     )
     _generate_reports(pipeline_metadata, previous_pipeline_metadata, metadata_output)
-    print("\n--- Compilación del Sprint 0 completada con éxito ---")
+    log.info("build_complete")
 
 
 if __name__ == "__main__":
