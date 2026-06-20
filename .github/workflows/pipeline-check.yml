@@ -79,7 +79,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --requirement requirements.txt
-          python -m pip install "$(grep '^pytest==' dev-requirements.txt)" "$(grep '^pytest-cov==' dev-requirements.txt)"
+          python -m pip install "$(grep '^pytest==' dev-requirements.txt)" "$(grep '^pytest-cov==' dev-requirements.txt)" "$(grep '^pytest-xdist==' dev-requirements.txt)"
           python -m pip install --editable .
 
       - name: Install unrar
