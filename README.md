@@ -67,7 +67,7 @@ En la práctica, sirve para responder preguntas comunes sin rehacer limpieza bas
 
 ---
 
-## Por qué existe
+## ¿Por qué existe?
 
 Trabajar con datos públicos chilenos implica enfrentar los mismos obstáculos una y otra vez:
 
@@ -83,7 +83,7 @@ chile-hub empaqueta esas decisiones en una capa reproducible: extrae desde fuent
 
 ---
 
-## Qué entrega chile-hub
+## ¿Qué entrega chile-hub?
 
 <table>
 <tr><td>
