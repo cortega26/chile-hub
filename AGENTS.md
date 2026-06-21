@@ -218,7 +218,7 @@ y no tener tildes ni `ñ`. Es la clave de búsqueda para joins de texto inexacto
 
 ---
 
-## 5. Cómo agregar un nuevo dataset
+## 5. ¿Cómo agregar un nuevo dataset?
 
 Sigue estos pasos en orden. No saltear ninguno.
 
@@ -498,7 +498,7 @@ pytest -v
 pytest tests/test_chile_hub.py::ChileHubTests::test_load_polars -v
 ```
 
-### Qué cubren los tests
+### ¿Qué cubren los tests?
 
 **`tests/test_chile_hub.py`** — requiere `data/normalized/` (ejecutar `make build` antes)
 
@@ -563,7 +563,7 @@ toleran 1 año. Si la consulta live falla, no se aplica backfill: el dataset que
 `[skip ci]` para evitar loops. Los artefactos de CI se suben como un directorio generado único,
 sin mantener una segunda lista manual de archivos.
 
-### Qué hacer cuando el publish rechaza un dataset
+### ¿Qué hacer cuando el publish rechaza un dataset?
 
 Si el job `publish` rechaza un dataset (por fallback, fetch fallido, o dato stale):
 
