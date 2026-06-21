@@ -1,6 +1,14 @@
 <div align="center">
 
-<h1>🇨🇱 chile-hub</h1>
+<h1>
+  <img 
+    src="https://rawcdn.githack.com/twitter/twemoji/v14.0.2/assets/svg/1f1e8-1f1f1.svg" 
+    alt="🇨🇱" 
+    width="39" 
+    align="absmiddle"
+  > 
+  chile-hub
+</h1>
 
 <p><strong>Datos públicos de Chile, curados y listos para análisis en una línea de código.</strong></p>
 
@@ -769,6 +777,6 @@ Revisa [`AGENTS.md`](./AGENTS.md) para entender la arquitectura, las reglas no n
 
 <div align="center">
 
-**🇨🇱 Hecho con datos públicos chilenos, para quienes construyen sobre Chile.**
+**<img src="https://rawcdn.githack.com/twitter/twemoji/v14.0.2/assets/svg/1f1e8-1f1f1.svg" alt="🇨🇱" width="20" align="absmiddle">  Hecho con datos públicos chilenos, para quienes construyen sobre Chile.**
 
 </div>
