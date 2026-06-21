@@ -4,7 +4,7 @@ Lee esto primero. Luego sigue los punteros. No leas archivos completos en frío.
 
 ---
 
-## Qué es este repositorio
+## ¿Qué es este repositorio?
 
 `chile-hub` es una capa de datos reproducible y curada sobre datasets públicos oficiales de Chile.
 Ejecuta un pipeline de extraccion → construccion → validacion → publicacion que produce artefactos
