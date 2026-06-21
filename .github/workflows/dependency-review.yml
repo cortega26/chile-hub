@@ -3,8 +3,7 @@ name: Dependency Review
 on:
   pull_request:
     paths:
-      - requirements.txt
-      - dev-requirements.txt
+      - uv.lock
       - pyproject.toml
       - .github/workflows/**
       - .github/dependabot.yml

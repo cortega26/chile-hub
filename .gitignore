@@ -41,9 +41,6 @@ htmlcov/
 .DS_Store
 Thumbs.db
 
-# Gestores de paquetes alternativos
-uv.lock
-
 # Python build artifacts
 dist/
 

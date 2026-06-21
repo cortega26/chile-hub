@@ -616,17 +616,18 @@ El HTML de un sitio web cambia en cada rediseño. Las fuentes MVP deben ser:
 No agregar nuevos datasets hasta que los existentes tengan señales de adopción
 documentadas (descargas, issues con casos de uso, menciones externas).
 
-### ❌ Usar versiones no fijadas en requirements.txt
+### ❌ Usar versiones no fijadas en pyproject.toml
 
-```
+```toml
 # ❌
-polars>=0.20.0
+"polars>=0.20.0"
 
 # ✅
-polars==0.20.31
+"polars==0.20.31"
 ```
 
 Las versiones flotantes pueden romper el pipeline silenciosamente en CI.
+Las dependencias se fijan en `pyproject.toml` y se reproducen exactamente vía `uv.lock`.
 
 ### ❌ Publicar datos sin pasar por validate_*()
 

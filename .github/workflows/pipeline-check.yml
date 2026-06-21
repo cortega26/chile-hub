@@ -43,19 +43,17 @@ jobs:
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-          cache: pip
-          cache-dependency-path: |
-            requirements.txt
-            dev-requirements.txt
 
-      - name: Install Ruff
-        run: python -m pip install "$(grep '^ruff==' dev-requirements.txt)"
+      - name: Set up uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          enable-cache: true
 
       - name: Check Python lint
-        run: python -m ruff check src/ tests/ scripts/
+        run: uvx ruff@0.15.17 check src/ tests/ scripts/
 
       - name: Check Python format
-        run: python -m ruff format --check src/ tests/ scripts/
+        run: uvx ruff@0.15.17 format --check src/ tests/ scripts/
 
   build-and-test:
     name: Build and verify data
@@ -71,16 +69,17 @@ jobs:
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-          cache: pip
-          cache-dependency-path: |
-            requirements.txt
-            dev-requirements.txt
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          enable-cache: true
 
       - name: Install dependencies
-        run: |
-          python -m pip install --requirement requirements.txt
-          python -m pip install "$(grep '^pytest==' dev-requirements.txt)" "$(grep '^pytest-cov==' dev-requirements.txt)" "$(grep '^pytest-xdist==' dev-requirements.txt)" "$(grep '^hypothesis==' dev-requirements.txt)"
-          python -m pip install --editable .
+        run: uv sync --extra pipeline --extra dev
+
+      - name: Add .venv to PATH
+        run: echo "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"
 
       - name: Install unrar
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
@@ -214,22 +213,20 @@ jobs:
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: ${{ matrix.python-version }}
-          cache: pip
-          cache-dependency-path: |
-            pyproject.toml
-            requirements.txt
-            dev-requirements.txt
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          enable-cache: true
 
       - name: Build wheel and source distribution
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install "$(grep '^build==' dev-requirements.txt)" "$(grep '^twine==' dev-requirements.txt)"
-          python -m build
-          python -m twine check dist/*
+          uv build
+          uvx twine check dist/*
 
       - name: Install wheel and smoke test CLI
         run: |
-          python -m pip install --force-reinstall dist/*.whl
+          uv pip install --system --force-reinstall dist/*.whl
           python -c "from chile_hub import ChileHub; print(ChileHub)"
           chile-hub --help
           chile-hub cache status
@@ -247,19 +244,23 @@ jobs:
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-          cache: pip
-          cache-dependency-path: |
-            requirements.txt
-            dev-requirements.txt
 
-      - name: Install Playwright
-        run: python -m pip install "$(grep '^playwright==' dev-requirements.txt)"
+      - name: Set up uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --extra dev
+
+      - name: Add .venv to PATH
+        run: echo "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"
 
       - name: Cache Chromium
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('requirements.txt', 'dev-requirements.txt') }}
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('uv.lock') }}
           restore-keys: playwright-chromium-${{ runner.os }}-
 
       - name: Install Chromium system dependencies

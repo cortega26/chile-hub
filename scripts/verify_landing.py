@@ -132,7 +132,7 @@ def verify_landing():
     except ImportError:
         fail(
             "Playwright no está disponible en el entorno actual. "
-            "Instala dependencias con `make bootstrap` o `pip install -r requirements.txt`."
+            "Instala dependencias con `make bootstrap` o `uv sync --extra dev`."
         )
 
     bundle = json.loads(BUNDLE_PATH.read_text(encoding="utf-8"))

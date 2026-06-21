@@ -1597,8 +1597,8 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn(
             'python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]', self.workflow_text
         )
-        self.assertIn("python -m build", self.workflow_text)
-        self.assertIn("python -m twine check dist/*", self.workflow_text)
+        self.assertIn("uv build", self.workflow_text)
+        self.assertIn("uvx twine check dist/*", self.workflow_text)
         self.assertIn(
             'python -c "from chile_hub import ChileHub; print(ChileHub)"', self.workflow_text
         )
@@ -1616,7 +1616,7 @@ class WorkflowContractTests(unittest.TestCase):
     def test_testpypi_workflow_smoke_tests_installed_console_script(self):
         testpypi_text = (ROOT_DIR / ".github" / "workflows" / "testpypi.yml").read_text()
         self.assertIn("repository-url: https://test.pypi.org/legacy/", testpypi_text)
-        self.assertIn("python -m build", testpypi_text)
+        self.assertIn("uv build", testpypi_text)
         self.assertIn("from chile_hub import ChileHub", testpypi_text)
         self.assertIn("chile-hub --help", testpypi_text)
 
