@@ -61,7 +61,7 @@ chile-hub/
 │   ├── builders/                  Módulos del pipeline extraídos de build_dev_db.py (formats, metadata, reports, artifacts, datasets, catalog, landing, io_utils, _shared)
 │   ├── chile_hub.py               Compatibility shim (21 líneas) — delega al paquete
 │   ├── chile_hub/                 Paquete Python instalable (ChileHub API + CLI + data manager)
-│   │   ├── core.py                ChileHub class + API pública (~1 570 líneas)
+│   │   ├── core.py                ChileHub class + API pública (~2 130 líneas)
 │   │   ├── cli.py                 CLI entry points
 │   │   ├── data_manager.py        Descarga de bundle, cache, verificación SHA256
 │   │   └── pipeline_status_utils.py  Reportes Markdown de salud, catálogo y redistribución

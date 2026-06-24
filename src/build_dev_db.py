@@ -5,15 +5,20 @@ from datetime import timezone
 
 import polars as pl
 
+# ── Ajuste de sys.path ────────────────────────────────────────────────────────
+# `python src/build_dev_db.py` no incluye el directorio raíz en sys.path, por lo
+# que las importaciones absolutas del paquete `src.*` fallarían.  Se agrega la
+# raíz del proyecto al inicio del path ANTES de cualquier import del paquete.
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
+# ──────────────────────────────────────────────────────────────────────────────
+
 from src.builders._logging import get_logger
 
 log = get_logger("build_dev_db")
 
 UTC = timezone.utc
-
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if ROOT_DIR not in sys.path:
-    sys.path.insert(0, ROOT_DIR)
 
 # Rutas, constantes y configuración de catálogo compartidas (re-exportadas para
 # mantener compatibilidad con scripts externos y tests que las importan desde aquí;
