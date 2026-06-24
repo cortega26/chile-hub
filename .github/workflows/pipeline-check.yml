@@ -155,7 +155,7 @@ jobs:
 
       - name: Upload coverage to Codecov
         if: false  # Deshabilitado: migrado a badge autogenerado (coverage_badge.json)
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           files: coverage.xml
           flags: unittests
