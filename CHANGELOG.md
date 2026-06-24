@@ -7,6 +7,36 @@ y se excluyen intencionalmente de estas notas.
 
 <!-- version list -->
 
+## 1.15.1 - 2026-06-24
+
+### Corregido
+
+- **build**: Mover ajuste de sys.path antes de importaciones de src.* en build_dev_db.py
+  ([`643f89c`](https://github.com/cortega26/chile-hub/commit/643f89c8d289c87cff6f842be7f7fcfa3a8cffa0))
+
+### Mantenimiento
+
+- **deps**: Bump actions/checkout from 6.0.3 to 7.0.0
+  ([#12](https://github.com/cortega26/chile-hub/pull/12),
+  [`581748f`](https://github.com/cortega26/chile-hub/commit/581748f34b2c20c6bb4dfe209571f2f02748085b))
+
+- **deps**: Bump astral-sh/setup-uv from 8.1.0 to 8.2.0
+  ([#13](https://github.com/cortega26/chile-hub/pull/13),
+  [`79edd13`](https://github.com/cortega26/chile-hub/commit/79edd1351a6208bf245cddb513d4b0b929342bca))
+
+- **deps**: Bump codecov/codecov-action from 5 to 7
+  ([#14](https://github.com/cortega26/chile-hub/pull/14),
+  [`3494e86`](https://github.com/cortega26/chile-hub/commit/3494e865489a578892f58edae52848ce5b84a237))
+
+### Documentación
+
+- **changelog**: Actualizar registro de cambios y configurar generación automática en español
+  ([`c0796f4`](https://github.com/cortega26/chile-hub/commit/c0796f48fe4c17e25395578a724f3451c5ab6991))
+
+- **datasets**: Evaluar candidatos y agregar estado under-review
+  ([`a0978a3`](https://github.com/cortega26/chile-hub/commit/a0978a38cf2889b19b65b88b610edf443d7ecfe4))
+
+
 ---
 
 ## 1.15.0 - 2026-06-21
