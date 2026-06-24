@@ -45,7 +45,7 @@ dependencies = [
 
 [project.optional-dependencies]
 pipeline = [
-    "duckdb==1.5.3",
+    "duckdb==1.5.4",
     "pandas==3.0.3; python_version >= '3.11'",
     "xlsxwriter==3.2.9",
     "curl_cffi==0.15.0",
