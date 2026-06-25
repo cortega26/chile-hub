@@ -1,10 +1,10 @@
 # chile-hub drift report
 
-- `generated_at_utc`: `2026-06-20T02:40:01.612344+00:00`
+- `generated_at_utc`: `2026-06-25T11:01:38.705135+00:00`
 - `dataset_count`: `15`
-- `drifted_count`: `3`
-- `healthy_count`: `12`
-- `fallback_count`: `0`
+- `drifted_count`: `5`
+- `healthy_count`: `10`
+- `fallback_count`: `2`
 - `partial_coverage_count`: `1`
 - `degraded_count`: `0`
 
@@ -20,10 +20,10 @@
 | `establecimientos_educacionales` | `healthy` | `live` | `not_applicable` | `none` | 0 | Ninguna. |
 | `censo_hogares_viviendas` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
 | `distritos_electorales` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
-| `finanzas_municipales` | `healthy` | `live` | `not_applicable` | `none` | 0 | Ninguna. |
+| `finanzas_municipales` | `drifted` | `fallback` | `not_applicable` | `warning` | 1 | Revisar warnings operativos del dataset antes de consumirlo en producción. |
 | `resultados_educacionales` | `healthy` | `live` | `not_applicable` | `none` | 0 | Ninguna. |
 | `indicadores_urbanos_siedu` | `drifted` | `live` | `partial` | `warning` | 1 | Revisar warnings operativos del dataset antes de consumirlo en producción. |
-| `perfil_territorial_comunal` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
+| `perfil_territorial_comunal` | `drifted` | `fallback` | `full` | `none` | 0 | Ninguna. |
 | `empresas` | `drifted` | `live` | `not_applicable` | `warning` | 3 | Revisar warnings operativos del dataset antes de consumirlo en producción. |
 
 ## regiones
@@ -128,13 +128,13 @@
 
 ## finanzas_municipales
 
-- `drift_status`: `healthy`
-- `source_mode`: `live`
+- `drift_status`: `drifted`
+- `source_mode`: `fallback`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
-- `degradation`: Sin degradación operativa detectada en este build.
-- `warning_count`: `0`
-- `diagnostic_summary`: Sin degradación operativa detectada en este build.
-- `recommended_action`: Ninguna.
+- `degradation`: finanzas_municipales source_mode is fallback; review before publication
+- `warning_count`: `1`
+- `diagnostic_summary`: finanzas_municipales source_mode is fallback; review before publication
+- `recommended_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.
 
 ## resultados_educacionales
 
@@ -158,8 +158,8 @@
 
 ## perfil_territorial_comunal
 
-- `drift_status`: `healthy`
-- `source_mode`: `live`
+- `drift_status`: `drifted`
+- `source_mode`: `fallback`
 - `coverage`: `Cobertura completa: 346/346 filas respecto del baseline esperado.`
 - `degradation`: Sin degradación operativa detectada en este build.
 - `warning_count`: `0`
@@ -171,7 +171,7 @@
 - `drift_status`: `drifted`
 - `source_mode`: `live`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
-- `degradation`: found 1 RUTs with non-standard format (not validated); unknown sociedad codes (new types?): ['SpA']; RES solo cubre constituciones bajo Ley 20.659 (regimen simplificado). No incluye empresas del regimen tradicional (Diario Oficial) ni empresas anteriores a mayo 2013.
+- `degradation`: found 1 RUTs with invalid format; unknown sociedad codes (new types?): ['SpA']; RES solo cubre constituciones bajo Ley 20.659 (regimen simplificado). No incluye empresas del regimen tradicional (Diario Oficial) ni empresas anteriores a mayo 2013.
 - `warning_count`: `3`
-- `diagnostic_summary`: found 1 RUTs with non-standard format (not validated)
+- `diagnostic_summary`: found 1 RUTs with invalid format
 - `recommended_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.

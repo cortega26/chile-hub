@@ -1,21 +1,21 @@
 # chile-hub overview
 
-- `generated_at_utc`: `2026-06-20T02:40:01.612344+00:00`
+- `generated_at_utc`: `2026-06-25T11:01:38.705135+00:00`
 - `overall_status`: `warn`
 - `dataset_count`: `15`
-- `live_count`: `15`
-- `fallback_count`: `0`
+- `live_count`: `13`
+- `fallback_count`: `2`
 - `stale_count`: `0`
-- `drifted_count`: `3`
+- `drifted_count`: `5`
 - `degraded_count`: `0`
 - `partial_coverage_count`: `1`
-- `warning_count`: `5`
+- `warning_count`: `6`
 - `shared_artifact_count`: `23`
 - `package_count`: `1`
 - `top_issue`: `empresas` (freshness=fresh, drift=drifted, warnings=3)
-- `top_issue_reason`: found 1 RUTs with non-standard format (not validated)
+- `top_issue_reason`: found 1 RUTs with invalid format
 - `top_issue_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.
-- `top_issue_summary`: empresas: found 1 RUTs with non-standard format (not validated) [source_detail=datos_gob_cl_ckan_api; warnings=3; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]
+- `top_issue_summary`: empresas: found 1 RUTs with invalid format [source_detail=datos_gob_cl_ckan_api; warnings=3; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]
 
 | Dataset | Mode | Validation | Freshness | Coverage | Drift |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -27,10 +27,10 @@
 | `empresas` | `live` | `ok` | `fresh` | `not_applicable` | `drifted` |
 | `establecimientos_educacionales` | `live` | `ok` | `fresh` | `not_applicable` | `healthy` |
 | `establecimientos_salud` | `live` | `ok` | `fresh` | `not_applicable` | `healthy` |
-| `finanzas_municipales` | `live` | `ok` | `fresh` | `not_applicable` | `healthy` |
+| `finanzas_municipales` | `fallback` | `ok` | `fresh` | `not_applicable` | `drifted` |
 | `indicadores` | `live` | `ok` | `fresh` | `not_applicable` | `drifted` |
 | `indicadores_urbanos_siedu` | `live` | `ok` | `fresh` | `partial` | `drifted` |
-| `perfil_territorial_comunal` | `live` | `ok` | `fresh` | `full` | `healthy` |
+| `perfil_territorial_comunal` | `fallback` | `ok` | `fresh` | `full` | `drifted` |
 | `provincias` | `live` | `ok` | `fresh` | `full` | `healthy` |
 | `regiones` | `live` | `ok` | `fresh` | `full` | `healthy` |
 | `resultados_educacionales` | `live` | `ok` | `fresh` | `not_applicable` | `healthy` |
@@ -39,7 +39,7 @@
 
 - `path`: `data/normalized/chile-hub-publishable-bundle.zip`
 - `package_type`: `zip`
-- `size_bytes`: `29221220`
+- `size_bytes`: `29225261`
 - `checksum`: `sha256` via `data/normalized/chile-hub-publishable-bundle.zip.sha256`
 - `verification_command`: `shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256`
 
