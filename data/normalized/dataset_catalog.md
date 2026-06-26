@@ -1,6 +1,6 @@
 # chile-hub dataset catalog
 
-- `generated_at_utc`: `2026-06-25T11:01:38.705135+00:00`
+- `generated_at_utc`: `2026-06-26T11:05:41.876177+00:00`
 - `dataset_count`: `15`
 
 | Dataset | Source | Mode | Freshness | Reuse | Records | Confidence | Join Keys | Validation |
@@ -9,14 +9,14 @@
 | `provincias` | BCN ArcGIS | `live` | `fresh (0.07h / 2160h)` | `open-attribution (CC BY)` | 56 | `Tier B` | `codigo_provincia, codigo_region` | `ok` |
 | `comunas` | BCN ArcGIS | `live` | `fresh (0.07h / 2160h)` | `open-attribution (CC BY)` | 346 | `Tier B` | `codigo_comuna, codigo_region` | `ok` |
 | `comunas_enriquecidas` | BCN ArcGIS | `live` | `fresh (0.07h / 2160h)` | `open-attribution (CC BY)` | 346 | `Tier B` | `codigo_comuna` | `ok` |
-| `indicadores` | Banco Central de Chile (via mindicador.cl) | `live` | `fresh (0.07h / 72h)` | `open-attribution (Reproducción libre con citación (BCCh / INE))` | 442 | `Tier A/B` | `fecha, codigo_indicador` | `ok` |
+| `indicadores` | Banco Central de Chile (via mindicador.cl) | `live` | `fresh (0.07h / 72h)` | `open-attribution (Reproducción libre con citación (BCCh / INE))` | 444 | `Tier A/B` | `fecha, codigo_indicador` | `ok` |
 | `censo_comunal` | Instituto Nacional de Estadisticas - Censo 2024 | `live` | `fresh (0.07h / 87600h)` | `open-attribution (CC BY 4.0)` | 346 | `Tier A` | `codigo_comuna, codigo_region` | `ok` |
 | `establecimientos_salud` | Ministerio de Salud - Establecimientos de Salud | `live` | `fresh (0.07h / 1080h)` | `open-attribution (CC0)` | 5707 | `Tier A` | `codigo_establecimiento, codigo_comuna` | `ok` |
 | `establecimientos_educacionales` | Ministerio de Educación - Directorio Oficial de Establecimientos | `live` | `fresh (0.07h / 8760h)` | `open-attribution (CC-BY-3.0)` | 12898 | `Tier A` | `codigo_comuna` | `ok` |
 | `censo_hogares_viviendas` | Instituto Nacional de Estadisticas - Censo 2024 | `live` | `fresh (0.07h / 87600h)` | `open-attribution (CC BY 4.0)` | 346 | `Tier A` | `codigo_comuna, codigo_region` | `ok` |
 | `distritos_electorales` | BCN / Biblioteca del Congreso Nacional de Chile | `live` | `fresh (0.07h / 87600h)` | `open-attribution (CC0)` | 346 | `Tier A` | `codigo_comuna` | `ok` |
 | `finanzas_municipales` | SINIM - SUBDERE | `fallback` | `fresh (0.07h / 8760h)` | `public-api-review-terms (Datos públicos municipales; términos de reutilización sujetos a revisión)` | 3 | `Tier B` | `anio, codigo_comuna` | `ok` |
-| `resultados_educacionales` | Centro de Estudios MINEDUC - Rendimiento 2024 | `live` | `fresh (0.06h / 8760h)` | `open-attribution (CC-BY-3.0)` | 345 | `Tier B` | `anio, codigo_comuna` | `ok` |
+| `resultados_educacionales` | Centro de Estudios MINEDUC - Rendimiento 2024 | `live` | `fresh (0.07h / 8760h)` | `open-attribution (CC-BY-3.0)` | 345 | `Tier B` | `anio, codigo_comuna` | `ok` |
 | `indicadores_urbanos_siedu` | INE - Sistema de Indicadores y Estándares de Desarrollo Urbano | `live` | `fresh (0.06h / 8760h)` | `open-attribution (Licencia de Datos Abiertos INE)` | 6701 | `Tier B` | `anio, codigo_comuna, codigo_indicador` | `ok` |
 | `perfil_territorial_comunal` | chile-hub | `fallback` | `fresh (0.0h / 1080h)` | `open-attribution (Derivada de fuentes abiertas con atribución)` | 346 | `Tier B` | `codigo_comuna` | `ok` |
 | `empresas` | Ministerio de Economia, Fomento y Turismo - Registro de Empresas y Sociedades (RES) | `live` | `fresh (0.06h / 1080h)` | `open-attribution (CC-BY)` | 1572116 | `Tier B` | `rut` | `ok` |
@@ -190,7 +190,7 @@ Resultados educacionales agregados por comuna y año, sin registros personales.
 
 - `source_url`: https://datosabiertos.mineduc.cl/wp-content/uploads/2025/04/Rendimiento_2024.rar
 - `documentation`: `docs/datasets/resultados_educacionales.md`
-- `freshness`: `fresh (0.06h / 8760h)`
+- `freshness`: `fresh (0.07h / 8760h)`
 - `reuse_policy`: `{"status": "open-attribution", "license": "CC-BY-3.0", "license_url": "https://creativecommons.org/licenses/by/3.0/cl/", "attribution_required": true, "redistribution_ok": true, "summary": "Datos agregados desde publicaciones del Centro de Estudios MINEDUC; citar fuente oficial."}`
 - `fields`: `anio, codigo_comuna, matricula_total, asistencia_promedio, tasa_aprobacion, tasa_reprobacion, tasa_retiro, establecimientos_reportados`
 - `join_keys`: `anio, codigo_comuna`
