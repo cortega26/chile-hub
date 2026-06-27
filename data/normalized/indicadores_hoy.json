@@ -2166,6 +2166,16 @@
   },
   {
     "fecha": "2026-06-30",
+    "codigo_indicador": "dolar",
+    "valor": 922.34
+  },
+  {
+    "fecha": "2026-06-30",
+    "codigo_indicador": "euro",
+    "valor": 1050.38
+  },
+  {
+    "fecha": "2026-06-30",
     "codigo_indicador": "uf",
     "valor": 40820.31
   },

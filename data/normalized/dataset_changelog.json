@@ -1,6 +1,6 @@
 {
-  "generated_at_utc": "2026-06-26T11:05:41.876177+00:00",
-  "previous_generated_at_utc": "2026-06-25T11:01:38.705135+00:00",
+  "generated_at_utc": "2026-06-27T10:43:46.491183+00:00",
+  "previous_generated_at_utc": "2026-06-26T11:05:41.876177+00:00",
   "dataset_count": 15,
   "datasets": [
     {
@@ -185,8 +185,8 @@
     },
     {
       "dataset": "indicadores",
-      "previous_record_count": 442,
-      "current_record_count": 444,
+      "previous_record_count": 444,
+      "current_record_count": 446,
       "record_count_delta": 2,
       "added_fields": [],
       "removed_fields": [],

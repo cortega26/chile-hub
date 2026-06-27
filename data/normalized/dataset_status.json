@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-06-26T11:05:41.876177+00:00",
+  "generated_at_utc": "2026-06-27T10:43:46.491183+00:00",
   "dataset_count": 15,
   "datasets": [
     {
@@ -10,7 +10,7 @@
         "status": "fresh",
         "age_hours": 0.07,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-06-26T11:05:41.873646+00:00"
+        "checked_at_utc": "2026-06-27T10:43:46.488730+00:00"
       },
       "record_count": 346,
       "expected_record_count": 346,
@@ -18,7 +18,7 @@
       "coverage_ratio": 1.0,
       "redistribution_status": "open-attribution",
       "redistribution_ok": true,
-      "refreshed_at_utc": "2026-06-26T11:01:30.044120+00:00",
+      "refreshed_at_utc": "2026-06-27T10:39:34.964796+00:00",
       "warnings": [],
       "recommended_action": "Ninguna."
     },
@@ -30,7 +30,7 @@
         "status": "fresh",
         "age_hours": 0.07,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-06-26T11:05:41.873672+00:00"
+        "checked_at_utc": "2026-06-27T10:43:46.488754+00:00"
       },
       "record_count": 346,
       "expected_record_count": 346,
@@ -38,7 +38,7 @@
       "coverage_ratio": 1.0,
       "redistribution_status": "open-attribution",
       "redistribution_ok": true,
-      "refreshed_at_utc": "2026-06-26T11:01:31.702264+00:00",
+      "refreshed_at_utc": "2026-06-27T10:39:36.664153+00:00",
       "warnings": [],
       "recommended_action": "Ninguna."
     },
@@ -50,7 +50,7 @@
         "status": "fresh",
         "age_hours": 0.07,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-26T11:05:41.873402+00:00"
+        "checked_at_utc": "2026-06-27T10:43:46.488504+00:00"
       },
       "record_count": 346,
       "expected_record_count": 346,
@@ -58,7 +58,7 @@
       "coverage_ratio": 1.0,
       "redistribution_status": "open-attribution",
       "redistribution_ok": true,
-      "refreshed_at_utc": "2026-06-26T11:01:19.489218+00:00",
+      "refreshed_at_utc": "2026-06-27T10:39:27.298086+00:00",
       "warnings": [],
       "recommended_action": "Ninguna."
     },
@@ -70,7 +70,7 @@
         "status": "fresh",
         "age_hours": 0.07,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-26T11:05:41.873410+00:00"
+        "checked_at_utc": "2026-06-27T10:43:46.488511+00:00"
       },
       "record_count": 346,
       "expected_record_count": 346,
@@ -78,7 +78,7 @@
       "coverage_ratio": 1.0,
       "redistribution_status": "open-attribution",
       "redistribution_ok": true,
-      "refreshed_at_utc": "2026-06-26T11:01:19.489218+00:00",
+      "refreshed_at_utc": "2026-06-27T10:39:27.298086+00:00",
       "warnings": [],
       "recommended_action": "Ninguna."
     },
@@ -90,7 +90,7 @@
         "status": "fresh",
         "age_hours": 0.07,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-06-26T11:05:41.873678+00:00"
+        "checked_at_utc": "2026-06-27T10:43:46.488759+00:00"
       },
       "record_count": 346,
       "expected_record_count": 346,
@@ -98,7 +98,7 @@
       "coverage_ratio": 1.0,
       "redistribution_status": "open-attribution",
       "redistribution_ok": true,
-      "refreshed_at_utc": "2026-06-26T11:01:33.515740+00:00",
+      "refreshed_at_utc": "2026-06-27T10:39:38.703663+00:00",
       "warnings": [],
       "recommended_action": "Ninguna."
     },
@@ -110,7 +110,7 @@
         "status": "fresh",
         "age_hours": 0.06,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-06-26T11:05:41.873735+00:00"
+        "checked_at_utc": "2026-06-27T10:43:46.488841+00:00"
       },
       "record_count": 1572116,
       "expected_record_count": null,
@@ -118,7 +118,7 @@
       "coverage_ratio": null,
       "redistribution_status": "open-attribution",
       "redistribution_ok": true,
-      "refreshed_at_utc": "2026-06-26T11:02:03.406435+00:00",
+      "refreshed_at_utc": "2026-06-27T10:40:12.037840+00:00",
       "warnings": [
         "found 1 RUTs with invalid format",
         "unknown sociedad codes (new types?): ['SpA']",
@@ -134,7 +134,7 @@
         "status": "fresh",
         "age_hours": 0.07,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-06-26T11:05:41.873664+00:00"
+        "checked_at_utc": "2026-06-27T10:43:46.488747+00:00"
       },
       "record_count": 12898,
       "expected_record_count": null,
@@ -142,7 +142,7 @@
       "coverage_ratio": null,
       "redistribution_status": "open-attribution",
       "redistribution_ok": true,
-      "refreshed_at_utc": "2026-06-26T11:01:36.215210+00:00",
+      "refreshed_at_utc": "2026-06-27T10:39:41.294873+00:00",
       "warnings": [],
       "recommended_action": "Ninguna."
     },
@@ -154,7 +154,7 @@
         "status": "fresh",
         "age_hours": 0.07,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-06-26T11:05:41.873656+00:00"
+        "checked_at_utc": "2026-06-27T10:43:46.488740+00:00"
       },
       "record_count": 5707,
       "expected_record_count": null,
@@ -162,7 +162,7 @@
       "coverage_ratio": null,
       "redistribution_status": "open-attribution",
       "redistribution_ok": true,
-      "refreshed_at_utc": "2026-06-26T11:01:32.995999+00:00",
+      "refreshed_at_utc": "2026-06-27T10:39:38.236253+00:00",
       "warnings": [],
       "recommended_action": "Ninguna."
     },
@@ -174,7 +174,7 @@
         "status": "fresh",
         "age_hours": 0.07,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-06-26T11:05:41.873685+00:00"
+        "checked_at_utc": "2026-06-27T10:43:46.488766+00:00"
       },
       "record_count": 3,
       "expected_record_count": null,
@@ -182,7 +182,7 @@
       "coverage_ratio": null,
       "redistribution_status": "public-api-review-terms",
       "redistribution_ok": true,
-      "refreshed_at_utc": "2026-06-26T11:01:37.571819+00:00",
+      "refreshed_at_utc": "2026-06-27T10:39:42.541588+00:00",
       "warnings": [
         "finanzas_municipales source_mode is fallback; review before publication"
       ],
@@ -196,15 +196,15 @@
         "status": "fresh",
         "age_hours": 0.07,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-06-26T11:05:41.873629+00:00"
+        "checked_at_utc": "2026-06-27T10:43:46.488713+00:00"
       },
-      "record_count": 444,
+      "record_count": 446,
       "expected_record_count": null,
       "coverage_status": "not_applicable",
       "coverage_ratio": null,
       "redistribution_status": "open-attribution",
       "redistribution_ok": true,
-      "refreshed_at_utc": "2026-06-26T11:01:26.606341+00:00",
+      "refreshed_at_utc": "2026-06-27T10:39:31.450957+00:00",
       "warnings": [
         "indicadores live refresh reused last published artifact for missing codes: ipc"
       ],
@@ -216,9 +216,9 @@
       "source_mode": "live",
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.06,
+        "age_hours": 0.07,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-06-26T11:05:41.873699+00:00"
+        "checked_at_utc": "2026-06-27T10:43:46.488811+00:00"
       },
       "record_count": 6701,
       "expected_record_count": null,
@@ -226,7 +226,7 @@
       "coverage_ratio": 0.3382,
       "redistribution_status": "open-attribution",
       "redistribution_ok": true,
-      "refreshed_at_utc": "2026-06-26T11:01:48.004969+00:00",
+      "refreshed_at_utc": "2026-06-27T10:39:52.073262+00:00",
       "warnings": [
         "indicadores_urbanos_siedu has intentionally partial urban coverage"
       ],
@@ -240,7 +240,7 @@
         "status": "fresh",
         "age_hours": 0.0,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-06-26T11:05:41.873723+00:00"
+        "checked_at_utc": "2026-06-27T10:43:46.488830+00:00"
       },
       "record_count": 346,
       "expected_record_count": 346,
@@ -248,7 +248,7 @@
       "coverage_ratio": 1.0,
       "redistribution_status": "open-attribution",
       "redistribution_ok": true,
-      "refreshed_at_utc": "2026-06-26T11:05:41.873708+00:00",
+      "refreshed_at_utc": "2026-06-27T10:43:46.488820+00:00",
       "warnings": [],
       "recommended_action": "Ninguna."
     },
@@ -260,7 +260,7 @@
         "status": "fresh",
         "age_hours": 0.07,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-26T11:05:41.873390+00:00"
+        "checked_at_utc": "2026-06-27T10:43:46.488492+00:00"
       },
       "record_count": 56,
       "expected_record_count": 56,
@@ -268,7 +268,7 @@
       "coverage_ratio": 1.0,
       "redistribution_status": "open-attribution",
       "redistribution_ok": true,
-      "refreshed_at_utc": "2026-06-26T11:01:19.489218+00:00",
+      "refreshed_at_utc": "2026-06-27T10:39:27.298086+00:00",
       "warnings": [],
       "recommended_action": "Ninguna."
     },
@@ -280,7 +280,7 @@
         "status": "fresh",
         "age_hours": 0.07,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-06-26T11:05:41.873359+00:00"
+        "checked_at_utc": "2026-06-27T10:43:46.488466+00:00"
       },
       "record_count": 16,
       "expected_record_count": 16,
@@ -288,7 +288,7 @@
       "coverage_ratio": 1.0,
       "redistribution_status": "open-attribution",
       "redistribution_ok": true,
-      "refreshed_at_utc": "2026-06-26T11:01:19.489218+00:00",
+      "refreshed_at_utc": "2026-06-27T10:39:27.298086+00:00",
       "warnings": [],
       "recommended_action": "Ninguna."
     },
@@ -300,7 +300,7 @@
         "status": "fresh",
         "age_hours": 0.07,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-06-26T11:05:41.873692+00:00"
+        "checked_at_utc": "2026-06-27T10:43:46.488804+00:00"
       },
       "record_count": 345,
       "expected_record_count": null,
@@ -308,7 +308,7 @@
       "coverage_ratio": null,
       "redistribution_status": "open-attribution",
       "redistribution_ok": true,
-      "refreshed_at_utc": "2026-06-26T11:01:44.038158+00:00",
+      "refreshed_at_utc": "2026-06-27T10:39:48.720199+00:00",
       "warnings": [],
       "recommended_action": "Ninguna."
     }
