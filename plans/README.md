@@ -2,39 +2,37 @@
 
 Planes de implementación generados por auditoría `/improve deep` en commits `ba2f434` (2026-06-13) y `a2cd288` (2026-06-19), y por `/improve plan` (mejoras de librerías/dependencias) en commit `140c8ea` (2026-06-29).
 
-## Planes activos (mejoras de librerías/dependencias, 2026-06-29)
+> **Archivado automático**: cuando un plan pasa a estado `DONE`, mueve su fichero `.md` a `archive/`
+> inmediatamente y borra su fila de la tabla de activos. No lo dejes en la tabla activa ni en
+> `plans/` raíz. Si el plan archivado merece mención, añádelo a la sección "Planes archivados"
+> correspondiente.
+
+## Planes activos
 
 | # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
 |---|------|----------|----------|--------|-----------|--------|
-| 018 | [Renderizar tablas de la CLI con `rich`](018-rich-cli-table-output.md) | P2 | M | MED | — | DONE |
-| 019 | [Publicar `datapackage.json` (Frictionless) como artefacto adicional](019-frictionless-datapackage.md) | P2 | M | LOW | — | TODO |
+| 014 | [Limpieza de arquitectura — catálogo externo, imports, alias](014-architecture-cleanup.md) | P2 | M | MED | — | TODO |
 | 020 | [Explorador SQL en la landing con DuckDB-Wasm](020-duckdb-wasm-playground.md) | P2 | M | MED | — | TODO |
 | 021 | [Publicar documentación de API con MkDocs Material + mkdocstrings](021-mkdocs-api-docs.md) | P3 | M | LOW | — | TODO |
 
-## Planes activos (auditoría 2026-06-19)
+## Planes archivados (mejoras de librerías/dependencias, 2026-06-29)
 
-| # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
-|---|------|----------|----------|--------|-----------|--------|
-| 012 | [Hardening de seguridad — TOCTOU, integridad binario y paths](012-security-hardening.md) | P2 | S | LOW | — | DONE |
-| 014 | [Limpieza de arquitectura — catálogo externo, imports, alias](014-architecture-cleanup.md) | P2 | M | MED | — | TODO |
+| # | Plan | Esfuerzo | Riesgo | Estado |
+|---|------|----------|--------|--------|
+| 018 | [Renderizar tablas de la CLI con `rich`](archive/018-rich-cli-table-output.md) | M | MED | DONE |
+| 019 | [Publicar `datapackage.json` (Frictionless) como artefacto adicional](archive/019-frictionless-datapackage.md) | M | LOW | DONE |
 
-## Planes en backlog (API pública — capa premium futura)
-
-| # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
-|---|------|----------|----------|--------|-----------|--------|
-| 011 | [Robustecer manejo de errores en API pública](011-harden-api-error-handling.md) | P1 | S | LOW | — | DONE |
-
-→ Ver también [`docs/backlog/06-api-error-handling.md`](../docs/backlog/06-api-error-handling.md)
-
-## Planes archivados (auditoría 2026-06-19, ejecutados)
+## Planes archivados (auditoría 2026-06-19)
 
 | # | Plan | Esfuerzo | Riesgo | Estado |
 |---|------|----------|--------|--------|
 | 010 | [Corregir bugs en extractores y validación](archive/010-fix-extractor-and-validation-bugs.md) | S | LOW | DONE |
+| 011 | [Robustecer manejo de errores en API pública](archive/011-harden-api-error-handling.md) | S | LOW | DONE |
+| 012 | [Hardening de seguridad — TOCTOU, integridad binario y paths](archive/012-security-hardening.md) | S | LOW | DONE |
 | 013 | [Cache en memoria para la API de ChileHub](archive/013-api-performance-caching.md) | S | LOW | DONE |
 | 015 | [Robustez de tests — HTTP mocking, CLI coverage, assertions](archive/015-test-robustness.md) | M | LOW | DONE |
 | 016 | [Cache de staging en CI](archive/016-ci-staging-cache.md) | S | MED | DONE |
-| 017 | [Nuevas capacidades de API — cruces, validación, exit codes, búsqueda](017-new-api-capabilities.md) | M | LOW | DONE |
+| 017 | [Nuevas capacidades de API — cruces, validación, exit codes, búsqueda](archive/017-new-api-capabilities.md) | M | LOW | DONE |
 
 ## Planes archivados (auditoría 2026-06-13, completados)
 
@@ -53,26 +51,19 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 ## Grafo de dependencias (planes activos)
 
 ```
-012 (independiente)
 014 (independiente)
-018 (independiente)   ← rich CLI
-019 (independiente)   ← Frictionless datapackage
 020 (independiente)   ← DuckDB-Wasm landing
 021 (independiente)   ← MkDocs API docs
 ```
 
-Los planes 018–021 son todos independientes entre sí y de 012/014: tocan superficies
-distintas (CLI, pipeline de build, landing, docs/CI) y pueden ejecutarse en cualquier
-orden o en paralelo.
+Los planes activos son independientes entre sí: tocan superficies distintas (pipeline de build,
+landing, docs/CI) y pueden ejecutarse en cualquier orden o en paralelo.
 
 ## Orden de ejecución recomendado
 
-1. **012** — esfuerzo S, máximo leverage en seguridad
-2. **014** — esfuerzo M, limpieza de arquitectura
-3. **018** — `rich`: victoria de UX rápida y de bajo riesgo (rich ya está en `uv.lock`)
-4. **019** — Frictionless: inversión de interoperabilidad, artefacto aditivo (no toca contratos, respeta ADR-005)
-5. **020** — DuckDB-Wasm: mayor salto de utilidad de la landing (riesgo MED por CSP/WASM)
-6. **021** — MkDocs: docs de API desde docstrings existentes (P3, aditivo)
+1. **014** — limpieza de arquitectura
+2. **020** — DuckDB-Wasm: mayor salto de utilidad de la landing (riesgo MED por CSP/WASM)
+3. **021** — MkDocs: docs de API desde docstrings existentes (P3, aditivo)
 
 ## Hallazgos considerados y diferidos (2026-06-29 — mejoras de librerías)
 
