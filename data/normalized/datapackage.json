@@ -1,0 +1,1364 @@
+{
+  "name": "chile-hub",
+  "title": "chile-hub -- Datos publicos de Chile curados",
+  "description": "Capa de datos reproducible y curada sobre datasets publicos oficiales de Chile: geografia, demografia, salud, educacion, finanzas municipales e indicadores.",
+  "version": "1.15.1",
+  "homepage": "https://tooltician.com/chile-hub/",
+  "created": "2026-06-29T20:57:58.226743+00:00",
+  "resources": [
+    {
+      "name": "regiones",
+      "path": "regiones.parquet",
+      "format": "parquet",
+      "mediatype": "application/vnd.apache.parquet",
+      "title": "regiones",
+      "description": "Capa derivada de regiones para filtros, joins y referencias administrativas de alto nivel.",
+      "schema": {
+        "fields": [
+          {
+            "name": "codigo_region",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_region",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          }
+        ],
+        "missingValues": [
+          ""
+        ],
+        "primaryKey": [
+          "codigo_region"
+        ]
+      },
+      "sources": [
+        {
+          "title": "BCN ArcGIS",
+          "path": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query"
+        }
+      ],
+      "licenses": [
+        {
+          "title": "CC BY",
+          "path": "https://datos.bcn.cl/es/informacion/lo-que-esta-haciendo-bcn"
+        }
+      ]
+    },
+    {
+      "name": "provincias",
+      "path": "provincias.parquet",
+      "format": "parquet",
+      "mediatype": "application/vnd.apache.parquet",
+      "title": "provincias",
+      "description": "Capa derivada de provincias para cruces intermedios entre region y comuna.",
+      "schema": {
+        "fields": [
+          {
+            "name": "codigo_region",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_region",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "codigo_provincia",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_provincia",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          }
+        ],
+        "missingValues": [
+          ""
+        ],
+        "primaryKey": [
+          "codigo_provincia"
+        ]
+      },
+      "sources": [
+        {
+          "title": "BCN ArcGIS",
+          "path": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query"
+        }
+      ],
+      "licenses": [
+        {
+          "title": "CC BY",
+          "path": "https://datos.bcn.cl/es/informacion/lo-que-esta-haciendo-bcn"
+        }
+      ]
+    },
+    {
+      "name": "comunas",
+      "path": "comunas.parquet",
+      "format": "parquet",
+      "mediatype": "application/vnd.apache.parquet",
+      "title": "comunas",
+      "description": "Base territorial normalizada para cruces por region, provincia y comuna.",
+      "schema": {
+        "fields": [
+          {
+            "name": "codigo_region",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_region",
+            "type": "string"
+          },
+          {
+            "name": "abreviatura",
+            "type": "string"
+          },
+          {
+            "name": "codigo_provincia",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_provincia",
+            "type": "string"
+          },
+          {
+            "name": "codigo_comuna",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_comuna",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_comuna_clean",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "latitud_cabecera",
+            "type": "string"
+          },
+          {
+            "name": "longitud_cabecera",
+            "type": "string"
+          },
+          {
+            "name": "poblacion_estimada",
+            "type": "string"
+          }
+        ],
+        "missingValues": [
+          ""
+        ],
+        "primaryKey": [
+          "codigo_comuna"
+        ]
+      },
+      "sources": [
+        {
+          "title": "BCN ArcGIS",
+          "path": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query"
+        }
+      ],
+      "licenses": [
+        {
+          "title": "CC BY",
+          "path": "https://datos.bcn.cl/es/informacion/lo-que-esta-haciendo-bcn"
+        }
+      ]
+    },
+    {
+      "name": "comunas_enriquecidas",
+      "path": "comunas.parquet",
+      "format": "parquet",
+      "mediatype": "application/vnd.apache.parquet",
+      "title": "comunas_enriquecidas",
+      "description": "Comunas con coordenadas de cabecera y poblacion estimada INE, listas para analisis territorial sin joins adicionales.",
+      "schema": {
+        "fields": [
+          {
+            "name": "codigo_region",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_region",
+            "type": "string"
+          },
+          {
+            "name": "abreviatura",
+            "type": "string"
+          },
+          {
+            "name": "codigo_provincia",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_provincia",
+            "type": "string"
+          },
+          {
+            "name": "codigo_comuna",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_comuna",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_comuna_clean",
+            "type": "string"
+          },
+          {
+            "name": "latitud_cabecera",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "longitud_cabecera",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "poblacion_estimada",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          }
+        ],
+        "missingValues": [
+          ""
+        ],
+        "primaryKey": [
+          "codigo_comuna"
+        ]
+      },
+      "sources": [
+        {
+          "title": "BCN ArcGIS",
+          "path": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query"
+        }
+      ],
+      "licenses": [
+        {
+          "title": "CC BY",
+          "path": "https://datos.bcn.cl/es/informacion/lo-que-esta-haciendo-bcn"
+        }
+      ]
+    },
+    {
+      "name": "indicadores",
+      "path": "indicadores.parquet",
+      "format": "parquet",
+      "mediatype": "application/vnd.apache.parquet",
+      "title": "indicadores",
+      "description": "Serie de indicadores economicos diarios de referencia para analisis y software.",
+      "schema": {
+        "fields": [
+          {
+            "name": "fecha",
+            "type": "date",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "codigo_indicador",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "valor",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          }
+        ],
+        "missingValues": [
+          ""
+        ],
+        "primaryKey": [
+          "fecha",
+          "codigo_indicador"
+        ]
+      },
+      "sources": [
+        {
+          "title": "Banco Central de Chile (via mindicador.cl)",
+          "path": "https://mindicador.cl/api"
+        }
+      ],
+      "licenses": [
+        {
+          "title": "Reproducción libre con citación (BCCh / INE)",
+          "path": "https://www.bcentral.cl/web/banco-central/terminos-y-condiciones"
+        }
+      ]
+    },
+    {
+      "name": "censo_comunal",
+      "path": "censo_comunal.parquet",
+      "format": "parquet",
+      "mediatype": "application/vnd.apache.parquet",
+      "title": "censo_comunal",
+      "description": "Perfil demografico comunal del Censo 2024 con sexo y grandes grupos de edad.",
+      "schema": {
+        "fields": [
+          {
+            "name": "codigo_region",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_region",
+            "type": "string"
+          },
+          {
+            "name": "codigo_provincia",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_provincia",
+            "type": "string"
+          },
+          {
+            "name": "codigo_comuna",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_comuna",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "poblacion_censada",
+            "type": "integer",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "hombres",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "mujeres",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "razon_hombre_mujer",
+            "type": "string"
+          },
+          {
+            "name": "poblacion_0_14",
+            "type": "string"
+          },
+          {
+            "name": "poblacion_15_29",
+            "type": "string"
+          },
+          {
+            "name": "poblacion_30_44",
+            "type": "string"
+          },
+          {
+            "name": "poblacion_45_64",
+            "type": "string"
+          },
+          {
+            "name": "poblacion_65_mas",
+            "type": "string"
+          }
+        ],
+        "missingValues": [
+          ""
+        ],
+        "primaryKey": [
+          "codigo_comuna"
+        ]
+      },
+      "sources": [
+        {
+          "title": "Instituto Nacional de Estadisticas - Censo 2024",
+          "path": "https://censo2024.ine.gob.cl/wp-content/uploads/2025/03/D1_Poblacion-censada-por-sexo-y-edad-en-grupos-quinquenales.xlsx"
+        }
+      ],
+      "licenses": [
+        {
+          "title": "CC BY 4.0",
+          "path": "https://www.ine.gob.cl/terminos-de-uso"
+        }
+      ]
+    },
+    {
+      "name": "establecimientos_salud",
+      "path": "establecimientos_salud.parquet",
+      "format": "parquet",
+      "mediatype": "application/vnd.apache.parquet",
+      "title": "establecimientos_salud",
+      "description": "Directorio vigente de establecimientos de salud con tipo, dependencia, urgencia y ubicacion.",
+      "schema": {
+        "fields": [
+          {
+            "name": "codigo_establecimiento",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_establecimiento",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "tipo_establecimiento",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "dependencia_administrativa",
+            "type": "string"
+          },
+          {
+            "name": "nivel_atencion",
+            "type": "string"
+          },
+          {
+            "name": "codigo_region",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_region",
+            "type": "string"
+          },
+          {
+            "name": "codigo_comuna",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_comuna",
+            "type": "string"
+          },
+          {
+            "name": "tiene_servicio_urgencia",
+            "type": "string"
+          },
+          {
+            "name": "tipo_urgencia",
+            "type": "string"
+          },
+          {
+            "name": "latitud",
+            "type": "string"
+          },
+          {
+            "name": "longitud",
+            "type": "string"
+          },
+          {
+            "name": "estado_funcionamiento",
+            "type": "string"
+          }
+        ],
+        "missingValues": [
+          ""
+        ],
+        "primaryKey": [
+          "codigo_establecimiento"
+        ]
+      },
+      "sources": [
+        {
+          "title": "Ministerio de Salud - Establecimientos de Salud",
+          "path": "https://datos.gob.cl/dataset/3bf4cf7c-f638-4735-9a01-f65faae4beca/resource/2c44d782-3365-44e3-aefb-2c8b8363a1bc/download/establecimientos_20260616.csv"
+        }
+      ],
+      "licenses": [
+        {
+          "title": "CC0",
+          "path": "http://www.opendefinition.org/licenses/cc-zero"
+        }
+      ]
+    },
+    {
+      "name": "establecimientos_educacionales",
+      "path": "establecimientos_educacionales.parquet",
+      "format": "parquet",
+      "mediatype": "application/vnd.apache.parquet",
+      "title": "establecimientos_educacionales",
+      "description": "Directorio oficial del Ministerio de Educación (MINEDUC) con Rol Base de Datos (RBD), ubicación y dependencia administrativa.",
+      "schema": {
+        "fields": [
+          {
+            "name": "rbd",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "dv_rbd",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_establecimiento",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "codigo_region",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "codigo_comuna",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "dependencia_administrativa",
+            "type": "string"
+          },
+          {
+            "name": "latitud",
+            "type": "string"
+          },
+          {
+            "name": "longitud",
+            "type": "string"
+          },
+          {
+            "name": "estado_funcionamiento",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          }
+        ],
+        "missingValues": [
+          ""
+        ],
+        "primaryKey": [
+          "rbd"
+        ]
+      },
+      "sources": [
+        {
+          "title": "Ministerio de Educación - Directorio Oficial de Establecimientos",
+          "path": "https://datosabiertos.mineduc.cl/wp-content/uploads/2025/11/Directorio-Oficial-EE-2025.rar"
+        }
+      ],
+      "licenses": [
+        {
+          "title": "CC-BY-3.0",
+          "path": "https://creativecommons.org/licenses/by/3.0/cl/"
+        }
+      ]
+    },
+    {
+      "name": "censo_hogares_viviendas",
+      "path": "censo_hogares_viviendas.parquet",
+      "format": "parquet",
+      "mediatype": "application/vnd.apache.parquet",
+      "title": "censo_hogares_viviendas",
+      "description": "Viviendas y hogares censados por comuna, ocupacion y tamano medio del hogar.",
+      "schema": {
+        "fields": [
+          {
+            "name": "codigo_region",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_region",
+            "type": "string"
+          },
+          {
+            "name": "codigo_provincia",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_provincia",
+            "type": "string"
+          },
+          {
+            "name": "codigo_comuna",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_comuna",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "viviendas_censadas",
+            "type": "integer",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "viviendas_particulares_ocupadas",
+            "type": "string"
+          },
+          {
+            "name": "viviendas_particulares_desocupadas",
+            "type": "string"
+          },
+          {
+            "name": "viviendas_colectivas",
+            "type": "string"
+          },
+          {
+            "name": "hogares_censados",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "promedio_personas_hogar",
+            "type": "string"
+          }
+        ],
+        "missingValues": [
+          ""
+        ],
+        "primaryKey": [
+          "codigo_comuna"
+        ]
+      },
+      "sources": [
+        {
+          "title": "Instituto Nacional de Estadisticas - Censo 2024",
+          "path": "https://censo2024.ine.gob.cl/wp-content/uploads/2025/03/V1_Viviendas-y-hogares-censados.xlsx"
+        }
+      ],
+      "licenses": [
+        {
+          "title": "CC BY 4.0",
+          "path": "https://www.ine.gob.cl/terminos-de-uso"
+        }
+      ]
+    },
+    {
+      "name": "distritos_electorales",
+      "path": "distritos_electorales.parquet",
+      "format": "parquet",
+      "mediatype": "application/vnd.apache.parquet",
+      "title": "distritos_electorales",
+      "description": "Asociación de comunas a distritos electorales (diputados) y circunscripciones senatoriales.",
+      "schema": {
+        "fields": [
+          {
+            "name": "codigo_comuna",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_comuna",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "distrito_electoral",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "circunscripcion_senatorial",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          }
+        ],
+        "missingValues": [
+          ""
+        ],
+        "primaryKey": [
+          "codigo_comuna"
+        ]
+      },
+      "sources": [
+        {
+          "title": "BCN / Biblioteca del Congreso Nacional de Chile",
+          "path": "https://www.bcn.cl/siit/observatorio/ley20840"
+        }
+      ],
+      "licenses": [
+        {
+          "title": "CC0",
+          "path": "http://www.opendefinition.org/licenses/cc-zero"
+        }
+      ]
+    },
+    {
+      "name": "finanzas_municipales",
+      "path": "finanzas_municipales.parquet",
+      "format": "parquet",
+      "mediatype": "application/vnd.apache.parquet",
+      "title": "finanzas_municipales",
+      "description": "Indicadores financieros municipales anuales desde SINIM/SUBDERE.",
+      "schema": {
+        "fields": [
+          {
+            "name": "anio",
+            "type": "integer",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "codigo_comuna",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_comuna",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "ingresos_totales",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "gastos_totales",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "ingresos_propios_permanentes",
+            "type": "string"
+          },
+          {
+            "name": "fondo_comun_municipal",
+            "type": "string"
+          },
+          {
+            "name": "gasto_personal",
+            "type": "string"
+          },
+          {
+            "name": "gasto_inversion",
+            "type": "string"
+          }
+        ],
+        "missingValues": [
+          ""
+        ],
+        "primaryKey": [
+          "anio",
+          "codigo_comuna"
+        ]
+      },
+      "sources": [
+        {
+          "title": "SINIM - SUBDERE",
+          "path": "https://datos.sinim.gov.cl/datos_municipales.php"
+        }
+      ],
+      "licenses": [
+        {
+          "title": "Datos públicos municipales; términos de reutilización sujetos a revisión",
+          "path": "https://datos.sinim.gov.cl/"
+        }
+      ]
+    },
+    {
+      "name": "resultados_educacionales",
+      "path": "resultados_educacionales.parquet",
+      "format": "parquet",
+      "mediatype": "application/vnd.apache.parquet",
+      "title": "resultados_educacionales",
+      "description": "Resultados educacionales agregados por comuna y año, sin registros personales.",
+      "schema": {
+        "fields": [
+          {
+            "name": "anio",
+            "type": "integer",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "codigo_comuna",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "matricula_total",
+            "type": "integer",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "asistencia_promedio",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "tasa_aprobacion",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "tasa_reprobacion",
+            "type": "string"
+          },
+          {
+            "name": "tasa_retiro",
+            "type": "string"
+          },
+          {
+            "name": "establecimientos_reportados",
+            "type": "string"
+          }
+        ],
+        "missingValues": [
+          ""
+        ],
+        "primaryKey": [
+          "anio",
+          "codigo_comuna"
+        ]
+      },
+      "sources": [
+        {
+          "title": "Centro de Estudios MINEDUC - Rendimiento 2024",
+          "path": "https://datosabiertos.mineduc.cl/wp-content/uploads/2025/04/Rendimiento_2024.rar"
+        }
+      ],
+      "licenses": [
+        {
+          "title": "CC-BY-3.0",
+          "path": "https://creativecommons.org/licenses/by/3.0/cl/"
+        }
+      ]
+    },
+    {
+      "name": "indicadores_urbanos_siedu",
+      "path": "indicadores_urbanos_siedu.parquet",
+      "format": "parquet",
+      "mediatype": "application/vnd.apache.parquet",
+      "title": "indicadores_urbanos_siedu",
+      "description": "Indicadores urbanos SIEDU en formato largo con cobertura comunal parcial esperada.",
+      "schema": {
+        "fields": [
+          {
+            "name": "anio",
+            "type": "integer",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "codigo_comuna",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "codigo_indicador",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_indicador",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "categoria",
+            "type": "string"
+          },
+          {
+            "name": "valor",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "unidad",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "fuente_original",
+            "type": "string"
+          },
+          {
+            "name": "cobertura_tipo",
+            "type": "string"
+          }
+        ],
+        "missingValues": [
+          ""
+        ],
+        "primaryKey": [
+          "anio",
+          "codigo_comuna",
+          "codigo_indicador"
+        ]
+      },
+      "sources": [
+        {
+          "title": "INE - Sistema de Indicadores y Estándares de Desarrollo Urbano",
+          "path": "https://www.ine.gob.cl/docs/default-source/sistema-de-indicadores-y-estandares-de-desarrollo-urbano/indicadores/actualizaci%C3%B3n-2019/matriz-siedu-publicacion.xlsm"
+        }
+      ],
+      "licenses": [
+        {
+          "title": "Licencia de Datos Abiertos INE",
+          "path": "https://www.ine.gob.cl/terminos-de-uso"
+        }
+      ]
+    },
+    {
+      "name": "perfil_territorial_comunal",
+      "path": "perfil_territorial_comunal.parquet",
+      "format": "parquet",
+      "mediatype": "application/vnd.apache.parquet",
+      "title": "perfil_territorial_comunal",
+      "description": "Perfil comunal curado que consolida DPA, censo, salud, educación, finanzas, SIEDU y distritos.",
+      "schema": {
+        "fields": [
+          {
+            "name": "codigo_region",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_region",
+            "type": "string"
+          },
+          {
+            "name": "abreviatura",
+            "type": "string"
+          },
+          {
+            "name": "codigo_provincia",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_provincia",
+            "type": "string"
+          },
+          {
+            "name": "codigo_comuna",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_comuna",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_comuna_clean",
+            "type": "string"
+          },
+          {
+            "name": "latitud_cabecera",
+            "type": "string"
+          },
+          {
+            "name": "longitud_cabecera",
+            "type": "string"
+          },
+          {
+            "name": "poblacion_estimada",
+            "type": "string"
+          },
+          {
+            "name": "poblacion_censada",
+            "type": "integer",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "poblacion_hombres",
+            "type": "string"
+          },
+          {
+            "name": "poblacion_mujeres",
+            "type": "string"
+          },
+          {
+            "name": "poblacion_0_14",
+            "type": "string"
+          },
+          {
+            "name": "poblacion_15_29",
+            "type": "string"
+          },
+          {
+            "name": "poblacion_30_44",
+            "type": "string"
+          },
+          {
+            "name": "poblacion_45_64",
+            "type": "string"
+          },
+          {
+            "name": "poblacion_65_mas",
+            "type": "string"
+          },
+          {
+            "name": "viviendas_censadas",
+            "type": "string"
+          },
+          {
+            "name": "hogares_censados",
+            "type": "string"
+          },
+          {
+            "name": "promedio_personas_por_hogar",
+            "type": "string"
+          },
+          {
+            "name": "establecimientos_salud_total",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "establecimientos_educacionales_total",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "distrito_electoral",
+            "type": "string"
+          },
+          {
+            "name": "circunscripcion_senatorial",
+            "type": "string"
+          },
+          {
+            "name": "anio_finanzas",
+            "type": "string"
+          },
+          {
+            "name": "ingresos_totales",
+            "type": "string"
+          },
+          {
+            "name": "gastos_totales",
+            "type": "string"
+          },
+          {
+            "name": "ingresos_propios_permanentes",
+            "type": "string"
+          },
+          {
+            "name": "fondo_comun_municipal",
+            "type": "string"
+          },
+          {
+            "name": "gasto_personal",
+            "type": "string"
+          },
+          {
+            "name": "gasto_inversion",
+            "type": "string"
+          },
+          {
+            "name": "anio_resultados_educacionales",
+            "type": "string"
+          },
+          {
+            "name": "matricula_total",
+            "type": "string"
+          },
+          {
+            "name": "asistencia_promedio",
+            "type": "string"
+          },
+          {
+            "name": "tasa_aprobacion",
+            "type": "string"
+          },
+          {
+            "name": "tasa_reprobacion",
+            "type": "string"
+          },
+          {
+            "name": "tasa_retiro",
+            "type": "string"
+          },
+          {
+            "name": "establecimientos_reportados",
+            "type": "string"
+          },
+          {
+            "name": "indicadores_siedu_total",
+            "type": "string"
+          },
+          {
+            "name": "valor_promedio_siedu",
+            "type": "string"
+          }
+        ],
+        "missingValues": [
+          ""
+        ],
+        "primaryKey": [
+          "codigo_comuna"
+        ]
+      },
+      "sources": [
+        {
+          "title": "chile-hub",
+          "path": "https://github.com/cortega26/chile-hub"
+        }
+      ],
+      "licenses": [
+        {
+          "title": "Derivada de fuentes abiertas con atribución",
+          "path": "https://github.com/cortega26/chile-hub"
+        }
+      ]
+    },
+    {
+      "name": "empresas",
+      "path": "empresas.parquet",
+      "format": "parquet",
+      "mediatype": "application/vnd.apache.parquet",
+      "title": "empresas",
+      "description": "Registro de Empresas y Sociedades (RES) con RUT, razon social, tipo societario, capital, fecha de constitucion y comuna de domicilio.",
+      "schema": {
+        "fields": [
+          {
+            "name": "rut",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "razon_social",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "codigo_sociedad",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "tipo_actuacion",
+            "type": "string"
+          },
+          {
+            "name": "capital",
+            "type": "integer",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "fecha_actuacion",
+            "type": "string"
+          },
+          {
+            "name": "fecha_registro",
+            "type": "string"
+          },
+          {
+            "name": "fecha_aprobacion_sii",
+            "type": "string"
+          },
+          {
+            "name": "anio",
+            "type": "integer",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "mes",
+            "type": "string"
+          },
+          {
+            "name": "comuna_tributaria",
+            "type": "string"
+          },
+          {
+            "name": "region_tributaria",
+            "type": "string"
+          },
+          {
+            "name": "comuna_social",
+            "type": "string"
+          },
+          {
+            "name": "region_social",
+            "type": "string"
+          }
+        ],
+        "missingValues": [
+          ""
+        ],
+        "primaryKey": [
+          "rut"
+        ]
+      },
+      "sources": [
+        {
+          "title": "Ministerio de Economia, Fomento y Turismo - Registro de Empresas y Sociedades (RES)",
+          "path": "https://datos.gob.cl/dataset/registro-de-empresas-y-sociedades"
+        }
+      ],
+      "licenses": [
+        {
+          "title": "CC-BY",
+          "path": "https://creativecommons.org/licenses/by/3.0/cl/"
+        }
+      ]
+    }
+  ]
+}

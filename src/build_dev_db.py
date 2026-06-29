@@ -49,6 +49,7 @@ from src.builders.catalog import (  # noqa: E402
     write_dataset_catalog,
     write_pipeline_metadata,
 )
+from src.builders.data_package import write_data_package_json  # noqa: E402
 from src.builders.datasets import (  # noqa: E402
     build_perfil_territorial_comunal,
     derive_geography_layers,
@@ -601,6 +602,11 @@ def _generate_reports(pipeline_metadata, previous_pipeline_metadata, metadata_ou
     write_hub_health_markdown_file(hub_health)
     catalog_output, dataset_catalog = write_dataset_catalog(pipeline_metadata)
     write_dataset_catalog_markdown_file(dataset_catalog)
+    data_package_output = write_data_package_json(
+        dataset_catalog,
+        pipeline_metadata["version"],
+        pipeline_metadata["public_site_url"],
+    )
     redistribution_report = build_redistribution_report(dataset_catalog)
     redistribution_report_output = write_redistribution_report_json(redistribution_report)
     write_redistribution_report_markdown_file(redistribution_report)
@@ -647,6 +653,7 @@ def _generate_reports(pipeline_metadata, previous_pipeline_metadata, metadata_ou
         overview=overview_output,
         artifact_manifest=artifact_manifest_output,
         hub_bundle=hub_bundle_output,
+        data_package=data_package_output,
         zip=zip_output,
         sha256=sha256_output,
     )

@@ -147,6 +147,10 @@ def build_publishable_artifact_index():
             "shared_type": "dataset_quality",
             "format": "markdown",
         },
+        "data/normalized/datapackage.json": {
+            "shared_type": "datapackage",
+            "format": "json",
+        },
     }
     artifact_index.update(shared_artifacts)
     return artifact_index

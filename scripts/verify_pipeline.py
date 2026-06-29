@@ -179,6 +179,26 @@ def verify_schema_contracts():
         verify_dataset_contract(dataset_name, contract, df, entry.get("outputs", {}), ROOT_DIR)
 
 
+def verify_data_package():
+    """Valida que datapackage.json sea un descriptor Frictionless conforme (metadata-only).
+
+    NO carga las filas de datos (validacion solo de metadata del descriptor).
+    Si frictionless no esta instalado (dependencia dev), omite sin fallar.
+    """
+    descriptor_path = NORMALIZED_DIR / "datapackage.json"
+    if not descriptor_path.exists():
+        fail("Missing datapackage.json -- ejecuta el build")
+    try:
+        import frictionless
+    except ImportError:
+        # frictionless es dependencia dev; si no esta, omitir sin fallar el build prod.
+        return
+    report = frictionless.Package.validate_descriptor(str(descriptor_path))
+    if not report.valid:
+        errors = "; ".join(str(e) for e in report.errors)
+        fail(f"datapackage.json no es un Frictionless Data Package valido: {errors}")
+
+
 def verify_source_registry(registry=None, catalog=None):
     if registry is None:
         registry = load_json(SOURCE_REGISTRY_PATH)
@@ -1621,6 +1641,7 @@ def main():
     verify_schema_contracts()
     verify_source_registry()
     verify_artifact_manifest()
+    verify_data_package()
     verify_publishable_zip()
 
     if profile in ("readiness", "publication"):

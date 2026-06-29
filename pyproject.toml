@@ -71,6 +71,7 @@ dev = [
     "hypothesis==6.155.7",
     "bandit==1.9.4",
     "structlog==26.1.0",
+    "frictionless>=5.18,<6",
 ]
 
 [project.scripts]
