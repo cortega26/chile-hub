@@ -11,7 +11,9 @@
 </h1>
 
 <p><strong>Datos públicos de Chile, curados y listos para análisis en una línea de código.</strong></p>
+<p><em>El hub de datos abiertos de Chile — parte del ecosistema Tooltician.</em></p>
 
+[![Part of Tooltician](https://img.shields.io/badge/Part%20of-Tooltician-6C47FF.svg?style=flat-square&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTIgM2g2YTQgNCAwIDAgMSA0IDR2MTRhMiAyIDAgMCAwLTItMkg0YTIgMiAwIDAgMS0yLTJWNVoiLz48cGF0aCBkPSJNMjIgM2gtNmE0IDQgMCAwIDAtNCA0djE0YTIgMiAwIDAgMSAyLTJoNGEyIDIgMCAwIDAgMi0yVjVhMiAyIDAgMCAwLTItMloiLz48L3N2Zz4=)](https://tooltician.com)
 [![CI/CD](https://github.com/cortega26/chile-hub/actions/workflows/pipeline-check.yml/badge.svg)](https://github.com/cortega26/chile-hub/actions)
 [![PyPI version](https://img.shields.io/pypi/v/chile-hub.svg)](https://pypi.org/project/chile-hub/)
 [![PyPI downloads](https://img.shields.io/pypi/dm/chile-hub.svg)](https://pypi.org/project/chile-hub/)
@@ -778,5 +780,7 @@ Revisa [`AGENTS.md`](./AGENTS.md) para entender la arquitectura, las reglas no n
 <div align="center">
 
 **<img src="https://rawcdn.githack.com/twitter/twemoji/v14.0.2/assets/svg/1f1e8-1f1f1.svg" alt="🇨🇱" width="20" align="absmiddle">  Hecho con datos públicos chilenos, para quienes construyen sobre Chile.**
+
+<sub>Part of the [Tooltician](https://tooltician.com) ecosystem — datos públicos, interoperables y listos para IA.</sub>
 
 </div>
