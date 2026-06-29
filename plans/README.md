@@ -1,6 +1,15 @@
 # Plans — chile-hub
 
-Planes de implementación generados por auditoría `/improve deep` en commits `ba2f434` (2026-06-13) y `a2cd288` (2026-06-19).
+Planes de implementación generados por auditoría `/improve deep` en commits `ba2f434` (2026-06-13) y `a2cd288` (2026-06-19), y por `/improve plan` (mejoras de librerías/dependencias) en commit `140c8ea` (2026-06-29).
+
+## Planes activos (mejoras de librerías/dependencias, 2026-06-29)
+
+| # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
+|---|------|----------|----------|--------|-----------|--------|
+| 018 | [Renderizar tablas de la CLI con `rich`](018-rich-cli-table-output.md) | P2 | M | MED | — | DONE |
+| 019 | [Publicar `datapackage.json` (Frictionless) como artefacto adicional](019-frictionless-datapackage.md) | P2 | M | LOW | — | TODO |
+| 020 | [Explorador SQL en la landing con DuckDB-Wasm](020-duckdb-wasm-playground.md) | P2 | M | MED | — | TODO |
+| 021 | [Publicar documentación de API con MkDocs Material + mkdocstrings](021-mkdocs-api-docs.md) | P3 | M | LOW | — | TODO |
 
 ## Planes activos (auditoría 2026-06-19)
 
@@ -46,12 +55,33 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 ```
 012 (independiente)
 014 (independiente)
+018 (independiente)   ← rich CLI
+019 (independiente)   ← Frictionless datapackage
+020 (independiente)   ← DuckDB-Wasm landing
+021 (independiente)   ← MkDocs API docs
 ```
+
+Los planes 018–021 son todos independientes entre sí y de 012/014: tocan superficies
+distintas (CLI, pipeline de build, landing, docs/CI) y pueden ejecutarse en cualquier
+orden o en paralelo.
 
 ## Orden de ejecución recomendado
 
 1. **012** — esfuerzo S, máximo leverage en seguridad
 2. **014** — esfuerzo M, limpieza de arquitectura
+3. **018** — `rich`: victoria de UX rápida y de bajo riesgo (rich ya está en `uv.lock`)
+4. **019** — Frictionless: inversión de interoperabilidad, artefacto aditivo (no toca contratos, respeta ADR-005)
+5. **020** — DuckDB-Wasm: mayor salto de utilidad de la landing (riesgo MED por CSP/WASM)
+6. **021** — MkDocs: docs de API desde docstrings existentes (P3, aditivo)
+
+## Hallazgos considerados y diferidos (2026-06-29 — mejoras de librerías)
+
+| Hallazgo | Motivo |
+|----------|--------|
+| **`pandera` (backend Polars) para consolidar validación** | **Diferido — tradeoff dudoso.** El ADR-005 decidió deliberadamente mantener los contratos `*.schema.json` como formato propio (más expresivo que JSON Schema para ancho fijo/cobertura/outputs; los tipos de Polars no mapean 1:1 a estándares). Pandera añadiría una **tercera** representación de esquema junto a `contracts/datasets/` y `src/validation.py`, y el ADR ya reconoce que los validadores de dominio (dígito verificador RUT, longitud CUT, sumas de cohortes) deben permanecer en Python de todos modos. La consolidación real sería marginal y el riesgo de divergencia, alto. Reconsiderar solo si se decide reemplazar por completo `validation.py`. |
+| **`typer` para reemplazar el `argparse` de la CLI** | **Diferido — incluido como follow-up en el Plan 018.** La CLI es un `argparse` probado con ~40 subcomandos; migrarla es un rewrite L con riesgo MED-HIGH de regresión, y el beneficio (ayuda/autocompletado) es marginal frente al `rich` del Plan 018, que captura la mayor parte del valor de UX con riesgo bajo. |
+| **`orjson`/`msgspec` para (de)serialización JSON** | **Rechazado.** Micro-optimización sin cuello de botella demostrado: el JSON I/O del pipeline no domina el wall-clock (lo dominan DuckDB/SQLite/Excel). No justifica una dependencia nueva. |
+| **`httpx` en lugar de `requests`** | **Rechazado.** Solo aportaría async, que el proyecto no necesita hoy (extractores secuenciales con `tenacity`). `requests` + `curl_cffi` ya cubren el caso por diseño (ver rechazo DM-08 de 2026-06-13). |
 
 ## Hallazgos considerados y rechazados (2026-06-19)
 
