@@ -7,6 +7,31 @@ y se excluyen intencionalmente de estas notas.
 
 <!-- version list -->
 
+## 1.16.0 - 2026-06-29
+
+### Mantenimiento
+
+- **deps-dev**: Bump duckdb ([#10](https://github.com/cortega26/chile-hub/pull/10),
+  [`140c8ea`](https://github.com/cortega26/chile-hub/commit/140c8ea034c9068aabb9b108760c45e1fda08543))
+
+- **deps-dev**: Bump the python-dev group with 3 updates
+  ([#11](https://github.com/cortega26/chile-hub/pull/11),
+  [`cd2e046`](https://github.com/cortega26/chile-hub/commit/cd2e0463af5e99dfcbc8eff0c70a188dcd0d1775))
+
+- **plans**: Archivar planes DONE y añadir instrucción de archivado automático
+  ([`faf90c2`](https://github.com/cortega26/chile-hub/commit/faf90c2eb3859d5828d29125347babca9503df35))
+
+### Agregado
+
+- **pipeline**: Publicar datapackage.json (Frictionless) derivado de contratos
+  ([`0d1fcc8`](https://github.com/cortega26/chile-hub/commit/0d1fcc80959d3dff06135f7ae8c73a11b21ea21c))
+
+### Refactorizado
+
+- **cli**: Renderizar tablas con rich en vez de padding manual
+  ([`85ef69f`](https://github.com/cortega26/chile-hub/commit/85ef69f61c341974de3e4f3f43c4eded24080963))
+
+
 ## 1.15.1 - 2026-06-24
 
 ### Corregido
