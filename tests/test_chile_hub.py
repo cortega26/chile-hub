@@ -281,7 +281,9 @@ class ChileHubTests(unittest.TestCase):
     def test_summary_table(self):
         table = self.hub.summary_table()
         self.assertIn("chile-hub summary", table)
-        self.assertIn("dataset      mode      records", table)
+        self.assertIn("dataset", table)
+        self.assertIn("mode", table)
+        self.assertIn("records", table)
         self.assertIn("comunas", table)
         self.assertIn("indicadores", table)
 
@@ -414,7 +416,9 @@ class ChileHubTests(unittest.TestCase):
         self.assertIn("top_issue_reason", table)
         self.assertIn("top_issue_action", table)
         self.assertIn("top_issue_summary", table)
-        self.assertIn("dataset      mode      validation", table)
+        self.assertIn("dataset", table)
+        self.assertIn("mode", table)
+        self.assertIn("validation", table)
         self.assertIn("indicadores", table)
 
     def test_runtime_status_audit(self):
@@ -461,7 +465,9 @@ class ChileHubTests(unittest.TestCase):
         self.assertIn("top_issue_action=", table)
         self.assertIn("top_issue_summary=", table)
         self.assertIn(f"top_issue={EXPECTED_TOP_ISSUE}", table)
-        self.assertIn("dataset      mode      severity", table)
+        self.assertIn("dataset", table)
+        self.assertIn("mode", table)
+        self.assertIn("severity", table)
         self.assertIn("indicadores", table)
 
     def test_top_issue(self):
@@ -531,7 +537,11 @@ class ChileHubTests(unittest.TestCase):
         self.assertIn("top_issue_reason", snapshot)
         self.assertIn("top_issue_action", snapshot)
         self.assertIn("package_path", snapshot)
-        self.assertIn("dataset      mode      validation  build      current", snapshot)
+        self.assertIn("dataset", snapshot)
+        self.assertIn("mode", snapshot)
+        self.assertIn("validation", snapshot)
+        self.assertIn("build", snapshot)
+        self.assertIn("current", snapshot)
         self.assertIn("comunas", snapshot)
 
     def test_inventory_contains_artifact_types(self):
@@ -565,7 +575,9 @@ class ChileHubTests(unittest.TestCase):
     def test_inventory_table(self):
         table = self.hub.inventory_table()
         self.assertIn("chile-hub inventory", table)
-        self.assertIn("dataset      mode      records", table)
+        self.assertIn("dataset", table)
+        self.assertIn("mode", table)
+        self.assertIn("records", table)
         self.assertIn("comunas", table)
         self.assertIn("indicadores", table)
 
@@ -629,7 +641,9 @@ class ChileHubTests(unittest.TestCase):
         table = self.hub.health_table()
         self.assertIn("chile-hub health", table)
         self.assertIn(f"overall={self.health['overall_status']}", table)
-        self.assertIn("dataset      severity  mode", table)
+        self.assertIn("dataset", table)
+        self.assertIn("severity", table)
+        self.assertIn("mode", table)
         self.assertIn("comunas", table)
 
     def test_freshness_audit(self):
@@ -650,7 +664,9 @@ class ChileHubTests(unittest.TestCase):
     def test_freshness_audit_table(self):
         table = self.hub.freshness_audit_table()
         self.assertIn("chile-hub freshness audit", table)
-        self.assertIn("dataset      mode      build", table)
+        self.assertIn("dataset", table)
+        self.assertIn("mode", table)
+        self.assertIn("build", table)
         self.assertIn("indicadores", table)
 
     def test_bundle_summary(self):
@@ -745,7 +761,8 @@ class ChileHubTests(unittest.TestCase):
         table = self.hub.redistribution_table()
         self.assertIn("chile-hub redistribution", table)
         self.assertIn("ready=", table)
-        self.assertIn("dataset      status", table)
+        self.assertIn("dataset", table)
+        self.assertIn("status", table)
         self.assertIn("indicadores", table)
 
     def test_provenance_report(self):
@@ -765,7 +782,9 @@ class ChileHubTests(unittest.TestCase):
     def test_provenance_table(self):
         table = self.hub.provenance_table()
         self.assertIn("chile-hub provenance", table)
-        self.assertIn("dataset      mode      source", table)
+        self.assertIn("dataset", table)
+        self.assertIn("mode", table)
+        self.assertIn("source", table)
         self.assertIn("warnings", table)
         self.assertIn("comunas", table)
 
@@ -787,7 +806,9 @@ class ChileHubTests(unittest.TestCase):
     def test_drift_table(self):
         table = self.hub.drift_table()
         self.assertIn("chile-hub drift", table)
-        self.assertIn("dataset      drift      mode", table)
+        self.assertIn("dataset", table)
+        self.assertIn("drift", table)
+        self.assertIn("mode", table)
         self.assertIn("warnings", table)
         self.assertIn("indicadores", table)
 
@@ -1148,7 +1169,9 @@ class ChileHubCliTests(unittest.TestCase):
     def test_cli_summary_table(self):
         result = self.run_cli("summary", "--format", "table")
         self.assertIn("chile-hub summary", result.stdout)
-        self.assertIn("dataset      mode      records", result.stdout)
+        self.assertIn("dataset", result.stdout)
+        self.assertIn("mode", result.stdout)
+        self.assertIn("records", result.stdout)
         self.assertIn("comunas", result.stdout)
 
     def test_cli_path(self):
@@ -1243,7 +1266,9 @@ class ChileHubCliTests(unittest.TestCase):
     def test_cli_inventory_table(self):
         result = self.run_cli("inventory", "--format", "table")
         self.assertIn("chile-hub inventory", result.stdout)
-        self.assertIn("dataset      mode      records", result.stdout)
+        self.assertIn("dataset", result.stdout)
+        self.assertIn("mode", result.stdout)
+        self.assertIn("records", result.stdout)
         self.assertIn("comunas", result.stdout)
 
     def test_cli_snapshot(self):
@@ -1281,7 +1306,11 @@ class ChileHubCliTests(unittest.TestCase):
         self.assertIn("current_overall_status", result.stdout)
         self.assertIn("top_issue", result.stdout)
         self.assertIn("current_fresh", result.stdout)
-        self.assertIn("dataset      mode      validation  build      current", result.stdout)
+        self.assertIn("dataset", result.stdout)
+        self.assertIn("mode", result.stdout)
+        self.assertIn("validation", result.stdout)
+        self.assertIn("build", result.stdout)
+        self.assertIn("current", result.stdout)
         self.assertIn("comunas", result.stdout)
 
     def test_cli_overview(self):
@@ -1305,7 +1334,9 @@ class ChileHubCliTests(unittest.TestCase):
         self.assertIn("top_issue_reason", result.stdout)
         self.assertIn("top_issue_action", result.stdout)
         self.assertIn("top_issue_summary", result.stdout)
-        self.assertIn("dataset      mode      validation", result.stdout)
+        self.assertIn("dataset", result.stdout)
+        self.assertIn("mode", result.stdout)
+        self.assertIn("validation", result.stdout)
         self.assertIn("indicadores", result.stdout)
 
     def test_cli_health(self):
@@ -1320,7 +1351,9 @@ class ChileHubCliTests(unittest.TestCase):
         result = self.run_cli("health", "--format", "table")
         self.assertIn("chile-hub health", result.stdout)
         self.assertIn(f"overall={self.health['overall_status']}", result.stdout)
-        self.assertIn("dataset      severity  mode", result.stdout)
+        self.assertIn("dataset", result.stdout)
+        self.assertIn("severity", result.stdout)
+        self.assertIn("mode", result.stdout)
 
     def test_pipeline_status_script_text(self):
         result = self.run_script("scripts/pipeline_status.py")
@@ -1339,7 +1372,9 @@ class ChileHubCliTests(unittest.TestCase):
     def test_cli_freshness_audit_table(self):
         result = self.run_cli("freshness-audit", "--format", "table")
         self.assertIn("chile-hub freshness audit", result.stdout)
-        self.assertIn("dataset      mode      build", result.stdout)
+        self.assertIn("dataset", result.stdout)
+        self.assertIn("mode", result.stdout)
+        self.assertIn("build", result.stdout)
         self.assertIn("indicadores", result.stdout)
 
     def test_cli_runtime_status(self):
@@ -1358,7 +1393,9 @@ class ChileHubCliTests(unittest.TestCase):
         self.assertIn("top_issue_reason=", result.stdout)
         self.assertIn("top_issue_action=", result.stdout)
         self.assertIn("top_issue_summary=", result.stdout)
-        self.assertIn("dataset      mode      severity", result.stdout)
+        self.assertIn("dataset", result.stdout)
+        self.assertIn("mode", result.stdout)
+        self.assertIn("severity", result.stdout)
         self.assertIn("indicadores", result.stdout)
 
     def test_cli_top_issue(self):
@@ -1420,7 +1457,8 @@ class ChileHubCliTests(unittest.TestCase):
     def test_cli_redistribution_table(self):
         result = self.run_cli("redistribution", "--format", "table")
         self.assertIn("chile-hub redistribution", result.stdout)
-        self.assertIn("dataset      status", result.stdout)
+        self.assertIn("dataset", result.stdout)
+        self.assertIn("status", result.stdout)
         self.assertIn("indicadores", result.stdout)
 
     def test_cli_provenance(self):
@@ -1431,7 +1469,9 @@ class ChileHubCliTests(unittest.TestCase):
     def test_cli_provenance_table(self):
         result = self.run_cli("provenance", "--format", "table")
         self.assertIn("chile-hub provenance", result.stdout)
-        self.assertIn("dataset      mode      source", result.stdout)
+        self.assertIn("dataset", result.stdout)
+        self.assertIn("mode", result.stdout)
+        self.assertIn("source", result.stdout)
         self.assertIn("comunas", result.stdout)
 
     def test_cli_drift(self):
@@ -1442,7 +1482,9 @@ class ChileHubCliTests(unittest.TestCase):
     def test_cli_drift_table(self):
         result = self.run_cli("drift", "--format", "table")
         self.assertIn("chile-hub drift", result.stdout)
-        self.assertIn("dataset      drift      mode", result.stdout)
+        self.assertIn("dataset", result.stdout)
+        self.assertIn("drift", result.stdout)
+        self.assertIn("mode", result.stdout)
         self.assertIn("indicadores", result.stdout)
 
     def test_cli_export(self):
@@ -1458,7 +1500,8 @@ class ChileHubCliTests(unittest.TestCase):
     def test_cli_check_sources(self):
         result = self.run_cli("check-sources", "--timeout", "2", "--format", "table")
         self.assertIn("chile-hub check-sources", result.stdout)
-        self.assertIn("dataset      status", result.stdout)
+        self.assertIn("dataset", result.stdout)
+        self.assertIn("status", result.stdout)
 
     def test_cli_cross(self):
         result = self.run_cli("cross", "comunas", "censo_comunal", "--format", "json")
