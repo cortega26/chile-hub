@@ -349,12 +349,13 @@ def build_dataset_metadata(dfs, meta):
         "comunas_enriquecidas": {
             **comunas_metadata,
             "dataset": "comunas_enriquecidas",
+            "alias_for": "comunas",
             "record_count": df_comunas.height,
             "fields": df_comunas.columns,
-            "reuse_policy": DATASET_CATALOG_CONFIG["comunas_enriquecidas"]["reuse_policy"],
+            "reuse_policy": DATASET_CATALOG_CONFIG["comunas"]["reuse_policy"],
             "freshness": build_freshness(
                 comunas_metadata.get("refreshed_at_utc"),
-                DATASET_CATALOG_CONFIG["comunas_enriquecidas"]["freshness_policy"]["max_age_hours"],
+                DATASET_CATALOG_CONFIG["comunas"]["freshness_policy"]["max_age_hours"],
             ),
         },
         "indicadores": {
