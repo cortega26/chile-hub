@@ -22,12 +22,12 @@
 [![License: MIT](https://img.shields.io/badge/Code%20License-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-3776AB.svg?style=flat&logo=python&logoColor=white)]()
 [![Formats](https://img.shields.io/badge/Formats-Parquet%20%7C%20DuckDB%20%7C%20SQLite%20%7C%20JSON%20%7C%20Excel-orange.svg)]()
-[![Datasets](https://img.shields.io/badge/Datasets-15%20capas-16a34a.svg)]()
+[![Datasets](https://img.shields.io/badge/Datasets-17%20capas-16a34a.svg)]()
 [![Comunas](https://img.shields.io/badge/Comunas-346-8b5cf6.svg)]()
 
 <p>
   <a href="#-instalar-y-usar-en-segundos">Instalación</a> ·
-  <a href="#las-15-capas-de-datos">Capas</a> ·
+  <a href="#las-17-capas-de-datos">Capas</a> ·
   <a href="#arquitectura-del-pipeline">Arquitectura</a> ·
   <a href="#cli-de-referencia">CLI</a> ·
   <a href="#fuentes-licencias-y-reúso">Licencias</a>
@@ -138,7 +138,7 @@ Pipeline determinista en GitHub Actions: extracción → build → verificación
 
 ---
 
-## Las 15 capas de datos
+## Las 17 capas de datos
 
 <!-- START_DATASET_TABLE -->
 
@@ -159,9 +159,9 @@ Pipeline determinista en GitHub Actions: extracción → build → verificación
 | 13 | **Indicadores Urbanos SIEDU** | 6 701 (parcial) | 🟢 live | INE / SIEDU | Datos abiertos INE | Anual |
 | 14 | **Perfil Territorial Comunal** | 346 | 🟢 live | chile-hub derivado | Fuentes abiertas | Derivada |
 | 15 | **Empresas (RES)** | ~1 572 116 | 🟢 live | Min. Economía / datos.gob.cl | CC-BY 3.0 CL | Mensual |
-| 16 | **pobreza_comunal** | 3 | 🟡 fallback | — | — | Bienal/trienal |
-| 17 | **consumo_electrico_comunal** | 3 | 🟡 fallback | — | — | Anual |
-| 18 | **delincuencia_comunal** | — | ⚪ unknown | — | — | Mensual |
+| 16 | **Pobreza Comunal (SAE)** | 3 | 🟡 fallback | MDS / Observatorio Social | Datos abiertos MDS | Bienal/trienal |
+| 17 | **Consumo Eléctrico Comunal** | 3 | 🟡 fallback | CNE / Energía Abierta | CC BY | Anual |
+| 18 | **Delincuencia Comunal** | — | ⚪ unknown | CEAD / SPD | Revisión términos | Mensual |
 
 > **🟢 live**: datos extraídos directamente desde la fuente oficial en cada ejecución del pipeline.
 > **🟡 fallback**: datos servidos desde un respaldo curado mientras se completa la extracción en vivo.
@@ -178,11 +178,11 @@ confiar ciegamente**. Los datos vienen con la evidencia que los respalda.
 | Pilar | Qué significa | Evidencia auditables |
 |:---|:---|:---|
 | **Procedencia documentada** | Cada dataset declara su fuente oficial exacta con URL directa al organismo público emisor (BCN, INE, MINEDUC, BCCh, MINSAL, datos.gob.cl). | [`provenance_report.md`](data/normalized/provenance_report.md) — fuente, modo y timestamp por capa |
-| **Auditoría legal explícita** | Licencia, atribución requerida y permiso de redistribución verificados dataset por dataset. **15 de 15 capas** pasan la auditoría (`ready`). | [`redistribution_report.md`](data/normalized/redistribution_report.md) + [`AGENTS.md §6`](AGENTS.md) |
+| **Auditoría legal explícita** | Licencia, atribución requerida y permiso de redistribución verificados dataset por dataset. **17 de 17 capas** pasan la auditoría (`ready`). | [`redistribution_report.md`](data/normalized/redistribution_report.md) + [`AGENTS.md §6`](AGENTS.md) |
 | **Pipeline que falla con estridencia** | Si una validación falla, el pipeline **aborta** — no publica datos corruptos, no emite advertencias silenciosas. | [`ADR-001`](docs/adr/ADR-001-pipeline-lineal-determinista.md) — fail-loud como decisión de arquitectura |
-| **Contratos de esquema verificados** | 15 contratos JSON Schema ([`contracts/datasets/`](contracts/datasets/)) definen columnas esperadas, tipos, claves primarias y cobertura. Se validan **en cada build** automáticamente. | [`ADR-005`](docs/adr/ADR-005-contratos-esquema-json-schema.md) + `contracts/datasets/*.json` |
-| **Salud transparente** | Dashboard público con severidad, frescura, cobertura, drift y degradación por dataset. 10 capas `ok`, 5 `warn`, 0 `error`. | [`hub_health.md`](data/normalized/hub_health.md) — estado completo actualizado en cada build |
-| **Calidad medida y pública** | Puntuación compuesta A-F por dataset: **promedio 93.5/100** (14 A, 1 B). Dimensiones: validación, contrato, madurez de fuente, frescura, cobertura, política de reúso. | [`dataset_quality.md`](data/normalized/dataset_quality.md) — scorecard completo |
+| **Contratos de esquema verificados** | 17 contratos JSON Schema ([`contracts/datasets/`](contracts/datasets/)) definen columnas esperadas, tipos, claves primarias y cobertura. Se validan **en cada build** automáticamente. | [`ADR-005`](docs/adr/ADR-005-contratos-esquema-json-schema.md) + `contracts/datasets/*.json` |
+| **Salud transparente** | Dashboard público con severidad, frescura, cobertura, drift y degradación por dataset. 12 capas `ok`, 5 `warn`, 0 `error`. | [`hub_health.md`](data/normalized/hub_health.md) — estado completo actualizado en cada build |
+| **Calidad medida y pública** | Puntuación compuesta A-F por dataset: **promedio 93.6/100** (16 A, 1 B). Dimensiones: validación, contrato, madurez de fuente, frescura, cobertura, política de reúso. | [`dataset_quality.md`](data/normalized/dataset_quality.md) — scorecard completo |
 
 Cada pilar se audita automáticamente en cada ejecución del pipeline. Los reportes se
 regeneran en cada build — no son documentos estáticos mantenidos a mano. Para auditar
@@ -195,11 +195,11 @@ chile-hub health       # severidad, frescura, drift y cobertura
 
 ### Respaldo adicional
 
-- **490+ tests** (372 recolectados por pytest, el resto en scripts de verificación
+- **511 tests** (511 recolectados por pytest, más scripts de verificación
   del pipeline) que validan extracción, contratos e integridad de datos.
 - **5 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura
   con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
-- **Drift monitoreado:** 5 datasets bajo vigilancia de deriva de esquema; cualquier
+- **Drift monitoreado:** todos los datasets bajo vigilancia de deriva de esquema; cualquier
   cambio en la fuente se detecta y registra ([`drift_report.md`](data/normalized/drift_report.md)).
 - **Trazabilidad completa:** cada build registra timestamp, versión de extractor y
   snapshot de entrada en [`provenance_report.md`](data/normalized/provenance_report.md).
@@ -311,7 +311,7 @@ chile-hub health       # severidad, frescura, drift y cobertura
 | `latitud` / `longitud` | `DOUBLE` | Coordenadas geográficas |
 | `estado_funcionamiento` | `VARCHAR` | `"Vigente"` |
 
-**11. finanzas_municipales** — Indicadores financieros municipales anuales (⚠️ parcial: 3/346 comunas)
+**11. finanzas_municipales** — Indicadores financieros municipales anuales (⚠️ parcial: 345/346 comunas)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
 | `anio` | `INTEGER` | `2024` |
@@ -358,6 +358,42 @@ chile-hub health       # severidad, frescura, drift y cobertura
 | `anio` | `INTEGER` | `2020` |
 | `comuna_tributaria` | `VARCHAR` | `"SANTIAGO"` |
 | `region_tributaria` | `VARCHAR` | `"13"` |
+
+**16. pobreza_comunal** — Estimaciones de pobreza por ingresos y multidimensional (SAE/CASEN)
+| Columna | Tipo | Ejemplo |
+|:---|:---|:---|
+| `codigo_region` | `VARCHAR(2)` | `"13"` |
+| `codigo_comuna` | `VARCHAR(5)` | `"13101"` |
+| `nombre_comuna` | `VARCHAR` | `"Santiago"` |
+| `anio` | `INTEGER` | `2022` |
+| `dimension` | `VARCHAR` | `"ingresos"` / `"multidimensional"` |
+| `tasa` | `DOUBLE` | `15.3` |
+| `limite_inferior` | `DOUBLE` | `12.1` |
+| `limite_superior` | `DOUBLE` | `18.9` |
+| `metodologia` | `VARCHAR` | `"SAE"` |
+| `fuente` | `VARCHAR` | `"Observatorio Social — MDS"` |
+
+**17. consumo_electrico_comunal** — Consumo eléctrico anual por comuna y tipo de cliente (CNE)
+| Columna | Tipo | Ejemplo |
+|:---|:---|:---|
+| `codigo_region` | `VARCHAR(2)` | `"13"` |
+| `codigo_comuna` | `VARCHAR(5)` | `"13101"` |
+| `nombre_comuna` | `VARCHAR` | `"Santiago"` |
+| `anio` | `INTEGER` | `2023` |
+| `tipo_cliente` | `VARCHAR` | `"Residencial"` |
+| `consumo_kwh` | `DOUBLE` | `1523400.5` |
+| `numero_clientes` | `INTEGER` | `45800` |
+| `fuente` | `VARCHAR` | `"CNE — Energía Abierta"` |
+
+**18. delincuencia_comunal** — Casos policiales por comuna (CEAD/SPD) ⚠️ _en carril candidate — datos no incluidos en el bundle público_
+| Columna | Tipo | Ejemplo |
+|:---|:---|:---|
+| `codigo_comuna` | `VARCHAR(5)` | `"13101"` |
+| `nombre_comuna` | `VARCHAR` | `"Santiago"` |
+| `anio` | `INTEGER` | `2024` |
+| `mes` | `INTEGER` | `1` |
+| `familia_delito` | `VARCHAR` | `"robos_violentos"` |
+| `casos` | `INTEGER` | `245` |
 
 </details>
 
@@ -573,9 +609,9 @@ flowchart TB
 | Dominio | Extractores |
 |:---|:---|
 | Territorio | `subdere_extractor.py`, `electoral_extractor.py` |
-| Demografía | `censo_extractor.py`, `censo_hogares_viviendas_extractor.py` |
+| Demografía | `censo_extractor.py`, `censo_hogares_viviendas_extractor.py`, `pobreza_extractor.py` |
 | Servicios públicos | `salud_extractor.py`, `mineduc_establecimientos_extractor.py`, `mineduc_resultados_extractor.py` |
-| Economía | `bcentral_extractor.py`, `sinim_finanzas_extractor.py`, `res_extractor.py` |
+| Economía | `bcentral_extractor.py`, `sinim_finanzas_extractor.py`, `res_extractor.py`, `consumo_electrico_extractor.py` |
 | Indicadores urbanos | `siedu_extractor.py` |
 
 </details>

@@ -745,6 +745,9 @@ _DISPLAY_NAMES = {
     "indicadores_urbanos_siedu": "Indicadores Urbanos SIEDU",
     "perfil_territorial_comunal": "Perfil Territorial Comunal",
     "empresas": "Empresas (RES)",
+    "pobreza_comunal": "Pobreza Comunal (SAE)",
+    "consumo_electrico_comunal": "Consumo Eléctrico Comunal",
+    "delincuencia_comunal": "Delincuencia Comunal",
 }
 
 _SOURCE_NAMES = {
@@ -763,6 +766,9 @@ _SOURCE_NAMES = {
     "indicadores_urbanos_siedu": "INE / SIEDU",
     "perfil_territorial_comunal": "chile-hub derivado",
     "empresas": "Min. Economía / datos.gob.cl",
+    "pobreza_comunal": "MDS / Observatorio Social",
+    "consumo_electrico_comunal": "CNE / Energía Abierta",
+    "delincuencia_comunal": "CEAD / SPD",
 }
 
 _LICENSE_LABELS = {
@@ -781,6 +787,9 @@ _LICENSE_LABELS = {
     "indicadores_urbanos_siedu": "Datos abiertos INE",
     "perfil_territorial_comunal": "Fuentes abiertas",
     "empresas": "CC-BY 3.0 CL",
+    "pobreza_comunal": "Datos abiertos MDS",
+    "consumo_electrico_comunal": "CC BY",
+    "delincuencia_comunal": "Revisión términos",
 }
 
 # Dataset cuyos registros varían entre builds (directorios vivos).
