@@ -7,6 +7,25 @@ y se excluyen intencionalmente de estas notas.
 
 <!-- version list -->
 
+## 1.17.0 - 2026-06-30
+
+### Documentación
+
+- **badge**: Badge Tooltician -> Parte de Tooltician
+  ([`74c0064`](https://github.com/cortega26/chile-hub/commit/74c00645f3e94e69e5f1802943d21e8c6582be33))
+
+- **readme**: Añadir badge y tagline de Tooltician ecosystem
+  ([`39bda6a`](https://github.com/cortega26/chile-hub/commit/39bda6a395cbbbbde323bf32da9d716d0e21dff7))
+
+- **readme**: Badge y tagline Tooltician en español
+  ([`0d8c179`](https://github.com/cortega26/chile-hub/commit/0d8c179770231ac433870f2370564327f70d0cb0))
+
+### Agregado
+
+- **backlog**: Completar #2 #3 #5 — contratos runtime, enum Dataset, dashboard salud
+  ([`a3ef978`](https://github.com/cortega26/chile-hub/commit/a3ef9782fb3c4dbf557d63d7fda226c15c42ac2a))
+
+
 ## 1.16.0 - 2026-06-29
 
 ### Mantenimiento
