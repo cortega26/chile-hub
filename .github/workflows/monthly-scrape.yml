@@ -1,0 +1,99 @@
+name: Monthly Scrape (SINIM)
+
+on:
+  schedule:
+    # Día 1 de cada mes, 03:00 UTC (23:00 CLT / 00:00 CLST)
+    - cron: "0 3 1 * *"
+  workflow_dispatch:
+    inputs:
+      year:
+        description: "Año a extraer (default: año actual)"
+        required: false
+        type: string
+
+permissions:
+  contents: write  # Para commit automático de datos actualizados
+
+env:
+  PYTHON_VERSION: "3.13"
+
+concurrency:
+  group: monthly-scrape
+  cancel-in-progress: false
+
+jobs:
+  scrape-sinim:
+    name: SINIM Finanzas Municipales
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: |
+          uv sync --group dev
+          uv run playwright install chromium
+
+      - name: Extract SINIM finanzas municipales
+        id: scrape
+        continue-on-error: true
+        run: |
+          uv run python src/extractors/sinim_finanzas_live_extractor.py
+        env:
+          SCRAPE_YEAR: ${{ inputs.year || '2024' }}
+
+      - name: Report scrape failure (non-blocking)
+        if: steps.scrape.outcome == 'failure'
+        run: |
+          echo "⚠️ SINIM scrape falló — se mantiene el último snapshot bueno."
+          echo "El build diario no se ve afectado."
+          echo "Revisar manualmente: https://datos.sinim.gov.cl/datos_municipales.php"
+          # No hacemos exit 1 — el workflow sigue siendo verde
+
+      - name: Rebuild with updated finanzas
+        if: steps.scrape.outcome == 'success'
+        run: |
+          uv run python -c "
+          import sys; sys.path.insert(0, 'src')
+          from extractors.sinim_finanzas_live_extractor import process_sinim_finanzas
+          process_sinim_finanzas()
+          "
+          uv run make build
+
+      - name: Commit updated data (if changed)
+        if: steps.scrape.outcome == 'success'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/staging/finanzas_municipales.csv
+          git add data/staging/finanzas_municipales.metadata.json
+          git add data/raw/sinim_finanzas_municipales_*.xlsx
+          git add data/normalized/ 2>/dev/null || true
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore(data): monthly SINIM scrape refresh [skip ci]"
+            git push
+          fi
+
+      - name: Summary
+        run: |
+          echo "## Monthly SINIM Scrape — $(date -u +%Y-%m-%d)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.scrape.outcome }}" = "success" ]; then
+            echo "✅ Scrape exitoso" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Scrape falló — usando último snapshot bueno" >> $GITHUB_STEP_SUMMARY
+            echo "⚠️ Requiere intervención manual: revisar portal SINIM" >> $GITHUB_STEP_SUMMARY
+          fi

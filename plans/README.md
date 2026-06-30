@@ -30,7 +30,7 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 
 | # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
 |---|------|----------|----------|--------|-----------|--------|
-| 022 | [Plan de avance — confiabilidad/narrativa (Track A) + expansión de catálogo por valor de cruce (Track B)](022-plan-avance-narrativa-confiabilidad.md) | P1 | L | MED | — | 🔶 Fases 1-2 ✓ · Ola B1 ✓ (2026-06-30) → Fase 3 + Ola B2 pendientes |
+| 022 | [Plan de avance — confiabilidad/narrativa (Track A) + expansión de catálogo por valor de cruce (Track B)](022-plan-avance-narrativa-confiabilidad.md) | P1 | L | MED | — | 🔶 Fases 1-3 ✓ · Ola B1 ✓ (2026-06-30) → Fase 4 + Ola B2 pendientes |
 | 014 | [Limpieza de arquitectura — catálogo externo, imports, alias](014-architecture-cleanup.md) | P2 | M | MED | — | TODO |
 | 020 | [Explorador SQL en la landing con DuckDB-Wasm](020-duckdb-wasm-playground.md) | P2 | M | MED | 022 (gate 4.3) | TODO |
 | 021 | [Publicar documentación de API con MkDocs Material + mkdocstrings](021-mkdocs-api-docs.md) | P3 | M | LOW | — | TODO |

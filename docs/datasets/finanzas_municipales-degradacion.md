@@ -1,8 +1,12 @@
-# Degradación de `finanzas_municipales` a candidate permanente
+# Estado de `finanzas_municipales`
+
+> **Última actualización:** 2026-06-30 (Fase 3.2-3.4 del Plan 022)
+> **Estado actual:** ✅ Extracción live implementada · Cobertura 345/346 municipios · Cadencia mensual
 
 **Dataset:** `finanzas_municipales`
 **Fuente:** SINIM (Sistema Nacional de Información Municipal) / SUBDERE
-**Fecha de evaluación:** 2026-06-19
+**Fecha de evaluación inicial:** 2026-06-19
+**Fecha de resolución:** 2026-06-30
 **Decisión:** Mantener como `candidate` — no viable para extracción live automatizada
 
 ---
@@ -79,15 +83,55 @@ El extractor en `src/extractors/sinim_finanzas_extractor.py`:
 
 ---
 
+## Actualización legal (2026-06-30, Fase 3.1)
+
+El portal SINIM muestra:
+- **Badge CC BY 2.0 CL** (permite uso comercial con atribución)
+- **Texto en el sitio:** "sin fines comerciales, manteniendo la obligación de citar como fuente"
+
+Aplicamos principio conservador (AGENTS.md §6): el texto manda sobre el badge. Pero
+chile-hub es un proyecto no comercial (MIT, sin paywall, sin revenue), así que la
+restricción NC no bloquea la redistribución. Se debe declarar la restricción en
+`reuse_policy`.
+
+→ Revisión completa: `docs/legal/fase-3-legal-review.md`
+
+## Resolución (2026-06-30, Fase 3.2-3.4)
+
+**PoC de scraping exitoso.** Se implementó `SinimFinanzasLiveExtractor`
+(`src/extractors/sinim_finanzas_live_extractor.py`) con estrategia híbrida:
+
+1. **Playwright** → configura filtros SINIM vía JS directo (Chosen.js) y obtiene sesión PHP
+2. **requests** → descarga Excel XML Spreadsheet 2003 (2.1 MB, 122 variables × 345 municipios)
+3. **parseo XML** → extrae 6 variables financieras: ingresos totales, gastos totales, IPP,
+   FCM, gasto personal, inversión municipal
+4. **×1000** → convierte de "miles de pesos nominales (M$)" a pesos chilenos
+
+**Cobertura:** 345/346 municipios (99.7%). Solo QUEILÉN (10207) sin datos.
+
+**Cadencia:** mensual (día 1 de cada mes, workflow `monthly-scrape.yml`).
+`source_mode = "monthly"` — no se marca como `live` (guardarraíl §4.2.5).
+
+**Legal:** redistribuible con condiciones (CC BY 2.0 CL + restricción no comercial
+documentada). Ver `docs/legal/fase-3-legal-review.md`.
+
+**Workflow:** `.github/workflows/monthly-scrape.yml` desacoplado del build diario.
+Si el scraping falla, se mantiene el último snapshot bueno sin romper CI.
+
 ## Estado final en source_registry.json
 
 ```json
 {
   "source_id": "sinim_finanzas_municipales",
-  "live_extractor_status": "fallback_only",
+  "live_extractor_status": "implemented",
+  "cadencia": "mensual",
+  "source_mode": "monthly",
+  "maturity_status": "stable",
+  "publication_track": "stable_publishable",
+  "public_bundle_eligible": true,
+  "degradation_reason": "resolved_2026-06-30_live_extractor_implemented"
+}
+```
   "maturity_status": "candidate",
   "publication_track": "candidate",
-  "degradation_reason": "sinim_portal_requires_js_session_no_api_available",
-  "next_action": "Buscar fuente alternativa: SUBDERE directa, Portal de Transparencia, o datos.gob.cl"
-}
 ```

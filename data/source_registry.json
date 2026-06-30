@@ -17,7 +17,8 @@
     "owner": "core",
     "next_action": "Maintain DPA cardinality and CUT format checks.",
     "publication_track": "stable_publishable",
-    "public_bundle_eligible": true
+    "public_bundle_eligible": true,
+    "cadencia": "bajo_demanda"
   },
   {
     "source_id": "bcn_provincias",
@@ -37,7 +38,8 @@
     "owner": "core",
     "next_action": "Maintain DPA cardinality and CUT format checks.",
     "publication_track": "stable_publishable",
-    "public_bundle_eligible": true
+    "public_bundle_eligible": true,
+    "cadencia": "bajo_demanda"
   },
   {
     "source_id": "bcn_comunas",
@@ -57,7 +59,8 @@
     "owner": "core",
     "next_action": "Maintain 346-comuna invariant and enrichment references.",
     "publication_track": "stable_publishable",
-    "public_bundle_eligible": true
+    "public_bundle_eligible": true,
+    "cadencia": "bajo_demanda"
   },
   {
     "source_id": "bcn_comunas_enriquecidas",
@@ -77,7 +80,8 @@
     "owner": "core",
     "next_action": "Keep derived schema aligned with comunas.",
     "publication_track": "stable_publishable",
-    "public_bundle_eligible": true
+    "public_bundle_eligible": true,
+    "cadencia": "bajo_demanda"
   },
   {
     "source_id": "mindicador_indicadores",
@@ -97,7 +101,8 @@
     "owner": "core",
     "next_action": "Monitor empty monthly IPC responses and published backfill behavior.",
     "publication_track": "stable_publishable",
-    "public_bundle_eligible": true
+    "public_bundle_eligible": true,
+    "cadencia": "diaria"
   },
   {
     "source_id": "ine_censo_comunal_2024",
@@ -117,7 +122,8 @@
     "owner": "core",
     "next_action": "Keep decennial source and schema documentation current.",
     "publication_track": "stable_publishable",
-    "public_bundle_eligible": true
+    "public_bundle_eligible": true,
+    "cadencia": "bajo_demanda"
   },
   {
     "source_id": "ine_censo_hogares_viviendas_2024",
@@ -137,7 +143,8 @@
     "owner": "core",
     "next_action": "Keep decennial source and schema documentation current.",
     "publication_track": "stable_publishable",
-    "public_bundle_eligible": true
+    "public_bundle_eligible": true,
+    "cadencia": "bajo_demanda"
   },
   {
     "source_id": "minsal_establecimientos_salud",
@@ -157,7 +164,8 @@
     "owner": "core",
     "next_action": "Monitor monthly source freshness and geocoding coverage.",
     "publication_track": "stable_publishable",
-    "public_bundle_eligible": true
+    "public_bundle_eligible": true,
+    "cadencia": "diaria"
   },
   {
     "source_id": "bcn_servel_distritos",
@@ -177,7 +185,8 @@
     "owner": "core",
     "next_action": "Update only when electoral district law changes.",
     "publication_track": "stable_publishable",
-    "public_bundle_eligible": true
+    "public_bundle_eligible": true,
+    "cadencia": "bajo_demanda"
   },
   {
     "source_id": "mineduc_establecimientos",
@@ -197,28 +206,32 @@
     "owner": "core",
     "next_action": "Monitor annual source package and RAR extraction dependency.",
     "publication_track": "stable_publishable",
-    "public_bundle_eligible": true
+    "public_bundle_eligible": true,
+    "cadencia": "diaria"
   },
   {
     "source_id": "sinim_finanzas_municipales",
     "dataset": "finanzas_municipales",
     "source_name": "SINIM / SUBDERE",
     "official_url": "https://datos.sinim.gov.cl/",
-    "access_method": "landing_snapshot",
+    "access_method": "scraping_playwright_xml",
     "license_status": "public-api-review-terms",
-    "live_extractor_status": "fallback_only",
+    "live_extractor_status": "implemented",
     "fallback_policy": "allowed_for_dev_blocked_for_publication",
-    "maturity_status": "candidate",
-    "live_ready": false,
+    "maturity_status": "stable",
+    "live_ready": true,
     "fallback_allowed": true,
-    "publish_blocking": true,
-    "review_by": "2026-09-18",
+    "publish_blocking": false,
+    "review_by": "2026-12-31",
     "stalled_after_days": 90,
     "owner": "core",
-    "degradation_reason": "sinim_portal_requires_js_session_no_api_available",
-    "next_action": "Buscar fuente alternativa: SUBDERE directa, Portal de Transparencia, o datos.gob.cl. Ver docs/datasets/finanzas_municipales-degradacion.md.",
-    "publication_track": "candidate",
-    "public_bundle_eligible": false
+    "degradation_reason": "resolved_2026-06-30_live_extractor_implemented",
+    "next_action": "Fase 3.2 PoC exitoso: extractor live implementado (sinim_finanzas_live_extractor.py). Cobertura 345/346 municipios (2024). Pendiente: workflow mensual (3.3) y metadata de cadencia (3.4).",
+    "publication_track": "stable_publishable",
+    "public_bundle_eligible": true,
+    "legal_note": "El sitio declara sin fines comerciales junto a badge CC BY 2.0 CL. Chile-hub es no comercial. Restricción NC debe declararse en reuse_policy.",
+    "cadencia": "mensual",
+    "source_mode": "mensual"
   },
   {
     "source_id": "mineduc_resultados_educacionales",
@@ -239,7 +252,8 @@
     "next_action": "Actualizar URL anualmente (año en nombre de archivo). Verificar columnas SIT_FIN_R si MINEDUC cambia metodología.",
     "publication_track": "stable_publishable",
     "public_bundle_eligible": true,
-    "source_notes": "RAR con CSV student-level (~3.5M filas). Agregado a nivel (anio, codigo_comuna). SIT_FIN_R: P=Promovido, R=Reprobado, T=Trasladado, Y=Retirado."
+    "source_notes": "RAR con CSV student-level (~3.5M filas). Agregado a nivel (anio, codigo_comuna). SIT_FIN_R: P=Promovido, R=Reprobado, T=Trasladado, Y=Retirado.",
+    "cadencia": "anual"
   },
   {
     "source_id": "ine_siedu_indicadores",
@@ -260,7 +274,8 @@
     "next_action": "Monitorear si INE publica una 6ta medición (post-2022) y actualizar URL y SHEET_YEARS.",
     "publication_track": "stable_publishable",
     "public_bundle_eligible": true,
-    "source_notes": "XLSM con 5 hojas de medición (2018-2022). Formato wide → long. Deduplicación: año más reciente por (codigo_comuna, codigo_indicador). Cobertura parcial: ~117 comunas urbanas seleccionadas por SIEDU."
+    "source_notes": "XLSM con 5 hojas de medición (2018-2022). Formato wide → long. Deduplicación: año más reciente por (codigo_comuna, codigo_indicador). Cobertura parcial: ~117 comunas urbanas seleccionadas por SIEDU.",
+    "cadencia": "bajo_demanda"
   },
   {
     "source_id": "chile_hub_perfil_territorial",
@@ -291,7 +306,8 @@
       "finanzas_municipales",
       "resultados_educacionales",
       "indicadores_urbanos_siedu"
-    ]
+    ],
+    "cadencia": "bajo_demanda"
   },
   {
     "source_id": "ministerio_economia_res",
@@ -311,7 +327,8 @@
     "owner": "core",
     "next_action": "Keep large-output behavior documented and verify Parquet-first consumption.",
     "publication_track": "stable_publishable",
-    "public_bundle_eligible": true
+    "public_bundle_eligible": true,
+    "cadencia": "diaria"
   },
   {
     "source_id": "mds_pobreza_comunal",
@@ -331,7 +348,8 @@
     "owner": "core",
     "next_action": "Monitorear publicación de próxima ronda CASEN (2024-2025).",
     "publication_track": "stable_publishable",
-    "public_bundle_eligible": true
+    "public_bundle_eligible": true,
+    "cadencia": "bajo_demanda"
   },
   {
     "source_id": "cne_consumo_electrico_comunal",
@@ -351,6 +369,7 @@
     "owner": "core",
     "next_action": "Monitorear disponibilidad del dataset en Energía Abierta.",
     "publication_track": "stable_publishable",
-    "public_bundle_eligible": true
+    "public_bundle_eligible": true,
+    "cadencia": "bajo_demanda"
   }
 ]

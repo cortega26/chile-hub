@@ -29,19 +29,19 @@ repos:
     hooks:
       - id: pip-audit
         name: pip-audit
-        entry: ./.venv/bin/pip-audit
+        entry: uv run pip-audit
         language: system
         pass_filenames: false
         files: ^pyproject\.toml$
       - id: interrogate
         name: interrogate
-        entry: ./.venv/bin/interrogate
+        entry: uv run interrogate
         language: system
         pass_filenames: false
         files: ^src/chile_hub/
       - id: bandit
         name: bandit
-        entry: ./.venv/bin/bandit -c pyproject.toml -r src/
+        entry: uv run bandit -c pyproject.toml -r src/
         language: system
         pass_filenames: false
         files: ^src/
