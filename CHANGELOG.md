@@ -7,6 +7,28 @@ y se excluyen intencionalmente de estas notas.
 
 <!-- version list -->
 
+## 1.17.1 - 2026-06-30
+
+### Corregido
+
+- **badge**: Use shields.io URL and move to last position
+  ([`46604ca`](https://github.com/cortega26/chile-hub/commit/46604ca028991630d7d497d669d358247b049638))
+
+### Mantenimiento
+
+- **deps**: Bump actions/cache from 5.0.5 to 6.1.0
+  ([#16](https://github.com/cortega26/chile-hub/pull/16),
+  [`d61298b`](https://github.com/cortega26/chile-hub/commit/d61298becc001f500b329c0dec92967dd76545f2))
+
+- **deps**: Bump actions/setup-python from 6.2.0 to 6.3.0
+  ([#17](https://github.com/cortega26/chile-hub/pull/17),
+  [`491847f`](https://github.com/cortega26/chile-hub/commit/491847fed3cb2a5f08340abb1d1ef4430ec1f425))
+
+- **deps-dev**: Bump the python-dev group with 2 updates
+  ([#15](https://github.com/cortega26/chile-hub/pull/15),
+  [`56a3843`](https://github.com/cortega26/chile-hub/commit/56a3843e4cce9480e8ae9c5d5df936419625d636))
+
+
 ## 1.17.0 - 2026-06-30
 
 ### Documentación
