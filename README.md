@@ -161,11 +161,12 @@ Pipeline determinista en GitHub Actions: extracción → build → verificación
 | 15 | **Empresas (RES)** | ~1 572 116 | 🟢 live | Min. Economía / datos.gob.cl | CC-BY 3.0 CL | Mensual |
 | 16 | **Pobreza Comunal (SAE)** | 3 | 🟡 fallback | MDS / Observatorio Social | Datos abiertos MDS | Bienal/trienal |
 | 17 | **Consumo Eléctrico Comunal** | 3 | 🟡 fallback | CNE / Energía Abierta | CC BY | Anual |
-| 18 | **Delincuencia Comunal** | — | ⚪ unknown | CEAD / SPD | Revisión términos | Mensual |
+| 18 | **Delincuencia Comunal** 🆕 | — | 🔜 próximamente | CEAD / SPD | Revisión términos | — |
 
 > **🟢 live**: datos extraídos directamente desde la fuente oficial en cada ejecución del pipeline.
 > **🟡 fallback**: datos servidos desde un respaldo curado mientras se completa la extracción en vivo.
 > **🔶 parcial**: cobertura inferior al 50% del universo esperado. Capa candidata, no completa.
+> **🔜 próximamente**: capa en carril candidate — extractor implementado, datos no incluidos en el bundle público.
 > Para auditar el estado exacto de cada capa: `chile-hub provenance` y `chile-hub health`.
 
 <!-- END_DATASET_TABLE -->

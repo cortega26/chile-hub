@@ -850,8 +850,14 @@ def sync_readme_layers_table():
     health_by_ds = {e["dataset"]: e for e in health.get("datasets", [])}
     status_by_ds = {e["dataset"]: e for e in status.get("datasets", [])}
 
+    # Ordenar: primero datasets con outputs (consumibles), luego placeholders (próximamente)
+    all_names = list(DATASET_CATALOG_CONFIG.keys())
+    built = [n for n in all_names if DATASET_CATALOG_CONFIG[n].get("outputs")]
+    upcoming = [n for n in all_names if not DATASET_CATALOG_CONFIG[n].get("outputs")]
+    ordered_names = built + upcoming
+
     rows = []
-    for i, ds_name in enumerate(DATASET_CATALOG_CONFIG.keys(), 1):
+    for i, ds_name in enumerate(ordered_names, 1):
         h = health_by_ds.get(ds_name, {})
         s = status_by_ds.get(ds_name, {})
         cfg = DATASET_CATALOG_CONFIG.get(ds_name, {})
@@ -860,12 +866,17 @@ def sync_readme_layers_table():
         source_name = _SOURCE_NAMES.get(ds_name, "—")
         license_label = _LICENSE_LABELS.get(ds_name, "—")
 
+        has_outputs = bool(cfg.get("outputs"))
+
         source_mode = h.get("source_mode", "unknown")
         coverage_note = cfg.get("coverage_note", "")
         coverage_status = h.get("coverage_status", "unknown")
 
         # Indicador de modo
-        if coverage_note.startswith("parcial"):
+        if not has_outputs:
+            mode_emoji = "🔜 próximamente"
+            registros = "—"
+        elif coverage_note.startswith("parcial"):
             mode_emoji = "🔶 parcial"
         elif source_mode == "live":
             mode_emoji = "🟢 live"
@@ -874,56 +885,62 @@ def sync_readme_layers_table():
         else:
             mode_emoji = f"⚪ {source_mode}"
 
-        # Conteo de registros
-        if ds_name in _SPECIAL_RECORD_COUNTS:
-            registros = _SPECIAL_RECORD_COUNTS[ds_name]
-        elif coverage_note.startswith("parcial"):
-            # Capa parcial/candidato: mostrar cobertura real honesta
-            rc = s.get("record_count")
-            ec = cfg.get("expected_record_count")
-            if rc is not None and ec is not None:
-                rc_fmt = f"{rc:,}".replace(",", " ")
-                registros = f"{rc_fmt} (parcial, {rc}/{ec})"
-            elif rc is not None:
-                rc_fmt = f"{rc:,}".replace(",", " ")
-                registros = f"{rc_fmt} (parcial)"
+        # Conteo de registros (solo para capas con outputs)
+        if has_outputs:
+            if ds_name in _SPECIAL_RECORD_COUNTS:
+                registros = _SPECIAL_RECORD_COUNTS[ds_name]
+            elif coverage_note.startswith("parcial"):
+                rc = s.get("record_count")
+                ec = cfg.get("expected_record_count")
+                if rc is not None and ec is not None:
+                    rc_fmt = f"{rc:,}".replace(",", " ")
+                    registros = f"{rc_fmt} (parcial, {rc}/{ec})"
+                elif rc is not None:
+                    rc_fmt = f"{rc:,}".replace(",", " ")
+                    registros = f"{rc_fmt} (parcial)"
+                else:
+                    registros = "parcial"
+            elif ds_name in _VARIABLE_COUNT_DATASETS:
+                rc = s.get("record_count")
+                registros = _format_record_count(
+                    rc, cfg.get("expected_record_count"), coverage_note
+                )
+            elif source_mode == "fallback":
+                rc = s.get("record_count")
+                if rc is not None and rc > 0:
+                    registros = f"{rc:,}".replace(",", " ")
+                else:
+                    registros = "fallback curado"
+            elif coverage_status == "partial":
+                rc = s.get("record_count")
+                ec = cfg.get("expected_record_count")
+                if rc is not None and ec is not None:
+                    pct = int(round(rc / ec * 100)) if ec > 0 else 0
+                    registros = f"{rc:,} (parcial, {pct}%)".replace(",", " ")
+                elif rc is not None:
+                    registros = f"{rc:,} (parcial)".replace(",", " ")
+                else:
+                    registros = "cobertura parcial"
             else:
-                registros = "parcial"
-        elif ds_name in _VARIABLE_COUNT_DATASETS:
-            rc = s.get("record_count")
-            registros = _format_record_count(rc, cfg.get("expected_record_count"), coverage_note)
-        elif source_mode == "fallback":
-            # Fallback sin coverage explícita
-            rc = s.get("record_count")
-            if rc is not None and rc > 0:
-                registros = f"{rc:,}".replace(",", " ")
-            else:
-                registros = "fallback curado"
-        elif coverage_status == "partial":
-            rc = s.get("record_count")
-            ec = cfg.get("expected_record_count")
-            if rc is not None and ec is not None:
-                pct = int(round(rc / ec * 100)) if ec > 0 else 0
-                registros = f"{rc:,} (parcial, {pct}%)".replace(",", " ")
-            elif rc is not None:
-                registros = f"{rc:,} (parcial)".replace(",", " ")
-            else:
-                registros = "cobertura parcial"
-        else:
-            rc = s.get("record_count")
-            registros = f"{rc:,}".replace(",", " ") if rc is not None else "—"
+                rc = s.get("record_count")
+                registros = f"{rc:,}".replace(",", " ") if rc is not None else "—"
 
         # Advertencia para capas parciales
         name_display = f"**{display_name}**"
-        if coverage_note.startswith("parcial"):
+        if not has_outputs:
+            name_display += " 🆕"
+        elif coverage_note.startswith("parcial"):
             name_display += " ⚠️"
 
         # Etiqueta de actualización
-        freshness_label = cfg.get("freshness_policy", {}).get("label", "")
-        if freshness_label in ("estable", ""):
+        if not has_outputs:
             actualizacion = "—"
         else:
-            actualizacion = freshness_label.capitalize()
+            freshness_label = cfg.get("freshness_policy", {}).get("label", "")
+            if freshness_label in ("estable", ""):
+                actualizacion = "—"
+            else:
+                actualizacion = freshness_label.capitalize()
 
         rows.append(
             f"| {i} | {name_display} | {registros} | {mode_emoji} | {source_name} | {license_label} | {actualizacion} |"
@@ -942,6 +959,8 @@ def sync_readme_layers_table():
         " se completa la extracción en vivo.\n"
         "> **🔶 parcial**: cobertura inferior al 50% del universo esperado."
         " Capa candidata, no completa.\n"
+        "> **🔜 próximamente**: capa en carril candidate — extractor implementado,"
+        " datos no incluidos en el bundle público.\n"
         "> Para auditar el estado exacto de cada capa:"
         " `chile-hub provenance` y `chile-hub health`."
     )
