@@ -16,6 +16,7 @@ if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
 from src.build_dev_db import DATASET_CATALOG_CONFIG
+from src.chile_hub.contracts import verify_dataset_contract as _lib_verify_contract
 from src.pipeline_status_utils import load_json
 
 STAGING_DIR = ROOT_DIR / "data" / "staging"
@@ -97,71 +98,28 @@ def fail(message):
     raise SystemExit(1)
 
 
-def _contract_type(dtype) -> str:
-    dtype_name = str(dtype)
-    if dtype_name == "String":
-        return "string"
-    if dtype_name in {"Int8", "Int16", "Int32", "Int64", "UInt8", "UInt16", "UInt32", "UInt64"}:
-        return "integer"
-    if dtype_name in {"Float32", "Float64"}:
-        return "float"
-    if dtype_name == "Date":
-        return "date"
-    if dtype_name == "Boolean":
-        return "boolean"
-    return dtype_name.lower()
+def verify_dataset_contract(dataset_name, contract, df, outputs, root_dir=None):
+    """Wrapper que mantiene compatibilidad: delega a la librería y llama a fail()
+    si la validación encuentra errores.
 
-
-def verify_dataset_contract(dataset_name, contract, df, outputs, root_dir=ROOT_DIR):
-    if contract.get("dataset") != dataset_name:
-        fail(f"{dataset_name} contract has mismatched dataset: {contract.get('dataset')}")
-
-    required_columns = contract.get("required_columns", [])
-    missing_columns = [column for column in required_columns if column not in df.columns]
-    if missing_columns:
-        fail(f"{dataset_name} is missing required columns: {', '.join(missing_columns)}")
-
-    for column, expected_type in contract.get("column_types", {}).items():
-        if column not in df.schema:
-            fail(f"{dataset_name} contract type column is missing from data: {column}")
-        actual_type = _contract_type(df.schema[column])
-        if actual_type != expected_type:
-            fail(f"{dataset_name}.{column} has type {actual_type}; expected {expected_type}")
-
-    primary_key = contract.get("primary_key", [])
-    if primary_key:
-        missing_key_columns = [column for column in primary_key if column not in df.columns]
-        if missing_key_columns:
-            fail(
-                f"{dataset_name} primary key columns are missing: {', '.join(missing_key_columns)}"
-            )
-        if df.select(primary_key).n_unique() != df.height:
-            fail(f"{dataset_name} primary key is not unique: {', '.join(primary_key)}")
-
-    for column, width in contract.get("fixed_width_columns", {}).items():
-        if column not in df.schema:
-            fail(f"{dataset_name} fixed-width column is missing: {column}")
-        if _contract_type(df.schema[column]) != "string":
-            fail(f"{dataset_name}.{column} must be string for fixed-width validation")
-        invalid_count = df.filter(
-            pl.col(column).is_null() | (pl.col(column).str.len_chars() != width)
-        ).height
-        if invalid_count:
-            fail(f"{dataset_name}.{column} has {invalid_count} values outside width {width}")
-
-    coverage_policy = contract.get("coverage_policy")
-    expected_record_count = contract.get("expected_record_count")
-    if coverage_policy == "full" and expected_record_count is not None:
-        if df.height != expected_record_count:
-            fail(f"{dataset_name} has {df.height} records; expected {expected_record_count}")
-
-    for output_type in contract.get("publish_outputs", []):
-        relative_path = outputs.get(output_type)
-        if not relative_path:
-            fail(f"{dataset_name} contract expects missing catalog output: {output_type}")
-        output_path = root_dir / relative_path
-        if not output_path.exists():
-            fail(f"{dataset_name} contract output does not exist: {relative_path}")
+    Migrado desde una implementación local a ``src.chile_hub.contracts``.
+    """
+    if root_dir is None:
+        root_dir = ROOT_DIR
+    result = _lib_verify_contract(
+        dataset_name,
+        contract,
+        df,
+        outputs=outputs,
+        root_dir=root_dir,
+        strict=False,
+    )
+    for warn in result.get("warnings", []):
+        print(f"WARNING: {dataset_name}: {warn}")
+    if result["status"] == "error":
+        for err in result["errors"]:
+            print(f"ERROR: {dataset_name}: {err}")
+        raise SystemExit(1)
 
 
 def verify_schema_contracts():

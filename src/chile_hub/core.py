@@ -13,6 +13,7 @@ import requests
 
 from ._render import render_table
 from .data_manager import ChileHubDataManager
+from .datasets import Dataset
 from .exceptions import (
     ChileHubDataError,
     ChileHubDatasetError,
@@ -31,6 +32,21 @@ UTC = timezone.utc
 ROOT_DIR = Path(__file__).resolve().parents[2]
 NORMALIZED_DIR = ROOT_DIR / "data" / "normalized"
 DATASET_CATALOG_PATH = NORMALIZED_DIR / "dataset_catalog.json"
+
+
+def _resolve_dataset_name(dataset_name: str | Dataset) -> str:
+    """Convierte un dataset_name a string, validando contra el enum ``Dataset``.
+
+    Acepta tanto strings como miembros del enum ``Dataset``. Si se pasa un
+    string que no es un dataset válido, lanza ``ChileHubDatasetError`` con
+    sugerencia.
+    """
+    if isinstance(dataset_name, Dataset):
+        return dataset_name.value
+    try:
+        return Dataset.from_string(dataset_name).value
+    except ValueError as exc:
+        raise ChileHubDatasetError(str(exc)) from exc
 
 
 def _format_available(values: list[str], requested: str | None = None) -> str:
@@ -256,7 +272,8 @@ class ChileHub:
     def list_datasets(self) -> list[str]:
         return [entry["dataset"] for entry in self.catalog.get("datasets", [])]
 
-    def get_dataset(self, dataset_name: str) -> dict[str, Any]:
+    def get_dataset(self, dataset_name: str | Dataset) -> dict[str, Any]:
+        dataset_name = _resolve_dataset_name(dataset_name)
         for entry in self.catalog.get("datasets", []):
             if entry["dataset"] == dataset_name:
                 return entry  # type: ignore[no-any-return]  # dict[str, Any] en runtime
@@ -264,7 +281,8 @@ class ChileHub:
             f"Dataset '{dataset_name}' no existe. {_format_available(self.list_datasets(), dataset_name)}"
         )
 
-    def get_output_path(self, dataset_name: str, output_type: str = "parquet") -> Path:
+    def get_output_path(self, dataset_name: str | Dataset, output_type: str = "parquet") -> Path:
+        dataset_name = _resolve_dataset_name(dataset_name)
         dataset = self.get_dataset(dataset_name)
         # Resolver alias: si el dataset apunta a otro, usar el canónico
         alias_for = dataset.get("alias_for")
@@ -279,24 +297,46 @@ class ChileHub:
             )
         return self.root_dir / outputs[output_type]  # type: ignore[no-any-return]  # Path en runtime
 
-    def load_polars(self, dataset_name: str) -> pl.DataFrame:
-        if dataset_name in self._df_cache:
-            return self._df_cache[dataset_name]
-        path = self.get_output_path(dataset_name, "parquet")
-        try:
-            df = pl.read_parquet(path)
-        except FileNotFoundError:
-            raise ChileHubDatasetError(
-                f"Archivo Parquet no encontrado para '{dataset_name}': {path}"
-            )
-        except Exception as exc:
-            raise ChileHubDatasetError(f"Error al leer Parquet para '{dataset_name}': {exc}")
-        self._df_cache[dataset_name] = df
-        return df
+    def load_polars(self, dataset_name: str | Dataset, validate: bool = False) -> pl.DataFrame:
+        dataset_name = _resolve_dataset_name(dataset_name)
+        """Carga un dataset como DataFrame de Polars.
+
+        Args:
+            dataset_name: Nombre del dataset (ej. "comunas", "indicadores").
+            validate: Si ``True``, ejecuta ``validate_dataset()`` antes de retornar.
+                Lanza ``ChileHubDataError`` si la validación falla.
+
+        Returns:
+            DataFrame de Polars con los datos del dataset.
+
+        Raises:
+            ChileHubDatasetError: Si el dataset no existe o el archivo es ilegible.
+            ChileHubDataError: Si ``validate=True`` y la validación encuentra errores.
+        """
+        if not validate or dataset_name not in self._df_cache:
+            path = self.get_output_path(dataset_name, "parquet")
+            try:
+                df = pl.read_parquet(path)
+            except FileNotFoundError:
+                raise ChileHubDatasetError(
+                    f"Archivo Parquet no encontrado para '{dataset_name}': {path}"
+                )
+            except Exception as exc:
+                raise ChileHubDatasetError(f"Error al leer Parquet para '{dataset_name}': {exc}")
+            self._df_cache[dataset_name] = df
+
+        if validate:
+            result = self.validate_dataset(dataset_name)
+            if result["status"] == "error":
+                raise ChileHubDataError(
+                    f"Validación fallida para '{dataset_name}': {'; '.join(result['errors'])}"
+                )
+
+        return self._df_cache[dataset_name]
 
     def cross_view(
         self,
-        datasets: list[str],
+        datasets: list[str | Dataset],
         on: str = "codigo_comuna",
         how: Literal["inner", "left", "right", "full", "semi", "anti", "cross", "outer"] = "left",
     ) -> pl.DataFrame:
@@ -331,7 +371,53 @@ class ChileHub:
             result = result.join(df, on=on, how=how)
         return result
 
-    def validate_user_data(self, df: pl.DataFrame, dataset_name: str) -> dict:
+    def validate_dataset(self, dataset_name: str | Dataset) -> dict:
+        dataset_name = _resolve_dataset_name(dataset_name)
+        """Valida los datos publicados del hub contra su contrato JSON Schema.
+
+        Carga el dataset desde Parquet y lo coteja contra el contrato en
+        ``contracts/datasets/{dataset_name}.schema.json``. Retorna un dict
+        con ``status``, ``errors`` y ``warnings``.
+
+        Args:
+            dataset_name: Nombre del dataset (ej. ``"comunas"``).
+
+        Returns:
+            Dict con:
+            - ``dataset``: nombre del dataset validado.
+            - ``status``: ``"ok"`` o ``"error"``.
+            - ``errors``: lista de errores de validación.
+            - ``warnings``: lista de advertencias.
+
+        Raises:
+            ChileHubDatasetError: Si no existe contrato o dataset.
+        """
+        from .contracts import verify_dataset_contract
+
+        contract_path = self.root_dir / "contracts" / "datasets" / f"{dataset_name}.schema.json"
+        if not contract_path.exists():
+            raise ChileHubDatasetError(
+                f"No existe contrato de schema para '{dataset_name}'. "
+                f"Datasets disponibles: {self.list_datasets()}"
+            )
+
+        with contract_path.open("r", encoding="utf-8") as f:
+            contract = json.load(f)
+
+        df = self.load_polars(dataset_name)
+        catalog_entry = self.get_dataset(dataset_name)
+        outputs = catalog_entry.get("outputs", {}) if catalog_entry else {}
+
+        return verify_dataset_contract(
+            dataset_name,
+            contract,
+            df,
+            outputs=outputs,
+            root_dir=self.root_dir,
+        )
+
+    def validate_user_data(self, df: pl.DataFrame, dataset_name: str | Dataset) -> dict:
+        dataset_name = _resolve_dataset_name(dataset_name)
         """Valida un DataFrame de usuario contra el contrato de schema del dataset.
 
         Usa los archivos de contrato en contracts/datasets/*.schema.json, que definen
@@ -478,7 +564,8 @@ class ChileHub:
 
         return results
 
-    def example_usage(self, dataset_name: str, kind: str = "python") -> str:
+    def example_usage(self, dataset_name: str | Dataset, kind: str = "python") -> str:
+        dataset_name = _resolve_dataset_name(dataset_name)
         dataset = self.get_dataset(dataset_name)
         examples = dataset.get("usage_examples", {})
         if kind not in examples:
@@ -1889,11 +1976,17 @@ def build_parser():  # pragma: no cover — entry point de CLI, testeado vía in
 
     # Subcomando: validate
     validate_parser = subparsers.add_parser(
-        "validate", help="Valida un archivo CSV o Parquet contra un schema del hub"
+        "validate", help="Valida un dataset del hub o un archivo CSV/Parquet contra su schema"
     )
-    validate_parser.add_argument("path", help="Ruta al archivo a validar (.csv o .parquet)")
     validate_parser.add_argument(
-        "--dataset", required=True, help="Dataset de referencia (ej. 'comunas')"
+        "target",
+        nargs="?",
+        help="Nombre del dataset del hub, o ruta a un archivo .csv/.parquet",
+    )
+    validate_parser.add_argument(
+        "--dataset",
+        help="Nombre del dataset de referencia (ej. 'comunas'). Obligatorio si se valida "
+        "un archivo externo; opcional si target es un dataset del hub.",
     )
 
     return parser
@@ -2163,17 +2256,27 @@ def _main(argv=None):  # pragma: no cover — dispatch de CLI, testeado vía smo
         return
 
     if args.command == "validate":
-        # Leer archivo de entrada
-        path = Path(args.path)
-        if not path.exists():
-            raise ChileHubError(f"Archivo no encontrado: {args.path}")
-        if path.suffix == ".csv":
-            df = pl.read_csv(path, infer_schema_length=0)
-        elif path.suffix == ".parquet":
-            df = pl.read_parquet(path)
+        if args.target is None:
+            # Sin argumento: mostrar ayuda del subcomando
+            parser.parse_args(["validate", "--help"])
+            return
+
+        target_path = Path(args.target)
+
+        # Si target existe como archivo, validar archivo externo
+        if target_path.exists() and target_path.suffix in (".csv", ".parquet"):
+            if not args.dataset:
+                raise ChileHubError("Debes especificar --dataset al validar un archivo externo.")
+            if target_path.suffix == ".csv":
+                df = pl.read_csv(target_path, infer_schema_length=0)
+            else:
+                df = pl.read_parquet(target_path)
+            result = hub.validate_user_data(df, args.dataset)
         else:
-            raise ChileHubError(f"Formato no soportado: {path.suffix}. Use .csv o .parquet.")
-        result = hub.validate_user_data(df, args.dataset)
+            # Si no es archivo, validar dataset del hub
+            dataset_name = args.dataset if args.dataset else args.target
+            result = hub.validate_dataset(dataset_name)
+
         print(json.dumps(result, ensure_ascii=False, indent=2))
         if result["status"] == "error":
             raise SystemExit(1)

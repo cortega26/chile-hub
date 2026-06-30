@@ -2398,6 +2398,107 @@
         .drawer-preview-table tr:hover td {
             background: #f8fafc;
         }
+
+        /* ── Health Dashboard ───────────────────────────────────────────── */
+        .health-section {
+            border-top: 1px solid var(--border-color);
+            padding-top: 2rem;
+        }
+
+        .health-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem 1.5rem;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding: 1rem 1.25rem;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        .health-summary-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .health-summary-item strong {
+            color: var(--text-primary);
+        }
+
+        .health-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .health-badge.ok { background: #d1fae5; color: #065f46; }
+        .health-badge.warn { background: #fef3c7; color: #92400e; }
+        .health-badge.error { background: #fee2e2; color: #991b1b; }
+
+        .health-table-wrap {
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        .health-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .health-table th {
+            background: var(--panel-bg);
+            padding: 0.6rem 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .health-table td {
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .health-table tr:last-child td { border-bottom: none; }
+
+        .severity-ok { background: #f0fdf4; }
+        .severity-warn { background: #fffbeb; }
+        .severity-error { background: #fef2f2; }
+
+        .pill {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .pill.ok, .pill.live, .pill.fresh { background: #d1fae5; color: #065f46; }
+        .pill.warn, .pill.fallback, .pill.stale { background: #fef3c7; color: #92400e; }
+        .pill.error, .pill.drifted { background: #fee2e2; color: #991b1b; }
+        .pill.unknown { background: #f3f4f6; color: #6b7280; }
+        .pill.partial { background: #e0e7ff; color: #3730a3; }
+        .pill.not_applicable { background: #f3f4f6; color: #6b7280; }
+
+        .health-hidden { display: none; }
+
+        @media (max-width: 768px) {
+            .health-summary { gap: 0.5rem 1rem; }
+        }
     </style>
 </head>
 <body>
@@ -2712,6 +2813,67 @@ LIMIT 10;</pre>
                     <button class="btn-page" id="prev-page-btn" disabled>Anterior</button>
                     <button class="btn-page" id="next-page-btn" disabled>Siguiente</button>
                 </div>
+            </div>
+        </section>
+
+        <!-- ══════════ Health Dashboard ══════════ -->
+        <section id="hub-health-section" class="health-section section-shell" aria-label="Estado operativo del hub">
+            <div class="section-heading">
+                <h2>
+                    <span class="health-badge" id="health-badge">—</span>
+                    Estado operativo
+                </h2>
+                <p>
+                    Resumen de salud de los datasets del hub: frescura, cobertura,
+                    modo de extracción y estado de validación.
+                    Actualizado: <strong id="health-generated-at">—</strong>.
+                </p>
+            </div>
+
+            <div class="health-summary" id="health-summary">
+                <span class="health-summary-item">
+                    Datasets: <strong id="health-dataset-count">—</strong>
+                </span>
+                <span class="health-summary-item ok">
+                    ✅ <strong id="health-ok-count">—</strong> ok
+                </span>
+                <span class="health-summary-item warn">
+                    ⚠️ <strong id="health-warn-count">—</strong> warn
+                </span>
+                <span class="health-summary-item error">
+                    ❌ <strong id="health-error-count">—</strong> error
+                </span>
+                <span class="health-summary-item">·</span>
+                <span class="health-summary-item">
+                    Live: <strong id="health-live-count">—</strong>
+                </span>
+                <span class="health-summary-item">
+                    Fallback: <strong id="health-fallback-count">—</strong>
+                </span>
+                <span class="health-summary-item">
+                    Stale: <strong id="health-stale-count">—</strong>
+                </span>
+                <span class="health-summary-item">
+                    Drifted: <strong id="health-drifted-count">—</strong>
+                </span>
+            </div>
+
+            <div id="health-table-wrap" class="health-table-wrap health-hidden">
+                <table class="health-table">
+                    <thead>
+                        <tr>
+                            <th>Dataset</th>
+                            <th>Estado</th>
+                            <th>Modo</th>
+                            <th>Validación</th>
+                            <th>Frescura</th>
+                            <th>Cobertura</th>
+                            <th>Drift</th>
+                            <th>Advertencias</th>
+                        </tr>
+                    </thead>
+                    <tbody id="health-tbody"></tbody>
+                </table>
             </div>
         </section>
     </main>

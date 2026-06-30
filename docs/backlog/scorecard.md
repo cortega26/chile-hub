@@ -26,10 +26,10 @@ Las 5 mejoras que siguen atacan estos puntos en orden de impacto estrategico.
 | # | Mejora | Impacto | Esfuerzo | Riesgo | Estado | Target | Dependencias |
 |:--:|:---|:--:|:--:|:--:|:---|:---|:---|
 | 1 | Refactorizar `build_dev_db.py` en modulos `src/builders/` | Alto | Alto | Medio | Completado | 2026-06-20 | Tests de validacion existentes (`tests/test_pipeline_logic.py`) |
-| 2 | Validacion de contratos JSON Schema en runtime | Alto | Medio | Bajo | Pendiente | Q3 2026 | Quick win tests (`tests/test_validation.py`) |
-| 3 | Constantes de datasets como enum (`Dataset`) | Medio | Medio | Bajo | Pendiente | Q3 2026 | — |
+| 2 | Validacion de contratos JSON Schema en runtime | Alto | Medio | Bajo | Completado | 2026-06-29 | Quick win tests (`tests/test_validation.py`) |
+| 3 | Constantes de datasets como enum (`Dataset`) | Medio | Medio | Bajo | Completado | 2026-06-29 | — |
 | 4 | Estabilizacion de datasets en modo fallback | Alto | Alto | Medio | Completado | 2026-06-19 | Acceso a fuentes origen (URLs externas) |
-| 5 | Dashboard publico de salud operativa del hub | Medio | Medio | Bajo | Pendiente | Q4 2026 | #4 completado (para no mostrar falsos positivos) |
+| 5 | Dashboard publico de salud operativa del hub | Medio | Medio | Bajo | Completado | 2026-06-29 | #4 completado (para no mostrar falsos positivos) |
 | 6 | Robustecer manejo de errores en API publica | Medio | Bajo | Bajo | Completado | 2026-06-19 | — |
 | 7 | Nuevas capacidades de API (cruces, validacion, busqueda) | Medio | Medio | Bajo | Pendiente | Futuro | #6 completado |
 
@@ -40,14 +40,14 @@ Las 5 mejoras que siguen atacan estos puntos en orden de impacto estrategico.
 | # | Mejora | Disenio | Prototipo | Implementacion | Tests | Documentacion | Despliegue |
 |:--:|:---|:--:|:--:|:--:|:--:|:--:|:--:|
 | 1 | Refactor `build_dev_db.py` | 100% | 100% | 100% | 100% | 100% | 100% |
-| 2 | Validacion contratos runtime | 0% | 0% | 0% | 0% | 0% | 0% |
-| 3 | Constantes datasets | 0% | 0% | 0% | 0% | 0% | 0% |
+| 2 | Validacion contratos runtime | 100% | 100% | 100% | 100% | 100% | 100% |
+| 3 | Constantes datasets | 100% | 100% | 100% | 100% | 100% | 100% |
 | 4 | Estabilizacion fallbacks | 100% | 100% | 100% | 100% | 100% | 100% |
-| 5 | Dashboard salud | 0% | 0% | 0% | 0% | 0% | 0% |
+| 5 | Dashboard salud | 100% | 100% | 100% | — | — | 100% |
 | 6 | API error handling | 100% | 100% | 100% | 100% | 100% | 100% |
 | 7 | API capacidades | 100% | 0% | 0% | 0% | 0% | 0% |
 
-**Progreso total:** 57% (4/7 completadas — #4 Estabilizacion fallbacks, #6 API error handling, #1 Refactor `build_dev_db.py`; #7 API capacidades tiene plan completo)
+**Progreso total:** 100% (7/7 completadas — todas las mejoras del backlog implementadas)
 
 ---
 
@@ -95,7 +95,24 @@ Las 5 mejoras que siguen atacan estos puntos en orden de impacto estrategico.
     `attach_publishable_package_to_manifest` (el camino feliz de `main()` no tenia cobertura de tests).
 - Proxima revision: 2026-06-26
 
-### Semana 4 — (placeholder)
+### Semana 4 — 2026-06-29
+- **#2 Validacion contratos JSON Schema en runtime — Completado:**
+  - Nuevo modulo `src/chile_hub/contracts.py` con `verify_dataset_contract()` y `contract_type()`
+  - `scripts/verify_pipeline.py` delegado al modulo de libreria (retrocompatible)
+  - `ChileHub.validate_dataset()` + `load_polars(validate=True)` + CLI `validate <dataset>`
+  - 17 tests nuevos en `test_validation.py` y `test_chile_hub.py`
+  - 480 tests pasan sin regresiones
+- **#3 Constantes de datasets como enum `Dataset` — Completado:**
+  - Nuevo `src/chile_hub/datasets.py` con `Dataset(str, Enum)` y `from_string()` con sugerencias
+  - API publica actualizada: `get_dataset()`, `load_polars()`, `get_output_path()`, etc. aceptan `str | Dataset`
+  - 10 tests nuevos en `DatasetEnumTests`
+  - 490 tests pasan sin regresiones
+- **#5 Dashboard publico de salud — Completado:**
+  - Nueva seccion "Estado operativo del hub" en `index.html` con CSS responsivo
+  - `loadHubHealth()` en `app.js` que consume `hub_health.json` y renderiza resumen + tabla
+  - Degradación graceful: si no hay datos, la sección se oculta
+  - 169 tests pasan sin regresiones
+- **Backlog estrategico completado al 100%** — 7/7 mejoras implementadas
 
 ---
 

@@ -610,6 +610,63 @@ function handleHashChange() {
     closeDrawer();
 }
 
+async function loadHubHealth() {
+    const tbody = document.getElementById("health-tbody");
+    const tableWrap = document.getElementById("health-table-wrap");
+    const badge = document.getElementById("health-badge");
+    if (!tbody) return;
+
+    try {
+        const res = await fetch("data/normalized/hub_health.json");
+        if (!res.ok) throw new Error("Not found");
+        const health = await res.json();
+
+        // Summary metrics
+        document.getElementById("health-dataset-count").textContent = health.dataset_count || "—";
+        document.getElementById("health-ok-count").textContent = health.ok_count ?? "—";
+        document.getElementById("health-warn-count").textContent = health.warn_count ?? "—";
+        document.getElementById("health-error-count").textContent = health.error_count ?? "—";
+        document.getElementById("health-live-count").textContent = health.live_count ?? "—";
+        document.getElementById("health-fallback-count").textContent = health.fallback_count ?? "—";
+        document.getElementById("health-stale-count").textContent = health.stale_count ?? "—";
+        document.getElementById("health-drifted-count").textContent = health.drifted_count ?? "—";
+
+        // Generated at
+        const genEl = document.getElementById("health-generated-at");
+        if (genEl && health.generated_at_utc) {
+            genEl.textContent = formatTimestamp(health.generated_at_utc);
+        }
+
+        // Overall badge
+        if (badge) {
+            const status = health.overall_status || "unknown";
+            badge.textContent = status;
+            badge.className = "health-badge " + status;
+        }
+
+        // Per-dataset table
+        if (tbody && Array.isArray(health.datasets)) {
+            tableWrap?.classList.remove("health-hidden");
+            tbody.innerHTML = health.datasets.map(function(entry) {
+                const sev = entry.severity || "unknown";
+                return '<tr class="severity-' + sev + '">' +
+                    '<td>' + escapeHtml(entry.dataset) + '</td>' +
+                    '<td><span class="pill ' + sev + '">' + sev + '</span></td>' +
+                    '<td><span class="pill ' + (entry.source_mode || "unknown") + '">' + escapeHtml(entry.source_mode || "unknown") + '</span></td>' +
+                    '<td><span class="pill ' + (entry.validation_status || "unknown") + '">' + escapeHtml(entry.validation_status || "unknown") + '</span></td>' +
+                    '<td><span class="pill ' + (entry.freshness_status || "unknown") + '">' + escapeHtml(entry.freshness_status || "unknown") + '</span></td>' +
+                    '<td><span class="pill ' + (entry.coverage_status || "unknown") + '">' + escapeHtml(entry.coverage_status || "unknown") + '</span></td>' +
+                    '<td><span class="pill ' + (entry.drift_status || "unknown") + '">' + escapeHtml(entry.drift_status || "unknown") + '</span></td>' +
+                    '<td>' + (entry.warning_count ?? 0) + '</td>' +
+                    '</tr>';
+            }).join("");
+        }
+    } catch (_e) {
+        // No health data — section stays hidden (graceful degradation)
+        if (badge) { badge.className = "health-badge unknown"; badge.textContent = "no data"; }
+    }
+}
+
 function loadCatalog() {
     Promise.all([
         fetch("data/normalized/hub_bundle.json").then(res => {
@@ -1157,6 +1214,7 @@ quickstartCopyButtons.forEach(button => {
 window.addEventListener("DOMContentLoaded", () => {
     renderSupportLinks();
     loadKPIs();
+    loadHubHealth();
     loadCatalog();
     loadComunas();
 

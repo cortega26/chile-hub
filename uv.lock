@@ -395,14 +395,18 @@ wheels = [
 
 [[package]]
 name = "chile-hub"
-version = "1.15.1"
+version = "1.16.0"
 source = { editable = "." }
 dependencies = [
+    { name = "duckdb" },
+    { name = "openpyxl" },
     { name = "platformdirs" },
     { name = "polars" },
     { name = "pyarrow" },
     { name = "requests" },
     { name = "rich" },
+    { name = "rutificador" },
+    { name = "tenacity" },
 ]
 
 [package.optional-dependencies]
@@ -440,11 +444,13 @@ requires-dist = [
     { name = "bandit", marker = "extra == 'dev'", specifier = "==1.9.4" },
     { name = "build", marker = "extra == 'dev'", specifier = "==1.5.0" },
     { name = "curl-cffi", marker = "extra == 'pipeline'", specifier = "==0.15.0" },
+    { name = "duckdb", specifier = ">=1.5.4" },
     { name = "duckdb", marker = "extra == 'pipeline'", specifier = "==1.5.4" },
     { name = "frictionless", marker = "extra == 'dev'", specifier = ">=5.18,<6" },
     { name = "hypothesis", marker = "extra == 'dev'", specifier = "==6.155.7" },
     { name = "interrogate", marker = "extra == 'dev'", specifier = "==1.7.0" },
     { name = "mypy", marker = "extra == 'dev'", specifier = "==2.1.0" },
+    { name = "openpyxl", specifier = ">=3.1.5" },
     { name = "openpyxl", marker = "extra == 'pipeline'", specifier = "==3.1.5" },
     { name = "pandas", marker = "python_full_version >= '3.11' and extra == 'pipeline'", specifier = "==3.0.3" },
     { name = "pip-audit", marker = "extra == 'dev'", specifier = "==2.10.1" },
@@ -460,9 +466,11 @@ requires-dist = [
     { name = "requests", specifier = ">=2.34.2" },
     { name = "rich", specifier = ">=14.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = "==0.15.18" },
+    { name = "rutificador", specifier = ">=1.5.8" },
     { name = "rutificador", marker = "extra == 'pipeline'", specifier = ">=1.5.8" },
     { name = "structlog", marker = "extra == 'dev'", specifier = "==26.1.0" },
     { name = "structlog", marker = "extra == 'pipeline'", specifier = "==26.1.0" },
+    { name = "tenacity", specifier = ">=9.1.4" },
     { name = "tenacity", marker = "extra == 'pipeline'", specifier = "==9.1.4" },
     { name = "twine", marker = "extra == 'dev'", specifier = "==6.2.0" },
     { name = "xlsxwriter", marker = "extra == 'pipeline'", specifier = "==3.2.9" },

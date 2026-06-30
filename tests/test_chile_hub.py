@@ -589,7 +589,7 @@ class ChileHubTests(unittest.TestCase):
         with self.assertRaises(ChileHubDatasetError) as dataset_error:
             self.hub.get_dataset("comuna")
         self.assertIsInstance(dataset_error.exception, KeyError)
-        self.assertIn("Quizas quisiste decir 'comunas'", str(dataset_error.exception))
+        self.assertIn("Quizás quisiste decir 'comunas'", str(dataset_error.exception))
 
         with self.assertRaises(ChileHubOutputError) as output_error:
             self.hub.get_output_path("comunas", "csv")
@@ -903,6 +903,30 @@ class ChileHubTests(unittest.TestCase):
             f"Esperaba error de duplicados, obtuve: {result['errors']}",
         )
 
+    # ── validate_dataset tests ─────────────────────────────────────────────────
+
+    def test_validate_dataset_ok(self):
+        """Valida que un dataset del hub pase su propio contrato."""
+        result = self.hub.validate_dataset("comunas")
+        self.assertEqual(result["status"], "ok")
+        self.assertEqual(result["errors"], [])
+
+    def test_validate_dataset_unknown(self):
+        """Valida que pedir un dataset inexistente lance error."""
+        with self.assertRaises(ChileHubDatasetError):
+            self.hub.validate_dataset("no_existe")
+
+    def test_load_polars_validate_ok(self):
+        """Valida que load_polars(validate=True) funcione con datos correctos."""
+        df = self.hub.load_polars("comunas", validate=True)
+        self.assertGreater(df.height, 0)
+        self.assertIn("codigo_comuna", df.columns)
+
+    def test_load_polars_validate_default(self):
+        """Valida que load_polars() sin validate=True no lance validación."""
+        df = self.hub.load_polars("comunas")
+        self.assertGreater(df.height, 0)
+
     # ── search_datasets tests ───────────────────────────────────────────────────
 
     def test_search_datasets_query(self):
@@ -1182,7 +1206,7 @@ class ChileHubCliTests(unittest.TestCase):
         result = self.run_cli_raw("show", "comuna")
         self.assertEqual(result.returncode, 1)
         self.assertEqual(result.stdout, "")
-        self.assertIn("Error: Dataset 'comuna' no existe", result.stderr)
+        self.assertIn("Error: Dataset 'comuna' no es válido", result.stderr)
         self.assertNotIn("Traceback", result.stderr)
 
     def test_cli_example(self):
@@ -1520,6 +1544,17 @@ class ChileHubCliTests(unittest.TestCase):
         result = self.run_cli("search", "--maturity", "stable")
         self.assertGreater(len(result.stdout.strip()), 0)
 
+    def test_cli_validate_dataset_ok(self):
+        """Valida que chile-hub validate comunas (sin path) funcione."""
+        result = self.run_cli("validate", "comunas")
+        self.assertIn('"status": "ok"', result.stdout)
+
+    def test_cli_validate_dataset_error(self):
+        """Valida que chile-hub validate no_existe muestre error."""
+        result = self.run_cli_raw("validate", "no_existe")
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("no es válido", result.stderr)
+
     def test_cli_validate_ok(self):
         import polars as pl
 
@@ -1674,6 +1709,100 @@ class MakefileContractTests(unittest.TestCase):
         self.assertIn("scripts/package_publishable_bundle.py --clean", self.makefile_text)
         self.assertNotIn("rm -f data/normalized/*.json", self.makefile_text)
         self.assertNotIn("rm -f data/normalized/*.parquet", self.makefile_text)
+
+
+# ── Dataset enum tests ─────────────────────────────────────────────────────
+
+
+class DatasetEnumTests(unittest.TestCase):
+    """Tests para el enum Dataset en src/chile_hub/datasets.py."""
+
+    def test_members_are_strings(self):
+        from src.chile_hub.datasets import Dataset
+
+        for member in Dataset:
+            self.assertIsInstance(member.value, str)
+            self.assertIsInstance(member, str)
+
+    def test_from_string_exact(self):
+        from src.chile_hub.datasets import Dataset
+
+        self.assertIs(Dataset.from_string("comunas"), Dataset.COMUNAS)
+        self.assertIs(Dataset.from_string("regiones"), Dataset.REGIONES)
+        self.assertIs(Dataset.from_string("empresas"), Dataset.EMPRESAS)
+
+    def test_from_string_with_typo_suggests(self):
+        from src.chile_hub.datasets import Dataset
+
+        with self.assertRaises(ValueError) as ctx:
+            Dataset.from_string("comuna")
+        self.assertIn("Quizás quisiste decir 'comunas'", str(ctx.exception))
+
+        with self.assertRaises(ValueError) as ctx:
+            Dataset.from_string("indicadore")
+        self.assertIn("Quizás quisiste decir 'indicadores'", str(ctx.exception))
+
+    def test_from_string_unknown_raises(self):
+        from src.chile_hub.datasets import Dataset
+
+        with self.assertRaises(ValueError):
+            Dataset.from_string("no_existe")
+
+    def test_values_returns_all(self):
+        from src.chile_hub.datasets import Dataset
+
+        vals = Dataset.values()
+        self.assertEqual(len(vals), 15)
+        self.assertIn("comunas", vals)
+        self.assertIn("regiones", vals)
+        self.assertIn("empresas", vals)
+
+    def test_all_datasets_have_corresponding_contract(self):
+        from pathlib import Path
+
+        from src.chile_hub.datasets import Dataset
+
+        contracts_dir = Path(__file__).resolve().parents[1] / "contracts" / "datasets"
+        for member in Dataset:
+            contract_path = contracts_dir / f"{member.value}.schema.json"
+            self.assertTrue(
+                contract_path.exists(),
+                f"Dataset '{member.value}' no tiene contrato en {contract_path}",
+            )
+
+    def test_load_polars_with_enum(self):
+        from src.chile_hub.datasets import Dataset
+
+        hub = self._get_hub()
+        df = hub.load_polars(Dataset.COMUNAS)
+        self.assertGreater(df.height, 0)
+        self.assertIn("codigo_comuna", df.columns)
+
+    def test_load_polars_with_enum_validate(self):
+        from src.chile_hub.datasets import Dataset
+
+        hub = self._get_hub()
+        df = hub.load_polars(Dataset.COMUNAS, validate=True)
+        self.assertGreater(df.height, 0)
+
+    def test_get_dataset_with_enum(self):
+        from src.chile_hub.datasets import Dataset
+
+        hub = self._get_hub()
+        meta = hub.get_dataset(Dataset.COMUNAS)
+        self.assertEqual(meta["dataset"], "comunas")
+
+    def test_cross_view_with_enum(self):
+        from src.chile_hub.datasets import Dataset
+
+        hub = self._get_hub()
+        df = hub.cross_view([Dataset.COMUNAS, Dataset.CENSO_COMUNAL])
+        self.assertGreater(df.height, 0)
+
+    def _get_hub(self):
+        from src.chile_hub import ChileHub
+
+        return ChileHub()
 
 
 class EntryPointTests(unittest.TestCase):

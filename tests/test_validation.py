@@ -975,5 +975,193 @@ class ValidatorContractProperties(unittest.TestCase):
         _property()
 
 
+# ── contracts.py tests ──────────────────────────────────────────────────────
+
+
+class ContractTypeTests(unittest.TestCase):
+    """Tests para contract_type() del módulo contracts."""
+
+    def _contract_type(self, dtype):
+        from src.chile_hub.contracts import contract_type
+
+        return contract_type(dtype)
+
+    def test_string_types(self):
+        self.assertEqual(self._contract_type("String"), "string")
+
+    def test_integer_types(self):
+        for t in ("Int8", "Int16", "Int32", "Int64", "UInt8", "UInt16", "UInt32", "UInt64"):
+            self.assertEqual(self._contract_type(t), "integer")
+
+    def test_float_types(self):
+        self.assertEqual(self._contract_type("Float32"), "float")
+        self.assertEqual(self._contract_type("Float64"), "float")
+
+    def test_date_type(self):
+        self.assertEqual(self._contract_type("Date"), "date")
+
+    def test_boolean_type(self):
+        self.assertEqual(self._contract_type("Boolean"), "boolean")
+
+    def test_unknown_type_defaults_to_lower(self):
+        self.assertEqual(self._contract_type("Time"), "time")
+        self.assertEqual(self._contract_type("List"), "list")
+
+
+_COMMUNES_CONTRACT = {
+    "dataset": "comunas",
+    "primary_key": ["codigo_comuna"],
+    "required_columns": ["codigo_comuna", "nombre_comuna", "nombre_comuna_clean"],
+    "column_types": {
+        "codigo_comuna": "string",
+        "nombre_comuna": "string",
+        "codigo_region": "string",
+    },
+    "fixed_width_columns": {"codigo_comuna": 5, "codigo_region": 2},
+    "expected_record_count": 3,
+    "coverage_policy": "full",
+    "publish_outputs": [],
+}
+
+
+class VerifyDatasetContractTests(unittest.TestCase):
+    """Tests para verify_dataset_contract() del módulo contracts."""
+
+    def _verify(self, contract=None, df=None, **kwargs):
+        from src.chile_hub.contracts import verify_dataset_contract
+
+        if contract is None:
+            contract = _COMMUNES_CONTRACT
+        if df is None:
+            df = pl.DataFrame(
+                {
+                    "codigo_comuna": ["01101", "01107", "01105"],
+                    "nombre_comuna": ["Iquique", "Alto Hospicio", "Pica"],
+                    "nombre_comuna_clean": ["iquique", "alto hospicio", "pica"],
+                    "codigo_region": ["01", "01", "01"],
+                }
+            )
+        return verify_dataset_contract("comunas", contract, df, **kwargs)
+
+    def test_ok_minimal(self):
+        result = self._verify()
+        self.assertEqual(result["status"], "ok")
+        self.assertEqual(result["errors"], [])
+        self.assertEqual(result["dataset"], "comunas")
+
+    def test_dataset_name_mismatch(self):
+        from src.chile_hub.contracts import verify_dataset_contract
+
+        result = verify_dataset_contract("otro", _COMMUNES_CONTRACT, pl.DataFrame())
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("contrato" in e for e in result["errors"]))
+
+    def test_missing_required_columns(self):
+        df = pl.DataFrame({"codigo_comuna": ["01101"]})
+        result = self._verify(df=df)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("Faltan columnas" in e for e in result["errors"]))
+
+    def test_wrong_column_type(self):
+        df = pl.DataFrame(
+            {
+                "codigo_comuna": ["01101"],
+                "nombre_comuna": ["Iquique"],
+                "nombre_comuna_clean": ["iquique"],
+                "codigo_region": [1],  # debe ser string
+            }
+        )
+        result = self._verify(df=df)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("tipo" in e.lower() for e in result["errors"]))
+
+    def test_duplicate_primary_key(self):
+        df = pl.DataFrame(
+            {
+                "codigo_comuna": ["01101", "01101"],
+                "nombre_comuna": ["Iquique", "Iquique"],
+                "nombre_comuna_clean": ["iquique", "iquique"],
+                "codigo_region": ["01", "01"],
+            }
+        )
+        result = self._verify(df=df)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("duplicado" in e for e in result["errors"]))
+
+    def test_null_in_primary_key(self):
+        df = pl.DataFrame(
+            {
+                "codigo_comuna": ["01101", None],
+                "nombre_comuna": ["Iquique", "Alto Hospicio"],
+                "nombre_comuna_clean": ["iquique", "alto hospicio"],
+                "codigo_region": ["01", "01"],
+            }
+        )
+        result = self._verify(df=df)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("nulos" in e for e in result["errors"]))
+
+    def test_fixed_width_violation(self):
+        df = pl.DataFrame(
+            {
+                "codigo_comuna": ["01101", "1101"],  # "1101" tiene largo 4
+                "nombre_comuna": ["Iquique", "Valparaíso"],
+                "nombre_comuna_clean": ["iquique", "valparaiso"],
+                "codigo_region": ["01", "01"],
+            }
+        )
+        result = self._verify(df=df)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("ancho" in e for e in result["errors"]))
+
+    def test_record_count_warning_non_strict(self):
+        df = pl.DataFrame(
+            {
+                "codigo_comuna": ["01101", "01107"],
+                "nombre_comuna": ["Iquique", "Alto Hospicio"],
+                "nombre_comuna_clean": ["iquique", "alto hospicio"],
+                "codigo_region": ["01", "01"],
+            }
+        )
+        result = self._verify(df=df)  # 2 filas, contrato espera 3
+        self.assertEqual(result["status"], "ok")  # warning no bloquea
+        self.assertGreater(len(result["warnings"]), 0)
+
+    def test_record_count_error_strict(self):
+        df = pl.DataFrame(
+            {
+                "codigo_comuna": ["01101", "01107"],
+                "nombre_comuna": ["Iquique", "Alto Hospicio"],
+                "nombre_comuna_clean": ["iquique", "alto hospicio"],
+                "codigo_region": ["01", "01"],
+            }
+        )
+        result = self._verify(df=df, strict=True)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("Registros" in e for e in result["errors"]))
+
+    def test_missing_publish_output(self):
+        from src.chile_hub.contracts import verify_dataset_contract
+
+        contract = dict(_COMMUNES_CONTRACT)
+        contract["publish_outputs"] = ["parquet", "json"]
+        df = pl.DataFrame(
+            {
+                "codigo_comuna": ["01101"],
+                "nombre_comuna": ["Iquique"],
+                "nombre_comuna_clean": ["iquique"],
+                "codigo_region": ["01"],
+            }
+        )
+        result = verify_dataset_contract(
+            "comunas",
+            contract,
+            df,
+            outputs={"parquet": "data/normalized/comunas.parquet"},
+        )
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("output" in e for e in result["errors"]))
+
+
 if __name__ == "__main__":
     unittest.main()

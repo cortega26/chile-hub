@@ -333,7 +333,7 @@ class PipelineLogicTests(unittest.TestCase):
 
         with patch("builtins.print") as print_mock, self.assertRaisesRegex(SystemExit, "1"):
             verify_dataset_contract("demo", contract, df, {}, ROOT_DIR)
-        self.assertIn("missing required columns", print_mock.call_args.args[0])
+        self.assertIn("Faltan columnas requeridas", print_mock.call_args.args[0])
 
     def test_dataset_contract_rejects_duplicate_primary_key(self):
         df = pl.DataFrame({"codigo_comuna": ["01101", "01101"]})
@@ -349,7 +349,7 @@ class PipelineLogicTests(unittest.TestCase):
 
         with patch("builtins.print") as print_mock, self.assertRaisesRegex(SystemExit, "1"):
             verify_dataset_contract("demo", contract, df, {}, ROOT_DIR)
-        self.assertIn("primary key is not unique", print_mock.call_args.args[0])
+        self.assertIn("no es única", print_mock.call_args.args[0])
 
     def test_dataset_contract_rejects_invalid_cut_width(self):
         df = pl.DataFrame({"codigo_comuna": ["1101"]})
@@ -365,7 +365,7 @@ class PipelineLogicTests(unittest.TestCase):
 
         with patch("builtins.print") as print_mock, self.assertRaisesRegex(SystemExit, "1"):
             verify_dataset_contract("demo", contract, df, {}, ROOT_DIR)
-        self.assertIn("outside width 5", print_mock.call_args.args[0])
+        self.assertIn("fuera del ancho esperado de 5", print_mock.call_args.args[0])
 
     def test_source_registry_accepts_stable_publishable_entry(self):
         catalog = {"datasets": [{"dataset": "comunas"}]}

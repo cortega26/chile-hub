@@ -41,6 +41,10 @@ dependencies = [
     "requests>=2.34.2",
     "platformdirs>=4.10.0",
     "rich>=14.0",
+    "rutificador>=1.5.8",
+    "openpyxl>=3.1.5",
+    "duckdb>=1.5.4",
+    "tenacity>=9.1.4",
 ]
 
 
