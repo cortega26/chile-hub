@@ -12,6 +12,32 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.18.0 - 2026-06-30
+
+### Corregido
+
+- CI readiness — fallback para pobreza_comunal y consumo_electrico_comunal + archivar Plan 022
+  ([`b0ba125`](https://github.com/cortega26/chile-hub/commit/b0ba12579aef7c56980bdcd7b23dc12a85f72e24))
+
+- Landing — añade pobreza_comunal y consumo_electrico_comunal a categorías CATEGORIES
+  ([`63244a5`](https://github.com/cortega26/chile-hub/commit/63244a54ba8d2bce1e0287bb3a5327e7b86fa41b))
+
+### Agregado
+
+- Fase 1 — honestidad de datos y base de confianza (plan 022)
+  ([`1d97b49`](https://github.com/cortega26/chile-hub/commit/1d97b49daf2d722ee901d7e1d643f5b55519d5a6))
+
+- Fase 2 — narrativa técnica visible y Ola B1 — CASEN + CNE (plan 022)
+  ([`7e7d63b`](https://github.com/cortega26/chile-hub/commit/7e7d63b7acdab646b55e6337d475a26499ba227e))
+
+- Fase 3 — señales pasivas operativas y sanación de fuentes vía scraping (plan 022)
+  ([`ca698ea`](https://github.com/cortega26/chile-hub/commit/ca698ea19001b117703d60b62afa669e37b9ccc9))
+
+- Fase 4 — distribución sobre lo validado + Ola B2 — CEAD delincuencia + electoral research (plan
+  022)
+  ([`8e3e579`](https://github.com/cortega26/chile-hub/commit/8e3e579bdb26cc888c637b95f5f257dc352965d4))
+
+
 ## 1.17.1 - 2026-06-30
 
 ### Corregido
