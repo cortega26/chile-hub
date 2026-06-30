@@ -4,9 +4,8 @@ Proporciona funciones compartidas para extractores que siguen el patrón:
 fetch remoto → snapshot raw → fallback a datos curados → normalizar →
 metadata estándar → validar → escribir staging.
 
-Úsalo solo en extractores candidatos o nuevos. Los extractores estables
-con lógica de extracción compleja (subdere, bcentral, censo, RES) no
-necesitan adaptarse a este módulo.
+Es el estándar recomendado para todos los extractores del proyecto.
+Los extractores legacy se migrarán progresivamente a este módulo.
 """
 
 import datetime
