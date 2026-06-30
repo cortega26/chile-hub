@@ -371,5 +371,26 @@
     "publication_track": "stable_publishable",
     "public_bundle_eligible": true,
     "cadencia": "bajo_demanda"
+  },
+  {
+    "source_id": "cead_delincuencia_comunal",
+    "dataset": "delincuencia_comunal",
+    "source_name": "CEAD — Subsecretaría de Prevención del Delito",
+    "official_url": "https://cead.minsegpublica.gob.cl/estadisticas-delictuales/",
+    "access_method": "scraping_html_post",
+    "license_status": "public-api-review-terms",
+    "live_extractor_status": "implemented",
+    "fallback_policy": "fallback_to_last_snapshot",
+    "maturity_status": "candidate",
+    "live_ready": false,
+    "fallback_allowed": true,
+    "publish_blocking": true,
+    "review_by": "2026-09-21",
+    "stalled_after_days": 90,
+    "owner": "core",
+    "next_action": "Monitorear estabilidad del scraping; buscar fuente estructurada oficial (datos.gob.cl, export CEAD). Degradar a rejected si no madura para review_by.",
+    "publication_track": "candidate",
+    "public_bundle_eligible": false,
+    "cadencia": "monthly"
   }
 ]

@@ -5,6 +5,11 @@ las publicaciones en PyPI. Los commits de actualización de datos
 (`chore(data): daily refresh [skip ci]`) no representan lanzamientos de software
 y se excluyen intencionalmente de estas notas.
 
+Los bloques `> 🎯 **Resumen:**` que acompañan a algunos releases minor/major son
+**notas narrativas escritas por un humano**: cuentan *por qué* el release importa
+y cómo se conecta con la dirección del proyecto. Las listas categorizadas debajo
+son la bitácora automática generada desde los Conventional Commits.
+
 <!-- version list -->
 
 ## 1.17.1 - 2026-06-30
@@ -31,6 +36,16 @@ y se excluyen intencionalmente de estas notas.
 
 ## 1.17.0 - 2026-06-30
 
+> 🎯 **Resumen:** Este release cierra el backlog estratégico de ingeniería y posiciona
+> a chile-hub como parte del ecosistema Tooltician. Se completan tres frentes diferidos
+> desde la auditoría inicial: contratos de tipos en runtime (`contracts.py`), el enum
+> `Dataset` que unifica la referencia a capas, y el dashboard de salud programático
+> (`hub_health.json`). La librería ahora valida tipos al importar y expone un panel de
+> salud consultable sin abrir un Parquet. La identidad visual se alinea con Tooltician
+> (badge + tagline en español), cerrando la brecha entre la ingeniería real y su cara
+> pública. Este release es la base técnica sobre la que se construye la narrativa de
+> confiabilidad del Plan 022.
+
 ### Documentación
 
 - **badge**: Badge Tooltician -> Parte de Tooltician
@@ -49,6 +64,15 @@ y se excluyen intencionalmente de estas notas.
 
 
 ## 1.16.0 - 2026-06-29
+
+> 🎯 **Resumen:** Release de madurez de UX y estándares. La CLI migra de padding manual
+> a tablas formateadas con `rich` (Plan 018): `chile-hub info`, `list datasets` y
+> `show` ahora renderizan tablas con bordes, colores y columnas auto-ajustadas. El
+> pipeline publica `datapackage.json` en formato Frictionless Data (Plan 019), derivado
+> automáticamente de los contratos `contracts/datasets/*.json`, dando interoperabilidad
+> estándar sin mantenimiento adicional. Se institucionaliza la disciplina de archivado de
+> planes: los planes DONE se mueven a `archive/` de inmediato. La experiencia de uso
+> y la apertura de datos dan un salto sin tocar la lógica de negocio.
 
 ### Mantenimiento
 
@@ -106,6 +130,14 @@ y se excluyen intencionalmente de estas notas.
 ---
 
 ## 1.15.0 - 2026-06-21
+
+> 🎯 **Resumen:** Release de robustez de ingeniería. Todos los extractores HTTP ahora
+> reintentan automáticamente con backoff exponencial (vía `tenacity`): los fallos
+> transitorios de red —frecuentes en CI y en portales gubernamentales— ya no rompen
+> el build. La gestión de dependencias migra a `uv` en todos los flujos de CI,
+> dando resolución determinista y reduciendo el tiempo de instalación significativamente.
+> Estas dos mejoras eliminan las dos fuentes más comunes de falsos negativos en el
+> pipeline diario, haciendo que "CI roja = problema real" por primera vez.
 
 ### Agregado
 

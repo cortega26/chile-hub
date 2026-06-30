@@ -2,17 +2,18 @@
 
 ## Estado
 
-- **Decisión actual**: under-review (para revisión)
+- **Decisión actual**: **implemented** — extractor operativo en carril `candidate` (2026-06-30)
 - **Prioridad tentativa**: P1 por valor, condicionada por la fuente
 - **Esfuerzo estimado**: M si aparece una descarga estructurada estable; L si hay
   que mantener un extractor sobre scraping
 - **Riesgo**: HIGH — fragilidad de fuente
 - **Categoría**: seguridad / civic-data / data-quality
 - **Registrado**: 2026-06-21
+- **Implementado**: 2026-06-30 — `src/extractors/cead_delincuencia_live_extractor.py`
 - **review_by**: 2026-09-21 (`stalled_after_days`: 90)
 - **Carril de destino**: `candidate` (fuera del bundle público)
 - **Fuente verificada**: sí — sin descarga oficial estable; el acceso real es
-  scraping de tablas HTML (2026-06-21); ver Referencias.
+  scraping de tablas HTML vía POST al endpoint PHP de CEAD; ver Referencias.
 
 ## Mini-scorecard
 

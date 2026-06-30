@@ -2,11 +2,10 @@
 
 ## Estado
 
-- **Decision actual**: needs-research
+- **Decision actual**: **research-completed** — `autoridades_electas` listo para implementar, `resultados_electorales` diferido (2026-06-30)
 - **Prioridad tentativa**: P2
-- **Esfuerzo estimado**: M para autoridades/parlamentarios; L para resultados
-  historicos normalizados multi-eleccion
-- **Riesgo**: MED
+- **Esfuerzo estimado**: S-M para `autoridades_electas` (XML Cámara + Wikidata); S para `partidos_politicos`; L para `resultados_electorales` (diferido)
+- **Riesgo**: LOW para autoridades/partidos; MED-HIGH para resultados (diferido)
 - **Categoria**: civic-data / electoral / legal / data-quality
 - **Registrado**: 2026-06-18
 

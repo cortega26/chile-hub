@@ -1,4 +1,4 @@
-name: Monthly Scrape (SINIM)
+name: Monthly Scrape (SINIM + CEAD)
 
 on:
   schedule:
@@ -96,4 +96,70 @@ jobs:
           else
             echo "⚠️ Scrape falló — usando último snapshot bueno" >> $GITHUB_STEP_SUMMARY
             echo "⚠️ Requiere intervención manual: revisar portal SINIM" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  scrape-cead:
+    name: CEAD Delincuencia Comunal
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: |
+          uv sync --group dev
+
+      - name: Extract CEAD delincuencia comunal
+        id: scrape
+        continue-on-error: true
+        run: |
+          uv run python src/extractors/cead_delincuencia_live_extractor.py --year ${{ inputs.year || '2024' }}
+        env:
+          SCRAPE_YEAR: ${{ inputs.year || '2024' }}
+
+      - name: Report scrape failure (non-blocking)
+        if: steps.scrape.outcome == 'failure'
+        run: |
+          echo "⚠️ CEAD scrape falló — se mantiene el último snapshot bueno."
+          echo "El build diario no se ve afectado."
+          echo "Carril CANDIDATE — fuera del bundle público."
+          echo "Revisar manualmente: https://cead.minsegpublica.gob.cl/estadisticas-delictuales/"
+          # No hacemos exit 1 — el workflow sigue siendo verde
+
+      - name: Commit updated data (if changed)
+        if: steps.scrape.outcome == 'success'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/staging/delincuencia_comunal.csv
+          git add data/staging/delincuencia_comunal.metadata.json
+          git add data/raw/cead_delincuencia_*.json
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore(data): monthly CEAD delincuencia scrape refresh [skip ci]"
+            git push
+          fi
+
+      - name: Summary
+        run: |
+          echo "## Monthly CEAD Scrape — $(date -u +%Y-%m-%d)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.scrape.outcome }}" = "success" ]; then
+            echo "✅ Scrape exitoso" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Scrape falló — usando último snapshot bueno" >> $GITHUB_STEP_SUMMARY
+            echo "⚠️ Carril CANDIDATE — fuera del bundle público" >> $GITHUB_STEP_SUMMARY
+            echo "⚠️ Requiere intervención manual: revisar portal CEAD" >> $GITHUB_STEP_SUMMARY
           fi

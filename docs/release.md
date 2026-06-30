@@ -69,3 +69,40 @@ chore(data): daily refresh [skip ci]
 ```
 
 Estos commits no crean una nueva versión en PyPI.
+
+## Notas de release legibles para humanos
+
+Además del changelog automático, cada release **minor** y **major** lleva un bloque
+narrativo escrito por un humano en `CHANGELOG.md`. El bloque usa el formato:
+
+```
+> 🎯 **Resumen:** uno a tres párrafos que cuentan *por qué* el release importa,
+> cómo se conecta con la dirección del proyecto, y qué significa para quien lo lee.
+```
+
+**Cuándo se escribe:**
+- Releases **minor** (`feat:`) y **major** (`feat!:` / `BREAKING CHANGE:`): **siempre**.
+- Releases **patch** (`fix:`): **no llevan** resumen narrativo. El diff auto-generado
+  es suficiente.
+
+**Dónde se coloca:**
+- Justo después de la línea `## X.Y.Z - FECHA`, antes de los encabezados categorizados
+  (`### Agregado`, `### Corregido`, etc.).
+- La lista categorizada que sigue es la bitácora automática de `python-semantic-release`;
+  el resumen es la capa humana.
+
+**Qué cubre el resumen:**
+- El arco narrativo: qué problema resuelve este release en el contexto del proyecto.
+- Conexión con planes activos (p. ej. "Este release completa el Plan 018…").
+- Cambios de dirección o decisiones visibles para quien sigue el proyecto.
+- NO es un duplicado de la lista de commits; es el *por qué*, no el *qué*.
+
+**Quién lo escribe:**
+- El mantenedor, al momento de hacer el release o justo después. El bloque se añade
+  manualmente a `CHANGELOG.md` tras la publicación automática. Como PSR usa `mode = "update"`
+  (antepone contenido), las notas de releases anteriores no se tocan.
+
+**Convención de idioma:**
+- Los resúmenes narrativos van en **español neutral**, como el resto de la documentación
+  del proyecto. Las categorías auto-generadas por PSR heredan el idioma de los mensajes
+  de commit (inglés o español, según como se escribieron).

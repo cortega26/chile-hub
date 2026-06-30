@@ -1,12 +1,12 @@
 {
   "description": "Serie histórica semanal de descargas del bundle 'chile-hub-publishable-bundle.zip' desde GitHub Releases API. Señal pasiva — subcuenta usuarios recurrentes (cache local). Cero telemetría en la librería.",
-  "generated_at_utc": "2026-06-30T17:51:28.581597+00:00",
+  "generated_at_utc": "2026-06-30T19:33:17.436284+00:00",
   "repo": "cortega26/chile-hub",
   "asset_name": "chile-hub-publishable-bundle.zip",
   "snapshots": [
     {
       "date": "2026-06-30",
-      "fetched_at_utc": "2026-06-30T17:51:28.065222+00:00",
+      "fetched_at_utc": "2026-06-30T19:33:16.475455+00:00",
       "total_downloads": 36,
       "release_count": 27,
       "releases": [

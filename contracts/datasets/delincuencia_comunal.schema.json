@@ -1,0 +1,38 @@
+{
+  "dataset": "delincuencia_comunal",
+  "primary_key": ["anio", "mes", "codigo_comuna", "familia_delito"],
+  "required_columns": [
+    "anio",
+    "mes",
+    "codigo_comuna",
+    "familia_delito",
+    "casos"
+  ],
+  "column_types": {
+    "anio": "integer",
+    "mes": "integer",
+    "nombre_mes": "string",
+    "codigo_comuna": "string",
+    "nombre_comuna": "string",
+    "familia_delito": "string",
+    "nombre_familia": "string",
+    "casos": "integer",
+    "fuente": "string",
+    "url_fuente": "string"
+  },
+  "nullable_columns": [],
+  "fixed_width_columns": {
+    "codigo_comuna": 5
+  },
+  "expected_record_count": null,
+  "coverage_policy": "partial_expected",
+  "publish_outputs": ["csv"],
+  "_carril": "candidate",
+  "_review_by": "2026-09-21",
+  "_notas": [
+    "Dataset en carril CANDIDATE — NO incluido en el bundle público.",
+    "Fuente frágil: scraping de tabla HTML vía POST al endpoint PHP de CEAD.",
+    "review_by: 2026-09-21. stalled_after_days: 90.",
+    "Los casos son reportados por Carabineros y PDI a la SPD."
+  ]
+}

@@ -561,7 +561,7 @@ flowchart TB
     S --> B --> N --> V --> T --> L
 ```
 
-> [!IMPORTANT]
+> [!IMPORTANTE]
 > **Invariante crítica:** El pipeline aborta si la cardinalidad de comunas ≠ 346, si los códigos CUT pierden el formato `VARCHAR`, o si alguna regla de negocio se rompe. **Nunca** se publican datos corruptos.
 
 <details>

@@ -555,5 +555,30 @@
       "json": "data/normalized/consumo_electrico_comunal.json"
     },
     "documentation": "docs/datasets/consumo_electrico_comunal.md"
+  },
+  "delincuencia_comunal": {
+    "description": "Casos policiales de Delitos de Mayor Connotación Social (DMCS) y otras categorías por comuna y mes, reportados por Carabineros y PDI al Ministerio del Interior. Fuente: CEAD (Centro de Estudios y Análisis del Delito), Subsecretaría de Prevención del Delito.",
+    "join_keys": [
+      "codigo_comuna"
+    ],
+    "confidence_tier": "Tier C",
+    "expected_record_count": null,
+    "reuse_policy": {
+      "status": "public-api-review-terms",
+      "license": "Sin licencia explícita. Datos públicos agregados de la SPD.",
+      "license_url": "https://cead.minsegpublica.gob.cl/estadisticas-delictuales/",
+      "attribution_required": true,
+      "redistribution_ok": false,
+      "summary": "Casos policiales por comuna desde CEAD. Carril CANDIDATE — NO redistribuible en el bundle público."
+    },
+    "freshness_policy": {
+      "max_age_hours": 2160,
+      "label": "mensual"
+    },
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars(\"delincuencia_comunal\")\n# Casos de robos violentos por comuna en 2024\nrobos = df.filter(pl.col(\"familia_delito\") == \"robos_violentos\")",
+      "duckdb": "SELECT codigo_comuna, nombre_comuna, mes, casos\nFROM 'data/normalized/delincuencia_comunal.parquet'\nWHERE familia_delito = 'robos_violentos' AND anio = 2024\nORDER BY casos DESC;",
+      "cli": "chile-hub show delincuencia_comunal"
+    }
   }
 }
