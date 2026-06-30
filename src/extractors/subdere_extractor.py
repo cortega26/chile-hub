@@ -8,19 +8,12 @@ import requests
 
 UTC = timezone.utc
 
-try:
-    from src.extractors.base import (
-        BaseExtractor,
-        ensure_staging_directories,
-        write_staging_metadata,
-    )
-except ModuleNotFoundError:
-    from base import BaseExtractor, ensure_staging_directories, write_staging_metadata
-
-try:
-    from src.extractors.http_utils import fetch_with_retry
-except ModuleNotFoundError:
-    from http_utils import fetch_with_retry
+from src.extractors.base import (
+    BaseExtractor,
+    ensure_staging_directories,
+    write_staging_metadata,
+)
+from src.extractors.http_utils import fetch_with_retry
 
 # curl_cffi impersona el fingerprint TLS de Chrome, evitando bloqueos a nivel de TLS
 # que rechazan al user-agent por defecto de la librería requests de Python.
