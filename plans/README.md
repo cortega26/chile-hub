@@ -30,7 +30,6 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 
 | # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
 |---|------|----------|----------|--------|-----------|--------|
-| 014 | [Limpieza de arquitectura — catálogo externo, imports, alias](014-architecture-cleanup.md) | P2 | M | MED | — | TODO |
 | 020 | [Explorador SQL en la landing con DuckDB-Wasm](020-duckdb-wasm-playground.md) | P2 | M | MED | — | BLOCKED — gate 4.3: NO-GO (2026-06-30). Ver `docs/gate-4-3-decision-playground.md` para condiciones de re-evaluación. |
 | 021 | [Publicar documentación de API con MkDocs Material + mkdocstrings](021-mkdocs-api-docs.md) | P3 | M | LOW | — | TODO |
 
@@ -55,6 +54,7 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 | 011 | [Robustecer manejo de errores en API pública](archive/011-harden-api-error-handling.md) | S | LOW | DONE |
 | 012 | [Hardening de seguridad — TOCTOU, integridad binario y paths](archive/012-security-hardening.md) | S | LOW | DONE |
 | 013 | [Cache en memoria para la API de ChileHub](archive/013-api-performance-caching.md) | S | LOW | DONE |
+| 014 | [Limpieza de arquitectura — catálogo externo, imports, alias](archive/014-architecture-cleanup.md) | S | LOW | DONE |
 | 015 | [Robustez de tests — HTTP mocking, CLI coverage, assertions](archive/015-test-robustness.md) | M | LOW | DONE |
 | 016 | [Cache de staging en CI](archive/016-ci-staging-cache.md) | S | MED | DONE |
 | 017 | [Nuevas capacidades de API — cruces, validación, exit codes, búsqueda](archive/017-new-api-capabilities.md) | M | LOW | DONE |
@@ -76,21 +76,19 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 ## Grafo de dependencias (planes activos)
 
 ```
-014 (independiente)    ← limpieza de arquitectura
 020 (independiente)    ← bloqueado por gate 4.3 (no-go 2026-06-30); sin dependencia activa
 021 (independiente)    ← MkDocs API docs
 ```
 
-**014**, **020** y **021** son independientes entre sí: tocan superficies distintas (pipeline de build,
-landing, docs/CI) y pueden ejecutarse en cualquier orden o en paralelo. **020** sigue bloqueado por
+**020** y **021** son independientes entre sí: tocan superficies distintas (landing,
+docs/CI) y pueden ejecutarse en cualquier orden o en paralelo. **020** sigue bloqueado por
 el gate 4.3 (NO-GO); ver `docs/gate-4-3-decision-playground.md` para condiciones de re-evaluación.
 
 ## Orden de ejecución recomendado
 
 1. **023** — si se crea: autoridades_electas + partidos_politicos (integración XML/Wikidata, S-M de esfuerzo)
-2. **014** — limpieza de arquitectura (P2, aditivo)
-3. **021** — MkDocs: docs de API desde docstrings existentes (P3, aditivo)
-4. **020** — DuckDB-Wasm: solo si lo aprueba una re-evaluación futura del gate 4.3
+2. **021** — MkDocs: docs de API desde docstrings existentes (P3, aditivo)
+3. **020** — DuckDB-Wasm: solo si lo aprueba una re-evaluación futura del gate 4.3
 
 ## Hallazgos considerados y diferidos (2026-06-29 — mejoras de librerías)
 
