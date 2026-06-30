@@ -95,6 +95,8 @@ doctor:
 	PYTHONPATH=src $(PYTHON) src/extractors/mineduc_resultados_extractor.py
 	PYTHONPATH=src $(PYTHON) src/extractors/siedu_extractor.py
 	PYTHONPATH=src $(PYTHON) src/extractors/res_extractor.py
+	PYTHONPATH=src $(PYTHON) src/extractors/pobreza_extractor.py
+	PYTHONPATH=src $(PYTHON) src/extractors/consumo_electrico_extractor.py
 
 build:
 	$(PYTHON) src/build_dev_db.py

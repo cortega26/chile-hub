@@ -1,0 +1,38 @@
+{
+  "dataset": "consumo_electrico_comunal",
+  "primary_key": ["codigo_comuna", "anio", "tipo_cliente"],
+  "required_columns": [
+    "codigo_region",
+    "codigo_comuna",
+    "nombre_comuna",
+    "anio",
+    "tipo_cliente",
+    "consumo_kwh",
+    "numero_clientes",
+    "fuente",
+    "url_fuente",
+    "fecha_fuente"
+  ],
+  "column_types": {
+    "codigo_region": "string",
+    "codigo_comuna": "string",
+    "nombre_comuna": "string",
+    "anio": "integer",
+    "tipo_cliente": "string",
+    "consumo_kwh": "float",
+    "numero_clientes": "integer",
+    "fuente": "string",
+    "url_fuente": "string",
+    "fecha_fuente": "string"
+  },
+  "nullable_columns": [
+    "numero_clientes"
+  ],
+  "fixed_width_columns": {
+    "codigo_region": 2,
+    "codigo_comuna": 5
+  },
+  "expected_record_count": null,
+  "coverage_policy": "full",
+  "publish_outputs": ["parquet", "json"]
+}

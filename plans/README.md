@@ -2,16 +2,35 @@
 
 Planes de implementación generados por auditoría `/improve deep` en commits `ba2f434` (2026-06-13) y `a2cd288` (2026-06-19), y por `/improve plan` (mejoras de librerías/dependencias) en commit `140c8ea` (2026-06-29).
 
-> **Archivado automático**: cuando un plan pasa a estado `DONE`, mueve su fichero `.md` a `archive/`
-> inmediatamente y borra su fila de la tabla de activos. No lo dejes en la tabla activa ni en
-> `plans/` raíz. Si el plan archivado merece mención, añádelo a la sección "Planes archivados"
-> correspondiente.
+> ## Rutina obligatoria tras cada iteración / actualización / cambio
+>
+> Al cerrar **cualquier** iteración de trabajo sobre un plan (una tarea, una fase, una ola o el
+> plan completo), ejecuta estos pasos **en orden** antes de dar el trabajo por terminado. No los
+> dejes "para después": el índice y el backlog deben reflejar siempre el estado real.
+>
+> 1. **Actualiza la fila de estado** del plan en la tabla "Planes activos" de este archivo
+>    (`TODO` → `IN PROGRESS` → `DONE`; para planes maestros multi-fase usa un estado granular,
+>    p. ej. `🔶 Fase 1 ✓ (fecha)`).
+> 2. **Actualiza el backlog y el scorecard** si existen y el cambio los toca:
+>    `docs/backlog/scorecard.md` (métricas de avance y revisión semanal),
+>    `docs/backlog/NEXT_STEPS.md` y la ficha de backlog correspondiente en `docs/backlog/`.
+>    Si el plan tiene su propio registro interno (p. ej. el "registro de reevaluación" del Plan
+>    022, §9.4), añade también ahí la entrada de la iteración.
+> 3. **Archiva el trabajo terminado.** Cuando un plan pasa a `DONE`, mueve su fichero `.md` a
+>    `archive/` **de inmediato** y borra su fila de la tabla de activos — no lo dejes en la tabla
+>    activa ni en `plans/` raíz. Si merece mención, añádelo a la sección "Planes archivados"
+>    correspondiente. Para un **plan maestro multi-fase**, no lo archives hasta que **todas** sus
+>    fases/olas estén `DONE`; mientras tanto, mantén su fila activa con el estado granular del
+>    paso 1.
+> 4. **Verifica coherencia**: el grafo de dependencias y el "Orden de ejecución recomendado" de
+>    abajo deben seguir siendo válidos tras el cambio; ajústalos si una dependencia se resolvió o
+>    cambió de prioridad.
 
 ## Planes activos
 
 | # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
 |---|------|----------|----------|--------|-----------|--------|
-| 022 | [Plan de avance — confiabilidad/narrativa (Track A) + expansión de catálogo por valor de cruce (Track B)](022-plan-avance-narrativa-confiabilidad.md) | P1 | L | MED | — | 🔶 Fase 1 ✓ (2026-06-30) |
+| 022 | [Plan de avance — confiabilidad/narrativa (Track A) + expansión de catálogo por valor de cruce (Track B)](022-plan-avance-narrativa-confiabilidad.md) | P1 | L | MED | — | 🔶 Fases 1-2 ✓ · Ola B1 ✓ (2026-06-30) → Fase 3 + Ola B2 pendientes |
 | 014 | [Limpieza de arquitectura — catálogo externo, imports, alias](014-architecture-cleanup.md) | P2 | M | MED | — | TODO |
 | 020 | [Explorador SQL en la landing con DuckDB-Wasm](020-duckdb-wasm-playground.md) | P2 | M | MED | 022 (gate 4.3) | TODO |
 | 021 | [Publicar documentación de API con MkDocs Material + mkdocstrings](021-mkdocs-api-docs.md) | P3 | M | LOW | — | TODO |

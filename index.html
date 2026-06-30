@@ -2,8 +2,10 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'self' https://formspree.io; object-src 'none'; script-src 'self' https://analytics.ahrefs.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://analytics.ahrefs.com https://formspree.io; manifest-src 'self'; media-src 'self'; worker-src 'self' blob:; upgrade-insecure-requests">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'self' https://formspree.io; object-src 'none'; script-src 'self' https://gc.zgo.at; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://gc.zgo.at https://formspree.io; manifest-src 'self'; media-src 'self'; worker-src 'self' blob:; upgrade-insecure-requests">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script data-goatcounter="https://chile-hub.goatcounter.com/count"
+            async src="//gc.zgo.at/count.js"></script>
     <title>chile-hub — Capas de Datos de Chile</title>
     <meta name="description" content="chile-hub es una capa de datos oficial y curada de Chile. Accede a datasets listos de la DPA, economía, salud, educación y más en Parquet, JSON y DuckDB.">
     <meta name="robots" content="index, follow">
@@ -2680,6 +2682,9 @@ curl -s <span class="string">"https://tooltician.com/chile-hub/data/normalized/h
                 <article class="trust-item"><h3>Reutilización</h3><p>Licencia, atribución y redistribución documentadas por dataset, sin ambigüedad.</p></article>
                 <article class="trust-item"><h3>Integridad</h3><p>Manifest, hashes SHA256, cobertura, freshness y drift disponibles en cada build.</p></article>
             </div>
+            <p style="text-align:center; margin-top:var(--space-lg);">
+                <a href="https://github.com/cortega26/chile-hub/blob/main/docs/case-study-construccion-chile-hub.md">Leer el caso de estudio completo →</a>
+            </p>
         </section>
 
         <section class="quickstart-section" id="uso">
@@ -2883,6 +2888,7 @@ LIMIT 10;</pre>
             <p>Construido con Python, Polars y DuckDB.</p>
             <p>Fuentes: <a href="https://www.bcn.cl" target="_blank" rel="noopener noreferrer">BCN ArcGIS</a>, <a href="https://www.ine.gob.cl" target="_blank" rel="noopener noreferrer">INE</a>, <a href="https://www.minsal.cl" target="_blank" rel="noopener noreferrer">MINSAL</a>, <a href="https://www.mineduc.cl" target="_blank" rel="noopener noreferrer">MINEDUC</a>, <a href="https://mindicador.cl" target="_blank" rel="noopener noreferrer">mindicador.cl</a> y <a href="https://www.servel.cl" target="_blank" rel="noopener noreferrer">SERVEL</a>. Atribución individual en el catálogo.</p>
             <p>Licencia del Consolidado: <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener noreferrer">CC-BY-4.0</a></p>
+            <p><a href="privacy.html">Privacidad</a> — este sitio no usa cookies ni recolecta datos personales.</p>
         </div>
         <a href="https://github.com/cortega26/chile-hub/issues" target="_blank" rel="noopener noreferrer" style="white-space:nowrap;align-self:center;">Reportar un error →</a>
     </footer>

@@ -1326,6 +1326,149 @@ class HttpUtilsRetryTests(unittest.TestCase):
         self.assertFalse(_is_retryable(ValueError("algo inesperado")))
 
 
+class PobrezaComunalExtractorTests(unittest.TestCase):
+    """Tests unitarios para el extractor de pobreza comunal (CASEN / SAE)."""
+
+    def test_normalize_rows_writes_required_schema(self):
+        """normalize_rows produce las columnas requeridas con tipos correctos."""
+        from src.extractors.pobreza_extractor import FALLBACK_ROWS, normalize_rows
+
+        df = normalize_rows(FALLBACK_ROWS)
+        required = {
+            "codigo_region",
+            "codigo_comuna",
+            "nombre_comuna",
+            "anio",
+            "dimension",
+            "tasa",
+            "limite_inferior",
+            "limite_superior",
+            "metodologia",
+            "fuente",
+        }
+        self.assertTrue(required.issubset(set(df.columns)))
+        self.assertEqual(df["codigo_comuna"].dtype, pl.String)
+        self.assertEqual(df["codigo_region"].dtype, pl.String)
+        self.assertGreater(df.height, 0)
+
+    def test_normalize_rows_dimensions(self):
+        """Las filas de fallback tienen ambas dimensiones (ingresos y multidimensional)."""
+        from src.extractors.pobreza_extractor import FALLBACK_ROWS, normalize_rows
+
+        df = normalize_rows(FALLBACK_ROWS)
+        dims = set(df["dimension"].unique().to_list())
+        self.assertTrue({"ingresos", "multidimensional"}.issubset(dims))
+
+    def test_dataset_name(self):
+        """El extractor reporta el nombre canónico."""
+        from src.extractors.pobreza_extractor import PobrezaComunalExtractor
+
+        extractor = PobrezaComunalExtractor()
+        self.assertEqual(extractor.dataset_name, "pobreza_comunal")
+
+    def test_run_dry_run_returns_validation_without_writing(self):
+        """Dry run ejecuta fetch + normalize + validate sin persistir."""
+        import tempfile
+        from unittest.mock import patch
+
+        from src.extractors import pobreza_extractor
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            staging_csv = Path(tmpdir) / "pobreza_comunal.csv"
+            metadata_path = Path(tmpdir) / "pobreza_comunal.metadata.json"
+            with (
+                patch.object(pobreza_extractor, "STAGING_CSV_PATH", str(staging_csv)),
+                patch.object(pobreza_extractor, "METADATA_PATH", str(metadata_path)),
+                patch.object(pobreza_extractor, "RAW_DIR", tmpdir),
+                patch.object(pobreza_extractor, "STAGING_DIR", tmpdir),
+                patch.object(
+                    pobreza_extractor,
+                    "fetch_data",
+                    return_value=(
+                        pobreza_extractor.FALLBACK_ROWS,
+                        "fallback",
+                        pobreza_extractor.POBREZA_INGRESOS_URL,
+                        ["test"],
+                    ),
+                ),
+            ):
+                result = pobreza_extractor.PobrezaComunalExtractor().run(dry_run=True)
+                self.assertEqual(result["status"], "ok")
+                self.assertFalse(staging_csv.exists())
+
+    def test_normalize_empty_rows(self):
+        """normalize_rows con lista vacía retorna DataFrame con columnas esperadas."""
+        from src.extractors.pobreza_extractor import normalize_rows
+
+        df = normalize_rows([])
+        required = {"codigo_region", "codigo_comuna", "nombre_comuna", "anio", "dimension"}
+        self.assertTrue(required.issubset(set(df.columns)))
+        self.assertEqual(df.height, 0)
+
+
+class ConsumoElectricoExtractorTests(unittest.TestCase):
+    """Tests unitarios para el extractor de consumo eléctrico comunal (CNE)."""
+
+    def test_normalize_rows_writes_required_schema(self):
+        from src.extractors.consumo_electrico_extractor import FALLBACK_ROWS, normalize_rows
+
+        df = normalize_rows(FALLBACK_ROWS)
+        required = {
+            "codigo_region",
+            "codigo_comuna",
+            "nombre_comuna",
+            "anio",
+            "tipo_cliente",
+            "consumo_kwh",
+        }
+        self.assertTrue(required.issubset(set(df.columns)))
+        self.assertEqual(df["codigo_comuna"].dtype, pl.String)
+        self.assertGreater(df.height, 0)
+
+    def test_dataset_name(self):
+        from src.extractors.consumo_electrico_extractor import ConsumoElectricoExtractor
+
+        extractor = ConsumoElectricoExtractor()
+        self.assertEqual(extractor.dataset_name, "consumo_electrico_comunal")
+
+    def test_run_dry_run_returns_validation_without_writing(self):
+        import tempfile
+        from unittest.mock import patch
+
+        from src.extractors import consumo_electrico_extractor
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            staging_csv = Path(tmpdir) / "consumo_electrico_comunal.csv"
+            metadata_path = Path(tmpdir) / "consumo_electrico_comunal.metadata.json"
+            with (
+                patch.object(consumo_electrico_extractor, "STAGING_CSV_PATH", str(staging_csv)),
+                patch.object(consumo_electrico_extractor, "METADATA_PATH", str(metadata_path)),
+                patch.object(consumo_electrico_extractor, "RAW_DIR", tmpdir),
+                patch.object(consumo_electrico_extractor, "STAGING_DIR", tmpdir),
+                patch.object(
+                    consumo_electrico_extractor,
+                    "fetch_data",
+                    return_value=(
+                        consumo_electrico_extractor.FALLBACK_ROWS,
+                        "fallback",
+                        consumo_electrico_extractor.DOWNLOAD_URL,
+                        ["test"],
+                    ),
+                ),
+            ):
+                result = consumo_electrico_extractor.ConsumoElectricoExtractor().run(dry_run=True)
+                self.assertEqual(result["status"], "ok")
+                self.assertFalse(staging_csv.exists())
+
+    def test_normalize_empty_rows(self):
+        from src.extractors.consumo_electrico_extractor import normalize_rows
+
+        df = normalize_rows([])
+        required = {"codigo_region", "codigo_comuna", "tipo_cliente", "consumo_kwh"}
+        self.assertTrue(required.issubset(set(df.columns)))
+        self.assertEqual(df.height, 0)
+
+
 if __name__ == "__main__":
     import sys
 

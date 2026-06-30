@@ -22,11 +22,13 @@ from src.validation import (
     validate_censo_comunal,
     validate_censo_hogares_viviendas,
     validate_comunas,
+    validate_consumo_electrico_comunal,
     validate_distritos_electorales,
     validate_empresas,
     validate_establecimientos_educacionales,
     validate_establecimientos_salud,
     validate_indicadores,
+    validate_pobreza_comunal,
     validate_provincias,
     validate_regiones,
 )
@@ -1161,6 +1163,284 @@ class VerifyDatasetContractTests(unittest.TestCase):
         )
         self.assertEqual(result["status"], "error")
         self.assertTrue(any("output" in e for e in result["errors"]))
+
+
+class PobrezaComunalValidatorTests(unittest.TestCase):
+    """Tests unitarios para validate_pobreza_comunal."""
+
+    def setUp(self):
+        self.valid_codes = [f"{i:05d}" for i in range(1, 347)]
+
+    def _make_df(self, rows):
+        return pl.DataFrame(
+            rows,
+            schema={
+                "codigo_region": pl.String,
+                "codigo_comuna": pl.String,
+                "nombre_comuna": pl.String,
+                "anio": pl.Int64,
+                "dimension": pl.String,
+                "tasa": pl.Float64,
+                "limite_inferior": pl.Float64,
+                "limite_superior": pl.Float64,
+                "metodologia": pl.String,
+                "fuente": pl.String,
+                "url_fuente": pl.String,
+                "fecha_fuente": pl.String,
+            },
+        )
+
+    def test_valid_data_returns_ok(self):
+        df = self._make_df(
+            [
+                {
+                    "codigo_region": "13",
+                    "codigo_comuna": "13101",
+                    "nombre_comuna": "Santiago",
+                    "anio": 2022,
+                    "dimension": "ingresos",
+                    "tasa": 4.5,
+                    "limite_inferior": 3.2,
+                    "limite_superior": 6.1,
+                    "metodologia": "SAE",
+                    "fuente": "MDS",
+                    "url_fuente": "https://example.com",
+                    "fecha_fuente": "2026-06-30",
+                }
+            ]
+        )
+        result = validate_pobreza_comunal(df, valid_commune_codes=self.valid_codes)
+        self.assertEqual(result["status"], "ok")
+        self.assertEqual(result["errors"], [])
+
+    def test_empty_dataframe_returns_error(self):
+        df = self._make_df([])
+        result = validate_pobreza_comunal(df)
+        self.assertEqual(result["status"], "error")
+
+    def test_missing_columns_returns_error(self):
+        df = pl.DataFrame({"columna_random": [1]})
+        result = validate_pobreza_comunal(df)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("missing" in e for e in result["errors"]))
+
+    def test_tasa_out_of_bounds(self):
+        df = self._make_df(
+            [
+                {
+                    "codigo_region": "13",
+                    "codigo_comuna": "13101",
+                    "nombre_comuna": "Santiago",
+                    "anio": 2022,
+                    "dimension": "ingresos",
+                    "tasa": 150.0,
+                    "limite_inferior": 140.0,
+                    "limite_superior": 160.0,
+                    "metodologia": "SAE",
+                    "fuente": "MDS",
+                    "url_fuente": "https://example.com",
+                    "fecha_fuente": "2026-06-30",
+                }
+            ]
+        )
+        result = validate_pobreza_comunal(df)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("0-100" in e for e in result["errors"]))
+
+    def test_invalid_cut_format(self):
+        df = self._make_df(
+            [
+                {
+                    "codigo_region": "13",
+                    "codigo_comuna": "1101",
+                    "nombre_comuna": "Iquique",
+                    "anio": 2022,
+                    "dimension": "ingresos",
+                    "tasa": 4.5,
+                    "limite_inferior": 3.2,
+                    "limite_superior": 6.1,
+                    "metodologia": "SAE",
+                    "fuente": "MDS",
+                    "url_fuente": "https://example.com",
+                    "fecha_fuente": "2026-06-30",
+                }
+            ]
+        )
+        result = validate_pobreza_comunal(df)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("invalid length" in e for e in result["errors"]))
+
+    def test_unknown_communes_emit_warning_not_error(self):
+        df = self._make_df(
+            [
+                {
+                    "codigo_region": "99",
+                    "codigo_comuna": "99999",
+                    "nombre_comuna": "Ficticia",
+                    "anio": 2022,
+                    "dimension": "ingresos",
+                    "tasa": 4.5,
+                    "limite_inferior": 3.2,
+                    "limite_superior": 6.1,
+                    "metodologia": "SAE",
+                    "fuente": "MDS",
+                    "url_fuente": "https://example.com",
+                    "fecha_fuente": "2026-06-30",
+                }
+            ]
+        )
+        result = validate_pobreza_comunal(df, valid_commune_codes=["13101"])
+        self.assertEqual(result["status"], "ok")
+        self.assertTrue(
+            any("not in DPA" in w or "unknown" in w.lower() for w in result["warnings"])
+        )
+
+    def test_fallback_mode_warns(self):
+        df = self._make_df(
+            [
+                {
+                    "codigo_region": "13",
+                    "codigo_comuna": "13101",
+                    "nombre_comuna": "Santiago",
+                    "anio": 2022,
+                    "dimension": "ingresos",
+                    "tasa": 4.5,
+                    "limite_inferior": 3.2,
+                    "limite_superior": 6.1,
+                    "metodologia": "SAE",
+                    "fuente": "MDS",
+                    "url_fuente": "https://example.com",
+                    "fecha_fuente": "2026-06-30",
+                }
+            ]
+        )
+        result = validate_pobreza_comunal(df, metadata={"source_mode": "fallback"})
+        self.assertEqual(result["status"], "ok")
+        self.assertTrue(any("fallback" in w for w in result["warnings"]))
+
+
+class ConsumoElectricoValidatorTests(unittest.TestCase):
+    """Tests unitarios para validate_consumo_electrico_comunal."""
+
+    def setUp(self):
+        self.valid_codes = [f"{i:05d}" for i in range(1, 347)]
+
+    def _make_df(self, rows):
+        return pl.DataFrame(
+            rows,
+            schema={
+                "codigo_region": pl.String,
+                "codigo_comuna": pl.String,
+                "nombre_comuna": pl.String,
+                "anio": pl.Int64,
+                "tipo_cliente": pl.String,
+                "consumo_kwh": pl.Float64,
+                "numero_clientes": pl.Int64,
+                "fuente": pl.String,
+                "url_fuente": pl.String,
+                "fecha_fuente": pl.String,
+            },
+        )
+
+    def test_valid_data_returns_ok(self):
+        df = self._make_df(
+            [
+                {
+                    "codigo_region": "13",
+                    "codigo_comuna": "13101",
+                    "nombre_comuna": "Santiago",
+                    "anio": 2023,
+                    "tipo_cliente": "Residencial",
+                    "consumo_kwh": 1250000000.0,
+                    "numero_clientes": 150000,
+                    "fuente": "CNE",
+                    "url_fuente": "https://example.com",
+                    "fecha_fuente": "2026-06-30",
+                }
+            ]
+        )
+        result = validate_consumo_electrico_comunal(df, valid_commune_codes=self.valid_codes)
+        self.assertEqual(result["status"], "ok")
+
+    def test_empty_dataframe_returns_error(self):
+        df = self._make_df([])
+        result = validate_consumo_electrico_comunal(df)
+        self.assertEqual(result["status"], "error")
+
+    def test_negative_consumo_returns_error(self):
+        df = self._make_df(
+            [
+                {
+                    "codigo_region": "13",
+                    "codigo_comuna": "13101",
+                    "nombre_comuna": "Santiago",
+                    "anio": 2023,
+                    "tipo_cliente": "Residencial",
+                    "consumo_kwh": -100.0,
+                    "numero_clientes": 150,
+                    "fuente": "CNE",
+                    "url_fuente": "https://example.com",
+                    "fecha_fuente": "2026-06-30",
+                }
+            ]
+        )
+        result = validate_consumo_electrico_comunal(df)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("negative" in e for e in result["errors"]))
+
+    def test_invalid_cut_format(self):
+        df = self._make_df(
+            [
+                {
+                    "codigo_region": "13",
+                    "codigo_comuna": "1101",
+                    "nombre_comuna": "Iquique",
+                    "anio": 2023,
+                    "tipo_cliente": "Residencial",
+                    "consumo_kwh": 1000.0,
+                    "numero_clientes": 100,
+                    "fuente": "CNE",
+                    "url_fuente": "https://example.com",
+                    "fecha_fuente": "2026-06-30",
+                }
+            ]
+        )
+        result = validate_consumo_electrico_comunal(df)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("invalid length" in e for e in result["errors"]))
+
+    def test_duplicate_key_returns_error(self):
+        df = self._make_df(
+            [
+                {
+                    "codigo_region": "13",
+                    "codigo_comuna": "13101",
+                    "nombre_comuna": "Santiago",
+                    "anio": 2023,
+                    "tipo_cliente": "Residencial",
+                    "consumo_kwh": 1000.0,
+                    "numero_clientes": 100,
+                    "fuente": "CNE",
+                    "url_fuente": "https://example.com",
+                    "fecha_fuente": "2026-06-30",
+                },
+                {
+                    "codigo_region": "13",
+                    "codigo_comuna": "13101",
+                    "nombre_comuna": "Santiago",
+                    "anio": 2023,
+                    "tipo_cliente": "Residencial",
+                    "consumo_kwh": 2000.0,
+                    "numero_clientes": 100,
+                    "fuente": "CNE",
+                    "url_fuente": "https://example.com",
+                    "fecha_fuente": "2026-06-30",
+                },
+            ]
+        )
+        result = validate_consumo_electrico_comunal(df)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("duplicate" in e for e in result["errors"]))
 
 
 if __name__ == "__main__":

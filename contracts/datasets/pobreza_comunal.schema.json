@@ -1,0 +1,44 @@
+{
+  "dataset": "pobreza_comunal",
+  "primary_key": ["codigo_comuna", "anio", "dimension"],
+  "required_columns": [
+    "codigo_region",
+    "codigo_comuna",
+    "nombre_comuna",
+    "anio",
+    "dimension",
+    "tasa",
+    "limite_inferior",
+    "limite_superior",
+    "metodologia",
+    "fuente",
+    "url_fuente",
+    "fecha_fuente"
+  ],
+  "column_types": {
+    "codigo_region": "string",
+    "codigo_comuna": "string",
+    "nombre_comuna": "string",
+    "anio": "integer",
+    "dimension": "string",
+    "tasa": "float",
+    "limite_inferior": "float",
+    "limite_superior": "float",
+    "metodologia": "string",
+    "fuente": "string",
+    "url_fuente": "string",
+    "fecha_fuente": "string"
+  },
+  "nullable_columns": [
+    "tasa",
+    "limite_inferior",
+    "limite_superior"
+  ],
+  "fixed_width_columns": {
+    "codigo_region": 2,
+    "codigo_comuna": 5
+  },
+  "expected_record_count": null,
+  "coverage_policy": "partial",
+  "publish_outputs": ["parquet", "json"]
+}

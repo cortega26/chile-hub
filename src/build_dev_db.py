@@ -27,12 +27,14 @@ from src.builders._shared import (  # noqa: E402, F401
     CENSO_HOGARES_METADATA_PATH,
     CENSO_METADATA_PATH,
     COMUNAS_METADATA_PATH,
+    CONSUMO_ELECTRICO_COMUNAL_METADATA_PATH,
     DATASET_CATALOG_CONFIG,
     ELECTORAL_METADATA_PATH,
     EMPRESAS_METADATA_PATH,
     FINANZAS_METADATA_PATH,
     INDICADORES_METADATA_PATH,
     NORMALIZED_DIR,
+    POBREZA_COMUNAL_METADATA_PATH,
     RESULTADOS_EDUCACIONALES_METADATA_PATH,
     SALUD_METADATA_PATH,
     SIEDU_METADATA_PATH,
@@ -118,6 +120,7 @@ from src.validation import (
     validate_censo_comunal,
     validate_censo_hogares_viviendas,
     validate_comunas,
+    validate_consumo_electrico_comunal,
     validate_distritos_electorales,
     validate_empresas,
     validate_establecimientos_educacionales,
@@ -126,6 +129,7 @@ from src.validation import (
     validate_indicadores,
     validate_indicadores_urbanos_siedu,
     validate_perfil_territorial_comunal,
+    validate_pobreza_comunal,
     validate_provincias,
     validate_regiones,
     validate_resultados_educacionales,
@@ -155,6 +159,8 @@ def _load_inputs():
     resultados_educacionales_csv = os.path.join(STAGING_DIR, "resultados_educacionales.csv")
     siedu_csv = os.path.join(STAGING_DIR, "indicadores_urbanos_siedu.csv")
     empresas_csv = os.path.join(STAGING_DIR, "empresas.csv")
+    pobreza_comunal_csv = os.path.join(STAGING_DIR, "pobreza_comunal.csv")
+    consumo_electrico_csv = os.path.join(STAGING_DIR, "consumo_electrico_comunal.csv")
 
     required_staging = (
         comunas_csv,
@@ -222,6 +228,16 @@ def _load_inputs():
     siedu_metadata = load_metadata(SIEDU_METADATA_PATH)
     empresas_metadata = (
         load_metadata(EMPRESAS_METADATA_PATH) if os.path.exists(EMPRESAS_METADATA_PATH) else None
+    )
+    pobreza_comunal_metadata = (
+        load_metadata(POBREZA_COMUNAL_METADATA_PATH)
+        if os.path.exists(POBREZA_COMUNAL_METADATA_PATH)
+        else None
+    )
+    consumo_electrico_metadata = (
+        load_metadata(CONSUMO_ELECTRICO_COMUNAL_METADATA_PATH)
+        if os.path.exists(CONSUMO_ELECTRICO_COMUNAL_METADATA_PATH)
+        else None
     )
 
     metadata_files = [
@@ -350,6 +366,49 @@ def _load_inputs():
     else:
         log.info("dataset_skipped", dataset="empresas", reason="not_found_in_staging")
 
+    # Pobreza comunal: dataset opcional (nuevo, puede no existir en builds anteriores)
+    df_pobreza_comunal = None
+    if os.path.exists(pobreza_comunal_csv) and pobreza_comunal_metadata is not None:
+        df_pobreza_comunal = pl.read_csv(
+            pobreza_comunal_csv,
+            schema_overrides={
+                "codigo_region": pl.String,
+                "codigo_comuna": pl.String,
+                "anio": pl.Int64,
+                "tasa": pl.Float64,
+                "limite_inferior": pl.Float64,
+                "limite_superior": pl.Float64,
+            },
+        )
+        log.info("dataset_loaded", dataset="pobreza_comunal", records=df_pobreza_comunal.height)
+    else:
+        log.info("dataset_skipped", dataset="pobreza_comunal", reason="not_found_in_staging")
+
+    # Consumo eléctrico: dataset opcional (nuevo)
+    df_consumo_electrico = None
+    if os.path.exists(consumo_electrico_csv) and consumo_electrico_metadata is not None:
+        df_consumo_electrico = pl.read_csv(
+            consumo_electrico_csv,
+            schema_overrides={
+                "codigo_region": pl.String,
+                "codigo_comuna": pl.String,
+                "anio": pl.Int64,
+                "consumo_kwh": pl.Float64,
+                "numero_clientes": pl.Int64,
+            },
+        )
+        log.info(
+            "dataset_loaded",
+            dataset="consumo_electrico_comunal",
+            records=df_consumo_electrico.height,
+        )
+    else:
+        log.info(
+            "dataset_skipped",
+            dataset="consumo_electrico_comunal",
+            reason="not_found_in_staging",
+        )
+
     df_regiones, df_provincias = derive_geography_layers(df_comunas)
     df_perfil_territorial = build_perfil_territorial_comunal(
         df_comunas,
@@ -375,6 +434,8 @@ def _load_inputs():
         "resultados_educacionales": df_resultados_educacionales,
         "siedu": df_siedu,
         "empresas": df_empresas,
+        "pobreza_comunal": df_pobreza_comunal,
+        "consumo_electrico": df_consumo_electrico,
         "regiones": df_regiones,
         "provincias": df_provincias,
         "perfil_territorial": df_perfil_territorial,
@@ -391,6 +452,8 @@ def _load_inputs():
         "resultados_educacionales": resultados_educacionales_metadata,
         "siedu": siedu_metadata,
         "empresas": empresas_metadata,
+        "pobreza_comunal": pobreza_comunal_metadata,
+        "consumo_electrico": consumo_electrico_metadata,
     }
     return dfs, meta, previous_pipeline_metadata
 
@@ -408,6 +471,8 @@ def _compute_validations(dfs, meta):
     df_resultados_educacionales = dfs["resultados_educacionales"]
     df_siedu = dfs["siedu"]
     df_empresas = dfs["empresas"]
+    df_pobreza_comunal = dfs["pobreza_comunal"]
+    df_consumo_electrico = dfs["consumo_electrico"]
     df_regiones = dfs["regiones"]
     df_provincias = dfs["provincias"]
     df_perfil_territorial = dfs["perfil_territorial"]
@@ -422,6 +487,8 @@ def _compute_validations(dfs, meta):
     resultados_educacionales_metadata = meta["resultados_educacionales"]
     siedu_metadata = meta["siedu"]
     empresas_metadata = meta["empresas"]
+    pobreza_comunal_metadata = meta["pobreza_comunal"]
+    consumo_electrico_metadata = meta["consumo_electrico"]
 
     validations = {
         "regiones": validate_regiones(df_regiones),
@@ -463,6 +530,28 @@ def _compute_validations(dfs, meta):
                 )
             }
             if df_empresas is not None
+            else {}
+        ),
+        **(
+            {
+                "pobreza_comunal": validate_pobreza_comunal(
+                    df_pobreza_comunal,
+                    pobreza_comunal_metadata,
+                    df_comunas["codigo_comuna"].to_list(),
+                )
+            }
+            if df_pobreza_comunal is not None
+            else {}
+        ),
+        **(
+            {
+                "consumo_electrico_comunal": validate_consumo_electrico_comunal(
+                    df_consumo_electrico,
+                    consumo_electrico_metadata,
+                    df_comunas["codigo_comuna"].to_list(),
+                )
+            }
+            if df_consumo_electrico is not None
             else {}
         ),
         "perfil_territorial_comunal": validate_perfil_territorial_comunal(

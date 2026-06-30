@@ -167,6 +167,43 @@ Pipeline determinista en GitHub Actions: extracción → build → verificación
 
 <!-- END_DATASET_TABLE -->
 
+## 🔒 Por qué puedes confiar en estos datos
+
+Cada decisión de ingeniería de este proyecto está diseñada para que **no tengas que
+confiar ciegamente**. Los datos vienen con la evidencia que los respalda.
+
+| Pilar | Qué significa | Evidencia auditables |
+|:---|:---|:---|
+| **Procedencia documentada** | Cada dataset declara su fuente oficial exacta con URL directa al organismo público emisor (BCN, INE, MINEDUC, BCCh, MINSAL, datos.gob.cl). | [`provenance_report.md`](data/normalized/provenance_report.md) — fuente, modo y timestamp por capa |
+| **Auditoría legal explícita** | Licencia, atribución requerida y permiso de redistribución verificados dataset por dataset. **15 de 15 capas** pasan la auditoría (`ready`). | [`redistribution_report.md`](data/normalized/redistribution_report.md) + [`AGENTS.md §6`](AGENTS.md) |
+| **Pipeline que falla con estridencia** | Si una validación falla, el pipeline **aborta** — no publica datos corruptos, no emite advertencias silenciosas. | [`ADR-001`](docs/adr/ADR-001-pipeline-lineal-determinista.md) — fail-loud como decisión de arquitectura |
+| **Contratos de esquema verificados** | 15 contratos JSON Schema ([`contracts/datasets/`](contracts/datasets/)) definen columnas esperadas, tipos, claves primarias y cobertura. Se validan **en cada build** automáticamente. | [`ADR-005`](docs/adr/ADR-005-contratos-esquema-json-schema.md) + `contracts/datasets/*.json` |
+| **Salud transparente** | Dashboard público con severidad, frescura, cobertura, drift y degradación por dataset. 10 capas `ok`, 5 `warn`, 0 `error`. | [`hub_health.md`](data/normalized/hub_health.md) — estado completo actualizado en cada build |
+| **Calidad medida y pública** | Puntuación compuesta A-F por dataset: **promedio 93.5/100** (14 A, 1 B). Dimensiones: validación, contrato, madurez de fuente, frescura, cobertura, política de reúso. | [`dataset_quality.md`](data/normalized/dataset_quality.md) — scorecard completo |
+
+Cada pilar se audita automáticamente en cada ejecución del pipeline. Los reportes se
+regeneran en cada build — no son documentos estáticos mantenidos a mano. Para auditar
+el estado exacto de cualquier capa:
+
+```bash
+chile-hub provenance   # fuente, modo y timestamp por dataset
+chile-hub health       # severidad, frescura, drift y cobertura
+```
+
+### Respaldo adicional
+
+- **490+ tests** (372 recolectados por pytest, el resto en scripts de verificación
+  del pipeline) que validan extracción, contratos e integridad de datos.
+- **5 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura
+  con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
+- **Drift monitoreado:** 5 datasets bajo vigilancia de deriva de esquema; cualquier
+  cambio en la fuente se detecta y registra ([`drift_report.md`](data/normalized/drift_report.md)).
+- **Trazabilidad completa:** cada build registra timestamp, versión de extractor y
+  snapshot de entrada en [`provenance_report.md`](data/normalized/provenance_report.md).
+
+> Para una explicación más detallada de la arquitectura y las decisiones de diseño,
+> lee el [caso de estudio: cómo está construido chile-hub](docs/case-study-construccion-chile-hub.md).
+
 <details>
 <summary><b>Ver schema completo de cada capa</b></summary>
 

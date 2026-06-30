@@ -1,6 +1,19 @@
 // Configuración y Estado de la aplicación
 let comunas = [];
 let filteredComunas = [];
+
+// Analytics cookieless — GoatCounter
+// Registra descargas de datasets sin cookies ni PII.
+// goatcounter.count() es no-op si GoatCounter no está cargado.
+function trackDownload(dataset, format) {
+    if (window.goatcounter && window.goatcounter.count) {
+        window.goatcounter.count({
+            path: '/download/' + format + '/' + dataset,
+            title: 'Descarga ' + format.toUpperCase() + ' — ' + dataset,
+            event: true,
+        });
+    }
+}
 let currentPage = 1;
 const rowsPerPage = 10;
 
@@ -559,7 +572,7 @@ function showDatasetDrawer(dataset) {
                                 <strong style="color: var(--text-primary);">Formato Parquet</strong>
                                 <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.15rem;">tipo: parquet · sha256: ${parquetHash}</div>
                             </div>
-                            <a class="btn btn-primary" href="${escapeHtml(dataset.outputs.parquet)}" download style="font-size: 0.8rem; padding: 0.35rem 0.75rem;">Descargar</a>
+                            <a class="btn btn-primary" href="${escapeHtml(dataset.outputs.parquet)}" download style="font-size: 0.8rem; padding: 0.35rem 0.75rem;" onclick="trackDownload('${escapeHtml(dataset.dataset)}', 'parquet')">Descargar</a>
                         </div>
                     ` : ""}
                     ${dataset.outputs?.json ? `
@@ -568,7 +581,7 @@ function showDatasetDrawer(dataset) {
                                 <strong style="color: var(--text-primary);">Formato JSON</strong>
                                 <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.15rem;">tipo: json · sha256: ${jsonHash}</div>
                             </div>
-                            <a class="btn btn-primary" href="${escapeHtml(dataset.outputs.json)}" download style="font-size: 0.8rem; padding: 0.35rem 0.75rem;">Descargar</a>
+                            <a class="btn btn-primary" href="${escapeHtml(dataset.outputs.json)}" download style="font-size: 0.8rem; padding: 0.35rem 0.75rem;" onclick="trackDownload('${escapeHtml(dataset.dataset)}', 'json')">Descargar</a>
                         </div>
                     ` : ""}
                 </div>
@@ -912,7 +925,7 @@ function renderCatalog(bundle) {
 
                     <div class="dataset-card-actions">
                         <a href="#dataset-${escapeHtml(dataset.dataset)}" class="btn-card-action primary btn-details">Ver Ficha</a>
-                        ${dataset.outputs?.parquet ? `<a class="btn-card-action" href="${escapeHtml(dataset.outputs.parquet)}" download>Parquet</a>` : ""}
+                        ${dataset.outputs?.parquet ? `<a class="btn-card-action" href="${escapeHtml(dataset.outputs.parquet)}" download onclick="trackDownload('${escapeHtml(dataset.dataset)}', 'parquet')">Parquet</a>` : ""}
                     </div>
                 </article>
             `;

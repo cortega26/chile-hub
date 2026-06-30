@@ -15,9 +15,9 @@ BUNDLE_PATH = ROOT_DIR / "data" / "normalized" / "hub_bundle.json"
 PRODUCTION_CSP = (
     "default-src 'self'; base-uri 'self'; form-action 'self' https://formspree.io; "
     "frame-ancestors 'none'; object-src 'none'; "
-    "script-src 'self' https://analytics.ahrefs.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+    "script-src 'self' https://gc.zgo.at; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
     "img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; "
-    "connect-src 'self' https://analytics.ahrefs.com https://formspree.io; "
+    "connect-src 'self' https://gc.zgo.at https://formspree.io; "
     "manifest-src 'self'; media-src 'self'; worker-src 'self' blob:; upgrade-insecure-requests"
 )
 

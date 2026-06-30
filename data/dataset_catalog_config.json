@@ -493,5 +493,67 @@
     },
     "documentation": "docs/datasets/empresas.md",
     "_notes": "JSON y SQLite omitidos: >1.5M registros. Usa Parquet o DuckDB."
+  },
+  "pobreza_comunal": {
+    "description": "Estimaciones de pobreza comunal por ingresos y multidimensional derivadas de la encuesta CASEN mediante metodología SAE (Estimación de Áreas Pequeñas). Incluye tasa, límite inferior y superior del intervalo de confianza por comuna, año y dimensión.",
+    "join_keys": [
+      "codigo_comuna",
+      "codigo_region"
+    ],
+    "confidence_tier": "Tier A",
+    "expected_record_count": null,
+    "reuse_policy": {
+      "status": "open-attribution",
+      "license": "Datos abiertos MDS",
+      "license_url": "https://observatorio.ministeriodesarrollosocial.gob.cl/",
+      "attribution_required": true,
+      "redistribution_ok": true,
+      "summary": "Estimaciones de pobreza comunal publicadas por el Observatorio Social del MDS. Atribución requerida."
+    },
+    "freshness_policy": {
+      "max_age_hours": 175200,
+      "label": "bienal/trienal"
+    },
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('pobreza_comunal')\n# Filtrar pobreza por ingresos 2022\npobreza_2022 = df.filter(pl.col('anio') == 2022, pl.col('dimension') == 'ingresos')",
+      "duckdb": "SELECT codigo_comuna, nombre_comuna, tasa, limite_inferior, limite_superior\nFROM 'data/normalized/pobreza_comunal.parquet'\nWHERE anio = 2022 AND dimension = 'ingresos'\nORDER BY tasa DESC;",
+      "cli": "chile-hub show pobreza_comunal"
+    },
+    "outputs": {
+      "parquet": "data/normalized/pobreza_comunal.parquet",
+      "json": "data/normalized/pobreza_comunal.json"
+    },
+    "documentation": "docs/datasets/pobreza_comunal.md"
+  },
+  "consumo_electrico_comunal": {
+    "description": "Consumo eléctrico anual por comuna y tipo de cliente (Residencial, Comercial, Industrial, Agrícola, Alumbrado Público, Otros), publicado por la Comisión Nacional de Energía (CNE) en el portal Energía Abierta.",
+    "join_keys": [
+      "codigo_comuna",
+      "codigo_region"
+    ],
+    "confidence_tier": "Tier A",
+    "expected_record_count": null,
+    "reuse_policy": {
+      "status": "open-attribution",
+      "license": "CC BY",
+      "license_url": "http://energiaabierta.cl/",
+      "attribution_required": true,
+      "redistribution_ok": true,
+      "summary": "Consumo eléctrico anual por comuna publicado por la CNE en Energía Abierta. Atribución requerida."
+    },
+    "freshness_policy": {
+      "max_age_hours": 17520,
+      "label": "anual"
+    },
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('consumo_electrico_comunal')\n# Consumo residencial por comuna\nresidencial = df.filter(pl.col('tipo_cliente') == 'Residencial')",
+      "duckdb": "SELECT codigo_comuna, nombre_comuna, tipo_cliente, consumo_kwh\nFROM 'data/normalized/consumo_electrico_comunal.parquet'\nWHERE tipo_cliente = 'Residencial'\nORDER BY consumo_kwh DESC;",
+      "cli": "chile-hub show consumo_electrico_comunal"
+    },
+    "outputs": {
+      "parquet": "data/normalized/consumo_electrico_comunal.parquet",
+      "json": "data/normalized/consumo_electrico_comunal.json"
+    },
+    "documentation": "docs/datasets/consumo_electrico_comunal.md"
   }
 }

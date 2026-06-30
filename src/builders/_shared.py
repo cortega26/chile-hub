@@ -29,6 +29,10 @@ RESULTADOS_EDUCACIONALES_METADATA_PATH = os.path.join(
 )
 SIEDU_METADATA_PATH = os.path.join(STAGING_DIR, "indicadores_urbanos_siedu.metadata.json")
 EMPRESAS_METADATA_PATH = os.path.join(STAGING_DIR, "empresas.metadata.json")
+POBREZA_COMUNAL_METADATA_PATH = os.path.join(STAGING_DIR, "pobreza_comunal.metadata.json")
+CONSUMO_ELECTRICO_COMUNAL_METADATA_PATH = os.path.join(
+    STAGING_DIR, "consumo_electrico_comunal.metadata.json"
+)
 EXCEL_MAX_ROWS = 1_048_576  # Límite físico de Excel por hoja
 PUBLISHABLE_ARTIFACT_SUFFIXES = (".json", ".md", ".parquet")
 PUBLISHABLE_BUNDLE_ZIP_NAME = "chile-hub-publishable-bundle.zip"

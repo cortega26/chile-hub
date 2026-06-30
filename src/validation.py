@@ -804,3 +804,230 @@ def validate_puntos_interes(
         "errors": errors,
         "warnings": warnings,
     }
+
+
+def validate_pobreza_comunal(
+    df: pl.DataFrame,
+    metadata: dict[str, Any] | None = None,
+    valid_commune_codes: list[str] | None = None,
+) -> dict[str, Any]:
+    """Valida el dataset de pobreza comunal (CASEN / SAE).
+
+    Chequeos:
+    - Columnas requeridas
+    - Duplicados de clave primaria (codigo_comuna, anio, dimension)
+    - Rangos de tasa (0-100)
+    - Formato de códigos CUT
+    - Comunas desconocidas (warning, no error — la cobertura es parcial por diseño)
+    """
+    errors: list[str] = []
+    warnings: list[str] = []
+    row_count = df.height
+
+    required = [
+        "codigo_region",
+        "codigo_comuna",
+        "nombre_comuna",
+        "anio",
+        "dimension",
+        "tasa",
+        "limite_inferior",
+        "limite_superior",
+        "metodologia",
+        "fuente",
+    ]
+    missing = _missing_columns(df, required)
+    if missing:
+        errors.append(f"missing required columns: {missing}")
+        return {
+            "dataset": "pobreza_comunal",
+            "status": "error",
+            "record_count": row_count,
+            "errors": errors,
+            "warnings": warnings,
+        }
+
+    if row_count == 0:
+        errors.append("dataset está vacío")
+        return {
+            "dataset": "pobreza_comunal",
+            "status": "error",
+            "record_count": row_count,
+            "errors": errors,
+            "warnings": warnings,
+        }
+
+    # Duplicados de clave primaria
+    dup_count = _duplicate_count(df, ["codigo_comuna", "anio", "dimension"])
+    if dup_count > 0:
+        errors.append(
+            f"found {dup_count} duplicate rows by primary key (codigo_comuna, anio, dimension)"
+        )
+
+    # Formato de códigos CUT
+    invalid_region = _invalid_fixed_length_count(df, "codigo_region", 2)
+    if invalid_region > 0:
+        errors.append(f"found {invalid_region} codigo_region with invalid length (expected 2)")
+
+    invalid_cut = _invalid_fixed_length_count(df, "codigo_comuna", 5)
+    if invalid_cut > 0:
+        errors.append(f"found {invalid_cut} codigo_comuna with invalid length (expected 5)")
+
+    # Rangos de tasa (0-100%)
+    out_of_bounds = _percentage_out_of_bounds_count(
+        df, ["tasa", "limite_inferior", "limite_superior"]
+    )
+    if out_of_bounds > 0:
+        errors.append(f"found {out_of_bounds} values outside 0-100 range in tasa/intervalos")
+
+    # Comunas desconocidas (warning — cobertura parcial por diseño SAE)
+    if valid_commune_codes is not None:
+        unknown = _unknown_codes(df, "codigo_comuna", valid_commune_codes)
+        if unknown:
+            warnings.append(
+                f"pobreza_comunal references {len(unknown)} communes not in DPA: {unknown}"
+            )
+
+    # Dimensiones esperadas
+    valid_dims = {"ingresos", "multidimensional"}
+    actual_dims = set(df["dimension"].drop_nulls().unique().to_list())
+    unexpected_dims = actual_dims - valid_dims
+    if unexpected_dims:
+        warnings.append(f"dimensiones inesperadas: {unexpected_dims}")
+
+    # Advertencia de cobertura parcial (por diseño SAE)
+    comunas_con_dato = df["codigo_comuna"].n_unique()
+    if valid_commune_codes is not None and len(valid_commune_codes) > 0:
+        coverage_pct = round(comunas_con_dato / len(valid_commune_codes) * 100, 1)
+        warnings.append(
+            f"cobertura SAE: {comunas_con_dato}/{len(valid_commune_codes)} comunas "
+            f"({coverage_pct}%) — parcial por diseño; comunas sin muestra no tienen estimación"
+        )
+
+    # Verificar que el año es razonable
+    years = df["anio"].drop_nulls().unique().to_list()
+    future_years = [y for y in years if y > 2026]
+    if future_years:
+        warnings.append(f"años futuros detectados: {future_years}")
+
+    if metadata and metadata.get("source_mode") == "fallback":
+        warnings.append("pobreza_comunal source_mode is fallback; usando datos de muestra mínima.")
+
+    return {
+        "dataset": "pobreza_comunal",
+        "status": "error" if errors else "ok",
+        "record_count": row_count,
+        "errors": errors,
+        "warnings": warnings,
+    }
+
+
+def validate_consumo_electrico_comunal(
+    df: pl.DataFrame,
+    metadata: dict[str, Any] | None = None,
+    valid_commune_codes: list[str] | None = None,
+) -> dict[str, Any]:
+    """Valida el dataset de consumo eléctrico comunal (CNE / Energía Abierta).
+
+    Chequeos:
+    - Columnas requeridas
+    - Duplicados de clave primaria (codigo_comuna, anio, tipo_cliente)
+    - consumo_kwh >= 0
+    - Formato de códigos CUT
+    - Comunas desconocidas (warning)
+    """
+    errors: list[str] = []
+    warnings: list[str] = []
+    row_count = df.height
+
+    required = [
+        "codigo_region",
+        "codigo_comuna",
+        "nombre_comuna",
+        "anio",
+        "tipo_cliente",
+        "consumo_kwh",
+        "fuente",
+    ]
+    missing = _missing_columns(df, required)
+    if missing:
+        errors.append(f"missing required columns: {missing}")
+        return {
+            "dataset": "consumo_electrico_comunal",
+            "status": "error",
+            "record_count": row_count,
+            "errors": errors,
+            "warnings": warnings,
+        }
+
+    if row_count == 0:
+        errors.append("dataset está vacío")
+        return {
+            "dataset": "consumo_electrico_comunal",
+            "status": "error",
+            "record_count": row_count,
+            "errors": errors,
+            "warnings": warnings,
+        }
+
+    # Duplicados de clave primaria
+    dup_count = _duplicate_count(df, ["codigo_comuna", "anio", "tipo_cliente"])
+    if dup_count > 0:
+        errors.append(
+            f"found {dup_count} duplicate rows by primary key (codigo_comuna, anio, tipo_cliente)"
+        )
+
+    # Formato de códigos CUT
+    invalid_region = _invalid_fixed_length_count(df, "codigo_region", 2)
+    if invalid_region > 0:
+        errors.append(f"found {invalid_region} codigo_region with invalid length (expected 2)")
+
+    invalid_cut = _invalid_fixed_length_count(df, "codigo_comuna", 5)
+    if invalid_cut > 0:
+        errors.append(f"found {invalid_cut} codigo_comuna with invalid length (expected 5)")
+
+    # Consumo no negativo
+    neg_consumo = _negative_numeric_count(df, ["consumo_kwh"])
+    if neg_consumo > 0:
+        errors.append(f"found {neg_consumo} rows with negative consumo_kwh")
+
+    # Número de clientes no negativo (si existe)
+    if "numero_clientes" in df.columns:
+        neg_clientes = df.filter(
+            pl.col("numero_clientes").is_not_null() & (pl.col("numero_clientes") < 0)
+        ).height
+        if neg_clientes > 0:
+            warnings.append(f"found {neg_clientes} rows with negative numero_clientes")
+
+    # Comunas desconocidas (warning — puede haber municipios nuevos)
+    if valid_commune_codes is not None:
+        unknown = _unknown_codes(df, "codigo_comuna", valid_commune_codes)
+        if unknown:
+            warnings.append(
+                f"consumo_electrico_comunal references {len(unknown)} communes not in DPA: {unknown}"
+            )
+
+    # Verificar que hay tipos de cliente razonables
+    tipos = df["tipo_cliente"].drop_nulls().unique().to_list()
+    if not tipos:
+        warnings.append("no se encontraron tipos de cliente")
+    else:
+        warnings.append(f"tipos de cliente: {sorted(tipos)}")
+
+    # Años razonables
+    years = df["anio"].drop_nulls().unique().to_list()
+    if years:
+        warnings.append(f"años disponibles: {sorted(years)}")
+
+    if metadata and metadata.get("source_mode") == "fallback":
+        warnings.append(
+            "consumo_electrico_comunal source_mode is fallback; usando datos de muestra mínima."
+        )
+
+    return {
+        "dataset": "consumo_electrico_comunal",
+        "status": "error" if errors else "ok",
+        "record_count": row_count,
+        "errors": errors,
+        "warnings": warnings,
+    }
