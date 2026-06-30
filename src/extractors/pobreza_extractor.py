@@ -294,6 +294,7 @@ def build_metadata(mode: str, source_url: str, notes: list[str], row_count: int)
         "source_detail": "Estimaciones de Pobreza Comunal vía SAE desde encuesta CASEN",
         "refreshed_at_utc": datetime.datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "record_count": row_count,
+        "fields": REQUIRED_COLUMNS,
         "notes": notes,
         "reuse_policy": REUSE_POLICY,
     }

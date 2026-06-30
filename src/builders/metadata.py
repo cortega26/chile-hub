@@ -293,6 +293,8 @@ def build_dataset_metadata(dfs, meta):
     df_resultados_educacionales = dfs["resultados_educacionales"]
     df_siedu = dfs["siedu"]
     df_empresas = dfs["empresas"]
+    df_pobreza_comunal = dfs["pobreza_comunal"]
+    df_consumo_electrico = dfs["consumo_electrico"]
     df_regiones = dfs["regiones"]
     df_provincias = dfs["provincias"]
     df_perfil_territorial = dfs["perfil_territorial"]
@@ -307,6 +309,8 @@ def build_dataset_metadata(dfs, meta):
     resultados_educacionales_metadata = meta["resultados_educacionales"]
     siedu_metadata = meta["siedu"]
     empresas_metadata = meta["empresas"]
+    pobreza_comunal_metadata = meta["pobreza_comunal"]
+    consumo_electrico_metadata = meta["consumo_electrico"]
 
     dataset_metadata = {
         "regiones": {
@@ -530,6 +534,56 @@ def build_dataset_metadata(dfs, meta):
                 }
             }
             if df_empresas is not None
+            else {}
+        ),
+        **(
+            {
+                "pobreza_comunal": {
+                    "dataset": "pobreza_comunal",
+                    "source_name": pobreza_comunal_metadata.get("source_name", ""),
+                    "source_url": pobreza_comunal_metadata.get("source_url", ""),
+                    "source_mode": pobreza_comunal_metadata.get("source_mode", "fallback"),
+                    "source_detail": pobreza_comunal_metadata.get("source_detail", ""),
+                    "refreshed_at_utc": pobreza_comunal_metadata.get("refreshed_at_utc", ""),
+                    "record_count": df_pobreza_comunal.height,
+                    "fields": df_pobreza_comunal.columns,
+                    "notes": pobreza_comunal_metadata.get("notes", []),
+                    "reuse_policy": DATASET_CATALOG_CONFIG["pobreza_comunal"]["reuse_policy"],
+                    "freshness": build_freshness(
+                        pobreza_comunal_metadata.get("refreshed_at_utc", ""),
+                        DATASET_CATALOG_CONFIG["pobreza_comunal"]["freshness_policy"][
+                            "max_age_hours"
+                        ],
+                    ),
+                }
+            }
+            if df_pobreza_comunal is not None and pobreza_comunal_metadata is not None
+            else {}
+        ),
+        **(
+            {
+                "consumo_electrico_comunal": {
+                    "dataset": "consumo_electrico_comunal",
+                    "source_name": consumo_electrico_metadata.get("source_name", ""),
+                    "source_url": consumo_electrico_metadata.get("source_url", ""),
+                    "source_mode": consumo_electrico_metadata.get("source_mode", "fallback"),
+                    "source_detail": consumo_electrico_metadata.get("source_detail", ""),
+                    "refreshed_at_utc": consumo_electrico_metadata.get("refreshed_at_utc", ""),
+                    "record_count": df_consumo_electrico.height,
+                    "fields": df_consumo_electrico.columns,
+                    "notes": consumo_electrico_metadata.get("notes", []),
+                    "reuse_policy": DATASET_CATALOG_CONFIG["consumo_electrico_comunal"][
+                        "reuse_policy"
+                    ],
+                    "freshness": build_freshness(
+                        consumo_electrico_metadata.get("refreshed_at_utc", ""),
+                        DATASET_CATALOG_CONFIG["consumo_electrico_comunal"]["freshness_policy"][
+                            "max_age_hours"
+                        ],
+                    ),
+                }
+            }
+            if df_consumo_electrico is not None and consumo_electrico_metadata is not None
             else {}
         ),
     }

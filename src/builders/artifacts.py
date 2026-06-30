@@ -263,7 +263,7 @@ def write_hub_bundle_json(pipeline_metadata, hub_health, dataset_catalog, artifa
 
     full_catalog_count = dataset_catalog.get("dataset_count")
     public_dataset_count = len(stable_publicable_datasets)
-    candidate_dataset_count = len(candidate_datasets)
+    registry_candidate_count = len(candidate_datasets)
 
     bundle = {
         "version": pipeline_metadata.get("version", "unknown"),
@@ -271,7 +271,7 @@ def write_hub_bundle_json(pipeline_metadata, hub_health, dataset_catalog, artifa
         "overall_status": hub_health.get("overall_status"),
         "dataset_count": full_catalog_count,
         "public_dataset_count": public_dataset_count,
-        "candidate_dataset_count": candidate_dataset_count,
+        "candidate_dataset_count": registry_candidate_count,  # actualizado más abajo
         "health": {
             "ok_count": hub_health.get("ok_count"),
             "warn_count": hub_health.get("warn_count"),
@@ -356,6 +356,10 @@ def write_hub_bundle_json(pipeline_metadata, hub_health, dataset_catalog, artifa
             if reg_entry.get("upstream_datasets"):
                 candidate_entry["upstream_datasets"] = reg_entry["upstream_datasets"]
             bundle["candidate_datasets"].append(candidate_entry)
+
+    # candidate_dataset_count debe reflejar los datasets candidate
+    # efectivamente presentes en el catálogo (no solo en el registry)
+    bundle["candidate_dataset_count"] = len(bundle["candidate_datasets"])
 
     output_path = os.path.join(NORMALIZED_DIR, "hub_bundle.json")
     write_json_atomic(bundle, output_path, ensure_ascii=False, indent=2)

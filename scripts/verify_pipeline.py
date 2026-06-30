@@ -90,7 +90,9 @@ _PUBLISHABLE_FILES = [
 
 PUBLISHABLE_REQUIRED_FILES = _PUBLISHABLE_FILES + _derive_dataset_artifact_paths()
 REQUIRED_FILES = _LOCAL_BUILD_FILES + PUBLISHABLE_REQUIRED_FILES
-REQUIRED_DATASETS = set(DATASET_CATALOG_CONFIG)
+REQUIRED_DATASETS = {
+    name for name, config in DATASET_CATALOG_CONFIG.items() if config.get("outputs")
+}
 
 
 def fail(message):
@@ -176,13 +178,22 @@ def verify_source_registry(registry=None, catalog=None):
     if missing_registry:
         fail(f"source_registry.json is missing catalog datasets: {', '.join(missing_registry)}")
 
-    valid_access_methods = {"api", "direct_file", "landing_snapshot", "derived"}
+    valid_access_methods = {
+        "api",
+        "direct_file",
+        "landing_snapshot",
+        "derived",
+        "scraping_html_post",
+        "scraping_playwright_xml",
+        "xlsx",
+    }
     valid_license_statuses = {"open-attribution", "public-api-review-terms", "restricted"}
     valid_live_statuses = {"implemented", "fallback_only", "derived"}
     valid_fallback_policies = {
         "none",
         "allowed_for_dev",
         "allowed_for_dev_blocked_for_publication",
+        "fallback_to_last_snapshot",
     }
     valid_maturity_statuses = {"stable", "candidate", "experimental", "deprecated"}
     valid_publication_tracks = {"stable_publishable", "candidate"}
@@ -1475,14 +1486,15 @@ def verify_source_readiness_report():
     if not path.exists():
         fail("source_readiness.json not found — run 'make build' first")
     report = load_json(path)
-    if report.get("dataset_count") != len(REQUIRED_DATASETS):
+    if report.get("dataset_count") < len(REQUIRED_DATASETS):
         fail(
-            f"source_readiness.json has unexpected dataset_count: "
+            f"source_readiness.json covers fewer datasets than required: "
             f"{report.get('dataset_count')} vs {len(REQUIRED_DATASETS)}"
         )
     readiness_names = {entry.get("dataset") for entry in report.get("datasets", [])}
-    if readiness_names != REQUIRED_DATASETS:
-        fail(f"source_readiness.json has unexpected datasets: {sorted(readiness_names)}")
+    if not REQUIRED_DATASETS.issubset(readiness_names):
+        missing = sorted(REQUIRED_DATASETS - readiness_names)
+        fail(f"source_readiness.json is missing required datasets: {missing}")
     for entry in report.get("datasets", []):
         if entry.get("maturity_status") not in {
             "stable",

@@ -631,7 +631,9 @@ def build_dataset_quality(pipeline_metadata, hub_health, source_readiness):
 
     entries = []
 
-    for dataset_name in sorted(set(list(health_by_dataset) + list(readiness_by_dataset))):
+    # Solo puntuar datasets que están en el catálogo con outputs (los que el build produce)
+    eligible = {name for name, cfg in DATASET_CATALOG_CONFIG.items() if cfg.get("outputs")}
+    for dataset_name in sorted(eligible & (set(health_by_dataset) | set(readiness_by_dataset))):
         health = health_by_dataset.get(dataset_name, {})
         readiness = readiness_by_dataset.get(dataset_name, {})
 

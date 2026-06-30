@@ -48,8 +48,8 @@ INDICADORES_NON_SYNTHETIC_DELIVERY = {
     "raw_recovery",
     "preserved_existing",
 }
-EXPECTED_DATASET_COUNT = 15
-EXPECTED_TOP_ISSUE = "empresas"
+EXPECTED_DATASET_COUNT = 17
+EXPECTED_TOP_ISSUE = "consumo_electrico_comunal"
 
 
 def _assert_summary_has_recovery_source_detail(test_case, summary):
@@ -120,6 +120,8 @@ class ChileHubTests(unittest.TestCase):
                 "indicadores_urbanos_siedu",
                 "perfil_territorial_comunal",
                 "empresas",
+                "pobreza_comunal",
+                "consumo_electrico_comunal",
             ],
         )
 
@@ -249,6 +251,8 @@ class ChileHubTests(unittest.TestCase):
                 "indicadores_urbanos_siedu": "ok",
                 "perfil_territorial_comunal": "ok",
                 "empresas": "ok",
+                "pobreza_comunal": "ok",
+                "consumo_electrico_comunal": "ok",
             },
         )
         warning_counts = {item["dataset"]: item["warning_count"] for item in summary}
@@ -673,8 +677,8 @@ class ChileHubTests(unittest.TestCase):
         bundle = self.bundle
         self.assertEqual(bundle["overall_status"], self.health["overall_status"])
         self.assertEqual(bundle["dataset_count"], EXPECTED_DATASET_COUNT)
-        self.assertEqual(bundle["public_dataset_count"], 13)
-        self.assertEqual(bundle["candidate_dataset_count"], 2)
+        self.assertEqual(bundle["public_dataset_count"], 16)
+        self.assertEqual(bundle["candidate_dataset_count"], 1)
         self.assertEqual(len(bundle["datasets"]), bundle["public_dataset_count"])
         self.assertEqual(len(bundle["candidate_datasets"]), bundle["candidate_dataset_count"])
         # Verify candidate names
@@ -682,7 +686,6 @@ class ChileHubTests(unittest.TestCase):
         self.assertEqual(
             candidate_names,
             {
-                "finanzas_municipales",
                 "perfil_territorial_comunal",
             },
         )
@@ -1187,6 +1190,8 @@ class ChileHubCliTests(unittest.TestCase):
                 "indicadores_urbanos_siedu",
                 "perfil_territorial_comunal",
                 "empresas",
+                "pobreza_comunal",
+                "consumo_electrico_comunal",
             ],
         )
 
@@ -1262,9 +1267,9 @@ class ChileHubCliTests(unittest.TestCase):
     def test_cli_dataset_status_and_changelog(self):
         status = self.run_cli("dataset-status")
         changelog = self.run_cli("dataset-changelog")
-        self.assertIn('"dataset_count": 15', status.stdout)
+        self.assertIn('"dataset_count": 17', status.stdout)
         self.assertIn('"dataset": "perfil_territorial_comunal"', status.stdout)
-        self.assertIn('"dataset_count": 15', changelog.stdout)
+        self.assertIn('"dataset_count": 17', changelog.stdout)
         self.assertIn('"record_count_delta"', changelog.stdout)
 
     def test_cli_report(self):

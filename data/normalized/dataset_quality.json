@@ -1,14 +1,14 @@
 {
-  "generated_at_utc": "2026-06-30T11:06:52.581611+00:00",
-  "dataset_count": 15,
+  "generated_at_utc": "2026-06-30T20:33:50.919792+00:00",
+  "dataset_count": 17,
   "grade_distribution": {
-    "A": 14,
+    "A": 16,
     "B": 1,
     "C": 0,
     "D": 0,
     "F": 0
   },
-  "average_score": 93.5,
+  "average_score": 93.6,
   "weights": {
     "validation": 25,
     "schema_contract": 20,
@@ -117,6 +117,32 @@
       "recommended_action": "Keep derived schema aligned with comunas."
     },
     {
+      "dataset": "consumo_electrico_comunal",
+      "maturity_status": "stable",
+      "overall_score": 90.0,
+      "grade": "A",
+      "dimensions": {
+        "validation": 100,
+        "schema_contract": 100,
+        "source_readiness": 100,
+        "freshness": 100,
+        "coverage": 0,
+        "reuse_policy": 100
+      },
+      "weights": {
+        "validation": 25,
+        "schema_contract": 20,
+        "source_readiness": 20,
+        "freshness": 15,
+        "coverage": 10,
+        "reuse_policy": 10
+      },
+      "blocking_reasons": [
+        "Cobertura not_applicable"
+      ],
+      "recommended_action": "Monitorear disponibilidad del dataset en Energía Abierta."
+    },
+    {
       "dataset": "distritos_electorales",
       "maturity_status": "stable",
       "overall_score": 100.0,
@@ -220,15 +246,15 @@
     },
     {
       "dataset": "finanzas_municipales",
-      "maturity_status": "candidate",
-      "overall_score": 75.0,
-      "grade": "B",
+      "maturity_status": "stable",
+      "overall_score": 92.0,
+      "grade": "A",
       "dimensions": {
         "validation": 100,
         "schema_contract": 100,
-        "source_readiness": 50,
+        "source_readiness": 100,
         "freshness": 100,
-        "coverage": 0,
+        "coverage": 70,
         "reuse_policy": 50
       },
       "weights": {
@@ -240,22 +266,21 @@
         "reuse_policy": 10
       },
       "blocking_reasons": [
-        "Fuente en fallback_only — Buscar fuente alternativa: SUBDERE directa, Portal de Transparencia, o datos.gob.cl. Ver docs/datasets/finanzas_municipales-degradacion.md.",
-        "Cobertura not_applicable",
+        "Cobertura partial",
         "Reutilización: public-api-review-terms"
       ],
-      "recommended_action": "Buscar fuente alternativa: SUBDERE directa, Portal de Transparencia, o datos.gob.cl. Ver docs/datasets/finanzas_municipales-degradacion.md."
+      "recommended_action": "Fase 3.2 PoC exitoso: extractor live implementado (sinim_finanzas_live_extractor.py). Cobertura 345/346 municipios (2024). Pendiente: workflow mensual (3.3) y metadata de cadencia (3.4)."
     },
     {
       "dataset": "indicadores",
       "maturity_status": "stable",
-      "overall_score": 90.0,
-      "grade": "A",
+      "overall_score": 82.5,
+      "grade": "B",
       "dimensions": {
         "validation": 100,
         "schema_contract": 100,
         "source_readiness": 100,
-        "freshness": 100,
+        "freshness": 50,
         "coverage": 0,
         "reuse_policy": 100
       },
@@ -268,6 +293,7 @@
         "reuse_policy": 10
       },
       "blocking_reasons": [
+        "Datos stale",
         "Cobertura not_applicable"
       ],
       "recommended_action": "Monitor empty monthly IPC responses and published backfill behavior."
@@ -324,6 +350,32 @@
         "Capa derivada — depende de datasets upstream no publicables"
       ],
       "recommended_action": "Track readiness inherited from upstream component datasets."
+    },
+    {
+      "dataset": "pobreza_comunal",
+      "maturity_status": "stable",
+      "overall_score": 90.0,
+      "grade": "A",
+      "dimensions": {
+        "validation": 100,
+        "schema_contract": 100,
+        "source_readiness": 100,
+        "freshness": 100,
+        "coverage": 0,
+        "reuse_policy": 100
+      },
+      "weights": {
+        "validation": 25,
+        "schema_contract": 20,
+        "source_readiness": 20,
+        "freshness": 15,
+        "coverage": 10,
+        "reuse_policy": 10
+      },
+      "blocking_reasons": [
+        "Cobertura not_applicable"
+      ],
+      "recommended_action": "Monitorear publicación de próxima ronda CASEN (2024-2025)."
     },
     {
       "dataset": "provincias",

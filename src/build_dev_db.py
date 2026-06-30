@@ -589,6 +589,8 @@ def _write_data_artifacts(dfs):
     df_resultados_educacionales = dfs["resultados_educacionales"]
     df_siedu = dfs["siedu"]
     df_empresas = dfs["empresas"]
+    df_pobreza_comunal = dfs["pobreza_comunal"]
+    df_consumo_electrico = dfs["consumo_electrico"]
     df_regiones = dfs["regiones"]
     df_provincias = dfs["provincias"]
     df_perfil_territorial = dfs["perfil_territorial"]
@@ -601,6 +603,10 @@ def _write_data_artifacts(dfs):
     }
     if df_empresas is not None:
         extra_tables["empresas"] = df_empresas
+    if df_pobreza_comunal is not None:
+        extra_tables["pobreza_comunal"] = df_pobreza_comunal
+    if df_consumo_electrico is not None:
+        extra_tables["consumo_electrico_comunal"] = df_consumo_electrico
 
     # Convertir tablas extra a pandas UNA sola vez para SQLite y Excel.
     # Empresas tiene ~1.57M filas: la conversión es costosa y no debe duplicarse.

@@ -1,8 +1,8 @@
 # chile-hub redistribution report
 
-- `generated_at_utc`: `2026-06-30T11:06:52.581611+00:00`
-- `dataset_count`: `15`
-- `ready_count`: `15`
+- `generated_at_utc`: `2026-06-30T20:33:50.919792+00:00`
+- `dataset_count`: `17`
+- `ready_count`: `17`
 - `review_terms_count`: `0`
 - `unknown_count`: `0`
 
@@ -23,6 +23,8 @@
 | `indicadores_urbanos_siedu` | `ready` | Licencia de Datos Abiertos INE | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
 | `perfil_territorial_comunal` | `ready` | Derivada de fuentes abiertas con atribución | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
 | `empresas` | `ready` | CC-BY | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
+| `pobreza_comunal` | `ready` | Datos abiertos MDS | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
+| `consumo_electrico_comunal` | `ready` | CC BY | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
 
 ## regiones
 
@@ -173,3 +175,23 @@
 - `redistribution_ok`: `True`
 - `recommended_action`: Publicable con atribucion y referencia de fuente.
 - `summary`: Registro de Empresas y Sociedades (RES) del Ministerio de Economia, publicado en datos.gob.cl bajo CC-BY. Solo incluye constituciones bajo Ley 20.659 (regimen simplificado) desde 2013.
+
+## pobreza_comunal
+
+- `publishability_status`: `ready`
+- `license`: `Datos abiertos MDS`
+- `license_url`: https://observatorio.ministeriodesarrollosocial.gob.cl/
+- `attribution_required`: `True`
+- `redistribution_ok`: `True`
+- `recommended_action`: Publicable con atribucion y referencia de fuente.
+- `summary`: Estimaciones de pobreza comunal publicadas por el Observatorio Social del MDS. Atribución requerida.
+
+## consumo_electrico_comunal
+
+- `publishability_status`: `ready`
+- `license`: `CC BY`
+- `license_url`: http://energiaabierta.cl/
+- `attribution_required`: `True`
+- `redistribution_ok`: `True`
+- `recommended_action`: Publicable con atribucion y referencia de fuente.
+- `summary`: Consumo eléctrico anual por comuna publicado por la CNE en Energía Abierta. Atribución requerida.

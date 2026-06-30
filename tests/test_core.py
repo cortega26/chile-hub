@@ -312,7 +312,7 @@ class ChileHubCatalogQueriesTests(unittest.TestCase):
 
     def test_list_datasets_returns_expected_count(self):
         datasets = self.hub.list_datasets()
-        self.assertEqual(len(datasets), 15)
+        self.assertEqual(len(datasets), 17)
 
     def test_get_dataset_returns_dict_with_expected_fields(self):
         entry = self.hub.get_dataset("comunas")

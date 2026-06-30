@@ -126,6 +126,8 @@ jobs:
             python src/extractors/mineduc_resultados_extractor.py
             python src/extractors/siedu_extractor.py
             python src/extractors/res_extractor.py
+            python src/extractors/pobreza_extractor.py
+            python src/extractors/consumo_electrico_extractor.py
           fi
 
       - name: Build outputs

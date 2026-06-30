@@ -1,0 +1,44 @@
+[
+  {
+    "codigo_region": "13",
+    "codigo_comuna": "13101",
+    "nombre_comuna": "Santiago",
+    "anio": 2022,
+    "dimension": "ingresos",
+    "tasa": 4.5,
+    "limite_inferior": 3.2,
+    "limite_superior": 6.1,
+    "metodologia": "SAE",
+    "fuente": "Observatorio Social — MDS (fallback)",
+    "url_fuente": "https://observatorio.ministeriodesarrollosocial.gob.cl/storage/docs/pobreza-comunal/2022/Estimaciones_Tasa_Pobreza_Ingresos_Comunas_2022.xlsx",
+    "fecha_fuente": ""
+  },
+  {
+    "codigo_region": "13",
+    "codigo_comuna": "13101",
+    "nombre_comuna": "Santiago",
+    "anio": 2022,
+    "dimension": "multidimensional",
+    "tasa": 8.2,
+    "limite_inferior": 6.1,
+    "limite_superior": 10.5,
+    "metodologia": "SAE",
+    "fuente": "Observatorio Social — MDS (fallback)",
+    "url_fuente": "https://observatorio.ministeriodesarrollosocial.gob.cl/storage/docs/pobreza-comunal/2022/Estimaciones_Indice_Pobreza_Multidimensional_Comunas_2022.xlsx",
+    "fecha_fuente": ""
+  },
+  {
+    "codigo_region": "08",
+    "codigo_comuna": "08101",
+    "nombre_comuna": "Concepción",
+    "anio": 2022,
+    "dimension": "ingresos",
+    "tasa": 6.8,
+    "limite_inferior": 4.9,
+    "limite_superior": 9.0,
+    "metodologia": "SAE",
+    "fuente": "Observatorio Social — MDS (fallback)",
+    "url_fuente": "https://observatorio.ministeriodesarrollosocial.gob.cl/storage/docs/pobreza-comunal/2022/Estimaciones_Tasa_Pobreza_Ingresos_Comunas_2022.xlsx",
+    "fecha_fuente": ""
+  }
+]

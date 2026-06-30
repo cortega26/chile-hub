@@ -1,0 +1,38 @@
+[
+  {
+    "codigo_region": "13",
+    "codigo_comuna": "13101",
+    "nombre_comuna": "Santiago",
+    "anio": 2023,
+    "tipo_cliente": "Residencial",
+    "consumo_kwh": 1250000000.0,
+    "numero_clientes": 150000,
+    "fuente": "CNE — Energía Abierta (fallback)",
+    "url_fuente": "http://datos.energiaabierta.cl/dataviews/241686/consumo-electrico-anual-por-comuna-y-tipo-de-cliente/",
+    "fecha_fuente": ""
+  },
+  {
+    "codigo_region": "08",
+    "codigo_comuna": "08101",
+    "nombre_comuna": "Concepción",
+    "anio": 2023,
+    "tipo_cliente": "Residencial",
+    "consumo_kwh": 350000000.0,
+    "numero_clientes": 60000,
+    "fuente": "CNE — Energía Abierta (fallback)",
+    "url_fuente": "http://datos.energiaabierta.cl/dataviews/241686/consumo-electrico-anual-por-comuna-y-tipo-de-cliente/",
+    "fecha_fuente": ""
+  },
+  {
+    "codigo_region": "13",
+    "codigo_comuna": "13101",
+    "nombre_comuna": "Santiago",
+    "anio": 2023,
+    "tipo_cliente": "Comercial",
+    "consumo_kwh": 2100000000.0,
+    "numero_clientes": 45000,
+    "fuente": "CNE — Energía Abierta (fallback)",
+    "url_fuente": "http://datos.energiaabierta.cl/dataviews/241686/consumo-electrico-anual-por-comuna-y-tipo-de-cliente/",
+    "fecha_fuente": ""
+  }
+]

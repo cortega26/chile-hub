@@ -1,7 +1,7 @@
 {
-  "generated_at_utc": "2026-06-30T11:06:52.581611+00:00",
-  "dataset_count": 15,
-  "ready_count": 15,
+  "generated_at_utc": "2026-06-30T20:33:50.919792+00:00",
+  "dataset_count": 17,
+  "ready_count": 17,
   "review_terms_count": 0,
   "unknown_count": 0,
   "datasets": [
@@ -184,6 +184,30 @@
       "summary": "Registro de Empresas y Sociedades (RES) del Ministerio de Economia, publicado en datos.gob.cl bajo CC-BY. Solo incluye constituciones bajo Ley 20.659 (regimen simplificado) desde 2013.",
       "recommended_action": "Publicable con atribucion y referencia de fuente.",
       "documentation": "docs/datasets/empresas.md"
+    },
+    {
+      "dataset": "pobreza_comunal",
+      "publishability_status": "ready",
+      "license": "Datos abiertos MDS",
+      "license_url": "https://observatorio.ministeriodesarrollosocial.gob.cl/",
+      "reuse_status": "open-attribution",
+      "attribution_required": true,
+      "redistribution_ok": true,
+      "summary": "Estimaciones de pobreza comunal publicadas por el Observatorio Social del MDS. Atribución requerida.",
+      "recommended_action": "Publicable con atribucion y referencia de fuente.",
+      "documentation": "docs/datasets/pobreza_comunal.md"
+    },
+    {
+      "dataset": "consumo_electrico_comunal",
+      "publishability_status": "ready",
+      "license": "CC BY",
+      "license_url": "http://energiaabierta.cl/",
+      "reuse_status": "open-attribution",
+      "attribution_required": true,
+      "redistribution_ok": true,
+      "summary": "Consumo eléctrico anual por comuna publicado por la CNE en Energía Abierta. Atribución requerida.",
+      "recommended_action": "Publicable con atribucion y referencia de fuente.",
+      "documentation": "docs/datasets/consumo_electrico_comunal.md"
     }
   ]
 }

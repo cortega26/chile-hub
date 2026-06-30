@@ -30,9 +30,8 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 
 | # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
 |---|------|----------|----------|--------|-----------|--------|
-| 022 | [Plan de avance — confiabilidad/narrativa (Track A) + expansión de catálogo por valor de cruce (Track B)](022-plan-avance-narrativa-confiabilidad.md) | P1 | L | MED | — | ✅ Track A completo · Track B completo (2026-06-30). Implementación de autoridades_electas y partidos_politicos diferida a Plan 023. |
 | 014 | [Limpieza de arquitectura — catálogo externo, imports, alias](014-architecture-cleanup.md) | P2 | M | MED | — | TODO |
-| 020 | [Explorador SQL en la landing con DuckDB-Wasm](020-duckdb-wasm-playground.md) | P2 | M | MED | 022 (gate 4.3) | BLOCKED — gate 4.3: NO-GO (2026-06-30). Ver `docs/gate-4-3-decision-playground.md` para condiciones de re-evaluación. |
+| 020 | [Explorador SQL en la landing con DuckDB-Wasm](020-duckdb-wasm-playground.md) | P2 | M | MED | — | BLOCKED — gate 4.3: NO-GO (2026-06-30). Ver `docs/gate-4-3-decision-playground.md` para condiciones de re-evaluación. |
 | 021 | [Publicar documentación de API con MkDocs Material + mkdocstrings](021-mkdocs-api-docs.md) | P3 | M | LOW | — | TODO |
 
 ## Planes archivados (mejoras de librerías/dependencias, 2026-06-29)
@@ -41,6 +40,12 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 |---|------|----------|--------|--------|
 | 018 | [Renderizar tablas de la CLI con `rich`](archive/018-rich-cli-table-output.md) | M | MED | DONE |
 | 019 | [Publicar `datapackage.json` (Frictionless) como artefacto adicional](archive/019-frictionless-datapackage.md) | M | LOW | DONE |
+
+## Planes archivados (plan maestro 2026-06-30)
+
+| # | Plan | Esfuerzo | Riesgo | Estado |
+|---|------|----------|--------|--------|
+| 022 | [Plan de avance — confiabilidad/narrativa (Track A) + expansión de catálogo por valor de cruce (Track B)](archive/022-plan-avance-narrativa-confiabilidad.md) | L | MED | DONE — Track A (Fase 1–4) + Track B (Ola B1–B2) completos. Implementación de autoridades_electas y partidos_politicos diferida a Plan 023. |
 
 ## Planes archivados (auditoría 2026-06-19)
 
@@ -71,23 +76,21 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 ## Grafo de dependencias (planes activos)
 
 ```
-022 (plan maestro P1)  ← dirección estratégica; gate 4.3 decide si se ejecuta 020
-  └─ 020 (DuckDB-Wasm landing)   ← condicionado al gate 4.3 de 022
-014 (independiente)
+014 (independiente)    ← limpieza de arquitectura
+020 (independiente)    ← bloqueado por gate 4.3 (no-go 2026-06-30); sin dependencia activa
 021 (independiente)    ← MkDocs API docs
 ```
 
-**022** es el plan maestro estratégico (multi-fase) que fija la dirección prioritaria: narrativa de
-confiabilidad + honestidad de datos + señales pasivas. **020** queda condicionado a su gate 4.3
-(go/no-go con datos de atención). **014** y **021** son independientes y aditivos: tocan superficies
-distintas (pipeline de build, docs/CI) y pueden ejecutarse en cualquier orden o en paralelo.
+**014**, **020** y **021** son independientes entre sí: tocan superficies distintas (pipeline de build,
+landing, docs/CI) y pueden ejecutarse en cualquier orden o en paralelo. **020** sigue bloqueado por
+el gate 4.3 (NO-GO); ver `docs/gate-4-3-decision-playground.md` para condiciones de re-evaluación.
 
 ## Orden de ejecución recomendado
 
-1. **022** — plan maestro: ejecutar sus fases en orden 1→2→3→4 (es la prioridad del proyecto)
-2. **014** — limpieza de arquitectura (aditivo, en paralelo si hay capacidad)
+1. **023** — si se crea: autoridades_electas + partidos_politicos (integración XML/Wikidata, S-M de esfuerzo)
+2. **014** — limpieza de arquitectura (P2, aditivo)
 3. **021** — MkDocs: docs de API desde docstrings existentes (P3, aditivo)
-4. **020** — DuckDB-Wasm: solo si lo aprueba el gate 4.3 de 022 (riesgo MED por CSP/WASM)
+4. **020** — DuckDB-Wasm: solo si lo aprueba una re-evaluación futura del gate 4.3
 
 ## Hallazgos considerados y diferidos (2026-06-29 — mejoras de librerías)
 

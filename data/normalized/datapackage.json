@@ -4,7 +4,7 @@
   "description": "Capa de datos reproducible y curada sobre datasets publicos oficiales de Chile: geografia, demografia, salud, educacion, finanzas municipales e indicadores.",
   "version": "1.17.1",
   "homepage": "https://tooltician.com/chile-hub/",
-  "created": "2026-06-30T11:06:52.586930+00:00",
+  "created": "2026-06-30T20:33:50.924054+00:00",
   "resources": [
     {
       "name": "regiones",
@@ -546,7 +546,7 @@
       "sources": [
         {
           "title": "Ministerio de Salud - Establecimientos de Salud",
-          "path": "https://datos.gob.cl/dataset/3bf4cf7c-f638-4735-9a01-f65faae4beca/resource/2c44d782-3365-44e3-aefb-2c8b8363a1bc/download/establecimientos_20260623.csv"
+          "path": "https://datos.gob.cl/dataset/3bf4cf7c-f638-4735-9a01-f65faae4beca/resource/2c44d782-3365-44e3-aefb-2c8b8363a1bc/download/establecimientos_20260616.csv"
         }
       ],
       "licenses": [
@@ -800,7 +800,7 @@
       "format": "parquet",
       "mediatype": "application/vnd.apache.parquet",
       "title": "finanzas_municipales",
-      "description": "Indicadores financieros municipales anuales desde SINIM/SUBDERE.",
+      "description": "Indicadores financieros municipales anuales desde SINIM/SUBDERE. CAPA PARCIAL/CANDIDATO: 3 de 346 comunas (0.9%). Usar con precaución; no representa cobertura nacional.",
       "schema": {
         "fields": [
           {
@@ -1357,6 +1357,224 @@
         {
           "title": "CC-BY",
           "path": "https://creativecommons.org/licenses/by/3.0/cl/"
+        }
+      ]
+    },
+    {
+      "name": "pobreza_comunal",
+      "path": "pobreza_comunal.parquet",
+      "format": "parquet",
+      "mediatype": "application/vnd.apache.parquet",
+      "title": "pobreza_comunal",
+      "description": "Estimaciones de pobreza comunal por ingresos y multidimensional derivadas de la encuesta CASEN mediante metodología SAE (Estimación de Áreas Pequeñas). Incluye tasa, límite inferior y superior del intervalo de confianza por comuna, año y dimensión.",
+      "schema": {
+        "fields": [
+          {
+            "name": "codigo_region",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "codigo_comuna",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_comuna",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "anio",
+            "type": "integer",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "dimension",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "tasa",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "limite_inferior",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "limite_superior",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "metodologia",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "fuente",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "url_fuente",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "fecha_fuente",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          }
+        ],
+        "missingValues": [
+          ""
+        ],
+        "primaryKey": [
+          "codigo_comuna",
+          "anio",
+          "dimension"
+        ]
+      },
+      "sources": [
+        {
+          "title": "Observatorio Social — Ministerio de Desarrollo Social y Familia",
+          "path": "https://observatorio.ministeriodesarrollosocial.gob.cl/storage/docs/pobreza-comunal/2022/Estimaciones_Tasa_Pobreza_Ingresos_Comunas_2022.xlsx"
+        }
+      ],
+      "licenses": [
+        {
+          "title": "Datos abiertos MDS",
+          "path": "https://observatorio.ministeriodesarrollosocial.gob.cl/"
+        }
+      ]
+    },
+    {
+      "name": "consumo_electrico_comunal",
+      "path": "consumo_electrico_comunal.parquet",
+      "format": "parquet",
+      "mediatype": "application/vnd.apache.parquet",
+      "title": "consumo_electrico_comunal",
+      "description": "Consumo eléctrico anual por comuna y tipo de cliente (Residencial, Comercial, Industrial, Agrícola, Alumbrado Público, Otros), publicado por la Comisión Nacional de Energía (CNE) en el portal Energía Abierta.",
+      "schema": {
+        "fields": [
+          {
+            "name": "codigo_region",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "codigo_comuna",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_comuna",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "anio",
+            "type": "integer",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "tipo_cliente",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "consumo_kwh",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "numero_clientes",
+            "type": "integer",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "fuente",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "url_fuente",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "fecha_fuente",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          }
+        ],
+        "missingValues": [
+          ""
+        ],
+        "primaryKey": [
+          "codigo_comuna",
+          "anio",
+          "tipo_cliente"
+        ]
+      },
+      "sources": [
+        {
+          "title": "CNE — Energía Abierta",
+          "path": "http://datos.energiaabierta.cl/dataviews/241686/consumo-electrico-anual-por-comuna-y-tipo-de-cliente/"
+        }
+      ],
+      "licenses": [
+        {
+          "title": "CC BY",
+          "path": "http://energiaabierta.cl/"
         }
       ]
     }
