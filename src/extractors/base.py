@@ -28,6 +28,14 @@ def write_staging_metadata(path: str, metadata: dict[str, Any]) -> None:
 
 
 class BaseExtractor(ABC):
+    """Contrato común para extractores de chile-hub.
+
+    Los extractores se ejecutan como scripts standalone a través de funciones
+    ``process_*()`` invocadas desde el bloque ``if __name__ == "__main__"``
+    de cada módulo.  El método ``run()`` es el entry point canónico para uso
+    programático (tests, automatizaciones), no para el Makefile.
+    """
+
     @property
     @abstractmethod
     def dataset_name(self) -> str:
@@ -50,6 +58,12 @@ class BaseExtractor(ABC):
         """Persiste el dataset normalizado y sus metadatos en staging."""
 
     def run(self, dry_run: bool = False, **kwargs: Any) -> dict[str, Any]:
+        """Ejecuta el pipeline completo del extractor.
+
+        Entry point canónico para uso programático (tests, automatizaciones).
+        Los extractores invocados desde el Makefile usan ``process_*()``
+        standalone en vez de este método.
+        """
         raw_data = self.fetch(**kwargs)
         df = self.normalize(raw_data)
         metadata = {"dataset": self.dataset_name, "dry_run": dry_run}
