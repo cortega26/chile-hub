@@ -45,7 +45,7 @@ Las 5 mejoras que siguen atacan estos puntos en orden de impacto estrategico.
 | 4 | Estabilizacion fallbacks | 100% | 100% | 100% | 100% | 100% | 100% |
 | 5 | Dashboard salud | 100% | 100% | 100% | — | — | 100% |
 | 6 | API error handling | 100% | 100% | 100% | 100% | 100% | 100% |
-| 7 | API capacidades | 100% | 0% | 0% | 0% | 0% | 0% |
+| 7 | API capacidades | 100% | 100% | 100% | 100% | 100% | 100% |
 
 **Progreso total:** 100% (7/7 completadas — todas las mejoras del backlog implementadas)
 
