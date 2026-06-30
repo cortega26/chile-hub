@@ -1,6 +1,6 @@
 # chile-hub pipeline status
 
-- `generated_at_utc`: `2026-06-29T11:44:14.252520+00:00`
+- `generated_at_utc`: `2026-06-30T11:06:52.581611+00:00`
 - `overall_status`: `warn`
 - `warning_count`: `6`
 - `top_issue`: `empresas` (freshness=fresh, drift=drifted, warnings=3)
@@ -29,7 +29,7 @@
 
 ## censo_comunal
 
-- `refreshed_at_utc`: `2026-06-29T11:39:56.707133+00:00`
+- `refreshed_at_utc`: `2026-06-30T11:02:30.860577+00:00`
 - `freshness`: `fresh (0.07h / 87600h)`
 - `coverage`: `Cobertura completa: 346/346 filas respecto del baseline esperado.`
 - `fields`: `codigo_region, nombre_region, codigo_provincia, nombre_provincia, codigo_comuna, nombre_comuna, poblacion_censada, hombres, mujeres, razon_hombre_mujer, poblacion_0_14, poblacion_15_29, poblacion_30_44, poblacion_45_64, poblacion_65_mas`
@@ -38,7 +38,7 @@
 
 ## censo_hogares_viviendas
 
-- `refreshed_at_utc`: `2026-06-29T11:39:57.974148+00:00`
+- `refreshed_at_utc`: `2026-06-30T11:02:32.710060+00:00`
 - `freshness`: `fresh (0.07h / 87600h)`
 - `coverage`: `Cobertura completa: 346/346 filas respecto del baseline esperado.`
 - `fields`: `codigo_region, nombre_region, codigo_provincia, nombre_provincia, codigo_comuna, nombre_comuna, viviendas_censadas, viviendas_particulares_ocupadas, viviendas_particulares_desocupadas, viviendas_colectivas, hogares_censados, promedio_personas_hogar`
@@ -46,7 +46,7 @@
 
 ## comunas
 
-- `refreshed_at_utc`: `2026-06-29T11:39:48.674181+00:00`
+- `refreshed_at_utc`: `2026-06-30T11:02:23.828733+00:00`
 - `freshness`: `fresh (0.07h / 2160h)`
 - `coverage`: `Cobertura completa: 346/346 filas respecto del baseline esperado.`
 - `fields`: `codigo_region, nombre_region, abreviatura, codigo_provincia, nombre_provincia, codigo_comuna, nombre_comuna, nombre_comuna_clean, latitud_cabecera, longitud_cabecera, poblacion_estimada`
@@ -55,7 +55,7 @@
 
 ## comunas_enriquecidas
 
-- `refreshed_at_utc`: `2026-06-29T11:39:48.674181+00:00`
+- `refreshed_at_utc`: `2026-06-30T11:02:23.828733+00:00`
 - `freshness`: `fresh (0.07h / 2160h)`
 - `coverage`: `Cobertura completa: 346/346 filas respecto del baseline esperado.`
 - `fields`: `codigo_region, nombre_region, abreviatura, codigo_provincia, nombre_provincia, codigo_comuna, nombre_comuna, nombre_comuna_clean, latitud_cabecera, longitud_cabecera, poblacion_estimada`
@@ -64,7 +64,7 @@
 
 ## distritos_electorales
 
-- `refreshed_at_utc`: `2026-06-29T11:39:59.913232+00:00`
+- `refreshed_at_utc`: `2026-06-30T11:02:35.139796+00:00`
 - `freshness`: `fresh (0.07h / 87600h)`
 - `coverage`: `Cobertura completa: 346/346 filas respecto del baseline esperado.`
 - `fields`: `codigo_comuna, nombre_comuna, distrito_electoral, circunscripcion_senatorial`
@@ -72,7 +72,7 @@
 
 ## empresas
 
-- `refreshed_at_utc`: `2026-06-29T11:40:37.408955+00:00`
+- `refreshed_at_utc`: `2026-06-30T11:03:17.420183+00:00`
 - `freshness`: `fresh (0.06h / 1080h)`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
 - `fields`: `rut, razon_social, codigo_sociedad, tipo_actuacion, capital, fecha_actuacion, fecha_registro, fecha_aprobacion_sii, anio, mes, comuna_tributaria, region_tributaria, comuna_social, region_social`
@@ -81,7 +81,7 @@
 
 ## establecimientos_educacionales
 
-- `refreshed_at_utc`: `2026-06-29T11:40:02.340554+00:00`
+- `refreshed_at_utc`: `2026-06-30T11:02:37.427651+00:00`
 - `freshness`: `fresh (0.07h / 8760h)`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
 - `fields`: `rbd, dv_rbd, nombre_establecimiento, codigo_region, codigo_comuna, dependencia_administrativa, latitud, longitud, estado_funcionamiento`
@@ -89,7 +89,7 @@
 
 ## establecimientos_salud
 
-- `refreshed_at_utc`: `2026-06-29T11:39:59.436619+00:00`
+- `refreshed_at_utc`: `2026-06-30T11:02:34.615871+00:00`
 - `freshness`: `fresh (0.07h / 1080h)`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
 - `fields`: `codigo_establecimiento, nombre_establecimiento, tipo_establecimiento, dependencia_administrativa, nivel_atencion, codigo_region, nombre_region, codigo_comuna, nombre_comuna, tiene_servicio_urgencia, tipo_urgencia, latitud, longitud, estado_funcionamiento`
@@ -97,7 +97,7 @@
 
 ## finanzas_municipales
 
-- `refreshed_at_utc`: `2026-06-29T11:40:03.493666+00:00`
+- `refreshed_at_utc`: `2026-06-30T11:02:38.626383+00:00`
 - `freshness`: `fresh (0.07h / 8760h)`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
 - `fields`: `anio, codigo_comuna, nombre_comuna, ingresos_totales, gastos_totales, ingresos_propios_permanentes, fondo_comun_municipal, gasto_personal, gasto_inversion`
@@ -106,7 +106,7 @@
 
 ## indicadores
 
-- `refreshed_at_utc`: `2026-06-29T11:39:52.973902+00:00`
+- `refreshed_at_utc`: `2026-06-30T11:02:27.531655+00:00`
 - `freshness`: `fresh (0.07h / 72h)`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
 - `fields`: `fecha, codigo_indicador, valor`
@@ -116,7 +116,7 @@
 
 ## indicadores_urbanos_siedu
 
-- `refreshed_at_utc`: `2026-06-29T11:40:13.479538+00:00`
+- `refreshed_at_utc`: `2026-06-30T11:02:47.108165+00:00`
 - `freshness`: `fresh (0.07h / 8760h)`
 - `coverage`: `Comunas urbanas incluidas por SIEDU, no las 346 comunas del país.`
 - `fields`: `anio, codigo_comuna, codigo_indicador, nombre_indicador, categoria, valor, unidad, fuente_original, cobertura_tipo`
@@ -125,7 +125,7 @@
 
 ## perfil_territorial_comunal
 
-- `refreshed_at_utc`: `2026-06-29T11:44:14.250053+00:00`
+- `refreshed_at_utc`: `2026-06-30T11:06:52.579109+00:00`
 - `freshness`: `fresh (0.0h / 1080h)`
 - `coverage`: `Cobertura completa: 346/346 filas respecto del baseline esperado.`
 - `fields`: `codigo_region, nombre_region, abreviatura, codigo_provincia, nombre_provincia, codigo_comuna, nombre_comuna, nombre_comuna_clean, latitud_cabecera, longitud_cabecera, poblacion_estimada, poblacion_censada, poblacion_hombres, poblacion_mujeres, poblacion_0_14, poblacion_15_29, poblacion_30_44, poblacion_45_64, poblacion_65_mas, viviendas_censadas, hogares_censados, promedio_personas_por_hogar, establecimientos_salud_total, establecimientos_educacionales_total, distrito_electoral, circunscripcion_senatorial, anio_finanzas, ingresos_totales, gastos_totales, ingresos_propios_permanentes, fondo_comun_municipal, gasto_personal, gasto_inversion, anio_resultados_educacionales, matricula_total, asistencia_promedio, tasa_aprobacion, tasa_reprobacion, tasa_retiro, establecimientos_reportados, indicadores_siedu_total, valor_promedio_siedu`
@@ -134,7 +134,7 @@
 
 ## provincias
 
-- `refreshed_at_utc`: `2026-06-29T11:39:48.674181+00:00`
+- `refreshed_at_utc`: `2026-06-30T11:02:23.828733+00:00`
 - `freshness`: `fresh (0.07h / 2160h)`
 - `coverage`: `Cobertura completa: 56/56 filas respecto del baseline esperado.`
 - `fields`: `codigo_region, nombre_region, codigo_provincia, nombre_provincia`
@@ -143,7 +143,7 @@
 
 ## regiones
 
-- `refreshed_at_utc`: `2026-06-29T11:39:48.674181+00:00`
+- `refreshed_at_utc`: `2026-06-30T11:02:23.828733+00:00`
 - `freshness`: `fresh (0.07h / 2160h)`
 - `coverage`: `Cobertura completa: 16/16 filas respecto del baseline esperado.`
 - `fields`: `codigo_region, nombre_region`
@@ -152,7 +152,7 @@
 
 ## resultados_educacionales
 
-- `refreshed_at_utc`: `2026-06-29T11:40:09.671873+00:00`
+- `refreshed_at_utc`: `2026-06-30T11:02:43.961072+00:00`
 - `freshness`: `fresh (0.07h / 8760h)`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
 - `fields`: `anio, codigo_comuna, matricula_total, asistencia_promedio, tasa_aprobacion, tasa_reprobacion, tasa_retiro, establecimientos_reportados`

@@ -1,6 +1,6 @@
 # chile-hub overview
 
-- `generated_at_utc`: `2026-06-29T11:44:14.252520+00:00`
+- `generated_at_utc`: `2026-06-30T11:06:52.581611+00:00`
 - `overall_status`: `warn`
 - `dataset_count`: `15`
 - `live_count`: `13`
@@ -10,7 +10,7 @@
 - `degraded_count`: `0`
 - `partial_coverage_count`: `1`
 - `warning_count`: `6`
-- `shared_artifact_count`: `23`
+- `shared_artifact_count`: `24`
 - `package_count`: `1`
 - `top_issue`: `empresas` (freshness=fresh, drift=drifted, warnings=3)
 - `top_issue_reason`: found 1 RUTs with invalid format
@@ -39,7 +39,7 @@
 
 - `path`: `data/normalized/chile-hub-publishable-bundle.zip`
 - `package_type`: `zip`
-- `size_bytes`: `29225330`
+- `size_bytes`: `29229109`
 - `checksum`: `sha256` via `data/normalized/chile-hub-publishable-bundle.zip.sha256`
 - `verification_command`: `shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256`
 

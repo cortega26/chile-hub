@@ -2,9 +2,9 @@
   "name": "chile-hub",
   "title": "chile-hub -- Datos publicos de Chile curados",
   "description": "Capa de datos reproducible y curada sobre datasets publicos oficiales de Chile: geografia, demografia, salud, educacion, finanzas municipales e indicadores.",
-  "version": "1.15.1",
+  "version": "1.17.1",
   "homepage": "https://tooltician.com/chile-hub/",
-  "created": "2026-06-29T20:57:58.226743+00:00",
+  "created": "2026-06-30T11:06:52.586930+00:00",
   "resources": [
     {
       "name": "regiones",
@@ -546,7 +546,7 @@
       "sources": [
         {
           "title": "Ministerio de Salud - Establecimientos de Salud",
-          "path": "https://datos.gob.cl/dataset/3bf4cf7c-f638-4735-9a01-f65faae4beca/resource/2c44d782-3365-44e3-aefb-2c8b8363a1bc/download/establecimientos_20260616.csv"
+          "path": "https://datos.gob.cl/dataset/3bf4cf7c-f638-4735-9a01-f65faae4beca/resource/2c44d782-3365-44e3-aefb-2c8b8363a1bc/download/establecimientos_20260623.csv"
         }
       ],
       "licenses": [
