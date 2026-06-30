@@ -328,12 +328,15 @@
     "documentation": "docs/datasets/establecimientos_educacionales.md"
   },
   "finanzas_municipales": {
-    "description": "Indicadores financieros municipales anuales desde SINIM/SUBDERE.",
+    "description": "Indicadores financieros municipales anuales desde SINIM/SUBDERE. CAPA PARCIAL/CANDIDATO: 3 de 346 comunas (0.9%). Usar con precaución; no representa cobertura nacional.",
     "join_keys": [
       "anio",
       "codigo_comuna"
     ],
     "confidence_tier": "Tier B",
+    "coverage_note": "parcial_candidato_3_de_346_comunas",
+    "coverage_pct": 0.9,
+    "expected_record_count": 346,
     "reuse_policy": {
       "status": "public-api-review-terms",
       "license": "Datos públicos municipales; términos de reutilización sujetos a revisión",

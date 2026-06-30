@@ -90,6 +90,7 @@ from src.builders.reports import (  # noqa: E402
     build_provenance_report,
     build_redistribution_report,
     build_source_readiness,
+    sync_readme_layers_table,
     write_dataset_changelog_json,
     write_dataset_quality_json,
     write_dataset_status_json,
@@ -681,6 +682,7 @@ def main():
         validations_with_freshness,
     )
     _generate_reports(pipeline_metadata, previous_pipeline_metadata, metadata_output)
+    sync_readme_layers_table()
     log.info("build_complete")
 
 

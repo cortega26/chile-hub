@@ -7,6 +7,7 @@ calidad de datasets) y las escriben a `data/normalized/` de forma atómica.
 
 import json
 import os
+import re
 from datetime import datetime
 
 from src.builders._shared import (
@@ -722,3 +723,232 @@ def write_dataset_quality_json(quality):
     output_path = os.path.join(NORMALIZED_DIR, "dataset_quality.json")
     write_json_atomic(quality, output_path, ensure_ascii=False, indent=2)
     return output_path, quality
+
+
+# ── Mappings para sync_readme_layers_table ──────────────────────────────
+
+_DISPLAY_NAMES = {
+    "regiones": "Regiones",
+    "provincias": "Provincias",
+    "comunas": "Comunas",
+    "comunas_enriquecidas": "Comunas Enriquecidas",
+    "indicadores": "Indicadores Económicos",
+    "censo_comunal": "Censo Comunal 2024",
+    "censo_hogares_viviendas": "Censo Hogares y Viviendas",
+    "establecimientos_salud": "Establecimientos de Salud",
+    "distritos_electorales": "Distritos Electorales",
+    "establecimientos_educacionales": "Establecimientos Educacionales",
+    "finanzas_municipales": "Finanzas Municipales",
+    "resultados_educacionales": "Resultados Educacionales",
+    "indicadores_urbanos_siedu": "Indicadores Urbanos SIEDU",
+    "perfil_territorial_comunal": "Perfil Territorial Comunal",
+    "empresas": "Empresas (RES)",
+}
+
+_SOURCE_NAMES = {
+    "regiones": "BCN ArcGIS",
+    "provincias": "BCN ArcGIS",
+    "comunas": "BCN ArcGIS",
+    "comunas_enriquecidas": "BCN + INE",
+    "indicadores": "BCCh / mindicador.cl",
+    "censo_comunal": "INE",
+    "censo_hogares_viviendas": "INE",
+    "establecimientos_salud": "MINSAL / datos.gob.cl",
+    "distritos_electorales": "BCN / Ley 20.840",
+    "establecimientos_educacionales": "MINEDUC",
+    "finanzas_municipales": "SINIM / SUBDERE",
+    "resultados_educacionales": "MINEDUC",
+    "indicadores_urbanos_siedu": "INE / SIEDU",
+    "perfil_territorial_comunal": "chile-hub derivado",
+    "empresas": "Min. Economía / datos.gob.cl",
+}
+
+_LICENSE_LABELS = {
+    "regiones": "CC BY",
+    "provincias": "CC BY",
+    "comunas": "CC BY",
+    "comunas_enriquecidas": "CC BY",
+    "indicadores": "Libre c/cita",
+    "censo_comunal": "CC BY 4.0",
+    "censo_hogares_viviendas": "CC BY 4.0",
+    "establecimientos_salud": "CC0",
+    "distritos_electorales": "CC0",
+    "establecimientos_educacionales": "CC BY 3.0 CL",
+    "finanzas_municipales": "Revisión términos",
+    "resultados_educacionales": "CC BY 3.0 CL",
+    "indicadores_urbanos_siedu": "Datos abiertos INE",
+    "perfil_territorial_comunal": "Fuentes abiertas",
+    "empresas": "CC-BY 3.0 CL",
+}
+
+# Dataset cuyos registros varían entre builds (directorios vivos).
+# Se marcan con ~ para indicar que el número es aproximado al momento del build.
+_VARIABLE_COUNT_DATASETS = {
+    "establecimientos_salud",
+    "establecimientos_educacionales",
+    "empresas",
+}
+
+# Datasets con formato especial de registros (no numérico).
+_SPECIAL_RECORD_COUNTS = {
+    "indicadores": "Serie histórica",
+}
+
+
+def _format_record_count(record_count, expected_count, coverage_note):
+    """Formatea el conteo de registros para la tabla del README."""
+    if coverage_note and coverage_note.startswith("parcial"):
+        if record_count is not None and expected_count is not None:
+            return f"{record_count} (parcial, {record_count}/{expected_count})"
+        if record_count is not None:
+            return f"{record_count} (parcial)"
+        return "parcial"
+
+    if record_count is None:
+        return "—"
+
+    if record_count >= 10_000:
+        # Formato con separador de miles y ~ para directorios variables
+        s = f"{record_count:,}".replace(",", " ")
+        return f"~{s}"
+    return str(record_count)
+
+
+def sync_readme_layers_table():
+    """Regenera la tabla de capas del README desde los reportes máquina.
+
+    Lee ``hub_health.json`` (modo, cobertura) y ``dataset_status.json``
+    (conteo de registros) y escribe el bloque delimitado por
+    ``<!-- START_DATASET_TABLE -->`` / ``<!-- END_DATASET_TABLE -->``
+    en ``README.md``.
+
+    Si los reportes no existen (p. ej. build no ejecutado), no modifica nada.
+    """
+    health_path = os.path.join(NORMALIZED_DIR, "hub_health.json")
+    status_path = os.path.join(NORMALIZED_DIR, "dataset_status.json")
+
+    if not os.path.exists(health_path) or not os.path.exists(status_path):
+        print("README sync: omitido (reportes no encontrados)")
+        return
+
+    with open(health_path, "r", encoding="utf-8") as f:
+        health = json.load(f)
+    with open(status_path, "r", encoding="utf-8") as f:
+        status = json.load(f)
+
+    health_by_ds = {e["dataset"]: e for e in health.get("datasets", [])}
+    status_by_ds = {e["dataset"]: e for e in status.get("datasets", [])}
+
+    rows = []
+    for i, ds_name in enumerate(DATASET_CATALOG_CONFIG.keys(), 1):
+        h = health_by_ds.get(ds_name, {})
+        s = status_by_ds.get(ds_name, {})
+        cfg = DATASET_CATALOG_CONFIG.get(ds_name, {})
+
+        display_name = _DISPLAY_NAMES.get(ds_name, ds_name)
+        source_name = _SOURCE_NAMES.get(ds_name, "—")
+        license_label = _LICENSE_LABELS.get(ds_name, "—")
+
+        source_mode = h.get("source_mode", "unknown")
+        coverage_note = cfg.get("coverage_note", "")
+        coverage_status = h.get("coverage_status", "unknown")
+
+        # Indicador de modo
+        if coverage_note.startswith("parcial"):
+            mode_emoji = "🔶 parcial"
+        elif source_mode == "live":
+            mode_emoji = "🟢 live"
+        elif source_mode == "fallback":
+            mode_emoji = "🟡 fallback"
+        else:
+            mode_emoji = f"⚪ {source_mode}"
+
+        # Conteo de registros
+        if ds_name in _SPECIAL_RECORD_COUNTS:
+            registros = _SPECIAL_RECORD_COUNTS[ds_name]
+        elif coverage_note.startswith("parcial"):
+            # Capa parcial/candidato: mostrar cobertura real honesta
+            rc = s.get("record_count")
+            ec = cfg.get("expected_record_count")
+            if rc is not None and ec is not None:
+                rc_fmt = f"{rc:,}".replace(",", " ")
+                registros = f"{rc_fmt} (parcial, {rc}/{ec})"
+            elif rc is not None:
+                rc_fmt = f"{rc:,}".replace(",", " ")
+                registros = f"{rc_fmt} (parcial)"
+            else:
+                registros = "parcial"
+        elif ds_name in _VARIABLE_COUNT_DATASETS:
+            rc = s.get("record_count")
+            registros = _format_record_count(rc, cfg.get("expected_record_count"), coverage_note)
+        elif source_mode == "fallback":
+            # Fallback sin coverage explícita
+            rc = s.get("record_count")
+            if rc is not None and rc > 0:
+                registros = f"{rc:,}".replace(",", " ")
+            else:
+                registros = "fallback curado"
+        elif coverage_status == "partial":
+            rc = s.get("record_count")
+            ec = cfg.get("expected_record_count")
+            if rc is not None and ec is not None:
+                pct = int(round(rc / ec * 100)) if ec > 0 else 0
+                registros = f"{rc:,} (parcial, {pct}%)".replace(",", " ")
+            elif rc is not None:
+                registros = f"{rc:,} (parcial)".replace(",", " ")
+            else:
+                registros = "cobertura parcial"
+        else:
+            rc = s.get("record_count")
+            registros = f"{rc:,}".replace(",", " ") if rc is not None else "—"
+
+        # Advertencia para capas parciales
+        name_display = f"**{display_name}**"
+        if coverage_note.startswith("parcial"):
+            name_display += " ⚠️"
+
+        # Etiqueta de actualización
+        freshness_label = cfg.get("freshness_policy", {}).get("label", "")
+        if freshness_label in ("estable", ""):
+            actualizacion = "—"
+        else:
+            actualizacion = freshness_label.capitalize()
+
+        rows.append(
+            f"| {i} | {name_display} | {registros} | {mode_emoji} | {source_name} | {license_label} | {actualizacion} |"
+        )
+
+    header = (
+        "| # | Capa | Registros | Modo | Fuente | Licencia | Actualización |\n"
+        "|:--:|:---|:---|:--:|:---|:---|:--:|"
+    )
+    table_lines = [header] + rows
+
+    legend = (
+        "> **🟢 live**: datos extraídos directamente desde la fuente oficial"
+        " en cada ejecución del pipeline.\n"
+        "> **🟡 fallback**: datos servidos desde un respaldo curado mientras"
+        " se completa la extracción en vivo.\n"
+        "> **🔶 parcial**: cobertura inferior al 50% del universo esperado."
+        " Capa candidata, no completa.\n"
+        "> Para auditar el estado exacto de cada capa:"
+        " `chile-hub provenance` y `chile-hub health`."
+    )
+
+    table_block = "\n".join(table_lines) + "\n\n" + legend
+
+    readme_path = os.path.join(ROOT_DIR, "README.md")
+    with open(readme_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    pattern = r"<!-- START_DATASET_TABLE -->.*?<!-- END_DATASET_TABLE -->"
+    replacement = f"<!-- START_DATASET_TABLE -->\n\n{table_block}\n\n<!-- END_DATASET_TABLE -->"
+
+    new_content = re.sub(pattern, replacement, content, flags=re.DOTALL)
+
+    if new_content != content:
+        with open(readme_path, "w", encoding="utf-8") as f:
+            f.write(new_content)
+        print("README sync: tabla de capas regenerada desde hub_health.json + dataset_status.json")
+    else:
+        print("README sync: tabla de capas sin cambios")

@@ -140,6 +140,8 @@ Pipeline determinista en GitHub Actions: extracción → build → verificación
 
 ## Las 15 capas de datos
 
+<!-- START_DATASET_TABLE -->
+
 | # | Capa | Registros | Modo | Fuente | Licencia | Actualización |
 |:--:|:---|:---|:--:|:---|:---|:--:|
 | 1 | **Regiones** | 16 | 🟢 live | BCN ArcGIS | CC BY | — |
@@ -149,20 +151,21 @@ Pipeline determinista en GitHub Actions: extracción → build → verificación
 | 5 | **Indicadores Económicos** | Serie histórica | 🟢 live | BCCh / mindicador.cl | Libre c/cita | Diaria |
 | 6 | **Censo Comunal 2024** | 346 | 🟢 live | INE | CC BY 4.0 | Decenal |
 | 7 | **Censo Hogares y Viviendas** | 346 | 🟢 live | INE | CC BY 4.0 | Decenal |
-| 8 | **Establecimientos de Salud** | ~5 600 | 🟢 live | MINSAL / datos.gob.cl | CC0 | Mensual |
+| 8 | **Establecimientos de Salud** | 5707 | 🟢 live | MINSAL / datos.gob.cl | CC0 | Mensual |
 | 9 | **Distritos Electorales** | 346 | 🟢 live | BCN / Ley 20.840 | CC0 | — |
-| 10 | **Establecimientos Educacionales** | ~12 900 | 🟢 live | MINEDUC | CC BY 3.0 CL | Anual |
-| 11 | **Finanzas Municipales** | fallback curado | 🟡 fallback | SINIM / SUBDERE | Revisión términos | Anual |
-| 12 | **Resultados Educacionales** | fallback curado | 🟡 fallback | MINEDUC | CC BY 3.0 CL | Anual |
-| 13 | **Indicadores Urbanos SIEDU** | cobertura parcial | 🟡 fallback | INE / SIEDU | Datos abiertos INE | Anual |
+| 10 | **Establecimientos Educacionales** | ~12 898 | 🟢 live | MINEDUC | CC BY 3.0 CL | Anual |
+| 11 | **Finanzas Municipales** ⚠️ | 3 (parcial, 3/346) | 🔶 parcial | SINIM / SUBDERE | Revisión términos | Anual |
+| 12 | **Resultados Educacionales** | 345 | 🟢 live | MINEDUC | CC BY 3.0 CL | Anual |
+| 13 | **Indicadores Urbanos SIEDU** | 6 701 (parcial) | 🟢 live | INE / SIEDU | Datos abiertos INE | Anual |
 | 14 | **Perfil Territorial Comunal** | 346 | 🟡 fallback | chile-hub derivado | Fuentes abiertas | Derivada |
-| 15 | **Empresas (RES)** | ~1 570 000 | 🟢 live | Min. Economía / datos.gob.cl | CC-BY 3.0 CL | Mensual |
+| 15 | **Empresas (RES)** | ~1 572 116 | 🟢 live | Min. Economía / datos.gob.cl | CC-BY 3.0 CL | Mensual |
 
 > **🟢 live**: datos extraídos directamente desde la fuente oficial en cada ejecución del pipeline.
 > **🟡 fallback**: datos servidos desde un respaldo curado mientras se completa la extracción en vivo.
+> **🔶 parcial**: cobertura inferior al 50% del universo esperado. Capa candidata, no completa.
 > Para auditar el estado exacto de cada capa: `chile-hub provenance` y `chile-hub health`.
 
-> **Todas las capas se vinculan por `codigo_comuna`**, el Código Único Territorial de 5 caracteres definido por SUBDERE.
+<!-- END_DATASET_TABLE -->
 
 <details>
 <summary><b>Ver schema completo de cada capa</b></summary>
@@ -268,7 +271,7 @@ Pipeline determinista en GitHub Actions: extracción → build → verificación
 | `latitud` / `longitud` | `DOUBLE` | Coordenadas geográficas |
 | `estado_funcionamiento` | `VARCHAR` | `"Vigente"` |
 
-**11. finanzas_municipales** — Indicadores financieros municipales anuales
+**11. finanzas_municipales** — Indicadores financieros municipales anuales (⚠️ parcial: 3/346 comunas)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
 | `anio` | `INTEGER` | `2024` |
