@@ -19,7 +19,6 @@ permissions:
   contents: read
 
 env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
   PYTHON_VERSION: "3.13"
   PIPELINE_ARTIFACT: pipeline-output-${{ github.run_id }}
 
