@@ -12,6 +12,45 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.18.1 - 2026-07-01
+
+### Corregido
+
+- **ci**: Remove obsolete Node 24 forcing flag
+  ([#19](https://github.com/cortega26/chile-hub/pull/19),
+  [`4ae8957`](https://github.com/cortega26/chile-hub/commit/4ae8957f85ffbb8bddffabe065cdb20f967b3ff7))
+
+### Mantenimiento
+
+- Elimina plan 014 de plans/ (ya archivado)
+  ([`2c39890`](https://github.com/cortega26/chile-hub/commit/2c39890d60648499c986f45a0173f6fc7952e56f))
+
+### Documentación
+
+- Actualiza docstring de source_adapter — estándar recomendado
+  ([`ef118bc`](https://github.com/cortega26/chile-hub/commit/ef118bc6eb691cbf5d6f230f82db2105d72ac044))
+
+- Actualiza README para 17 capas — badges, métricas, schemas y extractores
+  ([`77e58ea`](https://github.com/cortega26/chile-hub/commit/77e58eaa2a3ccf4074be3d2b32de68d73c275bf0))
+
+- Archiva Plan 014 como DONE
+  ([`f51ac1d`](https://github.com/cortega26/chile-hub/commit/f51ac1d6137d608aa68fe7deec6c8021b13ebd23))
+
+- Documenta BaseExtractor.run() como entry point programático
+  ([`c7f3392`](https://github.com/cortega26/chile-hub/commit/c7f3392b4fb4a8cd3a64ad13e36e2a28d0d4326c))
+
+- Tabla README — delincuencia_comunal como «próximamente» + leyenda
+  ([`0aea153`](https://github.com/cortega26/chile-hub/commit/0aea153524b40d0bf9063c1a11ec6f72c96a1c7f))
+
+### Refactorizado
+
+- Remueve bloques try/except ModuleNotFoundError de subdere_extractor
+  ([`97dec70`](https://github.com/cortega26/chile-hub/commit/97dec7098bf945e6e6986cd09deacc6dfe4371bf))
+
+- Simplifica entrada comunas_enriquecidas en metadata.py como alias
+  ([`c48ff0e`](https://github.com/cortega26/chile-hub/commit/c48ff0e91f321155b2069e2cc78c1086efe56e65))
+
+
 ## 1.18.0 - 2026-06-30
 
 ### Corregido
