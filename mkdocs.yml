@@ -1,0 +1,45 @@
+site_name: chile-hub
+site_description: Datos públicos de Chile curados, normalizados y validados.
+site_url: https://tooltician.com/chile-hub/reference/
+repo_url: https://github.com/cortega26/chile-hub
+docs_dir: docs
+site_dir: reference
+
+theme:
+  name: material
+  language: es
+  features:
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+  palette:
+    - scheme: default
+      primary: cyan
+      toggle:
+        icon: material/weather-night
+        name: Modo oscuro
+    - scheme: slate
+      primary: cyan
+      toggle:
+        icon: material/weather-sunny
+        name: Modo claro
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          options:
+            docstring_style: google
+            show_source: true
+            show_root_heading: true
+            members_order: source
+
+nav:
+  - Inicio: index.md
+  - Instalación: installation.md
+  - Referencia de API: reference.md
+  - Criterios de inclusión: dataset-inclusion-criteria.md
+  - Compatibilidad de datasets: dataset-compatibility-policy.md
+  - Política de versionado: versioning-policy.md

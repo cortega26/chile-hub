@@ -76,6 +76,8 @@ dev = [
     "bandit==1.9.4",
     "structlog==26.1.0",
     "frictionless>=5.18,<6",
+    "mkdocs-material==9.7.6",
+    "mkdocstrings[python]==1.0.4",
 ]
 
 [project.scripts]
