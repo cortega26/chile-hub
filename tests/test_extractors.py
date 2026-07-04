@@ -23,6 +23,7 @@ from src.extractors import (
     electoral_extractor,
     mineduc_establecimientos_extractor,
     mineduc_resultados_extractor,
+    partidos_politicos_extractor,
     res_extractor,
     salud_extractor,
     siedu_extractor,
@@ -1467,6 +1468,56 @@ class ConsumoElectricoExtractorTests(unittest.TestCase):
         required = {"codigo_region", "codigo_comuna", "tipo_cliente", "consumo_kwh"}
         self.assertTrue(required.issubset(set(df.columns)))
         self.assertEqual(df.height, 0)
+
+
+class PartidosPoliticosExtractorTests(unittest.TestCase):
+    """Tests del extractor de partidos políticos (Plan 023 · Ola B)."""
+
+    XML = (
+        '<?xml version="1.0" encoding="utf-8"?>'
+        "<PartidosPoliticosColeccion "
+        'xmlns="http://opendata.camara.cl/camaradiputados/v1">'
+        "<PartidoPolitico><Id>FA</Id><Nombre>Frente Amplio</Nombre>"
+        "<Alias>FA</Alias></PartidoPolitico>"
+        "<PartidoPolitico><Id>DC</Id><Nombre>Partido Demócrata Cristiano</Nombre>"
+        "<Alias>DC</Alias></PartidoPolitico>"
+        "<PartidoPolitico><Id>FA</Id><Nombre>Frente Amplio</Nombre>"
+        "<Alias>FA</Alias></PartidoPolitico>"  # duplicado: debe deduplicarse
+        "<PartidoPolitico><Id></Id><Nombre>Sin id</Nombre></PartidoPolitico>"  # se descarta
+        "</PartidosPoliticosColeccion>"
+    ).encode("utf-8")
+
+    def test_parse_partidos_maps_schema_and_dedupes(self):
+        df = partidos_politicos_extractor.parse_partidos(self.XML)
+        self.assertEqual(df.height, 2)  # deduplicado + descarta el sin id
+        self.assertEqual(
+            df.columns,
+            [
+                "id_partido",
+                "nombre",
+                "sigla",
+                "estado_legal",
+                "fecha_constitucion",
+                "ambito",
+                "fuente",
+                "url_fuente",
+                "fecha_consulta",
+            ],
+        )
+        self.assertEqual(sorted(df["id_partido"].to_list()), ["DC", "FA"])
+        # Campos no provistos por la fuente quedan nulos en v1.
+        self.assertTrue(df["estado_legal"].is_null().all())
+
+    def test_no_personal_data_columns(self):
+        df = partidos_politicos_extractor.parse_partidos(self.XML)
+        personales = {"rut", "run", "domicilio", "rutdv"}
+        self.assertFalse(personales & {c.lower() for c in df.columns})
+
+    def test_validate_flags_low_count(self):
+        df = partidos_politicos_extractor.parse_partidos(self.XML)
+        result = partidos_politicos_extractor.PartidosPoliticosExtractor().validate(df, {})
+        self.assertEqual(result["status"], "error")  # 2 < MIN_EXPECTED_PARTIES
+        self.assertEqual(result["record_count"], 2)
 
 
 if __name__ == "__main__":
