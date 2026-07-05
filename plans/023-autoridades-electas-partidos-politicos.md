@@ -64,8 +64,20 @@
     RUT (Cámara) y email/teléfono (Senado) descartados. **518 tests verdes.**
   - Scrapling aislado en el extra `scraping` (conflicto de `click` con semantic-release),
     declarado conflictivo con `dev` en `[tool.uv]`.
-  - ⏳ **Pendientes:** `gobernador_regional` (16) y `alcalde` (345, decisión de licencia
-    Wikipedia CC-BY-SA); poblar `codigo_region`/`periodo` de senadores.
+  - ⏳ Poblar `codigo_region`/`periodo` de senadores (follow-up).
+
+- 🔶 **`autoridades_locales` (dataset separado CC-BY-SA) — v1 con gobernadores (2026-07-05).**
+  Decisión del operador: los cargos de Wikipedia (CC-BY-SA) van en un dataset **aislado**
+  para no propagar share-alike a los cargos oficiales CC-BY de `autoridades_electas`.
+  - **Gobernadores regionales (16)** desde la tabla de Wikipedia "Gobernador regional de
+    Chile" vía Scrapling; parseo por título de enlace (maneja género, `de`/`del`,
+    "regional Metropolitano"); `codigo_region` (01–16) mapeado. Partido + coalición.
+  - Extractor `autoridades_locales_extractor.py`, contrato (16), 3 tests, ficha, entrada
+    de registry (`candidate`, `license_status: share-alike`), mapas en reports.py, y nota
+    de segregación en `DATA_LICENSES.md`. **521 tests verdes.**
+  - ⏳ **Pendiente:** `alcalde` (345) — sin fuente de tabla única redistribuible (Wikidata
+    inconsistente; el anexo de Wikipedia son ~345 subpáginas). Follow-up (agregación
+    multi-página o curación).
 
 ## Why this matters
 

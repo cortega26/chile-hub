@@ -18,6 +18,7 @@ from requests import HTTPError
 
 from src.extractors import (
     autoridades_electas_extractor,
+    autoridades_locales_extractor,
     bcentral_extractor,
     censo_extractor,
     censo_hogares_viviendas_extractor,
@@ -1586,6 +1587,35 @@ class AutoridadesElectasExtractorTests(unittest.TestCase):
         self.assertEqual(sen["institucion"], "Senado")
         # el email no debe filtrarse como columna
         self.assertNotIn("email", {c.lower() for c in df.columns})
+
+
+class AutoridadesLocalesExtractorTests(unittest.TestCase):
+    """Tests del extractor de autoridades locales (Plan 023 · Ola A, gobernadores)."""
+
+    def test_region_from_title_variantes(self):
+        f = autoridades_locales_extractor._region_from_title
+        self.assertEqual(f("Gobernador regional de Arica y Parinacota"), "Arica y Parinacota")
+        self.assertEqual(f("Gobernadora regional de Atacama"), "Atacama")  # femenino
+        self.assertEqual(f("Gobernador regional del Maule"), "Maule")  # "del"
+        self.assertEqual(f("Gobernador regional Metropolitano de Santiago"), "Santiago")
+        self.assertIsNone(f("Renovación Nacional"))  # no es región
+
+    def test_normalize_mapea_codigo_region(self):
+        gobs = [
+            {"region": "Maule", "nombre": "Pedro X", "partido": "UDI", "pacto": "Chile Vamos"},
+            {"region": "Santiago", "nombre": "Claudio Y", "partido": "Ind.", "pacto": ""},
+        ]
+        df = autoridades_locales_extractor.build_autoridades_locales_df(gobs)
+        self.assertEqual(df.height, 2)
+        maule = df.filter(pl.col("nombre") == "Pedro X").row(0, named=True)
+        self.assertEqual(maule["codigo_region"], "07")
+        self.assertEqual(maule["cargo"], "gobernador_regional")
+        self.assertEqual(maule["id_autoridad"], "gobernador_07")
+        stgo = df.filter(pl.col("nombre") == "Claudio Y").row(0, named=True)
+        self.assertEqual(stgo["codigo_region"], "13")
+
+    def test_licencia_cc_by_sa(self):
+        self.assertEqual(autoridades_locales_extractor.REUSE_POLICY["license"], "CC-BY-SA")
 
 
 if __name__ == "__main__":

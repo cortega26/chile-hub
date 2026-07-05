@@ -750,6 +750,7 @@ _DISPLAY_NAMES = {
     "delincuencia_comunal": "Delincuencia Comunal",
     "partidos_politicos": "Partidos Políticos",
     "autoridades_electas": "Autoridades Electas",
+    "autoridades_locales": "Autoridades Locales",
 }
 
 _SOURCE_NAMES = {
@@ -773,6 +774,7 @@ _SOURCE_NAMES = {
     "delincuencia_comunal": "CEAD / SPD",
     "partidos_politicos": "Cámara de Diputados",
     "autoridades_electas": "Cámara de Diputados + Senado",
+    "autoridades_locales": "Wikipedia",
 }
 
 _LICENSE_LABELS = {
@@ -796,6 +798,7 @@ _LICENSE_LABELS = {
     "delincuencia_comunal": "Revisión términos",
     "partidos_politicos": "CC BY",
     "autoridades_electas": "CC BY",
+    "autoridades_locales": "CC BY-SA",
 }
 
 # Dataset cuyos registros varían entre builds (directorios vivos).
@@ -805,6 +808,7 @@ _VARIABLE_COUNT_DATASETS = {
     "establecimientos_educacionales",
     "empresas",
     "autoridades_electas",
+    "autoridades_locales",
     "partidos_politicos",
 }
 
