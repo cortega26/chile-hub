@@ -80,6 +80,21 @@ dev = [
     "mkdocstrings[python]==1.0.4",
 ]
 
+# Extractores que necesitan fetch stealth/anti-403 (p. ej. distrito de diputados en
+# camara.cl para autoridades_electas). Se aísla en su propio extra porque scrapling
+# exige click>=8.3, incompatible con el click<8.2 de python-semantic-release (dev).
+# El extractor importa scrapling de forma perezosa y degrada si no está instalado.
+scraping = [
+    "scrapling[fetchers]>=0.4.10",
+]
+
+[tool.uv]
+# dev y scraping no pueden coexistir (conflicto de click via semantic-release vs
+# scrapling); uv los resuelve en forks separados del lockfile.
+conflicts = [
+    [{ extra = "dev" }, { extra = "scraping" }],
+]
+
 [project.scripts]
 chile-hub = "chile_hub.cli:main"
 

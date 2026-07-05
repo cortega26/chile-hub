@@ -17,6 +17,7 @@ import openpyxl
 from requests import HTTPError
 
 from src.extractors import (
+    autoridades_electas_extractor,
     bcentral_extractor,
     censo_extractor,
     censo_hogares_viviendas_extractor,
@@ -1518,6 +1519,52 @@ class PartidosPoliticosExtractorTests(unittest.TestCase):
         result = partidos_politicos_extractor.PartidosPoliticosExtractor().validate(df, {})
         self.assertEqual(result["status"], "error")  # 2 < MIN_EXPECTED_PARTIES
         self.assertEqual(result["record_count"], 2)
+
+
+class AutoridadesElectasExtractorTests(unittest.TestCase):
+    """Tests del extractor de autoridades electas (Plan 023 · Ola A, cargo diputados)."""
+
+    XML = (
+        '<?xml version="1.0" encoding="utf-8"?>'
+        '<DiputadosPeriodoColeccion xmlns="http://opendata.camara.cl/camaradiputados/v1">'
+        "<DiputadoPeriodo><Diputado><Id>1009</Id><Nombre>Jorge</Nombre>"
+        "<ApellidoPaterno>Alessandri</ApellidoPaterno><ApellidoMaterno>Vergara</ApellidoMaterno>"
+        "<RUT>1</RUT><Sexo>Masculino</Sexo>"
+        "<Militancias><Militancia><FechaInicio>2018-03-11T00:00:00</FechaInicio>"
+        "<FechaTermino>2022-03-10T23:59:59</FechaTermino>"
+        "<Partido><Id>UDI</Id><Nombre>Unión Demócrata Independiente</Nombre></Partido></Militancia>"
+        "<Militancia><FechaInicio>2022-03-11T00:00:00</FechaInicio><FechaTermino></FechaTermino>"
+        "<Partido><Id>UDI</Id><Nombre>Unión Demócrata Independiente</Nombre></Partido></Militancia>"
+        "</Militancias></Diputado></DiputadoPeriodo>"
+        "<DiputadoPeriodo><Diputado><Id>1015</Id><Nombre>Jorge</Nombre>"
+        "<ApellidoPaterno>Brito</ApellidoPaterno><ApellidoMaterno>Hasbún</ApellidoMaterno>"
+        "<Militancias><Militancia><FechaInicio>2022-03-11T00:00:00</FechaInicio>"
+        "<FechaTermino></FechaTermino>"
+        "<Partido><Id>FA</Id><Nombre>Frente Amplio</Nombre></Partido></Militancia></Militancias>"
+        "</Diputado></DiputadoPeriodo>"
+        "</DiputadosPeriodoColeccion>"
+    ).encode("utf-8")
+
+    DISTRITOS = {"1009": "10", "1015": "7"}
+
+    def test_build_maps_schema_partido_y_distrito(self):
+        df = autoridades_electas_extractor.build_autoridades_df(self.XML, self.DISTRITOS)
+        self.assertEqual(df.height, 2)
+        self.assertEqual(df["cargo"].unique().to_list(), ["diputado"])
+        row = df.filter(pl.col("id_autoridad") == "diputado_1009").row(0, named=True)
+        self.assertEqual(row["nombre"], "Jorge Alessandri Vergara")
+        self.assertEqual(row["partido"], "Unión Demócrata Independiente")  # militancia vigente
+        self.assertEqual(row["distrito_electoral"], "10")  # unido por id
+        self.assertEqual(row["estado_mandato"], "vigente")
+
+    def test_distrito_nulo_si_no_hay_mapa(self):
+        df = autoridades_electas_extractor.build_autoridades_df(self.XML, {})
+        self.assertTrue(df["distrito_electoral"].is_null().all())
+
+    def test_sin_columnas_personales(self):
+        df = autoridades_electas_extractor.build_autoridades_df(self.XML, self.DISTRITOS)
+        personales = {"rut", "rutdv", "run", "fecha_nacimiento", "domicilio", "sexo"}
+        self.assertFalse(personales & {c.lower() for c in df.columns})
 
 
 if __name__ == "__main__":

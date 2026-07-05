@@ -1,0 +1,33 @@
+{
+  "dataset": "autoridades_electas",
+  "primary_key": ["id_autoridad"],
+  "required_columns": [
+    "id_autoridad",
+    "nombre",
+    "cargo",
+    "institucion",
+    "fuente",
+    "url_fuente",
+    "fecha_consulta"
+  ],
+  "column_types": {
+    "id_autoridad": "string",
+    "nombre": "string",
+    "cargo": "string",
+    "distrito_electoral": "string"
+  },
+  "nullable_columns": [
+    "partido",
+    "pacto",
+    "distrito_electoral",
+    "circunscripcion_senatorial",
+    "codigo_comuna",
+    "codigo_region",
+    "periodo_inicio",
+    "periodo_fin",
+    "estado_mandato"
+  ],
+  "expected_record_count": 155,
+  "coverage_policy": "roster",
+  "publish_outputs": ["parquet", "json"]
+}
