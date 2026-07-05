@@ -413,5 +413,26 @@
     "publication_track": "candidate",
     "public_bundle_eligible": false,
     "cadencia": "bajo_demanda"
+  },
+  {
+    "source_id": "camara_senado_autoridades_electas",
+    "dataset": "autoridades_electas",
+    "source_name": "Cámara de Diputadas y Diputados + Senado de Chile",
+    "official_url": "https://www.camara.cl/diputados/diputados.aspx",
+    "access_method": "api_scraping",
+    "license_status": "open-attribution",
+    "live_extractor_status": "implemented",
+    "fallback_policy": "fallback_to_last_snapshot",
+    "maturity_status": "candidate",
+    "live_ready": false,
+    "fallback_allowed": true,
+    "publish_blocking": true,
+    "review_by": "2026-10-05",
+    "stalled_after_days": 90,
+    "owner": "core",
+    "next_action": "Añadir cargos gobernador_regional (16) y alcalde (345); poblar codigo_region/periodo; promover a stable tras completar cargos y ventana de estabilidad.",
+    "publication_track": "candidate",
+    "public_bundle_eligible": false,
+    "cadencia": "bajo_demanda"
   }
 ]

@@ -749,6 +749,7 @@ _DISPLAY_NAMES = {
     "consumo_electrico_comunal": "Consumo Eléctrico Comunal",
     "delincuencia_comunal": "Delincuencia Comunal",
     "partidos_politicos": "Partidos Políticos",
+    "autoridades_electas": "Autoridades Electas",
 }
 
 _SOURCE_NAMES = {
@@ -771,6 +772,7 @@ _SOURCE_NAMES = {
     "consumo_electrico_comunal": "CNE / Energía Abierta",
     "delincuencia_comunal": "CEAD / SPD",
     "partidos_politicos": "Cámara de Diputados",
+    "autoridades_electas": "Cámara de Diputados + Senado",
 }
 
 _LICENSE_LABELS = {
@@ -793,6 +795,7 @@ _LICENSE_LABELS = {
     "consumo_electrico_comunal": "CC BY",
     "delincuencia_comunal": "Revisión términos",
     "partidos_politicos": "CC BY",
+    "autoridades_electas": "CC BY",
 }
 
 # Dataset cuyos registros varían entre builds (directorios vivos).
@@ -801,6 +804,8 @@ _VARIABLE_COUNT_DATASETS = {
     "establecimientos_salud",
     "establecimientos_educacionales",
     "empresas",
+    "autoridades_electas",
+    "partidos_politicos",
 }
 
 # Datasets con formato especial de registros (no numérico).

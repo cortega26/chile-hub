@@ -52,10 +52,20 @@
     `estado_legal`/`fecha_constitucion`/`ambito` → nullable en v1; completar con SERVEL.
     Promover a `stable_publishable` tras completar esos campos y una ventana de estabilidad.
 
-- ⏳ **`autoridades_electas` (Ola A) — pendiente.** El núcleo de diputados (roster+partido)
-  es limpio, pero el **distrito no está en el API** (confirmado; ver hallazgos) → requiere
-  scrape del perfil HTML. Senadores (Playwright), gobernadores (curado) y alcaldes
-  (Wikipedia CC-BY-SA multi-página) siguen pendientes. Es el grueso restante del plan.
+- 🔶 **`autoridades_electas` (Ola A) — v1 con 2 de 4 cargos, cableado candidate (2026-07-05).**
+  **Desbloqueado con Scrapling** (indicación del operador), que resuelve los 403/SPA que
+  antes frenaban:
+  - **Diputados (155):** roster+partido desde el WS de la Cámara; **distrito (155/155, 28
+    distritos)** desde `camara.cl` vía Scrapling (bypassa 403; join por `prmID`==Id del WS).
+  - **Senadores (50):** desde `senado.cl` (Next.js `__NEXT_DATA__`) vía Scrapling —
+    partido + circunscripción.
+  - Extractor `autoridades_electas_extractor.py` (import perezoso de Scrapling + degradación),
+    contrato (205), 4 tests, ficha, entrada de registry (`candidate`) y mapas en reports.py.
+    RUT (Cámara) y email/teléfono (Senado) descartados. **518 tests verdes.**
+  - Scrapling aislado en el extra `scraping` (conflicto de `click` con semantic-release),
+    declarado conflictivo con `dev` en `[tool.uv]`.
+  - ⏳ **Pendientes:** `gobernador_regional` (16) y `alcalde` (345, decisión de licencia
+    Wikipedia CC-BY-SA); poblar `codigo_region`/`periodo` de senadores.
 
 ## Why this matters
 

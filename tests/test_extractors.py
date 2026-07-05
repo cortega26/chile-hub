@@ -1566,6 +1566,27 @@ class AutoridadesElectasExtractorTests(unittest.TestCase):
         personales = {"rut", "rutdv", "run", "fecha_nacimiento", "domicilio", "sexo"}
         self.assertFalse(personales & {c.lower() for c in df.columns})
 
+    def test_incluye_senadores(self):
+        senadores = [
+            {
+                "ID_PARLAMENTARIO": 1110,
+                "NOMBRE_COMPLETO": "Pedro Araya Guerrero",
+                "PARTIDO": "P.P.D.",
+                "CIRCUNSCRIPCION_ID": 3,
+                "REGION": "Región de Antofagasta",
+                "EMAIL": "x@senado.cl",
+            }
+        ]
+        df = autoridades_electas_extractor.build_autoridades_df(self.XML, self.DISTRITOS, senadores)
+        self.assertEqual(df.height, 3)  # 2 diputados + 1 senador
+        sen = df.filter(pl.col("cargo") == "senador").row(0, named=True)
+        self.assertEqual(sen["id_autoridad"], "senador_1110")
+        self.assertEqual(sen["nombre"], "Pedro Araya Guerrero")
+        self.assertEqual(sen["circunscripcion_senatorial"], "3")
+        self.assertEqual(sen["institucion"], "Senado")
+        # el email no debe filtrarse como columna
+        self.assertNotIn("email", {c.lower() for c in df.columns})
+
 
 if __name__ == "__main__":
     import sys

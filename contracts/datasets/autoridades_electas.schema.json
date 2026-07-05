@@ -27,7 +27,7 @@
     "periodo_fin",
     "estado_mandato"
   ],
-  "expected_record_count": 155,
+  "expected_record_count": 205,
   "coverage_policy": "roster",
   "publish_outputs": ["parquet", "json"]
 }

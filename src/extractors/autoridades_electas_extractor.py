@@ -1,29 +1,31 @@
 """Extractor de autoridades electas de Chile (Plan 023 · Ola A).
 
-v1 (carril `candidate`): cargo **diputados** — 155 diputados/as del período
-legislativo vigente, con su partido actual y su **distrito electoral**.
+v1 (carril `candidate`): cargos **diputados** (155) y **senadores** (50) en ejercicio.
 
 Fuentes:
-- Roster + partido: web service de datos abiertos de la Cámara
+- Diputados — roster + partido: web service de la Cámara
   (`WSDiputado.asmx/retornarDiputadosPeriodoActual`).
-- Distrito electoral: listado web de la Cámara (`camara.cl/diputados/diputados.aspx`),
-  que bloquea HTTP simple (403) — se obtiene con **Scrapling** (fetch con headers
-  stealth). Se une al roster por `prmID`, que coincide con el Id del web service.
+- Diputados — distrito: listado web de la Cámara (`camara.cl/diputados/diputados.aspx`),
+  que bloquea HTTP simple (403) → se obtiene con **Scrapling** (headers stealth) y se une
+  por `prmID` (== Id del web service).
+- Senadores — roster + partido + circunscripción + región: `senado.cl` (Next.js), cuyo
+  `__NEXT_DATA__` embebe la lista estructurada; se obtiene con **Scrapling**.
 
-Cargos pendientes (documentados en la ficha y el plan): `senador` (50),
-`gobernador_regional` (16), `alcalde` (345).
+Cargos pendientes (ficha + plan): `gobernador_regional` (16), `alcalde` (345).
 
 Solo datos institucionales públicos de cargos en ejercicio; **sin datos personales**
-(línea roja Ley 19.628, ver `docs/legal/b2-2-electoral-research.md`). El RUT que expone
-el web service se descarta explícitamente.
+(línea roja Ley 19.628, ver `docs/legal/b2-2-electoral-research.md`). El RUT (Cámara) y
+el email/teléfono (Senado) se descartan explícitamente.
 """
 
 import datetime
+import json
 import os
 import re
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
+from typing import Any
 
 import polars as pl
 
@@ -55,6 +57,7 @@ DIPUTADOS_URL = (
     "retornarDiputadosPeriodoActual"
 )
 DIPUTADOS_LISTADO_URL = "https://www.camara.cl/diputados/diputados.aspx"
+SENADORES_URL = "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores"
 CAMARA_NS = {"v": "http://opendata.camara.cl/camaradiputados/v1"}
 
 # Período legislativo vigente de la Cámara (actualizar cada 4 años; ver review_by).
@@ -93,6 +96,7 @@ REUSE_POLICY = {
 }
 
 EXPECTED_DIPUTADOS = 155
+EXPECTED_SENADORES = 50
 _HEADERS = {"User-Agent": "chile-hub/data-pipeline (+https://github.com/cortega26/chile-hub)"}
 
 
@@ -166,6 +170,80 @@ def fetch_distritos_diputados() -> dict[str, str]:
     return mapa
 
 
+def fetch_senadores() -> list[dict[str, Any]]:
+    """Lista de senadores/as en ejercicio desde ``senado.cl`` (Next.js) vía Scrapling.
+
+    El sitio embebe la lista estructurada en ``__NEXT_DATA__``; se extrae la lista de
+    dicts con clave ``NOMBRE_COMPLETO`` (los 50 senadores/as). Si la obtención falla,
+    retorna ``[]`` para no romper el extractor (senadores es un cargo opcional).
+    """
+    try:
+        from scrapling.fetchers import Fetcher
+
+        page = Fetcher.get(SENADORES_URL, stealthy_headers=True)
+        html = page.html_content
+    except Exception as exc:  # noqa: BLE001 — degradación intencional
+        print(f"Advertencia: no se pudo obtener senadores ({exc}). Se omiten.")
+        return []
+    match = re.search(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', html, re.S)
+    if not match:
+        print("Advertencia: senado.cl no expuso __NEXT_DATA__. Se omiten senadores.")
+        return []
+    data = json.loads(match.group(1))
+    best: list[dict[str, Any]] = []
+
+    def _walk(obj: Any) -> None:
+        nonlocal best
+        if isinstance(obj, list) and obj and isinstance(obj[0], dict):
+            if any(isinstance(x, dict) and "NOMBRE_COMPLETO" in x for x in obj) and len(obj) > len(
+                best
+            ):
+                best = obj
+        if isinstance(obj, dict):
+            for value in obj.values():
+                _walk(value)
+        elif isinstance(obj, list):
+            for value in obj:
+                _walk(value)
+
+    _walk(data)
+    return best
+
+
+def _normalize_senadores(
+    senadores: list[dict[str, Any]], fecha_consulta: str
+) -> list[dict[str, str | None]]:
+    rows: list[dict[str, str | None]] = []
+    for s in senadores:
+        sid = str(s.get("ID_PARLAMENTARIO") or s.get("UUID") or "").strip()
+        nombre = (s.get("NOMBRE_COMPLETO") or "").strip()
+        if not sid or not nombre:
+            continue
+        circ = s.get("CIRCUNSCRIPCION_ID")
+        partido = (s.get("PARTIDO") or "").strip()
+        rows.append(
+            {
+                "id_autoridad": f"senador_{sid}",
+                "nombre": nombre,
+                "cargo": "senador",
+                "institucion": "Senado",
+                "partido": partido or None,
+                "pacto": None,
+                "distrito_electoral": None,
+                "circunscripcion_senatorial": str(circ) if circ is not None else None,
+                "codigo_comuna": None,
+                "codigo_region": None,
+                "periodo_inicio": None,
+                "periodo_fin": None,
+                "estado_mandato": "vigente",
+                "fuente": "Senado de Chile",
+                "url_fuente": SENADORES_URL,
+                "fecha_consulta": fecha_consulta,
+            }
+        )
+    return rows
+
+
 def _normalize_diputados(
     xml_bytes: bytes, distritos: dict[str, str], fecha_consulta: str
 ) -> list[dict[str, str | None]]:
@@ -211,12 +289,17 @@ def _normalize_diputados(
     return rows
 
 
-def build_autoridades_df(xml_diputados: bytes, distritos: dict[str, str]) -> pl.DataFrame:
-    """Construye el DataFrame canónico de autoridades electas (v1: solo diputados)."""
+def build_autoridades_df(
+    xml_diputados: bytes,
+    distritos: dict[str, str],
+    senadores: list[dict[str, Any]] | None = None,
+) -> pl.DataFrame:
+    """Construye el DataFrame canónico de autoridades electas (v1: diputados + senadores)."""
     fecha = datetime.datetime.now(UTC).date().isoformat()
     rows = _normalize_diputados(xml_diputados, distritos, fecha)
+    rows += _normalize_senadores(senadores or [], fecha)
     df = pl.DataFrame(rows, schema=SCHEMA)
-    return df.unique(subset=["id_autoridad"], keep="first").sort("id_autoridad")
+    return df.unique(subset=["id_autoridad"], keep="first").sort(["cargo", "id_autoridad"])
 
 
 class AutoridadesElectasExtractor(BaseExtractor):
@@ -230,24 +313,31 @@ class AutoridadesElectasExtractor(BaseExtractor):
         return {
             "diputados_xml": fetch_diputados_xml(),
             "distritos": fetch_distritos_diputados(),
+            "senadores": fetch_senadores(),
         }
 
     def normalize(self, raw_data: dict[str, object]) -> pl.DataFrame:
         xml_bytes = raw_data["diputados_xml"]
         distritos = raw_data["distritos"]
+        senadores = raw_data.get("senadores") or []
         assert isinstance(xml_bytes, bytes)
         assert isinstance(distritos, dict)
-        return build_autoridades_df(xml_bytes, distritos)
+        assert isinstance(senadores, list)
+        return build_autoridades_df(xml_bytes, distritos, senadores)
 
     def validate(self, df: pl.DataFrame, metadata: dict) -> dict:
         errors = []
         n_dip = df.filter(pl.col("cargo") == "diputado").height
         if n_dip != EXPECTED_DIPUTADOS:
             errors.append(f"Diputados esperados {EXPECTED_DIPUTADOS}, obtenidos {n_dip}.")
+        # Senadores es un cargo opcional (Scrapling); si está, debe cuadrar.
+        n_sen = df.filter(pl.col("cargo") == "senador").height
+        if n_sen and n_sen != EXPECTED_SENADORES:
+            errors.append(f"Senadores esperados {EXPECTED_SENADORES}, obtenidos {n_sen}.")
         if df["id_autoridad"].n_unique() != df.height:
             errors.append("id_autoridad no es único.")
         # Línea roja: sin columnas de datos personales.
-        personales = {"rut", "rutdv", "run", "domicilio", "fecha_nacimiento"}
+        personales = {"rut", "rutdv", "run", "domicilio", "fecha_nacimiento", "email", "fono"}
         if personales & {c.lower() for c in df.columns}:
             errors.append("El dataset contiene columnas de datos personales (línea roja).")
         return {"status": "error" if errors else "ok", "errors": errors, "record_count": df.height}
@@ -277,27 +367,31 @@ def process_autoridades_electas() -> str:
     if validation["status"] == "error":
         raise SystemExit(f"Validación fallida: {validation['errors']}")
 
+    n_dip = df.filter(pl.col("cargo") == "diputado").height
+    n_sen = df.filter(pl.col("cargo") == "senador").height
     n_con_distrito = df.filter(pl.col("distrito_electoral").is_not_null()).height
     metadata = {
         "dataset": "autoridades_electas",
-        "source_name": "Cámara de Diputadas y Diputados (datos abiertos + listado web)",
+        "source_name": "Cámara de Diputadas y Diputados + Senado de Chile",
         "source_url": DIPUTADOS_URL,
         "source_mode": "live",
-        "source_detail": "WSDiputado.asmx/retornarDiputadosPeriodoActual + camara.cl (Scrapling)",
+        "source_detail": (
+            "WSDiputado.asmx/retornarDiputadosPeriodoActual + camara.cl + senado.cl (Scrapling)"
+        ),
         "refreshed_at_utc": datetime.datetime.now(UTC).isoformat(),
         "record_count": df.height,
         "fields": df.columns,
         "notes": [
-            "v1: solo cargo diputado (155). Senadores/gobernadores/alcaldes pendientes.",
-            f"distrito_electoral vía Scrapling: {n_con_distrito}/{df.height} diputados.",
-            "RUT del web service descartado (línea roja de datos personales).",
+            f"v1: diputados ({n_dip}) + senadores ({n_sen}). Gobernadores/alcaldes pendientes.",
+            f"distrito_electoral vía Scrapling: {n_con_distrito}/{n_dip} diputados.",
+            "RUT (Cámara) y email/teléfono (Senado) descartados (línea roja de datos personales).",
         ],
         "reuse_policy": REUSE_POLICY,
     }
     extractor.write_staging(df, metadata)
     print(
         f"Autoridades electas guardadas en: {STAGING_CSV_PATH} "
-        f"({df.height} registros, {n_con_distrito} con distrito)"
+        f"({df.height} registros: {n_dip} diputados, {n_sen} senadores)"
     )
     return STAGING_CSV_PATH
 
