@@ -123,7 +123,7 @@ test:
 	$(PYTHON) -m pytest
 
 coverage:
-	$(PYTHON) -m pytest --cov=src/chile_hub --cov-report=term-missing --cov-report=xml
+	$(PYTHON) -m pytest --cov=src --cov-report=term-missing --cov-report=xml
 
 lint:
 	$(PYTHON) -m ruff check src/ tests/ scripts/

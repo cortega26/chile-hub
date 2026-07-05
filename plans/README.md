@@ -97,7 +97,7 @@ Ejecución en curso (elegida 2026-07-04): **021 → 023 → TC-02**.
 
 1. ~~**021** — MkDocs~~ ✅ **DONE (2026-07-04)**. Sitio de docs de API desde docstrings, servido en `/reference/`.
 2. **023** — autoridades_electas + partidos_politicos. Revisado tras Step 0: es M-L / MED (3 de 4 cargos requieren scraping), no el S-M/LOW que asumía la research. Mayor utilidad para la audiencia real.
-3. **TC-02** — ampliar la medición de cobertura al pipeline (`src/build_dev_db.py`, `src/builders/`, `src/extractors/`, `src/validation.py`); desbloqueado tras el refactor de ME1. Calidad/robustez.
+3. ~~**TC-02** — ampliar la medición de cobertura al pipeline~~ ✅ **DONE (2026-07-05)**. `source=["src"]` (antes solo `src/chile_hub`); cobertura honesta ~52.5% (antes ~84% vanidoso sobre 5% del código). Codecov `target: auto`; badge regenerado. Backfill de tests para subirla queda como follow-up.
 4. **020** — DuckDB-Wasm: solo si lo aprueba una re-evaluación futura del gate 4.3
 
 ## Hallazgos considerados y diferidos (2026-06-29 — mejoras de librerías)
