@@ -38,12 +38,19 @@
   - 3 tests en `tests/test_extractors.py` (`PartidosPoliticosExtractorTests`): mapeo de
     esquema + dedupe, ausencia de columnas personales, validación de conteo mínimo.
   - Suite completa: **514 pruebas verdes, 0 regresiones**. Lint/format limpios.
-  - ⏳ **Falta cablearlo al bundle** (`DATASET_CATALOG_CONFIG` en `_shared.py`,
-    `_load_inputs` en `build_dev_db.py`, `source_registry`, `Makefile extract`, ficha,
-    formatos). Confirmado que esa integración es cirugía intricada del god-module con
-    lógica por-dataset; se hace en un paso dedicado. Carril sugerido: `candidate` primero.
+  - ✅ **Cableado como `candidate`** (2026-07-05): entrada en `data/source_registry.json`
+    (`publication_track: candidate`, `public_bundle_eligible: false`), mapas de display en
+    `src/builders/reports.py` (nombre/fuente/licencia), ficha
+    `docs/datasets/partidos_politicos.md`. Hallazgo: un dataset `candidate` **NO** requiere
+    la cirugía de `_load_inputs`/`DATASET_CATALOG_CONFIG` (verificado contra el patrón de
+    `delincuencia_comunal`) — solo registry + contrato + reports + ficha. `make extract`
+    NO se toca (igual que delincuencia; se ejecuta on-demand). Los artefactos
+    (`source_readiness.json`, etc.) se regeneran en el ciclo `make refresh`/CI, no a mano
+    (regenerar el bundle localmente con staging parcial dropearía datasets). 514 tests
+    verdes tras el cableado.
   - Nota de honestidad: la fuente Cámara es un roster (incluye históricos) sin
     `estado_legal`/`fecha_constitucion`/`ambito` → nullable en v1; completar con SERVEL.
+    Promover a `stable_publishable` tras completar esos campos y una ventana de estabilidad.
 
 - ⏳ **`autoridades_electas` (Ola A) — pendiente.** El núcleo de diputados (roster+partido)
   es limpio, pero el **distrito no está en el API** (confirmado; ver hallazgos) → requiere

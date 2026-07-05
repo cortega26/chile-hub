@@ -748,6 +748,7 @@ _DISPLAY_NAMES = {
     "pobreza_comunal": "Pobreza Comunal (SAE)",
     "consumo_electrico_comunal": "Consumo Eléctrico Comunal",
     "delincuencia_comunal": "Delincuencia Comunal",
+    "partidos_politicos": "Partidos Políticos",
 }
 
 _SOURCE_NAMES = {
@@ -769,6 +770,7 @@ _SOURCE_NAMES = {
     "pobreza_comunal": "MDS / Observatorio Social",
     "consumo_electrico_comunal": "CNE / Energía Abierta",
     "delincuencia_comunal": "CEAD / SPD",
+    "partidos_politicos": "Cámara de Diputados",
 }
 
 _LICENSE_LABELS = {
@@ -790,6 +792,7 @@ _LICENSE_LABELS = {
     "pobreza_comunal": "Datos abiertos MDS",
     "consumo_electrico_comunal": "CC BY",
     "delincuencia_comunal": "Revisión términos",
+    "partidos_politicos": "CC BY",
 }
 
 # Dataset cuyos registros varían entre builds (directorios vivos).

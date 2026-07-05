@@ -392,5 +392,26 @@
     "publication_track": "candidate",
     "public_bundle_eligible": false,
     "cadencia": "monthly"
+  },
+  {
+    "source_id": "camara_partidos_politicos",
+    "dataset": "partidos_politicos",
+    "source_name": "Cámara de Diputadas y Diputados — Datos Abiertos",
+    "official_url": "https://opendata.camara.cl/",
+    "access_method": "api",
+    "license_status": "open-attribution",
+    "live_extractor_status": "implemented",
+    "fallback_policy": "fallback_to_last_snapshot",
+    "maturity_status": "candidate",
+    "live_ready": false,
+    "fallback_allowed": true,
+    "publish_blocking": true,
+    "review_by": "2026-10-05",
+    "stalled_after_days": 90,
+    "owner": "core",
+    "next_action": "Completar estado_legal/fecha_constitucion/ambito desde SERVEL; promover a stable_publishable tras ventana de estabilidad.",
+    "publication_track": "candidate",
+    "public_bundle_eligible": false,
+    "cadencia": "bajo_demanda"
   }
 ]
