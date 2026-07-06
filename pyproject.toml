@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "chile-hub"
-version = "1.18.0"
+version = "1.18.1"
 description = "Datos públicos de Chile curados, normalizados y validados: geografía, demografía, economía, salud, educación, finanzas municipales, indicadores urbanos y distritos electorales. Listos para consumir en una línea de código con Polars, DuckDB, SQLite y Excel."
 readme = "README.md"
 requires-python = ">=3.10,<3.15"
@@ -62,7 +62,7 @@ pipeline = [
 dev = [
     "build==1.5.0",
     "twine==6.2.0",
-    "python-semantic-release==10.5.3",
+    "python-semantic-release==10.6.1",
     "playwright==1.61.0",
     "ruff==0.15.20",
     "pytest==9.1.1",
@@ -72,7 +72,7 @@ dev = [
     "pip-audit==2.10.1",
     "interrogate==1.7.0",
     "pytest-xdist==3.8.0",
-    "hypothesis==6.155.7",
+    "hypothesis==6.156.1",
     "bandit==1.9.4",
     "structlog==26.1.0",
     "frictionless>=5.18,<6",
