@@ -12,6 +12,61 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.19.0 - 2026-07-06
+
+### Mantenimiento
+
+- **deps**: Bump astral-sh/setup-uv from 8.2.0 to 8.3.0
+  ([#23](https://github.com/cortega26/chile-hub/pull/23),
+  [`5671b54`](https://github.com/cortega26/chile-hub/commit/5671b545a8014f6d15bed9134dc06843319eae05))
+
+- **deps-dev**: Bump the python-dev group with 2 updates
+  ([#20](https://github.com/cortega26/chile-hub/pull/20),
+  [`23ac012`](https://github.com/cortega26/chile-hub/commit/23ac0126273f56b0ac3723996bd34ee40e47c742))
+
+### Documentación
+
+- **site**: Publica referencia de API con MkDocs Material (Plan 021)
+  ([#24](https://github.com/cortega26/chile-hub/pull/24),
+  [`b3a8deb`](https://github.com/cortega26/chile-hub/commit/b3a8deb5df7cf7bfe4bfd263f550169de5ffc477))
+
+### Agregado
+
+- **data**: Autoridades_electas v1 — diputados con distrito vía Scrapling (Plan 023 Ola A)
+  ([#24](https://github.com/cortega26/chile-hub/pull/24),
+  [`b3a8deb`](https://github.com/cortega26/chile-hub/commit/b3a8deb5df7cf7bfe4bfd263f550169de5ffc477))
+
+- **data**: Autoridades_electas — cargo senadores + cableado candidate (Plan 023)
+  ([#24](https://github.com/cortega26/chile-hub/pull/24),
+  [`b3a8deb`](https://github.com/cortega26/chile-hub/commit/b3a8deb5df7cf7bfe4bfd263f550169de5ffc477))
+
+- **data**: Autoridades_locales — alcaldes (345 comunas, best-effort) vía API MediaWiki
+  ([#24](https://github.com/cortega26/chile-hub/pull/24),
+  [`b3a8deb`](https://github.com/cortega26/chile-hub/commit/b3a8deb5df7cf7bfe4bfd263f550169de5ffc477))
+
+- **data**: Autoridades_locales — gobernadores (Wikipedia CC-BY-SA, segregado) (Plan 023)
+  ([#24](https://github.com/cortega26/chile-hub/pull/24),
+  [`b3a8deb`](https://github.com/cortega26/chile-hub/commit/b3a8deb5df7cf7bfe4bfd263f550169de5ffc477))
+
+- **data**: Extractor partidos_politicos desde Cámara + Plan 023
+  ([#24](https://github.com/cortega26/chile-hub/pull/24),
+  [`b3a8deb`](https://github.com/cortega26/chile-hub/commit/b3a8deb5df7cf7bfe4bfd263f550169de5ffc477))
+
+- **data**: Promueve partidos_politicos y autoridades_electas a stable_publishable
+  ([#24](https://github.com/cortega26/chile-hub/pull/24),
+  [`b3a8deb`](https://github.com/cortega26/chile-hub/commit/b3a8deb5df7cf7bfe4bfd263f550169de5ffc477))
+
+- **data**: Registra partidos_politicos en carril candidate (Plan 023)
+  ([#24](https://github.com/cortega26/chile-hub/pull/24),
+  [`b3a8deb`](https://github.com/cortega26/chile-hub/commit/b3a8deb5df7cf7bfe4bfd263f550169de5ffc477))
+
+### Tests
+
+- **coverage**: Mide todo el pipeline, no solo la librería (TC-02)
+  ([#24](https://github.com/cortega26/chile-hub/pull/24),
+  [`b3a8deb`](https://github.com/cortega26/chile-hub/commit/b3a8deb5df7cf7bfe4bfd263f550169de5ffc477))
+
+
 ## 1.18.1 - 2026-07-01
 
 ### Corregido
