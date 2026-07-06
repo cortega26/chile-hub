@@ -1,15 +1,20 @@
+# Nota: el upload a Codecov está deshabilitado en pipeline-check.yml (se usa el badge
+# autogenerado coverage_badge.json). Esta config queda por si se reactiva.
+# TC-02: la cobertura ahora mide todo src/ (~50% real), no solo src/chile_hub (~84%
+# vanidoso). project.target=auto protege la línea base real sin exigir un 80% arbitrario;
+# subirla es un follow-up de backfill de tests.
 coverage:
   status:
     project:
       default:
-        target: 80%
+        target: auto
         threshold: 2%
     patch:
       default:
         target: 75%
   precision: 0
   round: down
-  range: "50...80"
+  range: "40...80"
 
 comment:
   layout: "header, diff, files, footer"

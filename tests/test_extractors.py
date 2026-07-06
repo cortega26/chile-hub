@@ -17,12 +17,15 @@ import openpyxl
 from requests import HTTPError
 
 from src.extractors import (
+    autoridades_electas_extractor,
+    autoridades_locales_extractor,
     bcentral_extractor,
     censo_extractor,
     censo_hogares_viviendas_extractor,
     electoral_extractor,
     mineduc_establecimientos_extractor,
     mineduc_resultados_extractor,
+    partidos_politicos_extractor,
     res_extractor,
     salud_extractor,
     siedu_extractor,
@@ -1467,6 +1470,332 @@ class ConsumoElectricoExtractorTests(unittest.TestCase):
         required = {"codigo_region", "codigo_comuna", "tipo_cliente", "consumo_kwh"}
         self.assertTrue(required.issubset(set(df.columns)))
         self.assertEqual(df.height, 0)
+
+
+class PartidosPoliticosExtractorTests(unittest.TestCase):
+    """Tests del extractor de partidos políticos (Plan 023 · Ola B)."""
+
+    XML = (
+        '<?xml version="1.0" encoding="utf-8"?>'
+        "<PartidosPoliticosColeccion "
+        'xmlns="http://opendata.camara.cl/camaradiputados/v1">'
+        "<PartidoPolitico><Id>FA</Id><Nombre>Frente Amplio</Nombre>"
+        "<Alias>FA</Alias></PartidoPolitico>"
+        "<PartidoPolitico><Id>DC</Id><Nombre>Partido Demócrata Cristiano</Nombre>"
+        "<Alias>DC</Alias></PartidoPolitico>"
+        "<PartidoPolitico><Id>FA</Id><Nombre>Frente Amplio</Nombre>"
+        "<Alias>FA</Alias></PartidoPolitico>"  # duplicado: debe deduplicarse
+        "<PartidoPolitico><Id></Id><Nombre>Sin id</Nombre></PartidoPolitico>"  # se descarta
+        "</PartidosPoliticosColeccion>"
+    ).encode("utf-8")
+
+    def test_parse_partidos_maps_schema_and_dedupes(self):
+        df = partidos_politicos_extractor.parse_partidos(self.XML)
+        self.assertEqual(df.height, 2)  # deduplicado + descarta el sin id
+        self.assertEqual(
+            df.columns,
+            [
+                "id_partido",
+                "nombre",
+                "sigla",
+                "estado_legal",
+                "fecha_constitucion",
+                "ambito",
+                "fuente",
+                "url_fuente",
+                "fecha_consulta",
+            ],
+        )
+        self.assertEqual(sorted(df["id_partido"].to_list()), ["DC", "FA"])
+        # Campos no provistos por la fuente quedan nulos en v1.
+        self.assertTrue(df["estado_legal"].is_null().all())
+
+    def test_no_personal_data_columns(self):
+        df = partidos_politicos_extractor.parse_partidos(self.XML)
+        personales = {"rut", "run", "domicilio", "rutdv"}
+        self.assertFalse(personales & {c.lower() for c in df.columns})
+
+    def test_validate_flags_low_count(self):
+        df = partidos_politicos_extractor.parse_partidos(self.XML)
+        result = partidos_politicos_extractor.PartidosPoliticosExtractor().validate(df, {})
+        self.assertEqual(result["status"], "error")  # 2 < MIN_EXPECTED_PARTIES
+        self.assertEqual(result["record_count"], 2)
+
+    def test_parse_partidos_con_servel_lookup(self):
+        """El join con SERVEL completa estado_legal/fecha_constitucion; ambito queda nulo."""
+        servel_lookup = {"partido democrata cristiano": ("constituido", "1988-05-02")}
+        df = partidos_politicos_extractor.parse_partidos(self.XML, servel_lookup)
+        dc = df.filter(pl.col("id_partido") == "DC").row(0, named=True)
+        self.assertEqual(dc["estado_legal"], "constituido")
+        self.assertEqual(dc["fecha_constitucion"], "1988-05-02")
+        self.assertIsNone(dc["ambito"])
+        fa = df.filter(pl.col("id_partido") == "FA").row(0, named=True)
+        self.assertIsNone(fa["estado_legal"])  # sin match en SERVEL, no se inventa
+
+    def test_parse_fecha_espanol(self):
+        f = partidos_politicos_extractor._parse_fecha_espanol
+        self.assertEqual(f("2 de mayo de 1988"), "1988-05-02")
+        self.assertEqual(f("13 de abril de 2017"), "2017-04-13")
+        self.assertIsNone(f("fecha desconocida"))
+
+    def test_norm_partido_quita_sufijo_de_chile(self):
+        f = partidos_politicos_extractor._norm_partido
+        self.assertEqual(f("Partido Comunista"), f("Partido Comunista de Chile"))
+
+    def test_parse_servel_tabla_constituidos(self):
+        html_fragment = (
+            "<table>"
+            "<tr><td>Partidos Políticos</td><td>Fecha de constitución</td><td>Ver</td></tr>"
+            "<tr><td>Fecha Constitución Partidos Políticos</td><td>12 de junio de 2026</td>"
+            "<td></td></tr>"
+            "<tr><td>Partido Demócrata Cristiano</td><td>2 de mayo de 1988</td><td></td></tr>"
+            "</table>"
+        )
+        filas = partidos_politicos_extractor._parse_servel_tabla(html_fragment, con_fecha=True)
+        self.assertEqual(filas, [("Partido Demócrata Cristiano", "2 de mayo de 1988")])
+
+    def test_fetch_servel_estado_legal_degrada_si_falla_la_red(self):
+        with patch.object(
+            partidos_politicos_extractor,
+            "fetch_with_retry",
+            side_effect=OSError("sin red"),
+        ):
+            lookup = partidos_politicos_extractor.fetch_servel_estado_legal()
+        self.assertEqual(lookup, {})
+
+    def test_fetch_servel_estado_legal_combina_ambas_paginas(self):
+        constituidos_html = (
+            "<table><tr><td>Partido Demócrata Cristiano</td>"
+            "<td>2 de mayo de 1988</td><td></td></tr></table>"
+        )
+        en_formacion_html = (
+            "<table><tr><td>Partido Cristiano de Chile</td><td>Ver</td></tr></table>"
+        )
+
+        def _fake_fetch(url, **kwargs):
+            resp = MagicMock()
+            resp.text = (
+                constituidos_html
+                if url == partidos_politicos_extractor.SERVEL_CONSTITUIDOS_URL
+                else en_formacion_html
+            )
+            return resp
+
+        with patch.object(
+            partidos_politicos_extractor, "fetch_with_retry", side_effect=_fake_fetch
+        ):
+            lookup = partidos_politicos_extractor.fetch_servel_estado_legal()
+        self.assertEqual(lookup["partido democrata cristiano"], ("constituido", "1988-05-02"))
+        self.assertEqual(lookup["partido cristiano"], ("en_formacion", None))
+
+
+class AutoridadesElectasExtractorTests(unittest.TestCase):
+    """Tests del extractor de autoridades electas (Plan 023 · Ola A, cargo diputados)."""
+
+    XML = (
+        '<?xml version="1.0" encoding="utf-8"?>'
+        '<DiputadosPeriodoColeccion xmlns="http://opendata.camara.cl/camaradiputados/v1">'
+        "<DiputadoPeriodo><Diputado><Id>1009</Id><Nombre>Jorge</Nombre>"
+        "<ApellidoPaterno>Alessandri</ApellidoPaterno><ApellidoMaterno>Vergara</ApellidoMaterno>"
+        "<RUT>1</RUT><Sexo>Masculino</Sexo>"
+        "<Militancias><Militancia><FechaInicio>2018-03-11T00:00:00</FechaInicio>"
+        "<FechaTermino>2022-03-10T23:59:59</FechaTermino>"
+        "<Partido><Id>UDI</Id><Nombre>Unión Demócrata Independiente</Nombre></Partido></Militancia>"
+        "<Militancia><FechaInicio>2022-03-11T00:00:00</FechaInicio><FechaTermino></FechaTermino>"
+        "<Partido><Id>UDI</Id><Nombre>Unión Demócrata Independiente</Nombre></Partido></Militancia>"
+        "</Militancias></Diputado></DiputadoPeriodo>"
+        "<DiputadoPeriodo><Diputado><Id>1015</Id><Nombre>Jorge</Nombre>"
+        "<ApellidoPaterno>Brito</ApellidoPaterno><ApellidoMaterno>Hasbún</ApellidoMaterno>"
+        "<Militancias><Militancia><FechaInicio>2022-03-11T00:00:00</FechaInicio>"
+        "<FechaTermino></FechaTermino>"
+        "<Partido><Id>FA</Id><Nombre>Frente Amplio</Nombre></Partido></Militancia></Militancias>"
+        "</Diputado></DiputadoPeriodo>"
+        "</DiputadosPeriodoColeccion>"
+    ).encode("utf-8")
+
+    DISTRITOS = {"1009": "10", "1015": "7"}
+
+    def test_build_maps_schema_partido_y_distrito(self):
+        df = autoridades_electas_extractor.build_autoridades_df(self.XML, self.DISTRITOS)
+        self.assertEqual(df.height, 2)
+        self.assertEqual(df["cargo"].unique().to_list(), ["diputado"])
+        row = df.filter(pl.col("id_autoridad") == "diputado_1009").row(0, named=True)
+        self.assertEqual(row["nombre"], "Jorge Alessandri Vergara")
+        self.assertEqual(row["partido"], "Unión Demócrata Independiente")  # militancia vigente
+        self.assertEqual(row["distrito_electoral"], "10")  # unido por id
+        self.assertEqual(row["estado_mandato"], "vigente")
+
+    def test_distrito_nulo_si_no_hay_mapa(self):
+        df = autoridades_electas_extractor.build_autoridades_df(self.XML, {})
+        self.assertTrue(df["distrito_electoral"].is_null().all())
+
+    def test_sin_columnas_personales(self):
+        df = autoridades_electas_extractor.build_autoridades_df(self.XML, self.DISTRITOS)
+        personales = {"rut", "rutdv", "run", "fecha_nacimiento", "domicilio", "sexo"}
+        self.assertFalse(personales & {c.lower() for c in df.columns})
+
+    def test_incluye_senadores(self):
+        senadores = [
+            {
+                "ID_PARLAMENTARIO": 1110,
+                "NOMBRE_COMPLETO": "Pedro Araya Guerrero",
+                "PARTIDO": "P.P.D.",
+                "CIRCUNSCRIPCION_ID": 3,
+                "REGION": "Región de Antofagasta",
+                "EMAIL": "x@senado.cl",
+                "PERIODOS": [
+                    {"DESDE": "2022", "HASTA": "2026", "VIGENTE": 0},
+                    {"DESDE": "2026", "HASTA": "2030", "VIGENTE": 1},
+                ],
+            }
+        ]
+        df = autoridades_electas_extractor.build_autoridades_df(self.XML, self.DISTRITOS, senadores)
+        self.assertEqual(df.height, 3)  # 2 diputados + 1 senador
+        sen = df.filter(pl.col("cargo") == "senador").row(0, named=True)
+        self.assertEqual(sen["id_autoridad"], "senador_1110")
+        self.assertEqual(sen["nombre"], "Pedro Araya Guerrero")
+        self.assertEqual(sen["circunscripcion_senatorial"], "3")
+        self.assertEqual(sen["institucion"], "Senado")
+        self.assertEqual(sen["codigo_region"], "02")
+        self.assertEqual(sen["periodo_inicio"], "2026-03-11")
+        self.assertEqual(sen["periodo_fin"], "2030-03-10")
+        # el email no debe filtrarse como columna
+        self.assertNotIn("email", {c.lower() for c in df.columns})
+
+    def test_senador_sin_periodo_vigente_queda_nulo(self):
+        senadores = [
+            {
+                "ID_PARLAMENTARIO": 1111,
+                "NOMBRE_COMPLETO": "Alguien Sin Vigente",
+                "REGION": "Región de Magallanes y la Antártica Chilena",
+                "PERIODOS": [{"DESDE": "2018", "HASTA": "2022", "VIGENTE": 0}],
+            }
+        ]
+        df = autoridades_electas_extractor.build_autoridades_df(self.XML, self.DISTRITOS, senadores)
+        sen = df.filter(pl.col("id_autoridad") == "senador_1111").row(0, named=True)
+        self.assertIsNone(sen["periodo_inicio"])
+        self.assertIsNone(sen["periodo_fin"])
+        self.assertEqual(sen["codigo_region"], "12")  # variante real de senado.cl
+
+
+class AutoridadesLocalesExtractorTests(unittest.TestCase):
+    """Tests del extractor de autoridades locales (Plan 023 · Ola A, gobernadores)."""
+
+    def test_region_from_title_variantes(self):
+        f = autoridades_locales_extractor._region_from_title
+        self.assertEqual(f("Gobernador regional de Arica y Parinacota"), "Arica y Parinacota")
+        self.assertEqual(f("Gobernadora regional de Atacama"), "Atacama")  # femenino
+        self.assertEqual(f("Gobernador regional del Maule"), "Maule")  # "del"
+        self.assertEqual(f("Gobernador regional Metropolitano de Santiago"), "Santiago")
+        self.assertIsNone(f("Renovación Nacional"))  # no es región
+
+    def test_normalize_mapea_codigo_region(self):
+        gobs = [
+            {"region": "Maule", "nombre": "Pedro X", "partido": "UDI", "pacto": "Chile Vamos"},
+            {"region": "Santiago", "nombre": "Claudio Y", "partido": "Ind.", "pacto": ""},
+        ]
+        df = autoridades_locales_extractor.build_autoridades_locales_df(gobs)
+        self.assertEqual(df.height, 2)
+        maule = df.filter(pl.col("nombre") == "Pedro X").row(0, named=True)
+        self.assertEqual(maule["codigo_region"], "07")
+        self.assertEqual(maule["cargo"], "gobernador_regional")
+        self.assertEqual(maule["id_autoridad"], "gobernador_07")
+        stgo = df.filter(pl.col("nombre") == "Claudio Y").row(0, named=True)
+        self.assertEqual(stgo["codigo_region"], "13")
+
+    def test_licencia_cc_by_sa(self):
+        self.assertEqual(autoridades_locales_extractor.REUSE_POLICY["license"], "CC-BY-SA")
+
+    def test_comuna_name_from_title_quita_prefijo_y_desambiguador(self):
+        f = autoridades_locales_extractor._comuna_name_from_title
+        self.assertEqual(f("Anexo:Alcaldes de Concepción (Chile)"), "Concepción")
+        self.assertEqual(f("Anexo:Alcaldes de Alhué"), "Alhué")
+
+    def test_extract_alcalde_actual_via_titular(self):
+        wikitext = (
+            "{{Ficha de cargo\n"
+            "| titular = [[Orlando Vargas Pizarro]]\n"
+            "| inicio = {{fecha|6|12|2024}}\n"
+            "| imagen =\n"
+            "}}"
+        )
+        nombre, inicio = autoridades_locales_extractor._extract_alcalde_actual(wikitext)
+        self.assertEqual(nombre, "Orlando Vargas Pizarro")
+        self.assertEqual(inicio, "2024-12-06")
+
+    def test_extract_alcalde_actual_titular_una_linea_no_se_come_otros_campos(self):
+        # Bug real: infobox con varios campos en una sola línea separados por "|".
+        wikitext = "|titular=Patricio Ferreira Rivera|inicio=6 de diciembre de 2016|dirige=[[Alto Hospicio]]|sede=[[Municipalidad]]"
+        nombre, inicio = autoridades_locales_extractor._extract_alcalde_actual(wikitext)
+        self.assertEqual(nombre, "Patricio Ferreira Rivera")
+
+    def test_extract_alcalde_actual_titular_vacio_cae_a_fallback(self):
+        # Bug real: "titular = " vacío no debe tragarse el campo siguiente.
+        wikitext = (
+            "|titular         = \n"
+            "|inicio          = {{Fecha|6|12|2012}}\n"
+            "|en_ejercicio    = Centauri Dios\n"
+        )
+        nombre, _inicio = autoridades_locales_extractor._extract_alcalde_actual(wikitext)
+        self.assertNotIn("inicio", (nombre or ""))
+        self.assertNotIn("{{Fecha", (nombre or ""))
+
+    def test_extract_alcalde_actual_fallback_tabla_respeta_wikilink_con_pipe(self):
+        # Bug real: dividir la fila por "|" a secas rompe [[X|Y]] a la mitad.
+        wikitext = (
+            "{|\n"
+            "|-\n"
+            "|[[Sacha Razmilic|Sacha Razmilic Burgos]]\n"
+            "|6 de diciembre de 2024\n"
+            "|''En el cargo''\n"
+            "|[[Evolución Política|Evópoli]]\n"
+            "|}"
+        )
+        nombre, _inicio = autoridades_locales_extractor._extract_alcalde_actual(wikitext)
+        self.assertEqual(nombre, "Sacha Razmilic Burgos")
+
+    def test_extract_alcalde_actual_fallback_descarta_ordinal_e_imagen(self):
+        # Bug real: la celda ordinal ("31°") y la de imagen no deben tomarse como nombre.
+        wikitext = (
+            "{|\n"
+            "|-\n"
+            "|'''31°'''\n"
+            "|[[Archivo:Falta_imagen_hombre.svg|100x100px]]\n"
+            "|Rodrigo Cornejo Inostroza\n"
+            "|2024-en el cargo\n"
+            "|}"
+        )
+        nombre, _inicio = autoridades_locales_extractor._extract_alcalde_actual(wikitext)
+        self.assertEqual(nombre, "Rodrigo Cornejo Inostroza")
+
+    def test_extract_alcalde_actual_sin_evidencia_retorna_none(self):
+        # Sin titular ni marca de vigencia explícita: no se inventa un nombre.
+        wikitext = "{|\n|-\n|Juan Pérez\n|1990\n|1994\n|}"
+        nombre, inicio = autoridades_locales_extractor._extract_alcalde_actual(wikitext)
+        self.assertIsNone(nombre)
+        self.assertIsNone(inicio)
+
+    def test_normalize_alcaldes_matchea_codigo_comuna(self):
+        alcaldes = [{"comuna": "Arica", "nombre": "X Y", "periodo_inicio": None}]
+        lookup = {"arica": ("01101", "15")}
+        df = autoridades_locales_extractor.build_autoridades_locales_df([], alcaldes, lookup)
+        row = df.filter(pl.col("cargo") == "alcalde").row(0, named=True)
+        self.assertEqual(row["codigo_comuna"], "01101")
+        self.assertEqual(row["codigo_region"], "15")
+        self.assertEqual(row["estado_mandato"], "vigente")
+
+    def test_normalize_alcaldes_sin_nombre_marca_sin_identificar(self):
+        alcaldes = [{"comuna": "Antofagasta", "nombre": None, "periodo_inicio": None}]
+        df = autoridades_locales_extractor.build_autoridades_locales_df([], alcaldes, {})
+        row = df.filter(pl.col("cargo") == "alcalde").row(0, named=True)
+        self.assertIsNone(row["nombre"])
+        self.assertEqual(row["estado_mandato"], "sin_identificar")
+
+    def test_sin_columnas_personales_alcaldes(self):
+        alcaldes = [{"comuna": "Arica", "nombre": "X Y", "periodo_inicio": None}]
+        df = autoridades_locales_extractor.build_autoridades_locales_df([], alcaldes, {})
+        personales = {"rut", "run", "domicilio", "fecha_nacimiento"}
+        self.assertFalse(personales & {c.lower() for c in df.columns})
 
 
 if __name__ == "__main__":

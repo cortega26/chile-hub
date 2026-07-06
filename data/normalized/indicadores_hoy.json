@@ -2051,6 +2051,16 @@
   },
   {
     "fecha": "2026-06-19",
+    "codigo_indicador": "dolar",
+    "valor": 897.19
+  },
+  {
+    "fecha": "2026-06-19",
+    "codigo_indicador": "euro",
+    "valor": 1028.3
+  },
+  {
+    "fecha": "2026-06-19",
     "codigo_indicador": "uf",
     "valor": 40790.42
   },
@@ -2066,8 +2076,28 @@
   },
   {
     "fecha": "2026-06-22",
+    "codigo_indicador": "dolar",
+    "valor": 900.6
+  },
+  {
+    "fecha": "2026-06-22",
+    "codigo_indicador": "euro",
+    "valor": 1033.63
+  },
+  {
+    "fecha": "2026-06-22",
     "codigo_indicador": "uf",
     "valor": 40798.57
+  },
+  {
+    "fecha": "2026-06-23",
+    "codigo_indicador": "dolar",
+    "valor": 905.78
+  },
+  {
+    "fecha": "2026-06-23",
+    "codigo_indicador": "euro",
+    "valor": 1035.06
   },
   {
     "fecha": "2026-06-23",
@@ -2076,13 +2106,43 @@
   },
   {
     "fecha": "2026-06-24",
+    "codigo_indicador": "dolar",
+    "valor": 915.58
+  },
+  {
+    "fecha": "2026-06-24",
+    "codigo_indicador": "euro",
+    "valor": 1041.73
+  },
+  {
+    "fecha": "2026-06-24",
     "codigo_indicador": "uf",
     "valor": 40804.0
   },
   {
     "fecha": "2026-06-25",
+    "codigo_indicador": "dolar",
+    "valor": 921.42
+  },
+  {
+    "fecha": "2026-06-25",
+    "codigo_indicador": "euro",
+    "valor": 1046.35
+  },
+  {
+    "fecha": "2026-06-25",
     "codigo_indicador": "uf",
     "valor": 40806.72
+  },
+  {
+    "fecha": "2026-06-26",
+    "codigo_indicador": "dolar",
+    "valor": 916.97
+  },
+  {
+    "fecha": "2026-06-26",
+    "codigo_indicador": "euro",
+    "valor": 1043.08
   },
   {
     "fecha": "2026-06-26",
@@ -2106,8 +2166,28 @@
   },
   {
     "fecha": "2026-06-30",
+    "codigo_indicador": "dolar",
+    "valor": 922.34
+  },
+  {
+    "fecha": "2026-06-30",
+    "codigo_indicador": "euro",
+    "valor": 1050.38
+  },
+  {
+    "fecha": "2026-06-30",
     "codigo_indicador": "uf",
     "valor": 40820.31
+  },
+  {
+    "fecha": "2026-07-01",
+    "codigo_indicador": "dolar",
+    "valor": 922.21
+  },
+  {
+    "fecha": "2026-07-01",
+    "codigo_indicador": "euro",
+    "valor": 1053.47
   },
   {
     "fecha": "2026-07-01",
@@ -2121,8 +2201,28 @@
   },
   {
     "fecha": "2026-07-02",
+    "codigo_indicador": "dolar",
+    "valor": 927.35
+  },
+  {
+    "fecha": "2026-07-02",
+    "codigo_indicador": "euro",
+    "valor": 1055.13
+  },
+  {
+    "fecha": "2026-07-02",
     "codigo_indicador": "uf",
     "valor": 40825.75
+  },
+  {
+    "fecha": "2026-07-03",
+    "codigo_indicador": "dolar",
+    "valor": 921.7
+  },
+  {
+    "fecha": "2026-07-03",
+    "codigo_indicador": "euro",
+    "valor": 1053.85
   },
   {
     "fecha": "2026-07-03",
@@ -2138,6 +2238,16 @@
     "fecha": "2026-07-05",
     "codigo_indicador": "uf",
     "valor": 40833.91
+  },
+  {
+    "fecha": "2026-07-06",
+    "codigo_indicador": "dolar",
+    "valor": 921.74
+  },
+  {
+    "fecha": "2026-07-06",
+    "codigo_indicador": "euro",
+    "valor": 1054.38
   },
   {
     "fecha": "2026-07-06",

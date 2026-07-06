@@ -30,8 +30,14 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 
 | # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
 |---|------|----------|----------|--------|-----------|--------|
+| 023 | [Datasets `autoridades_electas` y `partidos_politicos`](023-autoridades-electas-partidos-politicos.md) | P2 | M-L | MED | — (deriva de Plan 022 · Ola B2.2, research cerrada) | 🔶 Ola A y B `stable_publishable` y en el bundle público (2026-07-06): `partidos_politicos` (36, 15 con estado_legal/fecha vía SERVEL) y `autoridades_electas` (diputados+senadores, 205, senadores con codigo_region/periodo completos). `autoridades_locales` (gobernadores+alcaldes, 240, CC-BY-SA segregado) queda `candidate` — cobertura de alcaldes insuficiente a criterio del operador, pendiente mejorar el extractor. No se archiva hasta resolver ese follow-up. |
 | 020 | [Explorador SQL en la landing con DuckDB-Wasm](020-duckdb-wasm-playground.md) | P2 | M | MED | — | BLOCKED — gate 4.3: NO-GO (2026-06-30). Ver `docs/gate-4-3-decision-playground.md` para condiciones de re-evaluación. |
-| 021 | [Publicar documentación de API con MkDocs Material + mkdocstrings](021-mkdocs-api-docs.md) | P3 | M | LOW | — | TODO |
+
+## Planes archivados (docs, 2026-07-04)
+
+| # | Plan | Esfuerzo | Riesgo | Estado |
+|---|------|----------|--------|--------|
+| 021 | [Publicar documentación de API con MkDocs Material + mkdocstrings](archive/021-mkdocs-api-docs.md) | M | LOW | DONE — sitio de docs (`mkdocs.yml`, `docs/index.md`, `docs/reference.md`), targets `docs-build`/`docs-serve`, build integrado en `pages-deploy.yml` (servido en `/reference/`). |
 
 ## Planes archivados (mejoras de librerías/dependencias, 2026-06-29)
 
@@ -76,19 +82,23 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 ## Grafo de dependencias (planes activos)
 
 ```
+023 (independiente)    ← autoridades_electas + partidos_politicos (Cámara XML / Wikidata)
 020 (independiente)    ← bloqueado por gate 4.3 (no-go 2026-06-30); sin dependencia activa
-021 (independiente)    ← MkDocs API docs
 ```
 
-**020** y **021** son independientes entre sí: tocan superficies distintas (landing,
-docs/CI) y pueden ejecutarse en cualquier orden o en paralelo. **020** sigue bloqueado por
-el gate 4.3 (NO-GO); ver `docs/gate-4-3-decision-playground.md` para condiciones de re-evaluación.
+**023** y **020** son independientes entre sí: tocan superficies distintas
+(catálogo/extractores, landing) y pueden ejecutarse en cualquier orden. **020** sigue
+bloqueado por el gate 4.3 (NO-GO); ver `docs/gate-4-3-decision-playground.md` para
+condiciones de re-evaluación. **021** (MkDocs) quedó DONE el 2026-07-04.
 
 ## Orden de ejecución recomendado
 
-1. **023** — si se crea: autoridades_electas + partidos_politicos (integración XML/Wikidata, S-M de esfuerzo)
-2. **021** — MkDocs: docs de API desde docstrings existentes (P3, aditivo)
-3. **020** — DuckDB-Wasm: solo si lo aprueba una re-evaluación futura del gate 4.3
+Ejecución en curso (elegida 2026-07-04): **021 → 023 → TC-02**.
+
+1. ~~**021** — MkDocs~~ ✅ **DONE (2026-07-04)**. Sitio de docs de API desde docstrings, servido en `/reference/`.
+2. **023** — autoridades_electas + partidos_politicos. Revisado tras Step 0: es M-L / MED (3 de 4 cargos requieren scraping), no el S-M/LOW que asumía la research. Mayor utilidad para la audiencia real.
+3. ~~**TC-02** — ampliar la medición de cobertura al pipeline~~ ✅ **DONE (2026-07-05)**. `source=["src"]` (antes solo `src/chile_hub`); cobertura honesta ~52.5% (antes ~84% vanidoso sobre 5% del código). Codecov `target: auto`; badge regenerado. Backfill de tests para subirla queda como follow-up.
+4. **020** — DuckDB-Wasm: solo si lo aprueba una re-evaluación futura del gate 4.3
 
 ## Hallazgos considerados y diferidos (2026-06-29 — mejoras de librerías)
 

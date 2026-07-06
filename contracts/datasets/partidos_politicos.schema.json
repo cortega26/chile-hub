@@ -1,0 +1,14 @@
+{
+  "dataset": "partidos_politicos",
+  "primary_key": ["id_partido"],
+  "required_columns": ["id_partido", "nombre", "sigla", "fuente", "url_fuente", "fecha_consulta"],
+  "column_types": {
+    "id_partido": "string",
+    "nombre": "string",
+    "sigla": "string"
+  },
+  "nullable_columns": ["estado_legal", "fecha_constitucion", "ambito"],
+  "expected_record_count": 36,
+  "coverage_policy": "roster",
+  "publish_outputs": ["parquet", "json"]
+}

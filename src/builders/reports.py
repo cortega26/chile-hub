@@ -748,6 +748,9 @@ _DISPLAY_NAMES = {
     "pobreza_comunal": "Pobreza Comunal (SAE)",
     "consumo_electrico_comunal": "Consumo Eléctrico Comunal",
     "delincuencia_comunal": "Delincuencia Comunal",
+    "partidos_politicos": "Partidos Políticos",
+    "autoridades_electas": "Autoridades Electas",
+    "autoridades_locales": "Autoridades Locales",
 }
 
 _SOURCE_NAMES = {
@@ -769,6 +772,9 @@ _SOURCE_NAMES = {
     "pobreza_comunal": "MDS / Observatorio Social",
     "consumo_electrico_comunal": "CNE / Energía Abierta",
     "delincuencia_comunal": "CEAD / SPD",
+    "partidos_politicos": "Cámara de Diputados",
+    "autoridades_electas": "Cámara de Diputados + Senado",
+    "autoridades_locales": "Wikipedia",
 }
 
 _LICENSE_LABELS = {
@@ -790,6 +796,9 @@ _LICENSE_LABELS = {
     "pobreza_comunal": "Datos abiertos MDS",
     "consumo_electrico_comunal": "CC BY",
     "delincuencia_comunal": "Revisión términos",
+    "partidos_politicos": "CC BY",
+    "autoridades_electas": "CC BY",
+    "autoridades_locales": "CC BY-SA",
 }
 
 # Dataset cuyos registros varían entre builds (directorios vivos).
@@ -798,6 +807,9 @@ _VARIABLE_COUNT_DATASETS = {
     "establecimientos_salud",
     "establecimientos_educacionales",
     "empresas",
+    "autoridades_electas",
+    "autoridades_locales",
+    "partidos_politicos",
 }
 
 # Datasets con formato especial de registros (no numérico).

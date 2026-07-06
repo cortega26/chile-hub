@@ -44,6 +44,9 @@ Thumbs.db
 # Python build artifacts
 dist/
 
+# MkDocs — sitio de documentación generado (Plan 021)
+/reference/
+
 
 # CodeGraph
 .codegraph/daemon.pid

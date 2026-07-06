@@ -1,15 +1,15 @@
 # chile-hub overview
 
-- `generated_at_utc`: `2026-06-30T21:18:43.891603+00:00`
+- `generated_at_utc`: `2026-07-06T15:21:31.259458+00:00`
 - `overall_status`: `warn`
-- `dataset_count`: `17`
+- `dataset_count`: `19`
 - `live_count`: `15`
-- `fallback_count`: `2`
-- `stale_count`: `1`
-- `drifted_count`: `6`
+- `fallback_count`: `4`
+- `stale_count`: `0`
+- `drifted_count`: `8`
 - `degraded_count`: `0`
 - `partial_coverage_count`: `2`
-- `warning_count`: `11`
+- `warning_count`: `12`
 - `shared_artifact_count`: `24`
 - `package_count`: `1`
 - `top_issue`: `consumo_electrico_comunal` (freshness=fresh, drift=drifted, warnings=3)
@@ -19,6 +19,7 @@
 
 | Dataset | Mode | Validation | Freshness | Coverage | Drift |
 | :--- | :--- | :--- | :--- | :--- | :--- |
+| `autoridades_electas` | `live` | `ok` | `fresh` | `full` | `healthy` |
 | `censo_comunal` | `live` | `ok` | `fresh` | `full` | `healthy` |
 | `censo_hogares_viviendas` | `live` | `ok` | `fresh` | `full` | `healthy` |
 | `comunas` | `live` | `ok` | `fresh` | `full` | `healthy` |
@@ -28,10 +29,11 @@
 | `empresas` | `live` | `ok` | `fresh` | `not_applicable` | `drifted` |
 | `establecimientos_educacionales` | `live` | `ok` | `fresh` | `not_applicable` | `healthy` |
 | `establecimientos_salud` | `live` | `ok` | `fresh` | `not_applicable` | `healthy` |
-| `finanzas_municipales` | `live` | `ok` | `fresh` | `partial` | `drifted` |
-| `indicadores` | `live` | `ok` | `stale` | `not_applicable` | `drifted` |
+| `finanzas_municipales` | `fallback` | `ok` | `fresh` | `partial` | `drifted` |
+| `indicadores` | `live` | `ok` | `fresh` | `not_applicable` | `drifted` |
 | `indicadores_urbanos_siedu` | `live` | `ok` | `fresh` | `partial` | `drifted` |
-| `perfil_territorial_comunal` | `live` | `ok` | `fresh` | `full` | `healthy` |
+| `partidos_politicos` | `live` | `ok` | `fresh` | `full` | `drifted` |
+| `perfil_territorial_comunal` | `fallback` | `ok` | `fresh` | `full` | `drifted` |
 | `pobreza_comunal` | `fallback` | `ok` | `fresh` | `not_applicable` | `drifted` |
 | `provincias` | `live` | `ok` | `fresh` | `full` | `healthy` |
 | `regiones` | `live` | `ok` | `fresh` | `full` | `healthy` |
@@ -41,7 +43,7 @@
 
 - `path`: `data/normalized/chile-hub-publishable-bundle.zip`
 - `package_type`: `zip`
-- `size_bytes`: `29272582`
+- `size_bytes`: `29270512`
 - `checksum`: `sha256` via `data/normalized/chile-hub-publishable-bundle.zip.sha256`
 - `verification_command`: `shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256`
 

@@ -1,8 +1,8 @@
 # chile-hub redistribution report
 
-- `generated_at_utc`: `2026-06-30T21:18:43.891603+00:00`
-- `dataset_count`: `17`
-- `ready_count`: `17`
+- `generated_at_utc`: `2026-07-06T15:21:31.259458+00:00`
+- `dataset_count`: `19`
+- `ready_count`: `19`
 - `review_terms_count`: `0`
 - `unknown_count`: `0`
 
@@ -25,6 +25,8 @@
 | `empresas` | `ready` | CC-BY | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
 | `pobreza_comunal` | `ready` | Datos abiertos MDS | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
 | `consumo_electrico_comunal` | `ready` | CC BY | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
+| `partidos_politicos` | `ready` | CC-BY | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
+| `autoridades_electas` | `ready` | CC-BY | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
 
 ## regiones
 
@@ -195,3 +197,23 @@
 - `redistribution_ok`: `True`
 - `recommended_action`: Publicable con atribucion y referencia de fuente.
 - `summary`: Consumo eléctrico anual por comuna publicado por la CNE en Energía Abierta. Atribución requerida.
+
+## partidos_politicos
+
+- `publishability_status`: `ready`
+- `license`: `CC-BY`
+- `license_url`: https://creativecommons.org/licenses/by/4.0/
+- `attribution_required`: `True`
+- `redistribution_ok`: `True`
+- `recommended_action`: Publicable con atribucion y referencia de fuente.
+- `summary`: Roster institucional de partidos políticos (Cámara de Diputadas y Diputados), enriquecido con estado legal y fecha de constitución desde SERVEL. ambito (nacional/regional) queda nullable: no se encontró esa señal en ninguna fuente.
+
+## autoridades_electas
+
+- `publishability_status`: `ready`
+- `license`: `CC-BY`
+- `license_url`: https://creativecommons.org/licenses/by/4.0/
+- `attribution_required`: `True`
+- `redistribution_ok`: `True`
+- `recommended_action`: Publicable con atribucion y referencia de fuente.
+- `summary`: Autoridades electas en ejercicio (diputados y senadores) desde la Cámara de Diputadas y Diputados y el Senado de Chile. Gobernador_regional y alcalde viven en el dataset segregado autoridades_locales (CC-BY-SA).

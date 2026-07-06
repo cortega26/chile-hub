@@ -48,7 +48,7 @@ INDICADORES_NON_SYNTHETIC_DELIVERY = {
     "raw_recovery",
     "preserved_existing",
 }
-EXPECTED_DATASET_COUNT = 17
+EXPECTED_DATASET_COUNT = 19
 EXPECTED_TOP_ISSUE = "consumo_electrico_comunal"
 
 
@@ -122,6 +122,8 @@ class ChileHubTests(unittest.TestCase):
                 "empresas",
                 "pobreza_comunal",
                 "consumo_electrico_comunal",
+                "partidos_politicos",
+                "autoridades_electas",
             ],
         )
 
@@ -253,6 +255,8 @@ class ChileHubTests(unittest.TestCase):
                 "empresas": "ok",
                 "pobreza_comunal": "ok",
                 "consumo_electrico_comunal": "ok",
+                "partidos_politicos": "ok",
+                "autoridades_electas": "ok",
             },
         )
         warning_counts = {item["dataset"]: item["warning_count"] for item in summary}
@@ -677,7 +681,7 @@ class ChileHubTests(unittest.TestCase):
         bundle = self.bundle
         self.assertEqual(bundle["overall_status"], self.health["overall_status"])
         self.assertEqual(bundle["dataset_count"], EXPECTED_DATASET_COUNT)
-        self.assertEqual(bundle["public_dataset_count"], 16)
+        self.assertEqual(bundle["public_dataset_count"], 18)
         self.assertEqual(bundle["candidate_dataset_count"], 1)
         self.assertEqual(len(bundle["datasets"]), bundle["public_dataset_count"])
         self.assertEqual(len(bundle["candidate_datasets"]), bundle["candidate_dataset_count"])
@@ -1192,6 +1196,8 @@ class ChileHubCliTests(unittest.TestCase):
                 "empresas",
                 "pobreza_comunal",
                 "consumo_electrico_comunal",
+                "partidos_politicos",
+                "autoridades_electas",
             ],
         )
 
@@ -1267,9 +1273,9 @@ class ChileHubCliTests(unittest.TestCase):
     def test_cli_dataset_status_and_changelog(self):
         status = self.run_cli("dataset-status")
         changelog = self.run_cli("dataset-changelog")
-        self.assertIn('"dataset_count": 17', status.stdout)
+        self.assertIn(f'"dataset_count": {EXPECTED_DATASET_COUNT}', status.stdout)
         self.assertIn('"dataset": "perfil_territorial_comunal"', status.stdout)
-        self.assertIn('"dataset_count": 17', changelog.stdout)
+        self.assertIn(f'"dataset_count": {EXPECTED_DATASET_COUNT}', changelog.stdout)
         self.assertIn('"record_count_delta"', changelog.stdout)
 
     def test_cli_report(self):

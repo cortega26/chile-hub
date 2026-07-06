@@ -1,9 +1,9 @@
 {
-  "generated_at_utc": "2026-06-30T21:18:43.891603+00:00",
-  "dataset_count": 17,
+  "generated_at_utc": "2026-07-06T15:21:31.259458+00:00",
+  "dataset_count": 19,
   "grade_distribution": {
-    "A": 16,
-    "B": 1,
+    "A": 19,
+    "B": 0,
     "C": 0,
     "D": 0,
     "F": 0
@@ -18,6 +18,32 @@
     "reuse_policy": 10
   },
   "datasets": [
+    {
+      "dataset": "autoridades_electas",
+      "maturity_status": "stable",
+      "overall_score": 90.0,
+      "grade": "A",
+      "dimensions": {
+        "validation": 100,
+        "schema_contract": 100,
+        "source_readiness": 50,
+        "freshness": 100,
+        "coverage": 100,
+        "reuse_policy": 100
+      },
+      "weights": {
+        "validation": 25,
+        "schema_contract": 20,
+        "source_readiness": 20,
+        "freshness": 15,
+        "coverage": 10,
+        "reuse_policy": 10
+      },
+      "blocking_reasons": [
+        "Fuente no lista para live"
+      ],
+      "recommended_action": "codigo_region/periodo de senadores completados desde senado.cl (REGION/PERIODOS). gobernador_regional y alcalde viven en el dataset segregado autoridades_locales (CC-BY-SA, candidate) por decisión de licencia."
+    },
     {
       "dataset": "censo_comunal",
       "maturity_status": "stable",
@@ -274,13 +300,13 @@
     {
       "dataset": "indicadores",
       "maturity_status": "stable",
-      "overall_score": 82.5,
-      "grade": "B",
+      "overall_score": 90.0,
+      "grade": "A",
       "dimensions": {
         "validation": 100,
         "schema_contract": 100,
         "source_readiness": 100,
-        "freshness": 50,
+        "freshness": 100,
         "coverage": 0,
         "reuse_policy": 100
       },
@@ -293,7 +319,6 @@
         "reuse_policy": 10
       },
       "blocking_reasons": [
-        "Datos stale",
         "Cobertura not_applicable"
       ],
       "recommended_action": "Monitor empty monthly IPC responses and published backfill behavior."
@@ -323,6 +348,32 @@
         "Cobertura partial"
       ],
       "recommended_action": "Monitorear si INE publica una 6ta medición (post-2022) y actualizar URL y SHEET_YEARS."
+    },
+    {
+      "dataset": "partidos_politicos",
+      "maturity_status": "stable",
+      "overall_score": 90.0,
+      "grade": "A",
+      "dimensions": {
+        "validation": 100,
+        "schema_contract": 100,
+        "source_readiness": 50,
+        "freshness": 100,
+        "coverage": 100,
+        "reuse_policy": 100
+      },
+      "weights": {
+        "validation": 25,
+        "schema_contract": 20,
+        "source_readiness": 20,
+        "freshness": 15,
+        "coverage": 10,
+        "reuse_policy": 10
+      },
+      "blocking_reasons": [
+        "Fuente no lista para live"
+      ],
+      "recommended_action": "estado_legal/fecha_constitucion completados desde SERVEL (15/36 partidos matcheados por nombre; el resto son históricos no listados en SERVEL). ambito (nacional/regional) queda nullable: no se encontró esa señal en ninguna fuente institucional disponible."
     },
     {
       "dataset": "perfil_territorial_comunal",

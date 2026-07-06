@@ -295,6 +295,8 @@ def build_dataset_metadata(dfs, meta):
     df_empresas = dfs["empresas"]
     df_pobreza_comunal = dfs["pobreza_comunal"]
     df_consumo_electrico = dfs["consumo_electrico"]
+    df_partidos_politicos = dfs["partidos_politicos"]
+    df_autoridades_electas = dfs["autoridades_electas"]
     df_regiones = dfs["regiones"]
     df_provincias = dfs["provincias"]
     df_perfil_territorial = dfs["perfil_territorial"]
@@ -311,6 +313,8 @@ def build_dataset_metadata(dfs, meta):
     empresas_metadata = meta["empresas"]
     pobreza_comunal_metadata = meta["pobreza_comunal"]
     consumo_electrico_metadata = meta["consumo_electrico"]
+    partidos_politicos_metadata = meta["partidos_politicos"]
+    autoridades_electas_metadata = meta["autoridades_electas"]
 
     dataset_metadata = {
         "regiones": {
@@ -585,6 +589,54 @@ def build_dataset_metadata(dfs, meta):
                 }
             }
             if df_consumo_electrico is not None and consumo_electrico_metadata is not None
+            else {}
+        ),
+        **(
+            {
+                "partidos_politicos": {
+                    "dataset": "partidos_politicos",
+                    "source_name": partidos_politicos_metadata.get("source_name", ""),
+                    "source_url": partidos_politicos_metadata.get("source_url", ""),
+                    "source_mode": partidos_politicos_metadata.get("source_mode", "fallback"),
+                    "source_detail": partidos_politicos_metadata.get("source_detail", ""),
+                    "refreshed_at_utc": partidos_politicos_metadata.get("refreshed_at_utc", ""),
+                    "record_count": df_partidos_politicos.height,
+                    "fields": df_partidos_politicos.columns,
+                    "notes": partidos_politicos_metadata.get("notes", []),
+                    "reuse_policy": DATASET_CATALOG_CONFIG["partidos_politicos"]["reuse_policy"],
+                    "freshness": build_freshness(
+                        partidos_politicos_metadata.get("refreshed_at_utc", ""),
+                        DATASET_CATALOG_CONFIG["partidos_politicos"]["freshness_policy"][
+                            "max_age_hours"
+                        ],
+                    ),
+                }
+            }
+            if df_partidos_politicos is not None and partidos_politicos_metadata is not None
+            else {}
+        ),
+        **(
+            {
+                "autoridades_electas": {
+                    "dataset": "autoridades_electas",
+                    "source_name": autoridades_electas_metadata.get("source_name", ""),
+                    "source_url": autoridades_electas_metadata.get("source_url", ""),
+                    "source_mode": autoridades_electas_metadata.get("source_mode", "fallback"),
+                    "source_detail": autoridades_electas_metadata.get("source_detail", ""),
+                    "refreshed_at_utc": autoridades_electas_metadata.get("refreshed_at_utc", ""),
+                    "record_count": df_autoridades_electas.height,
+                    "fields": df_autoridades_electas.columns,
+                    "notes": autoridades_electas_metadata.get("notes", []),
+                    "reuse_policy": DATASET_CATALOG_CONFIG["autoridades_electas"]["reuse_policy"],
+                    "freshness": build_freshness(
+                        autoridades_electas_metadata.get("refreshed_at_utc", ""),
+                        DATASET_CATALOG_CONFIG["autoridades_electas"]["freshness_policy"][
+                            "max_age_hours"
+                        ],
+                    ),
+                }
+            }
+            if df_autoridades_electas is not None and autoridades_electas_metadata is not None
             else {}
         ),
     }

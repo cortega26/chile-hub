@@ -1,5 +1,14 @@
 # Plan 021: Publicar documentación de API con MkDocs Material + mkdocstrings
 
+> **✅ DONE (2026-07-04).** Implementado con dos ajustes sobre el plan original:
+> (1) `mkdocstrings[python]` se pineó a `==1.0.4` (la serie ya es 1.x, no `>=0.27`);
+> (2) los SHAs pineados de `pages-deploy.yml` se tomaron de los vivos en
+> `pipeline-check.yml` (`setup-python` v6.3.0 `ece7cb06…`, no el v6.2.0 del plan —
+> drift confirmado). `timeout-minutes` del deploy subido de 5 a 10 por el paso de build.
+> `docstring_style: google` confirmado. Verificado: `make docs-build` exit 0, la
+> referencia de API extrae `ChileHub`/`ChileHubDataManager`/excepciones, `make lint`
+> exit 0, `index.html`/`app.js` sin cambios, `/reference/` ignorado.
+
 > **Executor instructions**: Sigue este plan paso a paso. Ejecuta cada comando de
 > verificación y confirma el resultado esperado antes de pasar al siguiente paso.
 > Si ocurre algo de la sección "STOP conditions", detente y reporta — no improvises.

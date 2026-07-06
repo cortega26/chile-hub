@@ -1,14 +1,14 @@
 {
-  "generated_at_utc": "2026-06-30T21:18:43.891603+00:00",
+  "generated_at_utc": "2026-07-06T15:21:31.259458+00:00",
   "overall_status": "warn",
-  "dataset_count": 17,
+  "dataset_count": 19,
   "live_count": 15,
-  "fallback_count": 2,
-  "stale_count": 1,
-  "drifted_count": 6,
+  "fallback_count": 4,
+  "stale_count": 0,
+  "drifted_count": 8,
   "degraded_count": 0,
   "partial_coverage_count": 2,
-  "warning_count": 11,
+  "warning_count": 12,
   "top_issue": {
     "dataset": "consumo_electrico_comunal",
     "attention_priority": 0,
@@ -26,7 +26,7 @@
   "primary_package": {
     "path": "data/normalized/chile-hub-publishable-bundle.zip",
     "package_type": "zip",
-    "size_bytes": 29272582,
+    "size_bytes": 29270512,
     "checksum_algorithm": "sha256",
     "checksum_path": "data/normalized/chile-hub-publishable-bundle.zip.sha256",
     "verification_command": "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256"
@@ -56,6 +56,14 @@
     "status_markdown"
   ],
   "datasets": [
+    {
+      "dataset": "autoridades_electas",
+      "source_mode": "live",
+      "validation_status": "ok",
+      "freshness_status": "fresh",
+      "coverage_status": "full",
+      "drift_status": "healthy"
+    },
     {
       "dataset": "censo_comunal",
       "source_mode": "live",
@@ -130,7 +138,7 @@
     },
     {
       "dataset": "finanzas_municipales",
-      "source_mode": "live",
+      "source_mode": "fallback",
       "validation_status": "ok",
       "freshness_status": "fresh",
       "coverage_status": "partial",
@@ -140,7 +148,7 @@
       "dataset": "indicadores",
       "source_mode": "live",
       "validation_status": "ok",
-      "freshness_status": "stale",
+      "freshness_status": "fresh",
       "coverage_status": "not_applicable",
       "drift_status": "drifted"
     },
@@ -153,12 +161,20 @@
       "drift_status": "drifted"
     },
     {
-      "dataset": "perfil_territorial_comunal",
+      "dataset": "partidos_politicos",
       "source_mode": "live",
       "validation_status": "ok",
       "freshness_status": "fresh",
       "coverage_status": "full",
-      "drift_status": "healthy"
+      "drift_status": "drifted"
+    },
+    {
+      "dataset": "perfil_territorial_comunal",
+      "source_mode": "fallback",
+      "validation_status": "ok",
+      "freshness_status": "fresh",
+      "coverage_status": "full",
+      "drift_status": "drifted"
     },
     {
       "dataset": "pobreza_comunal",

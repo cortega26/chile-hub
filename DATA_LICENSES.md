@@ -28,3 +28,13 @@ chile-hub provenance
 Si una fuente tiene términos ambiguos o restrictivos, la política del proyecto es
 excluirla de los paquetes públicos hasta que se resuelva el estado de
 redistribución.
+
+## Datasets con licencia share-alike (segregados)
+
+El dataset **`autoridades_locales`** (gobernadores regionales; carril `candidate`) se
+compila desde **Wikipedia**, cuya licencia es **CC-BY-SA 4.0 (share-alike)**. Para
+evitar que la obligación share-alike se propague al resto del bundle (mayormente CC-BY /
+CC0), este dataset se mantiene **segregado**: los cargos de fuente oficial (diputados y
+senadores) viven en `autoridades_electas` (CC-BY) y **no** se mezclan con los de
+Wikipedia. Quien redistribuya `autoridades_locales` debe cumplir CC-BY-SA (atribución +
+share-alike). Ver `docs/datasets/autoridades_locales.md`.
