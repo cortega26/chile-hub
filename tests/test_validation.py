@@ -19,6 +19,7 @@ if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
 from src.validation import (
+    validate_autoridades_electas,
     validate_censo_comunal,
     validate_censo_hogares_viviendas,
     validate_comunas,
@@ -28,6 +29,7 @@ from src.validation import (
     validate_establecimientos_educacionales,
     validate_establecimientos_salud,
     validate_indicadores,
+    validate_partidos_politicos,
     validate_pobreza_comunal,
     validate_provincias,
     validate_regiones,
@@ -1441,6 +1443,173 @@ class ConsumoElectricoValidatorTests(unittest.TestCase):
         result = validate_consumo_electrico_comunal(df)
         self.assertEqual(result["status"], "error")
         self.assertTrue(any("duplicate" in e for e in result["errors"]))
+
+
+class PartidosPoliticosValidatorTests(unittest.TestCase):
+    """Tests unitarios para validate_partidos_politicos (Plan 023)."""
+
+    def _make_df(self, rows):
+        return pl.DataFrame(
+            rows,
+            schema={
+                "id_partido": pl.String,
+                "nombre": pl.String,
+                "sigla": pl.String,
+                "estado_legal": pl.String,
+                "fecha_constitucion": pl.String,
+                "ambito": pl.String,
+                "fuente": pl.String,
+                "url_fuente": pl.String,
+                "fecha_consulta": pl.String,
+            },
+        )
+
+    def test_valid_data_returns_ok(self):
+        df = self._make_df(
+            [
+                {
+                    "id_partido": "1",
+                    "nombre": "Unión Demócrata Independiente",
+                    "sigla": "UDI",
+                    "estado_legal": "constituido",
+                    "fecha_constitucion": "1989-05-03",
+                    "ambito": None,
+                    "fuente": "Cámara",
+                    "url_fuente": "https://example.com",
+                    "fecha_consulta": "2026-07-06",
+                }
+            ]
+        )
+        result = validate_partidos_politicos(df)
+        self.assertEqual(result["status"], "ok")
+
+    def test_nulls_en_estado_legal_no_fallan(self):
+        """Un partido sin match en SERVEL queda con estado_legal nulo — no es error."""
+        df = self._make_df(
+            [
+                {
+                    "id_partido": "2",
+                    "nombre": "Partido Histórico",
+                    "sigla": "PH",
+                    "estado_legal": None,
+                    "fecha_constitucion": None,
+                    "ambito": None,
+                    "fuente": "Cámara",
+                    "url_fuente": "https://example.com",
+                    "fecha_consulta": "2026-07-06",
+                }
+            ]
+        )
+        result = validate_partidos_politicos(df)
+        self.assertEqual(result["status"], "ok")
+
+    def test_empty_dataframe_returns_error(self):
+        result = validate_partidos_politicos(self._make_df([]))
+        self.assertEqual(result["status"], "error")
+
+    def test_duplicate_key_returns_error(self):
+        row = {
+            "id_partido": "1",
+            "nombre": "Partido X",
+            "sigla": "PX",
+            "estado_legal": None,
+            "fecha_constitucion": None,
+            "ambito": None,
+            "fuente": "Cámara",
+            "url_fuente": "https://example.com",
+            "fecha_consulta": "2026-07-06",
+        }
+        result = validate_partidos_politicos(self._make_df([row, row]))
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("duplicate" in e for e in result["errors"]))
+
+    def test_estado_legal_fuera_de_dominio_es_error(self):
+        df = self._make_df(
+            [
+                {
+                    "id_partido": "1",
+                    "nombre": "Partido X",
+                    "sigla": "PX",
+                    "estado_legal": "activo",
+                    "fecha_constitucion": None,
+                    "ambito": None,
+                    "fuente": "Cámara",
+                    "url_fuente": "https://example.com",
+                    "fecha_consulta": "2026-07-06",
+                }
+            ]
+        )
+        result = validate_partidos_politicos(df)
+        self.assertEqual(result["status"], "error")
+
+
+class AutoridadesElectasValidatorTests(unittest.TestCase):
+    """Tests unitarios para validate_autoridades_electas (Plan 023)."""
+
+    def _make_df(self, rows):
+        return pl.DataFrame(
+            rows,
+            schema={
+                "id_autoridad": pl.String,
+                "nombre": pl.String,
+                "cargo": pl.String,
+                "institucion": pl.String,
+                "partido": pl.String,
+                "codigo_comuna": pl.String,
+                "codigo_region": pl.String,
+                "fuente": pl.String,
+                "url_fuente": pl.String,
+                "fecha_consulta": pl.String,
+            },
+        )
+
+    def _row(self, **overrides):
+        row = {
+            "id_autoridad": "senador_1",
+            "nombre": "Nombre Apellido",
+            "cargo": "senador",
+            "institucion": "Senado",
+            "partido": "Partido X",
+            "codigo_comuna": None,
+            "codigo_region": "02",
+            "fuente": "Senado",
+            "url_fuente": "https://example.com",
+            "fecha_consulta": "2026-07-06",
+        }
+        row.update(overrides)
+        return row
+
+    def test_valid_data_returns_ok(self):
+        result = validate_autoridades_electas(self._make_df([self._row()]))
+        self.assertEqual(result["status"], "ok")
+
+    def test_empty_dataframe_returns_error(self):
+        result = validate_autoridades_electas(self._make_df([]))
+        self.assertEqual(result["status"], "error")
+
+    def test_duplicate_key_returns_error(self):
+        row = self._row()
+        result = validate_autoridades_electas(self._make_df([row, row]))
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("duplicate" in e for e in result["errors"]))
+
+    def test_cargo_fuera_de_dominio_v1_es_error(self):
+        df = self._make_df([self._row(id_autoridad="alcalde_1", cargo="alcalde")])
+        result = validate_autoridades_electas(df)
+        self.assertEqual(result["status"], "error")
+
+    def test_codigo_region_invalido_es_error(self):
+        df = self._make_df([self._row(codigo_region="2")])
+        result = validate_autoridades_electas(df)
+        self.assertEqual(result["status"], "error")
+
+    def test_codigo_region_nulo_no_falla(self):
+        """Diputados no tienen codigo_region en v1 — nulo no debe fallar la validación."""
+        df = self._make_df(
+            [self._row(id_autoridad="diputado_1", cargo="diputado", codigo_region=None)]
+        )
+        result = validate_autoridades_electas(df)
+        self.assertEqual(result["status"], "ok")
 
 
 if __name__ == "__main__":

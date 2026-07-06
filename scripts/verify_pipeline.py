@@ -183,6 +183,7 @@ def verify_source_registry(registry=None, catalog=None):
         "direct_file",
         "landing_snapshot",
         "derived",
+        "scraping_html",
         "scraping_html_post",
         "scraping_playwright_xml",
         "xlsx",

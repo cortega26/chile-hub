@@ -84,6 +84,7 @@ doctor:
 	@$(PYTHON) -c "import duckdb, polars, pyarrow; from importlib.metadata import version; print('duckdb=' + duckdb.__version__); print('polars=' + polars.__version__); print('pyarrow=' + pyarrow.__version__); print('playwright=' + version('playwright'))"
 	@$(PYTHON) scripts/check_validation_registration.py
 
+extract:
 	PYTHONPATH=src $(PYTHON) src/extractors/subdere_extractor.py
 	PYTHONPATH=src $(PYTHON) src/extractors/bcentral_extractor.py
 	PYTHONPATH=src $(PYTHON) src/extractors/censo_extractor.py
@@ -97,6 +98,8 @@ doctor:
 	PYTHONPATH=src $(PYTHON) src/extractors/res_extractor.py
 	PYTHONPATH=src $(PYTHON) src/extractors/pobreza_extractor.py
 	PYTHONPATH=src $(PYTHON) src/extractors/consumo_electrico_extractor.py
+	PYTHONPATH=src $(PYTHON) src/extractors/partidos_politicos_extractor.py
+	PYTHONPATH=src $(PYTHON) src/extractors/autoridades_electas_extractor.py
 
 build:
 	$(PYTHON) src/build_dev_db.py

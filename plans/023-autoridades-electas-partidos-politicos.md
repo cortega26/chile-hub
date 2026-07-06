@@ -96,6 +96,61 @@
     `license_status: share-alike`), mapas en reports.py, nota de segregación en
     `DATA_LICENSES.md`. **531 tests verdes.**
 
+**2026-07-06 — Promoción a `stable_publishable`:**
+
+- ✅ **`partidos_politicos` y `autoridades_electas` promovidos a `stable_publishable`,
+  cableados al bundle público real.** Decisiones tomadas con el operador antes de
+  codificar: (1) cerrar el gap de SERVEL para partidos aceptando `ambito` nulo (sin
+  fuente encontrada); (2) cablear `codigo_region`/`periodo` de senadores; (3)
+  `autoridades_locales` **NO se promueve** — cobertura de alcaldes (165/345) insuficiente
+  a criterio del operador, requiere mejorar el extractor primero; (4) licencia CC-BY-SA
+  de `autoridades_locales` en el bundle ya aprobada para cuando se retome.
+  - **`partidos_politicos`**: nuevo `fetch_servel_estado_legal()` en el extractor —
+    scraping de dos páginas HTML estáticas y reales de SERVEL
+    (`partidos-constituidos`/`partidos-en-formacion`, verificadas en vivo), parseo de
+    fecha en español, join por nombre normalizado (con fallback de sufijo "de Chile").
+    Resultado real: **15/36 partidos con `estado_legal`/`fecha_constitucion`** (el resto
+    son históricos que no aparecen en SERVEL — coherente con que el roster de la Cámara
+    incluye militancias pasadas). `ambito` queda nulo, documentado.
+  - **`autoridades_electas`**: `codigo_region`/`periodo_inicio`/`periodo_fin` de
+    senadores poblados desde campos ya presentes en `senado.cl` (`REGION`, `PERIODOS`)
+    que el extractor descartaba. **50/50 senadores con ambos campos.**
+  - Nuevo módulo compartido `src/extractors/region_utils.py` (mapa nombre-de-región →
+    código CUT + normalizador de texto), extraído de `autoridades_locales_extractor.py`
+    para reutilizarse en `autoridades_electas_extractor.py` sin duplicar el dict de 16
+    regiones.
+  - Cableado real: `data/dataset_catalog_config.json` (nuevas entradas),
+    `src/builders/_shared.py` (constantes de metadata path),
+    `src/build_dev_db.py`/`src/builders/metadata.py` (`_load_inputs`,
+    `_compute_validations`, `_write_data_artifacts`, `build_dataset_metadata` — 4 puntos
+    de cableado, no 2 como asumía el plan original), `src/validation.py`
+    (`validate_partidos_politicos`, `validate_autoridades_electas`),
+    `data/source_registry.json` (`publication_track: stable_publishable`,
+    `public_bundle_eligible: true`, `live_ready: true`).
+  - **3 bugs preexistentes encontrados y corregidos** (no introducidos hoy, pero
+    bloqueaban la verificación): (1) el target `extract` del Makefile no tenía regla —
+    sus 13 líneas quedaban colgando como parte del recipe de `doctor:`, así que
+    `make extract` era un no-op silencioso; (2) `subdere_extractor.py` importaba
+    `from src.extractors.base import ...` sin el bootstrap de `sys.path` que sí tienen
+    los demás extractores, y fallaba al invocarse como script (reproducido también en la
+    forma exacta que usa `pipeline-check.yml`); (3) `data/source_registry.json` tenía dos
+    valores de enum inválidos (`access_method: "api_scraping"` en autoridades_electas y
+    `"scraping_html"` en autoridades_locales, este último ya inválido desde antes) y
+    `autoridades_locales` nunca se había añadido a `DATASET_CATALOG_CONFIG` (requerido
+    para *cualquier* entrada del registro, sea `candidate` o `stable`, igual que
+    `delincuencia_comunal`) — ninguno se había detectado porque `make verify` nunca se
+    había corrido con este estado del registro.
+  - Pipeline completo verificado de punta a punta: `make extract` (15 extractores) →
+    `make build` (incl. ~1.5M filas de empresas) → `make verify` (19 datasets, 0 errores)
+    → `make test` (**549 tests verdes**, sube de 531 por los tests nuevos de SERVEL/
+    senadores/validadores) → `make verify-landing` → `make lint`/`make format-check`.
+    Conteos de datasets hardcodeados en tests (`EXPECTED_DATASET_COUNT`, listas de
+    `list_datasets()`, `public_dataset_count`) actualizados de 17→19 / 16→18.
+  - `autoridades_locales` queda con entrada nueva en `DATASET_CATALOG_CONFIG` (sin
+    `outputs`, igual que `delincuencia_comunal`) solo para que el registro sea válido —
+    su `publication_track` sigue `candidate`, sin cambios de cobertura ni de cableado al
+    build.
+
 ## Why this matters
 
 El Plan 022 (Ola B2.2) cerró la **research legal y de fuentes** del dominio electoral
@@ -464,21 +519,29 @@ público".
 
 ## Done criteria
 
-**Ola A** (todas):
-- [ ] `contracts/datasets/autoridades_electas.schema.json` existe y valida el dataset.
-- [ ] `src/extractors/autoridades_electas_extractor.py` genera staging CSV + metadata.
-- [ ] Entrada(s) en `data/source_registry.json` con carril decidido y justificado.
-- [ ] Entrada en `DATASET_CATALOG_CONFIG` (`src/builders/catalog.py`).
-- [ ] `docs/datasets/autoridades_electas.md` con declaración de límite de datos.
-- [ ] Línea en `Makefile` target `extract`; snapshot de fallback versionado.
-- [ ] Tests del extractor + contrato + reconciliación + negativo de datos personales.
-- [ ] `make refresh` exit 0; sin regresiones; landing y `hub_health` reflejan el dataset.
+**Ola A** (todas) — ✅ **DONE (2026-07-06)**:
+- [x] `contracts/datasets/autoridades_electas.schema.json` existe y valida el dataset.
+- [x] `src/extractors/autoridades_electas_extractor.py` genera staging CSV + metadata.
+- [x] Entrada(s) en `data/source_registry.json` con carril decidido y justificado
+      (`stable_publishable`, `public_bundle_eligible: true`, `live_ready: true`).
+- [x] Entrada en `DATASET_CATALOG_CONFIG` (`data/dataset_catalog_config.json`).
+- [x] `docs/datasets/autoridades_electas.md` con declaración de límite de datos.
+- [x] Línea en `Makefile` target `extract`; fallback vía `fallback_to_last_snapshot` +
+      cache de staging en CI (no snapshot versionado aparte).
+- [x] Tests del extractor + contrato + reconciliación + negativo de datos personales.
+- [x] `make refresh` (extract+build+verify+test+verify-landing+lint+format-check) exit 0;
+      sin regresiones; landing y `hub_health` reflejan el dataset (19 datasets).
 
-**Ola B**: los mismos criterios con `partidos_politicos`.
+**Ola B** — ✅ **DONE (2026-07-06)**: los mismos criterios con `partidos_politicos`.
 
 **Cierre**:
-- [ ] `plans/README.md` actualizado (estado/orden); archivado cuando ambas olas `DONE`.
-- [ ] `make check` exit 0.
+- [x] `plans/README.md` actualizado (estado/orden). **No se archiva todavía**: el
+      dataset `autoridades_locales` (añadido a este plan por decisión del operador,
+      2026-07-06) queda `candidate` — cobertura de alcaldes (165/345) insuficiente para
+      el operador; requiere mejorar el extractor antes de promover. Ver nota de
+      seguimiento en "Progreso de implementación".
+- [x] `make check` exit 0 (build/verify/test/verify-landing/lint/format-check, cada uno
+      corrido individualmente con éxito el 2026-07-06).
 
 ## STOP conditions
 

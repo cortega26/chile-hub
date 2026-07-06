@@ -1521,6 +1521,73 @@ class PartidosPoliticosExtractorTests(unittest.TestCase):
         self.assertEqual(result["status"], "error")  # 2 < MIN_EXPECTED_PARTIES
         self.assertEqual(result["record_count"], 2)
 
+    def test_parse_partidos_con_servel_lookup(self):
+        """El join con SERVEL completa estado_legal/fecha_constitucion; ambito queda nulo."""
+        servel_lookup = {"partido democrata cristiano": ("constituido", "1988-05-02")}
+        df = partidos_politicos_extractor.parse_partidos(self.XML, servel_lookup)
+        dc = df.filter(pl.col("id_partido") == "DC").row(0, named=True)
+        self.assertEqual(dc["estado_legal"], "constituido")
+        self.assertEqual(dc["fecha_constitucion"], "1988-05-02")
+        self.assertIsNone(dc["ambito"])
+        fa = df.filter(pl.col("id_partido") == "FA").row(0, named=True)
+        self.assertIsNone(fa["estado_legal"])  # sin match en SERVEL, no se inventa
+
+    def test_parse_fecha_espanol(self):
+        f = partidos_politicos_extractor._parse_fecha_espanol
+        self.assertEqual(f("2 de mayo de 1988"), "1988-05-02")
+        self.assertEqual(f("13 de abril de 2017"), "2017-04-13")
+        self.assertIsNone(f("fecha desconocida"))
+
+    def test_norm_partido_quita_sufijo_de_chile(self):
+        f = partidos_politicos_extractor._norm_partido
+        self.assertEqual(f("Partido Comunista"), f("Partido Comunista de Chile"))
+
+    def test_parse_servel_tabla_constituidos(self):
+        html_fragment = (
+            "<table>"
+            "<tr><td>Partidos Políticos</td><td>Fecha de constitución</td><td>Ver</td></tr>"
+            "<tr><td>Fecha Constitución Partidos Políticos</td><td>12 de junio de 2026</td>"
+            "<td></td></tr>"
+            "<tr><td>Partido Demócrata Cristiano</td><td>2 de mayo de 1988</td><td></td></tr>"
+            "</table>"
+        )
+        filas = partidos_politicos_extractor._parse_servel_tabla(html_fragment, con_fecha=True)
+        self.assertEqual(filas, [("Partido Demócrata Cristiano", "2 de mayo de 1988")])
+
+    def test_fetch_servel_estado_legal_degrada_si_falla_la_red(self):
+        with patch.object(
+            partidos_politicos_extractor,
+            "fetch_with_retry",
+            side_effect=OSError("sin red"),
+        ):
+            lookup = partidos_politicos_extractor.fetch_servel_estado_legal()
+        self.assertEqual(lookup, {})
+
+    def test_fetch_servel_estado_legal_combina_ambas_paginas(self):
+        constituidos_html = (
+            "<table><tr><td>Partido Demócrata Cristiano</td>"
+            "<td>2 de mayo de 1988</td><td></td></tr></table>"
+        )
+        en_formacion_html = (
+            "<table><tr><td>Partido Cristiano de Chile</td><td>Ver</td></tr></table>"
+        )
+
+        def _fake_fetch(url, **kwargs):
+            resp = MagicMock()
+            resp.text = (
+                constituidos_html
+                if url == partidos_politicos_extractor.SERVEL_CONSTITUIDOS_URL
+                else en_formacion_html
+            )
+            return resp
+
+        with patch.object(
+            partidos_politicos_extractor, "fetch_with_retry", side_effect=_fake_fetch
+        ):
+            lookup = partidos_politicos_extractor.fetch_servel_estado_legal()
+        self.assertEqual(lookup["partido democrata cristiano"], ("constituido", "1988-05-02"))
+        self.assertEqual(lookup["partido cristiano"], ("en_formacion", None))
+
 
 class AutoridadesElectasExtractorTests(unittest.TestCase):
     """Tests del extractor de autoridades electas (Plan 023 · Ola A, cargo diputados)."""
@@ -1576,6 +1643,10 @@ class AutoridadesElectasExtractorTests(unittest.TestCase):
                 "CIRCUNSCRIPCION_ID": 3,
                 "REGION": "Región de Antofagasta",
                 "EMAIL": "x@senado.cl",
+                "PERIODOS": [
+                    {"DESDE": "2022", "HASTA": "2026", "VIGENTE": 0},
+                    {"DESDE": "2026", "HASTA": "2030", "VIGENTE": 1},
+                ],
             }
         ]
         df = autoridades_electas_extractor.build_autoridades_df(self.XML, self.DISTRITOS, senadores)
@@ -1585,8 +1656,26 @@ class AutoridadesElectasExtractorTests(unittest.TestCase):
         self.assertEqual(sen["nombre"], "Pedro Araya Guerrero")
         self.assertEqual(sen["circunscripcion_senatorial"], "3")
         self.assertEqual(sen["institucion"], "Senado")
+        self.assertEqual(sen["codigo_region"], "02")
+        self.assertEqual(sen["periodo_inicio"], "2026-03-11")
+        self.assertEqual(sen["periodo_fin"], "2030-03-10")
         # el email no debe filtrarse como columna
         self.assertNotIn("email", {c.lower() for c in df.columns})
+
+    def test_senador_sin_periodo_vigente_queda_nulo(self):
+        senadores = [
+            {
+                "ID_PARLAMENTARIO": 1111,
+                "NOMBRE_COMPLETO": "Alguien Sin Vigente",
+                "REGION": "Región de Magallanes y la Antártica Chilena",
+                "PERIODOS": [{"DESDE": "2018", "HASTA": "2022", "VIGENTE": 0}],
+            }
+        ]
+        df = autoridades_electas_extractor.build_autoridades_df(self.XML, self.DISTRITOS, senadores)
+        sen = df.filter(pl.col("id_autoridad") == "senador_1111").row(0, named=True)
+        self.assertIsNone(sen["periodo_inicio"])
+        self.assertIsNone(sen["periodo_fin"])
+        self.assertEqual(sen["codigo_region"], "12")  # variante real de senado.cl
 
 
 class AutoridadesLocalesExtractorTests(unittest.TestCase):

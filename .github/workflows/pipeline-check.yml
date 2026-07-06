@@ -128,6 +128,8 @@ jobs:
             python src/extractors/res_extractor.py
             python src/extractors/pobreza_extractor.py
             python src/extractors/consumo_electrico_extractor.py
+            python src/extractors/partidos_politicos_extractor.py
+            python src/extractors/autoridades_electas_extractor.py
           fi
 
       - name: Build outputs

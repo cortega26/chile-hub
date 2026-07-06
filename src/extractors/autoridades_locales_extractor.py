@@ -28,7 +28,6 @@ import datetime
 import os
 import re
 import sys
-import unicodedata
 from pathlib import Path
 
 import polars as pl
@@ -46,9 +45,11 @@ try:
         write_staging_metadata,
     )
     from src.extractors.http_utils import fetch_with_retry
+    from src.extractors.region_utils import REGION_A_CODIGO, norm_text
 except ModuleNotFoundError:
     from base import BaseExtractor, ensure_staging_directories, write_staging_metadata
     from http_utils import fetch_with_retry
+    from region_utils import REGION_A_CODIGO, norm_text
 
 DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data"))
 STAGING_DIR = os.path.join(DATA_DIR, "staging")
@@ -112,39 +113,6 @@ _REGION_TITLE_RE = re.compile(
 def _region_from_title(title: str) -> str | None:
     match = _REGION_TITLE_RE.match(title.strip())
     return match.group(1).strip() if match else None
-
-
-def _norm(text: str) -> str:
-    """Minúsculas sin acentos, para emparejar nombres de región."""
-    nfkd = unicodedata.normalize("NFKD", text.lower().strip())
-    return "".join(c for c in nfkd if not unicodedata.combining(c))
-
-
-# Nombre corto de región (como aparece en Wikipedia) -> código CUT de 2 dígitos.
-_REGION_A_CODIGO = {
-    "arica y parinacota": "15",
-    "tarapaca": "01",
-    "antofagasta": "02",
-    "atacama": "03",
-    "coquimbo": "04",
-    "valparaiso": "05",
-    "metropolitana de santiago": "13",
-    "metropolitana": "13",
-    "libertador general bernardo o'higgins": "06",
-    "o'higgins": "06",
-    "maule": "07",
-    "nuble": "16",
-    "biobio": "08",
-    "la araucania": "09",
-    "araucania": "09",
-    "los rios": "14",
-    "los lagos": "10",
-    "santiago": "13",
-    "aysen del general carlos ibanez del campo": "11",
-    "aysen": "11",
-    "magallanes y de la antartica chilena": "12",
-    "magallanes": "12",
-}
 
 
 _WIKILINK_RE = re.compile(r"\[\[([^\]|]+)(?:\|([^\]]+))?\]\]")
@@ -377,10 +345,10 @@ def _normalize_gobernadores(
     rows: list[dict[str, str | None]] = []
     for g in gobernadores:
         region = g["region"].strip()
-        codigo_region = _REGION_A_CODIGO.get(_norm(region))
+        codigo_region = REGION_A_CODIGO.get(norm_text(region))
         rows.append(
             {
-                "id_autoridad": f"gobernador_{codigo_region or _norm(region).replace(' ', '_')}",
+                "id_autoridad": f"gobernador_{codigo_region or norm_text(region).replace(' ', '_')}",
                 "nombre": g["nombre"].strip(),
                 "cargo": "gobernador_regional",
                 "institucion": f"Gobierno Regional de {region}",
@@ -428,11 +396,11 @@ def _normalize_alcaldes(
         comuna = (a.get("comuna") or "").strip()
         if not comuna:
             continue
-        codigo_comuna, codigo_region = comunas_lookup.get(_norm(comuna), (None, None))
+        codigo_comuna, codigo_region = comunas_lookup.get(norm_text(comuna), (None, None))
         nombre = a.get("nombre")
         rows.append(
             {
-                "id_autoridad": f"alcalde_{codigo_comuna or _norm(comuna).replace(' ', '_')}",
+                "id_autoridad": f"alcalde_{codigo_comuna or norm_text(comuna).replace(' ', '_')}",
                 "nombre": nombre,
                 "cargo": "alcalde",
                 "institucion": f"Municipalidad de {comuna}",

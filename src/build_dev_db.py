@@ -24,6 +24,7 @@ UTC = timezone.utc
 # mantener compatibilidad con scripts externos y tests que las importan desde aquí;
 # DATASET_CATALOG_CONFIG se consume vía build_dev_db en verify_pipeline.py y tests).
 from src.builders._shared import (  # noqa: E402, F401
+    AUTORIDADES_ELECTAS_METADATA_PATH,
     CENSO_HOGARES_METADATA_PATH,
     CENSO_METADATA_PATH,
     COMUNAS_METADATA_PATH,
@@ -34,6 +35,7 @@ from src.builders._shared import (  # noqa: E402, F401
     FINANZAS_METADATA_PATH,
     INDICADORES_METADATA_PATH,
     NORMALIZED_DIR,
+    PARTIDOS_POLITICOS_METADATA_PATH,
     POBREZA_COMUNAL_METADATA_PATH,
     RESULTADOS_EDUCACIONALES_METADATA_PATH,
     SALUD_METADATA_PATH,
@@ -117,6 +119,7 @@ from src.pipeline_status_utils import (
     write_status_markdown_file,
 )
 from src.validation import (
+    validate_autoridades_electas,
     validate_censo_comunal,
     validate_censo_hogares_viviendas,
     validate_comunas,
@@ -128,6 +131,7 @@ from src.validation import (
     validate_finanzas_municipales,
     validate_indicadores,
     validate_indicadores_urbanos_siedu,
+    validate_partidos_politicos,
     validate_perfil_territorial_comunal,
     validate_pobreza_comunal,
     validate_provincias,
@@ -161,6 +165,8 @@ def _load_inputs():
     empresas_csv = os.path.join(STAGING_DIR, "empresas.csv")
     pobreza_comunal_csv = os.path.join(STAGING_DIR, "pobreza_comunal.csv")
     consumo_electrico_csv = os.path.join(STAGING_DIR, "consumo_electrico_comunal.csv")
+    partidos_politicos_csv = os.path.join(STAGING_DIR, "partidos_politicos.csv")
+    autoridades_electas_csv = os.path.join(STAGING_DIR, "autoridades_electas.csv")
 
     required_staging = (
         comunas_csv,
@@ -237,6 +243,16 @@ def _load_inputs():
     consumo_electrico_metadata = (
         load_metadata(CONSUMO_ELECTRICO_COMUNAL_METADATA_PATH)
         if os.path.exists(CONSUMO_ELECTRICO_COMUNAL_METADATA_PATH)
+        else None
+    )
+    partidos_politicos_metadata = (
+        load_metadata(PARTIDOS_POLITICOS_METADATA_PATH)
+        if os.path.exists(PARTIDOS_POLITICOS_METADATA_PATH)
+        else None
+    )
+    autoridades_electas_metadata = (
+        load_metadata(AUTORIDADES_ELECTAS_METADATA_PATH)
+        if os.path.exists(AUTORIDADES_ELECTAS_METADATA_PATH)
         else None
     )
 
@@ -409,6 +425,38 @@ def _load_inputs():
             reason="not_found_in_staging",
         )
 
+    # Partidos políticos: dataset opcional (nuevo)
+    df_partidos_politicos = None
+    if os.path.exists(partidos_politicos_csv) and partidos_politicos_metadata is not None:
+        df_partidos_politicos = pl.read_csv(partidos_politicos_csv, infer_schema_length=None)
+        log.info(
+            "dataset_loaded",
+            dataset="partidos_politicos",
+            records=df_partidos_politicos.height,
+        )
+    else:
+        log.info("dataset_skipped", dataset="partidos_politicos", reason="not_found_in_staging")
+
+    # Autoridades electas: dataset opcional (nuevo)
+    df_autoridades_electas = None
+    if os.path.exists(autoridades_electas_csv) and autoridades_electas_metadata is not None:
+        df_autoridades_electas = pl.read_csv(
+            autoridades_electas_csv,
+            schema_overrides={
+                "distrito_electoral": pl.String,
+                "circunscripcion_senatorial": pl.String,
+                "codigo_comuna": pl.String,
+                "codigo_region": pl.String,
+            },
+        )
+        log.info(
+            "dataset_loaded",
+            dataset="autoridades_electas",
+            records=df_autoridades_electas.height,
+        )
+    else:
+        log.info("dataset_skipped", dataset="autoridades_electas", reason="not_found_in_staging")
+
     df_regiones, df_provincias = derive_geography_layers(df_comunas)
     df_perfil_territorial = build_perfil_territorial_comunal(
         df_comunas,
@@ -436,6 +484,8 @@ def _load_inputs():
         "empresas": df_empresas,
         "pobreza_comunal": df_pobreza_comunal,
         "consumo_electrico": df_consumo_electrico,
+        "partidos_politicos": df_partidos_politicos,
+        "autoridades_electas": df_autoridades_electas,
         "regiones": df_regiones,
         "provincias": df_provincias,
         "perfil_territorial": df_perfil_territorial,
@@ -454,6 +504,8 @@ def _load_inputs():
         "empresas": empresas_metadata,
         "pobreza_comunal": pobreza_comunal_metadata,
         "consumo_electrico": consumo_electrico_metadata,
+        "partidos_politicos": partidos_politicos_metadata,
+        "autoridades_electas": autoridades_electas_metadata,
     }
     return dfs, meta, previous_pipeline_metadata
 
@@ -473,6 +525,8 @@ def _compute_validations(dfs, meta):
     df_empresas = dfs["empresas"]
     df_pobreza_comunal = dfs["pobreza_comunal"]
     df_consumo_electrico = dfs["consumo_electrico"]
+    df_partidos_politicos = dfs["partidos_politicos"]
+    df_autoridades_electas = dfs["autoridades_electas"]
     df_regiones = dfs["regiones"]
     df_provincias = dfs["provincias"]
     df_perfil_territorial = dfs["perfil_territorial"]
@@ -489,6 +543,8 @@ def _compute_validations(dfs, meta):
     empresas_metadata = meta["empresas"]
     pobreza_comunal_metadata = meta["pobreza_comunal"]
     consumo_electrico_metadata = meta["consumo_electrico"]
+    partidos_politicos_metadata = meta["partidos_politicos"]
+    autoridades_electas_metadata = meta["autoridades_electas"]
 
     validations = {
         "regiones": validate_regiones(df_regiones),
@@ -554,6 +610,26 @@ def _compute_validations(dfs, meta):
             if df_consumo_electrico is not None
             else {}
         ),
+        **(
+            {
+                "partidos_politicos": validate_partidos_politicos(
+                    df_partidos_politicos, partidos_politicos_metadata
+                )
+            }
+            if df_partidos_politicos is not None
+            else {}
+        ),
+        **(
+            {
+                "autoridades_electas": validate_autoridades_electas(
+                    df_autoridades_electas,
+                    autoridades_electas_metadata,
+                    df_comunas["codigo_comuna"].to_list(),
+                )
+            }
+            if df_autoridades_electas is not None
+            else {}
+        ),
         "perfil_territorial_comunal": validate_perfil_territorial_comunal(
             df_perfil_territorial,
             {
@@ -591,6 +667,8 @@ def _write_data_artifacts(dfs):
     df_empresas = dfs["empresas"]
     df_pobreza_comunal = dfs["pobreza_comunal"]
     df_consumo_electrico = dfs["consumo_electrico"]
+    df_partidos_politicos = dfs["partidos_politicos"]
+    df_autoridades_electas = dfs["autoridades_electas"]
     df_regiones = dfs["regiones"]
     df_provincias = dfs["provincias"]
     df_perfil_territorial = dfs["perfil_territorial"]
@@ -607,6 +685,10 @@ def _write_data_artifacts(dfs):
         extra_tables["pobreza_comunal"] = df_pobreza_comunal
     if df_consumo_electrico is not None:
         extra_tables["consumo_electrico_comunal"] = df_consumo_electrico
+    if df_partidos_politicos is not None:
+        extra_tables["partidos_politicos"] = df_partidos_politicos
+    if df_autoridades_electas is not None:
+        extra_tables["autoridades_electas"] = df_autoridades_electas
 
     # Convertir tablas extra a pandas UNA sola vez para SQLite y Excel.
     # Empresas tiene ~1.57M filas: la conversión es costosa y no debe duplicarse.

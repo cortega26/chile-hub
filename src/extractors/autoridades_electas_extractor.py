@@ -8,8 +8,9 @@ Fuentes:
 - Diputados — distrito: listado web de la Cámara (`camara.cl/diputados/diputados.aspx`),
   que bloquea HTTP simple (403) → se obtiene con **Scrapling** (headers stealth) y se une
   por `prmID` (== Id del web service).
-- Senadores — roster + partido + circunscripción + región: `senado.cl` (Next.js), cuyo
-  `__NEXT_DATA__` embebe la lista estructurada; se obtiene con **Scrapling**.
+- Senadores — roster + partido + circunscripción + región + período: `senado.cl`
+  (Next.js), cuyo `__NEXT_DATA__` embebe la lista estructurada (campos `REGION` y
+  `PERIODOS`, este último con el mandato vigente marcado); se obtiene con **Scrapling**.
 
 Cargos pendientes (ficha + plan): `gobernador_regional` (16), `alcalde` (345).
 
@@ -42,9 +43,11 @@ try:
         write_staging_metadata,
     )
     from src.extractors.http_utils import fetch_with_retry
+    from src.extractors.region_utils import region_nombre_a_codigo
 except ModuleNotFoundError:
     from base import BaseExtractor, ensure_staging_directories, write_staging_metadata
     from http_utils import fetch_with_retry
+    from region_utils import region_nombre_a_codigo
 
 DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data"))
 RAW_DIR = os.path.join(DATA_DIR, "raw")
@@ -210,6 +213,25 @@ def fetch_senadores() -> list[dict[str, Any]]:
     return best
 
 
+def _periodo_vigente(periodos: Any) -> tuple[str | None, str | None]:
+    """Extrae ``(periodo_inicio, periodo_fin)`` del mandato con ``VIGENTE == 1``.
+
+    ``senado.cl`` entrega ``PERIODOS`` como una lista de mandatos históricos con años
+    (``DESDE``/``HASTA``, sin día/mes). Se usa la misma convención de instalación del
+    Congreso que `PERIODO_DIPUTADOS` (11 de marzo → 10 de marzo) para expresarlos como
+    fecha completa. Sin una entrada vigente, ambos quedan `None` (no se inventa).
+    """
+    if not isinstance(periodos, list):
+        return None, None
+    for periodo in periodos:
+        if isinstance(periodo, dict) and periodo.get("VIGENTE") == 1:
+            desde, hasta = periodo.get("DESDE"), periodo.get("HASTA")
+            if desde and hasta:
+                return f"{desde}-03-11", f"{hasta}-03-10"
+            return None, None
+    return None, None
+
+
 def _normalize_senadores(
     senadores: list[dict[str, Any]], fecha_consulta: str
 ) -> list[dict[str, str | None]]:
@@ -221,6 +243,8 @@ def _normalize_senadores(
             continue
         circ = s.get("CIRCUNSCRIPCION_ID")
         partido = (s.get("PARTIDO") or "").strip()
+        region = (s.get("REGION") or "").strip()
+        periodo_inicio, periodo_fin = _periodo_vigente(s.get("PERIODOS"))
         rows.append(
             {
                 "id_autoridad": f"senador_{sid}",
@@ -232,9 +256,9 @@ def _normalize_senadores(
                 "distrito_electoral": None,
                 "circunscripcion_senatorial": str(circ) if circ is not None else None,
                 "codigo_comuna": None,
-                "codigo_region": None,
-                "periodo_inicio": None,
-                "periodo_fin": None,
+                "codigo_region": region_nombre_a_codigo(region) if region else None,
+                "periodo_inicio": periodo_inicio,
+                "periodo_fin": periodo_fin,
                 "estado_mandato": "vigente",
                 "fuente": "Senado de Chile",
                 "url_fuente": SENADORES_URL,
@@ -370,6 +394,9 @@ def process_autoridades_electas() -> str:
     n_dip = df.filter(pl.col("cargo") == "diputado").height
     n_sen = df.filter(pl.col("cargo") == "senador").height
     n_con_distrito = df.filter(pl.col("distrito_electoral").is_not_null()).height
+    n_sen_con_region = df.filter(
+        (pl.col("cargo") == "senador") & pl.col("codigo_region").is_not_null()
+    ).height
     metadata = {
         "dataset": "autoridades_electas",
         "source_name": "Cámara de Diputadas y Diputados + Senado de Chile",
@@ -382,8 +409,11 @@ def process_autoridades_electas() -> str:
         "record_count": df.height,
         "fields": df.columns,
         "notes": [
-            f"v1: diputados ({n_dip}) + senadores ({n_sen}). Gobernadores/alcaldes pendientes.",
+            f"v1: diputados ({n_dip}) + senadores ({n_sen}). Gobernador_regional/alcalde viven "
+            "en el dataset segregado autoridades_locales (licencia CC-BY-SA).",
             f"distrito_electoral vía Scrapling: {n_con_distrito}/{n_dip} diputados.",
+            f"codigo_region/periodo de senadores: {n_sen_con_region}/{n_sen} poblados desde "
+            "senado.cl (REGION/PERIODOS).",
             "RUT (Cámara) y email/teléfono (Senado) descartados (línea roja de datos personales).",
         ],
         "reuse_policy": REUSE_POLICY,

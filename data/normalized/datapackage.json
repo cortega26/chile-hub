@@ -4,7 +4,7 @@
   "description": "Capa de datos reproducible y curada sobre datasets publicos oficiales de Chile: geografia, demografia, salud, educacion, finanzas municipales e indicadores.",
   "version": "1.18.0",
   "homepage": "https://tooltician.com/chile-hub/",
-  "created": "2026-06-30T21:18:43.895965+00:00",
+  "created": "2026-07-06T15:21:31.265103+00:00",
   "resources": [
     {
       "name": "regiones",
@@ -546,7 +546,7 @@
       "sources": [
         {
           "title": "Ministerio de Salud - Establecimientos de Salud",
-          "path": "https://datos.gob.cl/dataset/3bf4cf7c-f638-4735-9a01-f65faae4beca/resource/2c44d782-3365-44e3-aefb-2c8b8363a1bc/download/establecimientos_20260616.csv"
+          "path": "https://datos.gob.cl/dataset/3bf4cf7c-f638-4735-9a01-f65faae4beca/resource/2c44d782-3365-44e3-aefb-2c8b8363a1bc/download/establecimientos_20260630.csv"
         }
       ],
       "licenses": [
@@ -1575,6 +1575,205 @@
         {
           "title": "CC BY",
           "path": "http://energiaabierta.cl/"
+        }
+      ]
+    },
+    {
+      "name": "partidos_politicos",
+      "path": "partidos_politicos.parquet",
+      "format": "parquet",
+      "mediatype": "application/vnd.apache.parquet",
+      "title": "partidos_politicos",
+      "description": "Roster de partidos políticos de Chile (Cámara de Diputadas y Diputados), con estado_legal y fecha_constitucion completados por join de nombre contra el registro público de SERVEL.",
+      "schema": {
+        "fields": [
+          {
+            "name": "id_partido",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "sigla",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "estado_legal",
+            "type": "string"
+          },
+          {
+            "name": "fecha_constitucion",
+            "type": "string"
+          },
+          {
+            "name": "ambito",
+            "type": "string"
+          },
+          {
+            "name": "fuente",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "url_fuente",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "fecha_consulta",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          }
+        ],
+        "missingValues": [
+          ""
+        ],
+        "primaryKey": [
+          "id_partido"
+        ]
+      },
+      "sources": [
+        {
+          "title": "Cámara de Diputadas y Diputados (datos abiertos) + SERVEL",
+          "path": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos"
+        }
+      ],
+      "licenses": [
+        {
+          "title": "CC-BY",
+          "path": "https://creativecommons.org/licenses/by/4.0/"
+        }
+      ]
+    },
+    {
+      "name": "autoridades_electas",
+      "path": "autoridades_electas.parquet",
+      "format": "parquet",
+      "mediatype": "application/vnd.apache.parquet",
+      "title": "autoridades_electas",
+      "description": "Autoridades electas en ejercicio de Chile (diputados y senadores): partido, distrito electoral/circunscripción senatorial, región y período de mandato.",
+      "schema": {
+        "fields": [
+          {
+            "name": "id_autoridad",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "cargo",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "institucion",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "partido",
+            "type": "string"
+          },
+          {
+            "name": "pacto",
+            "type": "string"
+          },
+          {
+            "name": "distrito_electoral",
+            "type": "string"
+          },
+          {
+            "name": "circunscripcion_senatorial",
+            "type": "string"
+          },
+          {
+            "name": "codigo_comuna",
+            "type": "string"
+          },
+          {
+            "name": "codigo_region",
+            "type": "string"
+          },
+          {
+            "name": "periodo_inicio",
+            "type": "string"
+          },
+          {
+            "name": "periodo_fin",
+            "type": "string"
+          },
+          {
+            "name": "estado_mandato",
+            "type": "string"
+          },
+          {
+            "name": "fuente",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "url_fuente",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "fecha_consulta",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          }
+        ],
+        "missingValues": [
+          ""
+        ],
+        "primaryKey": [
+          "id_autoridad"
+        ]
+      },
+      "sources": [
+        {
+          "title": "Cámara de Diputadas y Diputados + Senado de Chile",
+          "path": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual"
+        }
+      ],
+      "licenses": [
+        {
+          "title": "CC-BY",
+          "path": "https://creativecommons.org/licenses/by/4.0/"
         }
       ]
     }

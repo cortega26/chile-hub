@@ -580,5 +580,93 @@
       "duckdb": "SELECT codigo_comuna, nombre_comuna, mes, casos\nFROM 'data/normalized/delincuencia_comunal.parquet'\nWHERE familia_delito = 'robos_violentos' AND anio = 2024\nORDER BY casos DESC;",
       "cli": "chile-hub show delincuencia_comunal"
     }
+  },
+  "partidos_politicos": {
+    "description": "Roster de partidos políticos de Chile (Cámara de Diputadas y Diputados), con estado_legal y fecha_constitucion completados por join de nombre contra el registro público de SERVEL.",
+    "join_keys": [
+      "id_partido"
+    ],
+    "confidence_tier": "Tier B",
+    "expected_record_count": 36,
+    "reuse_policy": {
+      "status": "open-attribution",
+      "license": "CC-BY",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "attribution_required": true,
+      "redistribution_ok": true,
+      "summary": "Roster institucional de partidos políticos (Cámara de Diputadas y Diputados), enriquecido con estado legal y fecha de constitución desde SERVEL. ambito (nacional/regional) queda nullable: no se encontró esa señal en ninguna fuente."
+    },
+    "freshness_policy": {
+      "max_age_hours": 87600,
+      "label": "bajo_demanda"
+    },
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars(\"partidos_politicos\")\n# Partidos con estado legal constituido\nconstituidos = df.filter(pl.col(\"estado_legal\") == \"constituido\")",
+      "duckdb": "SELECT nombre, sigla, estado_legal, fecha_constitucion\nFROM 'data/normalized/partidos_politicos.parquet'\nWHERE estado_legal = 'constituido'\nORDER BY fecha_constitucion;",
+      "cli": "chile-hub show partidos_politicos"
+    },
+    "outputs": {
+      "parquet": "data/normalized/partidos_politicos.parquet",
+      "json": "data/normalized/partidos_politicos.json"
+    },
+    "documentation": "docs/datasets/partidos_politicos.md"
+  },
+  "autoridades_electas": {
+    "description": "Autoridades electas en ejercicio de Chile (diputados y senadores): partido, distrito electoral/circunscripción senatorial, región y período de mandato.",
+    "join_keys": [
+      "distrito_electoral",
+      "circunscripcion_senatorial",
+      "codigo_region"
+    ],
+    "confidence_tier": "Tier B",
+    "expected_record_count": 205,
+    "reuse_policy": {
+      "status": "open-attribution",
+      "license": "CC-BY",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "attribution_required": true,
+      "redistribution_ok": true,
+      "summary": "Autoridades electas en ejercicio (diputados y senadores) desde la Cámara de Diputadas y Diputados y el Senado de Chile. Gobernador_regional y alcalde viven en el dataset segregado autoridades_locales (CC-BY-SA)."
+    },
+    "freshness_policy": {
+      "max_age_hours": 87600,
+      "label": "bajo_demanda"
+    },
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars(\"autoridades_electas\")\n# Senadores por región\nsenadores = df.filter(pl.col(\"cargo\") == \"senador\")",
+      "duckdb": "SELECT nombre, cargo, partido, codigo_region\nFROM 'data/normalized/autoridades_electas.parquet'\nWHERE cargo = 'senador'\nORDER BY codigo_region;",
+      "cli": "chile-hub show autoridades_electas"
+    },
+    "outputs": {
+      "parquet": "data/normalized/autoridades_electas.parquet",
+      "json": "data/normalized/autoridades_electas.json"
+    },
+    "documentation": "docs/datasets/autoridades_electas.md"
+  },
+  "autoridades_locales": {
+    "description": "Autoridades locales/subnacionales de Chile (gobernadores regionales y alcaldes) compiladas desde Wikipedia. Dataset segregado de autoridades_electas por su licencia CC-BY-SA (share-alike).",
+    "join_keys": [
+      "codigo_region",
+      "codigo_comuna"
+    ],
+    "confidence_tier": "Tier C",
+    "expected_record_count": 240,
+    "reuse_policy": {
+      "status": "open-attribution",
+      "license": "CC-BY-SA",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attribution_required": true,
+      "redistribution_ok": false,
+      "summary": "Autoridades locales (gobernadores regionales y alcaldes) desde Wikipedia, CC-BY-SA (share-alike). Carril CANDIDATE — NO redistribuible en el bundle público mientras no se asegure una fuente no share-alike o se acepte explícitamente esta licencia en el bundle."
+    },
+    "freshness_policy": {
+      "max_age_hours": 87600,
+      "label": "bajo_demanda"
+    },
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars(\"autoridades_locales\")\n# Alcaldes con titular identificado\nalcaldes = df.filter((pl.col(\"cargo\") == \"alcalde\") & pl.col(\"nombre\").is_not_null())",
+      "duckdb": "SELECT nombre, cargo, codigo_comuna, codigo_region\nFROM 'data/normalized/autoridades_locales.parquet'\nWHERE cargo = 'alcalde';",
+      "cli": "chile-hub show autoridades_locales"
+    }
   }
 }

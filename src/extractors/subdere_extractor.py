@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -8,12 +9,20 @@ import requests
 
 UTC = timezone.utc
 
-from src.extractors.base import (
-    BaseExtractor,
-    ensure_staging_directories,
-    write_staging_metadata,
-)
-from src.extractors.http_utils import fetch_with_retry
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
+
+try:
+    from src.extractors.base import (
+        BaseExtractor,
+        ensure_staging_directories,
+        write_staging_metadata,
+    )
+    from src.extractors.http_utils import fetch_with_retry
+except ModuleNotFoundError:
+    from base import BaseExtractor, ensure_staging_directories, write_staging_metadata
+    from http_utils import fetch_with_retry
 
 # curl_cffi impersona el fingerprint TLS de Chrome, evitando bloqueos a nivel de TLS
 # que rechazan al user-agent por defecto de la librería requests de Python.
