@@ -572,5 +572,12 @@ Detente y reporta (no improvises) si:
 - **Enriquecimiento cruzado**: una vez publicado, `autoridades_electas` habilita cruces
   con `distritos_electorales`, `comunas` y `perfil_territorial_comunal` — candidato a
   columna derivada en el perfil territorial (follow-up, no en este plan).
-</content>
-</invoke>
+- **Refresco automático (Tarea 1, cerrada 2026-07-06, sin cambios de código)**: al
+  quedar `partidos_politicos`/`autoridades_electas` cableados a la extracción completa
+  de `.github/workflows/pipeline-check.yml`, el job `publish` de ese mismo workflow
+  (`if: github.event_name == 'schedule' || inputs.publish == true`) ya los refresca a
+  diario junto con el resto de datasets `stable` y commitea los cambios a `main`
+  (`chore(data): daily refresh [skip ci]`) — no hace falta un workflow separado tipo
+  `monthly-scrape.yml`. `autoridades_locales` sigue `candidate`, fuera de esa lista de
+  extracción; se refresca a mano antes del próximo intento de promoción, igual que
+  `delincuencia_comunal` y como era el caso de los otros dos hasta esta promoción.
