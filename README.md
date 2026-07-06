@@ -22,12 +22,12 @@
 [![License: MIT](https://img.shields.io/badge/Code%20License-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-3776AB.svg?style=flat&logo=python&logoColor=white)]()
 [![Formats](https://img.shields.io/badge/Formats-Parquet%20%7C%20DuckDB%20%7C%20SQLite%20%7C%20JSON%20%7C%20Excel-orange.svg)]()
-[![Datasets](https://img.shields.io/badge/Datasets-17%20capas-16a34a.svg)]()
+[![Datasets](https://img.shields.io/badge/Datasets-19%20capas-16a34a.svg)]()
 [![Comunas](https://img.shields.io/badge/Comunas-346-8b5cf6.svg)]()
 
 <p>
   <a href="#-instalar-y-usar-en-segundos">Instalación</a> ·
-  <a href="#las-17-capas-de-datos">Capas</a> ·
+  <a href="#las-19-capas-de-datos">Capas</a> ·
   <a href="#arquitectura-del-pipeline">Arquitectura</a> ·
   <a href="#cli-de-referencia">CLI</a> ·
   <a href="#fuentes-licencias-y-reúso">Licencias</a>
@@ -138,7 +138,7 @@ Pipeline determinista en GitHub Actions: extracción → build → verificación
 
 ---
 
-## Las 17 capas de datos
+## Las 19 capas de datos
 
 <!-- START_DATASET_TABLE -->
 
@@ -164,6 +164,7 @@ Pipeline determinista en GitHub Actions: extracción → build → verificación
 | 18 | **Partidos Políticos** | 36 | 🟢 live | Cámara de Diputados | CC BY | Bajo_demanda |
 | 19 | **Autoridades Electas** | 205 | 🟢 live | Cámara de Diputados + Senado | CC BY | Bajo_demanda |
 | 20 | **Delincuencia Comunal** 🆕 | — | 🔜 próximamente | CEAD / SPD | Revisión términos | — |
+| 21 | **Autoridades Locales** 🆕 | — | 🔜 próximamente | Wikipedia | CC BY-SA | — |
 
 > **🟢 live**: datos extraídos directamente desde la fuente oficial en cada ejecución del pipeline.
 > **🟡 fallback**: datos servidos desde un respaldo curado mientras se completa la extracción en vivo.
@@ -181,10 +182,10 @@ confiar ciegamente**. Los datos vienen con la evidencia que los respalda.
 | Pilar | Qué significa | Evidencia auditables |
 |:---|:---|:---|
 | **Procedencia documentada** | Cada dataset declara su fuente oficial exacta con URL directa al organismo público emisor (BCN, INE, MINEDUC, BCCh, MINSAL, datos.gob.cl). | [`provenance_report.md`](data/normalized/provenance_report.md) — fuente, modo y timestamp por capa |
-| **Auditoría legal explícita** | Licencia, atribución requerida y permiso de redistribución verificados dataset por dataset. **17 de 17 capas** pasan la auditoría (`ready`). | [`redistribution_report.md`](data/normalized/redistribution_report.md) + [`AGENTS.md §6`](AGENTS.md) |
+| **Auditoría legal explícita** | Licencia, atribución requerida y permiso de redistribución verificados dataset por dataset. **19 de 19 capas** pasan la auditoría (`ready`). | [`redistribution_report.md`](data/normalized/redistribution_report.md) + [`AGENTS.md §6`](AGENTS.md) |
 | **Pipeline que falla con estridencia** | Si una validación falla, el pipeline **aborta** — no publica datos corruptos, no emite advertencias silenciosas. | [`ADR-001`](docs/adr/ADR-001-pipeline-lineal-determinista.md) — fail-loud como decisión de arquitectura |
-| **Contratos de esquema verificados** | 17 contratos JSON Schema ([`contracts/datasets/`](contracts/datasets/)) definen columnas esperadas, tipos, claves primarias y cobertura. Se validan **en cada build** automáticamente. | [`ADR-005`](docs/adr/ADR-005-contratos-esquema-json-schema.md) + `contracts/datasets/*.json` |
-| **Salud transparente** | Dashboard público con severidad, frescura, cobertura, drift y degradación por dataset. 12 capas `ok`, 5 `warn`, 0 `error`. | [`hub_health.md`](data/normalized/hub_health.md) — estado completo actualizado en cada build |
+| **Contratos de esquema verificados** | 21 contratos JSON Schema ([`contracts/datasets/`](contracts/datasets/)) definen columnas esperadas, tipos, claves primarias y cobertura. Se validan **en cada build** automáticamente. | [`ADR-005`](docs/adr/ADR-005-contratos-esquema-json-schema.md) + `contracts/datasets/*.json` |
+| **Salud transparente** | Dashboard público con severidad, frescura, cobertura, drift y degradación por dataset. 11 capas `ok`, 8 `warn`, 0 `error`. | [`hub_health.md`](data/normalized/hub_health.md) — estado completo actualizado en cada build |
 | **Calidad medida y pública** | Puntuación compuesta A-F por dataset: **promedio 93.6/100** (16 A, 1 B). Dimensiones: validación, contrato, madurez de fuente, frescura, cobertura, política de reúso. | [`dataset_quality.md`](data/normalized/dataset_quality.md) — scorecard completo |
 
 Cada pilar se audita automáticamente en cada ejecución del pipeline. Los reportes se
@@ -198,7 +199,7 @@ chile-hub health       # severidad, frescura, drift y cobertura
 
 ### Respaldo adicional
 
-- **511 tests** (511 recolectados por pytest, más scripts de verificación
+- **549 tests** (549 recolectados por pytest, más scripts de verificación
   del pipeline) que validan extracción, contratos e integridad de datos.
 - **5 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura
   con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
@@ -388,7 +389,32 @@ chile-hub health       # severidad, frescura, drift y cobertura
 | `numero_clientes` | `INTEGER` | `45800` |
 | `fuente` | `VARCHAR` | `"CNE — Energía Abierta"` |
 
-**18. delincuencia_comunal** — Casos policiales por comuna (CEAD/SPD) ⚠️ _en carril candidate — datos no incluidos en el bundle público_
+**18. partidos_politicos** — Roster de partidos políticos vigentes e históricos (Cámara + SERVEL)
+| Columna | Tipo | Ejemplo |
+|:---|:---|:---|
+| `id_partido` | `VARCHAR` | `"DC"` |
+| `nombre` | `VARCHAR` | `"Partido Demócrata Cristiano"` |
+| `sigla` | `VARCHAR` | `"DC"` |
+| `estado_legal` | `VARCHAR` | `"constituido"` (nulo si no matchea con SERVEL) |
+| `fecha_constitucion` | `DATE` | `1988-05-02` |
+| `ambito` | `VARCHAR` | `null` (sin fuente que lo provea) |
+| `fuente` | `VARCHAR` | `"Cámara de Diputadas y Diputados"` |
+
+**19. autoridades_electas** — Diputados y senadores en ejercicio, con partido y distrito/circunscripción
+| Columna | Tipo | Ejemplo |
+|:---|:---|:---|
+| `id_autoridad` | `VARCHAR` | `"diputado_1009"` |
+| `nombre` | `VARCHAR` | `"Jorge Alessandri Vergara"` |
+| `cargo` | `VARCHAR` | `"diputado"` / `"senador"` |
+| `institucion` | `VARCHAR` | `"Cámara de Diputadas y Diputados"` / `"Senado"` |
+| `partido` | `VARCHAR` | `"Unión Demócrata Independiente"` |
+| `distrito_electoral` | `VARCHAR` | `"10"` (solo diputados) |
+| `circunscripcion_senatorial` | `VARCHAR` | `"3"` (solo senadores) |
+| `codigo_region` | `VARCHAR(2)` | `"02"` (solo senadores) |
+| `periodo_inicio` / `periodo_fin` | `DATE` | `2026-03-11` / `2030-03-10` |
+| `estado_mandato` | `VARCHAR` | `"vigente"` |
+
+**20. delincuencia_comunal** — Casos policiales por comuna (CEAD/SPD) ⚠️ _en carril candidate — datos no incluidos en el bundle público_
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
 | `codigo_comuna` | `VARCHAR(5)` | `"13101"` |
@@ -397,6 +423,17 @@ chile-hub health       # severidad, frescura, drift y cobertura
 | `mes` | `INTEGER` | `1` |
 | `familia_delito` | `VARCHAR` | `"robos_violentos"` |
 | `casos` | `INTEGER` | `245` |
+
+**21. autoridades_locales** — Gobernadores regionales y alcaldes vía Wikipedia (CC-BY-SA) ⚠️ _en carril candidate — datos no incluidos en el bundle público_
+| Columna | Tipo | Ejemplo |
+|:---|:---|:---|
+| `id_autoridad` | `VARCHAR` | `"gobernador_01"` |
+| `nombre` | `VARCHAR` | `null` si no hay evidencia clara del titular |
+| `cargo` | `VARCHAR` | `"gobernador_regional"` / `"alcalde"` |
+| `codigo_region` | `VARCHAR(2)` | `"01"` |
+| `codigo_comuna` | `VARCHAR(5)` | `"01101"` (solo alcaldes) |
+| `partido` | `VARCHAR` | nulo si no identificado |
+| `estado_mandato` | `VARCHAR` | `"vigente"` / `"sin_identificar"` |
 
 </details>
 
