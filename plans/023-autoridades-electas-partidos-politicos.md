@@ -66,18 +66,35 @@
     declarado conflictivo con `dev` en `[tool.uv]`.
   - ⏳ Poblar `codigo_region`/`periodo` de senadores (follow-up).
 
-- 🔶 **`autoridades_locales` (dataset separado CC-BY-SA) — v1 con gobernadores (2026-07-05).**
+- ✅ **`autoridades_locales` (dataset separado CC-BY-SA) — completo (2026-07-06):
+  gobernadores (16) + alcaldes (best-effort, 224/345).**
   Decisión del operador: los cargos de Wikipedia (CC-BY-SA) van en un dataset **aislado**
   para no propagar share-alike a los cargos oficiales CC-BY de `autoridades_electas`.
   - **Gobernadores regionales (16)** desde la tabla de Wikipedia "Gobernador regional de
     Chile" vía Scrapling; parseo por título de enlace (maneja género, `de`/`del`,
     "regional Metropolitano"); `codigo_region` (01–16) mapeado. Partido + coalición.
-  - Extractor `autoridades_locales_extractor.py`, contrato (16), 3 tests, ficha, entrada
-    de registry (`candidate`, `license_status: share-alike`), mapas en reports.py, y nota
-    de segregación en `DATA_LICENSES.md`. **521 tests verdes.**
-  - ⏳ **Pendiente:** `alcalde` (345) — sin fuente de tabla única redistribuible (Wikidata
-    inconsistente; el anexo de Wikipedia son ~345 subpáginas). Follow-up (agregación
-    multi-página o curación).
+  - **Alcaldes:** el "Anexo:Alcaldes de Chile" enlaza 345 subpáginas; se resolvió con la
+    **API pública de MediaWiki** (sin Scrapling — API abierta, sin bloqueo), en lotes de
+    50 títulos (~7 requests). De 345 enlaces, **~224 tienen página real** (121 son
+    enlaces rojos: comunas rurales pequeñas sin página propia, límite real de la fuente).
+    Extracción vía campo `titular=` del infobox (~165/224) con fallback a la última fila
+    de tabla marcada "en el cargo"/"en ejercicio"/"actualidad"; sin evidencia clara, el
+    nombre queda nulo (`estado_mandato: sin_identificar`) — no se inventa. Cruce a
+    `codigo_comuna` vía `comunas.csv` (~221/224 matchean).
+  - **3 bugs reales encontrados y corregidos durante la verificación** (no se commiteó
+    hasta pasar el chequeo de calidad): (1) infobox de un solo campo por línea rompía y
+    el regex de `titular=`/`inicio=` capturaba el resto de la línea completa —
+    corregido con lookahead que detiene en el siguiente `|campo=`; (2) campo `titular`
+    vacío hacía que el regex (con `+`) saltara al campo siguiente y lo capturara por
+    error — corregido a `*` para reconocer cadena vacía; (3) el fallback de tabla
+    dividía filas por cualquier `|`, rompiendo wikilinks con texto alternativo
+    (`[[X|Y]]`) a la mitad, y no filtraba celdas de imagen ni numeraciones ordinales
+    (`'''31°'''`) — corregido con split por límite real de celda MediaWiki y filtros
+    adicionales.
+  - Extractor `autoridades_locales_extractor.py`, contrato (240), 13 tests (incluyen
+    regresión de cada bug), ficha con números honestos, entrada de registry (`candidate`,
+    `license_status: share-alike`), mapas en reports.py, nota de segregación en
+    `DATA_LICENSES.md`. **531 tests verdes.**
 
 ## Why this matters
 

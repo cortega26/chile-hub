@@ -1617,6 +1617,97 @@ class AutoridadesLocalesExtractorTests(unittest.TestCase):
     def test_licencia_cc_by_sa(self):
         self.assertEqual(autoridades_locales_extractor.REUSE_POLICY["license"], "CC-BY-SA")
 
+    def test_comuna_name_from_title_quita_prefijo_y_desambiguador(self):
+        f = autoridades_locales_extractor._comuna_name_from_title
+        self.assertEqual(f("Anexo:Alcaldes de Concepción (Chile)"), "Concepción")
+        self.assertEqual(f("Anexo:Alcaldes de Alhué"), "Alhué")
+
+    def test_extract_alcalde_actual_via_titular(self):
+        wikitext = (
+            "{{Ficha de cargo\n"
+            "| titular = [[Orlando Vargas Pizarro]]\n"
+            "| inicio = {{fecha|6|12|2024}}\n"
+            "| imagen =\n"
+            "}}"
+        )
+        nombre, inicio = autoridades_locales_extractor._extract_alcalde_actual(wikitext)
+        self.assertEqual(nombre, "Orlando Vargas Pizarro")
+        self.assertEqual(inicio, "2024-12-06")
+
+    def test_extract_alcalde_actual_titular_una_linea_no_se_come_otros_campos(self):
+        # Bug real: infobox con varios campos en una sola línea separados por "|".
+        wikitext = "|titular=Patricio Ferreira Rivera|inicio=6 de diciembre de 2016|dirige=[[Alto Hospicio]]|sede=[[Municipalidad]]"
+        nombre, inicio = autoridades_locales_extractor._extract_alcalde_actual(wikitext)
+        self.assertEqual(nombre, "Patricio Ferreira Rivera")
+
+    def test_extract_alcalde_actual_titular_vacio_cae_a_fallback(self):
+        # Bug real: "titular = " vacío no debe tragarse el campo siguiente.
+        wikitext = (
+            "|titular         = \n"
+            "|inicio          = {{Fecha|6|12|2012}}\n"
+            "|en_ejercicio    = Centauri Dios\n"
+        )
+        nombre, _inicio = autoridades_locales_extractor._extract_alcalde_actual(wikitext)
+        self.assertNotIn("inicio", (nombre or ""))
+        self.assertNotIn("{{Fecha", (nombre or ""))
+
+    def test_extract_alcalde_actual_fallback_tabla_respeta_wikilink_con_pipe(self):
+        # Bug real: dividir la fila por "|" a secas rompe [[X|Y]] a la mitad.
+        wikitext = (
+            "{|\n"
+            "|-\n"
+            "|[[Sacha Razmilic|Sacha Razmilic Burgos]]\n"
+            "|6 de diciembre de 2024\n"
+            "|''En el cargo''\n"
+            "|[[Evolución Política|Evópoli]]\n"
+            "|}"
+        )
+        nombre, _inicio = autoridades_locales_extractor._extract_alcalde_actual(wikitext)
+        self.assertEqual(nombre, "Sacha Razmilic Burgos")
+
+    def test_extract_alcalde_actual_fallback_descarta_ordinal_e_imagen(self):
+        # Bug real: la celda ordinal ("31°") y la de imagen no deben tomarse como nombre.
+        wikitext = (
+            "{|\n"
+            "|-\n"
+            "|'''31°'''\n"
+            "|[[Archivo:Falta_imagen_hombre.svg|100x100px]]\n"
+            "|Rodrigo Cornejo Inostroza\n"
+            "|2024-en el cargo\n"
+            "|}"
+        )
+        nombre, _inicio = autoridades_locales_extractor._extract_alcalde_actual(wikitext)
+        self.assertEqual(nombre, "Rodrigo Cornejo Inostroza")
+
+    def test_extract_alcalde_actual_sin_evidencia_retorna_none(self):
+        # Sin titular ni marca de vigencia explícita: no se inventa un nombre.
+        wikitext = "{|\n|-\n|Juan Pérez\n|1990\n|1994\n|}"
+        nombre, inicio = autoridades_locales_extractor._extract_alcalde_actual(wikitext)
+        self.assertIsNone(nombre)
+        self.assertIsNone(inicio)
+
+    def test_normalize_alcaldes_matchea_codigo_comuna(self):
+        alcaldes = [{"comuna": "Arica", "nombre": "X Y", "periodo_inicio": None}]
+        lookup = {"arica": ("01101", "15")}
+        df = autoridades_locales_extractor.build_autoridades_locales_df([], alcaldes, lookup)
+        row = df.filter(pl.col("cargo") == "alcalde").row(0, named=True)
+        self.assertEqual(row["codigo_comuna"], "01101")
+        self.assertEqual(row["codigo_region"], "15")
+        self.assertEqual(row["estado_mandato"], "vigente")
+
+    def test_normalize_alcaldes_sin_nombre_marca_sin_identificar(self):
+        alcaldes = [{"comuna": "Antofagasta", "nombre": None, "periodo_inicio": None}]
+        df = autoridades_locales_extractor.build_autoridades_locales_df([], alcaldes, {})
+        row = df.filter(pl.col("cargo") == "alcalde").row(0, named=True)
+        self.assertIsNone(row["nombre"])
+        self.assertEqual(row["estado_mandato"], "sin_identificar")
+
+    def test_sin_columnas_personales_alcaldes(self):
+        alcaldes = [{"comuna": "Arica", "nombre": "X Y", "periodo_inicio": None}]
+        df = autoridades_locales_extractor.build_autoridades_locales_df([], alcaldes, {})
+        personales = {"rut", "run", "domicilio", "fecha_nacimiento"}
+        self.assertFalse(personales & {c.lower() for c in df.columns})
+
 
 if __name__ == "__main__":
     import sys

@@ -451,7 +451,7 @@
     "review_by": "2026-10-05",
     "stalled_after_days": 90,
     "owner": "core",
-    "next_action": "Añadir cargo alcalde (345); buscar fuente redistribuible no-share-alike para promover.",
+    "next_action": "Ampliar cobertura de alcaldes (~165/345 identificados; ~121 sin página en Wikipedia, ~59 sin marca de vigencia clara); buscar fuente redistribuible no-share-alike para promover a stable_publishable.",
     "publication_track": "candidate",
     "public_bundle_eligible": false,
     "cadencia": "bajo_demanda"

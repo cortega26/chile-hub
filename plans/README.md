@@ -30,7 +30,7 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 
 | # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
 |---|------|----------|----------|--------|-----------|--------|
-| 023 | [Datasets `autoridades_electas` y `partidos_politicos`](023-autoridades-electas-partidos-politicos.md) | P2 | M-L | MED | — (deriva de Plan 022 · Ola B2.2, research cerrada) | IN PROGRESS — Step 0 hecho (fuentes verificadas 2026-07-03); diputados listo, resto necesita scraping |
+| 023 | [Datasets `autoridades_electas` y `partidos_politicos`](023-autoridades-electas-partidos-politicos.md) | P2 | M-L | MED | — (deriva de Plan 022 · Ola B2.2, research cerrada) | 🔶 Ola A y B completas como `candidate` (2026-07-06): `partidos_politicos` (36), `autoridades_electas` (diputados+senadores, 205), `autoridades_locales` (gobernadores+alcaldes, 240, CC-BY-SA segregado). Falta promoción a `stable_publishable` y cableado al bundle (`_load_inputs`/`DATASET_CATALOG_CONFIG`). |
 | 020 | [Explorador SQL en la landing con DuckDB-Wasm](020-duckdb-wasm-playground.md) | P2 | M | MED | — | BLOCKED — gate 4.3: NO-GO (2026-06-30). Ver `docs/gate-4-3-decision-playground.md` para condiciones de re-evaluación. |
 
 ## Planes archivados (docs, 2026-07-04)

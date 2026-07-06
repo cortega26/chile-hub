@@ -17,6 +17,7 @@
     "codigo_region": "string"
   },
   "nullable_columns": [
+    "nombre",
     "partido",
     "pacto",
     "distrito_electoral",
@@ -27,7 +28,7 @@
     "periodo_fin",
     "estado_mandato"
   ],
-  "expected_record_count": 16,
+  "expected_record_count": 240,
   "coverage_policy": "roster",
   "publish_outputs": ["parquet", "json"]
 }
