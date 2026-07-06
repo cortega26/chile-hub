@@ -12,6 +12,21 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.19.1 - 2026-07-06
+
+### Corregido
+
+- **ci**: Sync codeql-action init/analyze versions and group future bumps
+  ([#25](https://github.com/cortega26/chile-hub/pull/25),
+  [`b80e728`](https://github.com/cortega26/chile-hub/commit/b80e728de6af506d10e700223533c3a5ff854834))
+
+### Documentación
+
+- **readme**: Sincroniza tabla y menciones de capas tras promover 2 datasets
+  ([#26](https://github.com/cortega26/chile-hub/pull/26),
+  [`c1419e9`](https://github.com/cortega26/chile-hub/commit/c1419e94951b199cb4da23eb7ba562ce77ca7d2d))
+
+
 ## 1.19.0 - 2026-07-06
 
 ### Mantenimiento
