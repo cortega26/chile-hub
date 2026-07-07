@@ -48,6 +48,9 @@ jobs:
         with:
           enable-cache: true
 
+      - name: Verify uv.lock is in sync with pyproject.toml
+        run: uv lock --locked
+
       - name: Check Python lint
         run: uvx ruff@0.15.17 check src/ tests/ scripts/
 
