@@ -12,6 +12,19 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.19.2 - 2026-07-07
+
+### Corregido
+
+- **extractors**: Preserva ceros CUT y usa isoformat en consumo/pobreza
+  ([`3ad6ab9`](https://github.com/cortega26/chile-hub/commit/3ad6ab9a378bb8e42eec89bae745f1c525d05b83))
+
+### Mantenimiento
+
+- **deps**: Regenera uv.lock y añade guardia --locked en CI
+  ([`a6b22b8`](https://github.com/cortega26/chile-hub/commit/a6b22b82cc0e1702b9a1b33138054204ad1e03ca))
+
+
 ## 1.19.1 - 2026-07-06
 
 ### Corregido
