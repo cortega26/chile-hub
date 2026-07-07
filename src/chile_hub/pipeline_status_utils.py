@@ -69,6 +69,8 @@ def load_metadata(path=PIPELINE_METADATA_PATH):
 def parse_iso_datetime(value):
     if not value:
         return None
+    if isinstance(value, str) and value.endswith("Z"):
+        value = value[:-1] + "+00:00"
     try:
         parsed = datetime.fromisoformat(value)
     except ValueError:

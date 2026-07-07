@@ -2152,6 +2152,13 @@ class PipelineStatusUtilsTests(unittest.TestCase):
         self.assertIn("stale", format_freshness({"status": "stale"}))
         self.assertEqual(format_freshness({"status": "unknown"}), "unknown")
 
+    def test_parse_iso_datetime_accepts_z_and_offset_utc(self):
+        from src.pipeline_status_utils import parse_iso_datetime
+
+        expected = datetime.datetime(2026, 7, 7, 12, 0, tzinfo=datetime.UTC)
+        self.assertEqual(parse_iso_datetime("2026-07-07T12:00:00Z"), expected)
+        self.assertEqual(parse_iso_datetime("2026-07-07T12:00:00+00:00"), expected)
+
     def test_format_reuse_policy(self):
         from src.pipeline_status_utils import format_reuse_policy
 
