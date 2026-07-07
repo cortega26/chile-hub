@@ -12,7 +12,7 @@ entender la arquitectura, las reglas no negociables y las convenciones del proye
 ## 1. Propósito del proyecto
 
 `chile-hub` es una capa de datos pública, curada y reproducible sobre **datos oficiales de Chile**.
-Actualmente publica quince capas:
+Actualmente publica diecinueve (19) capas:
 
 | Capa | Fuente | Descripción |
 |:---|:---|:---|
@@ -29,6 +29,10 @@ Actualmente publica quince capas:
 | **Indicadores Urbanos SIEDU** | INE / SIEDU | Indicadores urbanos en formato largo con cobertura parcial esperada |
 | **Perfil Territorial Comunal** | chile-hub derivado | Una fila por comuna con métricas territoriales consolidadas |
 | **Empresas (RES)** | Ministerio de Economía / datos.gob.cl | Registro de constituciones de empresas bajo Ley 20.659 con RUT, razón social, tipo societario y comuna |
+| **Pobreza Comunal (SAE)** | MDS / Observatorio Social | Estimaciones de pobreza por ingresos y multidimensional por comuna |
+| **Consumo Eléctrico Comunal** | CNE / Energía Abierta | Consumo eléctrico anual por comuna y tipo de cliente |
+| **Partidos Políticos** | Cámara de Diputados / SERVEL | Roster de partidos políticos vigentes e históricos con estado legal |
+| **Autoridades Electas** | Cámara de Diputados + Senado | Diputados y senadores en ejercicio, con partido y distrito o circunscripción |
 
 **El objetivo no es tener todos los datos de Chile. Es entregar un número pequeño de datasets
 limpios, versionados, validados y consumibles en una línea de código.**
@@ -56,16 +60,16 @@ chile-hub/
 │   │   ├── mineduc_resultados_extractor.py      Resultados educacionales agregados (MINEDUC) → data/staging/
 │   │   ├── siedu_extractor.py                   Indicadores urbanos SIEDU (INE) → data/staging/
 │   │   └── res_extractor.py                     Registro de Empresas y Sociedades (datos.gob.cl) → data/staging/
-│   ├── validation.py              Todas las funciones validate_*() — módulo independiente (~760 líneas)
-│   ├── build_dev_db.py            Orquestador (~670 líneas): main() + fases (_load_inputs, _compute_validations, _write_data_artifacts, _generate_reports)
+│   ├── validation.py              Todas las funciones validate_*() — módulo independiente (1 194 líneas)
+│   ├── build_dev_db.py            Orquestador (867 líneas): main() + fases (_load_inputs, _compute_validations, _write_data_artifacts, _generate_reports)
 │   ├── builders/                  Módulos del pipeline extraídos de build_dev_db.py (formats, metadata, reports, artifacts, datasets, catalog, landing, io_utils, _shared)
 │   ├── chile_hub.py               Compatibility shim (21 líneas) — delega al paquete
 │   ├── chile_hub/                 Paquete Python instalable (ChileHub API + CLI + data manager)
-│   │   ├── core.py                ChileHub class + API pública (~2 130 líneas)
+│   │   ├── core.py                ChileHub class + API pública (2 302 líneas)
 │   │   ├── cli.py                 CLI entry points
 │   │   ├── data_manager.py        Descarga de bundle, cache, verificación SHA256
-│   │   └── pipeline_status_utils.py  Reportes Markdown de salud, catálogo y redistribución
-│   └── pipeline_status_utils.py   Copia para imports de build_dev_db.py
+│   │   └── pipeline_status_utils.py  Reportes Markdown de salud, catálogo y redistribución (888 líneas)
+│   └── pipeline_status_utils.py   Copia para imports de build_dev_db.py (888 líneas)
 │
 ├── data/
 │   ├── raw/          Snapshots crudos de cada respuesta de API (JSON). Solo lectura una vez guardados.
@@ -102,8 +106,8 @@ codegraph find <symbol_name>                       # En qué archivo está defin
 
 **Reglas para acotar lecturas y ahorrar tokens:**
 - Usar `view_file` con `StartLine`/`EndLine` — nunca leer archivos grandes enteros de golpe.
-- `base.py` (59 líneas) es seguro de leer completo. `validation.py` (~760 líneas) — leer por validador individual.
-- `build_dev_db.py` (~670 líneas) y `src/chile_hub/core.py` (~1 600 líneas) — usar estas áncoras:
+- `base.py` (73 líneas) es seguro de leer completo. `validation.py` (1 194 líneas) — leer por validador individual.
+- `build_dev_db.py` (867 líneas) y `src/chile_hub/core.py` (2 302 líneas) — usar estas áncoras:
 
 | Archivo | Líneas de interés |
 |---|---|

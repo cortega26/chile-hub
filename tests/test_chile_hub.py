@@ -1759,11 +1759,18 @@ class DatasetEnumTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             Dataset.from_string("no_existe")
 
-    def test_values_returns_all(self):
+    def test_values_match_catalog(self):
+        import json
+        from pathlib import Path
+
         from src.chile_hub.datasets import Dataset
 
+        catalog_path = Path("data/normalized/dataset_catalog.json")
+        catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+        catalog_ids = {entry["dataset"] for entry in catalog["datasets"]}
+
         vals = Dataset.values()
-        self.assertEqual(len(vals), 15)
+        self.assertEqual(set(vals), catalog_ids)
         self.assertIn("comunas", vals)
         self.assertIn("regiones", vals)
         self.assertIn("empresas", vals)

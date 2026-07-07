@@ -43,7 +43,9 @@ drift, and fixes the stale count/table in the agent‑facing docs.
   `PERFIL_TERRITORIAL_COMUNAL = "perfil_territorial_comunal"`. Missing:
   `pobreza_comunal`, `consumo_electrico_comunal`, `partidos_politicos`, `autoridades_electas`.
 - The canonical list of 19 dataset ids is the set of keys in
-  `data/normalized/dataset_catalog.json` (a dict keyed by dataset id). Confirmed ids:
+  `data/normalized/dataset_catalog.json`: the file is a top-level object with
+  `dataset_count`, `generated_at_utc`, and a `datasets` list; each dataset entry carries
+  its id in the `dataset` field. Confirmed ids:
   `autoridades_electas, censo_comunal, censo_hogares_viviendas, comunas, comunas_enriquecidas,
   consumo_electrico_comunal, distritos_electorales, empresas, establecimientos_educacionales,
   establecimientos_salud, finanzas_municipales, indicadores, indicadores_urbanos_siedu,
@@ -126,14 +128,15 @@ def test_values_match_catalog(self):
     from src.chile_hub.datasets import Dataset
 
     catalog_path = Path("data/normalized/dataset_catalog.json")
-    catalog_ids = set(json.loads(catalog_path.read_text(encoding="utf-8")).keys())
+    catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+    catalog_ids = {entry["dataset"] for entry in catalog["datasets"]}
     self.assertEqual(set(Dataset.values()), catalog_ids)
 ```
 
 Keep the existing `assertIn("comunas"/"regiones"/"empresas", ...)` sanity assertions (rename the
-method if you prefer, but do not delete the coverage). If the catalog JSON is not a flat dict
-keyed by id in this repo checkout, adapt `catalog_ids` extraction to match its real shape and note
-what you found (see STOP conditions).
+method if you prefer, but do not delete the coverage). If the catalog JSON no longer has a
+top-level `datasets` list with `dataset` fields in this repo checkout, treat that as a STOP
+condition and report the real shape rather than guessing.
 
 **Verify**: `.venv/bin/python -m pytest tests/test_chile_hub.py -q -k "Dataset or dataset or catalog"` → all pass.
 
@@ -172,8 +175,9 @@ Machine-checkable. ALL must hold:
 
 Stop and report back if:
 
-- `data/normalized/dataset_catalog.json` is NOT a flat dict keyed by dataset id (its shape drifted) —
-  report the real shape so the guard test can be written correctly rather than guessing.
+- `data/normalized/dataset_catalog.json` no longer has a top-level `datasets` list whose entries
+  include a `dataset` id field — report the real shape so the guard test can be written correctly
+  rather than guessing.
 - The catalog id set is not exactly the 19 ids listed in "Current state" (a dataset was added/removed
   since `c486e7c`) — sync the enum to the live catalog and note the difference.
 - `test_all_datasets_have_corresponding_contract` fails after adding the four members (a contract file
