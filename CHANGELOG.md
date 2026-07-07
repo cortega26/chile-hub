@@ -12,6 +12,19 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.19.3 - 2026-07-07
+
+### Corregido
+
+- **api**: Agrega datasets faltantes al enum Dataset
+  ([`88187f0`](https://github.com/cortega26/chile-hub/commit/88187f031f0ef856c1260d0d282a93efbd066af0))
+
+### Mantenimiento
+
+- **deps**: Sync uv lock after release bump
+  ([`0a95440`](https://github.com/cortega26/chile-hub/commit/0a95440635c552c960a9115ea9d72482169d441a))
+
+
 ## 1.19.2 - 2026-07-07
 
 ### Corregido
