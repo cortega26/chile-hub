@@ -36,7 +36,6 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 
 | # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
 |---|------|----------|----------|--------|-----------|--------|
-| 024 | [Extractores: preserva ceros CUT + timestamps ISO](024-extractor-cut-and-timestamp-integrity.md) | P1 | S | LOW | — | TODO |
 | 025 | [Sincroniza enum `Dataset` (+docs) con el catálogo de 19](025-sync-dataset-enum-and-docs-with-catalog.md) | P1 | S | LOW | — | TODO |
 | 027 | [Provenance real en scrape SINIM exitoso](027-sinim-finanzas-provenance-label.md) | P2 | S | LOW | — | TODO |
 | 028 | [Elimina verificación unrar no-op y engañosa](028-remove-unrar-tofu-integrity-noop.md) | P2 | S | LOW | — | TODO |
@@ -50,7 +49,7 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 | 036 | [Tests golden de writers de artefactos](036-golden-output-tests-artifact-writers.md) | P2 | M | LOW | 030 (opc.) | TODO |
 | 037 | [Vectoriza DV de RUT + elimina `rutificador`](037-vectorize-rut-validation.md) | P2 | M | MED | coord. 032 | TODO |
 | 038 | [Deduplica `pipeline_status_utils.py`](038-deduplicate-pipeline-status-utils.md) | P3 | M | MED | — | TODO |
-| 039 | [Diseño: resuelve capas comunales 3/346 en el bundle](039-design-resolve-sparse-comunal-layers.md) | P2 | M | MED | 024, 034 | TODO |
+| 039 | [Diseño: resuelve capas comunales 3/346 en el bundle](039-design-resolve-sparse-comunal-layers.md) | P2 | M | MED | 034 (024 DONE) | TODO |
 | 040 | [Diseño: superficie SQL `hub.sql()` sobre Parquet](040-design-hub-sql-query-surface.md) | P2 | S-M | LOW | coord. 032 | TODO |
 | 041 | [Diseño: import/validate de `datapackage.json`](041-design-datapackage-import-validate.md) | P3 | S | LOW | — | TODO |
 | 023 | [Datasets `autoridades_electas` y `partidos_politicos`](023-autoridades-electas-partidos-politicos.md) | P2 | M-L | MED | — (deriva de Plan 022 · Ola B2.2, research cerrada) | 🔶 Ola A y B `stable_publishable` y en el bundle público (2026-07-06): `partidos_politicos` (36, 15 con estado_legal/fecha vía SERVEL) y `autoridades_electas` (diputados+senadores, 205, senadores con codigo_region/periodo completos). `autoridades_locales` (gobernadores+alcaldes, 240, CC-BY-SA segregado) queda `candidate` — cobertura de alcaldes insuficiente a criterio del operador, pendiente mejorar el extractor. No se archiva hasta resolver ese follow-up. |
@@ -60,6 +59,7 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 
 | # | Plan | Esfuerzo | Riesgo | Estado |
 |---|------|----------|--------|--------|
+| 024 | [Extractores: preserva ceros CUT + timestamps ISO](archive/024-extractor-cut-and-timestamp-integrity.md) | S | LOW | DONE — ejecutado en `advisor/024-extractor-cut-timestamp` commit `3ad6ab9`; `grep` de timestamps, overrides/zfill, diff de `pipeline_status_utils`, pytest focal (`221 passed`), lint y format-check OK. |
 | 026 | [Regenera `uv.lock` + guardia `--locked` en CI](archive/026-regenerate-uv-lock-and-ci-guard.md) | S | LOW | DONE — ejecutado en `advisor/026-uv-lock-sync` commit `a6b22b8`; `uv lock --locked`, `uv sync --extra pipeline --extra dev --locked` y `WorkflowContractTests` OK. |
 
 ## Planes archivados (docs, 2026-07-04)
@@ -112,12 +112,12 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 
 ```
 Auditoría 2026-07-07 (024–041):
-  024 031 025 027 028 029 030   (independientes — cada uno un archivo/área distinta)
+  031 025 027 028 029 030       (independientes — cada uno un archivo/área distinta)
   032 → 037                     (lock limpio resuelto por 026; 037 quita rutificador que 032 reubica)
   032 ⇠ 040                     (040 hub.sql necesita duckdb; reconciliar con la reubicación de 032)
   030 → 036 (opcional)          (036 puede afirmar el guard de Excel de 030)
   033 034 035 038 041           (independientes)
-  024, 034 → 039                (039 decide capas comunales tras arreglar el bug CUT y el scrape SINIM)
+  034 → 039                     (024 DONE; 039 decide capas comunales tras arreglar el scrape SINIM)
 
 Planes previos:
   023 (independiente)  ← autoridades_electas + partidos_politicos; queda abierto por autoridades_locales
@@ -128,23 +128,23 @@ Planes previos:
 2026-07-07, así que **032** (adelgazar deps) ya puede partir de un lock limpio; **037** elimina `rutificador`, que **032**
 solo reubica — coordinar; **040** (`hub.sql`) reintroduce la necesidad de `duckdb` que **032** saca de
 runtime, así que ambos deben acordar si `duckdb` vuelve a runtime o va en un extra `query`. **039**
-depende de **024** (bug CUT que bloquea `consumo_electrico`) y **034** (scrape SINIM roto) para no
-atribuir mal las causas del 3/346. El resto de 024–031 son fixes de un archivo, ejecutables en cualquier
+depende ahora de **034** (scrape SINIM roto); **024** ya resolvió el bug CUT que bloqueaba
+`consumo_electrico`. El resto de 025 y 027–031 son fixes de un archivo, ejecutables en cualquier
 orden. **020** sigue bloqueado (gate 4.3 NO-GO); **021** (MkDocs) quedó DONE el 2026-07-04.
 
 ## Orden de ejecución recomendado
 
 **Auditoría 2026-07-07 (024–041) — orden sugerido por olas:**
 
-1. **Ola de fixes P1** (independientes, S/LOW): **024, 025**. Defectos que rompen datos publicados,
-   la API pública del enum, y la reproducibilidad del lock — máximo apalancamiento, verificación limpia.
+1. **Ola de fixes P1** (independiente, S/LOW): **025**. Defecto que desincroniza la API pública del enum
+   con el catálogo — alto apalancamiento, verificación limpia. (**024** ya está DONE.)
 2. **Ola de fixes P2** (independientes, S/LOW): **027, 028, 029, 030, 031**. Un archivo cada uno.
 3. **Higiene de deps/CI**: **032**, luego **033** y **034**. (033 puede sacar a la luz un backlog de
    mypy/interrogate — ver su Step 1 y sus STOP conditions.)
 4. **Backfill de tests**: **035** (gate de publicación — baseline de verificación), luego **036** (writers).
 5. **Refactors**: **037** (vectoriza RUT; coordinar con 032) y **038** (dedup; MED por el acoplamiento
    `__init__ → core`).
-6. **Diseño/spikes**: **039** (después de 024 y 034), **040** (coordinar con 032), **041**.
+6. **Diseño/spikes**: **039** (después de 034; 024 ya está DONE), **040** (coordinar con 032), **041**.
 
 Planes previos aún vigentes:
 - **023** — autoridades_electas + partidos_politicos: DONE para diputados/senadores/partidos; queda abierto
