@@ -33,9 +33,13 @@ class Dataset(str, enum.Enum):
     ESTABLECIMIENTOS_SALUD = "establecimientos_salud"
     ESTABLECIMIENTOS_EDUCACIONALES = "establecimientos_educacionales"
     DISTRITOS_ELECTORALES = "distritos_electorales"
+    PARTIDOS_POLITICOS = "partidos_politicos"
+    AUTORIDADES_ELECTAS = "autoridades_electas"
     FINANZAS_MUNICIPALES = "finanzas_municipales"
     RESULTADOS_EDUCACIONALES = "resultados_educacionales"
     INDICADORES_URBANOS_SIEDU = "indicadores_urbanos_siedu"
+    POBREZA_COMUNAL = "pobreza_comunal"
+    CONSUMO_ELECTRICO_COMUNAL = "consumo_electrico_comunal"
     EMPRESAS = "empresas"
     PERFIL_TERRITORIAL_COMUNAL = "perfil_territorial_comunal"
 

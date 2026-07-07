@@ -41,21 +41,21 @@ confiables — no una cobertura exhaustiva.
 ```
 src/
 ├── extractors/
-│   ├── base.py                    ABC BaseExtractor — 59 lineas, leer completo
+│   ├── base.py                    ABC BaseExtractor — 73 lineas, leer completo
 │   └── {name}_extractor.py        Un archivo por dataset, extiende BaseExtractor
-├── validation.py                  TODAS las validate_*() — ~760 lineas, leer por validador
-├── build_dev_db.py                Orquestador del pipeline (~670 lineas) — main() + fases:
+├── validation.py                  TODAS las validate_*() — 1 194 lineas, leer por validador
+├── build_dev_db.py                Orquestador del pipeline (867 lineas) — main() + fases:
 │   _load_inputs / _compute_validations / _write_data_artifacts / _generate_reports
 │   El bloque validations = {…} vive en _compute_validations()
 ├── builders/                      Modulos del pipeline (extraidos de build_dev_db.py):
 │   _shared, io_utils, formats, metadata, reports, artifacts, datasets, catalog, landing
 ├── chile_hub.py                   Shim de compatibilidad (21 lineas) — delega al paquete inferior
 ├── chile_hub/
-│   ├── core.py                    Clase ChileHub + API publica completa — ~1 600 lineas
+│   ├── core.py                    Clase ChileHub + API publica completa — 2 302 lineas
 │   ├── cli.py                     Puntos de entrada de CLI (5 lineas)
 │   ├── data_manager.py            Descarga de bundles, cache, SHA256 — ~200 lineas
-│   └── pipeline_status_utils.py   Constructores de reportes (health, catalog, redistribution) — ~770 lineas
-├── pipeline_status_utils.py       Copia del anterior para importaciones de build_dev_db.py
+│   └── pipeline_status_utils.py   Constructores de reportes (health, catalog, redistribution) — 888 lineas
+├── pipeline_status_utils.py       Copia del anterior para importaciones de build_dev_db.py — 888 lineas
 
 data/
 ├── raw/        Snapshots de auditoria — solo append, nunca editar
@@ -84,8 +84,8 @@ tests/
 | Navegar archivos grandes sin leerlos en frio | `CLAUDE.md` → seccion **CodeGraph** |
 | Encontrar donde esta definido un simbolo | `codegraph find <name>` o `grep -n "def <name>" src/` |
 | Leer API publica de ChileHub | `src/chile_hub/core.py` (clase ChileHub, todos los metodos publicos) |
-| Leer toda la logica de validacion | `src/validation.py` (~760 lineas — leer por validador) |
-| Leer contrato de extractors | `src/extractors/base.py` (59 lineas — seguro de leer completo) |
+| Leer toda la logica de validacion | `src/validation.py` (1 194 lineas — leer por validador) |
+| Leer contrato de extractors | `src/extractors/base.py` (73 lineas — seguro de leer completo) |
 
 ---
 

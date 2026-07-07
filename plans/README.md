@@ -36,7 +36,6 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 
 | # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
 |---|------|----------|----------|--------|-----------|--------|
-| 025 | [Sincroniza enum `Dataset` (+docs) con el catálogo de 19](025-sync-dataset-enum-and-docs-with-catalog.md) | P1 | S | LOW | — | TODO |
 | 027 | [Provenance real en scrape SINIM exitoso](027-sinim-finanzas-provenance-label.md) | P2 | S | LOW | — | TODO |
 | 028 | [Elimina verificación unrar no-op y engañosa](028-remove-unrar-tofu-integrity-noop.md) | P2 | S | LOW | — | TODO |
 | 029 | [Corrige 3 docstrings desubicadas en `core.py`](029-fix-misplaced-docstrings-core.md) | P2 | S | LOW | — | TODO |
@@ -60,6 +59,7 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 | # | Plan | Esfuerzo | Riesgo | Estado |
 |---|------|----------|--------|--------|
 | 024 | [Extractores: preserva ceros CUT + timestamps ISO](archive/024-extractor-cut-and-timestamp-integrity.md) | S | LOW | DONE — ejecutado en `advisor/024-extractor-cut-timestamp` commit `3ad6ab9`; `grep` de timestamps, overrides/zfill, diff de `pipeline_status_utils`, pytest focal (`221 passed`), lint y format-check OK. |
+| 025 | [Sincroniza enum `Dataset` (+docs) con el catálogo de 19](archive/025-sync-dataset-enum-and-docs-with-catalog.md) | S | LOW | DONE — ejecutado en `advisor/025-sync-dataset-enum`; `Dataset.values()` = 19, `Dataset.from_string()` resuelve los datasets nuevos, pytest focal (`39 passed, 130 deselected`), lint y format-check OK. Commit pendiente: el hook pre-commit local no encontró `interrogate`. |
 | 026 | [Regenera `uv.lock` + guardia `--locked` en CI](archive/026-regenerate-uv-lock-and-ci-guard.md) | S | LOW | DONE — ejecutado en `advisor/026-uv-lock-sync` commit `a6b22b8`; `uv lock --locked`, `uv sync --extra pipeline --extra dev --locked` y `WorkflowContractTests` OK. |
 
 ## Planes archivados (docs, 2026-07-04)
