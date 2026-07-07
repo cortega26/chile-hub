@@ -292,7 +292,7 @@ def build_metadata(mode: str, source_url: str, notes: list[str], row_count: int)
         "source_url": source_url,
         "source_mode": mode,
         "source_detail": "Estimaciones de Pobreza Comunal vía SAE desde encuesta CASEN",
-        "refreshed_at_utc": datetime.datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "refreshed_at_utc": datetime.datetime.now(UTC).isoformat(),
         "record_count": row_count,
         "fields": REQUIRED_COLUMNS,
         "notes": notes,
@@ -344,7 +344,7 @@ class PobrezaComunalExtractor(BaseExtractor):
         merged = {
             **metadata,
             "dataset": self.dataset_name,
-            "refreshed_at_utc": datetime.datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "refreshed_at_utc": datetime.datetime.now(UTC).isoformat(),
             "record_count": df.height,
         }
         write_staging_metadata(METADATA_PATH, merged)

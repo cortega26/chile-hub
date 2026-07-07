@@ -1428,6 +1428,62 @@ class ConsumoElectricoExtractorTests(unittest.TestCase):
         self.assertEqual(df["codigo_comuna"].dtype, pl.String)
         self.assertGreater(df.height, 0)
 
+    def test_normalize_rows_zero_pads_cut_codes(self):
+        from src.extractors.consumo_electrico_extractor import normalize_rows
+
+        df = normalize_rows(
+            [
+                {
+                    "codigo_region": 8,
+                    "codigo_comuna": 8101,
+                    "nombre_comuna": "Concepcion",
+                    "anio": 2023,
+                    "tipo_cliente": "Regulado",
+                    "consumo_kwh": 123.4,
+                    "numero_clientes": 10,
+                    "fuente": "test",
+                    "url_fuente": "https://example.test",
+                    "fecha_fuente": "2026-07-07",
+                }
+            ]
+        )
+
+        self.assertEqual(df.item(0, "codigo_region"), "08")
+        self.assertEqual(df.item(0, "codigo_comuna"), "08101")
+
+    def test_enrich_with_cut_preserves_leading_zeroes_from_staging(self):
+        import tempfile
+        from unittest.mock import patch
+
+        from src.extractors import consumo_electrico_extractor
+
+        rows = [
+            {
+                "codigo_region": "",
+                "codigo_comuna": "",
+                "nombre_comuna": "Concepcion",
+                "anio": 2023,
+                "tipo_cliente": "Regulado",
+                "consumo_kwh": 123.4,
+                "numero_clientes": 10,
+                "fuente": "test",
+                "url_fuente": "https://example.test",
+                "fecha_fuente": "2026-07-07",
+            }
+        ]
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            comunas_csv = Path(tmpdir) / "comunas.csv"
+            comunas_csv.write_text(
+                "codigo_region,codigo_comuna,nombre_comuna\n08,08101,Concepcion\n",
+                encoding="utf-8",
+            )
+            with patch.object(consumo_electrico_extractor, "STAGING_DIR", tmpdir):
+                enriched = consumo_electrico_extractor._enrich_with_cut(rows)
+
+        self.assertEqual(enriched[0]["codigo_region"], "08")
+        self.assertEqual(enriched[0]["codigo_comuna"], "08101")
+
     def test_dataset_name(self):
         from src.extractors.consumo_electrico_extractor import ConsumoElectricoExtractor
 

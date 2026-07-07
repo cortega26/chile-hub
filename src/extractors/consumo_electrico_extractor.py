@@ -199,7 +199,9 @@ def _enrich_with_cut(rows: list[dict]) -> list[dict]:
         return rows
 
     comunas_df = pl.read_csv(
-        comunas_csv, columns=["codigo_region", "codigo_comuna", "nombre_comuna"]
+        comunas_csv,
+        columns=["codigo_region", "codigo_comuna", "nombre_comuna"],
+        schema_overrides={"codigo_region": pl.String, "codigo_comuna": pl.String},
     )
     # Normalizar nombres para matching
     comunas_lookup = {}
@@ -269,8 +271,8 @@ def normalize_rows(rows: list[dict]) -> pl.DataFrame:
                 df = df.with_columns(pl.lit("", dtype=pl.String).alias(col))
 
     df = df.with_columns(
-        pl.col("codigo_region").cast(pl.String),
-        pl.col("codigo_comuna").cast(pl.String),
+        pl.col("codigo_region").cast(pl.String).str.zfill(2),
+        pl.col("codigo_comuna").cast(pl.String).str.zfill(5),
         pl.col("nombre_comuna").cast(pl.String),
         pl.col("anio").cast(pl.Int64),
         pl.col("tipo_cliente").cast(pl.String),
@@ -294,7 +296,7 @@ def build_metadata(mode: str, source_url: str, notes: list[str], row_count: int)
         "source_url": source_url,
         "source_mode": mode,
         "source_detail": "Consumo eléctrico anual por comuna y tipo de cliente",
-        "refreshed_at_utc": datetime.datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "refreshed_at_utc": datetime.datetime.now(UTC).isoformat(),
         "record_count": row_count,
         "fields": REQUIRED_COLUMNS,
         "notes": notes,
@@ -346,7 +348,7 @@ class ConsumoElectricoExtractor(BaseExtractor):
         merged = {
             **metadata,
             "dataset": self.dataset_name,
-            "refreshed_at_utc": datetime.datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "refreshed_at_utc": datetime.datetime.now(UTC).isoformat(),
             "record_count": df.height,
         }
         write_staging_metadata(METADATA_PATH, merged)
