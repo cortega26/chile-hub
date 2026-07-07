@@ -1,6 +1,12 @@
 # Plans — chile-hub
 
-Planes de implementación generados por auditoría `/improve deep` en commits `ba2f434` (2026-06-13) y `a2cd288` (2026-06-19), y por `/improve plan` (mejoras de librerías/dependencias) en commit `140c8ea` (2026-06-29).
+Planes de implementación generados por auditoría `/improve deep` en commits `ba2f434` (2026-06-13), `a2cd288` (2026-06-19) y `c486e7c` (2026-07-07), y por `/improve plan` (mejoras de librerías/dependencias) en commit `140c8ea` (2026-06-29).
+
+> **Última auditoría `/improve deep` (2026-07-07, commit `c486e7c`)**: planes **024–041**.
+> Repo maduro; los grandes ítems previos ya están hechos. Lo restante es una cola de
+> defectos pequeños de alta confianza (024–031), higiene de deps/CI (032–034), backfill
+> de tests del gate de publicación y los writers (035–036), dos refactors (037–038) y
+> tres planes de diseño (039–041). Ver "Hallazgos considerados y diferidos (2026-07-07)".
 
 > ## Rutina obligatoria tras cada iteración / actualización / cambio
 >
@@ -30,8 +36,31 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 
 | # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
 |---|------|----------|----------|--------|-----------|--------|
+| 024 | [Extractores: preserva ceros CUT + timestamps ISO](024-extractor-cut-and-timestamp-integrity.md) | P1 | S | LOW | — | TODO |
+| 025 | [Sincroniza enum `Dataset` (+docs) con el catálogo de 19](025-sync-dataset-enum-and-docs-with-catalog.md) | P1 | S | LOW | — | TODO |
+| 027 | [Provenance real en scrape SINIM exitoso](027-sinim-finanzas-provenance-label.md) | P2 | S | LOW | — | TODO |
+| 028 | [Elimina verificación unrar no-op y engañosa](028-remove-unrar-tofu-integrity-noop.md) | P2 | S | LOW | — | TODO |
+| 029 | [Corrige 3 docstrings desubicadas en `core.py`](029-fix-misplaced-docstrings-core.md) | P2 | S | LOW | — | TODO |
+| 030 | [Guarda Excel para tablas masivas + dedup SHA bundle](030-excel-large-table-guard-and-bundle-sha-dedup.md) | P2 | S | LOW | — | TODO |
+| 031 | [Arregla la cache muerta de `load_polars`](031-fix-dead-load-polars-cache.md) | P2 | S | LOW | — | TODO |
+| 032 | [Adelgaza deps runtime del paquete instalado](032-slim-runtime-dependencies.md) | P2 | S | MED | — (026 DONE) | TODO |
+| 033 | [Ejecuta mypy/bandit/pip-audit/interrogate en CI](033-enforce-quality-gates-in-ci.md) | P2 | S-M | MED | — | TODO |
+| 034 | [Arregla el workflow `monthly-scrape` (`--group dev`)](034-fix-monthly-scrape-workflow.md) | P2 | S | LOW | — | TODO |
+| 035 | [Tests de caracterización del gate `verify_pipeline`](035-characterization-tests-publish-gate.md) | P2 | L | LOW | — | TODO |
+| 036 | [Tests golden de writers de artefactos](036-golden-output-tests-artifact-writers.md) | P2 | M | LOW | 030 (opc.) | TODO |
+| 037 | [Vectoriza DV de RUT + elimina `rutificador`](037-vectorize-rut-validation.md) | P2 | M | MED | coord. 032 | TODO |
+| 038 | [Deduplica `pipeline_status_utils.py`](038-deduplicate-pipeline-status-utils.md) | P3 | M | MED | — | TODO |
+| 039 | [Diseño: resuelve capas comunales 3/346 en el bundle](039-design-resolve-sparse-comunal-layers.md) | P2 | M | MED | 024, 034 | TODO |
+| 040 | [Diseño: superficie SQL `hub.sql()` sobre Parquet](040-design-hub-sql-query-surface.md) | P2 | S-M | LOW | coord. 032 | TODO |
+| 041 | [Diseño: import/validate de `datapackage.json`](041-design-datapackage-import-validate.md) | P3 | S | LOW | — | TODO |
 | 023 | [Datasets `autoridades_electas` y `partidos_politicos`](023-autoridades-electas-partidos-politicos.md) | P2 | M-L | MED | — (deriva de Plan 022 · Ola B2.2, research cerrada) | 🔶 Ola A y B `stable_publishable` y en el bundle público (2026-07-06): `partidos_politicos` (36, 15 con estado_legal/fecha vía SERVEL) y `autoridades_electas` (diputados+senadores, 205, senadores con codigo_region/periodo completos). `autoridades_locales` (gobernadores+alcaldes, 240, CC-BY-SA segregado) queda `candidate` — cobertura de alcaldes insuficiente a criterio del operador, pendiente mejorar el extractor. No se archiva hasta resolver ese follow-up. |
 | 020 | [Explorador SQL en la landing con DuckDB-Wasm](020-duckdb-wasm-playground.md) | P2 | M | MED | — | BLOCKED — gate 4.3: NO-GO (2026-06-30). Ver `docs/gate-4-3-decision-playground.md` para condiciones de re-evaluación. |
+
+## Planes archivados (auditoría 2026-07-07)
+
+| # | Plan | Esfuerzo | Riesgo | Estado |
+|---|------|----------|--------|--------|
+| 026 | [Regenera `uv.lock` + guardia `--locked` en CI](archive/026-regenerate-uv-lock-and-ci-guard.md) | S | LOW | DONE — ejecutado en `advisor/026-uv-lock-sync` commit `a6b22b8`; `uv lock --locked`, `uv sync --extra pipeline --extra dev --locked` y `WorkflowContractTests` OK. |
 
 ## Planes archivados (docs, 2026-07-04)
 
@@ -82,23 +111,66 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 ## Grafo de dependencias (planes activos)
 
 ```
-023 (independiente)    ← autoridades_electas + partidos_politicos (Cámara XML / Wikidata)
-020 (independiente)    ← bloqueado por gate 4.3 (no-go 2026-06-30); sin dependencia activa
+Auditoría 2026-07-07 (024–041):
+  024 031 025 027 028 029 030   (independientes — cada uno un archivo/área distinta)
+  032 → 037                     (lock limpio resuelto por 026; 037 quita rutificador que 032 reubica)
+  032 ⇠ 040                     (040 hub.sql necesita duckdb; reconciliar con la reubicación de 032)
+  030 → 036 (opcional)          (036 puede afirmar el guard de Excel de 030)
+  033 034 035 038 041           (independientes)
+  024, 034 → 039                (039 decide capas comunales tras arreglar el bug CUT y el scrape SINIM)
+
+Planes previos:
+  023 (independiente)  ← autoridades_electas + partidos_politicos; queda abierto por autoridades_locales
+  020 (independiente)  ← bloqueado por gate 4.3 (no-go 2026-06-30). DIR-01/Plan 040 es su hermano no-bloqueado
 ```
 
-**023** y **020** son independientes entre sí: tocan superficies distintas
-(catálogo/extractores, landing) y pueden ejecutarse en cualquier orden. **020** sigue
-bloqueado por el gate 4.3 (NO-GO); ver `docs/gate-4-3-decision-playground.md` para
-condiciones de re-evaluación. **021** (MkDocs) quedó DONE el 2026-07-04.
+**Interacciones clave de la auditoría 2026-07-07:** **026** (regenerar lock) quedó DONE el
+2026-07-07, así que **032** (adelgazar deps) ya puede partir de un lock limpio; **037** elimina `rutificador`, que **032**
+solo reubica — coordinar; **040** (`hub.sql`) reintroduce la necesidad de `duckdb` que **032** saca de
+runtime, así que ambos deben acordar si `duckdb` vuelve a runtime o va en un extra `query`. **039**
+depende de **024** (bug CUT que bloquea `consumo_electrico`) y **034** (scrape SINIM roto) para no
+atribuir mal las causas del 3/346. El resto de 024–031 son fixes de un archivo, ejecutables en cualquier
+orden. **020** sigue bloqueado (gate 4.3 NO-GO); **021** (MkDocs) quedó DONE el 2026-07-04.
 
 ## Orden de ejecución recomendado
 
-Ejecución en curso (elegida 2026-07-04): **021 → 023 → TC-02**.
+**Auditoría 2026-07-07 (024–041) — orden sugerido por olas:**
 
-1. ~~**021** — MkDocs~~ ✅ **DONE (2026-07-04)**. Sitio de docs de API desde docstrings, servido en `/reference/`.
-2. **023** — autoridades_electas + partidos_politicos. Revisado tras Step 0: es M-L / MED (3 de 4 cargos requieren scraping), no el S-M/LOW que asumía la research. Mayor utilidad para la audiencia real.
-3. ~~**TC-02** — ampliar la medición de cobertura al pipeline~~ ✅ **DONE (2026-07-05)**. `source=["src"]` (antes solo `src/chile_hub`); cobertura honesta ~52.5% (antes ~84% vanidoso sobre 5% del código). Codecov `target: auto`; badge regenerado. Backfill de tests para subirla queda como follow-up.
-4. **020** — DuckDB-Wasm: solo si lo aprueba una re-evaluación futura del gate 4.3
+1. **Ola de fixes P1** (independientes, S/LOW): **024, 025**. Defectos que rompen datos publicados,
+   la API pública del enum, y la reproducibilidad del lock — máximo apalancamiento, verificación limpia.
+2. **Ola de fixes P2** (independientes, S/LOW): **027, 028, 029, 030, 031**. Un archivo cada uno.
+3. **Higiene de deps/CI**: **032**, luego **033** y **034**. (033 puede sacar a la luz un backlog de
+   mypy/interrogate — ver su Step 1 y sus STOP conditions.)
+4. **Backfill de tests**: **035** (gate de publicación — baseline de verificación), luego **036** (writers).
+5. **Refactors**: **037** (vectoriza RUT; coordinar con 032) y **038** (dedup; MED por el acoplamiento
+   `__init__ → core`).
+6. **Diseño/spikes**: **039** (después de 024 y 034), **040** (coordinar con 032), **041**.
+
+Planes previos aún vigentes:
+- **023** — autoridades_electas + partidos_politicos: DONE para diputados/senadores/partidos; queda abierto
+  el follow-up de `autoridades_locales` (cobertura de alcaldes). Se cruza con **DIR-04** de esta auditoría.
+- **020** — DuckDB-Wasm playground: solo si lo aprueba una re-evaluación futura del gate 4.3. **Plan 040**
+  entrega el mismo valor "explora los datos" a la audiencia que sí existe, sin depender del tráfico de la landing.
+
+## Hallazgos considerados y diferidos (2026-07-07 — auditoría deep)
+
+Considerados en la auditoría `/improve deep` (commit `c486e7c`) y **no** convertidos en plan, para que no se
+re-auditen. (Los defectos accionables sí están en 024–041.)
+
+| Hallazgo | Motivo |
+|----------|--------|
+| **PERF-01**: el pipeline regenera todos los artefactos de todos los datasets en cada corrida (sin deltas) | **Diferido — L, MED.** Coincide con la pregunta abierta PQ4 (`.audit/open-questions.md`) y el rechazo previo de "build paralelo": el ahorro no justifica el riesgo mientras el build completo tome <45 min. Rebuild incremental necesita hash por dataset + coherencia del contenedor DuckDB/SQLite/ZIP. Reconsiderar cuando el build supere 45 min. |
+| **PERF-06**: `overview`/`snapshot`/`runtime_status` recomputan `freshness_audit`/`summary` varias veces por invocación | **Diferido — magnitud baja.** Las lecturas JSON/Parquet ya están memoizadas; la recomputación es iteración en memoria sub-ms. Cleanup "solo si se toca el archivo". |
+| **SEC-02**: guardia de contención en `data_manager.clear()` usa `startswith` de strings de path | **Diferido — LOW.** Ruta auto-infligida (el usuario setea el env var). Cambiar a `is_relative_to` es un one-liner; hacerlo la próxima vez que se toque `data_manager.py`. |
+| **SEC-03**: atributos `class` en la tabla de salud de `app.js` sin `escapeHtml` | **Diferido — LOW.** Valores internos enum + `script-src 'self'` mitigan; no es XSS vivo. Corregir en el template de `src/builders/landing.py` (no en el `app.js` autogenerado) cuando se edite la landing. |
+| **CORRECTNESS-04**: `validate_user_data` resuelve contratos desde `ROOT_DIR` de módulo, no `self.root_dir` | **Diferido — MED.** Real en modo instalado/bundle, pero requiere decidir dónde viven los contratos para usuarios instalados. Anotado en el Plan 029 (Maintenance notes) como follow-up. |
+| **TECHDEBT-02**: `core.py` (2302 líneas) es god module; ~600 líneas de CLI viven ahí en vez de `cli.py` | **Diferido — L, MED.** Alto valor pero rewrite grande con red de seguridad solo de smoke tests. Mover la CLU a `cli.py` primero sería la rebanada de mayor valor; abrir plan propio cuando haya apetito. |
+| **TECHDEBT-03**: `sinim_finanzas_extractor.py` y `sinim_finanzas_live_extractor.py` son copias divergentes | **Diferido — M, MED.** El Plan 027 corrige el bug de provenance de la copia live; la consolidación de `normalize_rows`/`build_metadata` compartidas queda como follow-up. |
+| **TECHDEBT-05**: cinco idiomas distintos de resolución de raíz/`data/` (`parents[N]`, `_find_root`, etc.) | **Diferido — M, MED.** Consolidar en `_find_root()` toca muchos archivos; cosmético-funcional. Estandarizar gradualmente. |
+| **TECHDEBT-06 / DX-06**: split diario-vs-mensual de extracción no documentado; `make bootstrap` no instala `--extra scraping` | **Diferido — S, docs.** Anotado en 034 (Maintenance). Documentar los dos carriles de extracción y la degradación de `autoridades_electas` sin scrapling. |
+| **TC-04 / TC-05 / TC-07**: characterization de `build_dev_db.py`; tests de los 2 extractores live; split de `test_chile_hub.py` que hoy exige un build previo | **Diferido — backlog de tests.** Los planes 035 (gate) y 036 (writers) cubren el riesgo de publicación más alto primero; el resto del backfill queda como follow-up. |
+| **DIR-04**: promover o aceptar `autoridades_locales` (cola abierta del Plan 023) | **No duplicar** — sigue rastreado por el Plan 023 activo (cobertura de alcaldes). |
+| **DIR-05**: decidir `delincuencia_comunal` (CEAD) antes de su `review_by 2026-09-21` | **Decisión del mantenedor, no plan de código.** El extractor y el workflow existen; el `next_action` en `data/source_registry.json` fuerza la decisión. |
 
 ## Hallazgos considerados y diferidos (2026-06-29 — mejoras de librerías)
 
