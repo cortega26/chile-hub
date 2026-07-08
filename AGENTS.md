@@ -33,9 +33,20 @@ Actualmente publica diecinueve (19) capas:
 | **Consumo Eléctrico Comunal** | CNE / Energía Abierta | Consumo eléctrico anual por comuna y tipo de cliente |
 | **Partidos Políticos** | Cámara de Diputados / SERVEL | Roster de partidos políticos vigentes e históricos con estado legal |
 | **Autoridades Electas** | Cámara de Diputados + Senado | Diputados y senadores en ejercicio, con partido y distrito o circunscripción |
+| **Delincuencia Comunal** | CEAD / Subsecretaría de Prevención del Delito | Casos policiales DMCS y otras categorías por comuna y mes (carril `candidate`, ver nota abajo) |
+| **Autoridades Locales** | Wikipedia (CC-BY-SA) | Gobernadores regionales y alcaldes, segregado de Autoridades Electas por licencia share-alike (carril `candidate`) |
 
 **El objetivo no es tener todos los datos de Chile. Es entregar un número pequeño de datasets
 limpios, versionados, validados y consumibles en una línea de código.**
+
+> **Carriles de publicación:** no todos los datasets listados arriba están en el bundle
+> público. Algunos viven en el carril `candidate` (evaluados, implementados, pero fuera
+> del ZIP publicable por fragilidad de fuente o licencia) con una fecha `review_by` de
+> reevaluación. La fuente de verdad de qué dataset está en qué carril, su
+> `maturity_status` y `confidence_tier` es **`data/dataset_catalog_config.json`** (y
+> `data/source_registry.json`); los criterios de aceptación completos viven en
+> **`docs/dataset-inclusion-criteria.md`**. No dupliques ese sistema aquí — referencia
+> esos documentos.
 
 ---
 
@@ -47,19 +58,29 @@ chile-hub/
 │   └── pipeline-check.yml      CI/CD: extrae, construye, valida, publica
 │
 ├── src/
-│   ├── extractors/
+│   ├── extractors/                 18 extractores por dataset + 4 módulos compartidos (ver nota abajo)
 │   │   ├── base.py                              BaseExtractor ABC (contrato para todos los extractores)
-│   │   ├── subdere_extractor.py                 DPA desde BCN ArcGIS → data/staging/
+│   │   ├── http_utils.py                        Reintentos/backoff HTTP compartidos
+│   │   ├── region_utils.py                      Normalización de nombres de región compartida
+│   │   ├── source_adapter.py                    Adaptador de fuente compartido
+│   │   ├── subdere_extractor.py                 DPA: regiones/provincias/comunas/comunas_enriquecidas (BCN ArcGIS) → data/staging/
 │   │   ├── bcentral_extractor.py                Indicadores desde mindicador.cl → data/staging/
 │   │   ├── censo_extractor.py                   Censo 2024 — población comunal (INE) → data/staging/
 │   │   ├── censo_hogares_viviendas_extractor.py Censo 2024 — hogares y viviendas (INE) → data/staging/
 │   │   ├── salud_extractor.py                   Establecimientos de salud (MINSAL) → data/staging/
 │   │   ├── electoral_extractor.py               Distritos electorales (BCN/SERVEL) → data/staging/
 │   │   ├── mineduc_establecimientos_extractor.py Establecimientos educacionales (MINEDUC) → data/staging/
-│   │   ├── sinim_finanzas_extractor.py          Finanzas municipales SINIM → data/staging/
 │   │   ├── mineduc_resultados_extractor.py      Resultados educacionales agregados (MINEDUC) → data/staging/
 │   │   ├── siedu_extractor.py                   Indicadores urbanos SIEDU (INE) → data/staging/
-│   │   └── res_extractor.py                     Registro de Empresas y Sociedades (datos.gob.cl) → data/staging/
+│   │   ├── res_extractor.py                     Empresas — Registro de Empresas y Sociedades (datos.gob.cl) → data/staging/
+│   │   ├── pobreza_extractor.py                 Pobreza comunal SAE (MDS) → data/staging/
+│   │   ├── consumo_electrico_extractor.py       Consumo eléctrico comunal (CNE) → data/staging/
+│   │   ├── partidos_politicos_extractor.py      Partidos políticos vigentes (SERVEL) → data/staging/
+│   │   ├── autoridades_electas_extractor.py     Diputados y senadores en ejercicio → data/staging/
+│   │   ├── sinim_finanzas_extractor.py          Finanzas municipales — stub de fallback; NO corre en `make extract`
+│   │   ├── sinim_finanzas_live_extractor.py     Finanzas municipales — scraper real; corre en `monthly-scrape.yml`
+│   │   ├── cead_delincuencia_live_extractor.py  Delincuencia comunal (CEAD); corre en `monthly-scrape.yml`
+│   │   └── autoridades_locales_extractor.py     Autoridades locales (Wikipedia); carril `candidate`, sin cadencia automática
 │   ├── validation.py              Todas las funciones validate_*() — módulo independiente (1 194 líneas)
 │   ├── build_dev_db.py            Orquestador (867 líneas): main() + fases (_load_inputs, _compute_validations, _write_data_artifacts, _generate_reports)
 │   ├── builders/                  Módulos del pipeline extraídos de build_dev_db.py (formats, metadata, reports, artifacts, datasets, catalog, landing, io_utils, _shared)
@@ -72,24 +93,40 @@ chile-hub/
 │   └── pipeline_status_utils.py   Copia para imports de build_dev_db.py (888 líneas)
 │
 ├── data/
+│   ├── dataset_catalog_config.json  Fuente de verdad de qué datasets existen (cargado por _shared.py)
+│   ├── source_registry.json         Registro de fuentes: maturity_status, confidence_tier, review_by
 │   ├── raw/          Snapshots crudos de cada respuesta de API (JSON). Solo lectura una vez guardados.
 │   ├── staging/      Datos parseados y cercanos a la fuente (CSV + metadata.json por dataset).
 │   └── normalized/   Artefactos finales publicables (Parquet, JSON, DuckDB, Excel, ZIP, reportes).
 │
-├── tests/
-│   ├── test_chile_hub.py        ChileHubTests · ArtifactContractTests · ChileHubCliTests
-│   │                            WorkflowContractTests · MakefileContractTests
-│   ├── test_extractors.py       SubdereExtractorTests · BCentralExtractorTests · BaseExtractorContractTests
-│   └── test_pipeline_logic.py   PipelineLogicTests · ValidatorTests · CUTInvariantTests · IndicatorFallbackTests
+├── tests/                        9 archivos — ver tabla completa en §8, no la dupliques aquí
+│   ├── test_chile_hub.py         API/CLI de ChileHub, contratos de artefactos, workflow, Makefile
+│   ├── test_extractors.py        Un test class por extractor + contrato de BaseExtractor
+│   ├── test_pipeline_logic.py    Lógica interna de build_dev_db.py, invariantes CUT, changelog
+│   ├── test_validation.py        Funciones validate_*() de src/validation.py
+│   ├── test_core.py              Métodos públicos de ChileHub (core.py)
+│   ├── test_data_package.py      Builder de Frictionless Data Package
+│   ├── test_packaging_runtime.py Empaquetado del bundle publicable en runtime
+│   ├── test_render.py            Helper de renderizado de tablas (_render.py)
+│   └── test_ci_config.py         Guardrails de regresiones reales de CI/Makefile
 │
 ├── scripts/
-│   ├── verify_pipeline.py  Verifica integridad de artefactos post-build
-│   ├── verify_landing.py   Smoke tests de la landing page con Playwright
-│   └── pipeline_status.py  Genera pipeline_status.md
+│   ├── verify_pipeline.py             Verifica integridad de artefactos post-build
+│   ├── verify_landing.py              Smoke tests de la landing page con Playwright
+│   ├── pipeline_status.py             Genera pipeline_status.md
+│   ├── check_validation_registration.py  Valida que cada validate_*() esté registrada en build_dev_db.py
+│   └── check_companion_paths.py       Anti-drift: dataset registry↔docs/contratos + co-cambio de rutas (§12)
 │
 ├── docs/datasets/          Documentación por dataset (fuente, schema, licencia, recetas)
 └── examples/               Notebooks y scripts de demostración para usuarios
 ```
+
+No todos los datasets tienen un extractor 1:1: `subdere_extractor.py` alimenta cuatro
+claves (`regiones`, `provincias`, `comunas`, `comunas_enriquecidas`) y
+`perfil_territorial_comunal` es derivado en `build_dev_db.py` a partir de otros
+datasets, sin extractor propio. El mapeo autoritativo dataset↔extractor es
+**`data/dataset_catalog_config.json`**, no esta lista — si la lista de arriba y el
+JSON no coinciden, confía en el JSON y actualiza esta lista.
 
 ---
 
@@ -127,12 +164,23 @@ codegraph find <symbol_name>                       # En qué archivo está defin
              src/extractors/salud_extractor.py
              src/extractors/electoral_extractor.py
              src/extractors/mineduc_establecimientos_extractor.py
-             src/extractors/sinim_finanzas_extractor.py
              src/extractors/mineduc_resultados_extractor.py
              src/extractors/siedu_extractor.py
              src/extractors/res_extractor.py
+             src/extractors/pobreza_extractor.py
+             src/extractors/consumo_electrico_extractor.py
+             src/extractors/partidos_politicos_extractor.py
+             src/extractors/autoridades_electas_extractor.py
+             (los 14 que corre `make extract` / el job diario de CI — ver §11)
              → Produce: data/staging/{dataset}.csv + data/staging/{dataset}.metadata.json
              → Produce: data/raw/{source}_{timestamp}.json  (snapshot crudo)
+
+             Cadencia distinta / carril `candidate` (NO corren en `make extract`):
+             sinim_finanzas_live_extractor.py y cead_delincuencia_live_extractor.py
+             (vía `monthly-scrape.yml`); autoridades_locales_extractor.py (ad hoc).
+             sinim_finanzas_extractor.py es un stub de fallback, no un paso del
+             pipeline diario — nunca invocarlo desde un job programado (ver
+             `tests/test_ci_config.py::SinimDailyJobGuardrailTests`).
 
 2. BUILD     src/build_dev_db.py
              Lee: data/staging/
@@ -286,10 +334,15 @@ Campos obligatorios en `metadata.json`:
 }
 ```
 
-### Paso 3 — Registrar en build_dev_db.py
+### Paso 3 — Registrar en data/dataset_catalog_config.json
 
-Agregar la entrada correspondiente en `DATASET_CATALOG_CONFIG` siguiendo el patrón
-de los datasets existentes (`regiones`, `provincias`, `comunas`, `indicadores`).
+`DATASET_CATALOG_CONFIG` ya **no** es un dict literal en `build_dev_db.py`: se carga
+en tiempo de ejecución desde **`data/dataset_catalog_config.json`** vía
+`src/builders/_shared.py::_load_catalog_config()`. Agregar la entrada correspondiente
+en ese JSON siguiendo el patrón de los datasets existentes (`regiones`, `provincias`,
+`comunas`, `indicadores`). Si el dataset tiene carril (`candidate` /
+`stable_publishable`), `maturity_status` o `confidence_tier`, esos campos viven en
+**`data/source_registry.json`** (ver §1 y `docs/dataset-inclusion-criteria.md`).
 
 ### Paso 4 — Agregar validaciones
 
@@ -509,42 +562,70 @@ pytest tests/test_chile_hub.py::ChileHubTests::test_load_polars -v
 
 ### ¿Qué cubren los tests?
 
-**`tests/test_chile_hub.py`** — requiere `data/normalized/` (ejecutar `make build` antes)
+9 archivos en `tests/`. Esta tabla es de **navegación por archivo**, no un
+inventario de clases — las clases cambian con frecuencia y una lista exhaustiva
+aquí quedaría stale de inmediato. Para el inventario vivo de clases:
+```bash
+grep -n "^class " tests/*.py
+```
 
-| Clase | Qué verifica |
-|:---|:---|
-| `ChileHubTests` | API Python: `load_polars`, `health`, `bundle`, `redistribution`, `provenance` |
-| `ArtifactContractTests` | Contratos de artefactos: SHA256, catálogo, ZIP, metadatos de redistribución |
-| `ChileHubCliTests` | CLI: todos los subcomandos (`list`, `path`, `show`, `health`, `bundle`, etc.) |
-| `WorkflowContractTests` | Contratos del workflow CI: estructura del YAML, steps esperados |
-| `MakefileContractTests` | Targets del Makefile: existencia y coherencia de comandos |
-
-**`tests/test_extractors.py`** — no requiere datos normalizados
-
-| Clase | Qué verifica |
-|:---|:---|
-| `SubdereExtractorTests` | Fetch, normalización y staging del extractor DPA |
-| `BCentralExtractorTests` | Fetch, normalización y staging del extractor de indicadores |
-| `SinimFinanzasExtractorTests` | Fetch y normalización del extractor SINIM |
-| `MineducResultadosExtractorTests` | Fetch y normalización del extractor de resultados educacionales |
-| `SieduExtractorTests` | Fetch y normalización del extractor SIEDU |
-| `ResExtractorTests` | Fetch, normalización y staging del extractor RES |
-| `BaseExtractorContractTests` | Contrato ABC de `BaseExtractor`: interfaz y métodos obligatorios |
-
-**`tests/test_pipeline_logic.py`** — no requiere datos normalizados
-
-| Clase | Qué verifica |
-|:---|:---|
-| `PipelineLogicTests` | Lógica interna de `build_dev_db.py`: enriquecimiento, degradación, metadata |
-| `ValidatorTests` | Funciones `validate_*()` de `src/validation.py`: bordes vacíos, claves duplicadas |
-| `CUTInvariantTests` | Invariante de longitud fija de códigos CUT en transformaciones |
-| `IndicatorFallbackTests` | Comportamiento del fallback de indicadores y backfill |
+| Archivo | Requiere `data/normalized/` | Qué cubre |
+|:---|:---:|:---|
+| `test_chile_hub.py` | Sí (`make build` antes) | API Python de `ChileHub`, CLI, contratos de artefactos (SHA256, catálogo, ZIP), contratos de workflow/Makefile, `Dataset(StrEnum)` |
+| `test_extractors.py` | No | Un test class por extractor (fetch, normalización, staging) + contrato ABC de `BaseExtractor` + reintentos HTTP |
+| `test_pipeline_logic.py` | No | Lógica interna de `build_dev_db.py`, invariantes CUT, fallback de indicadores, severidad de `dataset_changelog.json`, builders (`reports`, `pipeline_status_utils`) |
+| `test_validation.py` | No | Funciones `validate_*()` de `src/validation.py`: bordes vacíos, claves duplicadas, casos límite |
+| `test_core.py` | Sí | Métodos públicos de `ChileHub` (`core.py`): metadatos, reportes operativos, inspección — no cubre CLI |
+| `test_data_package.py` | No | Builder de Frictionless Data Package |
+| `test_packaging_runtime.py` | No | Empaquetado del bundle publicable (ZIP, SHA256) en runtime |
+| `test_render.py` | No | Helper de renderizado de tablas (`_render.py`) |
+| `test_ci_config.py` | No | Guardrails de texto simple para regresiones **reales** ya ocurridas de CI/Makefile (ver política abajo) |
 
 ### Reglas al agregar tests
 
-- Los tests **no deben correr extractores ni el pipeline**. Leen de `data/normalized/`.
-- Un test que falla por datos desactualizados indica que el pipeline no ha corrido, no que el código está roto.
-- Todos los valores esperados en assertions deben estar justificados en comentarios si no son obvios.
+- Los tests que leen `data/normalized/` (`test_chile_hub.py`, `test_core.py`)
+  **no deben correr extractores ni el pipeline** — un fallo por datos
+  desactualizados indica que el pipeline no ha corrido (`make build`), no que
+  el código está roto.
+- Todos los valores esperados en assertions deben estar justificados en
+  comentarios si no son obvios.
+
+### Política de revisión y actualización de tests
+
+**Cuándo agregar un test:**
+- Dataset nuevo → §5 Paso 5 (ya cubierto).
+- Fix de un bug → agregar un test de regresión que falle sin el fix y pase con él.
+  Sin este test, el bug puede reaparecer sin que nadie lo note.
+- Cambio de contrato/esquema/CI/Makefile con impacto real (rompió un pipeline,
+  un dato mal validado llegó a publicarse, etc.) → seguir el patrón de
+  `tests/test_ci_config.py`: un test de texto simple, con un docstring que
+  documente el incidente concreto que lo motivó (qué pasó, qué commit lo arregló).
+  No hace falta un parser completo (YAML, AST) si una comprobación de texto
+  acotada ya previene la regresión — ver el propio `test_ci_config.py` para el
+  criterio de cuándo alcanza con texto y cuándo no.
+
+**Cuándo actualizar un test existente sin debilitarlo:**
+- Solo si el comportamiento esperado cambió **a propósito**. El commit que
+  actualiza el test debe explicar el porqué (referenciar el ADR, plan o issue
+  que motivó el cambio de contrato), no solo "arreglar test roto".
+- Nunca relajar una aserción, aumentar una tolerancia o quitar una validación
+  de un test únicamente para que el pipeline pase sin haber entendido la causa
+  raíz del fallo. Si no está claro si el test o el código están equivocados,
+  investigar antes de tocar cualquiera de los dos.
+- `skip`/`xfail` temporal solo con razón explícita y fecha de revisión en el
+  mismo commit; nunca como forma silenciosa de esquivar un fallo.
+
+**Cobertura:** `.codecov.yml` define `patch.target: 75%` (diffs) y
+`project.target: auto` con `threshold: 2%` como piso de referencia — aunque
+el upload a Codecov esté deshabilitado hoy (se usa el badge autogenerado), el
+criterio sigue vigente: código nuevo del pipeline debe venir acompañado de
+tests que ejerciten sus ramas nuevas, no solo el camino feliz.
+
+**Co-cambio automático:** `scripts/check_companion_paths.py` (modo `companions`,
+§12) bloquea en CI un PR que modifique `src/validation.py`, `src/extractors/**`
+o `src/build_dev_db.py` sin tocar también su archivo de test compañero. Esto no
+reemplaza el criterio humano de arriba — solo evita el caso más simple de
+"cambié código y me olvidé de tocar el test".
 
 ---
 
@@ -555,7 +636,8 @@ El workflow `.github/workflows/pipeline-check.yml` corre en `push` a `main`,
 
 ### Jobs del workflow
 
-1. `quality` — Ruff lint y format check.
+1. `quality` — Ruff lint y format check, más los gates anti-drift de §12
+   (`check_companion_paths.py registry` siempre; `companions` solo en `pull_request`).
 2. `build-and-test` — extractores, build, verificación, tests y status.
 3. `landing` — smoke test Playwright usando exactamente los outputs del job anterior.
 4. `publish` — solo en `schedule` o dispatch con `publish=true`; exige
@@ -651,13 +733,13 @@ No bypassear estas validaciones ni mover su lógica a otro módulo.
 ```bash
 # Entorno
 make bootstrap          # Crea .venv, instala deps + Playwright/Chromium
-make doctor             # Python efectivo y dependencias clave
+make doctor             # Python efectivo, dependencias clave y gates anti-drift (§12)
 
 # Pipeline completo (lo más común)
 make refresh            # extract → build → verify → test → verify-landing → lint + format-check
 
 # Pasos individuales
-make extract            # Corre los 11 extractores → data/staging/
+make extract            # Corre los 14 extractores de cadencia diaria → data/staging/
 make build              # Compila todos los artefactos → data/normalized/
 make verify             # Integridad de artefactos (SHA-256, conteos, schema)
 make test               # pytest — lee data/normalized/, NO corre el pipeline
@@ -696,5 +778,51 @@ python -m src.chile_hub bundle
 
 ---
 
-*Última actualización: 17 Junio 2026. Actualizar este documento cuando cambie la arquitectura,
-se agreguen datasets o se modifiquen invariantes críticas.*
+## 12. Documentación cableada al código — política anti-drift
+
+Este mismo documento estuvo desactualizado (conteo de datasets, lista de
+extractores, ubicación de `DATASET_CATALOG_CONFIG`, archivos de test) hasta que
+esta sección se escribió. La lección: una regla de "recuerda actualizar la doc"
+sin verificación mecánica no escala — nadie se acuerda. La política de aquí en
+adelante es que **todo hecho documentado que sea derivable del código declare su
+fuente de verdad canónica** y, cuando sea mecánicamente verificable, esté
+protegido por un chequeo automatizado en vez de depender solo de buena voluntad.
+
+### Propietarios canónicos
+
+| Hecho | Fuente de verdad | Verificado por |
+|:---|:---|:---|
+| Qué datasets existen, su metadata | `data/dataset_catalog_config.json` | `check_companion_paths.py registry` |
+| Carril (`candidate`/`stable_publishable`), `maturity_status`, `confidence_tier`, `review_by` | `data/source_registry.json` | — (criterios en `docs/dataset-inclusion-criteria.md`) |
+| Contrato de esquema por dataset | `contracts/datasets/{nombre}.schema.json` | `check_companion_paths.py registry` |
+| Documentación de usuario por dataset | `docs/datasets/{nombre}.md` | `check_companion_paths.py registry` |
+| Criterios de inclusión/deprecación de datasets | `docs/dataset-inclusion-criteria.md` | — (revisión humana) |
+| Registro de funciones `validate_*()` | bloque `validations = {…}` en `build_dev_db.py` | `check_validation_registration.py` |
+| Versión del paquete | `pyproject.toml` (`[project] version`) | `python-semantic-release` (§7) |
+| Inventario de clases de test | `tests/*.py` (no una tabla en prosa) | `grep '^class ' tests/*.py` (§8) |
+
+### Mecanismo: `scripts/check_companion_paths.py`
+
+Dos modos, ambos corren en `make doctor` y/o en el job `quality` de CI
+(`.github/workflows/pipeline-check.yml`):
+
+1. **`registry`** (siempre, sin diff): verifica que cada clave de
+   `data/dataset_catalog_config.json` tenga su contrato en `contracts/datasets/`
+   y su doc en `docs/datasets/`. Bloqueante — `SystemExit` si falta alguno.
+2. **`companions`** (solo en `pull_request`, vía diff contra el commit base):
+   aplica la tabla `COMPANION_RULES` — si cambia una ruta disparadora (p. ej.
+   `data/dataset_catalog_config.json`, `src/validation.py`,
+   `src/extractors/**`) y ninguna de sus rutas compañeras (docs, tests,
+   `AGENTS.md`) aparece en el mismo diff, el PR falla con un mensaje explícito
+   de qué se esperaba.
+
+**Regla de mantenimiento:** si agregas una ruta nueva con una relación de
+co-cambio real (un módulo más en `src/`, un nuevo doc que depende de un JSON),
+agrega la regla correspondiente a `COMPANION_RULES` en el mismo PR que la
+introduce — no dejes que el próximo drift se descubra a mano, como este.
+
+---
+
+*Este documento se actualiza junto con los cambios que describe (ver §12), no
+en una fecha fija. Para la fecha real de la última modificación:
+`git log -1 --format=%ad -- AGENTS.md`.*

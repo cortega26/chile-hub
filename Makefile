@@ -83,6 +83,7 @@ doctor:
 	@$(PYTHON) -c "import sys; print(sys.executable)"
 	@$(PYTHON) -c "import duckdb, polars, pyarrow; from importlib.metadata import version; print('duckdb=' + duckdb.__version__); print('polars=' + polars.__version__); print('pyarrow=' + pyarrow.__version__); print('playwright=' + version('playwright'))"
 	@$(PYTHON) scripts/check_validation_registration.py
+	@$(PYTHON) scripts/check_companion_paths.py registry
 
 extract:
 	PYTHONPATH=src $(PYTHON) src/extractors/subdere_extractor.py

@@ -10,7 +10,17 @@ Ejecuta las verificaciones útiles más pequeñas antes de abrir un pull request
 make lint
 make format-check
 make test
+make doctor
 ```
+
+`make doctor` corre `scripts/check_companion_paths.py registry`: verifica que cada
+dataset de `data/dataset_catalog_config.json` tenga su contrato en
+`contracts/datasets/` y su doc en `docs/datasets/`. En CI, un chequeo adicional por
+pull request (`check_companion_paths.py companions`) exige que ciertos cambios de
+código (`src/validation.py`, `src/extractors/**`, `data/dataset_catalog_config.json`,
+entre otros — ver `AGENTS.md §12`) vengan acompañados de su test o documento
+asociado en el mismo diff. Si CI marca una ruta compañera faltante, actualiza el
+doc/test indicado en el mismo PR.
 
 Para cambios que afectan archivos públicos generados, ejecuta:
 

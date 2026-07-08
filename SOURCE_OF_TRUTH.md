@@ -21,6 +21,7 @@ confiables — no una cobertura exhaustiva.
 | **`SOURCE_OF_TRUTH.md`** ← estas aqui | Indice de navegacion, resumen de invariantes, mapa de archivos + tareas | Siempre primero — ~100 lineas |
 | **`AGENTS.md`** | Reglas completas del pipeline, politica legal, flujo de 7 pasos para agregar datasets, jobs de CI/CD, antipatrones, convenciones de codigo | Al agregar un dataset · depurar el pipeline · preguntas legales · cambios en CI |
 | **`CLAUDE.md`** | Redirige a AGENTS.md + SOURCE_OF_TRUTH.md; punto de entrada del proyecto para sesiones de Claude Code | Primera visita al repositorio · orientacion |
+| **`docs/dataset-inclusion-criteria.md`** | Criterios de aceptacion/deprecacion de datasets, carriles `candidate`/`stable_publishable` | Al evaluar si un dataset nuevo entra al MVP · al reevaluar un `candidate` |
 
 ---
 
@@ -62,10 +63,11 @@ data/
 ├── staging/    {dataset}.csv + {dataset}.metadata.json — entradas del pipeline
 └── normalized/ Artefactos generados — NUNCA editar manualmente; siempre regenerar
 
-tests/
+tests/                      9 archivos — inventario completo en AGENTS.md §8, no lo dupliques aqui
 ├── test_chile_hub.py        Requiere data/normalized/ — ejecutar `make build` primero
-├── test_extractors.py       No requiere datos normalizados
-└── test_pipeline_logic.py   No requiere datos normalizados
+├── test_core.py             Requiere data/normalized/
+└── test_extractors.py, test_pipeline_logic.py, test_validation.py, test_data_package.py,
+    test_packaging_runtime.py, test_render.py, test_ci_config.py   No requieren datos normalizados
 ```
 
 ---
@@ -81,6 +83,7 @@ tests/
 | Entender los jobs de CI/CD | **`AGENTS.md §9`** |
 | Verificar estado legal de redistribucion de una fuente | **`AGENTS.md §6`** |
 | Revisar que antipatrones evitar | **`AGENTS.md §10`** |
+| CI marca un documento/test desincronizado del codigo | **`AGENTS.md §12`** — `scripts/check_companion_paths.py` |
 | Navegar archivos grandes sin leerlos en frio | `CLAUDE.md` → seccion **CodeGraph** |
 | Encontrar donde esta definido un simbolo | `codegraph find <name>` o `grep -n "def <name>" src/` |
 | Leer API publica de ChileHub | `src/chile_hub/core.py` (clase ChileHub, todos los metodos publicos) |

@@ -57,6 +57,19 @@ jobs:
       - name: Check Python format
         run: uvx ruff@0.15.17 format --check src/ tests/ scripts/
 
+      - name: Check dataset registry/docs/contracts sync
+        run: python scripts/check_companion_paths.py registry
+
+      - name: Fetch PR base commit for companion-path diff
+        if: github.event_name == 'pull_request'
+        run: git fetch --no-tags --depth=1 origin "${{ github.event.pull_request.base.sha }}"
+
+      - name: Check companion paths (docs/tests co-change)
+        if: github.event_name == 'pull_request'
+        run: |
+          python scripts/check_companion_paths.py companions \
+            --base "${{ github.event.pull_request.base.sha }}"
+
   build-and-test:
     name: Build and verify data
     if: github.event_name != 'push' || !contains(github.event.head_commit.message, '[skip ci]')
