@@ -22,7 +22,9 @@
 [![License: MIT](https://img.shields.io/badge/Code%20License-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-3776AB.svg?style=flat&logo=python&logoColor=white)]()
 [![Formats](https://img.shields.io/badge/Formats-Parquet%20%7C%20DuckDB%20%7C%20SQLite%20%7C%20JSON%20%7C%20Excel-orange.svg)]()
+<!-- START_DATASET_BADGE -->
 [![Datasets](https://img.shields.io/badge/Datasets-19%20capas-16a34a.svg)]()
+<!-- END_DATASET_BADGE -->
 [![Comunas](https://img.shields.io/badge/Comunas-346-8b5cf6.svg)]()
 
 <p>
@@ -182,11 +184,11 @@ confiar ciegamente**. Los datos vienen con la evidencia que los respalda.
 | Pilar | Qué significa | Evidencia auditables |
 |:---|:---|:---|
 | **Procedencia documentada** | Cada dataset declara su fuente oficial exacta con URL directa al organismo público emisor (BCN, INE, MINEDUC, BCCh, MINSAL, datos.gob.cl). | [`provenance_report.md`](data/normalized/provenance_report.md) — fuente, modo y timestamp por capa |
-| **Auditoría legal explícita** | Licencia, atribución requerida y permiso de redistribución verificados dataset por dataset. **19 de 19 capas** pasan la auditoría (`ready`). | [`redistribution_report.md`](data/normalized/redistribution_report.md) + [`AGENTS.md §6`](AGENTS.md) |
+| **Auditoría legal explícita** | <!-- START_REDISTRIBUTION_SUMMARY -->Licencia, atribución requerida y permiso de redistribución verificados dataset por dataset. **19 de 19 capas** pasan la auditoría (`ready`).<!-- END_REDISTRIBUTION_SUMMARY --> | [`redistribution_report.md`](data/normalized/redistribution_report.md) + [`AGENTS.md §6`](AGENTS.md) |
 | **Pipeline que falla con estridencia** | Si una validación falla, el pipeline **aborta** — no publica datos corruptos, no emite advertencias silenciosas. | [`ADR-001`](docs/adr/ADR-001-pipeline-lineal-determinista.md) — fail-loud como decisión de arquitectura |
-| **Contratos de esquema verificados** | 21 contratos JSON Schema ([`contracts/datasets/`](contracts/datasets/)) definen columnas esperadas, tipos, claves primarias y cobertura. Se validan **en cada build** automáticamente. | [`ADR-005`](docs/adr/ADR-005-contratos-esquema-json-schema.md) + `contracts/datasets/*.json` |
-| **Salud transparente** | Dashboard público con severidad, frescura, cobertura, drift y degradación por dataset. 12 capas `ok`, 7 `warn`, 0 `error`. | [`hub_health.md`](data/normalized/hub_health.md) — estado completo actualizado en cada build |
-| **Calidad medida y pública** | Puntuación compuesta A-F por dataset: **promedio 94.2/100** (18 A, 1 B). Dimensiones: validación, contrato, madurez de fuente, frescura, cobertura, política de reúso. | [`dataset_quality.md`](data/normalized/dataset_quality.md) — scorecard completo |
+| **Contratos de esquema verificados** | <!-- START_CONTRACT_COUNT -->21 contratos JSON Schema ([`contracts/datasets/`](contracts/datasets/)) definen columnas esperadas, tipos, claves primarias y cobertura. Se validan **en cada build** automáticamente.<!-- END_CONTRACT_COUNT --> | [`ADR-005`](docs/adr/ADR-005-contratos-esquema-json-schema.md) + `contracts/datasets/*.json` |
+| **Salud transparente** | <!-- START_HEALTH_SUMMARY -->Dashboard público con severidad, frescura, cobertura, drift y degradación por dataset. 12 capas `ok`, 7 `warn`, 0 `error`.<!-- END_HEALTH_SUMMARY --> | [`hub_health.md`](data/normalized/hub_health.md) — estado completo actualizado en cada build |
+| **Calidad medida y pública** | <!-- START_QUALITY_SUMMARY -->Puntuación compuesta A-F por dataset: **promedio 94.2/100** (18 A, 1 B). Dimensiones: validación, contrato, madurez de fuente, frescura, cobertura, política de reúso.<!-- END_QUALITY_SUMMARY --> | [`dataset_quality.md`](data/normalized/dataset_quality.md) — scorecard completo |
 
 Cada pilar se audita automáticamente en cada ejecución del pipeline. Los reportes se
 regeneran en cada build — no son documentos estáticos mantenidos a mano. Para auditar
@@ -199,10 +201,12 @@ chile-hub health       # severidad, frescura, drift y cobertura
 
 ### Respaldo adicional
 
-- **583 tests** (`pytest --collect-only`, más scripts de verificación
-  del pipeline) que validan extracción, contratos e integridad de datos.
-- **5 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura
-  con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
+<!-- START_TEST_COUNT -->
+- **597 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
+<!-- END_TEST_COUNT -->
+<!-- START_ADR_COUNT -->
+- **5 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
+<!-- END_ADR_COUNT -->
 - **Drift monitoreado:** todos los datasets bajo vigilancia de deriva de esquema; cualquier
   cambio en la fuente se detecta y registra ([`drift_report.md`](data/normalized/drift_report.md)).
 - **Trazabilidad completa:** cada build registra timestamp, versión de extractor y
@@ -508,13 +512,15 @@ df = comunas.join(censo, on="codigo_comuna")
 print(df.head())
 ```
 
+<!-- START_VERSION_PIN_EXAMPLE -->
 > **Versionado:** Para entornos productivos, fija la versión exacta en `requirements.txt`
 > (revisa el badge de PyPI al inicio de este README para la versión más reciente):
 > ```
-> chile-hub==1.19.11
+> chile-hub==1.19.12
 > ```
 > El bundle de datos se publica con cada release. La API del módulo `ChileHub` sigue
 > versionado semántico: cambios de interfaz pública solo en _major releases_.
+<!-- END_VERSION_PIN_EXAMPLE -->
 
 ### Desarrollo local del pipeline
 

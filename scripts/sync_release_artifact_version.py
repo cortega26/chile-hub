@@ -23,23 +23,21 @@ from src.builders.artifacts import (
     write_publishable_bundle_sha256,
     write_publishable_bundle_zip,
 )
-from src.builders.io_utils import write_json_atomic
+from src.builders.io_utils import read_project_version, write_json_atomic
 from src.builders.landing import sync_landing_metadata
 
 NORMALIZED_DIR = ROOT_DIR / "data" / "normalized"
 
 
 def load_project_metadata() -> tuple[str, str]:
+    version = read_project_version(str(ROOT_DIR))
     with open(ROOT_DIR / "pyproject.toml", "rb") as f:
         pyproject_data = tomllib.load(f)
-    version = pyproject_data.get("project", {}).get("version")
     public_site_url = (
         pyproject_data.get("tool", {})
         .get("chile_hub", {})
         .get("public_site_url", "https://tooltician.com/chile-hub/")
     )
-    if not version:
-        raise SystemExit("pyproject.toml is missing project.version")
     return version, public_site_url
 
 

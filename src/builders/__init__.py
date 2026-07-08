@@ -12,6 +12,8 @@ módulos cohesivos:
 - `datasets`: builders de datasets derivados (perfil territorial, capas geográficas).
 - `catalog`: escritura del metadata del pipeline y del catálogo de datasets.
 - `landing`: sincronización de metadatos JSON-LD en la landing page.
+- `doc_sync`: sincroniza hechos hardcodeados (conteos, versión, salud, calidad)
+  con README.md — ver AGENTS.md §12.
 
 `build_dev_db.py` re-exporta los nombres públicos para mantener
 compatibilidad con scripts externos (`scripts/verify_pipeline.py`) y tests.
