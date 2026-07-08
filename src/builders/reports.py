@@ -343,7 +343,11 @@ def build_provenance_report(dataset_catalog):
     return {
         "generated_at_utc": dataset_catalog.get("generated_at_utc"),
         "dataset_count": len(datasets),
-        "live_count": sum(1 for entry in datasets if entry.get("source_mode") == "live"),
+        # "monthly" (p. ej. finanzas_municipales, ver Fase 3.4) cuenta como
+        # live_count: es dato genuino de la fuente, solo con cadencia menor.
+        "live_count": sum(
+            1 for entry in datasets if entry.get("source_mode") in {"live", "monthly"}
+        ),
         "fallback_count": sum(1 for entry in datasets if entry.get("source_mode") == "fallback"),
         "datasets": datasets,
     }

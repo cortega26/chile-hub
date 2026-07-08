@@ -262,7 +262,9 @@ def build_hub_health(metadata):
         "ok_count": ok_count,
         "warn_count": warn_count,
         "error_count": error_count,
-        "live_count": sum(1 for entry in entries if entry["source_mode"] == "live"),
+        # "monthly" cuenta como live_count: dato genuino de la fuente,
+        # solo con cadencia menor (ver Fase 3.4, source_registry.json).
+        "live_count": sum(1 for entry in entries if entry["source_mode"] in {"live", "monthly"}),
         "fallback_count": sum(1 for entry in entries if entry["source_mode"] == "fallback"),
         "stale_count": sum(1 for entry in entries if entry["freshness_status"] == "stale"),
         "unknown_freshness_count": sum(

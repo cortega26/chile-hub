@@ -151,13 +151,20 @@ def _download_xlsx(url: str, label: str) -> Path:
 def _parse_pobreza_xlsx(path: Path, dimension: str, anio: int) -> list[dict]:
     """Parsea un XLSX de pobreza comunal y retorna filas normalizadas.
 
-    El formato esperado es una tabla con columnas:
-    región, código_region, comuna, código_comuna, estimación_puntual,
-    límite_inferior, límite_superior (nombres exactos varían según ronda).
+    Formato real verificado el 2026-07-08 (hoja "Estimaciones", ambos archivos
+    ingresos y multidimensional comparten layout): fila 1 título, fila 2 en
+    blanco, fila 3 encabezado, datos desde la fila 4 en adelante:
+    [código_comuna, nombre_región, nombre_comuna, población_proyectada,
+    personas_en_pobreza, tasa (fracción 0-1), límite_inferior, límite_superior,
+    presencia_muestra_casen, tipo_estimación_sae]. El archivo no incluye un
+    código de región numérico — se deriva de los 2 primeros dígitos del
+    código de comuna (convención DPA estándar). La tasa y los límites vienen
+    como fracción; se escalan a porcentaje para igualar la convención del
+    resto del dataset (ver FALLBACK_ROWS).
     """
     workbook = openpyxl.load_workbook(path, read_only=True, data_only=True)
     sheet = workbook.active
-    rows_raw = list(sheet.iter_rows(min_row=2, values_only=True))
+    rows_raw = list(sheet.iter_rows(min_row=4, values_only=True))
     workbook.close()
 
     rows = []
@@ -166,17 +173,13 @@ def _parse_pobreza_xlsx(path: Path, dimension: str, anio: int) -> list[dict]:
         if not row or sum(1 for c in row if c is not None) < 4:
             continue
 
-        # Intentar extraer las columnas clave por posición
-        # El formato típico del MDS es:
-        # [código_region, región, código_comuna, comuna, tasa, li, ls, ...]
         try:
-            codigo_region = str(int(row[0])).zfill(2) if row[0] is not None else None
-            # Saltar columna 1 (nombre región)
-            codigo_comuna = str(int(row[2])).zfill(5) if row[2] is not None else None
-            nombre_comuna = str(row[3]).strip() if row[3] is not None else ""
-            tasa = float(row[4]) if row[4] is not None else None
-            limite_inferior = float(row[5]) if len(row) > 5 and row[5] is not None else None
-            limite_superior = float(row[6]) if len(row) > 6 and row[6] is not None else None
+            codigo_comuna = str(int(row[0])).zfill(5) if row[0] is not None else None
+            codigo_region = codigo_comuna[:2] if codigo_comuna else None
+            nombre_comuna = str(row[2]).strip() if row[2] is not None else ""
+            tasa = float(row[5]) * 100 if row[5] is not None else None
+            limite_inferior = float(row[6]) * 100 if len(row) > 6 and row[6] is not None else None
+            limite_superior = float(row[7]) * 100 if len(row) > 7 and row[7] is not None else None
         except (ValueError, TypeError, IndexError):
             continue
 
