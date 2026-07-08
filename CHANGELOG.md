@@ -12,6 +12,23 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.19.7 - 2026-07-08
+
+### Corregido
+
+- **ci**: Make monthly scrape commits tolerant
+  ([`974b502`](https://github.com/cortega26/chile-hub/commit/974b502cb4f6975e168f6ba6adbcfe312a085ea2))
+
+- **ci**: Quiet CodeQL Python legacy probe
+  ([`f056684`](https://github.com/cortega26/chile-hub/commit/f0566844d5f02a5153f5385f20306849eb1fd31f))
+
+- **ci**: Set CodeQL Python executable
+  ([`0229cc3`](https://github.com/cortega26/chile-hub/commit/0229cc32d89662fed27ad1a0924d4ac122ff9f7a))
+
+- **ci**: Stage monthly scrape outputs safely
+  ([`f0f8096`](https://github.com/cortega26/chile-hub/commit/f0f80964b83f88fb0538bc4bb8faeb033b0c56ea))
+
+
 ## 1.19.6 - 2026-07-08
 
 ### Corregido
