@@ -1631,7 +1631,6 @@ class WorkflowContractTests(unittest.TestCase):
             ROOT_DIR / ".github" / "workflows" / "pypi-release.yml"
         ).read_text()
         cls.codeql_workflow_text = (ROOT_DIR / ".github" / "workflows" / "codeql.yml").read_text()
-        cls.lgtm_text = (ROOT_DIR / ".lgtm.yml").read_text()
         cls.monthly_workflow_text = (
             ROOT_DIR / ".github" / "workflows" / "monthly-scrape.yml"
         ).read_text()
@@ -1751,8 +1750,10 @@ class WorkflowContractTests(unittest.TestCase):
     def test_codeql_python_analysis_uses_no_build_mode(self):
         self.assertIn("languages: python", self.codeql_workflow_text)
         self.assertIn("build-mode: none", self.codeql_workflow_text)
-        self.assertIn("python_setup:", self.lgtm_text)
-        self.assertIn("version: 3", self.lgtm_text)
+        self.assertIn(
+            "CODEQL_EXTRACTOR_PYTHON_OPTION_PYTHON_EXECUTABLE_NAME: python3",
+            self.codeql_workflow_text,
+        )
 
     def test_testpypi_workflow_smoke_tests_installed_console_script(self):
         testpypi_text = (ROOT_DIR / ".github" / "workflows" / "testpypi.yml").read_text()

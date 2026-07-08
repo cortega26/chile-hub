@@ -20,6 +20,8 @@ jobs:
     name: Analyze Python
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      CODEQL_EXTRACTOR_PYTHON_OPTION_PYTHON_EXECUTABLE_NAME: python3
     permissions:
       contents: read
       security-events: write
