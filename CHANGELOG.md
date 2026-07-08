@@ -12,6 +12,14 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.19.4 - 2026-07-08
+
+### Corregido
+
+- **ci**: Harden release artifact gates
+  ([`4ebca99`](https://github.com/cortega26/chile-hub/commit/4ebca99768d2f99415f221a41fda226fcebfbfa0))
+
+
 ## 1.19.3 - 2026-07-07
 
 ### Corregido
