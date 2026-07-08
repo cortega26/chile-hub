@@ -12,6 +12,14 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.19.8 - 2026-07-08
+
+### Corregido
+
+- **ci**: Force-add gitignored monthly scrape outputs; deprecate consumo_electrico_comunal
+  ([`57e6eaf`](https://github.com/cortega26/chile-hub/commit/57e6eafb5492878f08395419e4d624d0aaaea314))
+
+
 ## 1.19.7 - 2026-07-08
 
 ### Corregido
