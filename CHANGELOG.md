@@ -12,6 +12,41 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.19.13 - 2026-07-08
+
+### Corregido
+
+- **docs**: Avoid duplicate reference slug
+  ([`7ef9df7`](https://github.com/cortega26/chile-hub/commit/7ef9df7f7da7feb3e632792ea3bd8127dbf2e376))
+
+### Mantenimiento
+
+- Centralize hardcoded README facts (DRY single-source sync)
+  ([#28](https://github.com/cortega26/chile-hub/pull/28),
+  [`378eba0`](https://github.com/cortega26/chile-hub/commit/378eba061a707f96f60bbba4952c8b9da6ec7df1))
+
+- Centralize hardcoded README facts into a single-source sync mechanism
+  ([#28](https://github.com/cortega26/chile-hub/pull/28),
+  [`378eba0`](https://github.com/cortega26/chile-hub/commit/378eba061a707f96f60bbba4952c8b9da6ec7df1))
+
+### Documentación
+
+- Hide unnecessary mkdocs sidebar scrollbars
+  ([`12e23b9`](https://github.com/cortega26/chile-hub/commit/12e23b97ab4a5c60a087156868031ab658a82c3f))
+
+- Improve documentation discoverability
+  ([`b9acaf7`](https://github.com/cortega26/chile-hub/commit/b9acaf70a4fd135c57361ef457d062fbd4bb5533))
+
+- Normalize changelog language and refresh docs
+  ([`db6c3af`](https://github.com/cortega26/chile-hub/commit/db6c3af183cb4179ed2d4f220755a177e72b48e5))
+
+- Suppress mkdocs sidebar scrollbars broadly
+  ([`0090fc3`](https://github.com/cortega26/chile-hub/commit/0090fc34c6629d5a7193af9a6b793acb382989db))
+
+- Sync README test count
+  ([`3bad640`](https://github.com/cortega26/chile-hub/commit/3bad640170a8a6fd45d5da91e2d941c648950acd))
+
+
 ## 1.19.12 - 2026-07-08
 
 ### Corregido
