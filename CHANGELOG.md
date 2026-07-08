@@ -12,6 +12,14 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.19.5 - 2026-07-08
+
+### Corregido
+
+- **ci**: Clarify readiness and quiet release logs
+  ([`dc5a882`](https://github.com/cortega26/chile-hub/commit/dc5a88259eebcc433e09a8e957fa6369e3f6e884))
+
+
 ## 1.19.4 - 2026-07-08
 
 ### Corregido
