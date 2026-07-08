@@ -26,12 +26,16 @@
   margin-top: 1.1rem;
 }
 
-.md-sidebar__scrollwrap {
+.md-sidebar,
+.md-sidebar * {
   -ms-overflow-style: none;
+  scrollbar-color: transparent transparent;
   scrollbar-width: none;
 }
 
-.md-sidebar__scrollwrap::-webkit-scrollbar {
+.md-sidebar::-webkit-scrollbar,
+.md-sidebar *::-webkit-scrollbar {
+  display: none;
   width: 0;
   height: 0;
 }
