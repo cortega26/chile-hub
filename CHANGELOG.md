@@ -12,6 +12,14 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.19.10 - 2026-07-08
+
+### Corregido
+
+- **ci**: Stop daily job from clobbering the monthly SINIM snapshot
+  ([`5ba983e`](https://github.com/cortega26/chile-hub/commit/5ba983e9b31ab7e32efa39348618f70ad052ba7f))
+
+
 ## 1.19.9 - 2026-07-08
 
 ### Corregido

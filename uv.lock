@@ -457,7 +457,7 @@ wheels = [
 
 [[package]]
 name = "chile-hub"
-version = "1.19.9"
+version = "1.19.10"
 source = { editable = "." }
 dependencies = [
     { name = "duckdb" },
