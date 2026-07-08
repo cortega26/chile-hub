@@ -50,6 +50,37 @@ PIPELINE_METADATA_PATH = NORMALIZED_DIR / "pipeline_metadata.json"
 STATUS_MARKDOWN_PATH = NORMALIZED_DIR / "pipeline_status.md"
 DATASET_CATALOG_MARKDOWN_PATH = NORMALIZED_DIR / "dataset_catalog.md"
 HUB_HEALTH_MARKDOWN_PATH = NORMALIZED_DIR / "hub_health.md"
+SOURCE_REGISTRY_PATH = ROOT_DIR / "data" / "source_registry.json"
+
+
+def _load_source_registry_datasets() -> tuple:
+    """Retorna (todos_los_datasets, datasets_con_tarjeta_publica) del registry.
+
+    build_hub_health es exclusivamente build-time (invocado solo desde
+    build_dev_db.py / scripts/*.py, nunca desde el paquete chile_hub
+    instalado), así que leer source_registry.json aquí es seguro — a
+    diferencia de compute_top_issue, que sí debe seguir siendo puro/sin
+    I/O porque el paquete instalado la llama en runtime sin acceso a
+    data/ (ver _find_root()). Se retorna también el set completo de
+    nombres para que el llamador pueda distinguir "estos entries son
+    del pipeline real" de fixtures sintéticos de tests (que no aparecen
+    en el registry) y así no filtrar en ese segundo caso.
+    """
+    try:
+        with open(SOURCE_REGISTRY_PATH, "r", encoding="utf-8") as f:
+            registry = json.load(f)
+    except FileNotFoundError:
+        return set(), set()
+    all_names = {entry["dataset"] for entry in registry}
+    public_names = {
+        entry["dataset"]
+        for entry in registry
+        if entry.get("publication_track") == "stable_publishable"
+        and entry.get("public_bundle_eligible") is True
+    }
+    return all_names, public_names
+
+
 REDISTRIBUTION_REPORT_MARKDOWN_PATH = NORMALIZED_DIR / "redistribution_report.md"
 PROVENANCE_REPORT_MARKDOWN_PATH = NORMALIZED_DIR / "provenance_report.md"
 DRIFT_REPORT_MARKDOWN_PATH = NORMALIZED_DIR / "drift_report.md"
@@ -253,7 +284,22 @@ def build_hub_health(metadata):
     ok_count = sum(1 for entry in entries if entry["severity"] == "ok")
     overall_status = "error" if error_count else "warn" if warn_count else "ok"
 
-    top_issue = compute_top_issue(entries)
+    # top_issue alimenta el enlace "Ver top issue" de la landing page, que
+    # apunta a #dataset-{nombre}; los datasets candidate no tienen tarjeta
+    # ahí (ver artifacts.py), así que solo pueden ser el top_issue los
+    # datasets con tarjeta pública real, o el enlace queda roto. Solo se
+    # filtra si algún dataset de `entries` existe realmente en el registry
+    # — así build_status_text/build_status_markdown siguen siendo puras
+    # frente a fixtures sintéticos de tests (datasets inventados que no
+    # están en source_registry.json no activan el filtro).
+    registry_datasets, public_datasets = _load_source_registry_datasets()
+    entries_match_registry = any(entry["dataset"] in registry_datasets for entry in entries)
+    top_issue_candidates = (
+        [entry for entry in entries if entry["dataset"] in public_datasets]
+        if entries_match_registry
+        else entries
+    )
+    top_issue = compute_top_issue(top_issue_candidates)
 
     return {
         "generated_at_utc": metadata.get("generated_at_utc"),
