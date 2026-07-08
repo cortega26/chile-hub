@@ -12,6 +12,17 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.19.6 - 2026-07-08
+
+### Corregido
+
+- **ci**: Pin CodeQL Python extraction version
+  ([`e2f3710`](https://github.com/cortega26/chile-hub/commit/e2f3710676899ffe13ded10f335cf3d24a47b62b))
+
+- **ci**: Redeploy Pages after bot-authored commits to main
+  ([`fd23f12`](https://github.com/cortega26/chile-hub/commit/fd23f120ddbaa719771ff03612967aa25ec37780))
+
+
 ## 1.19.5 - 2026-07-08
 
 ### Corregido
