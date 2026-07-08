@@ -62,25 +62,20 @@ jobs:
           echo "Revisar manualmente: https://datos.sinim.gov.cl/datos_municipales.php"
           # No hacemos exit 1 — el workflow sigue siendo verde
 
-      - name: Rebuild with updated finanzas
+      - name: Validate SINIM staging output
         if: steps.scrape.outcome == 'success'
         run: |
-          uv run python -c "
-          import sys; sys.path.insert(0, 'src')
-          from extractors.sinim_finanzas_live_extractor import process_sinim_finanzas
-          process_sinim_finanzas()
-          "
-          uv run make build
+          test -f data/staging/finanzas_municipales.csv
+          test -f data/staging/finanzas_municipales.metadata.json
 
       - name: Commit updated data (if changed)
         if: steps.scrape.outcome == 'success'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/staging/finanzas_municipales.csv
-          git add data/staging/finanzas_municipales.metadata.json
-          git add data/raw/sinim_finanzas_municipales_*.xlsx
-          git add data/normalized/ 2>/dev/null || true
+          git add --ignore-missing data/staging/finanzas_municipales.csv
+          git add --ignore-missing data/staging/finanzas_municipales.metadata.json
+          git add --ignore-missing data/raw/sinim_finanzas_municipales_*.xlsx
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
@@ -144,9 +139,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/staging/delincuencia_comunal.csv
-          git add data/staging/delincuencia_comunal.metadata.json
-          git add data/raw/cead_delincuencia_*.json
+          git add --ignore-missing data/staging/delincuencia_comunal.csv
+          git add --ignore-missing data/staging/delincuencia_comunal.metadata.json
+          git add --ignore-missing data/raw/cead_delincuencia_*.json
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else

@@ -1746,6 +1746,9 @@ class WorkflowContractTests(unittest.TestCase):
             self.monthly_workflow_text.count("uv sync --extra pipeline --extra dev"), 2
         )
         self.assertEqual(self.monthly_workflow_text.count("uv lock --locked"), 2)
+        self.assertIn("Validate SINIM staging output", self.monthly_workflow_text)
+        self.assertNotIn("uv run make build", self.monthly_workflow_text)
+        self.assertEqual(self.monthly_workflow_text.count("git add --ignore-missing"), 6)
 
     def test_codeql_python_analysis_uses_no_build_mode(self):
         self.assertIn("languages: python", self.codeql_workflow_text)
