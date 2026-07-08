@@ -12,6 +12,14 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.19.9 - 2026-07-08
+
+### Corregido
+
+- **ci**: Resync index.html JSON-LD with source_registry (Pipeline Check #270)
+  ([`fcc7f6f`](https://github.com/cortega26/chile-hub/commit/fcc7f6f11b809dfe299fd597a60afdb3d2f5c4ee))
+
+
 ## 1.19.8 - 2026-07-08
 
 ### Corregido
