@@ -3,6 +3,16 @@ name: Pages Deploy
 on:
   push:
     branches: [main]
+  workflow_run:
+    # Pipeline Check y PyPI Release publican commits (datos actualizados,
+    # bump de versión) usando el GITHUB_TOKEN por defecto. GitHub Actions
+    # no dispara workflows de tipo `push` para commits hechos con ese
+    # token, así que Pages nunca se redesplegaba tras esos cambios y el
+    # sitio quedaba mostrando datos y versión desactualizados. Este
+    # trigger cierra ese hueco.
+    workflows: ["Pipeline Check", "PyPI Release"]
+    branches: [main]
+    types: [completed]
   workflow_dispatch:
 
 permissions:
@@ -17,6 +27,7 @@ concurrency:
 jobs:
   deploy:
     name: Deploy to GitHub Pages
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
