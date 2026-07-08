@@ -1,7 +1,7 @@
 PYTHON ?= $(if $(wildcard .venv/bin/python),.venv/bin/python,python3)
 VENV_DIR ?= .venv
 
-.PHONY: help bootstrap install-browsers doctor extract build verify verify-dev verify-readiness verify-publication verify-live verify-landing test coverage lint lint-fix format format-check package package-check package-smoke check refresh status catalog hub-list hub-summary hub-summary-table hub-example hub-artifacts hub-shared-artifacts hub-shared-artifacts-table hub-reports hub-reports-table hub-report hub-inventory hub-inventory-table hub-snapshot hub-snapshot-table hub-overview hub-overview-table hub-status hub-status-table hub-health hub-health-table hub-bundle hub-freshness-audit hub-freshness-audit-table hub-runtime-status hub-runtime-status-table hub-top-issue hub-top-issue-text hub-top-issue-table hub-packages hub-packages-table hub-package hub-package-verify hub-redistribution hub-redistribution-table hub-provenance hub-provenance-table hub-drift hub-drift-table hub-source-readiness hub-dataset-quality package-bundle clean-publishable docs-build docs-serve
+.PHONY: help bootstrap install-browsers doctor extract build verify verify-dev verify-readiness verify-publication verify-live verify-landing test coverage lint lint-fix format format-check package package-check package-smoke check refresh sync-docs status catalog hub-list hub-summary hub-summary-table hub-example hub-artifacts hub-shared-artifacts hub-shared-artifacts-table hub-reports hub-reports-table hub-report hub-inventory hub-inventory-table hub-snapshot hub-snapshot-table hub-overview hub-overview-table hub-status hub-status-table hub-health hub-health-table hub-bundle hub-freshness-audit hub-freshness-audit-table hub-runtime-status hub-runtime-status-table hub-top-issue hub-top-issue-text hub-top-issue-table hub-packages hub-packages-table hub-package hub-package-verify hub-redistribution hub-redistribution-table hub-provenance hub-provenance-table hub-drift hub-drift-table hub-source-readiness hub-dataset-quality package-bundle clean-publishable docs-build docs-serve
 
 help:
 	@printf "Targets disponibles:\n"
@@ -25,6 +25,7 @@ help:
 	@printf "  make package-smoke    Instala wheel local y prueba import + CLI\n"
 	@printf "  make check            Ejecuta build + verify + test + verify-landing\n"
 	@printf "  make refresh          Ejecuta extract + build + verify + test + verify-landing + lint + format-check\n"
+	@printf "  make sync-docs        Sincroniza hechos hardcodeados en README.md (ver AGENTS.md §12)\n"
 	@printf "  make status           Imprime resumen humano del pipeline\n"
 	@printf "  make catalog          Muestra dataset_catalog.json\n"
 	@printf "  make hub-list         Lista datasets via CLI\n"
@@ -84,6 +85,10 @@ doctor:
 	@$(PYTHON) -c "import duckdb, polars, pyarrow; from importlib.metadata import version; print('duckdb=' + duckdb.__version__); print('polars=' + polars.__version__); print('pyarrow=' + pyarrow.__version__); print('playwright=' + version('playwright'))"
 	@$(PYTHON) scripts/check_validation_registration.py
 	@$(PYTHON) scripts/check_companion_paths.py registry
+	@$(PYTHON) scripts/sync_docs.py --check
+
+sync-docs:
+	$(PYTHON) scripts/sync_docs.py
 
 extract:
 	PYTHONPATH=src $(PYTHON) src/extractors/subdere_extractor.py

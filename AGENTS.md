@@ -798,8 +798,15 @@ protegido por un chequeo automatizado en vez de depender solo de buena voluntad.
 | Documentación de usuario por dataset | `docs/datasets/{nombre}.md` | `check_companion_paths.py registry` |
 | Criterios de inclusión/deprecación de datasets | `docs/dataset-inclusion-criteria.md` | — (revisión humana) |
 | Registro de funciones `validate_*()` | bloque `validations = {…}` en `build_dev_db.py` | `check_validation_registration.py` |
-| Versión del paquete | `pyproject.toml` (`[project] version`) | `python-semantic-release` (§7) |
+| Versión del paquete | `pyproject.toml` (`[project] version`) | `python-semantic-release` (§7), `scripts/sync_docs.py` propaga a README.md |
 | Inventario de clases de test | `tests/*.py` (no una tabla en prosa) | `grep '^class ' tests/*.py` (§8) |
+| Conteo de tests en README | `tests/test_*.py` (AST, no pytest — ver caveat parametrize en `doc_sync.py`) | `scripts/sync_docs.py --check` |
+| Conteo de ADRs en README | `docs/adr/*.md` | `scripts/sync_docs.py --check` |
+| Conteo de contratos en README | `contracts/datasets/*.schema.json` | `scripts/sync_docs.py --check` |
+| Badge "N capas" y resumen de auditoría legal en README | `data/dataset_catalog_config.json` / `data/normalized/redistribution_report.json` | `scripts/sync_docs.py --check` |
+| Resumen de salud (`ok`/`warn`/`error`) en README | `data/normalized/hub_health.json` | `scripts/sync_docs.py --check` |
+| Score de calidad (A-F) en README | `data/normalized/dataset_quality.json` | `scripts/sync_docs.py --check` |
+| Ejemplo de pin de versión en README | `pyproject.toml` vía `read_project_version()` | `scripts/sync_docs.py --check` |
 
 ### Mecanismo: `scripts/check_companion_paths.py`
 
@@ -820,6 +827,48 @@ Dos modos, ambos corren en `make doctor` y/o en el job `quality` de CI
 co-cambio real (un módulo más en `src/`, un nuevo doc que depende de un JSON),
 agrega la regla correspondiente a `COMPANION_RULES` en el mismo PR que la
 introduce — no dejes que el próximo drift se descubra a mano, como este.
+
+### Mecanismo: bloques delimitados + `scripts/sync_docs.py`
+
+`check_companion_paths.py` fuerza que se *toque* un archivo compañero, pero no
+verifica que su *contenido* siga siendo correcto. Para hechos de README.md que
+son derivables mecánicamente de un artefacto o del código (no prosa curada),
+`src/builders/doc_sync.py` + `src/builders/reports.py::sync_readme_layers_table()`
+regeneran el texto exacto dentro de un bloque delimitado por comentarios HTML
+(`<!-- START_X --> ... <!-- END_X -->`), usando el helper compartido
+`src/builders/io_utils.py::replace_delimited_block()`.
+
+- **Generación:** `make sync-docs`, o automáticamente al final de
+  `make build` (`build_dev_db.py::main()` llama a `sync_readme_layers_table()`
+  y `sync_all_docs()`).
+- **Verificación:** `python scripts/sync_docs.py --check` (no escribe, falla
+  con `SystemExit` si algún bloque quedaría desincronizado) corre en
+  `make doctor` y en el job `quality` de CI en cada push/PR/schedule — sin
+  dependencias nuevas, `doc_sync.py` es 100% stdlib.
+- **Caso especial — drift por datos *live*:** el chequeo de `quality` solo
+  detecta drift introducido por el propio PR (código, tests, ADRs, contratos,
+  `pyproject.toml`). Si los datos cambian sin que ningún PR toque código (p. ej.
+  `hub_health.json` se regenera con nuevos valores en el `schedule` diario), el
+  paso "Check build-synced files" del job `build-and-test` (solo
+  `schedule`/`workflow_dispatch`, después de un build real) compara
+  `index.html`, `app.js` **y `README.md`** contra el build recién generado.
+
+**Qué NO usa este mecanismo:** las tablas de prosa de `AGENTS.md` (§1 capas,
+§2/§3 extractores, §8 archivos de test) no se regeneran — son descripciones
+curadas editorialmente, no datos de una sola celda; automatizarlas exigiría
+mantener esa prosa duplicada dentro de un generador, sin eliminar el
+mantenimiento manual. Su protección es otra: los *conteos* que citan ("19
+capas", "9 archivos de test", "14 extractores en `make extract`") se detectan
+a ojo en revisión de PR, y su *completitud estructural* (¿falta una fila?) ya
+la cubre el gate de co-cambio de `check_companion_paths.py` de arriba.
+
+**Seguimiento recomendado, no implementado todavía** (mayor alcance):
+automatizar la tabla "CLI de referencia" de README.md introspeccionando
+`build_parser()` (requiere agregar `uv sync` al job `quality`, hoy sin
+dependencias); y automatizar la tabla de extractores de README.md, lo que
+requiere agregar primero un campo `"extractor"` a las 21 entradas de
+`data/dataset_catalog_config.json` (beneficio adicional: permitiría extender
+`check_companion_paths.py registry` para validar que ese archivo existe).
 
 ---
 

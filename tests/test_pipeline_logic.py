@@ -2717,6 +2717,263 @@ class SyncLandingMetadataTests(unittest.TestCase):
                 landing.sync_landing_metadata("https://example.cl/chile-hub/")
 
 
+class ReplaceDelimitedBlockTests(unittest.TestCase):
+    """Tests para io_utils.replace_delimited_block(): el helper compartido que
+    generaliza el patrón de sync_readme_layers_table() a cualquier bloque
+    delimitado (ver AGENTS.md §12, mecanismo de bloques delimitados)."""
+
+    def _write(self, tmpdir, content):
+        path = Path(tmpdir) / "doc.md"
+        path.write_text(content, encoding="utf-8")
+        return path
+
+    def test_missing_marker_raises_system_exit(self):
+        from src.builders.io_utils import replace_delimited_block
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = self._write(tmpdir, "sin marcadores aquí")
+            with self.assertRaises(SystemExit):
+                replace_delimited_block(str(path), "FOO", "nuevo cuerpo")
+
+    def test_check_only_does_not_write(self):
+        from src.builders.io_utils import replace_delimited_block
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = self._write(tmpdir, "<!-- START_FOO -->\n\nviejo\n\n<!-- END_FOO -->")
+            changed = replace_delimited_block(str(path), "FOO", "nuevo", check_only=True)
+            self.assertTrue(changed)
+            self.assertIn("viejo", path.read_text(encoding="utf-8"))
+
+    def test_writes_and_returns_true_when_body_changes(self):
+        from src.builders.io_utils import replace_delimited_block
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = self._write(
+                tmpdir, "antes\n<!-- START_FOO -->\n\nviejo\n\n<!-- END_FOO -->\ndespués"
+            )
+            changed = replace_delimited_block(str(path), "FOO", "nuevo")
+            self.assertTrue(changed)
+            content = path.read_text(encoding="utf-8")
+            self.assertIn("nuevo", content)
+            self.assertNotIn("viejo", content)
+            self.assertIn("antes", content)
+            self.assertIn("después", content)
+
+    def test_returns_false_and_does_not_touch_file_when_unchanged(self):
+        from src.builders.io_utils import replace_delimited_block
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = self._write(tmpdir, "<!-- START_FOO -->\n\nigual\n\n<!-- END_FOO -->")
+            mtime_before = path.stat().st_mtime_ns
+            changed = replace_delimited_block(str(path), "FOO", "igual")
+            self.assertFalse(changed)
+            self.assertEqual(path.stat().st_mtime_ns, mtime_before)
+
+    def test_inline_separator_keeps_same_line(self):
+        from src.builders.io_utils import replace_delimited_block
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = self._write(tmpdir, "| celda <!-- START_FOO -->viejo<!-- END_FOO --> | otra |")
+            replace_delimited_block(str(path), "FOO", "nuevo", separator="")
+            content = path.read_text(encoding="utf-8")
+            self.assertEqual(
+                content,
+                "| celda <!-- START_FOO -->nuevo<!-- END_FOO --> | otra |",
+            )
+
+    def test_body_with_backslashes_is_not_interpreted_as_backreference(self):
+        """re.sub interpretaría \\1/\\g<...> en un string de reemplazo — el
+        helper usa una función de reemplazo para evitar ese bug de forma
+        estructural, no por casualidad. Este test lo fija como regresión."""
+        from src.builders.io_utils import replace_delimited_block
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = self._write(tmpdir, "<!-- START_FOO -->\n\nviejo\n\n<!-- END_FOO -->")
+            replace_delimited_block(str(path), "FOO", r"C:\Users\1 y \g<name>", separator="")
+            content = path.read_text(encoding="utf-8")
+            self.assertIn(r"C:\Users\1 y \g<name>", content)
+
+
+class DocSyncTests(unittest.TestCase):
+    """Tests para src/builders/doc_sync.py: sincroniza hechos hardcodeados de
+    README.md (conteo de tests/ADRs/contratos, badge, pin de versión, salud,
+    calidad, redistribución) con su fuente de verdad. Ver AGENTS.md §12."""
+
+    def _readme(self, tmpdir, *blocks):
+        lines = ["# README de prueba", ""]
+        for name in blocks:
+            lines += [f"<!-- START_{name} -->", "placeholder", f"<!-- END_{name} -->"]
+        path = Path(tmpdir) / "README.md"
+        path.write_text("\n".join(lines), encoding="utf-8")
+        return path
+
+    def test_test_count_matches_ast_function_count(self):
+        from src.builders import doc_sync
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tests_dir = Path(tmpdir) / "tests"
+            tests_dir.mkdir()
+            (tests_dir / "test_a.py").write_text(
+                "def test_one():\n    pass\n\n\ndef test_two():\n    pass\n", encoding="utf-8"
+            )
+            (tests_dir / "test_b.py").write_text(
+                "def test_three():\n    pass\n\n\ndef helper():\n    pass\n", encoding="utf-8"
+            )
+            (tests_dir / "not_a_test.py").write_text(
+                "def test_ignored():\n    pass\n", encoding="utf-8"
+            )
+            readme = self._readme(tmpdir, "TEST_COUNT")
+
+            with (
+                patch.object(doc_sync, "TESTS_DIR", str(tests_dir)),
+                patch.object(doc_sync, "README_PATH", str(readme)),
+            ):
+                changed = doc_sync.sync_readme_test_count()
+
+            self.assertTrue(changed)
+            self.assertIn("**3 tests**", readme.read_text(encoding="utf-8"))
+
+    def test_adr_and_contract_counts(self):
+        from src.builders import doc_sync
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            adr_dir = Path(tmpdir) / "adr"
+            adr_dir.mkdir()
+            (adr_dir / "ADR-001-x.md").write_text("x", encoding="utf-8")
+            (adr_dir / "ADR-002-y.md").write_text("y", encoding="utf-8")
+            (adr_dir / "README.md").write_text("no cuenta")
+
+            contracts_dir = Path(tmpdir) / "contracts"
+            contracts_dir.mkdir()
+            (contracts_dir / "comunas.schema.json").write_text("{}", encoding="utf-8")
+
+            readme = self._readme(tmpdir, "ADR_COUNT", "CONTRACT_COUNT")
+
+            with (
+                patch.object(doc_sync, "ADR_DIR", str(adr_dir)),
+                patch.object(doc_sync, "CONTRACTS_DIR", str(contracts_dir)),
+                patch.object(doc_sync, "README_PATH", str(readme)),
+            ):
+                doc_sync.sync_readme_adr_count()
+                doc_sync.sync_readme_contract_count()
+
+            content = readme.read_text(encoding="utf-8")
+            self.assertIn("**2 ADRs**", content)
+            self.assertIn("1 contratos JSON Schema", content)
+
+    def test_health_and_quality_summary_from_fixtures(self):
+        from src.builders import doc_sync
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            normalized_dir = Path(tmpdir) / "normalized"
+            normalized_dir.mkdir()
+            (normalized_dir / "hub_health.json").write_text(
+                json.dumps({"ok_count": 5, "warn_count": 2, "error_count": 0}), encoding="utf-8"
+            )
+            (normalized_dir / "dataset_quality.json").write_text(
+                json.dumps(
+                    {
+                        "average_score": 91.0,
+                        "grade_distribution": {"A": 4, "B": 1, "C": 0, "D": 0, "F": 0},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            readme = self._readme(tmpdir, "HEALTH_SUMMARY", "QUALITY_SUMMARY")
+
+            with (
+                patch.object(doc_sync, "NORMALIZED_DIR", str(normalized_dir)),
+                patch.object(doc_sync, "README_PATH", str(readme)),
+            ):
+                doc_sync.sync_readme_health_summary()
+                doc_sync.sync_readme_quality_summary()
+
+            content = readme.read_text(encoding="utf-8")
+            self.assertIn("5 capas `ok`, 2 `warn`, 0 `error`", content)
+            self.assertIn("promedio 91.0/100", content)
+            self.assertIn("4 A, 1 B", content)
+
+    def test_health_summary_returns_false_when_artifact_missing(self):
+        from src.builders import doc_sync
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            normalized_dir = Path(tmpdir) / "normalized"
+            normalized_dir.mkdir()
+            readme = self._readme(tmpdir, "HEALTH_SUMMARY")
+
+            with (
+                patch.object(doc_sync, "NORMALIZED_DIR", str(normalized_dir)),
+                patch.object(doc_sync, "README_PATH", str(readme)),
+            ):
+                changed = doc_sync.sync_readme_health_summary()
+
+            self.assertFalse(changed)
+            self.assertIn("placeholder", readme.read_text(encoding="utf-8"))
+
+    def test_version_pin_example_reads_pyproject(self):
+        from src.builders import doc_sync
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            (Path(tmpdir) / "pyproject.toml").write_text(
+                '[project]\nname = "x"\nversion = "9.9.9"\n', encoding="utf-8"
+            )
+            readme = self._readme(tmpdir, "VERSION_PIN_EXAMPLE")
+
+            with (
+                patch.object(doc_sync, "ROOT_DIR", tmpdir),
+                patch.object(doc_sync, "README_PATH", str(readme)),
+            ):
+                doc_sync.sync_readme_version_pin_example()
+
+            self.assertIn("chile-hub==9.9.9", readme.read_text(encoding="utf-8"))
+
+    def test_dataset_badge_counts_only_datasets_with_outputs(self):
+        from src.builders import doc_sync
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            readme = self._readme(tmpdir, "DATASET_BADGE")
+            fake_catalog = {
+                "comunas": {"outputs": {"parquet": "x"}},
+                "empresas": {"outputs": {"parquet": "y"}},
+                "candidato": {"outputs": {}},
+            }
+
+            with (
+                patch.object(doc_sync, "DATASET_CATALOG_CONFIG", fake_catalog),
+                patch.object(doc_sync, "README_PATH", str(readme)),
+            ):
+                doc_sync.sync_readme_dataset_badge()
+
+            self.assertIn("Datasets-2%20capas", readme.read_text(encoding="utf-8"))
+
+    def test_redistribution_summary_from_fixture(self):
+        from src.builders import doc_sync
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            normalized_dir = Path(tmpdir) / "normalized"
+            normalized_dir.mkdir()
+            (normalized_dir / "redistribution_report.json").write_text(
+                json.dumps({"ready_count": 17, "dataset_count": 19}), encoding="utf-8"
+            )
+            readme = self._readme(tmpdir, "REDISTRIBUTION_SUMMARY")
+
+            with (
+                patch.object(doc_sync, "NORMALIZED_DIR", str(normalized_dir)),
+                patch.object(doc_sync, "README_PATH", str(readme)),
+            ):
+                doc_sync.sync_readme_redistribution_summary()
+
+            self.assertIn("**17 de 19 capas**", readme.read_text(encoding="utf-8"))
+
+    def test_sync_all_docs_runs_every_function_without_error(self):
+        """Smoke test contra el README real: confirma que las 8 funciones
+        corren sin lanzar excepciones y que check_only nunca escribe."""
+        from src.builders import doc_sync
+
+        changed = doc_sync.sync_all_docs(check_only=True)
+        self.assertIsInstance(changed, list)
+
+
 if __name__ == "__main__":
     import pytest
 

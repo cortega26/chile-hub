@@ -60,6 +60,9 @@ jobs:
       - name: Check dataset registry/docs/contracts sync
         run: python scripts/check_companion_paths.py registry
 
+      - name: Check docs sync (README hardcoded facts)
+        run: python scripts/sync_docs.py --check
+
       - name: Fetch PR base commit for companion-path diff
         if: github.event_name == 'pull_request'
         run: git fetch --no-tags --depth=1 origin "${{ github.event.pull_request.base.sha }}"
@@ -162,9 +165,9 @@ jobs:
       - name: Check build-synced files
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: |
-          if ! git diff --quiet -- index.html app.js; then
-            git diff -- index.html app.js
-            echo "::error::Build-synced files are stale. Run python src/build_dev_db.py and commit index.html/app.js."
+          if ! git diff --quiet -- index.html app.js README.md; then
+            git diff -- index.html app.js README.md
+            echo "::error::Build-synced files are stale. Run python src/build_dev_db.py and commit index.html/app.js/README.md."
             exit 1
           fi
 

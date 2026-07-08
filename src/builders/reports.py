@@ -7,7 +7,6 @@ calidad de datasets) y las escriben a `data/normalized/` de forma atómica.
 
 import json
 import os
-import re
 from datetime import datetime
 
 from src.builders._shared import (
@@ -17,7 +16,7 @@ from src.builders._shared import (
     ROOT_DIR,
     UTC,
 )
-from src.builders.io_utils import write_json_atomic
+from src.builders.io_utils import replace_delimited_block, write_json_atomic
 
 
 def write_hub_health_json(health):
@@ -841,7 +840,7 @@ def _format_record_count(record_count, expected_count, coverage_note):
     return str(record_count)
 
 
-def sync_readme_layers_table():
+def sync_readme_layers_table(check_only=False):
     """Regenera la tabla de capas del README desde los reportes máquina.
 
     Lee ``hub_health.json`` (modo, cobertura) y ``dataset_status.json``
@@ -850,13 +849,15 @@ def sync_readme_layers_table():
     en ``README.md``.
 
     Si los reportes no existen (p. ej. build no ejecutado), no modifica nada.
+    Con ``check_only=True`` no escribe — solo retorna si el bloque cambiaría
+    (usado por ``scripts/sync_docs.py --check``).
     """
     health_path = os.path.join(NORMALIZED_DIR, "hub_health.json")
     status_path = os.path.join(NORMALIZED_DIR, "dataset_status.json")
 
     if not os.path.exists(health_path) or not os.path.exists(status_path):
         print("README sync: omitido (reportes no encontrados)")
-        return
+        return False
 
     with open(health_path, "r", encoding="utf-8") as f:
         health = json.load(f)
@@ -984,17 +985,13 @@ def sync_readme_layers_table():
     table_block = "\n".join(table_lines) + "\n\n" + legend
 
     readme_path = os.path.join(ROOT_DIR, "README.md")
-    with open(readme_path, "r", encoding="utf-8") as f:
-        content = f.read()
+    changed = replace_delimited_block(
+        readme_path, "DATASET_TABLE", table_block, check_only=check_only
+    )
 
-    pattern = r"<!-- START_DATASET_TABLE -->.*?<!-- END_DATASET_TABLE -->"
-    replacement = f"<!-- START_DATASET_TABLE -->\n\n{table_block}\n\n<!-- END_DATASET_TABLE -->"
-
-    new_content = re.sub(pattern, replacement, content, flags=re.DOTALL)
-
-    if new_content != content:
-        with open(readme_path, "w", encoding="utf-8") as f:
-            f.write(new_content)
-        print("README sync: tabla de capas regenerada desde hub_health.json + dataset_status.json")
+    if changed:
+        verb = "cambiaría" if check_only else "regenerada"
+        print(f"README sync: tabla de capas {verb} desde hub_health.json + dataset_status.json")
     else:
         print("README sync: tabla de capas sin cambios")
+    return changed

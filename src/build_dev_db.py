@@ -58,6 +58,7 @@ from src.builders.datasets import (  # noqa: E402
     build_perfil_territorial_comunal,
     derive_geography_layers,
 )
+from src.builders.doc_sync import sync_all_docs  # noqa: E402
 from src.builders.formats import (  # noqa: E402
     build_duckdb,
     build_excel,
@@ -860,6 +861,7 @@ def main():
     )
     _generate_reports(pipeline_metadata, previous_pipeline_metadata, metadata_output)
     sync_readme_layers_table()
+    sync_all_docs()
     log.info("build_complete")
 
 
