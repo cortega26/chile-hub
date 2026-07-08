@@ -232,7 +232,7 @@
         {
           "@type": "Dataset",
           "name": "consumo_electrico_comunal",
-          "description": "Consumo eléctrico anual por comuna y tipo de cliente (Residencial, Comercial, Industrial, Agrícola, Alumbrado Público, Otros), publicado por la Comisión Nacional de Energía (CNE) en el portal Energía Abierta.",
+          "description": "Consumo eléctrico anual por comuna y tipo de cliente (Residencial, Comercial, Industrial, Agrícola, Alumbrado Público, Otros), publicado por la Comisión Nacional de Energía (CNE) en el portal Energía Abierta. DEPRECATED: la fuente Junar de energiaabierta.cl fue decomisionada (investigado 2026-07-07); el dataset solo publica datos de muestra (FALLBACK_ROWS), no está en el bundle público. Ver data/source_registry.json.",
           "url": "https://tooltician.com/chile-hub/#dataset-consumo_electrico_comunal",
           "license": "http://energiaabierta.cl/",
           "creator": {
@@ -268,6 +268,17 @@
           "description": "Autoridades electas en ejercicio de Chile (diputados y senadores): partido, distrito electoral/circunscripción senatorial, región y período de mandato.",
           "url": "https://tooltician.com/chile-hub/#dataset-autoridades_electas",
           "license": "https://creativecommons.org/licenses/by/4.0/",
+          "creator": {
+            "@type": "Organization",
+            "name": "chile-hub"
+          }
+        },
+        {
+          "@type": "Dataset",
+          "name": "autoridades_locales",
+          "description": "Autoridades locales/subnacionales de Chile (gobernadores regionales y alcaldes) compiladas desde Wikipedia. Dataset segregado de autoridades_electas por su licencia CC-BY-SA (share-alike).",
+          "url": "https://tooltician.com/chile-hub/#dataset-autoridades_locales",
+          "license": "https://creativecommons.org/licenses/by-sa/4.0/",
           "creator": {
             "@type": "Organization",
             "name": "chile-hub"
