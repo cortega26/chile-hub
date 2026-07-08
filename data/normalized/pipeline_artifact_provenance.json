@@ -1,0 +1,10 @@
+{
+  "publish_input": false,
+  "require_live": false,
+  "source_ref": "refs/heads/main",
+  "source_run_event": "push",
+  "source_run_id": "28979199261",
+  "source_sha": "32d7e35bfe8871ea343d9fbc08e5843129a21c8a",
+  "verification_profile": "readiness",
+  "workflow": "Pipeline Check"
+}

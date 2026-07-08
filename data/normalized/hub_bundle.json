@@ -1,5 +1,5 @@
 {
-  "version": "1.19.11",
+  "version": "1.19.12",
   "generated_at_utc": "2026-07-08T22:02:42.124535+00:00",
   "overall_status": "warn",
   "dataset_count": 19,
@@ -1940,8 +1940,8 @@
     {
       "path": "data/normalized/chile-hub-publishable-bundle.zip",
       "package_type": "zip",
-      "size_bytes": 29300576,
-      "sha256": "66c6c628cea8bb8eb9d6cf6a39c4ecd3f7528f03de3e6a0467a8bca5095af95b",
+      "size_bytes": 29300359,
+      "sha256": "541cf5a7701c32d1b7c03adbfabc58ba475cbc45d4b1efe6f990913776bb2b85",
       "checksum_algorithm": "sha256",
       "checksum_path": "data/normalized/chile-hub-publishable-bundle.zip.sha256",
       "verification_command": "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256"

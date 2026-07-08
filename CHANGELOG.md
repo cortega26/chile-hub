@@ -12,6 +12,25 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.19.12 - 2026-07-08
+
+### Corregido
+
+- Keep landing data version in sync
+  ([`df0999e`](https://github.com/cortega26/chile-hub/commit/df0999e1a53c1e9d03ea9eb39bdc921a37e9dcab))
+
+### Documentación
+
+- Harden AGENTS.md with test policy + doc/test anti-drift gate
+  ([#27](https://github.com/cortega26/chile-hub/pull/27),
+  [`32d7e35`](https://github.com/cortega26/chile-hub/commit/32d7e35bfe8871ea343d9fbc08e5843129a21c8a))
+
+### Tests
+
+- Regression coverage for the Pipeline Check #270 fix chain + recent gaps
+  ([`354ad6e`](https://github.com/cortega26/chile-hub/commit/354ad6e1ed3a1290c6281b8dfda327f4017f4f39))
+
+
 ## 1.19.11 - 2026-07-08
 
 ### Corregido
