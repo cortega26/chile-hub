@@ -291,6 +291,14 @@ def verify_landing():
         if repo_href != "https://github.com/cortega26/chile-hub":
             fail(f"Unexpected repo href: {repo_href}")
 
+        docs_nav_href = page.locator(".site-nav a", has_text="Documentación").get_attribute("href")
+        if docs_nav_href != "reference/":
+            fail(f"Unexpected docs nav href: {docs_nav_href}")
+
+        docs_cta_href = page.get_by_role("link", name="Ver documentación").get_attribute("href")
+        if docs_cta_href != "reference/":
+            fail(f"Unexpected docs CTA href: {docs_cta_href}")
+
         support_nav_href = page.get_by_role("link", name="Apoyar").get_attribute("href")
         if support_nav_href != "#apoyar":
             fail(f"Unexpected support nav href: {support_nav_href}")

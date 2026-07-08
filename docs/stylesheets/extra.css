@@ -1,0 +1,75 @@
+/* Align MkDocs Material with the public chile-hub landing: quiet, technical,
+   and readable before decorative. */
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color: #123d30;
+  --md-primary-fg-color--dark: #0d2f25;
+  --md-accent-fg-color: #0f766e;
+  --md-typeset-a-color: #0f766e;
+}
+
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #123d30;
+  --md-primary-fg-color--dark: #0d2f25;
+  --md-accent-fg-color: #22d3ee;
+  --md-typeset-a-color: #67e8f9;
+}
+
+.md-header__title {
+  font-weight: 700;
+}
+
+.md-tabs__link {
+  font-size: 0.78rem;
+}
+
+.md-main__inner {
+  margin-top: 1.1rem;
+}
+
+.md-typeset h1 {
+  font-weight: 650;
+  letter-spacing: 0;
+}
+
+.md-typeset h2 {
+  font-weight: 650;
+}
+
+.md-typeset table:not([class]) {
+  font-size: 0.74rem;
+}
+
+.md-typeset table:not([class]) th {
+  background-color: var(--md-default-fg-color--lightest);
+}
+
+/* Keep the API reference readable without adding horizontal scrollbars for
+   ordinary long signatures or URLs. Tables may still scroll when necessary. */
+.md-typeset .doc-heading,
+.md-typeset .doc-heading code,
+.md-typeset .doc-signature,
+.md-typeset .doc-signature code {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.md-typeset pre > code {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.md-typeset .highlight,
+.md-typeset pre {
+  max-width: 100%;
+}
+
+.md-typeset .md-typeset__table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.md-typeset .doc-object {
+  border-top: 1px solid var(--md-default-fg-color--lightest);
+  padding-top: 0.5rem;
+}

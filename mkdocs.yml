@@ -4,25 +4,37 @@ site_url: https://tooltician.com/chile-hub/reference/
 repo_url: https://github.com/cortega26/chile-hub
 docs_dir: docs
 site_dir: reference
+extra_css:
+  - stylesheets/extra.css
 
 theme:
   name: material
   language: es
   features:
+    - navigation.footer
     - navigation.sections
+    - navigation.tabs
     - navigation.top
     - content.code.copy
+    - search.highlight
+    - search.suggest
+    - toc.follow
   palette:
     - scheme: default
-      primary: cyan
+      primary: teal
+      accent: cyan
       toggle:
         icon: material/weather-night
         name: Modo oscuro
     - scheme: slate
-      primary: cyan
+      primary: teal
+      accent: cyan
       toggle:
         icon: material/weather-sunny
         name: Modo claro
+
+extra:
+  homepage: https://tooltician.com/chile-hub/
 
 plugins:
   - search
@@ -37,6 +49,7 @@ plugins:
             members_order: source
 
 nav:
+  - Sitio público: https://tooltician.com/chile-hub/
   - Inicio: index.md
   - Instalación: installation.md
   - Referencia de API: reference.md
