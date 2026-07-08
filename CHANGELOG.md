@@ -12,6 +12,17 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.19.11 - 2026-07-08
+
+### Corregido
+
+- **data**: Correct pobreza_comunal XLSX column mapping; sync tests with registry
+  ([`3f968ab`](https://github.com/cortega26/chile-hub/commit/3f968ab2a4765a7761d16d689199ccbce6aa9f5c))
+
+- **landing**: Keep top_issue link on the public bundle (build-time only)
+  ([`9b85a23`](https://github.com/cortega26/chile-hub/commit/9b85a2309d55d54b044537fefbaa5fe6a11369a5))
+
+
 ## 1.19.10 - 2026-07-08
 
 ### Corregido
