@@ -1,21 +1,21 @@
 # chile-hub overview
 
-- `generated_at_utc`: `2026-07-06T15:21:31.259458+00:00`
+- `generated_at_utc`: `2026-07-08T22:02:42.124535+00:00`
 - `overall_status`: `warn`
 - `dataset_count`: `19`
-- `live_count`: `15`
-- `fallback_count`: `4`
+- `live_count`: `16`
+- `fallback_count`: `3`
 - `stale_count`: `0`
 - `drifted_count`: `8`
 - `degraded_count`: `0`
 - `partial_coverage_count`: `2`
-- `warning_count`: `12`
+- `warning_count`: `11`
 - `shared_artifact_count`: `24`
 - `package_count`: `1`
-- `top_issue`: `consumo_electrico_comunal` (freshness=fresh, drift=drifted, warnings=3)
-- `top_issue_reason`: tipos de cliente: ['Comercial', 'Residencial']
+- `top_issue`: `empresas` (freshness=fresh, drift=drifted, warnings=3)
+- `top_issue_reason`: found 1 RUTs with invalid format
 - `top_issue_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.
-- `top_issue_summary`: consumo_electrico_comunal: tipos de cliente: ['Comercial', 'Residencial'] [source_detail=Consumo eléctrico anual por comuna y tipo de cliente; warnings=3; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]
+- `top_issue_summary`: empresas: found 1 RUTs with invalid format [source_detail=datos_gob_cl_ckan_api; warnings=3; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]
 
 | Dataset | Mode | Validation | Freshness | Coverage | Drift |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -29,7 +29,7 @@
 | `empresas` | `live` | `ok` | `fresh` | `not_applicable` | `drifted` |
 | `establecimientos_educacionales` | `live` | `ok` | `fresh` | `not_applicable` | `healthy` |
 | `establecimientos_salud` | `live` | `ok` | `fresh` | `not_applicable` | `healthy` |
-| `finanzas_municipales` | `fallback` | `ok` | `fresh` | `partial` | `drifted` |
+| `finanzas_municipales` | `monthly` | `ok` | `fresh` | `partial` | `drifted` |
 | `indicadores` | `live` | `ok` | `fresh` | `not_applicable` | `drifted` |
 | `indicadores_urbanos_siedu` | `live` | `ok` | `fresh` | `partial` | `drifted` |
 | `partidos_politicos` | `live` | `ok` | `fresh` | `full` | `drifted` |
@@ -43,7 +43,7 @@
 
 - `path`: `data/normalized/chile-hub-publishable-bundle.zip`
 - `package_type`: `zip`
-- `size_bytes`: `29270512`
+- `size_bytes`: `29300576`
 - `checksum`: `sha256` via `data/normalized/chile-hub-publishable-bundle.zip.sha256`
 - `verification_command`: `shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256`
 

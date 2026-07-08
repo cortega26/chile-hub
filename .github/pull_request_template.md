@@ -7,6 +7,7 @@
 - [ ] `make lint`
 - [ ] `make format-check`
 - [ ] `make test`
+- [ ] `make doctor` (dataset/docs/contracts sync, see `AGENTS.md §12`)
 - [ ] `make verify-landing`
 
 ## Data Pipeline

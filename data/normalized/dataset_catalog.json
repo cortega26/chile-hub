@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-07-06T15:21:31.259458+00:00",
+  "generated_at_utc": "2026-07-08T22:02:42.124535+00:00",
   "dataset_count": 19,
   "datasets": [
     {
@@ -10,7 +10,7 @@
       "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
       "source_mode": "live",
       "source_detail": "bcn_arcgis",
-      "refreshed_at_utc": "2026-07-06T15:11:21.639718+00:00",
+      "refreshed_at_utc": "2026-07-08T01:58:02.208753+00:00",
       "record_count": 16,
       "fields": [
         "codigo_region",
@@ -32,9 +32,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.17,
+        "age_hours": 20.08,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-07-06T15:21:31.257145+00:00"
+        "checked_at_utc": "2026-07-08T22:02:42.122297+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -85,7 +85,7 @@
       "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
       "source_mode": "live",
       "source_detail": "bcn_arcgis",
-      "refreshed_at_utc": "2026-07-06T15:11:21.639718+00:00",
+      "refreshed_at_utc": "2026-07-08T01:58:02.208753+00:00",
       "record_count": 56,
       "fields": [
         "codigo_region",
@@ -110,9 +110,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.17,
+        "age_hours": 20.08,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-07-06T15:21:31.257172+00:00"
+        "checked_at_utc": "2026-07-08T22:02:42.122324+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -163,7 +163,7 @@
       "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
       "source_mode": "live",
       "source_detail": "bcn_arcgis",
-      "refreshed_at_utc": "2026-07-06T15:11:21.639718+00:00",
+      "refreshed_at_utc": "2026-07-08T01:58:02.208753+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -195,9 +195,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.17,
+        "age_hours": 20.08,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-07-06T15:21:31.257181+00:00"
+        "checked_at_utc": "2026-07-08T22:02:42.122333+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -248,7 +248,7 @@
       "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
       "source_mode": "live",
       "source_detail": "bcn_arcgis",
-      "refreshed_at_utc": "2026-07-06T15:11:21.639718+00:00",
+      "refreshed_at_utc": "2026-07-08T01:58:02.208753+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -279,9 +279,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.17,
+        "age_hours": 20.08,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-07-06T15:21:31.257186+00:00"
+        "checked_at_utc": "2026-07-08T22:02:42.122338+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -368,9 +368,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.15,
+        "age_hours": 54.84,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-07-06T15:21:31.257356+00:00"
+        "checked_at_utc": "2026-07-08T22:02:42.122498+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 72,
@@ -458,9 +458,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.15,
+        "age_hours": 54.84,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-07-06T15:21:31.257368+00:00"
+        "checked_at_utc": "2026-07-08T22:02:42.122511+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -545,9 +545,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.15,
+        "age_hours": 54.84,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-07-06T15:21:31.257374+00:00"
+        "checked_at_utc": "2026-07-08T22:02:42.122518+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 1080,
@@ -624,9 +624,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.15,
+        "age_hours": 54.84,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-07-06T15:21:31.257379+00:00"
+        "checked_at_utc": "2026-07-08T22:02:42.122524+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -707,9 +707,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.15,
+        "age_hours": 54.84,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-07-06T15:21:31.257384+00:00"
+        "checked_at_utc": "2026-07-08T22:02:42.122529+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -778,9 +778,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.15,
+        "age_hours": 54.84,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-07-06T15:21:31.257388+00:00"
+        "checked_at_utc": "2026-07-08T22:02:42.122534+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -823,10 +823,10 @@
       "alias_for": null,
       "source_name": "SINIM - SUBDERE",
       "source_url": "https://datos.sinim.gov.cl/datos_municipales.php",
-      "source_mode": "fallback",
+      "source_mode": "monthly",
       "source_detail": "curated_fallback_pending_direct_export",
-      "refreshed_at_utc": "2026-07-06T15:12:21.871485+00:00",
-      "record_count": 3,
+      "refreshed_at_utc": "2026-07-08T19:27:07.437842+00:00",
+      "record_count": 345,
       "fields": [
         "anio",
         "codigo_comuna",
@@ -855,9 +855,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.15,
+        "age_hours": 2.59,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-07-06T15:21:31.257393+00:00"
+        "checked_at_utc": "2026-07-08T22:02:42.122538+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -866,14 +866,14 @@
       "coverage": {
         "status": "partial",
         "expected_record_count": 346,
-        "actual_record_count": 3,
-        "coverage_ratio": 0.0087,
-        "summary": "Cobertura parcial: 3/346 filas respecto del baseline esperado."
+        "actual_record_count": 345,
+        "coverage_ratio": 0.9971,
+        "summary": "Cobertura parcial: 345/346 filas respecto del baseline esperado."
       },
       "drift": {
         "status": "drifted",
-        "summary": "Drift detectado: mode=fallback, coverage=partial, degradation=warning.",
-        "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
+        "summary": "Drift detectado: mode=monthly, coverage=partial, degradation=none.",
+        "recommended_action": "Ninguna."
       },
       "usage_examples": {
         "python": "from chile_hub import ChileHub\nhub = ChileHub()\ndf = hub.load_polars('finanzas_municipales')",
@@ -889,17 +889,17 @@
       },
       "documentation": "docs/datasets/finanzas_municipales.md",
       "validation_status": "ok",
-      "warnings": [
-        "finanzas_municipales source_mode is fallback; review before publication"
-      ],
+      "warnings": [],
       "degradation": {
-        "status": "warning",
-        "impact": "finanzas_municipales source_mode is fallback; review before publication",
-        "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
+        "status": "none",
+        "impact": "Sin degradación operativa detectada en este build.",
+        "recommended_action": "Ninguna."
       },
       "notes": [
-        "official_landing_snapshot_saved",
-        "fallback_curated_rows_used: official_landing_fetch_failed"
+        "live: Playwright configurando filtros SINIM",
+        "live: descargando XML Spreadsheet",
+        "live: parseando XML Spreadsheet",
+        "live: 345 municipios extraídos (snapshot: sinim_finanzas_municipales_20260708T192459Z.xlsx)"
       ]
     },
     {
@@ -939,9 +939,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.15,
+        "age_hours": 54.84,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-07-06T15:21:31.257398+00:00"
+        "checked_at_utc": "2026-07-08T22:02:42.122543+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -1024,9 +1024,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.15,
+        "age_hours": 54.84,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-07-06T15:21:31.257403+00:00"
+        "checked_at_utc": "2026-07-08T22:02:42.122549+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -1081,7 +1081,7 @@
       "source_url": "https://github.com/cortega26/chile-hub",
       "source_mode": "fallback",
       "source_detail": "derived_from_validated_chile_hub_layers",
-      "refreshed_at_utc": "2026-07-06T15:21:31.257412+00:00",
+      "refreshed_at_utc": "2026-07-08T22:02:42.122557+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -1145,7 +1145,7 @@
         "status": "fresh",
         "age_hours": 0.0,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-07-06T15:21:31.257421+00:00"
+        "checked_at_utc": "2026-07-08T22:02:42.122565+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 1080,
@@ -1230,9 +1230,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.13,
+        "age_hours": 54.82,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-07-06T15:21:31.257428+00:00"
+        "checked_at_utc": "2026-07-08T22:02:42.122573+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 1080,
@@ -1321,9 +1321,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.13,
+        "age_hours": 54.82,
         "max_age_hours": 175200,
-        "checked_at_utc": "2026-07-06T15:21:31.257435+00:00"
+        "checked_at_utc": "2026-07-08T22:02:42.122579+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 175200,
@@ -1368,7 +1368,7 @@
     },
     {
       "dataset": "consumo_electrico_comunal",
-      "description": "Consumo eléctrico anual por comuna y tipo de cliente (Residencial, Comercial, Industrial, Agrícola, Alumbrado Público, Otros), publicado por la Comisión Nacional de Energía (CNE) en el portal Energía Abierta.",
+      "description": "Consumo eléctrico anual por comuna y tipo de cliente (Residencial, Comercial, Industrial, Agrícola, Alumbrado Público, Otros), publicado por la Comisión Nacional de Energía (CNE) en el portal Energía Abierta. DEPRECATED: la fuente Junar de energiaabierta.cl fue decomisionada (investigado 2026-07-07); el dataset solo publica datos de muestra (FALLBACK_ROWS), no está en el bundle público. Ver data/source_registry.json.",
       "alias_for": null,
       "source_name": "CNE — Energía Abierta",
       "source_url": "http://datos.energiaabierta.cl/dataviews/241686/consumo-electrico-anual-por-comuna-y-tipo-de-cliente/",
@@ -1394,7 +1394,7 @@
         "codigo_comuna",
         "codigo_region"
       ],
-      "confidence_tier": "Tier A",
+      "confidence_tier": "Tier C",
       "reuse_policy": {
         "status": "open-attribution",
         "license": "CC BY",
@@ -1405,9 +1405,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.13,
+        "age_hours": 54.82,
         "max_age_hours": 17520,
-        "checked_at_utc": "2026-07-06T15:21:31.257440+00:00"
+        "checked_at_utc": "2026-07-08T22:02:42.122585+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 17520,
@@ -1487,9 +1487,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.13,
+        "age_hours": 54.82,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-07-06T15:21:31.257445+00:00"
+        "checked_at_utc": "2026-07-08T22:02:42.122590+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -1578,9 +1578,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.13,
+        "age_hours": 54.82,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-07-06T15:21:31.257450+00:00"
+        "checked_at_utc": "2026-07-08T22:02:42.122596+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,

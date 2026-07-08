@@ -1,23 +1,23 @@
 {
-  "generated_at_utc": "2026-07-06T15:21:31.259458+00:00",
+  "generated_at_utc": "2026-07-08T22:02:42.124535+00:00",
   "overall_status": "warn",
   "dataset_count": 19,
-  "live_count": 15,
-  "fallback_count": 4,
+  "live_count": 16,
+  "fallback_count": 3,
   "stale_count": 0,
   "drifted_count": 8,
   "degraded_count": 0,
-  "warning_count": 12,
+  "warning_count": 11,
   "top_issue": {
-    "dataset": "consumo_electrico_comunal",
+    "dataset": "empresas",
     "attention_priority": 0,
     "warning_count": 3,
     "build_freshness_status": "fresh",
     "drift_status": "drifted",
     "degradation_status": "warning",
-    "source_detail": "Consumo eléctrico anual por comuna y tipo de cliente",
-    "diagnostic_summary": "tipos de cliente: ['Comercial', 'Residencial']",
+    "source_detail": "datos_gob_cl_ckan_api",
+    "diagnostic_summary": "found 1 RUTs with invalid format",
     "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
   },
-  "top_issue_summary": "consumo_electrico_comunal: tipos de cliente: ['Comercial', 'Residencial'] [source_detail=Consumo eléctrico anual por comuna y tipo de cliente; warnings=3; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]"
+  "top_issue_summary": "empresas: found 1 RUTs with invalid format [source_detail=datos_gob_cl_ckan_api; warnings=3; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]"
 }
