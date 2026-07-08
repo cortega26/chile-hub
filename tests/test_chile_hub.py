@@ -1750,7 +1750,11 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("--no-commit --no-tag --no-push --no-vcs-release", self.release_workflow_text)
         self.assertIn("uv lock", self.release_workflow_text)
         self.assertIn("uv lock --locked", self.release_workflow_text)
-        self.assertIn("git add CHANGELOG.md pyproject.toml uv.lock", self.release_workflow_text)
+        self.assertIn("python scripts/sync_release_artifact_version.py", self.release_workflow_text)
+        self.assertIn(
+            "git add CHANGELOG.md pyproject.toml uv.lock data/normalized/ index.html app.js",
+            self.release_workflow_text,
+        )
 
     def test_monthly_scrape_uses_project_extras_not_dependency_groups(self):
         self.assertNotIn("uv sync --group dev", self.monthly_workflow_text)

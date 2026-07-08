@@ -1,6 +1,6 @@
 {
-  "generated_at_utc": "2026-07-06T15:21:31.292748+00:00",
-  "artifact_count": 57,
+  "generated_at_utc": "2026-07-08T20:54:36.744448+00:00",
+  "artifact_count": 55,
   "artifacts": [
     {
       "path": "data/normalized/artifact_manifest.json",
@@ -8,8 +8,8 @@
       "output_type": null,
       "shared_type": "artifact_manifest",
       "format": "json",
-      "size_bytes": 16225,
-      "sha256": "a39ac49dca9dff01a6747e6c938fa7ce43f332fa1e8cde9e3ab2e3bd1f990e8f"
+      "size_bytes": 16803,
+      "sha256": "21684a6f7b3b08437962da836c49028eee9b8ef48a10b1087d241a2565c94fbd"
     },
     {
       "path": "data/normalized/autoridades_electas.json",
@@ -84,31 +84,13 @@
       "sha256": "41329567cccf411d76f912710d3f144f6bc054dcad43e2202f331fc2af8f8b0f"
     },
     {
-      "path": "data/normalized/consumo_electrico_comunal.json",
-      "dataset": "consumo_electrico_comunal",
-      "output_type": "json",
-      "shared_type": null,
-      "format": null,
-      "size_bytes": 1246,
-      "sha256": "e06e92dbc31dfbaaf58cefaf68030512bf2bf419336bd0369717f6151cb7f204"
-    },
-    {
-      "path": "data/normalized/consumo_electrico_comunal.parquet",
-      "dataset": "consumo_electrico_comunal",
-      "output_type": "parquet",
-      "shared_type": null,
-      "format": null,
-      "size_bytes": 4539,
-      "sha256": "b16fe85a66d94a15a8eae683408998eb1dfa4e67709a2f25619d1e77736f2efb"
-    },
-    {
       "path": "data/normalized/datapackage.json",
       "dataset": null,
       "output_type": null,
       "shared_type": "datapackage",
       "format": "json",
-      "size_bytes": 45804,
-      "sha256": "fb08097a90233df255a1528aa9d928da525ed339b22a20bf6ec2403063f74ccc"
+      "size_bytes": 45805,
+      "sha256": "ed374a152f37973f66e439661001d3e38bc83e12f63d7b46f4a6429950947e16"
     },
     {
       "path": "data/normalized/dataset_catalog.json",
@@ -269,8 +251,8 @@
       "output_type": null,
       "shared_type": "hub_bundle",
       "format": "json",
-      "size_bytes": 71784,
-      "sha256": "98bbabe287701a881d77202c760b6f3467613d2d9375484bee8095626955f5fc"
+      "size_bytes": 79275,
+      "sha256": "c12827f0473a7ab9006a4d9fbd88afe548ced235c35ab181d1fd80b63ee8c109"
     },
     {
       "path": "data/normalized/hub_health.json",
@@ -341,8 +323,8 @@
       "output_type": null,
       "shared_type": "overview",
       "format": "json",
-      "size_bytes": 5783,
-      "sha256": "7b2da70281b82f55d54c315e8f91cd800f570a5b5655429b24c7045dd6324bab"
+      "size_bytes": 6220,
+      "sha256": "74ed043e8f77186d555638e9dc6fed2f97a26e57f49ba46789caa56c14bfa06a"
     },
     {
       "path": "data/normalized/overview.md",
@@ -350,8 +332,8 @@
       "output_type": null,
       "shared_type": "overview",
       "format": "markdown",
-      "size_bytes": 3069,
-      "sha256": "f6d08d672a4e7095143da1d1bc44cbc90b5e5e69020bd25356c3d300acd4b397"
+      "size_bytes": 3222,
+      "sha256": "4f41f4152a3f287967762b14af6a83f455fc2f4b66ef3977d66193b34d76724b"
     },
     {
       "path": "data/normalized/partidos_politicos.json",
@@ -377,8 +359,8 @@
       "output_type": null,
       "shared_type": "pipeline_metadata",
       "format": "json",
-      "size_bytes": 57947,
-      "sha256": "7e430988d7f079971ac1a35b6b093bee567baa89390f8ccc630c8d5f80227ceb"
+      "size_bytes": 57948,
+      "sha256": "09854e59c64878cb89fcba0ee04a1ae90762c9585a7c5f110d451e811e8ac6f3"
     },
     {
       "path": "data/normalized/pipeline_status.md",
@@ -520,8 +502,8 @@
     {
       "path": "data/normalized/chile-hub-publishable-bundle.zip",
       "package_type": "zip",
-      "size_bytes": 29270512,
-      "sha256": "d348d3f1c9d51b42b893c6ae5860493995b761e8b5c11ad254251db27f3ce82e",
+      "size_bytes": 29269172,
+      "sha256": "9af023927815502dc82bcffb82716a8b93508974da60c88db1cd6b7b381dde42",
       "checksum_algorithm": "sha256",
       "checksum_path": "data/normalized/chile-hub-publishable-bundle.zip.sha256",
       "verification_command": "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256"

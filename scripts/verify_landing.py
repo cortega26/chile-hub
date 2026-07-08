@@ -195,6 +195,12 @@ def verify_landing():
         expected_version = bundle.get("version")
         if not expected_version:
             fail("hub_bundle.json is missing version field")
+        project_version = project_metadata.get("version")
+        if expected_version != project_version:
+            fail(
+                f"hub_bundle.json version is stale: expected {project_version}, "
+                f"got {expected_version}"
+            )
         navbar_badge = page.locator(".badge-alpha")
         if navbar_badge.count() != 1:
             fail("Expected exactly one .badge-alpha version badge in the navbar")

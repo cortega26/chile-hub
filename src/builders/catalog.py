@@ -27,7 +27,7 @@ def write_pipeline_metadata(dataset_metadata, validations):
         print(f"Advertencia: No se pudo obtener la versión de pyproject.toml: {e}")
 
     if version != "unknown":
-        sync_landing_metadata(public_site_url)
+        sync_landing_metadata(public_site_url, version)
 
     pipeline_metadata = {
         "version": version,

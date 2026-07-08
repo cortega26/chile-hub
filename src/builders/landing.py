@@ -7,7 +7,7 @@ import re
 from src.builders._shared import DATASET_CATALOG_CONFIG, ROOT_DIR
 
 
-def sync_landing_metadata(public_site_url):
+def sync_landing_metadata(public_site_url, version=None):
     index_path = os.path.join(ROOT_DIR, "index.html")
     app_path = os.path.join(ROOT_DIR, "app.js")
     public_site_url = public_site_url.rstrip("/") + "/"
@@ -109,6 +109,12 @@ def sync_landing_metadata(public_site_url):
             ]
             for pattern, replacement in replacements:
                 new_content = re.sub(pattern, replacement, new_content)
+            if version:
+                new_content = re.sub(
+                    r'<script src="app\.js(?:\?v=[^"]*)?" defer></script>',
+                    f'<script src="app.js?v={version}" defer></script>',
+                    new_content,
+                )
 
             if new_content != content:
                 with open(index_path, "w", encoding="utf-8") as f:

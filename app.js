@@ -56,6 +56,9 @@ let currentCatalogDatasets = [];
 let currentActiveDatasetInDrawer = null;
 let artifactManifestByPath = {};
 let packageManifestByPath = {};
+const CHILE_HUB_ASSET_VERSION = new URL(
+    document.currentScript?.src || window.location.href
+).searchParams.get("v") || "dev";
 const PUBLIC_DATA_BASE = "https://tooltician.com/chile-hub/data/normalized";
 const PREVIEW_ROW_LIMIT = 5;
 const SUPPORT_LINKS = [
@@ -70,6 +73,11 @@ const SUPPORT_LINKS = [
         className: "dataset-action muted",
     },
 ];
+
+function dataUrl(path) {
+    const separator = path.includes("?") ? "&" : "?";
+    return `${path}${separator}v=${encodeURIComponent(CHILE_HUB_ASSET_VERSION)}`;
+}
 
 // Formateador de moneda en pesos chilenos (CLP)
 const formatCLP = new Intl.NumberFormat("es-CL", {
@@ -307,7 +315,7 @@ async function loadDatasetPreview(button) {
 
     target.innerHTML = `<p class="dataset-preview-state">Cargando muestra...</p>`;
     try {
-        const response = await fetch(button.dataset.previewPath);
+        const response = await fetch(dataUrl(button.dataset.previewPath), { cache: "no-store" });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const rows = await response.json();
         target.innerHTML = buildPreviewTable(rows);
@@ -451,7 +459,7 @@ async function loadDrawerPreview(dataset) {
 
     container.innerHTML = `<p class="dataset-preview-state" style="padding:1.5rem; text-align:center; color:var(--text-secondary);">Cargando muestra...</p>`;
     try {
-        const response = await fetch(jsonPath);
+        const response = await fetch(dataUrl(jsonPath), { cache: "no-store" });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const rows = await response.json();
 
@@ -630,7 +638,9 @@ async function loadHubHealth() {
     if (!tbody) return;
 
     try {
-        const res = await fetch("data/normalized/hub_health.json");
+        const res = await fetch(dataUrl("data/normalized/hub_health.json"), {
+            cache: "no-store",
+        });
         if (!res.ok) throw new Error("Not found");
         const health = await res.json();
 
@@ -682,11 +692,11 @@ async function loadHubHealth() {
 
 function loadCatalog() {
     Promise.all([
-        fetch("data/normalized/hub_bundle.json").then(res => {
+        fetch(dataUrl("data/normalized/hub_bundle.json"), { cache: "no-store" }).then(res => {
             if (!res.ok) throw new Error("No se pudo cargar el bundle");
             return res.json();
         }),
-        fetch("data/normalized/artifact_manifest.json")
+        fetch(dataUrl("data/normalized/artifact_manifest.json"), { cache: "no-store" })
             .then(res => res.ok ? res.json() : null)
             .catch(() => null)
     ])
@@ -1000,7 +1010,7 @@ async function copyQuickstartSnippet(button) {
 
 // Cargar indicadores económicos en KPI Cards
 function loadKPIs() {
-    fetch("data/normalized/indicadores_hoy.json")
+    fetch(dataUrl("data/normalized/indicadores_hoy.json"), { cache: "no-store" })
         .then(res => {
             if (!res.ok) throw new Error("No se pudo cargar los indicadores");
             return res.json();
@@ -1051,7 +1061,7 @@ function showKPIError(id, label) {
 
 // Cargar datos territoriales
 function loadComunas() {
-    fetch("data/normalized/comunas.json")
+    fetch(dataUrl("data/normalized/comunas.json"), { cache: "no-store" })
         .then(res => {
             if (!res.ok) throw new Error("No se pudo cargar la DPA");
             return res.json();

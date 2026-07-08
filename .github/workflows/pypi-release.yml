@@ -127,10 +127,11 @@ jobs:
             if [[ "$before" != "$after" ]]; then
               uv lock
               uv lock --locked
+              python scripts/sync_release_artifact_version.py
 
               git config user.name "github-actions[bot]"
               git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-              git add CHANGELOG.md pyproject.toml uv.lock
+              git add CHANGELOG.md pyproject.toml uv.lock data/normalized/ index.html app.js
               git commit -m "chore(release): ${after} [skip ci]"
               tag="v${after}"
               git tag "$tag"

@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import polars as pl
+import tomllib
 
 UTC = timezone.utc
 
@@ -23,6 +24,11 @@ STAGING_DIR = ROOT_DIR / "data" / "staging"
 NORMALIZED_DIR = ROOT_DIR / "data" / "normalized"
 CONTRACTS_DIR = ROOT_DIR / "contracts" / "datasets"
 SOURCE_REGISTRY_PATH = ROOT_DIR / "data" / "source_registry.json"
+
+
+def load_project_version():
+    with open(ROOT_DIR / "pyproject.toml", "rb") as f:
+        return tomllib.load(f).get("project", {}).get("version")
 
 
 def _derive_dataset_artifact_paths():
@@ -685,6 +691,13 @@ def verify_required_files(required_files=None):
 def verify_pipeline_metadata():
     metadata_path = NORMALIZED_DIR / "pipeline_metadata.json"
     metadata = load_json(metadata_path)
+    expected_version = load_project_version()
+    if metadata.get("version") != expected_version:
+        fail(
+            "pipeline_metadata.json version is stale: "
+            f"expected {expected_version}, got {metadata.get('version')}. "
+            "Run 'python src/build_dev_db.py' (or 'make build') after bumping pyproject.toml."
+        )
 
     datasets = metadata.get("datasets", {})
     validations = metadata.get("validations", {})
@@ -1164,6 +1177,13 @@ def verify_hub_status():
 def verify_hub_bundle():
     bundle_path = NORMALIZED_DIR / "hub_bundle.json"
     bundle = load_json(bundle_path)
+    expected_version = load_project_version()
+    if bundle.get("version") != expected_version:
+        fail(
+            "hub_bundle.json version is stale: "
+            f"expected {expected_version}, got {bundle.get('version')}. "
+            "Run 'python src/build_dev_db.py' (or sync release artifacts) after bumping pyproject.toml."
+        )
 
     if bundle.get("dataset_count") != len(REQUIRED_DATASETS):
         fail(f"hub_bundle.json has unexpected dataset_count: {bundle.get('dataset_count')}")
