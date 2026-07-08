@@ -1630,6 +1630,7 @@ class WorkflowContractTests(unittest.TestCase):
         cls.release_workflow_text = (
             ROOT_DIR / ".github" / "workflows" / "pypi-release.yml"
         ).read_text()
+        cls.codeql_workflow_text = (ROOT_DIR / ".github" / "workflows" / "codeql.yml").read_text()
         cls.monthly_workflow_text = (
             ROOT_DIR / ".github" / "workflows" / "monthly-scrape.yml"
         ).read_text()
@@ -1710,12 +1711,20 @@ class WorkflowContractTests(unittest.TestCase):
             "data/normalized/chile-hub-publishable-bundle.zip", self.release_workflow_text
         )
         self.assertIn("data/normalized/dataset_catalog.json", self.release_workflow_text)
+        self.assertNotIn(
+            'gh release create "$tag" --notes "Release $tag" || true', self.release_workflow_text
+        )
+        self.assertIn('gh release view "$tag"', self.release_workflow_text)
 
     def test_pipeline_artifact_records_publication_provenance(self):
         self.assertIn("pipeline_artifact_provenance.json", self.workflow_text)
         self.assertIn('"verification_profile": profile', self.workflow_text)
         self.assertIn('"require_live": profile == "publication"', self.workflow_text)
         self.assertIn('"source_run_event": "${{ github.event_name }}"', self.workflow_text)
+        self.assertIn(
+            "Readiness profile: this run may pass with fallback or sample data.", self.workflow_text
+        )
+        self.assertIn("Publication profile: live-source gates are enforced", self.workflow_text)
 
     def test_pypi_release_requires_publication_grade_data_assets(self):
         self.assertIn("pipeline_artifact_provenance.json", self.release_workflow_text)
@@ -1737,6 +1746,10 @@ class WorkflowContractTests(unittest.TestCase):
             self.monthly_workflow_text.count("uv sync --extra pipeline --extra dev"), 2
         )
         self.assertEqual(self.monthly_workflow_text.count("uv lock --locked"), 2)
+
+    def test_codeql_python_analysis_uses_no_build_mode(self):
+        self.assertIn("languages: python", self.codeql_workflow_text)
+        self.assertIn("build-mode: none", self.codeql_workflow_text)
 
     def test_testpypi_workflow_smoke_tests_installed_console_script(self):
         testpypi_text = (ROOT_DIR / ".github" / "workflows" / "testpypi.yml").read_text()

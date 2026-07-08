@@ -132,9 +132,15 @@ jobs:
               git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
               git add CHANGELOG.md pyproject.toml uv.lock
               git commit -m "chore(release): ${after} [skip ci]"
-              git tag "v${after}"
-              git push origin HEAD:main "v${after}"
-              gh release create "v${after}" --notes "Release v${after}" || true
+              tag="v${after}"
+              git tag "$tag"
+              git push origin HEAD:main "$tag"
+
+              if gh release view "$tag" >/dev/null 2>&1; then
+                echo "Release $tag already exists"
+              else
+                gh release create "$tag" --notes "Release $tag"
+              fi
             else
               uv lock --locked
             fi
@@ -166,7 +172,11 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           tag="v${{ steps.semantic-release.outputs.version }}"
-          gh release create "$tag" --notes "Release $tag" || true
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "Release $tag already exists"
+          else
+            gh release create "$tag" --notes "Release $tag"
+          fi
           gh release upload "$tag" \
             data/normalized/chile-hub-publishable-bundle.zip \
             data/normalized/chile-hub-publishable-bundle.zip.sha256 \

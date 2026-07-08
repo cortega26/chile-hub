@@ -158,6 +158,24 @@ jobs:
           echo "profile=$profile" >> "$GITHUB_OUTPUT"
           python scripts/verify_pipeline.py --profile "$profile"
 
+      - name: Explain verification profile
+        run: |
+          if [[ "${{ steps.verify-pipeline.outputs.profile }}" == "publication" ]]; then
+            {
+              echo "## Verification profile"
+              echo ""
+              echo "Publication profile: live-source gates are enforced before artifacts can publish."
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            {
+              echo "## Verification profile"
+              echo ""
+              echo "Readiness profile: this run may pass with fallback or sample data."
+              echo ""
+              echo "These artifacts are suitable for CI smoke tests only. PyPI release asset upload requires a publication-profile artifact and a live-data verification guard."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
       - name: Write pipeline artifact provenance
         run: |
           python - <<'PY'
