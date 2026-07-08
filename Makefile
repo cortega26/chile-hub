@@ -92,7 +92,6 @@ extract:
 	PYTHONPATH=src $(PYTHON) src/extractors/salud_extractor.py
 	PYTHONPATH=src $(PYTHON) src/extractors/electoral_extractor.py
 	PYTHONPATH=src $(PYTHON) src/extractors/mineduc_establecimientos_extractor.py
-	PYTHONPATH=src $(PYTHON) src/extractors/sinim_finanzas_extractor.py
 	PYTHONPATH=src $(PYTHON) src/extractors/mineduc_resultados_extractor.py
 	PYTHONPATH=src $(PYTHON) src/extractors/siedu_extractor.py
 	PYTHONPATH=src $(PYTHON) src/extractors/res_extractor.py

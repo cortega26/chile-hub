@@ -94,6 +94,17 @@ REQUIRED_DATASETS = {
     name for name, config in DATASET_CATALOG_CONFIG.items() if config.get("outputs")
 }
 
+# Valores estructuralmente válidos de source_mode en cualquier reporte generado.
+# "monthly" cubre datasets de cadencia mensual con extractor live real (p. ej.
+# finanzas_municipales vía sinim_finanzas_live_extractor.py + Monthly Scrape
+# workflow) — genuinamente obtenidos de la fuente, pero no re-fetcheados en
+# cada build diario. Ver Fase 3.4 en data/source_registry.json.
+VALID_SOURCE_MODES = {"live", "fallback", "monthly"}
+
+# Subconjunto de VALID_SOURCE_MODES que cuenta como "no es un fallback
+# hardcodeado" para efectos de elegibilidad de publicación.
+NON_FALLBACK_SOURCE_MODES = {"live", "monthly"}
+
 
 def fail(message):
     print(f"ERROR: {message}")
@@ -465,7 +476,7 @@ def verify_publication_policy(metadata=None, registry=None, manifest=None):
             violations.append(f"{dataset_name}: missing from pipeline_metadata")
             continue
         freshness = dataset.get("freshness", {})
-        if dataset.get("source_mode") != "live":
+        if dataset.get("source_mode") not in NON_FALLBACK_SOURCE_MODES:
             violations.append(f"{dataset_name}: source_mode={dataset.get('source_mode')}")
         if freshness.get("status") != "fresh":
             violations.append(f"{dataset_name}: freshness={freshness.get('status')}")
@@ -708,7 +719,7 @@ def verify_pipeline_metadata():
         if not dataset_metadata.get("fields"):
             fail(f"{dataset_name} metadata is missing fields")
 
-        if dataset_metadata.get("source_mode") not in {"live", "fallback"}:
+        if dataset_metadata.get("source_mode") not in VALID_SOURCE_MODES:
             fail(
                 f"{dataset_name} metadata has invalid source_mode: {dataset_metadata.get('source_mode')}"
             )
@@ -1076,7 +1087,7 @@ def verify_hub_health():
     for entry in datasets:
         if entry.get("severity") not in {"ok", "warn", "error"}:
             fail(f"hub_health.json entry has invalid severity: {entry}")
-        if entry.get("source_mode") not in {"live", "fallback"}:
+        if entry.get("source_mode") not in VALID_SOURCE_MODES:
             fail(f"hub_health.json entry has invalid source_mode: {entry}")
         if entry.get("freshness_status") not in {"fresh", "stale", "unknown"}:
             fail(f"hub_health.json entry has invalid freshness_status: {entry}")
@@ -1340,7 +1351,7 @@ def verify_provenance_report():
     if dataset_names != REQUIRED_DATASETS:
         fail(f"provenance_report.json has unexpected datasets: {sorted(dataset_names)}")
     for entry in datasets:
-        if entry.get("source_mode") not in {"live", "fallback"}:
+        if entry.get("source_mode") not in VALID_SOURCE_MODES:
             fail(f"provenance_report.json has invalid source_mode: {entry}")
         if not entry.get("source_name"):
             fail(f"provenance_report.json is missing source_name: {entry}")
@@ -1380,7 +1391,7 @@ def verify_drift_report():
     for entry in datasets:
         if entry.get("drift_status") not in {"healthy", "drifted"}:
             fail(f"drift_report.json has invalid drift_status: {entry}")
-        if entry.get("source_mode") not in {"live", "fallback"}:
+        if entry.get("source_mode") not in VALID_SOURCE_MODES:
             fail(f"drift_report.json has invalid source_mode: {entry}")
         if entry.get("coverage_status") not in {
             "full",
@@ -1464,7 +1475,7 @@ def verify_overview():
     if dataset_names != REQUIRED_DATASETS:
         fail(f"overview.json has unexpected datasets: {sorted(dataset_names)}")
     for entry in datasets:
-        if entry.get("source_mode") not in {"live", "fallback"}:
+        if entry.get("source_mode") not in VALID_SOURCE_MODES:
             fail(f"overview.json has invalid source_mode: {entry}")
         if entry.get("validation_status") != "ok":
             fail(f"overview.json has unexpected validation_status: {entry}")

@@ -124,7 +124,6 @@ jobs:
             python src/extractors/salud_extractor.py
             python src/extractors/electoral_extractor.py
             python src/extractors/mineduc_establecimientos_extractor.py
-            python src/extractors/sinim_finanzas_extractor.py
             python src/extractors/mineduc_resultados_extractor.py
             python src/extractors/siedu_extractor.py
             python src/extractors/res_extractor.py
@@ -133,6 +132,15 @@ jobs:
             python src/extractors/partidos_politicos_extractor.py
             python src/extractors/autoridades_electas_extractor.py
           fi
+
+      - name: Restore versioned SINIM snapshot
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: |
+          # finanzas_municipales is monthly-cadence (see Monthly Scrape workflow),
+          # not a daily extractor. Its staging snapshot is force-committed to git
+          # by that workflow; make sure neither a stale actions/cache restore nor
+          # a leftover fallback write can shadow the versioned copy here.
+          git checkout -- data/staging/finanzas_municipales.csv data/staging/finanzas_municipales.metadata.json 2>/dev/null || true
 
       - name: Build outputs
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
