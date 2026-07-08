@@ -154,7 +154,7 @@ Pipeline determinista en GitHub Actions: extracción → build → verificación
 | 8 | **Establecimientos de Salud** | 5707 | 🟢 live | MINSAL / datos.gob.cl | CC0 | Mensual |
 | 9 | **Distritos Electorales** | 346 | 🟢 live | BCN / Ley 20.840 | CC0 | — |
 | 10 | **Establecimientos Educacionales** | ~12 898 | 🟢 live | MINEDUC | CC BY 3.0 CL | Anual |
-| 11 | **Finanzas Municipales** ⚠️ | 3 (parcial, 3/346) | 🔶 parcial | SINIM / SUBDERE | Revisión términos | Anual |
+| 11 | **Finanzas Municipales** ⚠️ | 345 (parcial, 345/346) | 🔶 parcial | SINIM / SUBDERE | Revisión términos | Anual |
 | 12 | **Resultados Educacionales** | 345 | 🟢 live | MINEDUC | CC BY 3.0 CL | Anual |
 | 13 | **Indicadores Urbanos SIEDU** | 6 701 (parcial) | 🟢 live | INE / SIEDU | Datos abiertos INE | Anual |
 | 14 | **Perfil Territorial Comunal** | 346 | 🟡 fallback | chile-hub derivado | Fuentes abiertas | Derivada |

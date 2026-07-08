@@ -4,7 +4,7 @@
   "description": "Capa de datos reproducible y curada sobre datasets publicos oficiales de Chile: geografia, demografia, salud, educacion, finanzas municipales e indicadores.",
   "version": "1.19.11",
   "homepage": "https://tooltician.com/chile-hub/",
-  "created": "2026-07-06T15:21:31.265103+00:00",
+  "created": "2026-07-08T22:02:42.129665+00:00",
   "resources": [
     {
       "name": "regiones",
@@ -1482,7 +1482,7 @@
       "format": "parquet",
       "mediatype": "application/vnd.apache.parquet",
       "title": "consumo_electrico_comunal",
-      "description": "Consumo eléctrico anual por comuna y tipo de cliente (Residencial, Comercial, Industrial, Agrícola, Alumbrado Público, Otros), publicado por la Comisión Nacional de Energía (CNE) en el portal Energía Abierta.",
+      "description": "Consumo eléctrico anual por comuna y tipo de cliente (Residencial, Comercial, Industrial, Agrícola, Alumbrado Público, Otros), publicado por la Comisión Nacional de Energía (CNE) en el portal Energía Abierta. DEPRECATED: la fuente Junar de energiaabierta.cl fue decomisionada (investigado 2026-07-07); el dataset solo publica datos de muestra (FALLBACK_ROWS), no está en el bundle público. Ver data/source_registry.json.",
       "schema": {
         "fields": [
           {

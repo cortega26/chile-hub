@@ -1,10 +1,10 @@
 # chile-hub drift report
 
-- `generated_at_utc`: `2026-07-06T15:21:31.259458+00:00`
+- `generated_at_utc`: `2026-07-08T22:02:42.124535+00:00`
 - `dataset_count`: `19`
 - `drifted_count`: `8`
 - `healthy_count`: `11`
-- `fallback_count`: `4`
+- `fallback_count`: `3`
 - `partial_coverage_count`: `2`
 - `degraded_count`: `0`
 
@@ -20,7 +20,7 @@
 | `establecimientos_educacionales` | `healthy` | `live` | `not_applicable` | `none` | 0 | Ninguna. |
 | `censo_hogares_viviendas` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
 | `distritos_electorales` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
-| `finanzas_municipales` | `drifted` | `fallback` | `partial` | `warning` | 1 | Revisar warnings operativos del dataset antes de consumirlo en producción. |
+| `finanzas_municipales` | `drifted` | `monthly` | `partial` | `none` | 0 | Ninguna. |
 | `resultados_educacionales` | `healthy` | `live` | `not_applicable` | `none` | 0 | Ninguna. |
 | `indicadores_urbanos_siedu` | `drifted` | `live` | `partial` | `warning` | 1 | Revisar warnings operativos del dataset antes de consumirlo en producción. |
 | `perfil_territorial_comunal` | `drifted` | `fallback` | `full` | `none` | 0 | Ninguna. |
@@ -133,12 +133,12 @@
 ## finanzas_municipales
 
 - `drift_status`: `drifted`
-- `source_mode`: `fallback`
-- `coverage`: `Cobertura parcial: 3/346 filas respecto del baseline esperado.`
-- `degradation`: finanzas_municipales source_mode is fallback; review before publication
-- `warning_count`: `1`
-- `diagnostic_summary`: finanzas_municipales source_mode is fallback; review before publication
-- `recommended_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.
+- `source_mode`: `monthly`
+- `coverage`: `Cobertura parcial: 345/346 filas respecto del baseline esperado.`
+- `degradation`: Sin degradación operativa detectada en este build.
+- `warning_count`: `0`
+- `diagnostic_summary`: Sin degradación operativa detectada en este build.
+- `recommended_action`: Ninguna.
 
 ## resultados_educacionales
 
