@@ -1408,6 +1408,115 @@ class PobrezaComunalExtractorTests(unittest.TestCase):
         self.assertTrue(required.issubset(set(df.columns)))
         self.assertEqual(df.height, 0)
 
+    def test_parse_pobreza_xlsx_matches_real_mds_column_layout(self):
+        """Regresión: el XLSX real del MDS tiene título+fila en blanco+header en
+        las filas 1-3, y sus columnas son [codigo_comuna, nombre_region (texto),
+        nombre_comuna, poblacion, personas_pobreza, tasa (fracción 0-1),
+        limite_inferior, limite_superior, presencia_muestra, tipo_estimacion] —
+        SIN código de región numérico. Un parser que asuma
+        [codigo_region, region, codigo_comuna, comuna, tasa, li, ls, ...]
+        (el layout documentado pero incorrecto que tenía este extractor hasta
+        2026-07-08) lee `int("Iquique")` en la posición de codigo_comuna y
+        descarta cada fila silenciosamente, cayendo siempre a fallback.
+        """
+        from src.extractors.pobreza_extractor import _parse_pobreza_xlsx
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "pobreza_ingresos.xlsx"
+            workbook = openpyxl.Workbook()
+            sheet = workbook.active
+            sheet.title = "Estimaciones"
+            sheet.append(["Estimaciones de Tasa de Pobreza por ingresos por comuna (SAE) 2022"])
+            sheet.append([])
+            sheet.append(
+                [
+                    "Código",
+                    "Región",
+                    "Nombre comuna",
+                    "Número de personas según proyecciones de población (*)",
+                    "Número de personas en situación de pobreza por ingresos (**)",
+                    "Porcentaje de personas en situación de pobreza por ingresos 2022",
+                    "Límite inferior\n (***)",
+                    "Límite superior",
+                    "Presencia de la comuna en la muestra Casen",
+                    "Tipo de estimación SAE \n(****)",
+                ]
+            )
+            sheet.append(
+                [
+                    1101,
+                    "Tarapacá",
+                    "Iquique",
+                    229674,
+                    18122,
+                    0.07890380841254656,
+                    0.06490288337885841,
+                    0.0929047334462347,
+                    "Sí",
+                    "Directa y Sintética (Fay-Herriot)",
+                ]
+            )
+            sheet.append(
+                [
+                    13101,
+                    "Metropolitana",
+                    "Santiago",
+                    404495,
+                    50000,
+                    0.1236,
+                    0.10,
+                    0.15,
+                    "Sí",
+                    "Directa y Sintética (Fay-Herriot)",
+                ]
+            )
+            workbook.save(path)
+
+            rows = _parse_pobreza_xlsx(path, "ingresos", anio=2022)
+
+        self.assertEqual(len(rows), 2)
+        iquique = next(r for r in rows if r["codigo_comuna"] == "01101")
+        # codigo_region se deriva de codigo_comuna, no de la columna "Región"
+        # (que es texto y nunca podría convertirse a un código numérico).
+        self.assertEqual(iquique["codigo_region"], "01")
+        self.assertEqual(iquique["nombre_comuna"], "Iquique")
+        self.assertEqual(iquique["dimension"], "ingresos")
+        # La fuente entrega fracción (0-1); el dataset usa convención de
+        # porcentaje (ver FALLBACK_ROWS), así que debe escalarse x100.
+        self.assertAlmostEqual(iquique["tasa"], 7.890380841254656)
+        self.assertAlmostEqual(iquique["limite_inferior"], 6.490288337885841)
+        self.assertAlmostEqual(iquique["limite_superior"], 9.29047334462347)
+
+        santiago = next(r for r in rows if r["codigo_comuna"] == "13101")
+        self.assertEqual(santiago["codigo_region"], "13")
+        self.assertEqual(santiago["nombre_comuna"], "Santiago")
+        self.assertAlmostEqual(santiago["tasa"], 12.36)
+
+    def test_parse_pobreza_xlsx_skips_malformed_rows(self):
+        """Filas sin código de comuna numérico (encabezados repetidos, notas al
+        pie, filas totalmente vacías) se descartan sin abortar el parseo."""
+        from src.extractors.pobreza_extractor import _parse_pobreza_xlsx
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "pobreza_multidimensional.xlsx"
+            workbook = openpyxl.Workbook()
+            sheet = workbook.active
+            sheet.append(["Título"])
+            sheet.append([])
+            sheet.append(["Código", "Región", "Nombre comuna"])
+            sheet.append(
+                [1101, "Tarapacá", "Iquique", 229674, 18122, 0.05, 0.04, 0.06, "Sí", "SAE"]
+            )
+            sheet.append([None, None, None, None, None, None, None, None, None, None])
+            sheet.append(["Nota: fuente INE 2022", None, None, None, None])
+            workbook.save(path)
+
+            rows = _parse_pobreza_xlsx(path, "multidimensional", anio=2022)
+
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["codigo_comuna"], "01101")
+        self.assertEqual(rows[0]["dimension"], "multidimensional")
+
 
 class ConsumoElectricoExtractorTests(unittest.TestCase):
     """Tests unitarios para el extractor de consumo eléctrico comunal (CNE)."""
@@ -1852,6 +1961,111 @@ class AutoridadesLocalesExtractorTests(unittest.TestCase):
         df = autoridades_locales_extractor.build_autoridades_locales_df([], alcaldes, {})
         personales = {"rut", "run", "domicilio", "fecha_nacimiento"}
         self.assertFalse(personales & {c.lower() for c in df.columns})
+
+
+def _sinim_xml_row(cell_values: dict) -> str:
+    """Construye una fila del XML Spreadsheet 2003 de SINIM con celdas en las
+    posiciones indicadas por `cell_values` (0-indexed); el resto quedan
+    vacías. Coincide con el formato real que exporta el portal SINIM."""
+    from src.extractors.sinim_finanzas_live_extractor import VARIABLE_COLUMN_MAP
+
+    max_index = max(VARIABLE_COLUMN_MAP.values())
+    cells = []
+    for i in range(max_index + 1):
+        value = cell_values.get(i)
+        if value is None:
+            cells.append("<Cell></Cell>")
+        else:
+            cells.append(f'<Cell><Data ss:Type="String">{value}</Data></Cell>')
+    return f"<Row>{''.join(cells)}</Row>"
+
+
+class SinimFinanzasLiveExtractorTests(unittest.TestCase):
+    """Tests para _parse_xml_spreadsheet (src/extractors/sinim_finanzas_live_extractor.py),
+    la lógica de parseo del "XML Spreadsheet 2003" que exporta el portal
+    SINIM — la única parte de este extractor testeable sin un navegador real
+    (el resto es sesión Playwright: setup, clicks, esperas)."""
+
+    def test_parse_xml_spreadsheet_extracts_mapped_columns_scaled_to_pesos(self):
+        from src.extractors.sinim_finanzas_live_extractor import (
+            VARIABLE_COLUMN_MAP,
+            _parse_xml_spreadsheet,
+        )
+
+        row = _sinim_xml_row(
+            {
+                0: "01101",
+                1: "Iquique",
+                VARIABLE_COLUMN_MAP["ingresos_totales"]: "104723.522",
+                VARIABLE_COLUMN_MAP["gastos_totales"]: "110061.007",
+                VARIABLE_COLUMN_MAP["ingresos_propios_permanentes"]: "47463.055",
+                VARIABLE_COLUMN_MAP["fondo_comun_municipal"]: "7496.937",
+                VARIABLE_COLUMN_MAP["gasto_personal"]: "21389.293",
+                VARIABLE_COLUMN_MAP["gasto_inversion"]: "2793.773",
+            }
+        )
+        # Filas 0-2 (título, headers, tipos) se saltan sin importar contenido.
+        xml = f"<Workbook><Worksheet><Table>{'<Row></Row>' * 3}{row}</Table></Worksheet></Workbook>"
+
+        rows = _parse_xml_spreadsheet(xml)
+
+        self.assertEqual(len(rows), 1)
+        r = rows[0]
+        self.assertEqual(r["codigo_comuna"], "01101")
+        self.assertEqual(r["nombre_comuna"], "Iquique")
+        self.assertEqual(r["anio"], 2024)
+        # Los valores vienen en miles de pesos → se escalan x1000.
+        self.assertAlmostEqual(r["ingresos_totales"], 104723522.0)
+        self.assertAlmostEqual(r["gastos_totales"], 110061007.0)
+        self.assertAlmostEqual(r["ingresos_propios_permanentes"], 47463055.0)
+        self.assertAlmostEqual(r["fondo_comun_municipal"], 7496937.0)
+        self.assertAlmostEqual(r["gasto_personal"], 21389293.0)
+        self.assertAlmostEqual(r["gasto_inversion"], 2793773.0)
+
+    def test_parse_xml_spreadsheet_fixes_latin1_encoded_comuna_names(self):
+        """SINIM entrega nombres de comuna en latin-1; el parser debe
+        recuperar los caracteres acentuados/ñ correctamente."""
+        from src.extractors.sinim_finanzas_live_extractor import (
+            VARIABLE_COLUMN_MAP,
+            _parse_xml_spreadsheet,
+        )
+
+        nombre_mal_codificado = "Ñuñoa".encode("utf-8").decode("latin-1")
+        row = _sinim_xml_row(
+            {
+                0: "13120",
+                1: nombre_mal_codificado,
+                VARIABLE_COLUMN_MAP["ingresos_totales"]: "1000",
+            }
+        )
+        xml = f"<Workbook><Table>{'<Row></Row>' * 3}{row}</Table></Workbook>"
+
+        rows = _parse_xml_spreadsheet(xml)
+
+        self.assertEqual(rows[0]["nombre_comuna"], "Ñuñoa")
+
+    def test_parse_xml_spreadsheet_skips_incomplete_rows(self):
+        """Una fila con menos celdas que la columna mapeada más alta se
+        descarta en vez de lanzar un IndexError."""
+        from src.extractors.sinim_finanzas_live_extractor import _parse_xml_spreadsheet
+
+        short_row = "<Row><Cell><Data>01101</Data></Cell><Cell><Data>Iquique</Data></Cell></Row>"
+        xml = f"<Workbook><Table>{'<Row></Row>' * 3}{short_row}</Table></Workbook>"
+
+        rows = _parse_xml_spreadsheet(xml)
+
+        self.assertEqual(rows, [])
+
+    def test_parse_xml_spreadsheet_raises_when_too_few_rows(self):
+        """Regresión de forma: si el portal cambia de layout y entrega menos
+        de 4 filas, debe fallar explícitamente en vez de silenciar el error
+        (matching el comportamiento fallback+aviso del resto del pipeline)."""
+        from src.extractors.sinim_finanzas_live_extractor import _parse_xml_spreadsheet
+
+        xml = "<Workbook><Table><Row></Row><Row></Row></Table></Workbook>"
+
+        with self.assertRaisesRegex(RuntimeError, "solo 2 filas"):
+            _parse_xml_spreadsheet(xml)
 
 
 if __name__ == "__main__":

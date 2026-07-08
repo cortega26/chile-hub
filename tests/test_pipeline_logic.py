@@ -1,5 +1,6 @@
 import datetime
 import json
+import re
 import sys
 import tempfile
 import unittest
@@ -175,6 +176,49 @@ class PipelineLogicTests(unittest.TestCase):
         registry = [self._stable_registry_entry(name) for name in DATASET_CATALOG_CONFIG]
 
         verify_publication_policy({"datasets": datasets}, registry=registry)
+
+    def test_publication_policy_accepts_monthly_source_mode(self):
+        """Regresión: finanzas_municipales (SINIM) es stable_publishable con
+        cadencia mensual real (sinim_finanzas_live_extractor.py, ver
+        Monthly Scrape workflow), y su metadata usa source_mode="monthly" —
+        no "live" — a propósito (Fase 3.4, "cadencia honesta"). Antes de
+        que verify_publication_policy reconociera ese valor, cualquier
+        dataset con source_mode="monthly" quedaba bloqueado de publicación
+        de forma permanente, aunque los datos fueran genuinamente reales.
+        """
+        datasets = {
+            name: {
+                "source_mode": "live",
+                "source_detail": "public_api",
+                "freshness": {"status": "fresh"},
+            }
+            for name in DATASET_CATALOG_CONFIG
+        }
+        datasets["indicadores"]["indicator_delivery"] = {
+            code: "live" for code in EXPECTED_INDICATOR_CODES
+        }
+        finanzas_name = next(name for name in DATASET_CATALOG_CONFIG if name != "indicadores")
+        datasets[finanzas_name]["source_mode"] = "monthly"
+        registry = [self._stable_registry_entry(name) for name in DATASET_CATALOG_CONFIG]
+
+        verify_publication_policy({"datasets": datasets}, registry=registry)
+
+    def test_publication_policy_rejects_unknown_source_mode(self):
+        """El gate no debe aceptar valores arbitrarios — solo live/fallback/monthly."""
+        datasets = {
+            "comunas": {
+                "source_mode": "weekly",
+                "source_detail": "public_api",
+                "freshness": {"status": "fresh"},
+            }
+        }
+        registry = [self._stable_registry_entry("comunas")]
+
+        with (
+            patch("builtins.print"),
+            self.assertRaisesRegex(SystemExit, "1"),
+        ):
+            verify_publication_policy({"datasets": datasets}, registry=registry)
 
     def test_publication_policy_rejects_fallback_and_partial_delivery(self):
         datasets = {
@@ -994,6 +1038,191 @@ class PipelineLogicTests(unittest.TestCase):
             "hub_status_json: data/normalized/hub_status.json",
             status_text,
         )
+
+    @staticmethod
+    def _issue_dataset(source_mode="live", warning_count=0, drift_status="healthy"):
+        return {
+            "source_name": "Test Source",
+            "source_mode": source_mode,
+            "source_detail": "public_api",
+            "record_count": 1,
+            "fields": ["id"],
+            "notes": [],
+            "freshness": {"status": "fresh", "summary": "fresh"},
+            "coverage": {"status": "full", "summary": "Cobertura completa"},
+            "reuse_policy": {"status": "open-attribution", "redistribution_ok": True},
+            "degradation": {
+                "status": "warning" if warning_count else "none",
+                "impact": "Impacto de prueba." if warning_count else "Sin impacto.",
+                "recommended_action": "Revisar." if warning_count else "Ninguna.",
+            },
+            "drift": {
+                "status": drift_status,
+                "summary": "Drift de prueba.",
+                "recommended_action": "Revisar." if drift_status != "healthy" else "Ninguna.",
+            },
+        }
+
+    def _issue_validation(self, warning_count):
+        return {
+            "status": "ok",
+            "warnings": [f"warning {i}" for i in range(warning_count)],
+        }
+
+    def test_build_hub_health_top_issue_excludes_non_public_candidate_dataset(self):
+        """Regresión: un dataset candidate (sin tarjeta en la landing page) con
+        más warnings que un dataset público NO debe ganar el top_issue — el
+        enlace "Ver top issue" de index.html apunta a #dataset-{nombre} y esa
+        tarjeta solo existe para datasets con public_bundle_eligible=true.
+        """
+        import tempfile
+
+        from src import pipeline_status_utils
+
+        registry = [
+            {
+                "dataset": "public_ds",
+                "publication_track": "stable_publishable",
+                "public_bundle_eligible": True,
+            },
+            {
+                "dataset": "candidate_ds",
+                "publication_track": "candidate",
+                "public_bundle_eligible": False,
+            },
+        ]
+        metadata = {
+            "generated_at_utc": "2026-07-08T00:00:00+00:00",
+            "datasets": {
+                # candidate_ds tiene más warnings (peor severidad) que public_ds.
+                "candidate_ds": self._issue_dataset(source_mode="fallback", warning_count=5),
+                "public_ds": self._issue_dataset(source_mode="live", warning_count=1),
+            },
+            "validations": {
+                "candidate_ds": self._issue_validation(5),
+                "public_ds": self._issue_validation(1),
+            },
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            registry_path = Path(tmpdir) / "source_registry.json"
+            registry_path.write_text(json.dumps(registry), encoding="utf-8")
+            with patch.object(pipeline_status_utils, "SOURCE_REGISTRY_PATH", registry_path):
+                health = build_hub_health(metadata)
+
+        self.assertEqual(health["top_issue"]["dataset"], "public_ds")
+
+    def test_build_hub_health_top_issue_stays_pure_for_synthetic_fixtures(self):
+        """Si ningún dataset de `entries` existe en el registry (fixtures
+        sintéticos como en test_build_status_text_includes_top_issue_reason_and_action),
+        build_hub_health no debe filtrar — de lo contrario rompería la pureza
+        que necesitan los tests unitarios que no dependen del repo real."""
+        import tempfile
+
+        from src import pipeline_status_utils
+
+        registry = [
+            {
+                "dataset": "real_public_dataset",
+                "publication_track": "stable_publishable",
+                "public_bundle_eligible": True,
+            },
+        ]
+        metadata = {
+            "generated_at_utc": "2026-07-08T00:00:00+00:00",
+            "datasets": {
+                "alpha": self._issue_dataset(source_mode="live", warning_count=0),
+                "beta": self._issue_dataset(source_mode="live", warning_count=3),
+            },
+            "validations": {
+                "alpha": self._issue_validation(0),
+                "beta": self._issue_validation(3),
+            },
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            registry_path = Path(tmpdir) / "source_registry.json"
+            registry_path.write_text(json.dumps(registry), encoding="utf-8")
+            with patch.object(pipeline_status_utils, "SOURCE_REGISTRY_PATH", registry_path):
+                health = build_hub_health(metadata)
+
+        # beta tiene warnings y ninguno de los dos datasets está en el
+        # registry de prueba, así que debe ganar por atención sin filtrar.
+        self.assertEqual(health["top_issue"]["dataset"], "beta")
+
+    def test_build_hub_health_top_issue_unfiltered_when_registry_missing(self):
+        """Si source_registry.json no existe (contexto empaquetado/instalado),
+        build_hub_health degrada con gracia al comportamiento sin filtro en
+        vez de lanzar una excepción."""
+        import tempfile
+
+        from src import pipeline_status_utils
+
+        metadata = {
+            "generated_at_utc": "2026-07-08T00:00:00+00:00",
+            "datasets": {
+                "alpha": self._issue_dataset(source_mode="live", warning_count=0),
+                "beta": self._issue_dataset(source_mode="live", warning_count=2),
+            },
+            "validations": {
+                "alpha": self._issue_validation(0),
+                "beta": self._issue_validation(2),
+            },
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            missing_path = Path(tmpdir) / "does_not_exist.json"
+            with patch.object(pipeline_status_utils, "SOURCE_REGISTRY_PATH", missing_path):
+                health = build_hub_health(metadata)
+
+        self.assertEqual(health["top_issue"]["dataset"], "beta")
+
+    def test_load_source_registry_datasets_splits_public_and_all(self):
+        import tempfile
+
+        from src.pipeline_status_utils import _load_source_registry_datasets
+
+        registry = [
+            {
+                "dataset": "public_a",
+                "publication_track": "stable_publishable",
+                "public_bundle_eligible": True,
+            },
+            {
+                "dataset": "public_but_ineligible",
+                "publication_track": "stable_publishable",
+                "public_bundle_eligible": False,
+            },
+            {
+                "dataset": "candidate_a",
+                "publication_track": "candidate",
+                "public_bundle_eligible": False,
+            },
+        ]
+        with tempfile.TemporaryDirectory() as tmpdir:
+            registry_path = Path(tmpdir) / "source_registry.json"
+            registry_path.write_text(json.dumps(registry), encoding="utf-8")
+            from src import pipeline_status_utils
+
+            with patch.object(pipeline_status_utils, "SOURCE_REGISTRY_PATH", registry_path):
+                all_names, public_names = _load_source_registry_datasets()
+
+        self.assertEqual(all_names, {"public_a", "public_but_ineligible", "candidate_a"})
+        self.assertEqual(public_names, {"public_a"})
+
+    def test_load_source_registry_datasets_missing_file_returns_empty_sets(self):
+        import tempfile
+
+        from src import pipeline_status_utils
+        from src.pipeline_status_utils import _load_source_registry_datasets
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            missing_path = Path(tmpdir) / "does_not_exist.json"
+            with patch.object(pipeline_status_utils, "SOURCE_REGISTRY_PATH", missing_path):
+                all_names, public_names = _load_source_registry_datasets()
+
+        self.assertEqual(all_names, set())
+        self.assertEqual(public_names, set())
 
 
 class ValidatorTests(unittest.TestCase):
@@ -2168,6 +2397,324 @@ class PipelineStatusUtilsTests(unittest.TestCase):
             format_reuse_policy({"status": "open-attribution", "license": "CC-BY"}),
         )
         self.assertEqual(format_reuse_policy({"status": "custom"}), "custom")
+
+
+class ReportsBuilderTests(unittest.TestCase):
+    """Tests para src/builders/reports.py (build_dev_db.py._generate_reports)."""
+
+    @staticmethod
+    def _catalog_entry(dataset, source_mode, warnings=None):
+        return {
+            "dataset": dataset,
+            "source_name": f"{dataset} source",
+            "source_url": f"https://example.cl/{dataset}",
+            "source_mode": source_mode,
+            "source_detail": "public_api",
+            "refreshed_at_utc": "2026-07-08T00:00:00+00:00",
+            "freshness": {"status": "fresh", "age_hours": 1.0, "max_age_hours": 24},
+            "reuse_policy": {"status": "open-attribution"},
+            "coverage": {"status": "full", "coverage_ratio": 1.0, "summary": "Completa"},
+            "degradation": {"status": "none"},
+            "drift": {"status": "healthy"},
+            "warnings": warnings or [],
+            "notes": [],
+        }
+
+    def test_build_provenance_report_counts_monthly_as_live(self):
+        """Regresión: source_mode="monthly" (finanzas_municipales) debe sumar a
+        live_count, no quedar fuera de live_count Y fallback_count a la vez —
+        eso rompía la invariante live_count + fallback_count == dataset_count
+        que valida test_provenance_report en test_chile_hub.py."""
+        from src.builders.reports import build_provenance_report
+
+        catalog = {
+            "generated_at_utc": "2026-07-08T00:00:00+00:00",
+            "datasets": [
+                self._catalog_entry("a_live", "live"),
+                self._catalog_entry("b_monthly", "monthly"),
+                self._catalog_entry("c_fallback", "fallback"),
+            ],
+        }
+
+        report = build_provenance_report(catalog)
+
+        self.assertEqual(report["dataset_count"], 3)
+        self.assertEqual(report["live_count"], 2)
+        self.assertEqual(report["fallback_count"], 1)
+        self.assertEqual(report["live_count"] + report["fallback_count"], report["dataset_count"])
+
+    def test_build_drift_report_fallback_count_excludes_monthly(self):
+        from src.builders.reports import build_drift_report
+
+        catalog = {
+            "generated_at_utc": "2026-07-08T00:00:00+00:00",
+            "datasets": [
+                self._catalog_entry("a_live", "live"),
+                self._catalog_entry("b_monthly", "monthly"),
+                self._catalog_entry("c_fallback", "fallback"),
+            ],
+        }
+
+        report = build_drift_report(catalog)
+
+        self.assertEqual(report["dataset_count"], 3)
+        self.assertEqual(report["fallback_count"], 1)
+
+    def test_build_hub_status_forwards_health_fields(self):
+        from src.builders.reports import build_hub_status
+
+        health = {
+            "generated_at_utc": "2026-07-08T00:00:00+00:00",
+            "overall_status": "warn",
+            "dataset_count": 3,
+            "live_count": 2,
+            "fallback_count": 1,
+            "stale_count": 0,
+            "drifted_count": 1,
+            "degraded_count": 0,
+            "warning_count": 2,
+            "top_issue": {"dataset": "c_fallback"},
+            "top_issue_summary": "c_fallback: algo pasó",
+        }
+
+        status = build_hub_status(health)
+
+        self.assertEqual(status["overall_status"], "warn")
+        self.assertEqual(status["live_count"], 2)
+        self.assertEqual(status["top_issue"]["dataset"], "c_fallback")
+
+
+class HubBundleCandidateDatasetTests(unittest.TestCase):
+    """Tests para write_hub_bundle_json (src/builders/artifacts.py), en
+    particular el filtrado de candidate_datasets/candidate_dataset_count que
+    causó una expectativa incorrecta al arreglar Pipeline Check #270: solo
+    los datasets candidate que YA tienen salidas reales en dataset_catalog
+    (outputs configurados) aparecen ahí — los "próximamente" sin outputs
+    (delincuencia_comunal, autoridades_locales) nunca entran, aunque estén
+    en el registry como candidate.
+    """
+
+    @staticmethod
+    def _minimal_pipeline_metadata():
+        return {"generated_at_utc": "2026-07-08T00:00:00+00:00", "version": "1.0.0"}
+
+    @staticmethod
+    def _minimal_hub_health():
+        return {
+            "overall_status": "warn",
+            "datasets": [],
+            "top_issue": None,
+            "top_issue_summary": "Sin top issue activo.",
+        }
+
+    @staticmethod
+    def _minimal_artifact_manifest():
+        return {"artifacts": [], "packages": []}
+
+    @staticmethod
+    def _catalog_dataset(name):
+        return {
+            "dataset": name,
+            "source_name": f"{name} source",
+            "source_url": f"https://example.cl/{name}",
+            "source_mode": "live",
+            "source_detail": "public_api",
+            "refreshed_at_utc": "2026-07-08T00:00:00+00:00",
+            "record_count": 1,
+            "freshness": {"status": "fresh"},
+            "coverage": {"status": "full"},
+            "degradation": {"status": "none"},
+            "drift": {"status": "healthy"},
+            "reuse_policy": {"status": "open-attribution"},
+            "warnings": [],
+        }
+
+    def test_candidate_dataset_count_excludes_candidates_without_catalog_outputs(self):
+        from src.builders import artifacts
+
+        registry = [
+            {
+                "dataset": "public_ds",
+                "publication_track": "stable_publishable",
+                "public_bundle_eligible": True,
+            },
+            {
+                "dataset": "candidate_with_outputs",
+                "publication_track": "candidate",
+                "public_bundle_eligible": False,
+            },
+            {
+                "dataset": "candidate_coming_soon",
+                "publication_track": "candidate",
+                "public_bundle_eligible": False,
+            },
+        ]
+        # dataset_catalog solo trae datasets con outputs reales;
+        # candidate_coming_soon nunca aparece ahí ("próximamente").
+        dataset_catalog = {
+            "dataset_count": 2,
+            "datasets": [
+                self._catalog_dataset("public_ds"),
+                self._catalog_dataset("candidate_with_outputs"),
+            ],
+        }
+
+        with (
+            tempfile.TemporaryDirectory() as tmpdir,
+            patch.object(artifacts, "load_source_registry", return_value=registry),
+            patch.object(artifacts, "NORMALIZED_DIR", tmpdir),
+        ):
+            _, bundle = artifacts.write_hub_bundle_json(
+                self._minimal_pipeline_metadata(),
+                self._minimal_hub_health(),
+                dataset_catalog,
+                self._minimal_artifact_manifest(),
+            )
+
+        self.assertEqual(bundle["public_dataset_count"], 1)
+        self.assertEqual(bundle["candidate_dataset_count"], 1)
+        candidate_names = {e["dataset"] for e in bundle["candidate_datasets"]}
+        self.assertEqual(candidate_names, {"candidate_with_outputs"})
+        self.assertNotIn("candidate_coming_soon", candidate_names)
+
+    def test_stable_publishable_dataset_appears_in_public_datasets_list(self):
+        from src.builders import artifacts
+
+        registry = [
+            {
+                "dataset": "public_ds",
+                "publication_track": "stable_publishable",
+                "public_bundle_eligible": True,
+            },
+        ]
+        dataset_catalog = {
+            "dataset_count": 1,
+            "datasets": [self._catalog_dataset("public_ds")],
+        }
+
+        with (
+            tempfile.TemporaryDirectory() as tmpdir,
+            patch.object(artifacts, "load_source_registry", return_value=registry),
+            patch.object(artifacts, "NORMALIZED_DIR", tmpdir),
+        ):
+            _, bundle = artifacts.write_hub_bundle_json(
+                self._minimal_pipeline_metadata(),
+                self._minimal_hub_health(),
+                dataset_catalog,
+                self._minimal_artifact_manifest(),
+            )
+
+        self.assertEqual(len(bundle["datasets"]), 1)
+        self.assertEqual(bundle["datasets"][0]["dataset"], "public_ds")
+        self.assertEqual(bundle["candidate_datasets"], [])
+
+
+_INDEX_HTML_FIXTURE = """<!DOCTYPE html>
+<html>
+<head>
+    <!-- START_DATA_CATALOG_JSON_LD -->
+    <script type="application/ld+json">
+    {"@context": "https://schema.org", "@type": "DataCatalog", "dataset": []}
+    </script>
+    <!-- END_DATA_CATALOG_JSON_LD -->
+</head>
+<body>old content https://cortega26.github.io/chile-hub/ more text</body>
+</html>
+"""
+
+_APP_JS_FIXTURE = """const PUBLIC_DATA_BASE = "https://stale.example.com/data/normalized";
+console.log(PUBLIC_DATA_BASE);
+"""
+
+
+class SyncLandingMetadataTests(unittest.TestCase):
+    """Tests para sync_landing_metadata (src/builders/landing.py): la función
+    que regenera el bloque JSON-LD de index.html y el PUBLIC_DATA_BASE de
+    app.js. Su desfase silencioso (un dataset agregado al registry sin volver
+    a correr build_dev_db.py) fue la causa raíz original de Pipeline Check
+    #270 — index.html llevaba sin el dataset autoridades_locales desde que se
+    mezcló, y el gate "Check build-synced files" no lo detectó hasta el
+    siguiente run programado.
+    """
+
+    def _write_fixtures(self, tmpdir):
+        index_path = Path(tmpdir) / "index.html"
+        app_path = Path(tmpdir) / "app.js"
+        index_path.write_text(_INDEX_HTML_FIXTURE, encoding="utf-8")
+        app_path.write_text(_APP_JS_FIXTURE, encoding="utf-8")
+        return index_path, app_path
+
+    def test_sync_landing_metadata_includes_every_catalog_dataset(self):
+        """Regresión directa: cada dataset de DATASET_CATALOG_CONFIG debe
+        aparecer en el JSON-LD regenerado — ninguno debe quedar afuera
+        silenciosamente (como pasó con autoridades_locales)."""
+        from src.builders import landing
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            index_path, _ = self._write_fixtures(tmpdir)
+            with patch.object(landing, "ROOT_DIR", tmpdir):
+                landing.sync_landing_metadata("https://example.cl/chile-hub/")
+
+            content = index_path.read_text(encoding="utf-8")
+            match = re.search(
+                r"<!-- START_DATA_CATALOG_JSON_LD -->.*?<!-- END_DATA_CATALOG_JSON_LD -->",
+                content,
+                flags=re.DOTALL,
+            )
+            self.assertIsNotNone(match)
+            script_match = re.search(
+                r'<script type="application/ld\+json">\s*(.*?)\s*</script>',
+                match.group(0),
+                flags=re.DOTALL,
+            )
+            catalog = json.loads(script_match.group(1))
+            dataset_names = {entry["url"].split("#dataset-")[1] for entry in catalog["dataset"]}
+            self.assertEqual(dataset_names, set(DATASET_CATALOG_CONFIG.keys()))
+
+    def test_sync_landing_metadata_rewrites_site_url_and_data_base(self):
+        from src.builders import landing
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            index_path, app_path = self._write_fixtures(tmpdir)
+            with patch.object(landing, "ROOT_DIR", tmpdir):
+                landing.sync_landing_metadata("https://example.cl/chile-hub/")
+
+            index_content = index_path.read_text(encoding="utf-8")
+            self.assertNotIn("https://cortega26.github.io/chile-hub/", index_content)
+            self.assertIn("https://example.cl/chile-hub/", index_content)
+
+            app_content = app_path.read_text(encoding="utf-8")
+            self.assertIn(
+                'const PUBLIC_DATA_BASE = "https://example.cl/chile-hub/data/normalized";',
+                app_content,
+            )
+            self.assertNotIn("stale.example.com", app_content)
+
+    def test_sync_landing_metadata_is_noop_when_already_in_sync(self):
+        """Corriendo dos veces con la misma URL, la segunda no debe reescribir
+        nada (mismo criterio que usa el gate "Check build-synced files")."""
+        from src.builders import landing
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            index_path, app_path = self._write_fixtures(tmpdir)
+            with patch.object(landing, "ROOT_DIR", tmpdir):
+                landing.sync_landing_metadata("https://example.cl/chile-hub/")
+                first_index = index_path.read_text(encoding="utf-8")
+                first_app = app_path.read_text(encoding="utf-8")
+
+                with patch("builtins.print") as mock_print:
+                    landing.sync_landing_metadata("https://example.cl/chile-hub/")
+
+            self.assertEqual(index_path.read_text(encoding="utf-8"), first_index)
+            self.assertEqual(app_path.read_text(encoding="utf-8"), first_app)
+            mock_print.assert_not_called()
+
+    def test_sync_landing_metadata_missing_files_does_not_raise(self):
+        from src.builders import landing
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with patch.object(landing, "ROOT_DIR", tmpdir):
+                landing.sync_landing_metadata("https://example.cl/chile-hub/")
 
 
 if __name__ == "__main__":
