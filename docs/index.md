@@ -26,7 +26,7 @@ print(comunas.head())
 | --- | --- |
 | Descargar o explorar los artefactos publicados | [Sitio público](https://tooltician.com/chile-hub/) |
 | Instalar el paquete y verificar datos locales | [Instalación](installation.md) |
-| Ver métodos, clases y excepciones del paquete | [Referencia de API](reference.md) |
+| Ver métodos, clases y excepciones del paquete | [Referencia de API](api.md) |
 | Entender qué datasets entran al hub | [Criterios de inclusión](dataset-inclusion-criteria.md) |
 | Revisar estabilidad de esquemas y versionado | [Compatibilidad de datasets](dataset-compatibility-policy.md) y [Política de versionado](versioning-policy.md) |
 

@@ -17,6 +17,8 @@ if str(ROOT_DIR) not in sys.path:
 PIPELINE_CHECK_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "pipeline-check.yml"
 MONTHLY_SCRAPE_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "monthly-scrape.yml"
 MAKEFILE = ROOT_DIR / "Makefile"
+MKDOCS_CONFIG = ROOT_DIR / "mkdocs.yml"
+DOCS_DIR = ROOT_DIR / "docs"
 
 
 class SinimDailyJobGuardrailTests(unittest.TestCase):
@@ -63,6 +65,22 @@ class SinimDailyJobGuardrailTests(unittest.TestCase):
         content = MONTHLY_SCRAPE_WORKFLOW.read_text(encoding="utf-8")
         self.assertIn('git add -f "$path"', content)
         self.assertNotIn('git add "$path"', content)
+
+
+class MkDocsReferenceSlugGuardrailTests(unittest.TestCase):
+    """Regresión: la documentación se publica bajo /reference/ y la página de
+    API también se llamaba reference.md, por lo que los enlaces generados desde
+    el home terminaban en /reference/reference/. La página de API debe usar un
+    slug distinto al directorio publicado.
+    """
+
+    def test_api_reference_page_slug_does_not_duplicate_site_dir(self):
+        content = MKDOCS_CONFIG.read_text(encoding="utf-8")
+        self.assertIn("site_dir: reference", content)
+        self.assertIn("- Referencia de API: api.md", content)
+        self.assertNotIn("- Referencia de API: reference.md", content)
+        self.assertTrue((DOCS_DIR / "api.md").is_file())
+        self.assertFalse((DOCS_DIR / "reference.md").exists())
 
 
 def _extract_make_target(makefile_content: str, target_name: str) -> str:

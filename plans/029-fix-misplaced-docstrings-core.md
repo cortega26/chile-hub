@@ -28,7 +28,7 @@ mechanical refactor artifact: a `dataset_name = _resolve_dataset_name(dataset_na
 was inserted at the top of each method, pushing the docstring to second position. The
 result is that `ChileHub.load_polars`, `ChileHub.validate_dataset`, and
 `ChileHub.validate_user_data` all have `__doc__ is None`, so they **vanish from the
-mkdocstrings API reference** (`docs/reference.md` → the published docs site) and from
+mkdocstrings API reference** (`docs/api.md` → the published docs site) and from
 `help(ChileHub.load_polars)`. These are core public API methods; their reference docs
 currently silently do not render.
 
