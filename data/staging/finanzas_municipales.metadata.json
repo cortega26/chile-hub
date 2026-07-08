@@ -1,0 +1,34 @@
+{
+  "dataset": "finanzas_municipales",
+  "source_name": "SINIM - SUBDERE",
+  "source_url": "https://datos.sinim.gov.cl/datos_municipales.php",
+  "source_mode": "monthly",
+  "source_detail": "curated_fallback_pending_direct_export",
+  "refreshed_at_utc": "2026-07-08T19:27:07.437842+00:00",
+  "record_count": 345,
+  "fields": [
+    "anio",
+    "codigo_comuna",
+    "nombre_comuna",
+    "ingresos_totales",
+    "gastos_totales",
+    "ingresos_propios_permanentes",
+    "fondo_comun_municipal",
+    "gasto_personal",
+    "gasto_inversion"
+  ],
+  "notes": [
+    "live: Playwright configurando filtros SINIM",
+    "live: descargando XML Spreadsheet",
+    "live: parseando XML Spreadsheet",
+    "live: 345 municipios extraídos (snapshot: sinim_finanzas_municipales_20260708T192459Z.xlsx)"
+  ],
+  "reuse_policy": {
+    "status": "public-api-review-terms",
+    "license": "CC BY 2.0 CL. El sitio SINIM declara 'sin fines comerciales'. Chile-hub es un proyecto no comercial (MIT, sin revenue). Atribución requerida a SINIM/SUBDERE/Ministerio del Interior.",
+    "license_url": "https://datos.sinim.gov.cl/",
+    "attribution_required": true,
+    "redistribution_ok": true,
+    "summary": "Datos presupuestarios municipales (ingresos, gastos, inversión, personal, Fondo Común Municipal) desde SINIM/SUBDERE. Uso no comercial, citar fuente. Revisión legal: docs/legal/fase-3-legal-review.md"
+  }
+}
