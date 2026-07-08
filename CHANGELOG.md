@@ -2,7 +2,7 @@
 
 Este proyecto usa Conventional Commits y `python-semantic-release` para versionar
 las publicaciones en PyPI. Los commits de actualización de datos
-(`chore(data): daily refresh [skip ci]`) no representan lanzamientos de software
+(`chore(data): daily refresh [skip ci]`) no representan releases de software
 y se excluyen intencionalmente de estas notas.
 
 Los bloques `> 🎯 **Resumen:**` que acompañan a algunos releases minor/major son
@@ -35,10 +35,10 @@ son la bitácora automática generada desde los Conventional Commits.
 
 ### Corregido
 
-- **data**: Correct pobreza_comunal XLSX column mapping; sync tests with registry
+- **datos**: Corrige el mapeo de columnas XLSX de pobreza_comunal y sincroniza las pruebas con el registro
   ([`3f968ab`](https://github.com/cortega26/chile-hub/commit/3f968ab2a4765a7761d16d689199ccbce6aa9f5c))
 
-- **landing**: Keep top_issue link on the public bundle (build-time only)
+- **despliegue**: Mantiene el enlace top_issue en el bundle público solo durante el build
   ([`9b85a23`](https://github.com/cortega26/chile-hub/commit/9b85a2309d55d54b044537fefbaa5fe6a11369a5))
 
 
@@ -46,7 +46,7 @@ son la bitácora automática generada desde los Conventional Commits.
 
 ### Corregido
 
-- **ci**: Stop daily job from clobbering the monthly SINIM snapshot
+- **ci**: Evita que el job diario sobrescriba el snapshot mensual de SINIM
   ([`5ba983e`](https://github.com/cortega26/chile-hub/commit/5ba983e9b31ab7e32efa39348618f70ad052ba7f))
 
 
@@ -54,7 +54,7 @@ son la bitácora automática generada desde los Conventional Commits.
 
 ### Corregido
 
-- **ci**: Resync index.html JSON-LD with source_registry (Pipeline Check #270)
+- **ci**: Resincroniza el JSON-LD de index.html con source_registry (Pipeline Check #270)
   ([`fcc7f6f`](https://github.com/cortega26/chile-hub/commit/fcc7f6f11b809dfe299fd597a60afdb3d2f5c4ee))
 
 
@@ -62,7 +62,7 @@ son la bitácora automática generada desde los Conventional Commits.
 
 ### Corregido
 
-- **ci**: Force-add gitignored monthly scrape outputs; deprecate consumo_electrico_comunal
+- **ci**: Fuerza la inclusión de salidas mensuales de scraping ignoradas por git y depreca consumo_electrico_comunal
   ([`57e6eaf`](https://github.com/cortega26/chile-hub/commit/57e6eafb5492878f08395419e4d624d0aaaea314))
 
 
@@ -70,16 +70,16 @@ son la bitácora automática generada desde los Conventional Commits.
 
 ### Corregido
 
-- **ci**: Make monthly scrape commits tolerant
+- **ci**: Hace tolerantes los commits del scraping mensual
   ([`974b502`](https://github.com/cortega26/chile-hub/commit/974b502cb4f6975e168f6ba6adbcfe312a085ea2))
 
-- **ci**: Quiet CodeQL Python legacy probe
+- **ci**: Silencia la sonda heredada de Python en CodeQL
   ([`f056684`](https://github.com/cortega26/chile-hub/commit/f0566844d5f02a5153f5385f20306849eb1fd31f))
 
-- **ci**: Set CodeQL Python executable
+- **ci**: Configura el ejecutable de Python para CodeQL
   ([`0229cc3`](https://github.com/cortega26/chile-hub/commit/0229cc32d89662fed27ad1a0924d4ac122ff9f7a))
 
-- **ci**: Stage monthly scrape outputs safely
+- **ci**: Prepara de forma segura las salidas del scraping mensual
   ([`f0f8096`](https://github.com/cortega26/chile-hub/commit/f0f80964b83f88fb0538bc4bb8faeb033b0c56ea))
 
 
@@ -87,10 +87,10 @@ son la bitácora automática generada desde los Conventional Commits.
 
 ### Corregido
 
-- **ci**: Pin CodeQL Python extraction version
+- **ci**: Fija la versión de extracción Python de CodeQL
   ([`e2f3710`](https://github.com/cortega26/chile-hub/commit/e2f3710676899ffe13ded10f335cf3d24a47b62b))
 
-- **ci**: Redeploy Pages after bot-authored commits to main
+- **ci**: Redespliega Pages después de commits automatizados en main
   ([`fd23f12`](https://github.com/cortega26/chile-hub/commit/fd23f120ddbaa719771ff03612967aa25ec37780))
 
 
@@ -98,7 +98,7 @@ son la bitácora automática generada desde los Conventional Commits.
 
 ### Corregido
 
-- **ci**: Clarify readiness and quiet release logs
+- **ci**: Aclara la preparación y reduce el ruido de los logs de release
   ([`dc5a882`](https://github.com/cortega26/chile-hub/commit/dc5a88259eebcc433e09a8e957fa6369e3f6e884))
 
 
@@ -106,7 +106,7 @@ son la bitácora automática generada desde los Conventional Commits.
 
 ### Corregido
 
-- **ci**: Harden release artifact gates
+- **ci**: Endurece las compuertas de artefactos de release
   ([`4ebca99`](https://github.com/cortega26/chile-hub/commit/4ebca99768d2f99415f221a41fda226fcebfbfa0))
 
 
@@ -119,7 +119,7 @@ son la bitácora automática generada desde los Conventional Commits.
 
 ### Mantenimiento
 
-- **deps**: Sync uv lock after release bump
+- **dependencias**: Sincroniza uv.lock después del incremento de versión
   ([`0a95440`](https://github.com/cortega26/chile-hub/commit/0a95440635c552c960a9115ea9d72482169d441a))
 
 
@@ -127,12 +127,12 @@ son la bitácora automática generada desde los Conventional Commits.
 
 ### Corregido
 
-- **extractors**: Preserva ceros CUT y usa isoformat en consumo/pobreza
+- **extractores**: Preserva ceros CUT y usa isoformat en consumo/pobreza
   ([`3ad6ab9`](https://github.com/cortega26/chile-hub/commit/3ad6ab9a378bb8e42eec89bae745f1c525d05b83))
 
 ### Mantenimiento
 
-- **deps**: Regenera uv.lock y añade guardia --locked en CI
+- **dependencias**: Regenera uv.lock y añade guardia --locked en CI
   ([`a6b22b8`](https://github.com/cortega26/chile-hub/commit/a6b22b82cc0e1702b9a1b33138054204ad1e03ca))
 
 
@@ -140,7 +140,7 @@ son la bitácora automática generada desde los Conventional Commits.
 
 ### Corregido
 
-- **ci**: Sync codeql-action init/analyze versions and group future bumps
+- **ci**: Sincroniza versiones de inicio/análisis de codeql-action y agrupa incrementos futuros
   ([#25](https://github.com/cortega26/chile-hub/pull/25),
   [`b80e728`](https://github.com/cortega26/chile-hub/commit/b80e728de6af506d10e700223533c3a5ff854834))
 
@@ -155,53 +155,53 @@ son la bitácora automática generada desde los Conventional Commits.
 
 ### Mantenimiento
 
-- **deps**: Bump astral-sh/setup-uv from 8.2.0 to 8.3.0
+- **dependencias**: Actualiza astral-sh/setup-uv de 8.2.0 a 8.3.0
   ([#23](https://github.com/cortega26/chile-hub/pull/23),
   [`5671b54`](https://github.com/cortega26/chile-hub/commit/5671b545a8014f6d15bed9134dc06843319eae05))
 
-- **deps-dev**: Bump the python-dev group with 2 updates
+- **dependencias-dev**: Actualiza el grupo python-dev con 2 cambios
   ([#20](https://github.com/cortega26/chile-hub/pull/20),
   [`23ac012`](https://github.com/cortega26/chile-hub/commit/23ac0126273f56b0ac3723996bd34ee40e47c742))
 
 ### Documentación
 
-- **site**: Publica referencia de API con MkDocs Material (Plan 021)
+- **sitio**: Publica referencia de API con MkDocs Material (Plan 021)
   ([#24](https://github.com/cortega26/chile-hub/pull/24),
   [`b3a8deb`](https://github.com/cortega26/chile-hub/commit/b3a8deb5df7cf7bfe4bfd263f550169de5ffc477))
 
 ### Agregado
 
-- **data**: Autoridades_electas v1 — diputados con distrito vía Scrapling (Plan 023 Ola A)
+- **datos**: Autoridades_electas v1 — diputados con distrito vía Scrapling (Plan 023 Ola A)
   ([#24](https://github.com/cortega26/chile-hub/pull/24),
   [`b3a8deb`](https://github.com/cortega26/chile-hub/commit/b3a8deb5df7cf7bfe4bfd263f550169de5ffc477))
 
-- **data**: Autoridades_electas — cargo senadores + cableado candidate (Plan 023)
+- **datos**: Autoridades_electas — cargo senadores + cableado candidate (Plan 023)
   ([#24](https://github.com/cortega26/chile-hub/pull/24),
   [`b3a8deb`](https://github.com/cortega26/chile-hub/commit/b3a8deb5df7cf7bfe4bfd263f550169de5ffc477))
 
-- **data**: Autoridades_locales — alcaldes (345 comunas, best-effort) vía API MediaWiki
+- **datos**: Autoridades_locales — alcaldes (345 comunas, con mejor esfuerzo) vía API MediaWiki
   ([#24](https://github.com/cortega26/chile-hub/pull/24),
   [`b3a8deb`](https://github.com/cortega26/chile-hub/commit/b3a8deb5df7cf7bfe4bfd263f550169de5ffc477))
 
-- **data**: Autoridades_locales — gobernadores (Wikipedia CC-BY-SA, segregado) (Plan 023)
+- **datos**: Autoridades_locales — gobernadores (Wikipedia CC-BY-SA, segregado) (Plan 023)
   ([#24](https://github.com/cortega26/chile-hub/pull/24),
   [`b3a8deb`](https://github.com/cortega26/chile-hub/commit/b3a8deb5df7cf7bfe4bfd263f550169de5ffc477))
 
-- **data**: Extractor partidos_politicos desde Cámara + Plan 023
+- **datos**: Extractor partidos_politicos desde Cámara + Plan 023
   ([#24](https://github.com/cortega26/chile-hub/pull/24),
   [`b3a8deb`](https://github.com/cortega26/chile-hub/commit/b3a8deb5df7cf7bfe4bfd263f550169de5ffc477))
 
-- **data**: Promueve partidos_politicos y autoridades_electas a stable_publishable
+- **datos**: Promueve partidos_politicos y autoridades_electas a stable_publishable
   ([#24](https://github.com/cortega26/chile-hub/pull/24),
   [`b3a8deb`](https://github.com/cortega26/chile-hub/commit/b3a8deb5df7cf7bfe4bfd263f550169de5ffc477))
 
-- **data**: Registra partidos_politicos en carril candidate (Plan 023)
+- **datos**: Registra partidos_politicos en carril candidate (Plan 023)
   ([#24](https://github.com/cortega26/chile-hub/pull/24),
   [`b3a8deb`](https://github.com/cortega26/chile-hub/commit/b3a8deb5df7cf7bfe4bfd263f550169de5ffc477))
 
-### Tests
+### Pruebas
 
-- **coverage**: Mide todo el pipeline, no solo la librería (TC-02)
+- **cobertura**: Mide todo el pipeline, no solo la librería (TC-02)
   ([#24](https://github.com/cortega26/chile-hub/pull/24),
   [`b3a8deb`](https://github.com/cortega26/chile-hub/commit/b3a8deb5df7cf7bfe4bfd263f550169de5ffc477))
 
@@ -210,7 +210,7 @@ son la bitácora automática generada desde los Conventional Commits.
 
 ### Corregido
 
-- **ci**: Remove obsolete Node 24 forcing flag
+- **ci**: Elimina la bandera obsoleta que forzaba Node 24
   ([#19](https://github.com/cortega26/chile-hub/pull/19),
   [`4ae8957`](https://github.com/cortega26/chile-hub/commit/4ae8957f85ffbb8bddffabe065cdb20f967b3ff7))
 
@@ -249,10 +249,10 @@ son la bitácora automática generada desde los Conventional Commits.
 
 ### Corregido
 
-- CI readiness — fallback para pobreza_comunal y consumo_electrico_comunal + archivar Plan 022
+- Preparación de CI — respaldo para pobreza_comunal y consumo_electrico_comunal + archivar Plan 022
   ([`b0ba125`](https://github.com/cortega26/chile-hub/commit/b0ba12579aef7c56980bdcd7b23dc12a85f72e24))
 
-- Landing — añade pobreza_comunal y consumo_electrico_comunal a categorías CATEGORIES
+- Despliegue — añade pobreza_comunal y consumo_electrico_comunal a categorías CATEGORIES
   ([`63244a5`](https://github.com/cortega26/chile-hub/commit/63244a54ba8d2bce1e0287bb3a5327e7b86fa41b))
 
 ### Agregado
@@ -266,7 +266,7 @@ son la bitácora automática generada desde los Conventional Commits.
 - Fase 3 — señales pasivas operativas y sanación de fuentes vía scraping (plan 022)
   ([`ca698ea`](https://github.com/cortega26/chile-hub/commit/ca698ea19001b117703d60b62afa669e37b9ccc9))
 
-- Fase 4 — distribución sobre lo validado + Ola B2 — CEAD delincuencia + electoral research (plan
+- Fase 4 — distribución sobre lo validado + Ola B2 — CEAD delincuencia + investigación electoral (plan
   022)
   ([`8e3e579`](https://github.com/cortega26/chile-hub/commit/8e3e579bdb26cc888c637b95f5f257dc352965d4))
 
@@ -275,56 +275,56 @@ son la bitácora automática generada desde los Conventional Commits.
 
 ### Corregido
 
-- **badge**: Use shields.io URL and move to last position
+- **insignia**: Usa URL de shields.io y la mueve a la última posición
   ([`46604ca`](https://github.com/cortega26/chile-hub/commit/46604ca028991630d7d497d669d358247b049638))
 
 ### Mantenimiento
 
-- **deps**: Bump actions/cache from 5.0.5 to 6.1.0
+- **dependencias**: Actualiza actions/cache de 5.0.5 a 6.1.0
   ([#16](https://github.com/cortega26/chile-hub/pull/16),
   [`d61298b`](https://github.com/cortega26/chile-hub/commit/d61298becc001f500b329c0dec92967dd76545f2))
 
-- **deps**: Bump actions/setup-python from 6.2.0 to 6.3.0
+- **dependencias**: Actualiza actions/setup-python de 6.2.0 a 6.3.0
   ([#17](https://github.com/cortega26/chile-hub/pull/17),
   [`491847f`](https://github.com/cortega26/chile-hub/commit/491847fed3cb2a5f08340abb1d1ef4430ec1f425))
 
-- **deps-dev**: Bump the python-dev group with 2 updates
+- **dependencias-dev**: Actualiza el grupo python-dev con 2 cambios
   ([#15](https://github.com/cortega26/chile-hub/pull/15),
   [`56a3843`](https://github.com/cortega26/chile-hub/commit/56a3843e4cce9480e8ae9c5d5df936419625d636))
 
 
 ## 1.17.0 - 2026-06-30
 
-> 🎯 **Resumen:** Este release cierra el backlog estratégico de ingeniería y posiciona
+> 🎯 **Resumen:** Este release cierra los pendientes estratégicos de ingeniería y posiciona
 > a chile-hub como parte del ecosistema Tooltician. Se completan tres frentes diferidos
-> desde la auditoría inicial: contratos de tipos en runtime (`contracts.py`), el enum
-> `Dataset` que unifica la referencia a capas, y el dashboard de salud programático
+> desde la auditoría inicial: contratos de tipos en tiempo de ejecución (`contracts.py`), el enum
+> `Dataset` que unifica la referencia a capas, y el panel de salud programático
 > (`hub_health.json`). La librería ahora valida tipos al importar y expone un panel de
 > salud consultable sin abrir un Parquet. La identidad visual se alinea con Tooltician
-> (badge + tagline en español), cerrando la brecha entre la ingeniería real y su cara
+> (insignia + lema en español), cerrando la brecha entre la ingeniería real y su cara
 > pública. Este release es la base técnica sobre la que se construye la narrativa de
 > confiabilidad del Plan 022.
 
 ### Documentación
 
-- **badge**: Badge Tooltician -> Parte de Tooltician
+- **insignia**: Insignia Tooltician -> Parte de Tooltician
   ([`74c0064`](https://github.com/cortega26/chile-hub/commit/74c00645f3e94e69e5f1802943d21e8c6582be33))
 
-- **readme**: Añadir badge y tagline de Tooltician ecosystem
+- **readme**: Añade insignia y lema del ecosistema Tooltician
   ([`39bda6a`](https://github.com/cortega26/chile-hub/commit/39bda6a395cbbbbde323bf32da9d716d0e21dff7))
 
-- **readme**: Badge y tagline Tooltician en español
+- **readme**: Insignia y lema Tooltician en español
   ([`0d8c179`](https://github.com/cortega26/chile-hub/commit/0d8c179770231ac433870f2370564327f70d0cb0))
 
 ### Agregado
 
-- **backlog**: Completar #2 #3 #5 — contratos runtime, enum Dataset, dashboard salud
+- **pendientes**: Completa #2 #3 #5 — contratos en tiempo de ejecución, enum Dataset y panel de salud
   ([`a3ef978`](https://github.com/cortega26/chile-hub/commit/a3ef9782fb3c4dbf557d63d7fda226c15c42ac2a))
 
 
 ## 1.16.0 - 2026-06-29
 
-> 🎯 **Resumen:** Release de madurez de UX y estándares. La CLI migra de padding manual
+> 🎯 **Resumen:** Lanzamiento de madurez de UX y estándares. La CLI migra de relleno manual
 > a tablas formateadas con `rich` (Plan 018): `chile-hub info`, `list datasets` y
 > `show` ahora renderizan tablas con bordes, colores y columnas auto-ajustadas. El
 > pipeline publica `datapackage.json` en formato Frictionless Data (Plan 019), derivado
@@ -335,24 +335,24 @@ son la bitácora automática generada desde los Conventional Commits.
 
 ### Mantenimiento
 
-- **deps-dev**: Bump duckdb ([#10](https://github.com/cortega26/chile-hub/pull/10),
+- **dependencias-dev**: Actualiza duckdb ([#10](https://github.com/cortega26/chile-hub/pull/10),
   [`140c8ea`](https://github.com/cortega26/chile-hub/commit/140c8ea034c9068aabb9b108760c45e1fda08543))
 
-- **deps-dev**: Bump the python-dev group with 3 updates
+- **dependencias-dev**: Actualiza el grupo python-dev con 3 cambios
   ([#11](https://github.com/cortega26/chile-hub/pull/11),
   [`cd2e046`](https://github.com/cortega26/chile-hub/commit/cd2e0463af5e99dfcbc8eff0c70a188dcd0d1775))
 
-- **plans**: Archivar planes DONE y añadir instrucción de archivado automático
+- **planes**: Archiva planes DONE y añade instrucción de archivado automático
   ([`faf90c2`](https://github.com/cortega26/chile-hub/commit/faf90c2eb3859d5828d29125347babca9503df35))
 
 ### Agregado
 
-- **pipeline**: Publicar datapackage.json (Frictionless) derivado de contratos
+- **pipeline**: Publica datapackage.json (Frictionless) derivado de contratos
   ([`0d1fcc8`](https://github.com/cortega26/chile-hub/commit/0d1fcc80959d3dff06135f7ae8c73a11b21ea21c))
 
 ### Refactorizado
 
-- **cli**: Renderizar tablas con rich en vez de padding manual
+- **cli**: Renderiza tablas con rich en vez de relleno manual
   ([`85ef69f`](https://github.com/cortega26/chile-hub/commit/85ef69f61c341974de3e4f3f43c4eded24080963))
 
 
@@ -360,20 +360,20 @@ son la bitácora automática generada desde los Conventional Commits.
 
 ### Corregido
 
-- **build**: Mover ajuste de sys.path antes de importaciones de src.* en build_dev_db.py
+- **build**: Mueve ajuste de sys.path antes de importaciones de src.* en build_dev_db.py
   ([`643f89c`](https://github.com/cortega26/chile-hub/commit/643f89c8d289c87cff6f842be7f7fcfa3a8cffa0))
 
 ### Mantenimiento
 
-- **deps**: Bump actions/checkout from 6.0.3 to 7.0.0
+- **dependencias**: Actualiza actions/checkout de 6.0.3 a 7.0.0
   ([#12](https://github.com/cortega26/chile-hub/pull/12),
   [`581748f`](https://github.com/cortega26/chile-hub/commit/581748f34b2c20c6bb4dfe209571f2f02748085b))
 
-- **deps**: Bump astral-sh/setup-uv from 8.1.0 to 8.2.0
+- **dependencias**: Actualiza astral-sh/setup-uv de 8.1.0 a 8.2.0
   ([#13](https://github.com/cortega26/chile-hub/pull/13),
   [`79edd13`](https://github.com/cortega26/chile-hub/commit/79edd1351a6208bf245cddb513d4b0b929342bca))
 
-- **deps**: Bump codecov/codecov-action from 5 to 7
+- **dependencias**: Actualiza codecov/codecov-action de 5 a 7
   ([#14](https://github.com/cortega26/chile-hub/pull/14),
   [`3494e86`](https://github.com/cortega26/chile-hub/commit/3494e865489a578892f58edae52848ce5b84a237))
 
@@ -382,7 +382,7 @@ son la bitácora automática generada desde los Conventional Commits.
 - **changelog**: Actualizar registro de cambios y configurar generación automática en español
   ([`c0796f4`](https://github.com/cortega26/chile-hub/commit/c0796f48fe4c17e25395578a724f3451c5ab6991))
 
-- **datasets**: Evaluar candidatos y agregar estado under-review
+- **datasets**: Evalúa candidatos y agrega estado under-review
   ([`a0978a3`](https://github.com/cortega26/chile-hub/commit/a0978a38cf2889b19b65b88b610edf443d7ecfe4))
 
 
@@ -390,7 +390,7 @@ son la bitácora automática generada desde los Conventional Commits.
 
 ## 1.15.0 - 2026-06-21
 
-> 🎯 **Resumen:** Release de robustez de ingeniería. Todos los extractores HTTP ahora
+> 🎯 **Resumen:** Lanzamiento de robustez de ingeniería. Todos los extractores HTTP ahora
 > reintentan automáticamente con backoff exponencial (vía `tenacity`): los fallos
 > transitorios de red —frecuentes en CI y en portales gubernamentales— ya no rompen
 > el build. La gestión de dependencias migra a `uv` en todos los flujos de CI,
@@ -449,12 +449,12 @@ son la bitácora automática generada desde los Conventional Commits.
 
 - Incorporadas herramientas de calidad al entorno de desarrollo: `mypy` (tipado
   estático), `pip-audit` (auditoría de dependencias), `interrogate` (cobertura de
-  docstrings), `bandit` (escaneo de seguridad estático), `pytest-xdist` (tests en
-  paralelo), `hypothesis` (property-based testing) y `structlog` (logging
+  docstrings), `bandit` (escaneo de seguridad estático), `pytest-xdist` (pruebas en
+  paralelo), `hypothesis` (pruebas basadas en propiedades) y `structlog` (registro
   estructurado del pipeline).
 - Corregida compatibilidad de `pytest-xdist` en CI removiendo `-n auto` de
   `addopts`.
-- Reparadas insignias de Coverage y Data Freshness en el README.
+- Reparadas insignias de cobertura y frescura de datos en el README.
 
 ---
 
@@ -462,7 +462,7 @@ son la bitácora automática generada desde los Conventional Commits.
 
 ### Cambiado
 
-- Rediseño de la landing page con cajón lateral deslizante (_slide-over drawer_)
+- Rediseño de la landing page con cajón lateral deslizante
   para mostrar detalles de cada dataset, reemplazando el panel anterior. La
   navegación es ahora más fluida y funciona correctamente en dispositivos móviles.
 
@@ -472,12 +472,12 @@ son la bitácora automática generada desde los Conventional Commits.
 
 ### Agregado
 
-- Extractor live para **SIEDU** (Sistema de Indicadores y Estándares de Desarrollo
+- Extractor en vivo para **SIEDU** (Sistema de Indicadores y Estándares de Desarrollo
   Urbano del MINVU): descarga directa desde la API oficial, eliminando la
   dependencia de snapshots locales.
-- Extractor live para **MINEDUC Resultados Educacionales**: obtención en vivo desde
+- Extractor en vivo para **MINEDUC Resultados Educacionales**: obtención en vivo desde
   la fuente oficial del Ministerio de Educación.
-- Ambos datasets pasan de modo `fallback` a modo `live`, cerrando los Issues #6 y #7.
+- Ambos datasets pasan de modo `fallback` a modo `live`, cerrando las incidencias #6 y #7.
 
 ---
 
@@ -485,8 +485,8 @@ son la bitácora automática generada desde los Conventional Commits.
 
 ### Corregido
 
-- Corregida metadata `source_mode` engañosa en varios extractores; URLs alineadas
-  con los endpoints reales de cada fuente.
+- Corregidos metadatos `source_mode` engañosos en varios extractores; URLs alineadas
+  con los puntos de acceso reales de cada fuente.
 - Dataset SINIM degradado a carril `candidate` al confirmarse que su fuente requiere
   revisión de redistribución.
 
@@ -500,7 +500,7 @@ son la bitácora automática generada desde los Conventional Commits.
 - `ChileHub.validate_user_data()`: valida un DataFrame externo contra el esquema
   de un dataset del hub.
 - `ChileHub.search_datasets()`: búsqueda de datasets por palabras clave.
-- Flag `--exit-code` en la CLI para integración programática con scripts de CI y
+- Bandera `--exit-code` en la CLI para integración programática con scripts de CI y
   orquestación.
 
 ### Cambiado
@@ -511,7 +511,7 @@ son la bitácora automática generada desde los Conventional Commits.
 
 ### Corregido
 
-- Eliminada ventana TOCTOU en la descarga del bundle: el hash SHA-256 se calcula
+- Eliminada ventana TOCTOU en la descarga del paquete: el hash SHA-256 se calcula
   en tránsito, no sobre el archivo ya escrito en disco.
 - Verificación de integridad del binario `unrar` antes de invocarlo, evitando la
   ejecución de binarios no confiables.
@@ -540,7 +540,7 @@ son la bitácora automática generada desde los Conventional Commits.
 
 ### Corregido
 
-- Cierre correcto de respuestas HTTP mediante context manager en todos los extractores.
+- Cierre correcto de respuestas HTTP mediante context managers en todos los extractores.
 - Tipado estricto de excepciones: `except Exception` reemplazado por tipos
   específicos en extractores para evitar captura silenciosa de errores inesperados.
 - Añadida llamada `drop_nulls()` en `validate_censo_hogares_viviendas()` para
@@ -577,7 +577,7 @@ son la bitácora automática generada desde los Conventional Commits.
 - Implementación de mejoras prioritarias de la auditoría de calidad: context managers
   en todos los recursos externos, tipado estricto de excepciones y eliminación de
   condiciones de carrera en operaciones de archivo.
-- Backlog de mejoras estratégicas con roadmap priorizado documentado en
+- Pendientes de mejoras estratégicas con hoja de ruta priorizada documentada en
   `docs/backlog/`.
 
 ### Interno
@@ -594,7 +594,7 @@ son la bitácora automática generada desde los Conventional Commits.
 - Nuevo comando CLI `chile-hub export`: exporta un dataset a un archivo en el
   formato especificado (CSV, JSON, Parquet, Excel).
 - Nuevo comando CLI `chile-hub check-sources`: verifica el estado de accesibilidad
-  de las fuentes upstream en vivo.
+  de las fuentes de origen en vivo.
 - Rangos de versiones de dependencias flexibilizados en `pyproject.toml` para
   mejorar la compatibilidad de instalación en distintos entornos.
 
@@ -618,7 +618,7 @@ son la bitácora automática generada desde los Conventional Commits.
 ### Interno
 
 - Corregida instalación del paquete `chile_hub` en el job de CI.
-- `codecov-action` anclado al tag estable `v5` en lugar de un SHA de commit.
+- `codecov-action` anclado a la etiqueta estable `v5` en lugar de un SHA de confirmación.
 
 ---
 
@@ -643,7 +643,7 @@ son la bitácora automática generada desde los Conventional Commits.
 
 ### Corregido
 
-- Corrección en la suite de pruebas eliminando la dependencia directa en snapshots `raw` locales.
+- Corrección en la suite de pruebas eliminando la dependencia directa de snapshots `raw` locales.
 - Aseguramiento de `pyarrow` como dependencia explícita requerida para la exportación y registro de Polars con DuckDB.
 
 ## 1.3.0 - 2026-06-18
@@ -670,11 +670,11 @@ son la bitácora automática generada desde los Conventional Commits.
 
 ### Cambiado
 
-- Migración del despliegue de GitHub Pages al flujo moderno basado en GitHub Actions workflow.
+- Migración del despliegue de GitHub Pages al flujo moderno basado en GitHub Actions.
 
 ### Corregido
 
-- Control de clicks en las pestañas de curl para evitar errores interactivos en datasets que no generan salida JSON.
+- Control de clics en las pestañas de curl para evitar errores interactivos en datasets que no generan salida JSON.
 
 ## 1.2.0 - 2026-06-17
 
@@ -684,7 +684,7 @@ son la bitácora automática generada desde los Conventional Commits.
   Sociedades del Ministerio de Economía, ~1.57M registros con RUT, razón
   social, tipo societario y comuna tributaria).
 - Agregado `res_extractor.py` con obtención en vivo desde datos.gob.cl, snapshot
-  crudo, staging CSV y generación de metadatos.
+  cruda, staging CSV y generación de metadatos.
 - Agregada `validate_empresas()` en `src/validation.py` con verificaciones de
   integridad referencial contra el DPA.
 - Agregada lógica de división automática en `build_excel()` para datasets que
@@ -706,7 +706,7 @@ son la bitácora automática generada desde los Conventional Commits.
 
 ### Eliminado
 
-- `puntos_interes` (POIs de OpenStreetMap) — extractor, configuración, tests, CI y
+- `puntos_interes` (POI de OpenStreetMap) — extractor, configuración, pruebas, CI y
   documentación. La API de Overpass resultó demasiado inestable para CI; se
   reconsiderará cuando haya una fuente oficial chilena de POIs disponible.
   `validate_puntos_interes()` se conserva en `src/validation.py` para
@@ -726,7 +726,7 @@ son la bitácora automática generada desde los Conventional Commits.
   `perfil_territorial_comunal`.
 - Agregadas integración de extractor, metadatos de staging, validación centralizada,
   Parquet/JSON normalizado, DuckDB, SQLite, Excel, catálogo, procedencia,
-  redistribución, health, bundle, CI y documentación para las nuevas capas.
+  redistribución, salud, paquete, CI y documentación para las nuevas capas.
 - Agregados artefactos operativos legibles por máquina `dataset_status.json` y
   `dataset_changelog.json`.
 - Agregados `ChileHub.dataset_status()`, `ChileHub.dataset_changelog()` y los

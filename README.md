@@ -185,8 +185,8 @@ confiar ciegamente**. Los datos vienen con la evidencia que los respalda.
 | **Auditoría legal explícita** | Licencia, atribución requerida y permiso de redistribución verificados dataset por dataset. **19 de 19 capas** pasan la auditoría (`ready`). | [`redistribution_report.md`](data/normalized/redistribution_report.md) + [`AGENTS.md §6`](AGENTS.md) |
 | **Pipeline que falla con estridencia** | Si una validación falla, el pipeline **aborta** — no publica datos corruptos, no emite advertencias silenciosas. | [`ADR-001`](docs/adr/ADR-001-pipeline-lineal-determinista.md) — fail-loud como decisión de arquitectura |
 | **Contratos de esquema verificados** | 21 contratos JSON Schema ([`contracts/datasets/`](contracts/datasets/)) definen columnas esperadas, tipos, claves primarias y cobertura. Se validan **en cada build** automáticamente. | [`ADR-005`](docs/adr/ADR-005-contratos-esquema-json-schema.md) + `contracts/datasets/*.json` |
-| **Salud transparente** | Dashboard público con severidad, frescura, cobertura, drift y degradación por dataset. 11 capas `ok`, 8 `warn`, 0 `error`. | [`hub_health.md`](data/normalized/hub_health.md) — estado completo actualizado en cada build |
-| **Calidad medida y pública** | Puntuación compuesta A-F por dataset: **promedio 93.6/100** (16 A, 1 B). Dimensiones: validación, contrato, madurez de fuente, frescura, cobertura, política de reúso. | [`dataset_quality.md`](data/normalized/dataset_quality.md) — scorecard completo |
+| **Salud transparente** | Dashboard público con severidad, frescura, cobertura, drift y degradación por dataset. 12 capas `ok`, 7 `warn`, 0 `error`. | [`hub_health.md`](data/normalized/hub_health.md) — estado completo actualizado en cada build |
+| **Calidad medida y pública** | Puntuación compuesta A-F por dataset: **promedio 94.2/100** (18 A, 1 B). Dimensiones: validación, contrato, madurez de fuente, frescura, cobertura, política de reúso. | [`dataset_quality.md`](data/normalized/dataset_quality.md) — scorecard completo |
 
 Cada pilar se audita automáticamente en cada ejecución del pipeline. Los reportes se
 regeneran en cada build — no son documentos estáticos mantenidos a mano. Para auditar
@@ -199,7 +199,7 @@ chile-hub health       # severidad, frescura, drift y cobertura
 
 ### Respaldo adicional
 
-- **549 tests** (549 recolectados por pytest, más scripts de verificación
+- **583 tests** (`pytest --collect-only`, más scripts de verificación
   del pipeline) que validan extracción, contratos e integridad de datos.
 - **5 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura
   con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
@@ -508,9 +508,10 @@ df = comunas.join(censo, on="codigo_comuna")
 print(df.head())
 ```
 
-> **Versionado:** Para entornos productivos, fija la versión exacta en `requirements.txt`:
+> **Versionado:** Para entornos productivos, fija la versión exacta en `requirements.txt`
+> (revisa el badge de PyPI al inicio de este README para la versión más reciente):
 > ```
-> chile-hub==1.15.0
+> chile-hub==1.19.11
 > ```
 > El bundle de datos se publica con cada release. La API del módulo `ChileHub` sigue
 > versionado semántico: cambios de interfaz pública solo en _major releases_.
@@ -651,8 +652,14 @@ flowchart TB
 | Territorio | `subdere_extractor.py`, `electoral_extractor.py` |
 | Demografía | `censo_extractor.py`, `censo_hogares_viviendas_extractor.py`, `pobreza_extractor.py` |
 | Servicios públicos | `salud_extractor.py`, `mineduc_establecimientos_extractor.py`, `mineduc_resultados_extractor.py` |
-| Economía | `bcentral_extractor.py`, `sinim_finanzas_extractor.py`, `res_extractor.py`, `consumo_electrico_extractor.py` |
+| Economía | `bcentral_extractor.py`, `sinim_finanzas_extractor.py`, `sinim_finanzas_live_extractor.py`, `res_extractor.py`, `consumo_electrico_extractor.py` |
 | Indicadores urbanos | `siedu_extractor.py` |
+| Política | `partidos_politicos_extractor.py`, `autoridades_electas_extractor.py`, `autoridades_locales_extractor.py` |
+| Seguridad (carril `candidate`) | `cead_delincuencia_live_extractor.py` |
+
+> El mapeo autoritativo dataset ↔ extractor vive en
+> [`data/dataset_catalog_config.json`](data/dataset_catalog_config.json); esta tabla
+> es solo orientativa. Detalle completo en [`AGENTS.md §2`](AGENTS.md).
 
 </details>
 
@@ -796,6 +803,11 @@ funcionan tanto desde PyPI como desde el entorno de desarrollo.
 | `chile-hub example <capa> --kind duckdb` | Receta de consumo lista para copiar y pegar |
 | `chile-hub overview` | Resumen general del build y estado actual |
 | `chile-hub inventory` | Archivos en `data/normalized/` con tamaños y hashes |
+| `chile-hub snapshot` | Snapshot humano y compacto del hub |
+| `chile-hub summary` | Resumen breve de datasets |
+| `chile-hub search <keyword>` | Busca datasets por keyword, fuente o madurez |
+| `chile-hub cross <a> <b>` | Cruza dos datasets por clave territorial común |
+| `chile-hub export <capa> --output archivo` | Exporta un dataset a CSV, JSON o Parquet |
 
 ### Calidad, salud y auditoría
 
@@ -809,6 +821,10 @@ funcionan tanto desde PyPI como desde el entorno de desarrollo.
 | `chile-hub status` | JSON ultraliviano para CI/CD |
 | `chile-hub dataset-status` | Estado detallado machine-readable por dataset |
 | `chile-hub dataset-changelog` | Cambios entre el build actual y el metadata anterior |
+| `chile-hub source-readiness` | Madurez de fuente por dataset |
+| `chile-hub dataset-quality` | Puntuación de calidad A-F por dataset |
+| `chile-hub check-sources` | Verifica conectividad en vivo con las fuentes oficiales |
+| `chile-hub validate <capa>` | Valida un dataset (o un CSV/Parquet propio) contra su schema |
 
 ### Distribución e integridad
 
@@ -818,9 +834,16 @@ funcionan tanto desde PyPI como desde el entorno de desarrollo.
 | `chile-hub redistribution` | Reporte legal de reúso por capa |
 | `chile-hub provenance` | URLs de origen y métodos de extracción |
 | `chile-hub verify-package` | Instrucción de verificación de integridad del ZIP |
+| `chile-hub artifacts` | Artefactos publicables del hub |
+| `chile-hub shared-artifacts` | Artefactos compartidos del hub (reportes, manifest) |
+| `chile-hub reports` | Lista los reportes compartidos disponibles |
+| `chile-hub report <nombre>` | Resuelve la metadata de un reporte compartido |
+| `chile-hub packages` | Paquetes publicables del hub |
+| `chile-hub package` | Metadata del package principal del hub |
 
 > En entorno de desarrollo, usa `python -m chile_hub` o `python -m src.chile_hub`
 > como alternativa al comando `chile-hub` si el paquete no está instalado en modo editable.
+> Para el listado completo y siempre actualizado: `chile-hub --help`.
 
 ---
 

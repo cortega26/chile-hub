@@ -22,12 +22,12 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 >    `docs/backlog/NEXT_STEPS.md` y la ficha de backlog correspondiente en `docs/backlog/`.
 >    Si el plan tiene su propio registro interno (p. ej. el "registro de reevaluación" del Plan
 >    022, §9.4), añade también ahí la entrada de la iteración.
-> 3. **Archiva el trabajo terminado.** Cuando un plan pasa a `DONE`, mueve su fichero `.md` a
->    `archive/` **de inmediato** y borra su fila de la tabla de activos — no lo dejes en la tabla
->    activa ni en `plans/` raíz. Si merece mención, añádelo a la sección "Planes archivados"
->    correspondiente. Para un **plan maestro multi-fase**, no lo archives hasta que **todas** sus
->    fases/olas estén `DONE`; mientras tanto, mantén su fila activa con el estado granular del
->    paso 1.
+> 3. **Archiva el trabajo terminado.** Cuando un plan pasa a `DONE`, mueve automáticamente su
+>    fichero `.md` a `archive/` **de inmediato** y borra su fila de la tabla de activos — no lo
+>    dejes en la tabla activa ni en `plans/` raíz. Si merece mención, añádelo a la sección
+>    "Planes archivados" correspondiente. Para un **plan maestro multi-fase**, no lo archives
+>    hasta que **todas** sus fases/olas estén `DONE`; mientras tanto, mantén su fila activa con
+>    el estado granular del paso 1.
 > 4. **Verifica coherencia**: el grafo de dependencias y el "Orden de ejecución recomendado" de
 >    abajo deben seguir siendo válidos tras el cambio; ajústalos si una dependencia se resolvió o
 >    cambió de prioridad.
