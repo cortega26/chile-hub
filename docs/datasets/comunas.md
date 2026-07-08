@@ -17,7 +17,7 @@ Es una capa base transversal: ayuda a limpiar nombres, preservar códigos CUT co
 
 - capa comunal servida vía BCN ArcGIS como fuente operativa actual
 - referencia territorial administrativa de SUBDERE como fallback secundario
-- procesamiento local desde [`src/extractors/subdere_extractor.py`](/home/carlos/VS_Code_Projects/chile-hub/src/extractors/subdere_extractor.py:1)
+- procesamiento local desde [`src/extractors/subdere_extractor.py`](https://github.com/cortega26/chile-hub/blob/main/src/extractors/subdere_extractor.py)
 
 ## Método de acceso actual
 

@@ -18,7 +18,7 @@ del usuario y un bug de fuga de conexiones HTTP:
 
 ## Plan completo
 
-→ [`plans/011-harden-api-error-handling.md`](../../plans/011-harden-api-error-handling.md)
+→ [`plans/011-harden-api-error-handling.md`](https://github.com/cortega26/chile-hub/blob/main/plans/011-harden-api-error-handling.md)
 
 ## ¿Por qué está en backlog?
 

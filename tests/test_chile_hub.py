@@ -1627,6 +1627,12 @@ class WorkflowContractTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.workflow_text = (ROOT_DIR / ".github" / "workflows" / "pipeline-check.yml").read_text()
+        cls.release_workflow_text = (
+            ROOT_DIR / ".github" / "workflows" / "pypi-release.yml"
+        ).read_text()
+        cls.monthly_workflow_text = (
+            ROOT_DIR / ".github" / "workflows" / "monthly-scrape.yml"
+        ).read_text()
         cls.workflow_lines = cls.workflow_text.splitlines()
         cls.step_names = []
 
@@ -1694,13 +1700,43 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("chile-hub cache status", self.workflow_text)
 
     def test_pypi_release_workflow_uses_trusted_publishing_and_release_assets(self):
-        release_text = (ROOT_DIR / ".github" / "workflows" / "pypi-release.yml").read_text()
-        self.assertIn("id-token: write", release_text)
-        self.assertIn("python -m semantic_release version --skip-build", release_text)
-        self.assertIn("steps.semantic-release.outputs.released == 'true'", release_text)
-        self.assertIn("pypa/gh-action-pypi-publish", release_text)
-        self.assertIn("data/normalized/chile-hub-publishable-bundle.zip", release_text)
-        self.assertIn("data/normalized/dataset_catalog.json", release_text)
+        self.assertIn("id-token: write", self.release_workflow_text)
+        self.assertIn("python -m semantic_release version --skip-build", self.release_workflow_text)
+        self.assertIn(
+            "steps.semantic-release.outputs.released == 'true'", self.release_workflow_text
+        )
+        self.assertIn("pypa/gh-action-pypi-publish", self.release_workflow_text)
+        self.assertIn(
+            "data/normalized/chile-hub-publishable-bundle.zip", self.release_workflow_text
+        )
+        self.assertIn("data/normalized/dataset_catalog.json", self.release_workflow_text)
+
+    def test_pipeline_artifact_records_publication_provenance(self):
+        self.assertIn("pipeline_artifact_provenance.json", self.workflow_text)
+        self.assertIn('"verification_profile": profile', self.workflow_text)
+        self.assertIn('"require_live": profile == "publication"', self.workflow_text)
+        self.assertIn('"source_run_event": "${{ github.event_name }}"', self.workflow_text)
+
+    def test_pypi_release_requires_publication_grade_data_assets(self):
+        self.assertIn("pipeline_artifact_provenance.json", self.release_workflow_text)
+        self.assertIn(
+            "python scripts/verify_pipeline.py --require-live", self.release_workflow_text
+        )
+        self.assertIn("steps.pipeline-assets.outputs.ready == 'true'", self.release_workflow_text)
+        self.assertIn("release data assets will not be attached", self.release_workflow_text)
+
+    def test_pypi_release_keeps_uv_lock_in_release_commit(self):
+        self.assertIn("--no-commit --no-tag --no-push --no-vcs-release", self.release_workflow_text)
+        self.assertIn("uv lock", self.release_workflow_text)
+        self.assertIn("uv lock --locked", self.release_workflow_text)
+        self.assertIn("git add CHANGELOG.md pyproject.toml uv.lock", self.release_workflow_text)
+
+    def test_monthly_scrape_uses_project_extras_not_dependency_groups(self):
+        self.assertNotIn("uv sync --group dev", self.monthly_workflow_text)
+        self.assertEqual(
+            self.monthly_workflow_text.count("uv sync --extra pipeline --extra dev"), 2
+        )
+        self.assertEqual(self.monthly_workflow_text.count("uv lock --locked"), 2)
 
     def test_testpypi_workflow_smoke_tests_installed_console_script(self):
         testpypi_text = (ROOT_DIR / ".github" / "workflows" / "testpypi.yml").read_text()

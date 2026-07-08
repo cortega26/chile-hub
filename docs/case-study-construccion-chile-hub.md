@@ -221,7 +221,7 @@ ZIP](https://github.com/cortega26/chile-hub/releases) sin instalar nada.
 
 ## Referencias
 
-- [README del proyecto](../README.md)
+- [README del proyecto](https://github.com/cortega26/chile-hub/blob/main/README.md)
 - [Pipeline y validación](https://github.com/cortega26/chile-hub/blob/main/AGENTS.md)
 - [Reporte de procedencia](https://github.com/cortega26/chile-hub/blob/main/data/normalized/provenance_report.md)
 - [Auditoría legal de redistribución](https://github.com/cortega26/chile-hub/blob/main/data/normalized/redistribution_report.md)
@@ -231,4 +231,4 @@ ZIP](https://github.com/cortega26/chile-hub/releases) sin instalar nada.
 
 ---
 
-*Este caso de estudio es parte del [Plan 022](../plans/022-plan-avance-narrativa-confiabilidad.md) — Fase 2: Narrativa técnica visible.*
+*Este caso de estudio es parte del [Plan 022](https://github.com/cortega26/chile-hub/blob/main/plans/022-plan-avance-narrativa-confiabilidad.md) — Fase 2: Narrativa técnica visible.*

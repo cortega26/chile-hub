@@ -16,8 +16,8 @@ Su valor está en ofrecer una llave regional mínima y estable, sin obligar a ca
 ## Fuente
 
 - derivado localmente a partir de la capa `comunas`
-- lógica de derivación en [`src/build_dev_db.py`](/home/carlos/VS_Code_Projects/chile-hub/src/build_dev_db.py:1)
-- hereda trazabilidad y modo efectivo de refresh desde [`src/extractors/subdere_extractor.py`](/home/carlos/VS_Code_Projects/chile-hub/src/extractors/subdere_extractor.py:1)
+- lógica de derivación en [`src/build_dev_db.py`](https://github.com/cortega26/chile-hub/blob/main/src/build_dev_db.py)
+- hereda trazabilidad y modo efectivo de refresh desde [`src/extractors/subdere_extractor.py`](https://github.com/cortega26/chile-hub/blob/main/src/extractors/subdere_extractor.py)
 
 ## Método de acceso actual
 

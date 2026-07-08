@@ -44,6 +44,7 @@ jobs:
         run: echo "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"
 
       - name: Download verified pipeline data assets
+        id: pipeline-assets
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -66,6 +67,49 @@ jobs:
             exit 1
           fi
 
+          if [[ ! -f data/normalized/pipeline_artifact_provenance.json ]]; then
+            echo "::notice::Pipeline artifact has no provenance manifest; release data assets will not be attached."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          set +e
+          python - <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          provenance = json.loads(
+              Path("data/normalized/pipeline_artifact_provenance.json").read_text(encoding="utf-8")
+          )
+          profile = provenance.get("verification_profile")
+          require_live = provenance.get("require_live")
+          source_event = provenance.get("source_run_event")
+
+          if profile != "publication" or require_live is not True:
+              print(
+                  "::notice::Pipeline artifact is not publication-grade "
+                  f"(profile={profile!r}, require_live={require_live!r}, event={source_event!r}); "
+                  "release data assets will not be attached."
+              )
+              sys.exit(2)
+          PY
+          validation_status="$?"
+          set -e
+
+          case "$validation_status" in
+            0)
+              python scripts/verify_pipeline.py --require-live
+              echo "ready=true" >> "$GITHUB_OUTPUT"
+              ;;
+            2)
+              echo "ready=false" >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              exit 1
+              ;;
+          esac
+
       - name: Python semantic release
         id: semantic-release
         env:
@@ -73,16 +117,32 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           before="$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")"
-          python -m semantic_release version --skip-build
+          python -m semantic_release version --skip-build --no-commit --no-tag --no-push --no-vcs-release
           after="$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")"
 
           # Detect if this is a tagged release, a manual run, or version bumped by semantic-release
           has_matching_tag="$(git tag --points-at HEAD | grep -E "^v${after}$" || true)"
 
           if [[ "$before" != "$after" || -n "$has_matching_tag" || "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            if [[ "$before" != "$after" ]]; then
+              uv lock
+              uv lock --locked
+
+              git config user.name "github-actions[bot]"
+              git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+              git add CHANGELOG.md pyproject.toml uv.lock
+              git commit -m "chore(release): ${after} [skip ci]"
+              git tag "v${after}"
+              git push origin HEAD:main "v${after}"
+              gh release create "v${after}" --notes "Release v${after}" || true
+            else
+              uv lock --locked
+            fi
             echo "released=true" >> "$GITHUB_OUTPUT"
             echo "version=$after" >> "$GITHUB_OUTPUT"
           else
+            git checkout -- CHANGELOG.md pyproject.toml uv.lock
+            uv lock --locked
             echo "released=false" >> "$GITHUB_OUTPUT"
             echo "version=$after" >> "$GITHUB_OUTPUT"
           fi
@@ -101,7 +161,7 @@ jobs:
           skip-existing: true
 
       - name: Attach verified data assets to release
-        if: steps.semantic-release.outputs.released == 'true'
+        if: steps.semantic-release.outputs.released == 'true' && steps.pipeline-assets.outputs.ready == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |

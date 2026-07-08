@@ -42,7 +42,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          uv sync --group dev
+          uv lock --locked
+          uv sync --extra pipeline --extra dev
           uv run playwright install chromium
 
       - name: Extract SINIM finanzas municipales
@@ -118,7 +119,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          uv sync --group dev
+          uv lock --locked
+          uv sync --extra pipeline --extra dev
 
       - name: Extract CEAD delincuencia comunal
         id: scrape

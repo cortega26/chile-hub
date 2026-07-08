@@ -73,12 +73,8 @@ def verify_dataset_contract(
             reportan como error. Si ``False``, son solo advertencia.
 
     Returns:
-        Dict con:
-        - **dataset**: Nombre del dataset validado.
-        - **status**: ``"ok"`` si pasa todas las validaciones, ``"error"`` si
-          alguna falla.
-        - **errors**: Lista de mensajes de error (vacía si ``status == "ok"``).
-        - **warnings**: Lista de advertencias no bloqueantes.
+        dict[str, Any]: Resultado de validación con ``dataset``, ``status``,
+        ``errors`` y ``warnings``.
     """
     if root_dir is None:
         root_dir = Path(__file__).resolve().parents[2]

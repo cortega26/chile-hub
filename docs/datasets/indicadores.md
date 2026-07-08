@@ -16,7 +16,7 @@ Es una capa de conveniencia: evita que cada proyecto tenga que consultar o parse
 ## Fuente
 
 - consumo actual desde `mindicador.cl`
-- procesamiento local desde [`src/extractors/bcentral_extractor.py`](/home/carlos/VS_Code_Projects/chile-hub/src/extractors/bcentral_extractor.py:1)
+- procesamiento local desde [`src/extractors/bcentral_extractor.py`](https://github.com/cortega26/chile-hub/blob/main/src/extractors/bcentral_extractor.py)
 
 ## Método de acceso actual
 

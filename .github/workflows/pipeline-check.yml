@@ -148,13 +148,41 @@ jobs:
           fi
 
       - name: Verify pipeline artifacts
+        id: verify-pipeline
         run: |
           if [[ "${{ github.event_name }}" == "schedule" || "${{ inputs.publish }}" == "true" ]]; then
             profile=publication
           else
             profile=readiness
           fi
+          echo "profile=$profile" >> "$GITHUB_OUTPUT"
           python scripts/verify_pipeline.py --profile "$profile"
+
+      - name: Write pipeline artifact provenance
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          profile = "${{ steps.verify-pipeline.outputs.profile }}"
+          metadata = {
+              "verification_profile": profile,
+              "require_live": profile == "publication",
+              "source_run_event": "${{ github.event_name }}",
+              "source_run_id": "${{ github.run_id }}",
+              "source_sha": "${{ github.sha }}",
+              "source_ref": "${{ github.ref }}",
+              "workflow": "${{ github.workflow }}",
+              "publish_input": os.environ.get("PUBLISH_INPUT", "false").lower() == "true",
+          }
+          Path("data/normalized/pipeline_artifact_provenance.json").write_text(
+              json.dumps(metadata, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PY
+        env:
+          PUBLISH_INPUT: ${{ inputs.publish || 'false' }}
 
       - name: Run unit and contract tests
         run: python -m pytest -v --cov=src --cov-report=term-missing --cov-report=xml

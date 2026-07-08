@@ -128,6 +128,6 @@ Deprecar un dataset requiere:
 ## 7. Referencias
 
 - [Política de Versionamiento](versioning-policy.md)
-- [Plan 008: Madurez de fuente y contratos](../plans/008-hardening-source-readiness-schema-contracts-quality.md)
-- [Source Registry](../data/source_registry.json)
-- [Contratos de esquema](../contracts/datasets/)
+- [Plan 008: Madurez de fuente y contratos](https://github.com/cortega26/chile-hub/blob/main/plans/008-hardening-source-readiness-schema-contracts-quality.md)
+- [Source Registry](https://github.com/cortega26/chile-hub/blob/main/data/source_registry.json)
+- [Contratos de esquema](https://github.com/cortega26/chile-hub/tree/main/contracts/datasets)
