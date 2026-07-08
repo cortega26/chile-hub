@@ -1,13 +1,26 @@
 # Consumo Eléctrico Comunal
 
+> **Carril:** `candidate` / `deprecated` — NO incluido en el bundle público.
+> **Fuente confirmada caída (2026-07-07):** el catálogo Junar de `energiaabierta.cl`
+> (subdominio `datos.energiaabierta.cl`) fue decomisionado por la CNE. El dominio
+> raíz fue migrado a WordPress; la página descriptiva del dataset sigue existiendo,
+> pero no ofrece ningún archivo descargable ni endpoint de API — el enlace "API"
+> del propio sitio apunta a `/visualizaciones/en-mantencion/`. El extractor nunca
+> logró un fetch en vivo exitoso desde que se agregó este dataset: los datos
+> publicados corresponden a `FALLBACK_ROWS`, una muestra mínima fabricada de 3
+> filas (Santiago y Concepción, 2023), no a datos reales de la CNE.
+> Ver `data/source_registry.json` (`consumo_electrico_comunal`) y AGENTS.md §6
+> ("Protocolo ante fuente permanentemente caída"). Se reevaluará solo si la CNE
+> publica un reemplazo oficial del catálogo de datos abiertos.
+
 Consumo eléctrico anual por comuna y tipo de cliente, publicado por la Comisión Nacional de Energía (CNE) en el portal Energía Abierta. Los datos provienen de la información que las empresas distribuidoras entregan a la CNE.
 
 ## Fuente y licencia
 
 - **Fuente:** CNE — Energía Abierta
-- **Formato de origen:** Excel (descarga directa, sin API key)
+- **Formato de origen:** Excel (descarga directa, sin API key) — **actualmente sin endpoint funcional**
 - **Reutilización:** CC BY con atribución requerida
-- **URL:** http://energiaabierta.cl/datasets-estadistica/consumo-electrico-anual-por-comuna-y-tipo-de-cliente/
+- **URL:** http://energiaabierta.cl/datasets-estadistica/consumo-electrico-anual-por-comuna-y-tipo-de-cliente/ (página descriptiva sin archivo descargable)
 
 ## Esquema
 
@@ -48,4 +61,5 @@ ORDER BY consumo_kwh DESC;
 
 ## Registro de cambios
 
+- v2 (2026-07-07): Degradado a `deprecated` / `candidate`, excluido del bundle público. La fuente Junar de `energiaabierta.cl` fue confirmada permanentemente caída; el dataset nunca tuvo un fetch en vivo exitoso y solo publicaba datos de muestra fabricados.
 - v1 (2026-06-30): Primera versión. Datos de consumo eléctrico anual por comuna desde Energía Abierta (CNE).

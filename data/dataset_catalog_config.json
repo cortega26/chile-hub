@@ -526,12 +526,12 @@
     "documentation": "docs/datasets/pobreza_comunal.md"
   },
   "consumo_electrico_comunal": {
-    "description": "Consumo eléctrico anual por comuna y tipo de cliente (Residencial, Comercial, Industrial, Agrícola, Alumbrado Público, Otros), publicado por la Comisión Nacional de Energía (CNE) en el portal Energía Abierta.",
+    "description": "Consumo eléctrico anual por comuna y tipo de cliente (Residencial, Comercial, Industrial, Agrícola, Alumbrado Público, Otros), publicado por la Comisión Nacional de Energía (CNE) en el portal Energía Abierta. DEPRECATED: la fuente Junar de energiaabierta.cl fue decomisionada (investigado 2026-07-07); el dataset solo publica datos de muestra (FALLBACK_ROWS), no está en el bundle público. Ver data/source_registry.json.",
     "join_keys": [
       "codigo_comuna",
       "codigo_region"
     ],
-    "confidence_tier": "Tier A",
+    "confidence_tier": "Tier C",
     "expected_record_count": null,
     "reuse_policy": {
       "status": "open-attribution",

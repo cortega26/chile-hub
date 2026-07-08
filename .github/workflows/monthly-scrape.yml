@@ -78,7 +78,9 @@ jobs:
             data/staging/finanzas_municipales.metadata.json \
             data/raw/sinim_finanzas_municipales_*.xlsx
           do
-            [ -e "$path" ] && git add "$path"
+            # -f: data/staging y data/raw estan en .gitignore por defecto;
+            # estos artefactos puntuales son la excepcion intencional (snapshot mensual versionado).
+            [ -e "$path" ] && git add -f "$path"
           done
           if git diff --staged --quiet; then
             echo "No changes to commit"
@@ -148,7 +150,9 @@ jobs:
             data/staging/delincuencia_comunal.metadata.json \
             data/raw/cead_delincuencia_*.json
           do
-            [ -e "$path" ] && git add "$path"
+            # -f: data/staging y data/raw estan en .gitignore por defecto;
+            # estos artefactos puntuales son la excepcion intencional (snapshot mensual versionado).
+            [ -e "$path" ] && git add -f "$path"
           done
           if git diff --staged --quiet; then
             echo "No changes to commit"

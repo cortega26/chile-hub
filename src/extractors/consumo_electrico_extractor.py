@@ -42,9 +42,27 @@ METADATA_PATH = os.path.join(STAGING_DIR, "consumo_electrico_comunal.metadata.js
 
 # ── URL de descarga ──────────────────────────────────────────────────────────
 # Excel directo desde el portal Energía Abierta (sin API key requerida)
+#
+# Investigación 2026-07-07: `datos.energiaabierta.cl` (el subdominio Junar que
+# servía este dataview) ya no resuelve DNS. El dominio raíz `energiaabierta.cl`
+# fue migrado a WordPress (sin el catálogo Junar); la página descriptiva del
+# dataset sigue viva en http://energiaabierta.cl/datasets-estadistica/
+# consumo-electrico-anual-por-comuna-y-tipo-de-cliente/ pero no expone ningún
+# archivo descargable ni endpoint de API — el propio enlace "API" del sitio
+# apunta a http://energiaabierta.cl/visualizaciones/en-mantencion/. Se mantiene
+# la URL histórica como DOWNLOAD_URL porque sigue siendo la referencia de la
+# fuente original y falla de forma limpia (ConnectionError → fallback); no se
+# reemplaza por la página nueva porque esta no sirve un archivo y rompería el
+# parser de Excel de otra forma. Ver AGENTS.md §6 "Protocolo ante fuente
+# permanentemente caída".
 DOWNLOAD_URL = (
     "http://datos.energiaabierta.cl/dataviews/241686/"
     "consumo-electrico-anual-por-comuna-y-tipo-de-cliente/"
+)
+SOURCE_STATUS_NOTE = (
+    "fuente confirmada caída de forma permanente (2026-07-07): CNE migró "
+    "energiaabierta.cl a WordPress y decomisionó el catálogo Junar; no existe "
+    "archivo ni endpoint de reemplazo. Ver AGENTS.md §6."
 )
 
 REUSE_POLICY = {
@@ -248,7 +266,7 @@ def fetch_data() -> tuple[list[dict], str, str, list[str]]:
             rows = _enrich_with_cut(rows)
             notes.append(f"fallback: {len(rows)} filas desde snapshot {snapshots[-1].name} ({exc})")
             return rows, "fallback", DOWNLOAD_URL, notes
-        notes.append(f"fallback: usando datos de muestra ({exc})")
+        notes.append(f"fallback: usando datos de muestra ({exc}). {SOURCE_STATUS_NOTE}")
         return FALLBACK_ROWS, "fallback", DOWNLOAD_URL, notes
 
 
