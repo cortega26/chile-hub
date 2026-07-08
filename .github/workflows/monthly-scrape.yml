@@ -73,9 +73,13 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add --ignore-missing data/staging/finanzas_municipales.csv
-          git add --ignore-missing data/staging/finanzas_municipales.metadata.json
-          git add --ignore-missing data/raw/sinim_finanzas_municipales_*.xlsx
+          for path in \
+            data/staging/finanzas_municipales.csv \
+            data/staging/finanzas_municipales.metadata.json \
+            data/raw/sinim_finanzas_municipales_*.xlsx
+          do
+            [ -e "$path" ] && git add "$path"
+          done
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
@@ -139,9 +143,13 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add --ignore-missing data/staging/delincuencia_comunal.csv
-          git add --ignore-missing data/staging/delincuencia_comunal.metadata.json
-          git add --ignore-missing data/raw/cead_delincuencia_*.json
+          for path in \
+            data/staging/delincuencia_comunal.csv \
+            data/staging/delincuencia_comunal.metadata.json \
+            data/raw/cead_delincuencia_*.json
+          do
+            [ -e "$path" ] && git add "$path"
+          done
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
