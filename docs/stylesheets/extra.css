@@ -26,6 +26,16 @@
   margin-top: 1.1rem;
 }
 
+.md-sidebar__scrollwrap {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.md-sidebar__scrollwrap::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
 .md-typeset h1 {
   font-weight: 650;
   letter-spacing: 0;
