@@ -167,7 +167,7 @@ branch = true
 # medía ~5% del código (solo la librería) dando un ~84% vanidoso; ahora la cobertura es
 # honesta sobre builders/extractors/validation/build_dev_db (~50% real). Subirla es un
 # follow-up de backfill de tests.
-source = ["src"]
+source = ["src", "scripts"]
 omit = [
     "src/chile_hub/__main__.py",
     "src/chile_hub/cli.py",

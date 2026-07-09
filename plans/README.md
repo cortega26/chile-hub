@@ -48,7 +48,7 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 
 | # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
 |---|------|----------|----------|--------|-----------|--------|
-| 035 | [Tests de caracterización del gate `verify_pipeline`](035-characterization-tests-publish-gate.md) | P2 | L | LOW | — | TODO — `354ad6e` ya sumó tests para 2 funciones más de `verify_pipeline.py` (6/~24 `verify_*` cubiertas) y para áreas adyacentes (`build_hub_health`, `sync_landing_metadata`), pero el deliverable del plan (`tests/test_verify_pipeline.py`, `scripts` en `coverage.source`, tests de `validate_puntos_interes`) sigue sin existir. |
+| 035 | [Tests de caracterización del gate `verify_pipeline`](035-characterization-tests-publish-gate.md) | P2 | L | LOW | — | DONE — `scripts` en coverage.source (pyproject.toml:170), `tests/test_verify_pipeline.py` con 26 tests (14 golden + 4 corruption + 6 synthetic + 1 main smoke + 1 readiness), `validate_puntos_interes` con 4 tests en `test_validation.py`, cobertura de `verify_pipeline.py` subió de ~0% a 64%. |
 | 036 | [Tests golden de writers de artefactos](036-golden-output-tests-artifact-writers.md) | P2 | M | LOW | — (030 DONE) | TODO |
 | 037 | [Vectoriza DV de RUT + elimina `rutificador`](037-vectorize-rut-validation.md) | P2 | M | MED | — (032 DONE) | TODO |
 | 038 | [Deduplica `pipeline_status_utils.py`](038-deduplicate-pipeline-status-utils.md) | P3 | M | MED | — | TODO — riesgo confirmado en vivo: entre `c486e7c` y `HEAD` ambas copias (`src/pipeline_status_utils.py` y `src/chile_hub/pipeline_status_utils.py`) recibieron el mismo parche de 54 líneas a mano dos veces (siguen siendo byte-idénticas por ahora, pero es exactamente el modo de fallo que el plan anticipa). |
