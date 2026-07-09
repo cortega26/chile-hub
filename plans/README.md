@@ -4,7 +4,7 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 
 > **Última auditoría `/improve deep` (2026-07-07, commit `c486e7c`)**: planes **024–041**.
 > Repo maduro; los grandes ítems previos ya están hechos. Lo restante es una cola de
-> defectos pequeños de alta confianza (024–031), higiene de deps/CI (032–034), backfill
+> defectos pequeños de alta confianza (024–031; 027–031 DONE ✅), higiene de deps/CI (032–034), backfill
 > de tests del gate de publicación y los writers (035–036), dos refactors (037–038) y
 > tres planes de diseño (039–041). Ver "Hallazgos considerados y diferidos (2026-07-07)".
 
@@ -48,13 +48,10 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 
 | # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
 |---|------|----------|----------|--------|-----------|--------|
-| 029 | [Corrige 3 docstrings desubicadas en `core.py`](029-fix-misplaced-docstrings-core.md) | P2 | S | LOW | — | TODO |
-| 030 | [Guarda Excel para tablas masivas + dedup SHA bundle](030-excel-large-table-guard-and-bundle-sha-dedup.md) | P2 | S | LOW | — | TODO |
-| 031 | [Arregla la cache muerta de `load_polars`](031-fix-dead-load-polars-cache.md) | P2 | S | LOW | — | TODO |
 | 032 | [Adelgaza deps runtime del paquete instalado](032-slim-runtime-dependencies.md) | P2 | S | MED | — (026 DONE) | TODO |
 | 033 | [Ejecuta mypy/bandit/pip-audit/interrogate en CI](033-enforce-quality-gates-in-ci.md) | P2 | S-M | MED | — | TODO — el job `quality` de `pipeline-check.yml` creció (lock-sync, docs-sync, companion-paths) pero sigue sin mypy/bandit/pip-audit/interrogate; el hueco que describe el plan sigue intacto. |
 | 035 | [Tests de caracterización del gate `verify_pipeline`](035-characterization-tests-publish-gate.md) | P2 | L | LOW | — | TODO — `354ad6e` ya sumó tests para 2 funciones más de `verify_pipeline.py` (6/~24 `verify_*` cubiertas) y para áreas adyacentes (`build_hub_health`, `sync_landing_metadata`), pero el deliverable del plan (`tests/test_verify_pipeline.py`, `scripts` en `coverage.source`, tests de `validate_puntos_interes`) sigue sin existir. |
-| 036 | [Tests golden de writers de artefactos](036-golden-output-tests-artifact-writers.md) | P2 | M | LOW | 030 (opc.) | TODO |
+| 036 | [Tests golden de writers de artefactos](036-golden-output-tests-artifact-writers.md) | P2 | M | LOW | — (030 DONE) | TODO |
 | 037 | [Vectoriza DV de RUT + elimina `rutificador`](037-vectorize-rut-validation.md) | P2 | M | MED | coord. 032 | TODO |
 | 038 | [Deduplica `pipeline_status_utils.py`](038-deduplicate-pipeline-status-utils.md) | P3 | M | MED | — | TODO — riesgo confirmado en vivo: entre `c486e7c` y `HEAD` ambas copias (`src/pipeline_status_utils.py` y `src/chile_hub/pipeline_status_utils.py`) recibieron el mismo parche de 54 líneas a mano dos veces (siguen siendo byte-idénticas por ahora, pero es exactamente el modo de fallo que el plan anticipa). |
 | 039 | [Diseño: resuelve capas comunales 3/346 en el bundle](039-design-resolve-sparse-comunal-layers.md) | P2 | S (era M) | LOW (era MED) | — (024 y 034 DONE) | TODO — **resuelto en sustancia por fixes reactivos, falta el ADR formal.** `consumo_electrico_comunal`: RE-CARRIL ya implementado (`57e6eaf`, fuente confirmada muerta permanentemente, `maturity_status="deprecated"`/`candidate`, fuera del bundle). `pobreza_comunal`: FILL ya en código (`3f968ab` corrigió el mapeo de columnas del XLSX real de MDS; producirá 345 comunas × 2 = 690 filas en el próximo extract en vivo — la causa raíz no era la que suponía el plan). `finanzas_municipales`: FILL ya logrado (scrape mensual corriendo tras 034; snapshot comprometido con 345/346 municipios). Trabajo restante: escribir `docs/adr/NNN-comunal-coverage-decision.md` documentando estas 3 decisiones ya tomadas, y confirmar que el próximo build recoge el `pobreza_comunal` real (no requiere código nuevo). |
@@ -67,6 +64,9 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 
 | # | Plan | Esfuerzo | Riesgo | Estado |
 |---|------|----------|--------|--------|
+| 031 | [Cache de load_polars en ruta por defecto](archive/031-fix-dead-load-polars-cache.md) | S | LOW | DONE — `advisor/031-load-polars-cache` commit `7b1f065`; eliminado `not validate or` del guard. 55 tests pasan, lint OK. |
+| 030 | [Guarda Excel + dedup SHA bundle](archive/030-excel-large-table-guard-and-bundle-sha-dedup.md) | S | LOW | DONE — `advisor/030-excel-guard` commit `a6aa9ef`; `_EXCEL_MAX_ROWS_SKIP = 500_000`, SHA se computa 1 vez. 150 tests pasan, build OK. |
+| 029 | [Docstrings restaurados en core.py](archive/029-fix-misplaced-docstrings-core.md) | S | LOW | DONE — `advisor/029-fix-misplaced-docstrings` commit `1d7a963`; `__doc__` restaurado en 3 métodos. 228 tests pasan. |
 | 028 | [Elimina verificación unrar no-op y engañosa](archive/028-remove-unrar-tofu-integrity-noop.md) | S | LOW | DONE — ejecutado en `advisor/028-remove-unrar-noop` commit `add5afa`; eliminados `_verify_unrar_integrity()`, `_UNRAR_EXPECTED_SHA256` e `import hashlib` de ambos extractores MINEDUC (-88 líneas), reemplazados por verificación real de disponibilidad vía `shutil.which()`. 108/108 tests pasan, lint y format-check OK. |
 | 027 | [Provenance real en scrape SINIM exitoso](archive/027-sinim-finanzas-provenance-label.md) | S | LOW | DONE — ejecutado en `advisor/027-sinim-provenance-label` commit `4690fec`; `source_mode != "fallback"` reemplaza la rama muerta `== "live"`, 2 tests nuevos (`test_build_metadata_monthly_sets_live_provenance` + `test_build_metadata_fallback_sets_curated_provenance`), 9/9 tests pasan, lint y format-check OK. |
 | 024 | [Extractores: preserva ceros CUT + timestamps ISO](archive/024-extractor-cut-and-timestamp-integrity.md) | S | LOW | DONE — ejecutado en `advisor/024-extractor-cut-timestamp` commit `3ad6ab9`; `grep` de timestamps, overrides/zfill, diff de `pipeline_status_utils`, pytest focal (`221 passed`), lint y format-check OK. |
@@ -129,10 +129,10 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 
 ```
 Auditoría 2026-07-07 (024–041):
-  031 025 029 030             (independientes — cada uno un archivo/área distinta)
+  025                      (independientes — cada uno un archivo/área distinta)
   032 → 037                     (lock limpio resuelto por 026; 037 quita rutificador que 032 reubica)
   032 ⇠ 040                     (040 hub.sql necesita duckdb; reconciliar con la reubicación de 032)
-  030 → 036 (opcional)          (036 puede afirmar el guard de Excel de 030)
+  — (030 DONE) → 036            (036 puede afirmar el guard de Excel de 030)
   033 035 038 041               (independientes; 034 quedó DONE de rebote — ver archivo)
   039                           (024 y 034 DONE; ya solo falta escribir el ADR — ver su fila)
 
@@ -147,7 +147,7 @@ solo reubica — coordinar; **040** (`hub.sql`) reintroduce la necesidad de `duc
 runtime, así que ambos deben acordar si `duckdb` vuelve a runtime o va en un extra `query`. **039**
 ya no depende de nada activo: **034** quedó DONE de rebote el 2026-07-08 (ver "Planes archivados —
 fixes reactivos") y **024** ya resolvió el bug CUT que bloqueaba `consumo_electrico`; lo único
-pendiente en 039 es redactar el ADR retroactivo. El resto de 025 y 029–031 son fixes de un archivo,
+pendiente en 039 es redactar el ADR retroactivo. 025 es un fix de un archivo ya cubierto,
 ejecutables en cualquier orden. **020** sigue bloqueado (gate 4.3 NO-GO); **021** (MkDocs) quedó DONE
 el 2026-07-04.
 
@@ -156,8 +156,8 @@ el 2026-07-04.
 **Auditoría 2026-07-07 (024–041) — orden sugerido por olas (actualizado 2026-07-09; 024, 025, 026 y
 034 ya están DONE/archivados, no aparecen abajo):**
 
-1. **Ola de fixes P2, un archivo cada uno, sin dependencias entre sí** — **029, 030, 031**.
-   (027 y 028 ya están DONE — archivados). El resto (029–031) es intercambiable, cada uno toca un archivo distinto.
+1. **Ola de fixes P2, un archivo cada uno, sin dependencias entre sí** — **COMPLETA** 🎉
+   (027, 028, 029, 030 y 031 DONE — archivados).
 2. **Higiene de deps/CI**: **032** (adelgazar runtime deps) → **033** (mypy/bandit/pip-audit/interrogate
    en CI). 032 antes de 033 porque 037 y 040 coordinan con la reubicación de deps que hace 032. 033
    puede sacar a la luz un backlog de mypy/interrogate — ver su Step 1 y sus STOP conditions.
