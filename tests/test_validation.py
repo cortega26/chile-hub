@@ -32,6 +32,7 @@ from src.validation import (
     validate_partidos_politicos,
     validate_pobreza_comunal,
     validate_provincias,
+    validate_puntos_interes,
     validate_regiones,
 )
 
@@ -1610,6 +1611,78 @@ class AutoridadesElectasValidatorTests(unittest.TestCase):
         )
         result = validate_autoridades_electas(df)
         self.assertEqual(result["status"], "ok")
+
+
+# ── validate_puntos_interes ─────────────────────────────────────────────────────
+
+
+class ValidatePuntosInteresTests(unittest.TestCase):
+    """Tests para validate_puntos_interes (OpenStreetMap POIs)."""
+
+    @staticmethod
+    def _valid_row(**overrides):
+        row = {
+            "osm_id": 1,
+            "nombre": "Plaza de Armas",
+            "categoria": "amenidad",
+            "tipo": "plaza",
+            "latitud": -33.45,
+            "longitud": -70.67,
+            "codigo_comuna": "13101",
+        }
+        row.update(overrides)
+        return row
+
+    @staticmethod
+    def _make_df(rows):
+        return pl.DataFrame(
+            rows,
+            schema={
+                "osm_id": pl.Int64,
+                "nombre": pl.String,
+                "categoria": pl.String,
+                "tipo": pl.String,
+                "latitud": pl.Float64,
+                "longitud": pl.Float64,
+                "codigo_comuna": pl.String,
+            },
+        )
+
+    def test_ok_minimal(self):
+        df = self._make_df([self._valid_row()])
+        result = validate_puntos_interes(df, metadata={"source_mode": "live"})
+        self.assertEqual(result["status"], "ok")
+        self.assertEqual(result["record_count"], 1)
+
+    def test_missing_columns_returns_error(self):
+        df = pl.DataFrame(
+            {"osm_id": []},
+            schema={"osm_id": pl.Int64},
+        )
+        result = validate_puntos_interes(df, None)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(
+            any("missing columns" in e for e in result["errors"]),
+            msg=f"Expected 'missing columns' error, got: {result['errors']}",
+        )
+
+    def test_out_of_bounds_coordinates_returns_error(self):
+        df = self._make_df([self._valid_row(latitud=-60.0)])
+        result = validate_puntos_interes(df, None)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(
+            any("outside Chile" in e for e in result["errors"]),
+            msg=f"Expected bounds error, got: {result['errors']}",
+        )
+
+    def test_invalid_codigo_comuna_returns_error(self):
+        df = self._make_df([self._valid_row(codigo_comuna="123")])
+        result = validate_puntos_interes(df, None)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(
+            any("5-char" in e for e in result["errors"]),
+            msg=f"Expected '5-char' error, got: {result['errors']}",
+        )
 
 
 if __name__ == "__main__":
