@@ -2067,6 +2067,58 @@ class SinimFinanzasLiveExtractorTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "solo 2 filas"):
             _parse_xml_spreadsheet(xml)
 
+    def test_build_metadata_monthly_sets_live_provenance(self):
+        """build_metadata con source_mode='monthly' produce
+        source_detail='live_scraping_sinim_portal'."""
+        import polars as pl
+
+        from src.extractors.sinim_finanzas_live_extractor import build_metadata
+
+        df = pl.DataFrame(
+            {
+                "anio": [2024],
+                "codigo_comuna": ["01101"],
+                "nombre_comuna": ["Iquique"],
+                "ingresos_totales": [100000.0],
+                "gastos_totales": [50000.0],
+                "ingresos_propios_permanentes": [30000.0],
+                "fondo_comun_municipal": [10000.0],
+                "gasto_personal": [20000.0],
+                "gasto_inversion": [5000.0],
+            }
+        )
+        metadata = build_metadata(df, "monthly", "https://example.com", ["nota"])
+        self.assertEqual(
+            metadata["source_detail"],
+            "live_scraping_sinim_portal",
+        )
+
+    def test_build_metadata_fallback_sets_curated_provenance(self):
+        """build_metadata con source_mode='fallback' produce
+        source_detail='curated_fallback_pending_direct_export'."""
+        import polars as pl
+
+        from src.extractors.sinim_finanzas_live_extractor import build_metadata
+
+        df = pl.DataFrame(
+            {
+                "anio": [2024],
+                "codigo_comuna": ["01101"],
+                "nombre_comuna": ["Iquique"],
+                "ingresos_totales": [100000.0],
+                "gastos_totales": [50000.0],
+                "ingresos_propios_permanentes": [30000.0],
+                "fondo_comun_municipal": [10000.0],
+                "gasto_personal": [20000.0],
+                "gasto_inversion": [5000.0],
+            }
+        )
+        metadata = build_metadata(df, "fallback", "https://example.com", ["nota"])
+        self.assertEqual(
+            metadata["source_detail"],
+            "curated_fallback_pending_direct_export",
+        )
+
 
 if __name__ == "__main__":
     import sys

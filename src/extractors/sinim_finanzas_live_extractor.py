@@ -441,7 +441,7 @@ def build_metadata(df: pl.DataFrame, source_mode: str, source_url: str, notes: l
         source_mode=source_mode,
         source_detail=(
             "live_scraping_sinim_portal"
-            if source_mode == "live"
+            if source_mode != "fallback"
             else "curated_fallback_pending_direct_export"
         ),
         df=df,
