@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-07-08T23:15:10.539410+00:00",
+  "generated_at_utc": "2026-07-09T14:35:08.687166+00:00",
   "artifact_count": 55,
   "artifacts": [
     {
@@ -9,7 +9,7 @@
       "shared_type": "artifact_manifest",
       "format": "json",
       "size_bytes": 16805,
-      "sha256": "940f494888a1e9dba13343f84d392bb5e2dd79df56722f9d05035fdbf9b93417"
+      "sha256": "b46d314b48c06becd6f6d584a9c1b23795d0b3c8717d095405cbbe2bd17eb8bc"
     },
     {
       "path": "data/normalized/autoridades_electas.json",
@@ -90,7 +90,7 @@
       "shared_type": "datapackage",
       "format": "json",
       "size_bytes": 46019,
-      "sha256": "05dbb818fb16f6000c791bfb53515d377892b7c8e364c6073c943df8e5a0d6a3"
+      "sha256": "f201558d8b59c9a0815060c827bae263edc35efbae107cf5fc48d4e184a89a6f"
     },
     {
       "path": "data/normalized/dataset_catalog.json",
@@ -252,7 +252,7 @@
       "shared_type": "hub_bundle",
       "format": "json",
       "size_bytes": 76043,
-      "sha256": "bf500961beb996a52dcbc15051ab49e55bddb44c385014fc77e8cf6b6d1a0242"
+      "sha256": "20f4c470edfa3dabf0dfc996ea35ef127752dca2eb814e3556c05d25f28d67de"
     },
     {
       "path": "data/normalized/hub_health.json",
@@ -360,7 +360,7 @@
       "shared_type": "pipeline_metadata",
       "format": "json",
       "size_bytes": 57874,
-      "sha256": "1c4adad9047c0139a685c9ea0c31f589ff57e33cbe9577e4c4e5820cc5143d92"
+      "sha256": "b4fc6149de56372e4d5810ea15a0a523ebf62568c39199005c73b4dd7d66b121"
     },
     {
       "path": "data/normalized/pipeline_status.md",
@@ -502,8 +502,8 @@
     {
       "path": "data/normalized/chile-hub-publishable-bundle.zip",
       "package_type": "zip",
-      "size_bytes": 29300362,
-      "sha256": "f969f15555bb9a0b8a8a4ff5a074719b7ad99a2d91970b740df8cd2cd075ca34",
+      "size_bytes": 29300372,
+      "sha256": "834c9bd47137d9ca73ad0c8b8e4056aa3f9ca3ea78cc8e5deffd46edf224f554",
       "checksum_algorithm": "sha256",
       "checksum_path": "data/normalized/chile-hub-publishable-bundle.zip.sha256",
       "verification_command": "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256"

@@ -12,6 +12,27 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.19.14 - 2026-07-09
+
+### Corregido
+
+- **extractors**: Etiqueta provenance real en scrape SINIM exitoso
+  ([`a478f50`](https://github.com/cortega26/chile-hub/commit/a478f50c78f566d244b28c4d210851c3028b9aac))
+
+- **extractors**: Etiqueta provenance real en scrape SINIM exitoso.
+  ([`4690fec`](https://github.com/cortega26/chile-hub/commit/4690fec06e443f4828acabd8853dc8635ae54195))
+
+### Mantenimiento
+
+- **plans**: Archiva plan 027 (DONE) — provenance real en scrape SINIM
+  ([`a478f50`](https://github.com/cortega26/chile-hub/commit/a478f50c78f566d244b28c4d210851c3028b9aac))
+
+### Documentación
+
+- Update pinned version example
+  ([`f269868`](https://github.com/cortega26/chile-hub/commit/f269868be7e2f69c753c57d5ac3689693e9abb50))
+
+
 ## 1.19.13 - 2026-07-08
 
 ### Corregido
