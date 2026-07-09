@@ -51,7 +51,6 @@ pipeline = [
     "curl_cffi==0.15.0",
     "openpyxl==3.1.5",
     "structlog==26.1.0",
-    "rutificador>=1.5.8",
     "tenacity==9.1.4",
 ]
 dev = [

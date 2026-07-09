@@ -1,7 +1,6 @@
 from typing import Any
 
 import polars as pl
-from rutificador import calcular_digito_verificador
 
 EXPECTED_INDICATOR_CODES = {"uf", "dolar", "euro", "utm", "ipc"}
 FALLBACK_COMUNAS_COUNT = 18
@@ -44,8 +43,39 @@ def _percentage_out_of_bounds_count(df: pl.DataFrame, columns: list[str]) -> int
     return count
 
 
+def _expected_dv_vectorized(bases: pl.Series) -> pl.Series:
+    """Calcula el dígito verificador Módulo 11 de forma vectorizada.
+
+    ``bases`` deben ser strings numéricos de 7 u 8 dígitos (ya validados).
+    El algoritmo (Módulo 11):
+      - Desde el dígito más a la derecha, pesos cíclicos 2,3,4,5,6,7,2,3,...
+      - Suma ponderada, resto módulo 11, DV = 11 - resto
+      - 11 -> "0", 10 -> "k", else -> str(resto)
+    """
+    padded = bases.str.zfill(8)
+    # Para un string de 8 chars right-aligned, pesos por posición (0=izquierda):
+    weights = [3, 2, 7, 6, 5, 4, 3, 2]
+
+    frame = padded.to_frame("b")
+    weighted = pl.lit(0)
+    for offset, w in enumerate(weights):
+        digit = pl.col("b").str.slice(offset, 1).cast(pl.Int64)
+        weighted = weighted + digit * w
+
+    r = weighted % 11
+    dv = 11 - r
+    expr = (
+        pl.when(dv == 11)
+        .then(pl.lit("0"))
+        .when(dv == 10)
+        .then(pl.lit("k"))
+        .otherwise(dv.cast(pl.String))
+    )
+    return frame.select(expr.alias("dv"))["dv"]
+
+
 def _validate_ruts_column(rut_series: pl.Series) -> tuple[int, int]:
-    """Valida formato y dígito verificador de RUTs usando rutificador.
+    """Valida formato y dígito verificador de RUTs.
 
     Retorna (format_bad_count, dv_bad_count):
     - format_bad_count: RUTs que no cumplen el formato XX.XXX.XXX-X
@@ -71,11 +101,8 @@ def _validate_ruts_column(rut_series: pl.Series) -> tuple[int, int]:
     bases = valid_ruts.str.replace(r"-[\dkK]$", "")
     declared_dvs = valid_ruts.str.replace(r"^\d{7,8}-", "").str.to_lowercase()
 
-    # Calcular DV esperado para cada base usando rutificador
-    expected_dvs = bases.map_elements(
-        calcular_digito_verificador,
-        return_dtype=pl.String,
-    )
+    # Calcular DV esperado para cada base (Polars vectorizado)
+    expected_dvs = _expected_dv_vectorized(bases)
 
     dv_bad = declared_dvs != expected_dvs
     dv_bad_count = int(dv_bad.sum())
@@ -601,7 +628,7 @@ def validate_empresas(
     if null_ruts:
         errors.append(f"found {null_ruts} null RUT values")
 
-    # RUT: validación de formato y dígito verificador con rutificador
+    # RUT: validación de formato y dígito verificador (vectorizada)
     format_bad, dv_bad = _validate_ruts_column(df["rut"])
     if format_bad > 0:
         warnings.append(f"found {format_bad} RUTs with invalid format")

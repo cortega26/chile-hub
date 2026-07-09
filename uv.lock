@@ -493,7 +493,6 @@ pipeline = [
     { name = "openpyxl" },
     { name = "pandas", marker = "python_full_version >= '3.11' or (extra == 'extra-9-chile-hub-dev' and extra == 'extra-9-chile-hub-scraping')" },
     { name = "pyarrow" },
-    { name = "rutificador" },
     { name = "structlog" },
     { name = "tenacity" },
     { name = "xlsxwriter" },
@@ -529,7 +528,6 @@ requires-dist = [
     { name = "requests", specifier = ">=2.34.2" },
     { name = "rich", specifier = ">=14.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = "==0.15.20" },
-    { name = "rutificador", marker = "extra == 'pipeline'", specifier = ">=1.5.8" },
     { name = "scrapling", extras = ["fetchers"], marker = "extra == 'scraping'", specifier = ">=0.4.10" },
     { name = "structlog", marker = "extra == 'dev'", specifier = "==26.1.0" },
     { name = "structlog", marker = "extra == 'pipeline'", specifier = "==26.1.0" },
@@ -3291,18 +3289,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/10/9b/5f14927848d2fd4aa891fd88d883788c5a7baba561c7874732364045708c/ruff-0.15.20-py3-none-win32.whl", hash = "sha256:ed65ef510e43a137207e0f01cfcf998aeddb1aeeda5c9d35023e910284d7cf21", size = 10857322, upload-time = "2026-06-25T17:20:28.612Z" },
     { url = "https://files.pythonhosted.org/packages/fa/f0/fe47c501f9dea92a26d788ff98bb5d92ed4cb4c88792c5c88af6b697dc8e/ruff-0.15.20-py3-none-win_amd64.whl", hash = "sha256:a525c81c70fb0380344dd1d8745d8cc1c890b7fc94a58d5a07bd8eb9557b8415", size = 11993274, upload-time = "2026-06-25T17:20:31.871Z" },
     { url = "https://files.pythonhosted.org/packages/d7/2b/9555445e1201d92b3195f45cdb153a0b68f24e0a4273f6e3d5ab46e212bb/ruff-0.15.20-py3-none-win_arm64.whl", hash = "sha256:2f5b2a6d614e8700388806a14996c40fab2c47b819ef57d790a34878858ed9ca", size = 11343498, upload-time = "2026-06-25T17:20:35.03Z" },
-]
-
-[[package]]
-name = "rutificador"
-version = "1.5.8"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "tomli", marker = "python_full_version < '3.11' or (extra == 'extra-9-chile-hub-dev' and extra == 'extra-9-chile-hub-scraping')" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/65/73/c14330d8fed28c6f71134b5f435518fe4ded25fd2b6a136b587bf2e25150/rutificador-1.5.8.tar.gz", hash = "sha256:e98f3fad2a216a5462ee09d1f8bdfcbdf91f2effa6f97643b84165920c9fb9f3", size = 38673, upload-time = "2026-05-14T23:53:22.194Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/33/04/4c1362d457e81a6bf1fcb415ac2e3d6499b0e10daf14e866173761681856/rutificador-1.5.8-py3-none-any.whl", hash = "sha256:c700022dedc41cc12edd46b5797d7462b725da58f193ea92b20e3f14f8141438", size = 44944, upload-time = "2026-05-14T23:53:20.628Z" },
 ]
 
 [[package]]
