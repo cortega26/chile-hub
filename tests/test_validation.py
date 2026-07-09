@@ -836,6 +836,62 @@ class ValidateEmpresasTests(unittest.TestCase):
         self.assertTrue(any("fallback" in w for w in result["warnings"]))
 
 
+class RUTCheckDigitTests(unittest.TestCase):
+    """Tests para el cálculo vectorizado del dígito verificador de RUT.
+
+    Pares conocidos (base -> DV) verificados contra el algoritmo Módulo 11.
+    Estos tests sobreviven a la remoción de la dependencia rutificador.
+    """
+
+    def test_pares_conocidos_7_y_8_digitos(self):
+        """Verifica DVs hardcodeados (7 y 8 dígitos, incluyendo caso k)."""
+        from src.validation import _expected_dv_vectorized
+
+        pairs = [
+            ("6350612", "5"),
+            ("11111111", "1"),
+            ("76286049", "k"),
+            ("76086428", "5"),
+            ("12345678", "5"),
+            ("10000000", "8"),
+            ("99999999", "9"),
+            ("1000000", "9"),
+            ("9999999", "3"),
+        ]
+        bases = pl.Series([p[0] for p in pairs])
+        expected = pl.Series([p[1] for p in pairs])
+        result = _expected_dv_vectorized(bases)
+        self.assertEqual(result.to_list(), expected.to_list())
+
+    def test_equivalencia_con_rutificador(self):
+        """Compara _expected_dv_vectorized vs calcular_digito_verificador.
+
+        Se salta si rutificador no está instalado (self-skip tras la migración).
+        Verifica un rango fijo de bases de 7 y 8 dígitos.
+        """
+        import pytest
+
+        pytest.importorskip("rutificador")
+        from rutificador import calcular_digito_verificador
+
+        from src.validation import _expected_dv_vectorized
+
+        # Rango fijo pequeño: 0..999 con 7 y 8 dígitos
+        bases_7 = [str(i).zfill(7) for i in range(0, 1000)]
+        bases_8 = [str(i).zfill(8) for i in range(0, 1000)]
+        bases = bases_7 + bases_8
+        bases_series = pl.Series(bases)
+
+        vectorized = _expected_dv_vectorized(bases_series)
+        expected = bases_series.map_elements(calcular_digito_verificador, return_dtype=pl.String)
+
+        mismatches = []
+        for i, (v, e) in enumerate(zip(vectorized, expected)):
+            if v != e:
+                mismatches.append((bases[i], str(v), str(e)))
+        self.assertEqual(mismatches, [], f"Mismatches found: {mismatches}")
+
+
 # ── Property-based tests (hypothesis) ──────────────────────────────────────────
 
 
