@@ -66,6 +66,7 @@ from src.builders.formats import (  # noqa: E402
     build_sqlite,
 )
 from src.builders.io_utils import (  # noqa: E402
+    compute_sha256,
     write_json_atomic,
     write_parquet_atomic,
 )
@@ -803,9 +804,10 @@ def _generate_reports(pipeline_metadata, previous_pipeline_metadata, metadata_ou
     write_dataset_quality_markdown_file(dataset_quality)
     artifact_manifest_output, artifact_manifest = write_artifact_manifest()
     zip_output = write_publishable_bundle_zip()
-    sha256_output = write_publishable_bundle_sha256(zip_output)
+    bundle_sha256 = compute_sha256(zip_output)
+    sha256_output = write_publishable_bundle_sha256(zip_output, sha256=bundle_sha256)
     artifact_manifest_output, artifact_manifest = attach_publishable_package_to_manifest(
-        zip_output, sha256_output, artifact_manifest
+        zip_output, sha256_output, artifact_manifest, sha256=bundle_sha256
     )
     hub_bundle_output, hub_bundle = write_hub_bundle_json(
         pipeline_metadata,

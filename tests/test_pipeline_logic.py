@@ -2974,6 +2974,58 @@ class DocSyncTests(unittest.TestCase):
         self.assertIsInstance(changed, list)
 
 
+class ExcelGuardTests(unittest.TestCase):
+    """Tests para el guardia de omisión de tablas masivas en Excel."""
+
+    def test_build_excel_skips_oversized_table(self):
+        """Tablas extra >500k filas se omiten del Excel; las pequeñas sí se incluyen."""
+        import openpyxl
+        import pandas as pd
+
+        from src.builders.formats import build_excel
+
+        df_tiny = pl.DataFrame({"col": [1]})
+
+        class OversizedFrame(pd.DataFrame):
+            def __len__(self):
+                return 500_001
+
+        extra_tables_pd = {
+            "test_small": pd.DataFrame({"x": [1, 2, 3]}),
+            "test_oversized": OversizedFrame({"x": [1, 2, 3]}),
+        }
+        extra_tables = {
+            "test_small": pl.DataFrame({"x": [1, 2, 3]}),
+            "test_oversized": pl.DataFrame({"x": [1, 2, 3]}),
+        }
+
+        test_config = {
+            "test_small": {"outputs": {}},
+            "test_oversized": {"outputs": {}},
+        }
+
+        with (
+            tempfile.TemporaryDirectory() as tmpdir,
+            patch("src.builders.formats.DATASET_CATALOG_CONFIG", test_config),
+        ):
+            output_path = str(Path(tmpdir) / "test.xlsx")
+            build_excel(
+                df_tiny,
+                df_tiny,
+                df_tiny,
+                df_tiny,
+                df_tiny,
+                df_tiny,
+                df_tiny,
+                extra_tables,
+                extra_tables_pd,
+                output_path,
+            )
+            wb = openpyxl.load_workbook(output_path)
+            self.assertIn("test_small", wb.sheetnames)
+            self.assertNotIn("test_oversized", wb.sheetnames)
+
+
 if __name__ == "__main__":
     import pytest
 

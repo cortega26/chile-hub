@@ -216,12 +216,20 @@ def build_excel(
             writer, sheet_name="Establecimientos Educacionales", index=False
         )
         # Escribir tablas extra, dividiendo las que excedan el límite de filas de Excel
+        _EXCEL_MAX_ROWS_SKIP = 500_000
         extra_sheet_names = {}  # table_name -> [sheet_names]
         for table_name, df_extra in extra_tables_pd.items():
+            num_rows = len(df_extra)
+            if num_rows > _EXCEL_MAX_ROWS_SKIP:
+                print(
+                    f"  Omite Excel para {table_name} ({num_rows:,} filas > "
+                    f"{_EXCEL_MAX_ROWS_SKIP:,}) — usa DuckDB o Parquet.",
+                    flush=True,
+                )
+                continue
             base_sheet = DATASET_CATALOG_CONFIG[table_name]["outputs"].get(
                 "excel_sheet", table_name[:31]
             )[:31]
-            num_rows = len(df_extra)
             if num_rows <= EXCEL_MAX_ROWS:
                 df_extra.to_excel(writer, sheet_name=base_sheet, index=False)
                 extra_sheet_names[table_name] = [base_sheet]

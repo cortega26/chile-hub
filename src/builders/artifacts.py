@@ -406,10 +406,11 @@ def write_publishable_bundle_zip():
     return output_path
 
 
-def write_publishable_bundle_sha256(zip_path):
+def write_publishable_bundle_sha256(zip_path, sha256=None):
     output_path = os.path.join(NORMALIZED_DIR, PUBLISHABLE_BUNDLE_SHA256_NAME)
     relative_zip_path = f"data/normalized/{os.path.basename(zip_path)}"
-    sha256 = compute_sha256(zip_path)
+    if sha256 is None:
+        sha256 = compute_sha256(zip_path)
     tmp_path = output_path + ".tmp"
     with open(tmp_path, "w", encoding="utf-8") as f:
         f.write(f"{sha256}  {relative_zip_path}\n")
@@ -417,7 +418,7 @@ def write_publishable_bundle_sha256(zip_path):
     return output_path
 
 
-def attach_publishable_package_to_manifest(zip_path, sha256_path, manifest=None):
+def attach_publishable_package_to_manifest(zip_path, sha256_path, manifest=None, sha256=None):
     manifest_path = os.path.join(NORMALIZED_DIR, "artifact_manifest.json")
     if manifest is None:
         with open(manifest_path, encoding="utf-8") as f:
@@ -425,12 +426,13 @@ def attach_publishable_package_to_manifest(zip_path, sha256_path, manifest=None)
 
     relative_path = f"data/normalized/{os.path.basename(zip_path)}"
     checksum_path = f"data/normalized/{os.path.basename(sha256_path)}"
+    sha256 = sha256 or compute_sha256(zip_path)
     manifest["packages"] = [
         {
             "path": relative_path,
             "package_type": "zip",
             "size_bytes": os.path.getsize(zip_path),
-            "sha256": compute_sha256(zip_path),
+            "sha256": sha256,
             "checksum_algorithm": "sha256",
             "checksum_path": checksum_path,
             "verification_command": f"shasum -a 256 -c {checksum_path}",
