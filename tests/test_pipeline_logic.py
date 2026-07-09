@@ -17,6 +17,7 @@ SRC_DIR = ROOT_DIR / "src"
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
+from chile_hub import pipeline_status_utils as _pipeline_canonical
 from scripts import package_publishable_bundle
 from scripts.verify_pipeline import (
     UTC,
@@ -1077,8 +1078,6 @@ class PipelineLogicTests(unittest.TestCase):
         """
         import tempfile
 
-        from src import pipeline_status_utils
-
         registry = [
             {
                 "dataset": "public_ds",
@@ -1107,7 +1106,7 @@ class PipelineLogicTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             registry_path = Path(tmpdir) / "source_registry.json"
             registry_path.write_text(json.dumps(registry), encoding="utf-8")
-            with patch.object(pipeline_status_utils, "SOURCE_REGISTRY_PATH", registry_path):
+            with patch.object(_pipeline_canonical, "SOURCE_REGISTRY_PATH", registry_path):
                 health = build_hub_health(metadata)
 
         self.assertEqual(health["top_issue"]["dataset"], "public_ds")
@@ -1118,8 +1117,6 @@ class PipelineLogicTests(unittest.TestCase):
         build_hub_health no debe filtrar — de lo contrario rompería la pureza
         que necesitan los tests unitarios que no dependen del repo real."""
         import tempfile
-
-        from src import pipeline_status_utils
 
         registry = [
             {
@@ -1143,7 +1140,7 @@ class PipelineLogicTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             registry_path = Path(tmpdir) / "source_registry.json"
             registry_path.write_text(json.dumps(registry), encoding="utf-8")
-            with patch.object(pipeline_status_utils, "SOURCE_REGISTRY_PATH", registry_path):
+            with patch.object(_pipeline_canonical, "SOURCE_REGISTRY_PATH", registry_path):
                 health = build_hub_health(metadata)
 
         # beta tiene warnings y ninguno de los dos datasets está en el
@@ -1155,8 +1152,6 @@ class PipelineLogicTests(unittest.TestCase):
         build_hub_health degrada con gracia al comportamiento sin filtro en
         vez de lanzar una excepción."""
         import tempfile
-
-        from src import pipeline_status_utils
 
         metadata = {
             "generated_at_utc": "2026-07-08T00:00:00+00:00",
@@ -1172,7 +1167,7 @@ class PipelineLogicTests(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as tmpdir:
             missing_path = Path(tmpdir) / "does_not_exist.json"
-            with patch.object(pipeline_status_utils, "SOURCE_REGISTRY_PATH", missing_path):
+            with patch.object(_pipeline_canonical, "SOURCE_REGISTRY_PATH", missing_path):
                 health = build_hub_health(metadata)
 
         self.assertEqual(health["top_issue"]["dataset"], "beta")
@@ -1202,9 +1197,8 @@ class PipelineLogicTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             registry_path = Path(tmpdir) / "source_registry.json"
             registry_path.write_text(json.dumps(registry), encoding="utf-8")
-            from src import pipeline_status_utils
 
-            with patch.object(pipeline_status_utils, "SOURCE_REGISTRY_PATH", registry_path):
+            with patch.object(_pipeline_canonical, "SOURCE_REGISTRY_PATH", registry_path):
                 all_names, public_names = _load_source_registry_datasets()
 
         self.assertEqual(all_names, {"public_a", "public_but_ineligible", "candidate_a"})
@@ -1213,12 +1207,11 @@ class PipelineLogicTests(unittest.TestCase):
     def test_load_source_registry_datasets_missing_file_returns_empty_sets(self):
         import tempfile
 
-        from src import pipeline_status_utils
         from src.pipeline_status_utils import _load_source_registry_datasets
 
         with tempfile.TemporaryDirectory() as tmpdir:
             missing_path = Path(tmpdir) / "does_not_exist.json"
-            with patch.object(pipeline_status_utils, "SOURCE_REGISTRY_PATH", missing_path):
+            with patch.object(_pipeline_canonical, "SOURCE_REGISTRY_PATH", missing_path):
                 all_names, public_names = _load_source_registry_datasets()
 
         self.assertEqual(all_names, set())

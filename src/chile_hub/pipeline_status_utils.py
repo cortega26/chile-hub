@@ -1,12 +1,8 @@
 """Constructores de reportes operativos y utilidades del pipeline de chile-hub.
 
-CANONICAL SOURCE — este archivo y src/pipeline_status_utils.py deben ser
-IDÉNTICOS. La raíz del proyecto se detecta con _find_root() (busca
-pyproject.toml como sentinel) para que el mismo código funcione desde
-src/ y desde src/chile_hub/ sin divergencia.
-
-Si editas este archivo, copia el resultado idéntico a la otra ubicación
-y confirma que ambos tests (test_chile_hub y test_pipeline_logic) pasan.
+La raíz del proyecto se detecta con _find_root() (busca pyproject.toml como
+sentinel) para que el mismo código funcione desde src/ y desde src/chile_hub/
+sin divergencia.
 """
 
 import json
