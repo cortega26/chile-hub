@@ -48,6 +48,21 @@ jobs:
         with:
           enable-cache: true
 
+      - name: Install dev dependencies
+        run: uv sync --extra pipeline --extra dev
+
+      - name: Type check (mypy)
+        run: uv run mypy
+
+      - name: Security scan (bandit)
+        run: uv run bandit -c pyproject.toml -r src/
+
+      - name: Dependency audit (pip-audit)
+        run: uv run pip-audit
+
+      - name: Docstring coverage (informational)
+        run: uv run interrogate --fail-under=80 src/chile_hub || true
+
       - name: Verify uv.lock is in sync with pyproject.toml
         run: uv lock --locked
 
