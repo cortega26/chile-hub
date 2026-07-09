@@ -10,6 +10,28 @@
 > `git diff --stat c486e7c..HEAD -- data/source_registry.json data/normalized/dataset_catalog.json`
 > and re‑confirm the live row counts (Step 1) before deciding.
 
+> **Reassessment note (2026-07-09)**: between `c486e7c` and this note, all three decisions below were
+> already made and implemented as side effects of an unrelated bug-hunting session (chasing Pipeline
+> Check #270), NOT by executing this spike. Confirmed:
+> - `consumo_electrico_comunal` → **RE‑CARRIL, done** (`57e6eaf`): source confirmed permanently dead
+>   (CNE decommissioned `energiaabierta.cl`'s Junar platform, no replacement API); `maturity_status`
+>   is now `deprecated`, `publication_track` is `candidate`, `public_bundle_eligible: false`.
+> - `pobreza_comunal` → **FILL, done in code** (`3f968ab`): the extractor's column mapping was wrong
+>   for the real MDS XLSX layout (not a source-coverage problem as this plan speculated), now fixed —
+>   will produce 345 comunas × 2 dimensions on the next live extract.
+> - `finanzas_municipales` → **FILL, done** (post‑034 monthly scrape ran successfully, `c8c7c70`):
+>   committed staging snapshot shows 345/346 municipios.
+>
+> Skip Steps 1–3 below (the measurement/tractability/decision work is already reflected in
+> `data/source_registry.json`) unless re‑verifying. The remaining real work is: (a) write
+> `docs/adr/NNN-comunal-coverage-decision.md` documenting these three decisions and their evidence
+> (the commits above), (b) confirm a live `pobreza_extractor.py` run actually lands 690 rows in the
+> published bundle (the code fix landed but may not have been exercised by a real build/publish yet),
+> and (c) confirm `consumo_electrico_comunal` is absent from `chile-hub-publishable-bundle.zip`. Note
+> Plan 027 (SINIM provenance label) is a related gap, now closed (DONE `4690fec`): the live
+> `finanzas_municipales` scrape was mislabeling its own provenance as curated fallback — worth citing
+> in the ADR.
+
 ## Status
 
 - **Priority**: P2

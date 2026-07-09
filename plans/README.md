@@ -8,6 +8,18 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 > de tests del gate de publicación y los writers (035–036), dos refactors (037–038) y
 > tres planes de diseño (039–041). Ver "Hallazgos considerados y diferidos (2026-07-07)".
 
+> **Reevaluación de vigencia (2026-07-09)**: entre `c486e7c` y `HEAD` (`c1aa3e9`) hubo 45 commits,
+> la mayoría fixes reactivos a bugs reales encontrados persiguiendo Pipeline Check #270 (cadena
+> `4ebca99`…`354ad6e`, más `3f968ab`/`57e6eaf`/`9b85a23`/`df0999e`), no ejecuciones deliberadas de
+> estos planes. Se revisó cada plan activo con su propio "drift check" contra `c486e7c`. Resultado:
+> **034 quedó DONE de rebote** (el fix reactivo `4ebca99` corrigió exactamente el `--group dev` →
+> `--extra pipeline --extra dev` que el plan pedía) y se archivó. **039 quedó resuelto en sustancia**
+> para los 3 datasets (ver su fila) pero sigue `TODO` porque falta el ADR formal. **Todos los demás
+> planes activos (027–033, 035–038, 040–041) siguen 100% vigentes** — se verificó línea por línea que
+> el defecto descrito sigue presente en el código actual; en dos casos la evidencia es ahora más
+> fuerte que en la auditoría original (ver notas en 027 y 038 abajo). Detalle completo de la
+> reevaluación al final de este archivo, sección "Reevaluación 2026-07-09".
+
 > ## Rutina obligatoria tras cada iteración / actualización / cambio
 >
 > Al cerrar **cualquier** iteración de trabajo sobre un plan (una tarea, una fase, una ola o el
@@ -36,19 +48,17 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 
 | # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
 |---|------|----------|----------|--------|-----------|--------|
-| 027 | [Provenance real en scrape SINIM exitoso](027-sinim-finanzas-provenance-label.md) | P2 | S | LOW | — | TODO |
 | 028 | [Elimina verificación unrar no-op y engañosa](028-remove-unrar-tofu-integrity-noop.md) | P2 | S | LOW | — | TODO |
 | 029 | [Corrige 3 docstrings desubicadas en `core.py`](029-fix-misplaced-docstrings-core.md) | P2 | S | LOW | — | TODO |
 | 030 | [Guarda Excel para tablas masivas + dedup SHA bundle](030-excel-large-table-guard-and-bundle-sha-dedup.md) | P2 | S | LOW | — | TODO |
 | 031 | [Arregla la cache muerta de `load_polars`](031-fix-dead-load-polars-cache.md) | P2 | S | LOW | — | TODO |
 | 032 | [Adelgaza deps runtime del paquete instalado](032-slim-runtime-dependencies.md) | P2 | S | MED | — (026 DONE) | TODO |
-| 033 | [Ejecuta mypy/bandit/pip-audit/interrogate en CI](033-enforce-quality-gates-in-ci.md) | P2 | S-M | MED | — | TODO |
-| 034 | [Arregla el workflow `monthly-scrape` (`--group dev`)](034-fix-monthly-scrape-workflow.md) | P2 | S | LOW | — | TODO |
-| 035 | [Tests de caracterización del gate `verify_pipeline`](035-characterization-tests-publish-gate.md) | P2 | L | LOW | — | TODO |
+| 033 | [Ejecuta mypy/bandit/pip-audit/interrogate en CI](033-enforce-quality-gates-in-ci.md) | P2 | S-M | MED | — | TODO — el job `quality` de `pipeline-check.yml` creció (lock-sync, docs-sync, companion-paths) pero sigue sin mypy/bandit/pip-audit/interrogate; el hueco que describe el plan sigue intacto. |
+| 035 | [Tests de caracterización del gate `verify_pipeline`](035-characterization-tests-publish-gate.md) | P2 | L | LOW | — | TODO — `354ad6e` ya sumó tests para 2 funciones más de `verify_pipeline.py` (6/~24 `verify_*` cubiertas) y para áreas adyacentes (`build_hub_health`, `sync_landing_metadata`), pero el deliverable del plan (`tests/test_verify_pipeline.py`, `scripts` en `coverage.source`, tests de `validate_puntos_interes`) sigue sin existir. |
 | 036 | [Tests golden de writers de artefactos](036-golden-output-tests-artifact-writers.md) | P2 | M | LOW | 030 (opc.) | TODO |
 | 037 | [Vectoriza DV de RUT + elimina `rutificador`](037-vectorize-rut-validation.md) | P2 | M | MED | coord. 032 | TODO |
-| 038 | [Deduplica `pipeline_status_utils.py`](038-deduplicate-pipeline-status-utils.md) | P3 | M | MED | — | TODO |
-| 039 | [Diseño: resuelve capas comunales 3/346 en el bundle](039-design-resolve-sparse-comunal-layers.md) | P2 | M | MED | 034 (024 DONE) | TODO |
+| 038 | [Deduplica `pipeline_status_utils.py`](038-deduplicate-pipeline-status-utils.md) | P3 | M | MED | — | TODO — riesgo confirmado en vivo: entre `c486e7c` y `HEAD` ambas copias (`src/pipeline_status_utils.py` y `src/chile_hub/pipeline_status_utils.py`) recibieron el mismo parche de 54 líneas a mano dos veces (siguen siendo byte-idénticas por ahora, pero es exactamente el modo de fallo que el plan anticipa). |
+| 039 | [Diseño: resuelve capas comunales 3/346 en el bundle](039-design-resolve-sparse-comunal-layers.md) | P2 | S (era M) | LOW (era MED) | — (024 y 034 DONE) | TODO — **resuelto en sustancia por fixes reactivos, falta el ADR formal.** `consumo_electrico_comunal`: RE-CARRIL ya implementado (`57e6eaf`, fuente confirmada muerta permanentemente, `maturity_status="deprecated"`/`candidate`, fuera del bundle). `pobreza_comunal`: FILL ya en código (`3f968ab` corrigió el mapeo de columnas del XLSX real de MDS; producirá 345 comunas × 2 = 690 filas en el próximo extract en vivo — la causa raíz no era la que suponía el plan). `finanzas_municipales`: FILL ya logrado (scrape mensual corriendo tras 034; snapshot comprometido con 345/346 municipios). Trabajo restante: escribir `docs/adr/NNN-comunal-coverage-decision.md` documentando estas 3 decisiones ya tomadas, y confirmar que el próximo build recoge el `pobreza_comunal` real (no requiere código nuevo). |
 | 040 | [Diseño: superficie SQL `hub.sql()` sobre Parquet](040-design-hub-sql-query-surface.md) | P2 | S-M | LOW | coord. 032 | TODO |
 | 041 | [Diseño: import/validate de `datapackage.json`](041-design-datapackage-import-validate.md) | P3 | S | LOW | — | TODO |
 | 023 | [Datasets `autoridades_electas` y `partidos_politicos`](023-autoridades-electas-partidos-politicos.md) | P2 | M-L | MED | — (deriva de Plan 022 · Ola B2.2, research cerrada) | 🔶 Ola A y B `stable_publishable` y en el bundle público (2026-07-06): `partidos_politicos` (36, 15 con estado_legal/fecha vía SERVEL) y `autoridades_electas` (diputados+senadores, 205, senadores con codigo_region/periodo completos). `autoridades_locales` (gobernadores+alcaldes, 240, CC-BY-SA segregado) queda `candidate` — cobertura de alcaldes insuficiente a criterio del operador, pendiente mejorar el extractor. No se archiva hasta resolver ese follow-up. |
@@ -58,9 +68,16 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 
 | # | Plan | Esfuerzo | Riesgo | Estado |
 |---|------|----------|--------|--------|
+| 027 | [Provenance real en scrape SINIM exitoso](archive/027-sinim-finanzas-provenance-label.md) | S | LOW | DONE — ejecutado en `advisor/027-sinim-provenance-label` commit `4690fec`; `source_mode != "fallback"` reemplaza la rama muerta `== "live"`, 2 tests nuevos (`test_build_metadata_monthly_sets_live_provenance` + `test_build_metadata_fallback_sets_curated_provenance`), 9/9 tests pasan, lint y format-check OK. |
 | 024 | [Extractores: preserva ceros CUT + timestamps ISO](archive/024-extractor-cut-and-timestamp-integrity.md) | S | LOW | DONE — ejecutado en `advisor/024-extractor-cut-timestamp` commit `3ad6ab9`; `grep` de timestamps, overrides/zfill, diff de `pipeline_status_utils`, pytest focal (`221 passed`), lint y format-check OK. |
 | 025 | [Sincroniza enum `Dataset` (+docs) con el catálogo de 19](archive/025-sync-dataset-enum-and-docs-with-catalog.md) | S | LOW | DONE — ejecutado en `advisor/025-sync-dataset-enum`; `Dataset.values()` = 19, `Dataset.from_string()` resuelve los datasets nuevos, pytest focal (`39 passed, 130 deselected`), lint y format-check OK. Commit pendiente: el hook pre-commit local no encontró `interrogate`. |
 | 026 | [Regenera `uv.lock` + guardia `--locked` en CI](archive/026-regenerate-uv-lock-and-ci-guard.md) | S | LOW | DONE — ejecutado en `advisor/026-uv-lock-sync` commit `a6b22b8`; `uv lock --locked`, `uv sync --extra pipeline --extra dev --locked` y `WorkflowContractTests` OK. |
+
+## Planes archivados (resueltos por fixes reactivos a Pipeline Check #270, 2026-07-08)
+
+| # | Plan | Esfuerzo | Riesgo | Estado |
+|---|------|----------|--------|--------|
+| 034 | [Arregla el workflow `monthly-scrape` (`--group dev`)](archive/034-fix-monthly-scrape-workflow.md) | S | LOW | DONE — **no ejecutado como plan**: resuelto de rebote por el commit reactivo `4ebca99` (`fix(ci): harden release artifact gates`), que cambió `uv sync --group dev` → `uv sync --extra pipeline --extra dev` en ambos jobs (Steps 1–2 del plan, verbatim). Endurecido después por `974b502`/`f0f8096`/`57e6eaf` (commit tolerante a `data/*` en `.gitignore`) y confirmado end-to-end por `c8c7c70` (refresh mensual de SINIM exitoso, 345/346 municipios). Único cabo suelto: el Step 3 del plan (test que impida que reaparezca `uv sync --group`) no se agregó — `tests/test_ci_config.py` guarda otras regresiones de esta misma cadena pero no esa línea específica; follow-up de bajo esfuerzo si se quiere el guardrail. |
 
 ## Planes archivados (docs, 2026-07-04)
 
@@ -112,12 +129,12 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 
 ```
 Auditoría 2026-07-07 (024–041):
-  031 025 027 028 029 030       (independientes — cada uno un archivo/área distinta)
+  031 025 028 029 030          (independientes — cada uno un archivo/área distinta)
   032 → 037                     (lock limpio resuelto por 026; 037 quita rutificador que 032 reubica)
   032 ⇠ 040                     (040 hub.sql necesita duckdb; reconciliar con la reubicación de 032)
   030 → 036 (opcional)          (036 puede afirmar el guard de Excel de 030)
-  033 034 035 038 041           (independientes)
-  034 → 039                     (024 DONE; 039 decide capas comunales tras arreglar el scrape SINIM)
+  033 035 038 041               (independientes; 034 quedó DONE de rebote — ver archivo)
+  039                           (024 y 034 DONE; ya solo falta escribir el ADR — ver su fila)
 
 Planes previos:
   023 (independiente)  ← autoridades_electas + partidos_politicos; queda abierto por autoridades_locales
@@ -128,23 +145,30 @@ Planes previos:
 2026-07-07, así que **032** (adelgazar deps) ya puede partir de un lock limpio; **037** elimina `rutificador`, que **032**
 solo reubica — coordinar; **040** (`hub.sql`) reintroduce la necesidad de `duckdb` que **032** saca de
 runtime, así que ambos deben acordar si `duckdb` vuelve a runtime o va en un extra `query`. **039**
-depende ahora de **034** (scrape SINIM roto); **024** ya resolvió el bug CUT que bloqueaba
-`consumo_electrico`. El resto de 025 y 027–031 son fixes de un archivo, ejecutables en cualquier
-orden. **020** sigue bloqueado (gate 4.3 NO-GO); **021** (MkDocs) quedó DONE el 2026-07-04.
+ya no depende de nada activo: **034** quedó DONE de rebote el 2026-07-08 (ver "Planes archivados —
+fixes reactivos") y **024** ya resolvió el bug CUT que bloqueaba `consumo_electrico`; lo único
+pendiente en 039 es redactar el ADR retroactivo. El resto de 025 y 028–031 son fixes de un archivo,
+ejecutables en cualquier orden. **020** sigue bloqueado (gate 4.3 NO-GO); **021** (MkDocs) quedó DONE
+el 2026-07-04.
 
 ## Orden de ejecución recomendado
 
-**Auditoría 2026-07-07 (024–041) — orden sugerido por olas:**
+**Auditoría 2026-07-07 (024–041) — orden sugerido por olas (actualizado 2026-07-09; 024, 025, 026 y
+034 ya están DONE/archivados, no aparecen abajo):**
 
-1. **Ola de fixes P1** (independiente, S/LOW): **025**. Defecto que desincroniza la API pública del enum
-   con el catálogo — alto apalancamiento, verificación limpia. (**024** ya está DONE.)
-2. **Ola de fixes P2** (independientes, S/LOW): **027, 028, 029, 030, 031**. Un archivo cada uno.
-3. **Higiene de deps/CI**: **032**, luego **033** y **034**. (033 puede sacar a la luz un backlog de
-   mypy/interrogate — ver su Step 1 y sus STOP conditions.)
-4. **Backfill de tests**: **035** (gate de publicación — baseline de verificación), luego **036** (writers).
-5. **Refactors**: **037** (vectoriza RUT; coordinar con 032) y **038** (dedup; MED por el acoplamiento
-   `__init__ → core`).
-6. **Diseño/spikes**: **039** (después de 034; 024 ya está DONE), **040** (coordinar con 032), **041**.
+1. **Ola de fixes P2, un archivo cada uno, sin dependencias entre sí** — **028, 029, 030, 031**.
+   (027 ya está DONE — archivado). El resto (028–031) es intercambiable, cada uno toca un archivo distinto.
+2. **Higiene de deps/CI**: **032** (adelgazar runtime deps) → **033** (mypy/bandit/pip-audit/interrogate
+   en CI). 032 antes de 033 porque 037 y 040 coordinan con la reubicación de deps que hace 032. 033
+   puede sacar a la luz un backlog de mypy/interrogate — ver su Step 1 y sus STOP conditions.
+3. **Backfill de tests**: **035** (gate de publicación — baseline de verificación) → **036** (writers).
+   035 primero porque es la red de seguridad que los refactors de la ola siguiente deberían tener antes
+   de tocar código de build.
+4. **Refactors**: **037** (vectoriza RUT; coordinar con 032, que ya reubicó `rutificador`) y **038**
+   (dedup `pipeline_status_utils.py`; MED por el acoplamiento `__init__ → core`). Sin orden estricto
+   entre ambos.
+5. **Diseño/spikes**: **039** (024 y 034 ya DONE — el spike se reduce a redactar el ADR retroactivo,
+   es el más rápido de cerrar de los tres) → **040** (coordinar con 032) → **041**.
 
 Planes previos aún vigentes:
 - **023** — autoridades_electas + partidos_politicos: DONE para diputados/senadores/partidos; queda abierto
@@ -167,7 +191,7 @@ re-auditen. (Los defectos accionables sí están en 024–041.)
 | **TECHDEBT-02**: `core.py` (2302 líneas) es god module; ~600 líneas de CLI viven ahí en vez de `cli.py` | **Diferido — L, MED.** Alto valor pero rewrite grande con red de seguridad solo de smoke tests. Mover la CLU a `cli.py` primero sería la rebanada de mayor valor; abrir plan propio cuando haya apetito. |
 | **TECHDEBT-03**: `sinim_finanzas_extractor.py` y `sinim_finanzas_live_extractor.py` son copias divergentes | **Diferido — M, MED.** El Plan 027 corrige el bug de provenance de la copia live; la consolidación de `normalize_rows`/`build_metadata` compartidas queda como follow-up. |
 | **TECHDEBT-05**: cinco idiomas distintos de resolución de raíz/`data/` (`parents[N]`, `_find_root`, etc.) | **Diferido — M, MED.** Consolidar en `_find_root()` toca muchos archivos; cosmético-funcional. Estandarizar gradualmente. |
-| **TECHDEBT-06 / DX-06**: split diario-vs-mensual de extracción no documentado; `make bootstrap` no instala `--extra scraping` | **Diferido — S, docs.** Anotado en 034 (Maintenance). Documentar los dos carriles de extracción y la degradación de `autoridades_electas` sin scrapling. |
+| **TECHDEBT-06 / DX-06**: split diario-vs-mensual de extracción no documentado; `make bootstrap` no instala `--extra scraping` | **Diferido — S, docs.** Anotado en el Plan 034 archivado (Maintenance notes, `archive/034-fix-monthly-scrape-workflow.md`). Documentar los dos carriles de extracción y la degradación de `autoridades_electas` sin scrapling. Sigue sin hacerse — el fix reactivo que archivó 034 resolvió el bug de `--group dev`, no esta documentación. |
 | **TC-04 / TC-05 / TC-07**: characterization de `build_dev_db.py`; tests de los 2 extractores live; split de `test_chile_hub.py` que hoy exige un build previo | **Diferido — backlog de tests.** Los planes 035 (gate) y 036 (writers) cubren el riesgo de publicación más alto primero; el resto del backfill queda como follow-up. |
 | **DIR-04**: promover o aceptar `autoridades_locales` (cola abierta del Plan 023) | **No duplicar** — sigue rastreado por el Plan 023 activo (cobertura de alcaldes). |
 | **DIR-05**: decidir `delincuencia_comunal` (CEAD) antes de su `review_by 2026-09-21` | **Decisión del mantenedor, no plan de código.** El extractor y el workflow existen; el `next_action` en `data/source_registry.json` fuerza la decisión. |
@@ -208,6 +232,45 @@ re-auditen. (Los defectos accionables sí están en 024–041.)
 | **DM-08**: `requests` + `curl_cffi` overlap | Por diseño. |
 | **DM-09**: `pandas` podría removerse | No justifica esfuerzo. |
 | **BUG-04 a BUG-10**: varios bugs de bajo riesgo | Riesgo bajo o por diseño. |
+
+## Reevaluación 2026-07-09
+
+Contexto: entre la auditoría `/improve deep` de `c486e7c` (2026-07-07) y `HEAD` (`c1aa3e9`, 2026-07-09)
+hubo 45 commits. La mayoría no fueron ejecuciones de estos planes sino **fixes reactivos** a bugs reales
+descubiertos persiguiendo el fallo de CI "Pipeline Check #270": la cadena `4ebca99` → `dc5a882` →
+`0229cc3` → `f056684` → `974b502` → `f0f8096` → `fcc7f6f` → `57e6eaf` → `3ad6ab9` (Plan 024, ese sí
+ejecutado) → `88187f0`/`71bc263` (Plan 025) → `9b85a23` → `df0999e` → `3f968ab` → `354ad6e`. Se pidió
+reevaluar si `plans/` sigue vigente. Método: cada plan activo trae su propio comando de "drift check"
+(`git diff --stat c486e7c..HEAD -- <archivos-del-plan>`) — se ejecutó para los 15 planes activos y se
+verificó el código/config real donde hubo diff.
+
+**Resultado por plan:**
+
+| Plan | Diff en sus archivos desde `c486e7c` | Veredicto |
+|---|---|---|
+| 027 | ninguno | Vigente. El bug (etiqueta de provenance) sigue presente y ahora es **observable en datos reales** committeados (ver su fila arriba). |
+| 028 | ninguno | Vigente, sin cambios. |
+| 029 | ninguno | Vigente; se confirmaron las 3 líneas exactas del defecto. |
+| 030 | `build_dev_db.py` +2 líneas (import de `sync_all_docs`, no relacionado) | Vigente; el guard de Excel sigue ausente. |
+| 031 | ninguno | Vigente; se confirmó la línea exacta del guard invertido. |
+| 032 | `pyproject.toml` (solo bump de versión), `AGENTS.md`, `uv.lock` | Vigente; las 5 deps solo-pipeline siguen en `[project.dependencies]`. |
+| 033 | `pipeline-check.yml` +81/-7, `Makefile` +9 | Vigente; el job `quality` creció (lock-sync, docs-sync, companion-paths) pero mypy/bandit/pip-audit/interrogate siguen sin CI. |
+| 034 | `monthly-scrape.yml` reescrito | **DONE de rebote** — archivado (ver tabla de archivados arriba). |
+| 035 | `verify_pipeline.py` +43/-, tests +1355 líneas | Vigente; cobertura de `verify_*` subió de 4 a 6 funciones de ~24, pero el deliverable del plan no existe. |
+| 036 | ninguno | Vigente, sin cambios. |
+| 037 | `pyproject.toml` (solo bump de versión) | Vigente; `rutificador` sigue importado vía `map_elements`. |
+| 038 | ambas copias +54 líneas cada una (edición manual paralela) | Vigente; se confirmó que siguen byte-idénticas, pero el riesgo que el plan describe se ejercitó en vivo. |
+| 039 | `source_registry.json`/`dataset_catalog.json` reescritos | **Sustancialmente resuelto**, sigue `TODO` solo para el ADR — ver nota en el archivo del plan y su fila arriba. |
+| 040 | `README.md` +53/-13 (sección DuckDB, no la API) | Vigente, sin cambios en `core.py`. |
+| 041 | `pyproject.toml` (solo bump de versión) | Vigente, sin cambios. |
+| 023 | sin diff en extractores relevantes | Sin cambios; la nota granular existente en su fila sigue siendo precisa. |
+| 020 | sin diff | Sin cambios; sigue BLOCKED por el gate 4.3. |
+
+**Conclusión**: de 15 planes activos, 13 siguen 100% vigentes tal como están escritos (sus propios
+drift-checks los blindan contra los cambios de línea/número que sí ocurrieron), 1 se archivó por estar
+resuelto (034) y 1 se redujo de alcance por estar resuelto en sustancia (039, falta solo el ADR). No se
+encontró ningún plan activo que un fix reactivo haya vuelto obsoleto por completo ni ninguno cuya premisa
+ya no aplique.
 
 ## Columnas de estado
 
