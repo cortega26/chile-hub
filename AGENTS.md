@@ -707,18 +707,21 @@ El HTML de un sitio web cambia en cada rediseño. Las fuentes MVP deben ser:
 No agregar nuevos datasets hasta que los existentes tengan señales de adopción
 documentadas (descargas, issues con casos de uso, menciones externas).
 
-### ❌ Usar versiones no fijadas en pyproject.toml
+### ❌ Usar versiones no fijadas en pyproject.toml (dependencias pipeline/dev)
 
 ```toml
-# ❌
-"polars>=0.20.0"
+# ✅ Runtime (rango compatible para que consumidores publicados resuelvan)
+"polars>=1.41.2,<2"
 
-# ✅
-"polars==0.20.31"
+# ✅ Pipeline / dev (pin exacto reproducido vía uv.lock)
+"duckdb==1.5.4"
 ```
 
-Las versiones flotantes pueden romper el pipeline silenciosamente en CI.
-Las dependencias se fijan en `pyproject.toml` y se reproducen exactamente vía `uv.lock`.
+Las dependencias **runtime** de la librería usan rangos compatibles (e.g. `polars>=1.41.2,<2`)
+porque los consumidores publicados necesitan flexibilidad de resolución. Las dependencias
+**pipeline y dev** (extractores, builders, validación, tooling) usan pins exactos (`==`)
+porque un cambio silencioso allí rompe la generación de artefactos. En ambos casos el
+_lockfile_ (`uv.lock`) es el único contrato reproducible — `uv sync` lo reproduce exactamente.
 
 ### ❌ Publicar datos sin pasar por validate_*()
 
