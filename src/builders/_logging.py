@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import os
 import sys
-from typing import Any
+from typing import Any, cast
 
 import structlog
 
@@ -70,4 +70,4 @@ _configure_pipeline_logging()
 
 def get_logger(name: str) -> structlog.stdlib.BoundLogger:
     """Retorna un logger estructurado con el nombre del módulo como contexto."""
-    return structlog.get_logger(name)
+    return cast(structlog.stdlib.BoundLogger, structlog.get_logger(name))

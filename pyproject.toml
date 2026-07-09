@@ -217,8 +217,8 @@ ignore-module = true
 ignore-nested-functions = true
 ignore-nested-classes = true
 # Umbral bajo en pre-commit: no bloquea commits, solo informa.
-# Usa 'make docs-coverage' para verificar el umbral estricto (80%).
-fail-under = 0
+# El CI ejecuta con --fail-under=80 (ver make docs-coverage).
+fail-under = 80
 paths = ["src/chile_hub"]
 exclude = ["src/chile_hub/pipeline_status_utils.py", "src/chile_hub/__main__.py"]
 
