@@ -12,6 +12,44 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.19.15 - 2026-07-09
+
+### Corregido
+
+- **api**: Restaura docstrings de load_polars/validate_* (orden de sentencias)
+  ([`1d7a963`](https://github.com/cortega26/chile-hub/commit/1d7a9636800daf02ab86a965c97a47c42e057cd5))
+
+### Mantenimiento
+
+- **plans**: Actualiza índice — Ola 1 (027-031) completa
+  ([`09869ee`](https://github.com/cortega26/chile-hub/commit/09869eedfdd3f56904356446cb7be82f08b82fec))
+
+- **plans**: Archiva plan 028 (DONE) — elimina verificación unrar no-op
+  ([`e33cd3b`](https://github.com/cortega26/chile-hub/commit/e33cd3bc4b843b84dad3df321f3d7158a0f688eb))
+
+- **plans**: Archiva plan 029 (DONE) — docstrings restaurados en core.py
+  ([`42bf34a`](https://github.com/cortega26/chile-hub/commit/42bf34aa1864d5d56627afbaffa5d8c133f6a632))
+
+- **plans**: Archiva plan 030 (DONE) — guardia Excel + dedup SHA bundle
+  ([`6949f65`](https://github.com/cortega26/chile-hub/commit/6949f6581e8cefff4d6ec3432934db4625eee406))
+
+- **plans**: Archiva plan 031 (DONE) — cache de load_polars en ruta por defecto
+  ([`4df4947`](https://github.com/cortega26/chile-hub/commit/4df494795d81fec4bc1f87a5241cb1fe039ee312))
+
+### Documentación
+
+- Update README release metadata
+  ([`e5947da`](https://github.com/cortega26/chile-hub/commit/e5947da71f55c2f54685c04181d36484d12dd0f9))
+
+### Mejorado
+
+- **api**: Cachea Parquet en load_polars también en la ruta por defecto
+  ([`7b1f065`](https://github.com/cortega26/chile-hub/commit/7b1f065f24ab78eed67e018e68f4d98812470cc9))
+
+- **build**: Omite Excel para tablas masivas y evita doble hash del bundle
+  ([`a6aa9ef`](https://github.com/cortega26/chile-hub/commit/a6aa9ef5247f206d9f758e1f0f19e3f0f387e274))
+
+
 ## 1.19.14 - 2026-07-09
 
 ### Corregido
