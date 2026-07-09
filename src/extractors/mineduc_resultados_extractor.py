@@ -7,7 +7,6 @@ Fuente: Rendimiento_2024.rar (MINEDUC Datos Abiertos).
 """
 
 import datetime
-import hashlib
 import os
 import shutil
 import subprocess
@@ -49,9 +48,6 @@ METADATA_PATH = STAGING_DIR / "resultados_educacionales.metadata.json"
 DOWNLOAD_URL = "https://datosabiertos.mineduc.cl/wp-content/uploads/2025/04/Rendimiento_2024.rar"
 SOURCE_URL = DOWNLOAD_URL
 RAR_FILENAME = "mineduc_rendimiento_2024.rar"
-
-# Hash del binario unrar registrado en primera ejecución
-_UNRAR_EXPECTED_SHA256 = None
 
 REUSE_POLICY = {
     "status": "open-attribution",
@@ -97,41 +93,6 @@ FALLBACK_ROWS = [
         "establecimientos_reportados": 151,
     },
 ]
-
-
-def _verify_unrar_integrity(unrar_path: Path) -> bool:
-    """Verifica que el binario unrar tenga un hash conocido.
-
-    En primera ejecución, registra el hash como referencia (se asume que
-    el bootstrap inicial es confiable). En ejecuciones posteriores, compara
-    contra el hash registrado.
-
-    Si unrar_path es un nombre de comando simple (ej. "unrar"), lo resuelve
-    usando el PATH del sistema vía shutil.which().
-    """
-    global _UNRAR_EXPECTED_SHA256
-
-    # Si la ruta no apunta a un archivo existente, intenta resolverla como
-    # comando del PATH (cubre el caso en que unrar_bin es "unrar" a secas).
-    if not unrar_path.exists():
-        resolved = shutil.which(str(unrar_path))
-        if resolved:
-            unrar_path = Path(resolved)
-        else:
-            return False
-
-    # Si no es un archivo regular, se omite la verificación (no hay binario
-    # concreto que hashear, p.ej. podría ser un symlink extraño).
-    if not unrar_path.is_file():
-        return True
-
-    actual = hashlib.sha256(unrar_path.read_bytes()).hexdigest()
-
-    if _UNRAR_EXPECTED_SHA256 is None:
-        _UNRAR_EXPECTED_SHA256 = actual
-        return True
-
-    return actual == _UNRAR_EXPECTED_SHA256
 
 
 def _find_unrar() -> Path | str:
@@ -210,11 +171,9 @@ def fetch_data(source_url: str = DOWNLOAD_URL) -> tuple[list[dict[str, Any]], st
         print(f"Descarga completada ({size_mb} MB).")
 
         unrar_bin = _find_unrar()
-        unrar_path_obj = Path(unrar_bin) if isinstance(unrar_bin, str) else unrar_bin
-        if not _verify_unrar_integrity(unrar_path_obj):
+        if shutil.which(str(unrar_bin)) is None and not Path(unrar_bin).exists():
             raise SystemExit(
-                f"Verificación de integridad fallida para {unrar_bin}. "
-                "Reinstala con 'apt-get install unrar'."
+                f"unrar no está disponible ({unrar_bin}). Instala con 'apt-get install unrar'."
             )
 
         with tempfile.TemporaryDirectory() as tmp_dir:

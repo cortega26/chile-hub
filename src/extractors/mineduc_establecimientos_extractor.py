@@ -1,7 +1,6 @@
 """Extrae el directorio oficial de establecimientos educacionales de MINEDUC."""
 
 import datetime
-import hashlib
 import os
 import shutil
 import subprocess
@@ -34,45 +33,6 @@ DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data")
 RAW_DIR = os.path.join(DATA_DIR, "raw")
 STAGING_DIR = os.path.join(DATA_DIR, "staging")
 STAGING_CSV_PATH = os.path.join(STAGING_DIR, "establecimientos_educacionales.csv")
-
-# Hash del binario unrar registrado en primera ejecución (bootstrap confiable)
-_UNRAR_EXPECTED_SHA256 = None
-
-
-def _verify_unrar_integrity(unrar_path: Path) -> bool:
-    """Verifica que el binario unrar tenga un hash conocido.
-
-    En primera ejecución, registra el hash como referencia (se asume que
-    el bootstrap inicial es confiable). En ejecuciones posteriores, compara
-    contra el hash registrado.
-
-    Si unrar_path es un nombre de comando simple (ej. "unrar"), lo resuelve
-    usando el PATH del sistema vía shutil.which().
-    """
-    global _UNRAR_EXPECTED_SHA256
-
-    # Si la ruta no apunta a un archivo existente, intenta resolverla como
-    # comando del PATH (cubre el caso en que unrar_bin es "unrar" a secas).
-    if not unrar_path.exists():
-        resolved = shutil.which(str(unrar_path))
-        if resolved:
-            unrar_path = Path(resolved)
-        else:
-            return False
-
-    # Si no es un archivo regular, se omite la verificación (no hay binario
-    # concreto que hashear, p.ej. podría ser un symlink extraño).
-    if not unrar_path.is_file():
-        return True
-
-    actual = hashlib.sha256(unrar_path.read_bytes()).hexdigest()
-
-    if _UNRAR_EXPECTED_SHA256 is None:
-        _UNRAR_EXPECTED_SHA256 = actual
-        return True
-
-    return actual == _UNRAR_EXPECTED_SHA256
-
 
 METADATA_PATH = os.path.join(STAGING_DIR, "establecimientos_educacionales.metadata.json")
 
@@ -113,12 +73,9 @@ def fetch_data() -> tuple[Path, str, str]:
             # Buscar en el PATH por si acaso
             unrar_bin = "unrar"
 
-        # Verificar integridad del binario unrar
-        unrar_path = Path(unrar_bin) if isinstance(unrar_bin, str) else unrar_bin
-        if not _verify_unrar_integrity(unrar_path):
+        if shutil.which(str(unrar_bin)) is None and not Path(unrar_bin).exists():
             raise SystemExit(
-                f"Verificación de integridad fallida para {unrar_bin}. "
-                f"El binario puede haber sido modificado. Reinstala con 'apt-get install unrar'."
+                f"unrar no está disponible ({unrar_bin}). Instala con 'apt-get install unrar'."
             )
 
         print(f"Extrayendo {rar_path} con {unrar_bin}...")
