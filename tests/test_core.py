@@ -431,5 +431,22 @@ class ChileHubInternalHelpersTests(unittest.TestCase):
         self.assertTrue(any("valores nulos" in e for e in result["errors"]))
 
 
+class ChileHubApiDocstringTests(unittest.TestCase):
+    """Los docstrings de los métodos públicos de la API no deben ser None."""
+
+    def test_public_api_methods_have_docstrings(self):
+        methods = [
+            ChileHub.load_polars,
+            ChileHub.validate_dataset,
+            ChileHub.validate_user_data,
+        ]
+        for method in methods:
+            self.assertIsNotNone(
+                method.__doc__,
+                f"{method.__name__}.__doc__ is None — "
+                f"documentation will not render in mkdocstrings",
+            )
+
+
 if __name__ == "__main__":
     unittest.main()

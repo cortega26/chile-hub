@@ -298,7 +298,6 @@ class ChileHub:
         return self.root_dir / outputs[output_type]  # type: ignore[no-any-return]  # Path en runtime
 
     def load_polars(self, dataset_name: str | Dataset, validate: bool = False) -> pl.DataFrame:
-        dataset_name = _resolve_dataset_name(dataset_name)
         """Carga un dataset como DataFrame de Polars.
 
         Args:
@@ -313,6 +312,7 @@ class ChileHub:
             ChileHubDatasetError: Si el dataset no existe o el archivo es ilegible.
             ChileHubDataError: Si ``validate=True`` y la validación encuentra errores.
         """
+        dataset_name = _resolve_dataset_name(dataset_name)
         if not validate or dataset_name not in self._df_cache:
             path = self.get_output_path(dataset_name, "parquet")
             try:
@@ -372,7 +372,6 @@ class ChileHub:
         return result
 
     def validate_dataset(self, dataset_name: str | Dataset) -> dict:
-        dataset_name = _resolve_dataset_name(dataset_name)
         """Valida los datos publicados del hub contra su contrato JSON Schema.
 
         Carga el dataset desde Parquet y lo coteja contra el contrato en
@@ -392,6 +391,7 @@ class ChileHub:
         Raises:
             ChileHubDatasetError: Si no existe contrato o dataset.
         """
+        dataset_name = _resolve_dataset_name(dataset_name)
         from .contracts import verify_dataset_contract
 
         contract_path = self.root_dir / "contracts" / "datasets" / f"{dataset_name}.schema.json"
@@ -417,7 +417,6 @@ class ChileHub:
         )
 
     def validate_user_data(self, df: pl.DataFrame, dataset_name: str | Dataset) -> dict:
-        dataset_name = _resolve_dataset_name(dataset_name)
         """Valida un DataFrame de usuario contra el contrato de schema del dataset.
 
         Usa los archivos de contrato en contracts/datasets/*.schema.json, que definen
@@ -437,6 +436,7 @@ class ChileHub:
         Raises:
             ChileHubDatasetError: Si no existe contrato para el dataset solicitado.
         """
+        dataset_name = _resolve_dataset_name(dataset_name)
         schema_path = ROOT_DIR / "contracts" / "datasets" / f"{dataset_name}.schema.json"
         if not schema_path.exists():
             raise ChileHubDatasetError(
