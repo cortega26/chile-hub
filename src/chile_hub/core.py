@@ -313,7 +313,7 @@ class ChileHub:
             ChileHubDataError: Si ``validate=True`` y la validación encuentra errores.
         """
         dataset_name = _resolve_dataset_name(dataset_name)
-        if not validate or dataset_name not in self._df_cache:
+        if dataset_name not in self._df_cache:
             path = self.get_output_path(dataset_name, "parquet")
             try:
                 df = pl.read_parquet(path)

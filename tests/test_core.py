@@ -9,6 +9,7 @@ No cubren el CLI (argparse + _main) — eso corresponde a tests de integración.
 
 import unittest
 from pathlib import Path
+from unittest import mock
 
 import polars as pl
 
@@ -331,6 +332,18 @@ class ChileHubCatalogQueriesTests(unittest.TestCase):
         df = self.hub.load_polars("regiones")
         self.assertIsInstance(df, pl.DataFrame)
         self.assertGreater(df.height, 0)
+
+    def test_load_polars_cache(self):
+        """Verifica que la segunda llamada a load_polars no relea Parquet."""
+        hub = _hub()
+        df1 = hub.load_polars("comunas")
+        self.assertGreater(df1.height, 0)
+
+        with mock.patch("chile_hub.core.pl.read_parquet") as mock_read:
+            df2 = hub.load_polars("comunas")
+            mock_read.assert_not_called()
+
+        self.assertIs(df1, df2)
 
     def test_example_usage_returns_string(self):
         example = self.hub.example_usage("comunas", "python")
