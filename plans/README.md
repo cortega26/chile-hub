@@ -50,7 +50,6 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 |---|------|----------|----------|--------|-----------|--------|
 | 035 | [Tests de caracterización del gate `verify_pipeline`](035-characterization-tests-publish-gate.md) | P2 | L | LOW | — | DONE — `scripts` en coverage.source (pyproject.toml:170), `tests/test_verify_pipeline.py` con 26 tests (14 golden + 4 corruption + 6 synthetic + 1 main smoke + 1 readiness), `validate_puntos_interes` con 4 tests en `test_validation.py`, cobertura de `verify_pipeline.py` subió de ~0% a 64%. |
 | 036 | [Tests golden de writers de artefactos](036-golden-output-tests-artifact-writers.md) | P2 | M | LOW | — (030 DONE) | TODO |
-| 037 | [Vectoriza DV de RUT + elimina `rutificador`](037-vectorize-rut-validation.md) | P2 | M | MED | — (032 DONE) | TODO |
 | 038 | [Deduplica `pipeline_status_utils.py`](038-deduplicate-pipeline-status-utils.md) | P3 | M | MED | — | TODO — riesgo confirmado en vivo: entre `c486e7c` y `HEAD` ambas copias (`src/pipeline_status_utils.py` y `src/chile_hub/pipeline_status_utils.py`) recibieron el mismo parche de 54 líneas a mano dos veces (siguen siendo byte-idénticas por ahora, pero es exactamente el modo de fallo que el plan anticipa). |
 | 039 | [Diseño: resuelve capas comunales 3/346 en el bundle](039-design-resolve-sparse-comunal-layers.md) | P2 | S (era M) | LOW (era MED) | — (024 y 034 DONE) | TODO — **resuelto en sustancia por fixes reactivos, falta el ADR formal.** `consumo_electrico_comunal`: RE-CARRIL ya implementado (`57e6eaf`, fuente confirmada muerta permanentemente, `maturity_status="deprecated"`/`candidate`, fuera del bundle). `pobreza_comunal`: FILL ya en código (`3f968ab` corrigió el mapeo de columnas del XLSX real de MDS; producirá 345 comunas × 2 = 690 filas en el próximo extract en vivo — la causa raíz no era la que suponía el plan). `finanzas_municipales`: FILL ya logrado (scrape mensual corriendo tras 034; snapshot comprometido con 345/346 municipios). Trabajo restante: escribir `docs/adr/NNN-comunal-coverage-decision.md` documentando estas 3 decisiones ya tomadas, y confirmar que el próximo build recoge el `pobreza_comunal` real (no requiere código nuevo). |
 | 040 | [Diseño: superficie SQL `hub.sql()` sobre Parquet](040-design-hub-sql-query-surface.md) | P2 | S-M | LOW | — (032 DONE) | TODO |
@@ -62,6 +61,7 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 
 | # | Plan | Esfuerzo | Riesgo | Estado |
 |---|------|----------|--------|--------|
+| 037 | [Vectoriza DV de RUT + elimina `rutificador`](archive/037-vectorize-rut-validation.md) | M | MED | DONE — ejecutado en `advisor/037-vectorize-rut` commit `6062f45`; `_expected_dv_vectorized` reemplaza `map_elements` con Polars vectorizado, `rutificador` eliminado de `pyproject.toml`, 95 tests pasan + 1 skipped (equivalencia con `importorskip`), lint y format-check OK. |
 | 033 | [Ejecuta mypy/bandit/pip-audit/interrogate en CI](archive/033-enforce-quality-gates-in-ci.md) | S-M | MED | DONE — ejecutado en `advisor/033-ci-quality-gates` commit `172014b`; 3 gates blocking (mypy/bandit/pip-audit) + interrogate informativo (`\|\| true`), `make docs-coverage`, `fail-under = 80`, fix de cast en `_logging.py`. |
 | 032 | [Adelgaza deps runtime del paquete instalado](archive/032-slim-runtime-dependencies.md) | S | MED | DONE — ejecutado en `advisor/032-slim-runtime-deps` commit `8032069`; `[project.dependencies]` reducido a 4 entradas, 5 deps pipeline bajo extra `pipeline`, install-smoke `rows: 346`, `make package-smoke` OK, wheel METADATA confirma solo 4 `Requires-Dist`, pre-commit hooks pasan limpiamente. |
 | 031 | [Cache de load_polars en ruta por defecto](archive/031-fix-dead-load-polars-cache.md) | S | LOW | DONE — `advisor/031-load-polars-cache` commit `7b1f065`; eliminado `not validate or` del guard. 55 tests pasan, lint OK. |
@@ -130,7 +130,7 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 ```
 Auditoría 2026-07-07 (024–041):
   025                      (independientes — cada uno un archivo/área distinta)
-  032 (DONE) → 037 040           (037 ya puede quitar rutificador sin coordinar; 040 ya sabe que duckdb va en extra pipeline)
+  032 (DONE) → 040           (040 ya sabe que duckdb va en extra pipeline)
   — (030 DONE) → 036            (036 puede afirmar el guard de Excel de 030)
   033 (DONE) → —                 (CI ya bloquea mypy/bandit/pip-audit en cada push/PR)
   035 038 041                    (independientes; 032, 033 y 034 quedaron DONE)
@@ -141,10 +141,11 @@ Planes previos:
   020 (independiente)  ← bloqueado por gate 4.3 (no-go 2026-06-30). DIR-01/Plan 040 es su hermano no-bloqueado
 ```
 
-**Interacciones clave de la auditoría 2026-07-07:** **026** (regenerar lock), **032** (adelgazar deps)
-y **033** (mypy/bandit/pip-audit en CI) quedaron DONE. La ola de higiene deps/CI está completa 🎉.
-**037** ya puede eliminar `rutificador` sin coordinar; **040** ya sabe que `duckdb` va en el extra
-`pipeline`. **039** solo necesita el ADR retroactivo. **020** sigue bloqueado (gate 4.3 NO-GO).
+**Interacciones clave de la auditoría 2026-07-07:** **026** (regenerar lock), **032** (adelgazar deps),
+**033** (mypy/bandit/pip-audit en CI) y **037** (vectorizar RUT, eliminar `rutificador`) quedaron DONE.
+La ola de higiene deps/CI está completa 🎉.
+**040** ya sabe que `duckdb` va en el extra `pipeline`. **039** solo necesita el ADR retroactivo.
+**020** sigue bloqueado (gate 4.3 NO-GO).
 
 ## Orden de ejecución recomendado
 
@@ -157,7 +158,7 @@ y **033** (mypy/bandit/pip-audit en CI) quedaron DONE. La ola de higiene deps/CI
 3. **Backfill de tests**: **035** (gate de publicación — baseline de verificación) → **036** (writers).
    035 primero porque es la red de seguridad que los refactors de la ola siguiente deberían tener antes
    de tocar código de build.
-4. **Refactors**: **037** (vectoriza RUT; coordinar con 032, que ya reubicó `rutificador`) y **038**
+4. **Refactors**: **037** ✅ DONE (vectoriza RUT) y **038**
    (dedup `pipeline_status_utils.py`; MED por el acoplamiento `__init__ → core`). Sin orden estricto
    entre ambos.
 5. **Diseño/spikes**: **039** (024 y 034 ya DONE — el spike se reduce a redactar el ADR retroactivo,
