@@ -35,22 +35,17 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Information Analysis",
 ]
 dependencies = [
-    "polars>=1.41.2",
-    # Required by Polars DataFrame.to_pandas() during artifact builds.
-    "pyarrow>=24.0.0",
+    "polars>=1.41.2,<2",
     "requests>=2.34.2",
     "platformdirs>=4.10.0",
     "rich>=14.0",
-    "rutificador>=1.5.8",
-    "openpyxl>=3.1.5",
-    "duckdb>=1.5.4",
-    "tenacity>=9.1.4",
 ]
 
 
 [project.optional-dependencies]
 pipeline = [
     "duckdb==1.5.4",
+    "pyarrow>=24.0.0",
     "pandas==3.0.3; python_version >= '3.11'",
     "xlsxwriter==3.2.9",
     "curl_cffi==0.15.0",
