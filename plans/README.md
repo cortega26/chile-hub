@@ -48,7 +48,6 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 
 | # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
 |---|------|----------|----------|--------|-----------|--------|
-| 028 | [Elimina verificación unrar no-op y engañosa](028-remove-unrar-tofu-integrity-noop.md) | P2 | S | LOW | — | TODO |
 | 029 | [Corrige 3 docstrings desubicadas en `core.py`](029-fix-misplaced-docstrings-core.md) | P2 | S | LOW | — | TODO |
 | 030 | [Guarda Excel para tablas masivas + dedup SHA bundle](030-excel-large-table-guard-and-bundle-sha-dedup.md) | P2 | S | LOW | — | TODO |
 | 031 | [Arregla la cache muerta de `load_polars`](031-fix-dead-load-polars-cache.md) | P2 | S | LOW | — | TODO |
@@ -68,6 +67,7 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 
 | # | Plan | Esfuerzo | Riesgo | Estado |
 |---|------|----------|--------|--------|
+| 028 | [Elimina verificación unrar no-op y engañosa](archive/028-remove-unrar-tofu-integrity-noop.md) | S | LOW | DONE — ejecutado en `advisor/028-remove-unrar-noop` commit `add5afa`; eliminados `_verify_unrar_integrity()`, `_UNRAR_EXPECTED_SHA256` e `import hashlib` de ambos extractores MINEDUC (-88 líneas), reemplazados por verificación real de disponibilidad vía `shutil.which()`. 108/108 tests pasan, lint y format-check OK. |
 | 027 | [Provenance real en scrape SINIM exitoso](archive/027-sinim-finanzas-provenance-label.md) | S | LOW | DONE — ejecutado en `advisor/027-sinim-provenance-label` commit `4690fec`; `source_mode != "fallback"` reemplaza la rama muerta `== "live"`, 2 tests nuevos (`test_build_metadata_monthly_sets_live_provenance` + `test_build_metadata_fallback_sets_curated_provenance`), 9/9 tests pasan, lint y format-check OK. |
 | 024 | [Extractores: preserva ceros CUT + timestamps ISO](archive/024-extractor-cut-and-timestamp-integrity.md) | S | LOW | DONE — ejecutado en `advisor/024-extractor-cut-timestamp` commit `3ad6ab9`; `grep` de timestamps, overrides/zfill, diff de `pipeline_status_utils`, pytest focal (`221 passed`), lint y format-check OK. |
 | 025 | [Sincroniza enum `Dataset` (+docs) con el catálogo de 19](archive/025-sync-dataset-enum-and-docs-with-catalog.md) | S | LOW | DONE — ejecutado en `advisor/025-sync-dataset-enum`; `Dataset.values()` = 19, `Dataset.from_string()` resuelve los datasets nuevos, pytest focal (`39 passed, 130 deselected`), lint y format-check OK. Commit pendiente: el hook pre-commit local no encontró `interrogate`. |
@@ -129,7 +129,7 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 
 ```
 Auditoría 2026-07-07 (024–041):
-  031 025 028 029 030          (independientes — cada uno un archivo/área distinta)
+  031 025 029 030             (independientes — cada uno un archivo/área distinta)
   032 → 037                     (lock limpio resuelto por 026; 037 quita rutificador que 032 reubica)
   032 ⇠ 040                     (040 hub.sql necesita duckdb; reconciliar con la reubicación de 032)
   030 → 036 (opcional)          (036 puede afirmar el guard de Excel de 030)
@@ -147,7 +147,7 @@ solo reubica — coordinar; **040** (`hub.sql`) reintroduce la necesidad de `duc
 runtime, así que ambos deben acordar si `duckdb` vuelve a runtime o va en un extra `query`. **039**
 ya no depende de nada activo: **034** quedó DONE de rebote el 2026-07-08 (ver "Planes archivados —
 fixes reactivos") y **024** ya resolvió el bug CUT que bloqueaba `consumo_electrico`; lo único
-pendiente en 039 es redactar el ADR retroactivo. El resto de 025 y 028–031 son fixes de un archivo,
+pendiente en 039 es redactar el ADR retroactivo. El resto de 025 y 029–031 son fixes de un archivo,
 ejecutables en cualquier orden. **020** sigue bloqueado (gate 4.3 NO-GO); **021** (MkDocs) quedó DONE
 el 2026-07-04.
 
@@ -156,8 +156,8 @@ el 2026-07-04.
 **Auditoría 2026-07-07 (024–041) — orden sugerido por olas (actualizado 2026-07-09; 024, 025, 026 y
 034 ya están DONE/archivados, no aparecen abajo):**
 
-1. **Ola de fixes P2, un archivo cada uno, sin dependencias entre sí** — **028, 029, 030, 031**.
-   (027 ya está DONE — archivado). El resto (028–031) es intercambiable, cada uno toca un archivo distinto.
+1. **Ola de fixes P2, un archivo cada uno, sin dependencias entre sí** — **029, 030, 031**.
+   (027 y 028 ya están DONE — archivados). El resto (029–031) es intercambiable, cada uno toca un archivo distinto.
 2. **Higiene de deps/CI**: **032** (adelgazar runtime deps) → **033** (mypy/bandit/pip-audit/interrogate
    en CI). 032 antes de 033 porque 037 y 040 coordinan con la reubicación de deps que hace 032. 033
    puede sacar a la luz un backlog de mypy/interrogate — ver su Step 1 y sus STOP conditions.
