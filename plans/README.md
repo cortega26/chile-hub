@@ -6,7 +6,7 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 > Repo maduro; los grandes ítems previos ya están hechos. Lo restante es una cola de
 > defectos pequeños de alta confianza (024–031; 027–031 DONE ✅), higiene de deps/CI (032, 033, 034 DONE ✅), backfill
 > de tests del gate de publicación (035 DONE ✅) y los writers (036 DONE ✅), dos refactors (037–038 DONE ✅) y
-> tres planes de diseño (039 DONE ✅, 040–041). Ver "Hallazgos considerados y diferidos (2026-07-07)".
+> tres planes de diseño (039 DONE ✅, 040 DONE ✅, 041). Ver "Hallazgos considerados y diferidos (2026-07-07)".
 
 > **Reevaluación de vigencia (2026-07-09)**: entre `c486e7c` y `HEAD` (`c1aa3e9`) hubo 45 commits,
 > la mayoría fixes reactivos a bugs reales encontrados persiguiendo Pipeline Check #270 (cadena
@@ -15,7 +15,7 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 > **034 quedó DONE de rebote** (el fix reactivo `4ebca99` corrigió exactamente el `--group dev` →
 > `--extra pipeline --extra dev` que el plan pedía) y se archivó. **039 quedó DONE** (ADR-006 escrito y
 > committeado). **Todos los demás
-> planes activos (027–033, 035–038, 040–041) siguen 100% vigentes** — se verificó línea por línea que
+> planes activos (027–033, 035–038, 040 DONE ✅, 041) siguen 100% vigentes** — se verificó línea por línea que
 > el defecto descrito sigue presente en el código actual; en dos casos la evidencia es ahora más
 > fuerte que en la auditoría original (ver notas en 027 y 038 abajo). Detalle completo de la
 > reevaluación al final de este archivo, sección "Reevaluación 2026-07-09".
@@ -48,7 +48,6 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 
 | # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
 |---|------|----------|----------|--------|-----------|--------|
-| 040 | [Diseño: superficie SQL `hub.sql()` sobre Parquet](040-design-hub-sql-query-surface.md) | P2 | S-M | LOW | — (032 DONE) | TODO |
 | 041 | [Diseño: import/validate de `datapackage.json`](041-design-datapackage-import-validate.md) | P3 | S | LOW | — | TODO |
 | 023 | [Datasets `autoridades_electas` y `partidos_politicos`](023-autoridades-electas-partidos-politicos.md) | P2 | M-L | MED | — (deriva de Plan 022 · Ola B2.2, research cerrada) | 🔶 Ola A y B `stable_publishable` y en el bundle público (2026-07-06): `partidos_politicos` (36, 15 con estado_legal/fecha vía SERVEL) y `autoridades_electas` (diputados+senadores, 205, senadores con codigo_region/periodo completos). `autoridades_locales` (gobernadores+alcaldes, 240, CC-BY-SA segregado) queda `candidate` — cobertura de alcaldes insuficiente a criterio del operador, pendiente mejorar el extractor. No se archiva hasta resolver ese follow-up. |
 | 020 | [Explorador SQL en la landing con DuckDB-Wasm](020-duckdb-wasm-playground.md) | P2 | M | MED | — | BLOCKED — gate 4.3: NO-GO (2026-06-30). Ver `docs/gate-4-3-decision-playground.md` para condiciones de re-evaluación. |
@@ -57,6 +56,7 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 
 | # | Plan | Esfuerzo | Riesgo | Estado |
 |---|------|----------|--------|--------|
+| 040 | [Superficie SQL `hub.sql()` sobre Parquet](archive/040-design-hub-sql-query-surface.md) | S-M | LOW | DONE — `ChileHub.sql()` implementado con DuckDB lazy import + vistas Parquet; 3 tests pasan; extra `query` en `pyproject.toml`; ADR-007 committeado. |
 | 039 | [Resuelve capas comunales 3/346 en el bundle](archive/039-design-resolve-sparse-comunal-layers.md) | S | LOW | DONE — decisiones de cobertura ya implementadas vía fixes reactivos (`57e6eaf`, `3f968ab`, `c8c7c70`); ADR-006 escrito y committeado documentando FILL/RE-CARRIL para los 3 datasets; verificación confirma finanzas_municipales 345 filas, consumo_electrico ausente del bundle. |
 | 038 | [Deduplica `pipeline_status_utils.py`](archive/038-deduplicate-pipeline-status-utils.md) | M | MED | DONE — ejecutado en `advisor/038-dedup-pipeline-status-utils` commit `77931b2`; shim PEP 562 `__getattr__` (21 líneas) reemplaza copia de 936 líneas, docstring de sincronización manual eliminado del canónico, 324 tests pasan, lint y format-check OK. |
 | 037 | [Vectoriza DV de RUT + elimina `rutificador`](archive/037-vectorize-rut-validation.md) | M | MED | DONE — ejecutado en `advisor/037-vectorize-rut` commit `6062f45`; `_expected_dv_vectorized` reemplaza `map_elements` con Polars vectorizado, `rutificador` eliminado de `pyproject.toml`, 95 tests pasan + 1 skipped, lint y format-check OK. |
@@ -130,7 +130,7 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 ```
 Auditoría 2026-07-07 (024–041):
   025                      (independientes — cada uno un archivo/área distinta)
-  032 (DONE) → 040           (040 ya sabe que duckdb va en extra pipeline)
+  032 (DONE) → 040 (DONE)    (040 DONE: hub.sql() implementado, ADR-007 committeado)
   — (030 DONE) → 036 (DONE)            (036 afirma el guard de Excel de 030, ambos DONE)
   033 (DONE) → —                 (CI ya bloquea mypy/bandit/pip-audit en cada push/PR)
   035 (DONE) → —          (035 ya archivado: gate de publicación con 26 tests)
@@ -146,7 +146,7 @@ Planes previos:
 **033** (mypy/bandit/pip-audit en CI), **035** (tests gate de publicación), **037** (vectorizar RUT) y
 **038** (dedup pipeline_status_utils) quedaron DONE. La ola de higiene deps/CI y los dos refactors están completos 🎉.
 **036** (tests de writers) quedó DONE — el backfill de tests del gate y los writers está cerrado.
-**040** ya sabe que `duckdb` va en el extra `pipeline`. **039** DONE ✅ (ADR-006 committeado).
+**040** ya sabe que `duckdb` va en el extra `pipeline`. **039** DONE ✅ (ADR-006 committeado). **040** DONE ✅ (hub.sql() + ADR-007).
 **020** sigue bloqueado (gate 4.3 NO-GO).
 
 ## Orden de ejecución recomendado
@@ -159,7 +159,7 @@ Planes previos:
 2. **Higiene de deps/CI** — **COMPLETA** 🎉 (032, 033 y 034 DONE).
 3. **Backfill de tests**: **COMPLETA** 🎉: **035** ✅ DONE (gate de publicación) y **036** ✅ DONE (writers).
 4. **Refactors** — **COMPLETA** 🎉: **037** ✅ (vectoriza RUT) y **038** ✅ (dedup pipeline_status_utils).
-5. **Diseño/spikes**: **039** ✅ DONE (ADR-006 committeado, decisiones ya implementadas) → **040** (coordinar con 032) → **041**.
+5. **Diseño/spikes**: **039** ✅ DONE (ADR-006) → **040** ✅ DONE (hub.sql() + ADR-007) → **041**.
 
 Planes previos aún vigentes:
 - **023** — autoridades_electas + partidos_politicos: DONE para diputados/senadores/partidos; queda abierto
