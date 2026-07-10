@@ -58,6 +58,15 @@ _HEADERS = {"User-Agent": "chile-hub/data-pipeline (+https://github.com/cortega2
 
 BCN_SIIT_URL = "https://www.bcn.cl/siit/reportescomunales/comunas_v.html"
 BCN_SIIT_ANNO = "2024"
+_BCN_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+    ),
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+    "Accept-Language": "es-CL,es;q=0.9,en;q=0.8",
+    "Referer": "https://www.google.com/",
+}
 
 SCHEMA: dict[str, type[pl.DataType]] = {
     "id_autoridad": pl.String,
@@ -454,7 +463,7 @@ def fetch_alcalde_bcn(codigo_comuna: str) -> str | None:
     """
     params = {"anno": BCN_SIIT_ANNO, "idcom": codigo_comuna}
     try:
-        resp = fetch_with_retry(BCN_SIIT_URL, params=params, headers=_HEADERS, timeout=20)
+        resp = fetch_with_retry(BCN_SIIT_URL, params=params, headers=_BCN_HEADERS, timeout=20)
         resp.raise_for_status()
     except Exception as exc:
         print(f"Advertencia: BCN SIIT inaccesible para comuna {codigo_comuna} ({exc}).")
