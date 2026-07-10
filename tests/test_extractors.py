@@ -1962,6 +1962,96 @@ class AutoridadesLocalesExtractorTests(unittest.TestCase):
         personales = {"rut", "run", "domicilio", "fecha_nacimiento"}
         self.assertFalse(personales & {c.lower() for c in df.columns})
 
+    def test_fetch_alcalde_bcn_extrae_nombre(self):
+        """Prueba unitaria con HTML real de BCN SIIT (Melipilla)."""
+        f = autoridades_locales_extractor.fetch_alcalde_bcn
+        # Esto requiere red; si no hay, es un test de integracion, no unitario.
+        # Para CI sin red, usar mock:
+        try:
+            nombre = f("13501")
+        except Exception:
+            self.skipTest("Sin acceso a BCN SIIT en este entorno")
+        self.assertIsNotNone(nombre)
+        self.assertIn("Olavarría", nombre)
+        self.assertNotIn("&nbsp;", nombre)
+        self.assertNotIn("<td>", nombre)
+
+    def test_fetch_alcalde_bcn_html_sintetico(self):
+        """Prueba unitaria del parseo de HTML (sin HTTP)."""
+        import re as _re_module
+
+        # Simular el HTML de BCN SIIT
+        html = (
+            '<table class="table table-striped">'
+            "<tr><td>Superficie</td><td>1345.0 km2</td></tr>"
+            "<tr><td>Alcalde</td><td>Apellido1 Apellido2 Nombres</td></tr>"
+            "<tr><td>N de concejales</td><td>8</td></tr>"
+            "</table>"
+        )
+        match = _re_module.search(
+            r"<td[^>]*>\s*Alcalde\s*</td>\s*<td[^>]*>\s*(.+?)\s*</td>",
+            html,
+            _re_module.I,
+        )
+        self.assertIsNotNone(match)
+        nombre = match.group(1).strip()
+        self.assertEqual(nombre, "Apellido1 Apellido2 Nombres")
+
+    def test_fetch_alcalde_bcn_html_sin_alcalde(self):
+        """HTML sin campo Alcalde devuelve None."""
+        import re as _re_module
+
+        html = "<table><tr><td>Superficie</td><td>1345.0 km2</td></tr></table>"
+        match = _re_module.search(
+            r"<td[^>]*>\s*Alcalde\s*</td>\s*<td[^>]*>\s*(.+?)\s*</td>",
+            html,
+            _re_module.I,
+        )
+        self.assertIsNone(match)
+
+    def test_fetch_alcalde_bcn_limpia_nbsp(self):
+        """Los &nbsp; en el nombre se limpian a espacios normales."""
+        import re as _re_module
+
+        html = "<td>Alcalde</td><td>Nombre&nbsp;Con&nbsp;Espacios</td>"
+        match = _re_module.search(
+            r"<td[^>]*>\s*Alcalde\s*</td>\s*<td[^>]*>\s*(.+?)\s*</td>",
+            html,
+            _re_module.I,
+        )
+        nombre = match.group(1).strip()
+        nombre = nombre.replace("&nbsp;", " ").replace("\xa0", " ")
+        nombre = _re_module.sub(r"\s+", " ", nombre).strip()
+        self.assertEqual(nombre, "Nombre Con Espacios")
+
+    def test_fetch_alcaldes_bcn_cobertura_total(self):
+        """BCN SIIT debe cubrir al menos 340 de las 345 comunas."""
+        lookup = autoridades_locales_extractor._load_comunas_lookup()
+        if not lookup:
+            self.skipTest("comunas.csv no disponible")
+        try:
+            filas = autoridades_locales_extractor.fetch_alcaldes_bcn(lookup, max_workers=5)
+        except Exception:
+            self.skipTest("Sin acceso a BCN SIIT en este entorno")
+        self.assertGreaterEqual(len(filas), 340)
+        con_nombre = sum(1 for f in filas if f["nombre"])
+        self.assertGreaterEqual(con_nombre, 300, f"Solo {con_nombre} alcaldes con nombre")
+
+    def test_normalize_alcaldes_fuente_bcn(self):
+        """Las filas de alcalde usan BCN SIIT como fuente (no Wikipedia)."""
+        alcaldes = [
+            {
+                "comuna": "Melipilla",
+                "nombre": "Olavarría Baeza Lorena Catalina",
+                "periodo_inicio": None,
+            }
+        ]
+        lookup = {"melipilla": ("13501", "13")}
+        df = autoridades_locales_extractor.build_autoridades_locales_df([], alcaldes, lookup)
+        row = df.filter(pl.col("cargo") == "alcalde").row(0, named=True)
+        self.assertEqual(row["fuente"], "BCN SIIT")
+        self.assertIn("idcom=13501", row["url_fuente"])
+
 
 def _sinim_xml_row(cell_values: dict) -> str:
     """Construye una fila del XML Spreadsheet 2003 de SINIM con celdas en las

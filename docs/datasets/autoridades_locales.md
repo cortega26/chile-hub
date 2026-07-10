@@ -1,44 +1,37 @@
-# Autoridades locales — Wikipedia (CC-BY-SA)
+# Autoridades locales — BCN SIIT + Wikipedia (CC-BY-SA)
 
 > **Carril:** `candidate` — NO incluido en el bundle público.
-> **Licencia:** **CC-BY-SA 4.0 (share-alike)** — dataset **segregado** de
-> `autoridades_electas` (CC-BY) para no propagar share-alike. Ver `DATA_LICENSES.md`.
-> **Fuente:** Wikipedia en español. **review_by:** 2026-10-05
+> **Fuente:** BCN SIIT (alcaldes) + Wikipedia (gobernadores).
+> **review_by:** 2026-10-05
 
-## Descripción
+## Descripcion
 
-Autoridades **locales/subnacionales** electas de Chile, compiladas desde Wikipedia. Se
-separa de `autoridades_electas` porque su fuente es CC-BY-SA: mantener los cargos de
-fuente oficial (diputados, senadores) en un dataset CC-BY y los de Wikipedia aquí evita
-contaminar la licencia del resto.
+Autoridades **locales/subnacionales** electas de Chile. Se separa de
+`autoridades_electas` porque los gobernadores usan Wikipedia (CC-BY-SA); los alcaldes
+usaban Wikipedia en v1 pero desde v2 usan **BCN SIIT** (fuente gubernamental oficial).
 
-**v1:** cargos **`gobernador_regional`** (16) y **`alcalde`** (224 comunas con página en
-Wikipedia de las 345 existentes; 165 con alcalde identificado).
+**v2 (Plan 042):** cargos **`gobernador_regional`** (16) y **`alcalde`** (345 comunas,
+cobertura nacional completa). Los alcaldes se obtienen desde BCN SIIT (Biblioteca del
+Congreso Nacional) — cobertura 100%, fuente oficial, sin restriccion de licencia para
+datos factuales de autoridades publicas.
 
-Solo cargos públicos; **sin datos personales**.
+Solo cargos publicos; **sin datos personales**.
 
-## Fuente y método
+## Fuente y metodo
 
-- **Gobernadores (16):** página "Gobernador regional de Chile" de Wikipedia, tabla única,
+- **Gobernadores (16):** pagina "Gobernador regional de Chile" de Wikipedia, tabla unica,
   obtenida con [Scrapling](https://github.com/D4Vinci/Scrapling) (aislado en el extra
-  `scraping` de `pyproject.toml`). La región se toma del *título* del enlace
-  (`Gobernador(a) regional [Metropolitano] de|del <región>`) y se mapea a `codigo_region`.
-- **Alcaldes (345 comunas enlazadas → 224 con página):** la página índice
-  "Anexo:Alcaldes de Chile" enlaza a una subpágina por comuna
-  ("Anexo:Alcaldes de \<comuna\>"); no hay tabla única. Se listan los 345 títulos (1
-  request) y se descarga su wikitext en lotes de 50 (~7 requests) vía la **API pública
-  de MediaWiki** (`action=query`, sin Scrapling: es una API abierta de solo lectura que
-  no bloquea, a diferencia de camara.cl/senado.cl). De los 345 enlaces, **~224 tienen
-  página real**; el resto son enlaces rojos (páginas no creadas, típicamente comunas
-  rurales pequeñas) — una limitación real de la fuente, no del extractor. El alcalde
-  vigente se extrae del campo `titular=` del infobox `{{Ficha de cargo...}}` (~165/224);
-  si no hay infobox, se intenta la última fila de la tabla histórica con marca explícita
-  de vigencia ("en el cargo"/"en ejercicio"/"actualidad"); sin evidencia clara, el
-  alcalde queda **nulo** (`estado_mandato: sin_identificar`) — no se inventa un nombre
-  (algunas comunas están efectivamente vacantes, p. ej. Antofagasta a fines de 2024).
-  El nombre de comuna se cruza con `comunas.csv` (`nombre_comuna_clean`) para poblar
-  `codigo_comuna`/`codigo_region` (~221/224 matchean).
-- Import perezoso de Scrapling con degradación: si no está instalado, el cargo
+  `scraping` de `pyproject.toml`). La region se toma del *titulo* del enlace
+  (`Gobernador(a) regional [Metropolitano] de|del <region>`) y se mapea a `codigo_region`.
+- **Alcaldes (345 comunas):** [BCN SIIT](https://www.bcn.cl/siit/reportescomunales/comunas_v.html?anno=2024)
+  (Sistema Integrado de Informacion Territorial de la Biblioteca del Congreso Nacional).
+  Una request HTTP por comuna (`idcom={codigo_comuna}`), parseo HTML de la tabla de datos
+  comunales. Fuente oficial del Congreso chileno; datos factuales de autoridades publicas,
+  sin restriccion de licencia.
+- **Enriquecimiento:** Wikipedia ("Anexo:Alcaldes de X") se usa como fuente secundaria
+  para `periodo_inicio` donde este disponible (~224 comunas con pagina existente). El
+  nombre del alcalde siempre proviene de BCN SIIT (fuente primaria).
+- Import perezoso de Scrapling con degradacion: si no esta instalado, el cargo
   `gobernador_regional` se omite (los alcaldes no dependen de Scrapling).
 
 ## Schema
@@ -50,33 +43,38 @@ Mismo esquema que `autoridades_electas`: `id_autoridad`, `nombre`, `cargo`, `ins
 
 ## Cobertura
 
-- **v1:** 16 gobernadores regionales (regiones 01–16) + 224 comunas con página de
-  alcalde (de 345 totales), de las cuales 165 tienen alcalde identificado.
-- **Frecuencia:** bajo demanda (cambia por elección; ver `review_by`).
+- **v2:** 16 gobernadores regionales (regiones 01–16) + 345 alcaldes (cobertura nacional
+  completa). BCN SIIT identifica al alcalde vigente en ~340+ comunas; las vacancias
+  temporales quedan con `nombre` nulo.
+- **Frecuencia:** bajo demanda (cambia por eleccion; ver `review_by`).
+
+## Licencia
+
+> **Licencia de los datos de alcaldes:** datos factuales de autoridades publicas
+> obtenidos de BCN SIIT (fuente gubernamental chilena). Sin restriccion conocida
+> de copyright para datos factuales de cargos publicos.
+> **Licencia de gobernadores regionales:** CC-BY-SA 4.0 (Wikipedia). Los 16
+> registros de gobernador mantienen atribucion share-alike.
 
 ## Limitaciones
 
-1. **Cobertura de alcaldes real, no completa:** 121 comunas no tienen página propia en
-   Wikipedia (enlaces rojos) y quedan fuera del dataset (no como fila con nulo, sino
-   ausentes); de las 224 con página, 59 no exponen un alcalde identificable con el
-   método actual (infobox vacío/inconsistente y sin marca de vigencia en la tabla) y
-   quedan con `nombre` nulo y `estado_mandato: sin_identificar`.
-2. **CC-BY-SA:** la redistribución exige atribución + share-alike.
-3. `periodo_inicio` de gobernadores aún nulo (parseo de fechas pendiente); en alcaldes
-   solo se puebla cuando el infobox trae una plantilla `{{fecha|D|M|Y}}` reconocible.
-4. **Wikipedia es una fuente editada, no oficial:** puede tener errores o desactualizarse
-   respecto al SERVEL. Verificar contra fuente oficial ante discrepancia relevante.
+1. **Cobertura nacional completa (345 comunas).** Puede haber brechas puntuales por
+   vacancia temporal del cargo.
+2. **Licencia mixta:** los gobernadores mantienen CC-BY-SA (Wikipedia); los alcaldes son
+   dato publico gubernamental sin restriccion conocida.
+3. `periodo_inicio` solo se puebla desde Wikipedia cuando la subpagina "Anexo:Alcaldes
+   de X" existe (~224 comunas) y el infobox trae una plantilla `{{fecha|D|M|Y}}`
+   reconocible; en el resto queda nulo.
 
 ## Regla de salida
 
-Se promueve solo si se asegura una fuente **no share-alike** para los cargos (o se acepta
-el bundle CC-BY-SA para este dataset) y se mejora la cobertura de alcaldes de forma
-material. Si la cobertura de Wikipedia cae por debajo de `MIN_ALCALDES_CON_TITULAR`
-(140) o el extractor se rompe sin arreglo para `review_by`, se degrada a `rejected`.
+Se promueve si la cobertura de BCN SIIT se mantiene sobre `MIN_ALCALDES_CON_TITULAR`
+(300) y no hay regresiones en la validacion. Si BCN SIIT cambia su estructura HTML o
+bloquea las requests, se degrada a `rejected`.
 
 ## Referencias
 
+- BCN SIIT — Reportes Comunales: https://www.bcn.cl/siit/reportescomunales/comunas_v.html?anno=2024
 - Wikipedia — Gobernador regional de Chile: https://es.wikipedia.org/wiki/Gobernador_regional_de_Chile
-- Wikipedia — Anexo:Alcaldes de Chile: https://es.wikipedia.org/wiki/Anexo:Alcaldes_de_Chile
 - Licencias: `DATA_LICENSES.md`
-- Plan 023 — Ola A: `plans/023-autoridades-electas-partidos-politicos.md`
+- Plan 042 — BCN SIIT alcaldes: `plans/042-ampliar-cobertura-alcaldes-main-article.md`

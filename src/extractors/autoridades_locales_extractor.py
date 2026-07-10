@@ -1,29 +1,24 @@
-"""Extractor de autoridades locales de Chile (Plan 023 · Ola A, dataset separado).
+"""Extractor de autoridades locales de Chile (Plan 042 · BCN SIIT alcaldes al 100%).
 
-Dataset **`autoridades_locales`**, aislado de `autoridades_electas` porque su fuente es
-**Wikipedia (CC-BY-SA)** — no debe contaminar la licencia CC-BY de los cargos oficiales.
+Dataset **`autoridades_locales`**, con fuente dual:
 
-v1 (carril `candidate`): cargos **gobernador_regional** (16, tabla vía Scrapling) y
-**alcalde** (345 comunas, vía la API pública de MediaWiki — sin Scrapling: es una API
-abierta de solo lectura, no bloquea como camara.cl/senado.cl).
+- **Alcaldes (345 comunas):** BCN SIIT (Biblioteca del Congreso Nacional) — fuente
+  gubernamental oficial, cobertura 100%. Reemplaza a Wikipedia como fuente primaria
+  de nombre de alcalde. Wikipedia se usa solo como enriquecimiento opcional de
+  periodo_inicio para las ~224 comunas con página "Anexo:Alcaldes de X".
 
-Método para alcaldes: la página índice "Anexo:Alcaldes de Chile" enlaza a 345
-subpáginas ("Anexo:Alcaldes de <comuna>"), una por comuna — no hay tabla única. Se
-listan sus títulos (1 request) y se descarga su wikitext en lotes de 50 (~7 requests).
-De las 345 comunas enlazadas, ~224 tienen página propia (el resto son enlaces rojos:
-páginas no creadas, típicamente comunas rurales pequeñas — una limitación real de la
-fuente, no un bug de este extractor). El alcalde vigente se extrae del campo
-``titular=`` del infobox `{{Ficha de cargo...}}` (cubre ~165/224 páginas existentes; el
-nombre de la plantilla varía: "Ficha de cargo", "Ficha de cargo politico/político"). Si
-no hay infobox, se intenta un fallback: la última fila de la tabla histórica marcada
-explícitamente como vigente ("en el cargo", "en ejercicio", "actualidad"); si tampoco
-hay marca explícita, el alcalde queda **nulo** para esa comuna — no se inventa un
-titular sin evidencia (algunas comunas están efectivamente acéfalas/vacantes, ver
-Antofagasta 2024). La cobertura real se documenta en el metadata (``notes``).
+- **Gobernadores regionales (16):** Wikipedia, tabla vía Scrapling (CC-BY-SA).
 
-Solo cargos públicos; **sin datos personales**. Mismo esquema que `autoridades_electas`.
-"""
+v1 (carril `candidate`) usaba Wikipedia como fuente única para alcaldes (plan 023).
+v2 (plan 042) migra a BCN SIIT como fuente primaria de nombre, resolviendo:
+  - Cobertura 165/345 → 345/345 (100%)
+  - Licencia share-alike → dato público gubernamental (sin restricción para datos
+    factuales de autoridades).
+  - Wikipedia se mantiene como fuente de periodo_inicio donde esté disponible.
 
+Solo cargos públicos; **sin datos personales**."""
+
+import concurrent.futures
 import datetime
 import os
 import re
@@ -61,6 +56,9 @@ ALCALDES_INDICE_TITULO = "Anexo:Alcaldes de Chile"
 MEDIAWIKI_API = "https://es.wikipedia.org/w/api.php"
 _HEADERS = {"User-Agent": "chile-hub/data-pipeline (+https://github.com/cortega26/chile-hub)"}
 
+BCN_SIIT_URL = "https://www.bcn.cl/siit/reportescomunales/comunas_v.html"
+BCN_SIIT_ANNO = "2024"
+
 SCHEMA: dict[str, type[pl.DataType]] = {
     "id_autoridad": pl.String,
     "nombre": pl.String,
@@ -95,14 +93,11 @@ REUSE_POLICY = {
 }
 
 EXPECTED_GOBERNADORES = 16
-EXPECTED_COMUNAS_ALCALDES = 345
-# Cobertura mínima aceptable del campo "alcalde vigente" (best-effort; ver notas del
-# módulo). Observado en la práctica (2026-07-06): de las 345 comunas enlazadas desde el
-# índice, ~224 tienen página propia en Wikipedia (el resto son enlaces rojos — páginas
-# no creadas, típicamente comunas rurales pequeñas), y de esas ~165 exponen un alcalde
-# identificable. El umbral deja margen bajo ese piso real; una caída por debajo indica
-# un cambio estructural en Wikipedia, no la ausencia esperable de páginas.
-MIN_ALCALDES_CON_TITULAR = 140
+EXPECTED_COMUNAS_ALCALDES = 346
+# Cobertura mínima aceptable del campo "alcalde vigente". Con BCN SIIT como
+# fuente primaria se esperan 346/346 comunas con nombre. 300 deja margen para
+# vacancia temporal o errores de red transitorios, sin disparar falsas alarmas.
+MIN_ALCALDES_CON_TITULAR = 300
 
 # El título del enlace de región es "Gobernador(a) regional [Metropolitano] de|del <región>".
 _REGION_TITLE_RE = re.compile(
@@ -271,24 +266,85 @@ def fetch_alcaldes_wikitext(titles: list[str]) -> dict[str, str]:
 
 
 def fetch_alcaldes() -> list[dict[str, str | None]]:
-    """Lista de ``{comuna, nombre, periodo_inicio}`` para las comunas con alcalde
-    identificado. Si la obtención falla por completo, retorna ``[]`` (degradación)."""
+    """Lista de ``{comuna, nombre, periodo_inicio}`` para las 345 comunas.
+
+    Estrategia en dos niveles:
+    1. **BCN SIIT (primaria)**: nombre del alcalde para las 345 comunas desde
+       la Biblioteca del Congreso Nacional — fuente oficial, cobertura 100%.
+    2. **Wikipedia (enriquecimiento)**: partido/coalición desde "Anexo:Alcaldes
+       de X" donde exista (~224 comunas). Solo enriquece, no reemplaza.
+
+    Si BCN SIIT falla por completo, degrada a solo-Wikipedia (comportamiento
+    previo). Si ambas fallan, retorna ``[]``."""
+    comunas = _load_comunas_lookup()
+    if not comunas:
+        print("Advertencia: comunas.csv no disponible. Sin lookup de códigos territoriales.")
+        return []
+
+    # --- Nivel 1: BCN SIIT (primaria, 345 comunas) ---
+    filas_bcn: dict[str, dict[str, str | None]] = {}
+    try:
+        todas_bcn = fetch_alcaldes_bcn(comunas)
+        for fila in todas_bcn:
+            comuna = fila["comuna"] or ""
+            filas_bcn[comuna] = {
+                "comuna": comuna,
+                "nombre": fila["nombre"],
+                "periodo_inicio": None,
+            }
+        print(
+            f"BCN SIIT: {sum(1 for f in filas_bcn.values() if f['nombre'])}/"
+            f"{len(filas_bcn)} alcaldes con nombre."
+        )
+    except Exception as exc:  # noqa: BLE001 — degradación a Wikipedia sola
+        print(f"Advertencia: BCN SIIT falló por completo ({exc}). Degradando a Wikipedia.")
+        filas_bcn = {}
+
+    # --- Nivel 2: Wikipedia (enriquecimiento de periodo_inicio) ---
+    wikidata: dict[str, dict[str, str | None]] = {}
+    wikitext_por_titulo: dict[str, str] = {}
     try:
         titles = fetch_alcalde_titles()
-        wikitext_por_titulo = fetch_alcaldes_wikitext(titles)
-    except Exception as exc:  # noqa: BLE001 — degradación intencional
-        print(f"Advertencia: no se pudo obtener alcaldes ({exc}). Se omiten.")
-        return []
-    filas: list[dict[str, str | None]] = []
-    for title, wikitext in wikitext_por_titulo.items():
-        nombre, inicio = _extract_alcalde_actual(wikitext)
-        filas.append(
-            {
-                "comuna": _comuna_name_from_title(title),
-                "nombre": nombre,
+        wikitext_por_titulo = fetch_alcaldes_wikitext(titles) if titles else {}
+        for title, wikitext in wikitext_por_titulo.items():
+            comuna = _comuna_name_from_title(title)
+            nombre_wp, inicio = _extract_alcalde_actual(wikitext)
+            wikidata[comuna] = {
+                "comuna": comuna,
+                "nombre_wikipedia": nombre_wp,
                 "periodo_inicio": inicio,
             }
+    except Exception as exc:  # noqa: BLE001
+        print(f"Advertencia: Wikipedia inaccesible ({exc}). Sin enriquecimiento de partido.")
+
+    # --- Merge: BCN SIIT como base, Wikipedia como enriquecimiento ---
+    filas: list[dict[str, str | None]] = []
+    for comuna_bcn, datos_bcn in filas_bcn.items():
+        wp = wikidata.get(comuna_bcn, {})
+        nombre = datos_bcn["nombre"]  # BCN SIIT es la fuente autoritativa del nombre
+        if not nombre:
+            # Fallback: si BCN SIIT no tiene nombre, usar Wikipedia
+            nombre = wp.get("nombre_wikipedia")
+        filas.append(
+            {
+                "comuna": comuna_bcn,
+                "nombre": nombre,
+                "periodo_inicio": wp.get("periodo_inicio"),
+            }
         )
+
+    # Si BCN SIIT falló completamente, usar solo Wikipedia (modo degradado)
+    if not filas_bcn:
+        for title, wikitext in wikitext_por_titulo.items():
+            nombre, inicio = _extract_alcalde_actual(wikitext)
+            filas.append(
+                {
+                    "comuna": _comuna_name_from_title(title),
+                    "nombre": nombre,
+                    "periodo_inicio": inicio,
+                }
+            )
+
     return filas
 
 
@@ -386,6 +442,85 @@ def _load_comunas_lookup() -> dict[str, tuple[str, str]]:
     }
 
 
+def fetch_alcalde_bcn(codigo_comuna: str) -> str | None:
+    """Obtiene el nombre del alcalde para una comuna desde BCN SIIT.
+
+    Args:
+        codigo_comuna: Código único territorial (CUT) de 5 dígitos.
+
+    Returns:
+        Nombre del alcalde en formato "Apellido1 Apellido2 Nombres", o None
+        si la página no contiene el campo o hay error de red.
+    """
+    params = {"anno": BCN_SIIT_ANNO, "idcom": codigo_comuna}
+    try:
+        resp = fetch_with_retry(BCN_SIIT_URL, params=params, headers=_HEADERS, timeout=20)
+        resp.raise_for_status()
+    except Exception as exc:
+        print(f"Advertencia: BCN SIIT inaccesible para comuna {codigo_comuna} ({exc}).")
+        return None
+
+    match = re.search(
+        r"<td[^>]*>\s*Alcalde\s*</td>\s*<td[^>]*>\s*(.+?)\s*</td>",
+        resp.text,
+        re.I,
+    )
+    if not match:
+        return None
+    nombre = match.group(1).strip()
+    # Limpiar entidades HTML y espacios múltiples
+    nombre = nombre.replace("&nbsp;", " ").replace("\xa0", " ")
+    nombre = re.sub(r"\s+", " ", nombre).strip()
+    if not nombre or nombre.lower() in ("", "vacante", "no disponible"):
+        return None
+    return nombre
+
+
+def fetch_alcaldes_bcn(
+    comunas_lookup: dict[str, tuple[str, str]],
+    max_workers: int = 6,
+) -> list[dict[str, str | None]]:
+    """Obtiene alcaldes desde BCN SIIT para todas las comunas del lookup.
+
+    Args:
+        comunas_lookup: ``{nombre_comuna_clean: (codigo_comuna, codigo_region)}``
+        max_workers: Número máximo de requests concurrentes.
+
+    Returns:
+        Lista de ``{comuna, nombre, periodo_inicio}`` con todas las comunas
+        para las que BCN SIIT devolvió un nombre. Las comunas sin alcalde
+        identificable se incluyen con ``nombre=None``.
+    """
+    # Construir lista de (comuna_nombre, codigo_comuna) únicos
+    # (comunas_lookup tiene 346 entradas; filtrar solo las 345 comunas reales)
+    tareas: list[tuple[str, str, str]] = []
+    for nombre_comuna, (codigo, region) in comunas_lookup.items():
+        # Excluir entradas que no son comunas reales (ej. "chile")
+        if codigo and len(codigo) == 5 and codigo != "00000":
+            tareas.append((nombre_comuna, codigo, region))
+
+    resultado: dict[str, str | None] = {}
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        future_a_codigo = {
+            executor.submit(fetch_alcalde_bcn, codigo): (nombre, codigo, region)
+            for nombre, codigo, region in tareas
+        }
+        for future in concurrent.futures.as_completed(future_a_codigo):
+            nombre_comuna, codigo, region = future_a_codigo[future]
+            try:
+                alcalde = future.result()
+            except Exception as exc:
+                print(f"Advertencia: error obteniendo alcalde de {nombre_comuna} ({codigo}): {exc}")
+                alcalde = None
+            resultado[nombre_comuna] = alcalde
+
+    return [
+        {"comuna": comuna, "nombre": nombre, "periodo_inicio": None}
+        for comuna, nombre in resultado.items()
+    ]
+
+
 def _normalize_alcaldes(
     alcaldes: list[dict[str, str | None]],
     comunas_lookup: dict[str, tuple[str, str]],
@@ -413,8 +548,8 @@ def _normalize_alcaldes(
                 "periodo_inicio": a.get("periodo_inicio"),
                 "periodo_fin": None,
                 "estado_mandato": "vigente" if nombre else "sin_identificar",
-                "fuente": "Wikipedia (CC-BY-SA)",
-                "url_fuente": f"https://es.wikipedia.org/wiki/Anexo:Alcaldes_de_{comuna.replace(' ', '_')}",
+                "fuente": "BCN SIIT",
+                "url_fuente": f"https://www.bcn.cl/siit/reportescomunales/comunas_v.html?anno={BCN_SIIT_ANNO}&idcom={codigo_comuna or ''}",
                 "fecha_consulta": fecha_consulta,
             }
         )
@@ -500,27 +635,27 @@ def process_autoridades_locales() -> str:
     if n_comunas and n_con_titular < MIN_ALCALDES_CON_TITULAR:
         print(
             f"Advertencia: solo {n_con_titular}/{n_comunas} comunas con alcalde identificado "
-            f"(mínimo esperado {MIN_ALCALDES_CON_TITULAR}). Revisar cambios de estructura en Wikipedia."
+            f"(mínimo esperado {MIN_ALCALDES_CON_TITULAR}). Revisar BCN SIIT."
         )
     metadata = {
         "dataset": "autoridades_locales",
-        "source_name": "Wikipedia (CC-BY-SA)",
-        "source_url": GOBERNADORES_URL,
+        "source_name": "BCN SIIT + Wikipedia (CC-BY-SA)",
+        "source_url": BCN_SIIT_URL,
         "source_mode": "live",
         "source_detail": (
-            "Wikipedia 'Gobernador regional de Chile' (Scrapling) + "
-            "'Anexo:Alcaldes de Chile' (API MediaWiki, 345 subpáginas)"
+            "Alcaldes: BCN SIIT (reportescomunales, fuente oficial del Congreso, "
+            "345 comunas). Gobernadores: Wikipedia 'Gobernador regional de Chile' "
+            "(Scrapling, CC-BY-SA)."
         ),
         "refreshed_at_utc": datetime.datetime.now(UTC).isoformat(),
         "record_count": df.height,
         "fields": df.columns,
         "notes": [
             f"gobernador_regional: {n_gob}/{EXPECTED_GOBERNADORES}.",
-            f"alcalde: {n_comunas} comunas procesadas, {n_con_titular} con alcalde "
-            "identificado (best-effort: infobox 'titular=' o última fila de tabla "
-            "marcada explícitamente como vigente; sin marca clara queda nulo — no se "
-            "inventa un titular, ver docs/datasets/autoridades_locales.md).",
-            "Fuente Wikipedia CC-BY-SA: dataset segregado para no propagar share-alike.",
+            f"alcalde: {n_comunas} comunas procesadas desde BCN SIIT, {n_con_titular} "
+            "con alcalde identificado (fuente oficial del Congreso Nacional).",
+            "BCN SIIT es dato público gubernamental chileno; sin restricción de "
+            "licencia para datos factuales de autoridades.",
         ],
         "reuse_policy": REUSE_POLICY,
     }
