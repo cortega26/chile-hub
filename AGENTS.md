@@ -34,7 +34,7 @@ Actualmente publica diecinueve (19) capas:
 | **Partidos Políticos** | Cámara de Diputados / SERVEL | Roster de partidos políticos vigentes e históricos con estado legal |
 | **Autoridades Electas** | Cámara de Diputados + Senado | Diputados y senadores en ejercicio, con partido y distrito o circunscripción |
 | **Delincuencia Comunal** | CEAD / Subsecretaría de Prevención del Delito | Casos policiales DMCS y otras categorías por comuna y mes (carril `candidate`, ver nota abajo) |
-| **Autoridades Locales** | Wikipedia (CC-BY-SA) | Gobernadores regionales y alcaldes, segregado de Autoridades Electas por licencia share-alike (carril `candidate`) |
+| **Autoridades Locales** | BCN SIIT + Wikipedia (CC BY / CC BY-SA) | Gobernadores regionales (Wikipedia) y alcaldes (BCN SIIT, 100% cobertura), segregado de Autoridades Electas por licencia mixta (carril `candidate`) |
 
 **El objetivo no es tener todos los datos de Chile. Es entregar un número pequeño de datasets
 limpios, versionados, validados y consumibles en una línea de código.**

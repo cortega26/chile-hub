@@ -73,8 +73,8 @@ instalación del Congreso (11 de marzo → 10 de marzo) que ya se usaba para dip
 ## Limitaciones
 
 1. **Solo diputados y senadores:** `gobernador_regional` y `alcalde` están en el
-   dataset segregado `autoridades_locales` (Wikipedia, CC-BY-SA) por decisión de
-   licencia — no son un follow-up de este dataset, sino un dataset distinto por diseño.
+   dataset segregado `autoridades_locales` (BCN SIIT + Wikipedia, licencia mixta) por
+   decisión de licencia — no son un follow-up de este dataset, sino un dataset distinto por diseño.
 2. **Período de diputados fijado en código** (2026-03-11 → 2030-03-10): actualizar cada
    4 años. El de senadores se deriva dinámicamente de `PERIODOS` (`senado.cl`).
 3. **`pacto` (coalición) no disponible:** ninguna de las dos fuentes lo expone.
@@ -83,6 +83,6 @@ instalación del Congreso (11 de marzo → 10 de marzo) que ya se usaba para dip
 
 - Datos abiertos Cámara: https://opendata.camara.cl/
 - Senado: https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores
-- Dataset relacionado (cargos subnacionales, CC-BY-SA): `docs/datasets/autoridades_locales.md`
+- Dataset relacionado (cargos subnacionales, licencia mixta CC BY / CC BY-SA): `docs/datasets/autoridades_locales.md`
 - Research electoral: `docs/legal/b2-2-electoral-research.md`
 - Plan 023 — Ola A: `plans/023-autoridades-electas-partidos-politicos.md`
