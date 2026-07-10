@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-07-10T17:34:45.616313+00:00",
+  "generated_at_utc": "2026-07-10T17:46:18.299925+00:00",
   "artifact_count": 55,
   "artifacts": [
     {
@@ -9,7 +9,7 @@
       "shared_type": "artifact_manifest",
       "format": "json",
       "size_bytes": 16805,
-      "sha256": "d6ac1fec92eb0de11e6fc5f252891553a47718b01db06d5af16d17bb0f4735bf"
+      "sha256": "39d64b0cd5722cd698ec4184642a0a0cf140251b4da9759cc6bf475a9eb0829b"
     },
     {
       "path": "data/normalized/autoridades_electas.json",
@@ -90,7 +90,7 @@
       "shared_type": "datapackage",
       "format": "json",
       "size_bytes": 46018,
-      "sha256": "dd0d28662bee0212cfa35a90711e76105b313998e613ce3d6c10862cd8caee61"
+      "sha256": "88eb768565200e53181c8f632b68bb35244fd2680a370dc65f38f39ca31d319e"
     },
     {
       "path": "data/normalized/dataset_catalog.json",
@@ -252,7 +252,7 @@
       "shared_type": "hub_bundle",
       "format": "json",
       "size_bytes": 76042,
-      "sha256": "2b44c4f71b90b790e119540dd9fd8814c43925d3671dec4b3702c03fd7c04fa2"
+      "sha256": "b2066e523a6c6d2bb942a13a7071aa42bc35b846b471d182d58393ccaff5dca0"
     },
     {
       "path": "data/normalized/hub_health.json",
@@ -360,7 +360,7 @@
       "shared_type": "pipeline_metadata",
       "format": "json",
       "size_bytes": 57873,
-      "sha256": "7dc4b497a217a969712d615d96198cbe60267b8ee8021b912faa798801c1ba20"
+      "sha256": "820f830ef279674fe71bfb693eec64f732eeeef7978dc2ae44a42c4e2d779fda"
     },
     {
       "path": "data/normalized/pipeline_status.md",
@@ -503,7 +503,7 @@
       "path": "data/normalized/chile-hub-publishable-bundle.zip",
       "package_type": "zip",
       "size_bytes": 29300359,
-      "sha256": "a464c1705682a8154936e4d00c54c22b7e85460789fdda9f68cdb34340341ea7",
+      "sha256": "e4b22ad11d29f2e9eae976b9d79945e6f43971297ae68d81c5c7ba81da748aff",
       "checksum_algorithm": "sha256",
       "checksum_path": "data/normalized/chile-hub-publishable-bundle.zip.sha256",
       "verification_command": "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256"

@@ -12,6 +12,25 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.21.1 - 2026-07-10
+
+### Corregido
+
+- Amplía cobertura del hook sync-docs a builders, catalog y contratos
+  ([`3959c79`](https://github.com/cortega26/chile-hub/commit/3959c79f697e2e8bbddccb4c1f03853402dc56b5))
+
+- **metadata**: Actualiza fuente y licencia de autoridades_locales a BCN SIIT
+  ([`0064191`](https://github.com/cortega26/chile-hub/commit/00641916d81c3b5497e04e8276d28443ce114b17))
+
+### Documentación
+
+- Actualiza referencias a autoridades_locales en AGENTS.md y docs/
+  ([`425e943`](https://github.com/cortega26/chile-hub/commit/425e94338fa19994e62e22e5eb67031b993a23e3))
+
+- Completa actualización de referencias a BCN SIIT en autoridades_locales
+  ([`bd42251`](https://github.com/cortega26/chile-hub/commit/bd42251073dd9db0112de758c687e6537ed5db8d))
+
+
 ## 1.21.0 - 2026-07-10
 
 ### Corregido
