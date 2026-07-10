@@ -667,10 +667,6 @@
       "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars(\"autoridades_locales\")\n# Alcaldes con titular identificado\nalcaldes = df.filter((pl.col(\"cargo\") == \"alcalde\") & pl.col(\"nombre\").is_not_null())",
       "duckdb": "SELECT nombre, cargo, codigo_comuna, codigo_region\nFROM 'data/normalized/autoridades_locales.parquet'\nWHERE cargo = 'alcalde';",
       "cli": "chile-hub show autoridades_locales"
-    },
-    "outputs": {
-      "parquet": "data/normalized/autoridades_locales.parquet",
-      "json": "data/normalized/autoridades_locales.json"
     }
   }
 }
