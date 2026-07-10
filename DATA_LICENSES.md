@@ -36,5 +36,7 @@ compila desde **Wikipedia**, cuya licencia es **CC-BY-SA 4.0 (share-alike)**. Pa
 evitar que la obligación share-alike se propague al resto del bundle (mayormente CC-BY /
 CC0), este dataset se mantiene **segregado**: los cargos de fuente oficial (diputados y
 senadores) viven en `autoridades_electas` (CC-BY) y **no** se mezclan con los de
-Wikipedia. Quien redistribuya `autoridades_locales` debe cumplir CC-BY-SA (atribución +
-share-alike). Ver `docs/datasets/autoridades_locales.md`.
+Wikipedia. Los alcaldes provienen de BCN SIIT (dato público gubernamental, 100% cobertura);
+los gobernadores regionales son de Wikipedia (CC-BY-SA). Quien redistribuya
+`autoridades_locales` debe cumplir ambas licencias (CC BY para alcaldes, CC-BY-SA para
+gobernadores). Ver `docs/datasets/autoridades_locales.md`.

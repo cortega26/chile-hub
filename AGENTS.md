@@ -80,7 +80,7 @@ chile-hub/
 │   │   ├── sinim_finanzas_extractor.py          Finanzas municipales — stub de fallback; NO corre en `make extract`
 │   │   ├── sinim_finanzas_live_extractor.py     Finanzas municipales — scraper real; corre en `monthly-scrape.yml`
 │   │   ├── cead_delincuencia_live_extractor.py  Delincuencia comunal (CEAD); corre en `monthly-scrape.yml`
-│   │   └── autoridades_locales_extractor.py     Autoridades locales (Wikipedia); carril `candidate`, sin cadencia automática
+│   │   └── autoridades_locales_extractor.py     Autoridades locales (BCN SIIT + Wikipedia); carril `candidate`, sin cadencia automática
 │   ├── validation.py              Todas las funciones validate_*() — módulo independiente (1 194 líneas)
 │   ├── build_dev_db.py            Orquestador (867 líneas): main() + fases (_load_inputs, _compute_validations, _write_data_artifacts, _generate_reports)
 │   ├── builders/                  Módulos del pipeline extraídos de build_dev_db.py (formats, metadata, reports, artifacts, datasets, catalog, landing, io_utils, _shared)

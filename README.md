@@ -428,7 +428,7 @@ chile-hub health       # severidad, frescura, drift y cobertura
 | `familia_delito` | `VARCHAR` | `"robos_violentos"` |
 | `casos` | `INTEGER` | `245` |
 
-**21. autoridades_locales** — Gobernadores regionales y alcaldes vía Wikipedia (CC-BY-SA) ⚠️ _en carril candidate — datos no incluidos en el bundle público_
+**21. autoridades_locales** — Gobernadores regionales (Wikipedia) y alcaldes (BCN SIIT, 100% cobertura) ⚠️ _en carril candidate — datos no incluidos en el bundle público_
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
 | `id_autoridad` | `VARCHAR` | `"gobernador_01"` |
