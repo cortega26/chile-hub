@@ -12,6 +12,35 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.21.0 - 2026-07-10
+
+### Corregido
+
+- Agrega --skip-build a make release
+  ([`ba96fa4`](https://github.com/cortega26/chile-hub/commit/ba96fa4c2ab9e5fdf6c0211affc5893ef3bda5da))
+
+- Usa --no-verify en bump-version y release
+  ([`ba01e5c`](https://github.com/cortega26/chile-hub/commit/ba01e5c20456e03183483ada70655e5b775121fd))
+
+### Integración continua
+
+- Añade cache-suffix por job para evitar colisiones de caché de setup-uv
+  ([`055a780`](https://github.com/cortega26/chile-hub/commit/055a7808e212d72caabd42443420f91625e2eca8))
+
+### Documentación
+
+- Sincroniza README.md con versión actual (1.20.0)
+  ([`65f349f`](https://github.com/cortega26/chile-hub/commit/65f349f5f5389231387787eff945dd5dceeebd81))
+
+### Agregado
+
+- Agrega make bump-version y hook pre-commit sync-docs auto-stage
+  ([`5c9261c`](https://github.com/cortega26/chile-hub/commit/5c9261ccc263388fe898b6f534b87495239c44cc))
+
+- Bump-version auto-commitea y agrega make release
+  ([`4be3b86`](https://github.com/cortega26/chile-hub/commit/4be3b8695f6bcd71d8a4843340b01cee57790b06))
+
+
 ## 1.20.0 - 2026-07-10
 
 ### Corregido
