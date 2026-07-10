@@ -67,9 +67,10 @@ async function runQuery(sql, statusEl, resultEl) {
     const db = await getDb();
     const base = new URL(".", window.location.href).href;
 
-    // DuckDB-Wasm no soporta read_parquet con URLs HTTP directas: cada archivo
-    // debe registrarse explícitamente con registerFileURL y luego referenciarse
-    // por su nombre registrado.
+    // DuckDB-Wasm no soporta read_parquet con URLs HTTP. Cada archivo debe
+    // registrarse como buffer: fetch() desde el hilo principal (el navegador
+    // maneja decompresión) y registerFileBuffer (evita que CDN sirva bytes
+    // comprimidos que DuckDB no puede interpretar).
     const parquetRegex = /read_parquet\s*\(\s*'([^']+)'\s*\)/g;
     let modifiedSql = sql;
     let match;
@@ -80,7 +81,14 @@ async function runQuery(sql, statusEl, resultEl) {
         const url = path.startsWith("data/")
           ? base + path
           : base + path.replace(/^\.\//, "");
-        await db.registerFileURL(basename, url, duckdb.DuckDBDataProtocol.HTTP, false);
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(
+            `No se pudo descargar ${basename} (HTTP ${response.status})`
+          );
+        }
+        const buffer = await response.arrayBuffer();
+        await db.registerFileBuffer(basename, new Uint8Array(buffer));
         modifiedSql = modifiedSql.replace(path, basename);
       }
     }
