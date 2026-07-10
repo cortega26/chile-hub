@@ -12,6 +12,57 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.19.16 - 2026-07-10
+
+### Mantenimiento
+
+- **deps**: Mueve deps solo-pipeline fuera de runtime del paquete
+  ([`8032069`](https://github.com/cortega26/chile-hub/commit/8032069786fc8bf85092f1f0800f302ebd9631d3))
+
+- **deps**: Mueve deps solo-pipeline fuera de runtime del paquete
+  ([`660cc9f`](https://github.com/cortega26/chile-hub/commit/660cc9f0527b862e3d8ac4325cf17517584f44b7))
+
+- **plans**: Archiva planes 032 y 033 (DONE) — deps runtime e higiene CI
+  ([`2fc121d`](https://github.com/cortega26/chile-hub/commit/2fc121d46fcd8673f4e9cced75dafc0d63f0e437))
+
+- **plans**: Archiva planes 032 y 033 (DONE) — deps runtime e higiene CI
+  ([`8cebcd8`](https://github.com/cortega26/chile-hub/commit/8cebcd849bf7fd244ba3f01614ce2bc4244236fe))
+
+- **plans**: Elimina archivo original del Plan 039 (ya movido a archive/)
+  ([`a8ff660`](https://github.com/cortega26/chile-hub/commit/a8ff6608d3676e388cb4d4c4701ac110e0da8000))
+
+### Integración continua
+
+- **quality**: Ejecuta mypy/bandit/pip-audit/interrogate en CI
+  ([`06d78ba`](https://github.com/cortega26/chile-hub/commit/06d78bab295a43b2e7b0cfc52cd996aa56b1b2e7))
+
+- **quality**: Ejecuta mypy/bandit/pip-audit/interrogate en CI
+  ([`84cffe3`](https://github.com/cortega26/chile-hub/commit/84cffe3d43ca4dc1e358da6d679bfa2808401212))
+
+### Documentación
+
+- **adr**: Document comunal coverage decisions (ADR-006)
+  ([`3d27596`](https://github.com/cortega26/chile-hub/commit/3d27596482782581291c294af4660dd057410c25))
+
+### Mejorado
+
+- **validation**: Vectoriza DV de RUT y elimina dependencia rutificador
+  ([`6062f45`](https://github.com/cortega26/chile-hub/commit/6062f45db29a659a7ac3e66102f7f421682a67d2))
+
+### Refactorizado
+
+- Deduplica pipeline_status_utils via re-export shim
+  ([`77931b2`](https://github.com/cortega26/chile-hub/commit/77931b2ee16b39f3d59d6e1220b8389362428480))
+
+### Tests
+
+- **builders**: Golden round-trip para writers de formatos y bundle
+  ([`4310cf6`](https://github.com/cortega26/chile-hub/commit/4310cf6bc130d8fb3d6dae9c1d0789187f47fe65))
+
+- **verify**: Caracteriza el gate de publicación y lo hace visible a coverage
+  ([`8488302`](https://github.com/cortega26/chile-hub/commit/84883025d46f573aa0f808095b1a3133604a5a4e))
+
+
 ## 1.19.15 - 2026-07-09
 
 ### Corregido
