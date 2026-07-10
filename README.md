@@ -23,7 +23,7 @@
 [![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-3776AB.svg?style=flat&logo=python&logoColor=white)]()
 [![Formats](https://img.shields.io/badge/Formats-Parquet%20%7C%20DuckDB%20%7C%20SQLite%20%7C%20JSON%20%7C%20Excel-orange.svg)]()
 <!-- START_DATASET_BADGE -->
-[![Datasets](https://img.shields.io/badge/Datasets-19%20capas-16a34a.svg)]()
+[![Datasets](https://img.shields.io/badge/Datasets-20%20capas-16a34a.svg)]()
 <!-- END_DATASET_BADGE -->
 [![Comunas](https://img.shields.io/badge/Comunas-346-8b5cf6.svg)]()
 
@@ -165,8 +165,8 @@ Pipeline determinista en GitHub Actions: extracción → build → verificación
 | 17 | **Consumo Eléctrico Comunal** | 3 | 🟡 fallback | CNE / Energía Abierta | CC BY | Anual |
 | 18 | **Partidos Políticos** | 36 | 🟢 live | Cámara de Diputados | CC BY | Bajo_demanda |
 | 19 | **Autoridades Electas** | 205 | 🟢 live | Cámara de Diputados + Senado | CC BY | Bajo_demanda |
-| 20 | **Delincuencia Comunal** 🆕 | — | 🔜 próximamente | CEAD / SPD | Revisión términos | — |
-| 21 | **Autoridades Locales** 🆕 | — | 🔜 próximamente | BCN SIIT + Wikipedia | CC BY / CC BY-SA | — |
+| 20 | **Autoridades Locales** | — | ⚪ unknown | BCN SIIT + Wikipedia | CC BY / CC BY-SA | Bajo_demanda |
+| 21 | **Delincuencia Comunal** 🆕 | — | 🔜 próximamente | CEAD / SPD | Revisión términos | — |
 
 > **🟢 live**: datos extraídos directamente desde la fuente oficial en cada ejecución del pipeline.
 > **🟡 fallback**: datos servidos desde un respaldo curado mientras se completa la extracción en vivo.
@@ -420,17 +420,7 @@ chile-hub health       # severidad, frescura, drift y cobertura
 | `periodo_inicio` / `periodo_fin` | `DATE` | `"2026-03-11` / `2030-03-10"` |
 | `estado_mandato` | `VARCHAR` | `"vigente"` |
 
-**20. delincuencia_comunal** — Casos policiales de Delitos de Mayor Connotación Social (DMCS) y otras categorías por comuna y mes, reportados por Carabineros y PDI al Ministerio del Interior. Fuente: CEAD (Centro de Estudios y Análisis del Delito), Subsecretaría de Prevención del Delito. (en carril candidate — datos no incluidos en el bundle público) (PK: anio, mes, codigo_comuna, familia_delito)
-| Columna | Tipo | Ejemplo |
-|:---|:---|:---|
-| `codigo_comuna` | `VARCHAR(5)` | `"01101"` |
-| `nombre_comuna` | `VARCHAR` | `"Santiago"` |
-| `anio` | `INTEGER` | `2024` |
-| `mes` | `INTEGER` | `1` |
-| `familia_delito` | `VARCHAR` | `"robos_violentos"` |
-| `casos` | `INTEGER` | `245` |
-
-**21. autoridades_locales** — Autoridades locales/subnacionales de Chile: gobernadores regionales (Wikipedia, CC-BY-SA) y alcaldes (BCN SIIT, dato público gubernamental). Wikipedia se mantiene como fuente de gobernadores y enriquecimiento opcional de periodo_inicio para alcaldes. Dataset segregado de autoridades_electas por licencia mixta. (en carril candidate — datos no incluidos en el bundle público) (PK: id_autoridad)
+**20. autoridades_locales** — Autoridades locales/subnacionales de Chile: gobernadores regionales (Wikipedia, CC-BY-SA) y alcaldes (BCN SIIT, dato público gubernamental). Wikipedia se mantiene como fuente de gobernadores y enriquecimiento opcional de periodo_inicio para alcaldes. Dataset segregado de autoridades_electas por licencia mixta. (PK: id_autoridad)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
 | `id_autoridad` | `VARCHAR` | `"gobernador_01"` |
@@ -440,6 +430,16 @@ chile-hub health       # severidad, frescura, drift y cobertura
 | `codigo_comuna` | `VARCHAR(5)` | `"01101"` (solo alcaldes)"` |
 | `partido` | `VARCHAR` | `"nulo si no identificado"` |
 | `estado_mandato` | `VARCHAR` | `"vigente"` / `"sin_identificar"` |
+
+**21. delincuencia_comunal** — Casos policiales de Delitos de Mayor Connotación Social (DMCS) y otras categorías por comuna y mes, reportados por Carabineros y PDI al Ministerio del Interior. Fuente: CEAD (Centro de Estudios y Análisis del Delito), Subsecretaría de Prevención del Delito. (en carril candidate — datos no incluidos en el bundle público) (PK: anio, mes, codigo_comuna, familia_delito)
+| Columna | Tipo | Ejemplo |
+|:---|:---|:---|
+| `codigo_comuna` | `VARCHAR(5)` | `"01101"` |
+| `nombre_comuna` | `VARCHAR` | `"Santiago"` |
+| `anio` | `INTEGER` | `2024` |
+| `mes` | `INTEGER` | `1` |
+| `familia_delito` | `VARCHAR` | `"robos_violentos"` |
+| `casos` | `INTEGER` | `245` |
 
 <!-- END_SCHEMA_DETAILS -->
 
