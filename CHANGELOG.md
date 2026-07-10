@@ -12,6 +12,17 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.22.0 - 2026-07-10
+
+### Agregado
+
+- **doc-sync**: Fase 1 — conteo de datasets en AGENTS.md auto-generado
+  ([`4a20a26`](https://github.com/cortega26/chile-hub/commit/4a20a265c765099e43c4dbe71e89c242a9e792bf))
+
+- **doc-sync**: Fase 2 — tabla de tests en AGENTS.md auto-generada
+  ([`6a211af`](https://github.com/cortega26/chile-hub/commit/6a211af62ce3bdf2c69f58b10255ac04301253de))
+
+
 ## 1.21.1 - 2026-07-10
 
 ### Corregido
