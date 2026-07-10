@@ -48,13 +48,14 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 
 | # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
 |---|------|----------|----------|--------|-----------|--------|
-| 023 | [Datasets `autoridades_electas` y `partidos_politicos`](023-autoridades-electas-partidos-politicos.md) | P2 | M-L | MED | — (deriva de Plan 022 · Ola B2.2, research cerrada) | 🔶 Ola A y B `stable_publishable` y en el bundle público (2026-07-06): `partidos_politicos` (36, 15 con estado_legal/fecha vía SERVEL) y `autoridades_electas` (diputados+senadores, 205, senadores con codigo_region/periodo completos). `autoridades_locales` (gobernadores+alcaldes, 240, CC-BY-SA segregado) queda `candidate` — cobertura de alcaldes insuficiente a criterio del operador, pendiente mejorar el extractor. No se archiva hasta resolver ese follow-up. |
 | 020 | [Explorador SQL en la landing con DuckDB-Wasm](020-duckdb-wasm-playground.md) | P2 | M | MED | — | BLOCKED — gate 4.3: NO-GO (2026-06-30). Ver `docs/gate-4-3-decision-playground.md` para condiciones de re-evaluación. |
 
 ## Planes archivados (auditoría 2026-07-07)
 
 | # | Plan | Esfuerzo | Riesgo | Estado |
 |---|------|----------|--------|--------|
+| 042 | [Ampliar cobertura de alcaldes al 100% vía BCN SIIT](archive/042-ampliar-cobertura-alcaldes-main-article.md) | S-M | LOW | DONE — `fetch_alcaldes_bcn()` + `fetch_alcalde_bcn()` implementados con `ThreadPoolExecutor`; `fetch_alcaldes()` reescrito con BCN SIIT como fuente primaria y Wikipedia como enriquecimiento de `periodo_inicio`; cobertura 165→346/346 (100%); 6 tests nuevos; `expected_record_count` 240→362; ficha y contrato actualizados. Commit `27ba534`. |
+| 023 | [Datasets `autoridades_electas` y `partidos_politicos`](archive/023-autoridades-electas-partidos-politicos.md) | M-L | MED | DONE — Ola A y B `stable_publishable` en el bundle público. Plan 042 cerró el follow-up de cobertura de alcaldes; este plan queda completamente cerrado. |
 | 041 | [Import/validate de `datapackage.json`](archive/041-design-datapackage-import-validate.md) | S | LOW | DONE — `from_datapackage()` y `frictionless_validate()` implementados con lazy frictionless import; 4 tests pasan; extra `validation` en pyproject.toml; ADR-008 committeado. |
 | 040 | [Superficie SQL `hub.sql()` sobre Parquet](archive/040-design-hub-sql-query-surface.md) | S-M | LOW | DONE — `ChileHub.sql()` implementado con DuckDB lazy import + vistas Parquet; 3 tests pasan; extra `query` en `pyproject.toml`; ADR-007 committeado. |
 | 039 | [Resuelve capas comunales 3/346 en el bundle](archive/039-design-resolve-sparse-comunal-layers.md) | S | LOW | DONE — decisiones de cobertura ya implementadas vía fixes reactivos (`57e6eaf`, `3f968ab`, `c8c7c70`); ADR-006 escrito y committeado documentando FILL/RE-CARRIL para los 3 datasets; verificación confirma finanzas_municipales 345 filas, consumo_electrico ausente del bundle. |
@@ -138,7 +139,6 @@ Auditoría 2026-07-07 (024–041):
   — (DONE)                     (039 DONE: ADR-006 escrito, decisiones ya implementadas)
 
 Planes previos:
-  023 (independiente)  ← autoridades_electas + partidos_politicos; queda abierto por autoridades_locales
   020 (independiente)  ← bloqueado por gate 4.3 (no-go 2026-06-30). DIR-01/Plan 040 es su hermano no-bloqueado
 ```
 
@@ -147,6 +147,7 @@ Planes previos:
 **038** (dedup pipeline_status_utils) quedaron DONE. La ola de higiene deps/CI y los dos refactors están completos 🎉.
 **036** (tests de writers) quedó DONE — el backfill de tests del gate y los writers está cerrado.
 **040** ya sabe que `duckdb` va en el extra `pipeline`. **039** DONE ✅ (ADR-006). **040** DONE ✅ (hub.sql() + ADR-007). **041** DONE ✅ (from_datapackage() + frictionless_validate() + ADR-008).
+**023** y **042** DONE ✅ (BCN SIIT completa cobertura de alcaldes 346/346 y cierra Plan 023).
 **020** sigue bloqueado (gate 4.3 NO-GO).
 
 ## Orden de ejecución recomendado
@@ -162,8 +163,6 @@ Planes previos:
 5. **Diseño/spikes**: **COMPLETA** 🎉: **039** ✅ DONE (ADR-006), **040** ✅ DONE (hub.sql() + ADR-007), **041** ✅ DONE (from_datapackage() + ADR-008).
 
 Planes previos aún vigentes:
-- **023** — autoridades_electas + partidos_politicos: DONE para diputados/senadores/partidos; queda abierto
-  el follow-up de `autoridades_locales` (cobertura de alcaldes). Se cruza con **DIR-04** de esta auditoría.
 - **020** — DuckDB-Wasm playground: solo si lo aprueba una re-evaluación futura del gate 4.3. **Plan 040**
   entrega el mismo valor "explora los datos" a la audiencia que sí existe, sin depender del tráfico de la landing.
 
