@@ -29,10 +29,10 @@ repos:
     hooks:
       - id: sync-docs
         name: sync-docs
-        entry: bash -c 'make sync-docs && git add README.md'
+        entry: bash -c 'make sync-docs && git add README.md AGENTS.md'
         language: system
         pass_filenames: false
-        files: ^(pyproject\.toml|README\.md|src/chile_hub/datasets\.py|src/builders/|scripts/sync_docs\.py|docs/adr/|tests/|data/dataset_catalog_config\.json|contracts/datasets/)$
+        files: ^(pyproject\.toml|README\.md|AGENTS\.md|src/chile_hub/datasets\.py|src/builders/|scripts/sync_docs\.py|docs/adr/|tests/|data/dataset_catalog_config\.json|contracts/datasets/)$
       - id: pip-audit
         name: pip-audit
         entry: uv run pip-audit

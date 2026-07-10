@@ -1,8 +1,8 @@
-"""Sincroniza hechos "variables" hardcodeados en README.md con su fuente de verdad.
+"""Sincroniza hechos "variables" hardcodeados en README.md y AGENTS.md con su fuente de verdad.
 
 Cada función lee un hecho derivado del estado real del proyecto (conteo de
-tests, de ADRs, de contratos, versión del paquete, salud y calidad del hub) y
-reemplaza el bloque delimitado correspondiente en README.md vía
+tests, de ADRs, de contratos, de datasets, versión del paquete, salud y
+calidad del hub) y reemplaza el bloque delimitado correspondiente vía
 ``replace_delimited_block``. Ver AGENTS.md §12 para la tabla completa de
 propietarios canónicos y dónde corre la generación/verificación.
 """
@@ -14,6 +14,7 @@ from src.builders._shared import DATASET_CATALOG_CONFIG, NORMALIZED_DIR, ROOT_DI
 from src.builders.io_utils import read_json_if_exists, read_project_version, replace_delimited_block
 
 README_PATH = os.path.join(ROOT_DIR, "README.md")
+AGENTS_PATH = os.path.join(ROOT_DIR, "AGENTS.md")
 TESTS_DIR = os.path.join(ROOT_DIR, "tests")
 ADR_DIR = os.path.join(ROOT_DIR, "docs", "adr")
 CONTRACTS_DIR = os.path.join(ROOT_DIR, "contracts", "datasets")
@@ -150,6 +151,14 @@ def sync_readme_quality_summary(check_only=False):
     )
 
 
+def sync_agents_dataset_count(check_only=False):
+    """Conteo de datasets en AGENTS.md desde el catálogo."""
+    total = len(DATASET_CATALOG_CONFIG)
+    return replace_delimited_block(
+        AGENTS_PATH, "AGENTS_DATASET_COUNT", str(total), check_only=check_only, separator=""
+    )
+
+
 SYNC_FUNCS = [
     sync_readme_test_count,
     sync_readme_adr_count,
@@ -159,6 +168,7 @@ SYNC_FUNCS = [
     sync_readme_redistribution_summary,
     sync_readme_health_summary,
     sync_readme_quality_summary,
+    sync_agents_dataset_count,
 ]
 
 

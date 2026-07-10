@@ -29,11 +29,11 @@ def main():
     if args.check:
         if changed:
             raise SystemExit(
-                "ERROR: bloques de README.md desincronizados: "
+                "ERROR: bloques de README.md o AGENTS.md desincronizados: "
                 + ", ".join(changed)
                 + " — corre 'make sync-docs' y commitea el resultado."
             )
-        print("sync_docs --check: README.md al día")
+        print("sync_docs --check: README.md y AGENTS.md al día")
     else:
         if changed:
             print("sync_docs: bloques actualizados: " + ", ".join(changed))
