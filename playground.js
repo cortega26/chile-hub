@@ -28,7 +28,8 @@ async function getDb() {
         import.meta.url
       ).href;
       const wasmResponse = await fetch(wasmUrl);
-      const wasmBlob = await wasmResponse.blob();
+      const wasmBuffer = await wasmResponse.arrayBuffer();
+      const wasmBlob = new Blob([wasmBuffer], { type: "application/wasm" });
       const wasmObjectUrl = URL.createObjectURL(wasmBlob);
 
       const worker = new Worker("./vendor/duckdb/duckdb-browser-mvp.worker.js");
