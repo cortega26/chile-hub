@@ -1,14 +1,15 @@
 PYTHON ?= $(if $(wildcard .venv/bin/python),.venv/bin/python,python3)
 VENV_DIR ?= .venv
 
-.PHONY: help bootstrap install-browsers doctor bump-version extract build verify verify-dev verify-readiness verify-publication verify-live verify-landing test coverage lint lint-fix format format-check docs-coverage package package-check package-smoke check refresh sync-docs status catalog hub-list hub-summary hub-summary-table hub-example hub-artifacts hub-shared-artifacts hub-shared-artifacts-table hub-reports hub-reports-table hub-report hub-inventory hub-inventory-table hub-snapshot hub-snapshot-table hub-overview hub-overview-table hub-status hub-status-table hub-health hub-health-table hub-bundle hub-freshness-audit hub-freshness-audit-table hub-runtime-status hub-runtime-status-table hub-top-issue hub-top-issue-text hub-top-issue-table hub-packages hub-packages-table hub-package hub-package-verify hub-redistribution hub-redistribution-table hub-provenance hub-provenance-table hub-drift hub-drift-table hub-source-readiness hub-dataset-quality package-bundle clean-publishable docs-build docs-serve
+.PHONY: help bootstrap install-browsers doctor bump-version release extract build verify verify-dev verify-readiness verify-publication verify-live verify-landing test coverage lint lint-fix format format-check docs-coverage package package-check package-smoke check refresh sync-docs status catalog hub-list hub-summary hub-summary-table hub-example hub-artifacts hub-shared-artifacts hub-shared-artifacts-table hub-reports hub-reports-table hub-report hub-inventory hub-inventory-table hub-snapshot hub-snapshot-table hub-overview hub-overview-table hub-status hub-status-table hub-health hub-health-table hub-bundle hub-freshness-audit hub-freshness-audit-table hub-runtime-status hub-runtime-status-table hub-top-issue hub-top-issue-text hub-top-issue-table hub-packages hub-packages-table hub-package hub-package-verify hub-redistribution hub-redistribution-table hub-provenance hub-provenance-table hub-drift hub-drift-table hub-source-readiness hub-dataset-quality package-bundle clean-publishable docs-build docs-serve
 
 help:
 	@printf "Targets disponibles:\n"
 	@printf "  make bootstrap        Crea .venv e instala dependencias\n"
 	@printf "  make install-browsers Instala Chromium para smoke tests de la landing\n"
 	@printf "  make doctor           Muestra el Python efectivo y dependencias clave\n"
-	@printf "  make bump-version     Bumpia versión en pyproject.toml + sync-docs (VERSION=X.Y.Z)\n"
+	@printf "  make bump-version     Bumpia versión en pyproject.toml + sync-docs + commit (VERSION=X.Y.Z)\n"
+	@printf "  make release          Detecta próxima versión (semantic-release) + sync-docs + commit\n"
 	@printf "  make extract          Ejecuta extractores\n"
 	@printf "  make build            Compila outputs del hub\n"
 	@printf "  make verify           Verifica artefactos generados (perfil dev)\n"
@@ -96,8 +97,20 @@ bump-version:
 	@printf "Bumpiando versión a %s...\n" "$(VERSION)"
 	@$(PYTHON) -c "import re; c=open('pyproject.toml').read(); open('pyproject.toml','w').write(re.sub(r'^version = \"[^\"]*\"','version = \"$(VERSION)\"',c,flags=re.MULTILINE))"
 	@$(PYTHON) scripts/sync_docs.py
-	@printf "\n✓ pyproject.toml y README.md actualizados a %s.\n" "$(VERSION)"
-	@printf "  Para commitear: git add pyproject.toml README.md && git commit -m 'chore: bump version to %s'\n" "$(VERSION)"
+	@git add pyproject.toml README.md
+	@printf "\n✓ pyproject.toml y README.md actualizados a %s. Commitando...\n" "$(VERSION)"
+	@git commit -m "chore: bump version to $(VERSION)"
+
+release:
+	@printf "Detectando próxima versión con semantic-release...\n"
+	@$(PYTHON) -m semantic_release version --no-commit --no-tag --no-push
+	@printf "Sincronizando README.md...\n"
+	@$(PYTHON) scripts/sync_docs.py
+	@git add pyproject.toml README.md CHANGELOG.md
+	@version=$$($(PYTHON) -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])"); \
+	git commit -m "chore(release): $$version [skip ci]"
+	@printf "\n✓ Release commiteado.\n"
+	@printf "  Para publicar: git push && git push --tags\n"
 
 sync-docs:
 	$(PYTHON) scripts/sync_docs.py
