@@ -239,6 +239,101 @@ def sync_agents_test_table(check_only=False):
     )
 
 
+_AGENTS_EXTRACTOR_DESCRIPTIONS = {
+    "base.py": "BaseExtractor ABC (contrato para todos los extractores)",
+    "http_utils.py": "Reintentos/backoff HTTP compartidos",
+    "region_utils.py": "Normalización de nombres de región compartida",
+    "source_adapter.py": "Adaptador de fuente compartido",
+    "subdere_extractor.py": (
+        "DPA: regiones/provincias/comunas/comunas_enriquecidas (BCN ArcGIS) → data/staging/"
+    ),
+    "bcentral_extractor.py": "Indicadores desde mindicador.cl → data/staging/",
+    "censo_extractor.py": "Censo 2024 — población comunal (INE) → data/staging/",
+    "censo_hogares_viviendas_extractor.py": (
+        "Censo 2024 — hogares y viviendas (INE) → data/staging/"
+    ),
+    "salud_extractor.py": "Establecimientos de salud (MINSAL) → data/staging/",
+    "electoral_extractor.py": "Distritos electorales (BCN/SERVEL) → data/staging/",
+    "mineduc_establecimientos_extractor.py": (
+        "Establecimientos educacionales (MINEDUC) → data/staging/"
+    ),
+    "mineduc_resultados_extractor.py": (
+        "Resultados educacionales agregados (MINEDUC) → data/staging/"
+    ),
+    "siedu_extractor.py": "Indicadores urbanos SIEDU (INE) → data/staging/",
+    "res_extractor.py": (
+        "Empresas — Registro de Empresas y Sociedades (datos.gob.cl) → data/staging/"
+    ),
+    "pobreza_extractor.py": "Pobreza comunal SAE (MDS) → data/staging/",
+    "consumo_electrico_extractor.py": ("Consumo eléctrico comunal (CNE) → data/staging/"),
+    "partidos_politicos_extractor.py": ("Partidos políticos vigentes (SERVEL) → data/staging/"),
+    "autoridades_electas_extractor.py": ("Diputados y senadores en ejercicio → data/staging/"),
+    "sinim_finanzas_extractor.py": (
+        "Finanzas municipales — stub de fallback; NO corre en `make extract`"
+    ),
+    "sinim_finanzas_live_extractor.py": (
+        "Finanzas municipales — scraper real; corre en `monthly-scrape.yml`"
+    ),
+    "cead_delincuencia_live_extractor.py": (
+        "Delincuencia comunal (CEAD); corre en `monthly-scrape.yml`"
+    ),
+    "autoridades_locales_extractor.py": (
+        "Autoridades locales (BCN SIIT + Wikipedia); carril `candidate`, sin cadencia automática"
+    ),
+}
+
+EXTRACTORS_DIR = os.path.join(ROOT_DIR, "src", "extractors")
+
+_SHARED_MODULES = {"base.py", "http_utils.py", "region_utils.py", "source_adapter.py"}
+
+
+def sync_agents_extractor_list(check_only=False):
+    """Árbol de extractores en AGENTS.md desde src/extractors/."""
+    all_files = sorted(
+        f for f in os.listdir(EXTRACTORS_DIR) if f.endswith(".py") and f != "__init__.py"
+    )
+    shared = [f for f in all_files if f in _SHARED_MODULES]
+    extractors_list = [f for f in all_files if f.endswith("_extractor.py")]
+    extractor_count = len(extractors_list)
+    shared_count = len(shared)
+
+    lines = [
+        "│   ├── extractors/                 "
+        f"{extractor_count} extractores por dataset + {shared_count}"
+        " módulos compartidos (ver nota abajo)"
+    ]
+
+    # Shared modules first
+    for fname in shared:
+        prefix = "│   │   ├──"
+        desc = _AGENTS_EXTRACTOR_DESCRIPTIONS.get(fname)
+        if desc is None:
+            raise SystemExit(
+                f"ERROR: extractor '{fname}' sin descripción en "
+                "_AGENTS_EXTRACTOR_DESCRIPTIONS. Agrega una entrada en "
+                "src/builders/doc_sync.py."
+            )
+        lines.append(f"{prefix} {fname:45s} {desc}")
+
+    # Extractors
+    for i, fname in enumerate(extractors_list):
+        is_last = i == len(extractors_list) - 1
+        prefix = "│   │   └──" if is_last else "│   │   ├──"
+        desc = _AGENTS_EXTRACTOR_DESCRIPTIONS.get(fname)
+        if desc is None:
+            raise SystemExit(
+                f"ERROR: extractor '{fname}' sin descripción en "
+                "_AGENTS_EXTRACTOR_DESCRIPTIONS. Agrega una entrada en "
+                "src/builders/doc_sync.py."
+            )
+        lines.append(f"{prefix} {fname:45s} {desc}")
+
+    body = "\n".join(lines)
+    return replace_delimited_block(
+        AGENTS_PATH, "AGENTS_EXTRACTOR_LIST", body, check_only=check_only, separator="\n"
+    )
+
+
 def sync_agents_dataset_count(check_only=False):
     """Conteo de datasets en AGENTS.md desde el catálogo."""
     total = len(DATASET_CATALOG_CONFIG)
@@ -258,6 +353,7 @@ SYNC_FUNCS = [
     sync_readme_quality_summary,
     sync_agents_dataset_count,
     sync_agents_test_table,
+    sync_agents_extractor_list,
 ]
 
 

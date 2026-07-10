@@ -58,29 +58,31 @@ chile-hub/
 │   └── pipeline-check.yml      CI/CD: extrae, construye, valida, publica
 │
 ├── src/
+<!-- START_AGENTS_EXTRACTOR_LIST -->
 │   ├── extractors/                 18 extractores por dataset + 4 módulos compartidos (ver nota abajo)
-│   │   ├── base.py                              BaseExtractor ABC (contrato para todos los extractores)
-│   │   ├── http_utils.py                        Reintentos/backoff HTTP compartidos
-│   │   ├── region_utils.py                      Normalización de nombres de región compartida
-│   │   ├── source_adapter.py                    Adaptador de fuente compartido
-│   │   ├── subdere_extractor.py                 DPA: regiones/provincias/comunas/comunas_enriquecidas (BCN ArcGIS) → data/staging/
-│   │   ├── bcentral_extractor.py                Indicadores desde mindicador.cl → data/staging/
-│   │   ├── censo_extractor.py                   Censo 2024 — población comunal (INE) → data/staging/
-│   │   ├── censo_hogares_viviendas_extractor.py Censo 2024 — hogares y viviendas (INE) → data/staging/
-│   │   ├── salud_extractor.py                   Establecimientos de salud (MINSAL) → data/staging/
-│   │   ├── electoral_extractor.py               Distritos electorales (BCN/SERVEL) → data/staging/
-│   │   ├── mineduc_establecimientos_extractor.py Establecimientos educacionales (MINEDUC) → data/staging/
-│   │   ├── mineduc_resultados_extractor.py      Resultados educacionales agregados (MINEDUC) → data/staging/
-│   │   ├── siedu_extractor.py                   Indicadores urbanos SIEDU (INE) → data/staging/
-│   │   ├── res_extractor.py                     Empresas — Registro de Empresas y Sociedades (datos.gob.cl) → data/staging/
-│   │   ├── pobreza_extractor.py                 Pobreza comunal SAE (MDS) → data/staging/
-│   │   ├── consumo_electrico_extractor.py       Consumo eléctrico comunal (CNE) → data/staging/
-│   │   ├── partidos_politicos_extractor.py      Partidos políticos vigentes (SERVEL) → data/staging/
-│   │   ├── autoridades_electas_extractor.py     Diputados y senadores en ejercicio → data/staging/
-│   │   ├── sinim_finanzas_extractor.py          Finanzas municipales — stub de fallback; NO corre en `make extract`
-│   │   ├── sinim_finanzas_live_extractor.py     Finanzas municipales — scraper real; corre en `monthly-scrape.yml`
-│   │   ├── cead_delincuencia_live_extractor.py  Delincuencia comunal (CEAD); corre en `monthly-scrape.yml`
-│   │   └── autoridades_locales_extractor.py     Autoridades locales (BCN SIIT + Wikipedia); carril `candidate`, sin cadencia automática
+│   │   ├── base.py                                       BaseExtractor ABC (contrato para todos los extractores)
+│   │   ├── http_utils.py                                 Reintentos/backoff HTTP compartidos
+│   │   ├── region_utils.py                               Normalización de nombres de región compartida
+│   │   ├── source_adapter.py                             Adaptador de fuente compartido
+│   │   ├── autoridades_electas_extractor.py              Diputados y senadores en ejercicio → data/staging/
+│   │   ├── autoridades_locales_extractor.py              Autoridades locales (BCN SIIT + Wikipedia); carril `candidate`, sin cadencia automática
+│   │   ├── bcentral_extractor.py                         Indicadores desde mindicador.cl → data/staging/
+│   │   ├── cead_delincuencia_live_extractor.py           Delincuencia comunal (CEAD); corre en `monthly-scrape.yml`
+│   │   ├── censo_extractor.py                            Censo 2024 — población comunal (INE) → data/staging/
+│   │   ├── censo_hogares_viviendas_extractor.py          Censo 2024 — hogares y viviendas (INE) → data/staging/
+│   │   ├── consumo_electrico_extractor.py                Consumo eléctrico comunal (CNE) → data/staging/
+│   │   ├── electoral_extractor.py                        Distritos electorales (BCN/SERVEL) → data/staging/
+│   │   ├── mineduc_establecimientos_extractor.py         Establecimientos educacionales (MINEDUC) → data/staging/
+│   │   ├── mineduc_resultados_extractor.py               Resultados educacionales agregados (MINEDUC) → data/staging/
+│   │   ├── partidos_politicos_extractor.py               Partidos políticos vigentes (SERVEL) → data/staging/
+│   │   ├── pobreza_extractor.py                          Pobreza comunal SAE (MDS) → data/staging/
+│   │   ├── res_extractor.py                              Empresas — Registro de Empresas y Sociedades (datos.gob.cl) → data/staging/
+│   │   ├── salud_extractor.py                            Establecimientos de salud (MINSAL) → data/staging/
+│   │   ├── siedu_extractor.py                            Indicadores urbanos SIEDU (INE) → data/staging/
+│   │   ├── sinim_finanzas_extractor.py                   Finanzas municipales — stub de fallback; NO corre en `make extract`
+│   │   ├── sinim_finanzas_live_extractor.py              Finanzas municipales — scraper real; corre en `monthly-scrape.yml`
+│   │   └── subdere_extractor.py                          DPA: regiones/provincias/comunas/comunas_enriquecidas (BCN ArcGIS) → data/staging/
+<!-- END_AGENTS_EXTRACTOR_LIST -->
 │   ├── validation.py              Todas las funciones validate_*() — módulo independiente (1 194 líneas)
 │   ├── build_dev_db.py            Orquestador (867 líneas): main() + fases (_load_inputs, _compute_validations, _write_data_artifacts, _generate_reports)
 │   ├── builders/                  Módulos del pipeline extraídos de build_dev_db.py (formats, metadata, reports, artifacts, datasets, catalog, landing, io_utils, _shared)
@@ -99,7 +101,7 @@ chile-hub/
 │   ├── staging/      Datos parseados y cercanos a la fuente (CSV + metadata.json por dataset).
 │   └── normalized/   Artefactos finales publicables (Parquet, JSON, DuckDB, Excel, ZIP, reportes).
 │
-├── tests/                        9 archivos — ver tabla completa en §8, no la dupliques aquí
+├── tests/                        12 archivos — ver tabla completa en §8, no la dupliques aquí
 │   ├── test_chile_hub.py         API/CLI de ChileHub, contratos de artefactos, workflow, Makefile
 │   ├── test_extractors.py        Un test class por extractor + contrato de BaseExtractor
 │   ├── test_pipeline_logic.py    Lógica interna de build_dev_db.py, invariantes CUT, changelog
