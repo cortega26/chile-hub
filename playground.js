@@ -21,13 +21,23 @@ let dbPromise = null; // se crea en el primer "Ejecutar"
 async function getDb() {
   if (!dbPromise) {
     dbPromise = (async () => {
-      // Force MVP variant — EH variant hits "function signature mismatch"
-      // on Cloudflare-served WASM despite being identical bytes on disk.
-      const bundle = MANUAL_BUNDLES.mvp;
-      const worker = new Worker(bundle.mainWorker);
+      // Pre-fetch WASM in the main thread to avoid CDN compression issues
+      // that corrupt the binary in the worker's fetch context.
+      const wasmUrl = new URL(
+        "./vendor/duckdb/duckdb-mvp.wasm",
+        import.meta.url
+      ).href;
+      const wasmResponse = await fetch(wasmUrl);
+      const wasmBlob = await wasmResponse.blob();
+      const wasmObjectUrl = URL.createObjectURL(wasmBlob);
+
+      const worker = new Worker("./vendor/duckdb/duckdb-browser-mvp.worker.js");
       const logger = new duckdb.ConsoleLogger();
       const db = new duckdb.AsyncDuckDB(logger, worker);
-      await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
+      // Pass the object URL instead of the raw path — the worker fetches
+      // it from the blob: URL, bypassing Cloudflare's compression.
+      await db.instantiate(wasmObjectUrl, null);
+      URL.revokeObjectURL(wasmObjectUrl);
       return db;
     })();
   }
