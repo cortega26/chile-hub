@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-07-10T01:16:51.631271+00:00",
+  "generated_at_utc": "2026-07-10T17:06:39.869065+00:00",
   "artifact_count": 55,
   "artifacts": [
     {
@@ -9,7 +9,7 @@
       "shared_type": "artifact_manifest",
       "format": "json",
       "size_bytes": 16805,
-      "sha256": "c8e5498f23b33375f8afdf86cd1863e9cb3ca08a0a21ac3dbfc647a2d314362e"
+      "sha256": "f1a47b1a55598c1674a18887e4a5d0cf8286590d7c867f8f2141b355a85c2056"
     },
     {
       "path": "data/normalized/autoridades_electas.json",
@@ -89,8 +89,8 @@
       "output_type": null,
       "shared_type": "datapackage",
       "format": "json",
-      "size_bytes": 46019,
-      "sha256": "0629aa49200683c1f65fa9c21d06122d49b0e54f405db22de2bc9a5227621cf3"
+      "size_bytes": 46018,
+      "sha256": "d2d3a45395df7198cc1ad7b150b321e30d6423152468e9b2b3ba1605e964bb1d"
     },
     {
       "path": "data/normalized/dataset_catalog.json",
@@ -251,8 +251,8 @@
       "output_type": null,
       "shared_type": "hub_bundle",
       "format": "json",
-      "size_bytes": 76043,
-      "sha256": "86004326408ed534dff022ca97feefba263751006ca9a4bb7feb2acfca47cdd9"
+      "size_bytes": 76042,
+      "sha256": "0409ab7825762cd94925597159fa350e482edf0faa0fc951c19d50f07f8a5590"
     },
     {
       "path": "data/normalized/hub_health.json",
@@ -359,8 +359,8 @@
       "output_type": null,
       "shared_type": "pipeline_metadata",
       "format": "json",
-      "size_bytes": 57874,
-      "sha256": "5e159affac85b3e5b8300871d44f2ed4f9679c2deb9208b0e55678aeb963ab33"
+      "size_bytes": 57873,
+      "sha256": "bd87859d8c648649bdc8ceb6b6039939ba53e23649ba14d729964780e2eaa986"
     },
     {
       "path": "data/normalized/pipeline_status.md",
@@ -502,8 +502,8 @@
     {
       "path": "data/normalized/chile-hub-publishable-bundle.zip",
       "package_type": "zip",
-      "size_bytes": 29300360,
-      "sha256": "705dbf50e684b2fee48684e55eb0d953f252ae2c9725c4b7df93e04293b1b26b",
+      "size_bytes": 29300364,
+      "sha256": "030148d16538c2364eb1f460ae1957892a0c93f19b06c7319d43e2372ecf9ded",
       "checksum_algorithm": "sha256",
       "checksum_path": "data/normalized/chile-hub-publishable-bundle.zip.sha256",
       "verification_command": "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256"

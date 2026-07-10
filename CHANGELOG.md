@@ -12,6 +12,28 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.20.0 - 2026-07-10
+
+### Corregido
+
+- **core**: Reemplaza type: ignore por cast explícito para compatibilidad mypy
+  ([`7b072a8`](https://github.com/cortega26/chile-hub/commit/7b072a83e814cba4ffdc64c2cabc17f1d70a3d94))
+
+- **data**: Agrega headers de navegador para BCN SIIT (resuelve HTTP 403)
+  ([`eea47a2`](https://github.com/cortega26/chile-hub/commit/eea47a2e135687fe7fbcb4d37db7dddc9d5ea24d))
+
+### Agregado
+
+- **core**: Add ChileHub.sql() query surface over Parquet via DuckDB views
+  ([`b0ee156`](https://github.com/cortega26/chile-hub/commit/b0ee156b3e56f83ebd937fa1f32b840bbe0e9af3))
+
+- **core**: Add from_datapackage() and frictionless_validate() via Frictionless
+  ([`ce23ee5`](https://github.com/cortega26/chile-hub/commit/ce23ee54c962698f6bc8f696d4c9511c84960672))
+
+- **data**: Reemplaza fuente de alcaldes con BCN SIIT (100% cobertura, 346/346)
+  ([`27ba534`](https://github.com/cortega26/chile-hub/commit/27ba534a971528bcbf1af5597f2cc76befab1b37))
+
+
 ## 1.19.16 - 2026-07-10
 
 ### Mantenimiento
