@@ -21,7 +21,9 @@ let dbPromise = null; // se crea en el primer "Ejecutar"
 async function getDb() {
   if (!dbPromise) {
     dbPromise = (async () => {
-      const bundle = await duckdb.selectBundle(MANUAL_BUNDLES);
+      // Force MVP variant — EH variant hits "function signature mismatch"
+      // on Cloudflare-served WASM despite being identical bytes on disk.
+      const bundle = MANUAL_BUNDLES.mvp;
       const worker = new Worker(bundle.mainWorker);
       const logger = new duckdb.ConsoleLogger();
       const db = new duckdb.AsyncDuckDB(logger, worker);
