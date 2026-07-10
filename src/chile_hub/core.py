@@ -371,6 +371,53 @@ class ChileHub:
             result = result.join(df, on=on, how=how)
         return result
 
+    def sql(self, query: str) -> pl.DataFrame:
+        """Ejecuta una consulta SQL sobre los datasets publicados como vistas DuckDB.
+
+        Cada dataset del catálogo se registra como una vista DuckDB con el mismo
+        nombre que el dataset. Las vistas se respaldan con los archivos Parquet
+        publicados y se registran de forma lazy en la primera llamada a ``sql()``.
+
+        Args:
+            query: Consulta SQL que referencia las vistas con los nombres de los
+                datasets (ej. ``"SELECT * FROM comunas LIMIT 5"``).
+
+        Returns:
+            DataFrame de Polars con el resultado de la consulta.
+
+        Raises:
+            ImportError: Si ``duckdb`` no está instalado.
+                Instálalo con ``pip install chile-hub[query]``.
+
+        Examples:
+            >>> hub = ChileHub()
+            >>> hub.sql("SELECT codigo_comuna, nombre_comuna_clean FROM comunas LIMIT 5")
+            >>> hub.sql("SELECT c.codigo_comuna, c.nombre_comuna_clean, cen.poblacion_censada FROM comunas c JOIN censo_comunal cen USING(codigo_comuna) LIMIT 10")
+        """
+        try:
+            import duckdb
+        except ImportError:
+            raise ImportError(
+                "Para usar SQL necesitas instalar duckdb: pip install chile-hub[query]"
+            )
+
+        if not hasattr(self, "_sql_views_registered"):
+            con = duckdb.connect()
+            for dataset_name in Dataset:
+                try:
+                    name = dataset_name.value
+                    path = self.get_output_path(name, "parquet")
+                    con.execute(f"CREATE VIEW \"{name}\" AS SELECT * FROM read_parquet('{path}')")  # nosec
+                except Exception:  # nosec
+                    # Skip datasets whose Parquet isn't available
+                    pass
+            self._sql_views_registered = True
+            self._sql_connection = con
+        else:
+            con = self._sql_connection
+
+        return con.execute(query).pl()  # type: ignore[no-any-return]
+
     def validate_dataset(self, dataset_name: str | Dataset) -> dict:
         """Valida los datos publicados del hub contra su contrato JSON Schema.
 

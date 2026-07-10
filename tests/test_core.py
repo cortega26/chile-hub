@@ -461,5 +461,54 @@ class ChileHubApiDocstringTests(unittest.TestCase):
             )
 
 
+class ChileHubSQLTests(unittest.TestCase):
+    """Tests para el mÃ©todo ChileHub.sql()."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.hub = _hub()
+
+    def test_sql_single_table_select(self):
+        """Una consulta simple contra una sola tabla retorna un DataFrame."""
+        result = self.hub.sql("SELECT codigo_comuna, nombre_comuna_clean FROM comunas LIMIT 5")
+        self.assertIsInstance(result, pl.DataFrame)
+        self.assertEqual(result.height, 5)
+        self.assertGreater(result.width, 0)
+
+    def test_sql_two_dataset_join(self):
+        """Un JOIN entre dos datasets por codigo_comuna produce resultados."""
+        result = self.hub.sql(
+            "SELECT c.codigo_comuna, c.nombre_comuna_clean, cen.poblacion_censada "
+            "FROM comunas c "
+            "JOIN censo_comunal cen ON c.codigo_comuna = cen.codigo_comuna "
+            "LIMIT 10"
+        )
+        self.assertIsInstance(result, pl.DataFrame)
+        self.assertGreater(result.height, 0)
+        self.assertIn("codigo_comuna", result.columns)
+        self.assertIn("nombre_comuna_clean", result.columns)
+        self.assertIn("poblacion_censada", result.columns)
+
+    def test_sql_missing_duckdb_raises_import_error(self):
+        """Si duckdb no estÃ¡ instalado, sql() lanza ImportError con mensaje Ãºtil."""
+        import sys
+
+        # Remover duckdb de sys.modules para forzar re-import
+        for key in list(sys.modules.keys()):
+            if key == "duckdb" or key.startswith("duckdb."):
+                sys.modules.pop(key)
+
+        def mock_import(name, *args, **kwargs):
+            if name == "duckdb":
+                raise ImportError("No module named 'duckdb'")
+            return __import__(name, *args, **kwargs)
+
+        hub = _hub()
+        with mock.patch("builtins.__import__", side_effect=mock_import):
+            with self.assertRaises(ImportError) as ctx:
+                hub.sql("SELECT 1")
+            self.assertIn("chile-hub[query]", str(ctx.exception))
+
+
 if __name__ == "__main__":
     unittest.main()
