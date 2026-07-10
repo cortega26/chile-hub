@@ -4,8 +4,8 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 
 > **Última auditoría `/improve deep` (2026-07-07, commit `c486e7c`)**: planes **024–041**.
 > Repo maduro; los grandes ítems previos ya están hechos. Lo restante es una cola de
-> defectos pequeños de alta confianza (024–031; 027–031 DONE ✅), higiene de deps/CI (033 DONE ✅; 032 y 034 DONE ✅), backfill
-> de tests del gate de publicación y los writers (035–036), dos refactors (037–038) y
+> defectos pequeños de alta confianza (024–031; 027–031 DONE ✅), higiene de deps/CI (032, 033, 034 DONE ✅), backfill
+> de tests del gate de publicación (035 DONE ✅) y los writers (036 DONE ✅), dos refactors (037–038 DONE ✅) y
 > tres planes de diseño (039–041). Ver "Hallazgos considerados y diferidos (2026-07-07)".
 
 > **Reevaluación de vigencia (2026-07-09)**: entre `c486e7c` y `HEAD` (`c1aa3e9`) hubo 45 commits,
@@ -48,8 +48,6 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 
 | # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
 |---|------|----------|----------|--------|-----------|--------|
-| 035 | [Tests de caracterización del gate `verify_pipeline`](035-characterization-tests-publish-gate.md) | P2 | L | LOW | — | DONE — `scripts` en coverage.source (pyproject.toml:170), `tests/test_verify_pipeline.py` con 26 tests (14 golden + 4 corruption + 6 synthetic + 1 main smoke + 1 readiness), `validate_puntos_interes` con 4 tests en `test_validation.py`, cobertura de `verify_pipeline.py` subió de ~0% a 64%. |
-| 036 | [Tests golden de writers de artefactos](036-golden-output-tests-artifact-writers.md) | P2 | M | LOW | — (030 DONE) | TODO |
 | 039 | [Diseño: resuelve capas comunales 3/346 en el bundle](039-design-resolve-sparse-comunal-layers.md) | P2 | S (era M) | LOW (era MED) | — (024 y 034 DONE) | TODO — **resuelto en sustancia por fixes reactivos, falta el ADR formal.** `consumo_electrico_comunal`: RE-CARRIL ya implementado (`57e6eaf`, fuente confirmada muerta permanentemente, `maturity_status="deprecated"`/`candidate`, fuera del bundle). `pobreza_comunal`: FILL ya en código (`3f968ab` corrigió el mapeo de columnas del XLSX real de MDS; producirá 345 comunas × 2 = 690 filas en el próximo extract en vivo — la causa raíz no era la que suponía el plan). `finanzas_municipales`: FILL ya logrado (scrape mensual corriendo tras 034; snapshot comprometido con 345/346 municipios). Trabajo restante: escribir `docs/adr/NNN-comunal-coverage-decision.md` documentando estas 3 decisiones ya tomadas, y confirmar que el próximo build recoge el `pobreza_comunal` real (no requiere código nuevo). |
 | 040 | [Diseño: superficie SQL `hub.sql()` sobre Parquet](040-design-hub-sql-query-surface.md) | P2 | S-M | LOW | — (032 DONE) | TODO |
 | 041 | [Diseño: import/validate de `datapackage.json`](041-design-datapackage-import-validate.md) | P3 | S | LOW | — | TODO |
@@ -62,6 +60,8 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 |---|------|----------|--------|--------|
 | 038 | [Deduplica `pipeline_status_utils.py`](archive/038-deduplicate-pipeline-status-utils.md) | M | MED | DONE — ejecutado en `advisor/038-dedup-pipeline-status-utils` commit `77931b2`; shim PEP 562 `__getattr__` (21 líneas) reemplaza copia de 936 líneas, docstring de sincronización manual eliminado del canónico, 324 tests pasan, lint y format-check OK. |
 | 037 | [Vectoriza DV de RUT + elimina `rutificador`](archive/037-vectorize-rut-validation.md) | M | MED | DONE — ejecutado en `advisor/037-vectorize-rut` commit `6062f45`; `_expected_dv_vectorized` reemplaza `map_elements` con Polars vectorizado, `rutificador` eliminado de `pyproject.toml`, 95 tests pasan + 1 skipped, lint y format-check OK. |
+| 036 | [Tests golden de writers de artefactos](archive/036-golden-output-tests-artifact-writers.md) | M | LOW | DONE — ejecutado en `advisor/036-artifact-writer-tests` commit `4310cf6`; `test_builders_formats.py` (10 tests) + `test_builders_artifacts.py` (8 tests), 18/18 pasan, round-trip Parquet/DuckDB/SQLite/Excel + integridad SHA-256 + consistencia manifiesto↔ZIP, `make lint` y `format-check` OK. |
+| 035 | [Tests de caracterización del gate `verify_pipeline`](archive/035-characterization-tests-publish-gate.md) | L | LOW | DONE — `scripts` en coverage.source, `test_verify_pipeline.py` con 26 tests, cobertura de `verify_pipeline.py` subió de ~0% a 64%. |
 | 033 | [Ejecuta mypy/bandit/pip-audit/interrogate en CI](archive/033-enforce-quality-gates-in-ci.md) | S-M | MED | DONE — ejecutado en `advisor/033-ci-quality-gates` commit `172014b`; 3 gates blocking (mypy/bandit/pip-audit) + interrogate informativo (`\|\| true`), `make docs-coverage`, `fail-under = 80`, fix de cast en `_logging.py`. |
 | 032 | [Adelgaza deps runtime del paquete instalado](archive/032-slim-runtime-dependencies.md) | S | MED | DONE — ejecutado en `advisor/032-slim-runtime-deps` commit `8032069`; `[project.dependencies]` reducido a 4 entradas, 5 deps pipeline bajo extra `pipeline`, install-smoke `rows: 346`, `make package-smoke` OK, wheel METADATA confirma solo 4 `Requires-Dist`, pre-commit hooks pasan limpiamente. |
 | 031 | [Cache de load_polars en ruta por defecto](archive/031-fix-dead-load-polars-cache.md) | S | LOW | DONE — `advisor/031-load-polars-cache` commit `7b1f065`; eliminado `not validate or` del guard. 55 tests pasan, lint OK. |
@@ -131,9 +131,10 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 Auditoría 2026-07-07 (024–041):
   025                      (independientes — cada uno un archivo/área distinta)
   032 (DONE) → 040           (040 ya sabe que duckdb va en extra pipeline)
-  — (030 DONE) → 036            (036 puede afirmar el guard de Excel de 030)
+  — (030 DONE) → 036 (DONE)            (036 afirma el guard de Excel de 030, ambos DONE)
   033 (DONE) → —                 (CI ya bloquea mypy/bandit/pip-audit en cada push/PR)
-  035 041                    (independientes; 032, 033, 034, 037 y 038 quedaron DONE)
+  035 (DONE) → —          (035 ya archivado: gate de publicación con 26 tests)
+  041                    (independiente; 032, 033, 034, 035, 037 y 038 quedaron DONE)
   039                           (024 y 034 DONE; ya solo falta escribir el ADR — ver su fila)
 
 Planes previos:
@@ -142,8 +143,9 @@ Planes previos:
 ```
 
 **Interacciones clave de la auditoría 2026-07-07:** **026** (regenerar lock), **032** (adelgazar deps),
-**033** (mypy/bandit/pip-audit en CI), **037** (vectorizar RUT) y **038** (dedup pipeline_status_utils)
-quedaron DONE. La ola de higiene deps/CI y los dos refactors están completos 🎉.
+**033** (mypy/bandit/pip-audit en CI), **035** (tests gate de publicación), **037** (vectorizar RUT) y
+**038** (dedup pipeline_status_utils) quedaron DONE. La ola de higiene deps/CI y los dos refactors están completos 🎉.
+**036** (tests de writers) quedó DONE — el backfill de tests del gate y los writers está cerrado.
 **040** ya sabe que `duckdb` va en el extra `pipeline`. **039** solo necesita el ADR retroactivo.
 **020** sigue bloqueado (gate 4.3 NO-GO).
 
@@ -155,9 +157,7 @@ quedaron DONE. La ola de higiene deps/CI y los dos refactors están completos �
 1. **Ola de fixes P2, un archivo cada uno, sin dependencias entre sí** — **COMPLETA** 🎉
    (027, 028, 029, 030 y 031 DONE — archivados).
 2. **Higiene de deps/CI** — **COMPLETA** 🎉 (032, 033 y 034 DONE).
-3. **Backfill de tests**: **035** (gate de publicación — baseline de verificación) → **036** (writers).
-   035 primero porque es la red de seguridad que los refactors de la ola siguiente deberían tener antes
-   de tocar código de build.
+3. **Backfill de tests**: **COMPLETA** 🎉: **035** ✅ DONE (gate de publicación) y **036** ✅ DONE (writers).
 4. **Refactors** — **COMPLETA** 🎉: **037** ✅ (vectoriza RUT) y **038** ✅ (dedup pipeline_status_utils).
 5. **Diseño/spikes**: **039** (024 y 034 ya DONE — el spike se reduce a redactar el ADR retroactivo,
    es el más rápido de cerrar de los tres) → **040** (coordinar con 032) → **041**.
@@ -249,7 +249,7 @@ verificó el código/config real donde hubo diff.
 | 033 | `pipeline-check.yml` +81/-7, `Makefile` +9 | Vigente; el job `quality` creció (lock-sync, docs-sync, companion-paths) pero mypy/bandit/pip-audit/interrogate siguen sin CI. |
 | 034 | `monthly-scrape.yml` reescrito | **DONE de rebote** — archivado (ver tabla de archivados arriba). |
 | 035 | `verify_pipeline.py` +43/-, tests +1355 líneas | Vigente; cobertura de `verify_*` subió de 4 a 6 funciones de ~24, pero el deliverable del plan no existe. |
-| 036 | ninguno | Vigente, sin cambios. |
+| 036 | ninguno | **DONE** — ejecutado 2026-07-09, commit `4310cf6`. |
 | 037 | `pyproject.toml` (solo bump de versión) | Vigente; `rutificador` sigue importado vía `map_elements`. |
 | 038 | ambas copias +54 líneas cada una (edición manual paralela) | Vigente; se confirmó que siguen byte-idénticas, pero el riesgo que el plan describe se ejercitó en vivo. |
 | 039 | `source_registry.json`/`dataset_catalog.json` reescritos | **Sustancialmente resuelto**, sigue `TODO` solo para el ADR — ver nota en el archivo del plan y su fila arriba. |
