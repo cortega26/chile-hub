@@ -15,7 +15,7 @@ async function getDb() {
       // WebAssembly.instantiate(). Fetching here (browser decompresses) and
       // passing as Blob URL bypasses this.
       const wasmResp = await fetch("./vendor/duckdb/duckdb-mvp.wasm");
-      const buf = await resp.arrayBuffer();
+      const buf = await wasmResp.arrayBuffer();
       const blob = new Blob([buf], { type: "application/wasm" });
       const blobUrl = URL.createObjectURL(blob);
 
