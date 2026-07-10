@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'self' https://formspree.io; object-src 'none'; script-src 'self' https://gc.zgo.at; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://gc.zgo.at https://formspree.io; manifest-src 'self'; media-src 'self'; worker-src 'self' blob:; upgrade-insecure-requests">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'self' https://formspree.io; object-src 'none'; script-src 'self' 'wasm-unsafe-eval' 'sha256-TmHOajS6t5/QY5KaUTImfqGzR2lm8kRkwsvdwdyyJ2k=' https://gc.zgo.at; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://gc.zgo.at https://formspree.io; manifest-src 'self'; media-src 'self'; worker-src 'self' blob:; upgrade-insecure-requests">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script data-goatcounter="https://chile-hub.goatcounter.com/count"
             async src="//gc.zgo.at/count.js"></script>
@@ -2796,6 +2796,22 @@ LIMIT 10;</pre>
             </div>
         </section>
 
+        <section class="section-shell" id="explorador">
+            <div class="catalog-header">
+                <div>
+                    <h2 class="catalog-title">Explorador SQL</h2>
+                    <div class="catalog-meta">Ejecuta SQL contra los Parquet publicados, en tu navegador. El motor se carga al primer clic.</div>
+                </div>
+            </div>
+            <label for="sql-input" class="visually-hidden">Consulta SQL</label>
+            <textarea id="sql-input" class="quickstart-code" rows="4" spellcheck="false">SELECT * FROM read_parquet('data/normalized/comunas.parquet') LIMIT 10;</textarea>
+            <div class="quickstart-head">
+                <button id="sql-run-btn" class="btn btn-primary">Ejecutar</button>
+                <span id="sql-status" aria-live="polite"></span>
+            </div>
+            <div id="sql-result"></div>
+        </section>
+
         <section class="participate-section" id="participar">
             <div>
                 <h2>Contribuye o propón el próximo dataset</h2>
@@ -2991,6 +3007,16 @@ LIMIT 10;</pre>
     </div>
     <div id="drawer-backdrop" class="drawer-backdrop"></div>
 
+    <script type="importmap">
+    {
+        "imports": {
+            "apache-arrow": "./vendor/apache-arrow/Arrow.mjs",
+            "flatbuffers": "./vendor/flatbuffers/mjs/flatbuffers.js",
+            "tslib": "./vendor/tslib.es6.mjs"
+        }
+    }
+    </script>
     <script src="app.js?v=1.21.1" defer></script>
+    <script type="module" src="playground.js"></script>
 </body>
 </html>

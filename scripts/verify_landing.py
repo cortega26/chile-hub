@@ -15,7 +15,8 @@ BUNDLE_PATH = ROOT_DIR / "data" / "normalized" / "hub_bundle.json"
 PRODUCTION_CSP = (
     "default-src 'self'; base-uri 'self'; form-action 'self' https://formspree.io; "
     "frame-ancestors 'none'; object-src 'none'; "
-    "script-src 'self' https://gc.zgo.at; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+    "script-src 'self' 'wasm-unsafe-eval' 'sha256-TmHOajS6t5/QY5KaUTImfqGzR2lm8kRkwsvdwdyyJ2k=' https://gc.zgo.at; "
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
     "img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; "
     "connect-src 'self' https://gc.zgo.at https://formspree.io; "
     "manifest-src 'self'; media-src 'self'; worker-src 'self' blob:; upgrade-insecure-requests"
@@ -569,11 +570,18 @@ def verify_landing():
         if not any("Acción recomendada:" in line for line in top_issue_meta):
             fail(f"Recommended action not found in top issue card metadata: {top_issue_meta}")
 
+        # Explorador SQL: verificar presencia (no ejecutar — evita descargar WASM en CI)
+        if page.locator("#sql-run-btn").count() != 1:
+            fail("Falta el botón del explorador SQL (#sql-run-btn)")
+        if page.locator("#sql-input").count() != 1:
+            fail("Falta el textarea del explorador SQL (#sql-input)")
+
         browser.close()
 
     print(
         "Landing verification passed: status, package surface, freshness, coverage, drift, reuse metadata, "
-        "public quickstart, previews, feedback actions, artifact metadata, dataset examples and copy interactions are working."
+        "public quickstart, previews, feedback actions, artifact metadata, dataset examples and copy interactions, "
+        "SQL explorer presence."
     )
 
 
