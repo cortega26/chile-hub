@@ -65,7 +65,7 @@ async function runQuery(sql, statusEl, resultEl) {
   resultEl.innerHTML = "";
   try {
     const db = await getDb();
-    const base = window.location.origin + window.location.pathname.replace(/\/?$/, "/");
+    const base = new URL(".", window.location.href).href;
 
     // DuckDB-Wasm no soporta read_parquet con URLs HTTP directas: cada archivo
     // debe registrarse explícitamente con registerFileURL y luego referenciarse
