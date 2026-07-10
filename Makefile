@@ -1,13 +1,14 @@
 PYTHON ?= $(if $(wildcard .venv/bin/python),.venv/bin/python,python3)
 VENV_DIR ?= .venv
 
-.PHONY: help bootstrap install-browsers doctor extract build verify verify-dev verify-readiness verify-publication verify-live verify-landing test coverage lint lint-fix format format-check docs-coverage package package-check package-smoke check refresh sync-docs status catalog hub-list hub-summary hub-summary-table hub-example hub-artifacts hub-shared-artifacts hub-shared-artifacts-table hub-reports hub-reports-table hub-report hub-inventory hub-inventory-table hub-snapshot hub-snapshot-table hub-overview hub-overview-table hub-status hub-status-table hub-health hub-health-table hub-bundle hub-freshness-audit hub-freshness-audit-table hub-runtime-status hub-runtime-status-table hub-top-issue hub-top-issue-text hub-top-issue-table hub-packages hub-packages-table hub-package hub-package-verify hub-redistribution hub-redistribution-table hub-provenance hub-provenance-table hub-drift hub-drift-table hub-source-readiness hub-dataset-quality package-bundle clean-publishable docs-build docs-serve
+.PHONY: help bootstrap install-browsers doctor bump-version extract build verify verify-dev verify-readiness verify-publication verify-live verify-landing test coverage lint lint-fix format format-check docs-coverage package package-check package-smoke check refresh sync-docs status catalog hub-list hub-summary hub-summary-table hub-example hub-artifacts hub-shared-artifacts hub-shared-artifacts-table hub-reports hub-reports-table hub-report hub-inventory hub-inventory-table hub-snapshot hub-snapshot-table hub-overview hub-overview-table hub-status hub-status-table hub-health hub-health-table hub-bundle hub-freshness-audit hub-freshness-audit-table hub-runtime-status hub-runtime-status-table hub-top-issue hub-top-issue-text hub-top-issue-table hub-packages hub-packages-table hub-package hub-package-verify hub-redistribution hub-redistribution-table hub-provenance hub-provenance-table hub-drift hub-drift-table hub-source-readiness hub-dataset-quality package-bundle clean-publishable docs-build docs-serve
 
 help:
 	@printf "Targets disponibles:\n"
 	@printf "  make bootstrap        Crea .venv e instala dependencias\n"
 	@printf "  make install-browsers Instala Chromium para smoke tests de la landing\n"
 	@printf "  make doctor           Muestra el Python efectivo y dependencias clave\n"
+	@printf "  make bump-version     Bumpia versión en pyproject.toml + sync-docs (VERSION=X.Y.Z)\n"
 	@printf "  make extract          Ejecuta extractores\n"
 	@printf "  make build            Compila outputs del hub\n"
 	@printf "  make verify           Verifica artefactos generados (perfil dev)\n"
@@ -86,6 +87,17 @@ doctor:
 	@$(PYTHON) scripts/check_validation_registration.py
 	@$(PYTHON) scripts/check_companion_paths.py registry
 	@$(PYTHON) scripts/sync_docs.py --check
+
+bump-version:
+	@if [ -z "$(VERSION)" ]; then \
+		printf "ERROR: debes especificar VERSION. Ej: make bump-version VERSION=1.20.1\n"; \
+		exit 1; \
+	fi
+	@printf "Bumpiando versión a %s...\n" "$(VERSION)"
+	@$(PYTHON) -c "import re; c=open('pyproject.toml').read(); open('pyproject.toml','w').write(re.sub(r'^version = \"[^\"]*\"','version = \"$(VERSION)\"',c,flags=re.MULTILINE))"
+	@$(PYTHON) scripts/sync_docs.py
+	@printf "\n✓ pyproject.toml y README.md actualizados a %s.\n" "$(VERSION)"
+	@printf "  Para commitear: git add pyproject.toml README.md && git commit -m 'chore: bump version to %s'\n" "$(VERSION)"
 
 sync-docs:
 	$(PYTHON) scripts/sync_docs.py
