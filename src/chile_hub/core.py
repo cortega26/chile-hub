@@ -6,7 +6,7 @@ import sys
 from datetime import datetime, timezone
 from difflib import get_close_matches
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 import polars as pl
 import requests
@@ -416,7 +416,7 @@ class ChileHub:
         else:
             con = self._sql_connection
 
-        return con.execute(query).pl()  # type: ignore[no-any-return]
+        return cast(pl.DataFrame, con.execute(query).pl())
 
     @classmethod
     def from_datapackage(cls, path_or_url: str | Path) -> "ChileHub":

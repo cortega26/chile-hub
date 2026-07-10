@@ -497,8 +497,14 @@ pipeline = [
     { name = "tenacity" },
     { name = "xlsxwriter" },
 ]
+query = [
+    { name = "duckdb" },
+]
 scraping = [
     { name = "scrapling", extra = ["fetchers"], marker = "extra == 'extra-9-chile-hub-scraping'" },
+]
+validation = [
+    { name = "frictionless" },
 ]
 
 [package.metadata]
@@ -507,7 +513,9 @@ requires-dist = [
     { name = "build", marker = "extra == 'dev'", specifier = "==1.5.0" },
     { name = "curl-cffi", marker = "extra == 'pipeline'", specifier = "==0.15.0" },
     { name = "duckdb", marker = "extra == 'pipeline'", specifier = "==1.5.4" },
+    { name = "duckdb", marker = "extra == 'query'", specifier = ">=1.5.4" },
     { name = "frictionless", marker = "extra == 'dev'", specifier = ">=5.18,<6" },
+    { name = "frictionless", marker = "extra == 'validation'", specifier = ">=5.18,<6" },
     { name = "hypothesis", marker = "extra == 'dev'", specifier = "==6.156.1" },
     { name = "interrogate", marker = "extra == 'dev'", specifier = "==1.7.0" },
     { name = "mkdocs-material", marker = "extra == 'dev'", specifier = "==9.7.6" },
@@ -535,7 +543,7 @@ requires-dist = [
     { name = "twine", marker = "extra == 'dev'", specifier = "==6.2.0" },
     { name = "xlsxwriter", marker = "extra == 'pipeline'", specifier = "==3.2.9" },
 ]
-provides-extras = ["pipeline", "dev", "scraping"]
+provides-extras = ["pipeline", "query", "validation", "dev", "scraping"]
 
 [[package]]
 name = "click"
@@ -1277,8 +1285,8 @@ dependencies = [
     { name = "attrs" },
     { name = "jsonschema-specifications" },
     { name = "referencing" },
-    { name = "rpds-py", version = "0.30.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra == 'extra-9-chile-hub-dev') or (extra == 'extra-9-chile-hub-dev' and extra == 'extra-9-chile-hub-scraping')" },
-    { name = "rpds-py", version = "2026.5.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and extra == 'extra-9-chile-hub-dev') or (extra == 'extra-9-chile-hub-dev' and extra == 'extra-9-chile-hub-scraping')" },
+    { name = "rpds-py", version = "0.30.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-9-chile-hub-dev' and extra == 'extra-9-chile-hub-scraping')" },
+    { name = "rpds-py", version = "2026.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-9-chile-hub-dev' and extra == 'extra-9-chile-hub-scraping')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/b3/fc/e067678238fa451312d4c62bf6e6cf5ec56375422aee02f9cb5f909b3047/jsonschema-4.26.0.tar.gz", hash = "sha256:0c26707e2efad8aa1bfc5b7ce170f3fccc2e4918ff85989ba9ffa9facb2be326", size = 366583, upload-time = "2026-01-07T13:41:07.246Z" }
 wheels = [
@@ -2793,7 +2801,7 @@ name = "python-dateutil"
 version = "2.9.0.post0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "six", marker = "python_full_version >= '3.11' or extra == 'extra-9-chile-hub-dev'" },
+    { name = "six" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/66/c0/0c8b6ad9f17a802ee498c46e004a0eb49bc148f2fd230864601a86dcf6db/python-dateutil-2.9.0.post0.tar.gz", hash = "sha256:37dd54208da7e1cd875388217d5e00ebd4179249f90fb72437e91a35459a0ad3", size = 342432, upload-time = "2024-03-01T18:36:20.211Z" }
 wheels = [
@@ -2967,9 +2975,9 @@ version = "0.37.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "attrs" },
-    { name = "rpds-py", version = "0.30.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra == 'extra-9-chile-hub-dev') or (extra == 'extra-9-chile-hub-dev' and extra == 'extra-9-chile-hub-scraping')" },
-    { name = "rpds-py", version = "2026.5.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and extra == 'extra-9-chile-hub-dev') or (extra == 'extra-9-chile-hub-dev' and extra == 'extra-9-chile-hub-scraping')" },
-    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+    { name = "rpds-py", version = "0.30.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-9-chile-hub-dev' and extra == 'extra-9-chile-hub-scraping')" },
+    { name = "rpds-py", version = "2026.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-9-chile-hub-dev' and extra == 'extra-9-chile-hub-scraping')" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13' or (extra == 'extra-9-chile-hub-dev' and extra == 'extra-9-chile-hub-scraping')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/22/f5/df4e9027acead3ecc63e50fe1e36aca1523e1719559c499951bb4b53188f/referencing-0.37.0.tar.gz", hash = "sha256:44aefc3142c5b842538163acb373e24cce6632bd54bdb01b21ad5863489f50d8", size = 78036, upload-time = "2025-10-13T15:30:48.871Z" }
 wheels = [
@@ -3534,7 +3542,7 @@ version = "0.26.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "annotated-doc" },
-    { name = "colorama", marker = "sys_platform == 'win32'" },
+    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-9-chile-hub-dev' and extra == 'extra-9-chile-hub-scraping')" },
     { name = "rich" },
     { name = "shellingham" },
 ]
