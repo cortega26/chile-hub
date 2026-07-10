@@ -562,7 +562,9 @@ pytest tests/test_chile_hub.py::ChileHubTests::test_load_polars -v
 
 ### ¿Qué cubren los tests?
 
-9 archivos en `tests/`. Esta tabla es de **navegación por archivo**, no un
+<!-- START_AGENTS_TEST_TABLE -->
+
+**12 archivos** en `tests/`. Esta tabla es de **navegación por archivo**, no un
 inventario de clases — las clases cambian con frecuencia y una lista exhaustiva
 aquí quedaría stale de inmediato. Para el inventario vivo de clases:
 ```bash
@@ -571,15 +573,20 @@ grep -n "^class " tests/*.py
 
 | Archivo | Requiere `data/normalized/` | Qué cubre |
 |:---|:---:|:---|
+| `test_builders_artifacts.py` | Sí (`make build` antes) | Builders de artefactos publicables (bundle ZIP, SHA-256, consistencia manifiesto↔ZIP) |
+| `test_builders_formats.py` | No | Golden round-trip para writers de formatos (Parquet, JSON, Excel, DuckDB, SQLite) |
 | `test_chile_hub.py` | Sí (`make build` antes) | API Python de `ChileHub`, CLI, contratos de artefactos (SHA256, catálogo, ZIP), contratos de workflow/Makefile, `Dataset(StrEnum)` |
+| `test_ci_config.py` | No | Guardrails de texto simple para regresiones **reales** ya ocurridas de CI/Makefile |
+| `test_core.py` | Sí (`make build` antes) | Métodos públicos de `ChileHub` (`core.py`): metadatos, reportes operativos, inspección — no cubre CLI |
+| `test_data_package.py` | Sí (`make build` antes) | Builder de Frictionless Data Package |
 | `test_extractors.py` | No | Un test class por extractor (fetch, normalización, staging) + contrato ABC de `BaseExtractor` + reintentos HTTP |
+| `test_packaging_runtime.py` | Sí (`make build` antes) | Empaquetado del bundle publicable (ZIP, SHA256) en runtime |
 | `test_pipeline_logic.py` | No | Lógica interna de `build_dev_db.py`, invariantes CUT, fallback de indicadores, severidad de `dataset_changelog.json`, builders (`reports`, `pipeline_status_utils`) |
-| `test_validation.py` | No | Funciones `validate_*()` de `src/validation.py`: bordes vacíos, claves duplicadas, casos límite |
-| `test_core.py` | Sí | Métodos públicos de `ChileHub` (`core.py`): metadatos, reportes operativos, inspección — no cubre CLI |
-| `test_data_package.py` | No | Builder de Frictionless Data Package |
-| `test_packaging_runtime.py` | No | Empaquetado del bundle publicable (ZIP, SHA256) en runtime |
 | `test_render.py` | No | Helper de renderizado de tablas (`_render.py`) |
-| `test_ci_config.py` | No | Guardrails de texto simple para regresiones **reales** ya ocurridas de CI/Makefile (ver política abajo) |
+| `test_validation.py` | No | Funciones `validate_*()` de `src/validation.py`: bordes vacíos, claves duplicadas, casos límite |
+| `test_verify_pipeline.py` | Sí (`make build` antes) | Verificación de pipeline (`verify_pipeline.py`) — guardia pre-publicación de artefactos |
+
+<!-- END_AGENTS_TEST_TABLE -->
 
 ### Reglas al agregar tests
 

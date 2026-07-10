@@ -151,6 +151,94 @@ def sync_readme_quality_summary(check_only=False):
     )
 
 
+_AGENTS_TEST_DESCRIPTIONS = {
+    "test_chile_hub.py": (
+        "API Python de `ChileHub`, CLI, contratos de artefactos "
+        "(SHA256, catálogo, ZIP), contratos de workflow/Makefile, "
+        "`Dataset(StrEnum)`"
+    ),
+    "test_extractors.py": (
+        "Un test class por extractor (fetch, normalización, staging) "
+        "+ contrato ABC de `BaseExtractor` + reintentos HTTP"
+    ),
+    "test_pipeline_logic.py": (
+        "Lógica interna de `build_dev_db.py`, invariantes CUT, "
+        "fallback de indicadores, severidad de `dataset_changelog.json`, "
+        "builders (`reports`, `pipeline_status_utils`)"
+    ),
+    "test_validation.py": (
+        "Funciones `validate_*()` de `src/validation.py`: bordes vacíos, "
+        "claves duplicadas, casos límite"
+    ),
+    "test_core.py": (
+        "Métodos públicos de `ChileHub` (`core.py`): metadatos, "
+        "reportes operativos, inspección — no cubre CLI"
+    ),
+    "test_data_package.py": "Builder de Frictionless Data Package",
+    "test_packaging_runtime.py": ("Empaquetado del bundle publicable (ZIP, SHA256) en runtime"),
+    "test_render.py": "Helper de renderizado de tablas (`_render.py`)",
+    "test_ci_config.py": (
+        "Guardrails de texto simple para regresiones **reales** ya ocurridas de CI/Makefile"
+    ),
+    "test_builders_artifacts.py": (
+        "Builders de artefactos publicables (bundle ZIP, SHA-256, consistencia manifiesto↔ZIP)"
+    ),
+    "test_builders_formats.py": (
+        "Golden round-trip para writers de formatos (Parquet, JSON, Excel, DuckDB, SQLite)"
+    ),
+    "test_verify_pipeline.py": (
+        "Verificación de pipeline (`verify_pipeline.py`) — guardia pre-publicación de artefactos"
+    ),
+}
+
+
+def _test_file_requires_normalized(filepath):
+    """Heurística: ¿el archivo de test lee de data/normalized/?"""
+    with open(filepath, "r", encoding="utf-8") as f:
+        return "data/normalized" in f.read(4096)
+
+
+def sync_agents_test_table(check_only=False):
+    """Tabla de archivos de test en AGENTS.md desde tests/test_*.py."""
+    test_files = sorted(
+        f for f in os.listdir(TESTS_DIR) if f.startswith("test_") and f.endswith(".py")
+    )
+    count = len(test_files)
+
+    rows = []
+    for fname in test_files:
+        fpath = os.path.join(TESTS_DIR, fname)
+        requires = "Sí (`make build` antes)" if _test_file_requires_normalized(fpath) else "No"
+        desc = _AGENTS_TEST_DESCRIPTIONS.get(fname)
+        if desc is None:
+            raise SystemExit(
+                f"ERROR: test '{fname}' sin descripción en "
+                "_AGENTS_TEST_DESCRIPTIONS. Agrega una entrada en "
+                "src/builders/doc_sync.py."
+            )
+        rows.append(f"| `{fname}` | {requires} | {desc} |")
+
+    header = "| Archivo | Requiere `data/normalized/` | Qué cubre |\n|:---|:---:|:---|"
+
+    intro = (
+        f"**{count} archivos** en `tests/`. Esta tabla es de "
+        "**navegación por archivo**, no un\n"
+        "inventario de clases — las clases cambian con frecuencia y una "
+        "lista exhaustiva\n"
+        "aquí quedaría stale de inmediato. Para el inventario vivo de "
+        "clases:\n"
+        "```bash\n"
+        'grep -n "^class " tests/*.py\n'
+        "```"
+    )
+
+    body = intro + "\n\n" + "\n".join([header] + rows)
+
+    return replace_delimited_block(
+        AGENTS_PATH, "AGENTS_TEST_TABLE", body, check_only=check_only, separator="\n\n"
+    )
+
+
 def sync_agents_dataset_count(check_only=False):
     """Conteo de datasets en AGENTS.md desde el catálogo."""
     total = len(DATASET_CATALOG_CONFIG)
@@ -169,6 +257,7 @@ SYNC_FUNCS = [
     sync_readme_health_summary,
     sync_readme_quality_summary,
     sync_agents_dataset_count,
+    sync_agents_test_table,
 ]
 
 
