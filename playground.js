@@ -1,31 +1,29 @@
 // Explorador SQL con DuckDB-Wasm. Inicialización diferida: el bundle WASM se carga
-// solo al primer clic en "Ejecutar", para no romper el smoke test (networkidle /
-// cero errores de consola en carga).
+// solo al primer clic en "Ejecutar", para no romper el smoke test.
 import * as duckdb from "./vendor/duckdb/duckdb-browser.mjs";
 
-// mainWorker: page-relative (new Worker() resuelve contra la página).
-// mainModule: worker-relative (el worker hace fetch() contra su propia ubicación).
-const MANUAL_BUNDLES = {
-  mvp: {
-    mainModule: "./duckdb-mvp.wasm",
-    mainWorker: "./vendor/duckdb/duckdb-browser-mvp.worker.js",
-  },
-  eh: {
-    mainModule: "./duckdb-eh.wasm",
-    mainWorker: "./vendor/duckdb/duckdb-browser-eh.worker.js",
-  },
-};
+const WASM_PATH = "./duckdb-mvp.wasm";
+const WORKER_PATH = "./vendor/duckdb/duckdb-browser-mvp.worker.js";
 
 let dbPromise = null;
 
 async function getDb() {
   if (!dbPromise) {
     dbPromise = (async () => {
-      const bundle = MANUAL_BUNDLES.mvp;
-      const worker = new Worker(bundle.mainWorker);
-      const logger = new duckdb.ConsoleLogger();
-      const db = new duckdb.AsyncDuckDB(logger, worker);
-      await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
+      // Pre-fetch WASM in the main thread: the worker's internal fetch goes
+      // through Cloudflare's CDN compression which corrupts the binary for
+      // WebAssembly.instantiate(). Fetching here (browser decompresses) and
+      // passing as Blob URL bypasses this.
+      const wasmUrl = new URL(WASM_PATH, import.meta.url).href;
+      const resp = await fetch(wasmUrl);
+      const buf = await resp.arrayBuffer();
+      const blob = new Blob([buf], { type: "application/wasm" });
+      const blobUrl = URL.createObjectURL(blob);
+
+      const worker = new Worker(WORKER_PATH);
+      const db = new duckdb.AsyncDuckDB(new duckdb.ConsoleLogger(), worker);
+      await db.instantiate(blobUrl, null);
+      URL.revokeObjectURL(blobUrl);
       return db;
     })();
   }
