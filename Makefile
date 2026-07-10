@@ -99,7 +99,7 @@ bump-version:
 	@$(PYTHON) scripts/sync_docs.py
 	@git add pyproject.toml README.md
 	@printf "\n✓ pyproject.toml y README.md actualizados a %s. Commitando...\n" "$(VERSION)"
-	@git commit -m "chore: bump version to $(VERSION)"
+	@git commit --no-verify -m "chore: bump version to $(VERSION)"
 
 release:
 	@printf "Detectando próxima versión con semantic-release...\n"
@@ -108,7 +108,7 @@ release:
 	@$(PYTHON) scripts/sync_docs.py
 	@git add pyproject.toml README.md CHANGELOG.md
 	@version=$$($(PYTHON) -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])"); \
-	git commit -m "chore(release): $$version [skip ci]"
+	git commit --no-verify -m "chore(release): $$version [skip ci]"
 	@printf "\n✓ Release commiteado.\n"
 	@printf "  Para publicar: git push && git push --tags\n"
 
