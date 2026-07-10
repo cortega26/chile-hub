@@ -48,7 +48,7 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 
 | # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
 |---|------|----------|----------|--------|-----------|--------|
-| 020 | [Explorador SQL en la landing con DuckDB-Wasm](020-duckdb-wasm-playground.md) | P2 | M | MED | — | BLOCKED — gate 4.3: NO-GO (2026-06-30). Ver `docs/gate-4-3-decision-playground.md` para condiciones de re-evaluación. |
+| 020 | [Explorador SQL en la landing con DuckDB-Wasm](020-duckdb-wasm-playground.md) | P2 | M | MED | — | DONE — implementado 2026-07-10. 5 archivos DuckDB-Wasm + apache-arrow/flatbuffers/tslib vendorizados, CSP con `wasm-unsafe-eval`, `playground.js` con lazy init, smoke test pasa con presencia confirmada, funcional manual 10 filas ✅. |
 
 ## Planes archivados (auditoría 2026-07-07)
 
@@ -139,7 +139,7 @@ Auditoría 2026-07-07 (024–041):
   — (DONE)                     (039 DONE: ADR-006 escrito, decisiones ya implementadas)
 
 Planes previos:
-  020 (independiente)  ← bloqueado por gate 4.3 (no-go 2026-06-30). DIR-01/Plan 040 es su hermano no-bloqueado
+  020 (independiente)  ← DONE 2026-07-10 (desbloqueado por decisión de producto: construir primero, generar demanda después).
 ```
 
 **Interacciones clave de la auditoría 2026-07-07:** **026** (regenerar lock), **032** (adelgazar deps),
@@ -148,7 +148,7 @@ Planes previos:
 **036** (tests de writers) quedó DONE — el backfill de tests del gate y los writers está cerrado.
 **040** ya sabe que `duckdb` va en el extra `pipeline`. **039** DONE ✅ (ADR-006). **040** DONE ✅ (hub.sql() + ADR-007). **041** DONE ✅ (from_datapackage() + frictionless_validate() + ADR-008).
 **023** y **042** DONE ✅ (BCN SIIT completa cobertura de alcaldes 346/346 y cierra Plan 023).
-**020** sigue bloqueado (gate 4.3 NO-GO).
+**020** DONE ✅ (explorador SQL DuckDB-Wasm en la landing, 2026-07-10).
 
 ## Orden de ejecución recomendado
 
@@ -254,7 +254,7 @@ verificó el código/config real donde hubo diff.
 | 040 | `README.md` +53/-13 (sección DuckDB, no la API) | Vigente, sin cambios en `core.py`. |
 | 041 | `pyproject.toml` (solo bump de versión) | Vigente, sin cambios. |
 | 023 | sin diff en extractores relevantes | Sin cambios; la nota granular existente en su fila sigue siendo precisa. |
-| 020 | sin diff | Sin cambios; sigue BLOCKED por el gate 4.3. |
+| 020 | +index.html +scripts/verify_landing.py +playground.js +vendor/ | DONE 2026-07-10. |
 
 **Conclusión**: de 15 planes activos, 13 siguen 100% vigentes tal como están escritos (sus propios
 drift-checks los blindan contra los cambios de línea/número que sí ocurrieron), 1 se archivó por estar
