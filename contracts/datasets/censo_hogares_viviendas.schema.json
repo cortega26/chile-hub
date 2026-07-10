@@ -1,7 +1,16 @@
 {
   "dataset": "censo_hogares_viviendas",
-  "primary_key": ["codigo_comuna"],
-  "required_columns": ["codigo_region", "codigo_provincia", "codigo_comuna", "nombre_comuna", "viviendas_censadas", "hogares_censados"],
+  "primary_key": [
+    "codigo_comuna"
+  ],
+  "required_columns": [
+    "codigo_region",
+    "codigo_provincia",
+    "codigo_comuna",
+    "nombre_comuna",
+    "viviendas_censadas",
+    "hogares_censados"
+  ],
   "column_types": {
     "codigo_region": "string",
     "codigo_provincia": "string",
@@ -16,5 +25,41 @@
   },
   "expected_record_count": 346,
   "coverage_policy": "full",
-  "publish_outputs": ["parquet", "json"]
+  "publish_outputs": [
+    "parquet",
+    "json"
+  ],
+  "columns": [
+    {
+      "name": "codigo_comuna",
+      "type": "string",
+      "width": 5,
+      "example": "01101"
+    },
+    {
+      "name": "viviendas_censadas",
+      "type": "integer",
+      "example": 85000
+    },
+    {
+      "name": "viviendas_particulares_ocupadas",
+      "type": "integer",
+      "example": 75000
+    },
+    {
+      "name": "viviendas_colectivas",
+      "type": "integer",
+      "example": 200
+    },
+    {
+      "name": "hogares_censados",
+      "type": "integer",
+      "example": 73000
+    },
+    {
+      "name": "promedio_personas_hogar",
+      "type": "float",
+      "example": 3.06
+    }
+  ]
 }

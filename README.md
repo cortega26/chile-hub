@@ -220,13 +220,15 @@ chile-hub health       # severidad, frescura, drift y cobertura
 
 <br>
 
-**1. regiones** — 16 regiones político-administrativas
+<!-- START_SCHEMA_DETAILS -->
+
+**1. regiones** — Capa derivada de regiones para filtros, joins y referencias administrativas de alto nivel. (PK: codigo_region)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
 | `codigo_region` | `VARCHAR(2)` | `"01"` |
 | `nombre_region` | `VARCHAR` | `"Tarapacá"` |
 
-**2. provincias** — 56 provincias con referencia a su región
+**2. provincias** — Capa derivada de provincias para cruces intermedios entre region y comuna. (PK: codigo_provincia)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
 | `codigo_region` | `VARCHAR(2)` | `"01"` |
@@ -234,7 +236,7 @@ chile-hub health       # severidad, frescura, drift y cobertura
 | `codigo_provincia` | `VARCHAR(3)` | `"011"` |
 | `nombre_provincia` | `VARCHAR` | `"Iquique"` |
 
-**3. comunas** — 346 comunas con nombres oficiales y limpios, coordenadas y población
+**3. comunas** — Base territorial normalizada para cruces por region, provincia y comuna. (PK: codigo_comuna)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
 | `codigo_comuna` | `VARCHAR(5)` | `"01101"` |
@@ -247,7 +249,7 @@ chile-hub health       # severidad, frescura, drift y cobertura
 | `longitud_cabecera` | `DOUBLE` | `-70.1508` |
 | `poblacion_estimada` | `INTEGER` | `223400` |
 
-**4. comunas_enriquecidas** — Comunas con coordenadas de cabecera y población estimada INE
+**4. comunas_enriquecidas** — Comunas con coordenadas de cabecera y poblacion estimada INE, listas para analisis territorial sin joins adicionales. (PK: codigo_comuna)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
 | `codigo_comuna` | `VARCHAR(5)` | `"01101"` |
@@ -259,14 +261,14 @@ chile-hub health       # severidad, frescura, drift y cobertura
 | `longitud_cabecera` | `DOUBLE` | `-70.1508` |
 | `poblacion_estimada` | `INTEGER` | `223400` |
 
-**5. indicadores** — Serie de indicadores económicos diarios (UF, Dólar, Euro, UTM, IPC)
+**5. indicadores** — Serie de indicadores economicos diarios de referencia para analisis y software. (PK: fecha, codigo_indicador)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
-| `fecha` | `DATE` | `2026-05-30` |
+| `fecha` | `DATE` | `"2026-05-30"` |
 | `codigo_indicador` | `VARCHAR` | `"uf"` |
-| `valor` | `DOUBLE` | `39420.50` |
+| `valor` | `DOUBLE` | `39420.5` |
 
-**6. censo_comunal** — Población por sexo y 5 tramos de edad para las 346 comunas
+**6. censo_comunal** — Perfil demografico comunal del Censo 2024 con sexo y grandes grupos de edad. (PK: codigo_comuna)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
 | `codigo_region` | `VARCHAR(2)` | `"01"` |
@@ -274,11 +276,11 @@ chile-hub health       # severidad, frescura, drift y cobertura
 | `codigo_comuna` | `VARCHAR(5)` | `"01101"` |
 | `nombre_comuna` | `VARCHAR` | `"Iquique"` |
 | `poblacion_censada` | `INTEGER` | `223400` |
-| `hombres` / `mujeres` | `INTEGER` | `111200` / `112200` |
+| `hombres` / `mujeres` | `INTEGER` | `"111200` / `112200"` |
 | `razon_hombre_mujer` | `DOUBLE` | `99.11` |
-| `poblacion_0_14` … `poblacion_65_mas` | `INTEGER` | 5 tramos etarios |
+| `poblacion_0_14` … `poblacion_65_mas` | `INTEGER` | `"5 tramos etarios"` |
 
-**7. censo_hogares_viviendas** — Viviendas, hogares y promedio de personas por hogar
+**7. censo_hogares_viviendas** — Viviendas y hogares censados por comuna, ocupacion y tamano medio del hogar. (PK: codigo_comuna)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
 | `codigo_comuna` | `VARCHAR(5)` | `"01101"` |
@@ -288,7 +290,7 @@ chile-hub health       # severidad, frescura, drift y cobertura
 | `hogares_censados` | `INTEGER` | `73000` |
 | `promedio_personas_hogar` | `DOUBLE` | `3.06` |
 
-**8. establecimientos_salud** — Directorio nacional de recintos de salud (~5 600)
+**8. establecimientos_salud** — Directorio vigente de establecimientos de salud con tipo, dependencia, urgencia y ubicacion. (PK: codigo_establecimiento)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
 | `codigo_establecimiento` | `VARCHAR` | `"101101"` |
@@ -297,81 +299,81 @@ chile-hub health       # severidad, frescura, drift y cobertura
 | `nivel_atencion` | `VARCHAR` | `"Alta Complejidad"` |
 | `codigo_comuna` | `VARCHAR(5)` | `"01101"` |
 | `tiene_servicio_urgencia` | `VARCHAR` | `"SI"` / `"NO"` |
-| `latitud` / `longitud` | `DOUBLE` | Coordenadas geográficas |
+| `latitud` / `longitud` | `DOUBLE` | `"Coordenadas geográficas"` |
 | `estado_funcionamiento` | `VARCHAR` | `"Vigente"` |
 
-**9. distritos_electorales** — Mapeo de comunas a distritos y circunscripciones
+**9. distritos_electorales** — Asociación de comunas a distritos electorales (diputados) y circunscripciones senatoriales. (PK: codigo_comuna)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
-| `codigo_comuna` | `VARCHAR(5)` | `"13114"` |
+| `codigo_comuna` | `VARCHAR(5)` | `"01101"` |
 | `nombre_comuna` | `VARCHAR` | `"Las Condes"` |
-| `distrito_electoral` | `VARCHAR` | `"11"` |
-| `circunscripcion_senatorial` | `VARCHAR` | `"7"` |
+| `distrito_electoral` | `VARCHAR` | `"10"` |
+| `circunscripcion_senatorial` | `VARCHAR` | `"3"` |
 
-**10. establecimientos_educacionales** — Directorio de colegios y liceos (~12 900)
+**10. establecimientos_educacionales** — Directorio oficial del Ministerio de Educación (MINEDUC) con Rol Base de Datos (RBD), ubicación y dependencia administrativa. (PK: rbd)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
-| `rbd` | `VARCHAR` | `"1"` |
+| `rbd` | `VARCHAR` | `"1234-5"` |
 | `dv_rbd` | `VARCHAR` | `"4"` |
 | `nombre_establecimiento` | `VARCHAR` | `"Liceo Abate Molina"` |
-| `codigo_comuna` | `VARCHAR(5)` | `"07101"` |
+| `codigo_comuna` | `VARCHAR(5)` | `"01101"` |
 | `dependencia_administrativa` | `VARCHAR` | `"Municipal"` |
-| `latitud` / `longitud` | `DOUBLE` | Coordenadas geográficas |
+| `latitud` / `longitud` | `DOUBLE` | `"Coordenadas geográficas"` |
 | `estado_funcionamiento` | `VARCHAR` | `"Vigente"` |
 
-**11. finanzas_municipales** — Indicadores financieros municipales anuales (⚠️ parcial: 345/346 comunas)
+**11. finanzas_municipales** — Indicadores financieros municipales anuales desde SINIM/SUBDERE. CAPA PARCIAL/CANDIDATO: 3 de 346 comunas (0.9%). Usar con precaución; no representa cobertura nacional. (PK: anio, codigo_comuna)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
 | `anio` | `INTEGER` | `2024` |
-| `codigo_comuna` | `VARCHAR(5)` | `"13101"` |
+| `codigo_comuna` | `VARCHAR(5)` | `"01101"` |
 | `ingresos_totales` / `gastos_totales` | `DOUBLE` | `245000000000.0` |
 | `ingresos_propios_permanentes` | `DOUBLE` | `162000000000.0` |
 | `fondo_comun_municipal` | `DOUBLE` | `39000000000.0` |
 
-**12. resultados_educacionales** — Métricas educacionales agregadas por comuna/año
+**12. resultados_educacionales** — Resultados educacionales agregados por comuna y año, sin registros personales. (PK: anio, codigo_comuna)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
 | `anio` | `INTEGER` | `2024` |
-| `codigo_comuna` | `VARCHAR(5)` | `"13101"` |
+| `codigo_comuna` | `VARCHAR(5)` | `"01101"` |
 | `matricula_total` | `INTEGER` | `122000` |
 | `asistencia_promedio` | `DOUBLE` | `86.2` |
-| `tasa_aprobacion` / `tasa_retiro` | `DOUBLE` | `91.4` / `4.5` |
+| `tasa_aprobacion` / `tasa_retiro` | `DOUBLE` | `"91.4` / `4.5"` |
 
-**13. indicadores_urbanos_siedu** — Indicadores urbanos en formato largo
+**13. indicadores_urbanos_siedu** — Indicadores urbanos SIEDU en formato largo con cobertura comunal parcial esperada. (PK: anio, codigo_comuna, codigo_indicador)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
 | `anio` | `INTEGER` | `2024` |
-| `codigo_comuna` | `VARCHAR(5)` | `"13101"` |
+| `codigo_comuna` | `VARCHAR(5)` | `"01101"` |
 | `codigo_indicador` | `VARCHAR` | `"siedu_acceso_areas_verdes"` |
 | `categoria` | `VARCHAR` | `"Espacio publico"` |
-| `valor` / `unidad` | `DOUBLE` / `VARCHAR` | `71.4` / `"porcentaje"` |
+| `valor` / `unidad` | `DOUBLE` | `"71.4` / `"porcentaje"` |
 
-**14. perfil_territorial_comunal** — Perfil derivado con una fila por comuna
+**14. perfil_territorial_comunal** — Perfil comunal curado que consolida DPA, censo, salud, educación, finanzas, SIEDU y distritos. (PK: codigo_comuna)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
-| `codigo_comuna` | `VARCHAR(5)` | `"13101"` |
+| `codigo_comuna` | `VARCHAR(5)` | `"01101"` |
 | `poblacion_censada` | `INTEGER` | `223400` |
 | `establecimientos_salud_total` | `INTEGER` | `140` |
 | `establecimientos_educacionales_total` | `INTEGER` | `410` |
 | `distrito_electoral` | `VARCHAR` | `"10"` |
 
-**15. empresas** — Registro de Empresas y Sociedades (RES) con RUT, razón social, tipo societario y comuna
+**15. empresas** — Registro de Empresas y Sociedades (RES) con RUT, razon social, tipo societario, capital, fecha de constitucion y comuna de domicilio. (PK: rut)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
 | `rut` | `VARCHAR` | `"76286049-K"` |
 | `razon_social` | `VARCHAR` | `"COMERCIALIZADORA EJEMPLO SPA"` |
 | `codigo_sociedad` | `VARCHAR` | `"SPA"` |
 | `capital` | `INTEGER` | `5000000` |
-| `fecha_actuacion` | `DATE` | `2020-06-15` |
+| `fecha_actuacion` | `DATE` | `"2020-06-15"` |
 | `anio` | `INTEGER` | `2020` |
 | `comuna_tributaria` | `VARCHAR` | `"SANTIAGO"` |
 | `region_tributaria` | `VARCHAR` | `"13"` |
 
-**16. pobreza_comunal** — Estimaciones de pobreza por ingresos y multidimensional (SAE/CASEN)
+**16. pobreza_comunal** — Estimaciones de pobreza comunal por ingresos y multidimensional derivadas de la encuesta CASEN mediante metodología SAE (Estimación de Áreas Pequeñas). Incluye tasa, límite inferior y superior del intervalo de confianza por comuna, año y dimensión. (PK: codigo_comuna, anio, dimension)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
-| `codigo_region` | `VARCHAR(2)` | `"13"` |
-| `codigo_comuna` | `VARCHAR(5)` | `"13101"` |
+| `codigo_region` | `VARCHAR(2)` | `"01"` |
+| `codigo_comuna` | `VARCHAR(5)` | `"01101"` |
 | `nombre_comuna` | `VARCHAR` | `"Santiago"` |
 | `anio` | `INTEGER` | `2022` |
 | `dimension` | `VARCHAR` | `"ingresos"` / `"multidimensional"` |
@@ -381,11 +383,11 @@ chile-hub health       # severidad, frescura, drift y cobertura
 | `metodologia` | `VARCHAR` | `"SAE"` |
 | `fuente` | `VARCHAR` | `"Observatorio Social — MDS"` |
 
-**17. consumo_electrico_comunal** — Consumo eléctrico anual por comuna y tipo de cliente (CNE)
+**17. consumo_electrico_comunal** — Consumo eléctrico anual por comuna y tipo de cliente (Residencial, Comercial, Industrial, Agrícola, Alumbrado Público, Otros), publicado por la Comisión Nacional de Energía (CNE) en el portal Energía Abierta. DEPRECATED: la fuente Junar de energiaabierta.cl fue decomisionada (investigado 2026-07-07); el dataset solo publica datos de muestra (FALLBACK_ROWS), no está en el bundle público. Ver data/source_registry.json. (PK: codigo_comuna, anio, tipo_cliente)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
-| `codigo_region` | `VARCHAR(2)` | `"13"` |
-| `codigo_comuna` | `VARCHAR(5)` | `"13101"` |
+| `codigo_region` | `VARCHAR(2)` | `"01"` |
+| `codigo_comuna` | `VARCHAR(5)` | `"01101"` |
 | `nombre_comuna` | `VARCHAR` | `"Santiago"` |
 | `anio` | `INTEGER` | `2023` |
 | `tipo_cliente` | `VARCHAR` | `"Residencial"` |
@@ -393,18 +395,18 @@ chile-hub health       # severidad, frescura, drift y cobertura
 | `numero_clientes` | `INTEGER` | `45800` |
 | `fuente` | `VARCHAR` | `"CNE — Energía Abierta"` |
 
-**18. partidos_politicos** — Roster de partidos políticos vigentes e históricos (Cámara + SERVEL)
+**18. partidos_politicos** — Roster de partidos políticos de Chile (Cámara de Diputadas y Diputados), con estado_legal y fecha_constitucion completados por join de nombre contra el registro público de SERVEL. (PK: id_partido)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
 | `id_partido` | `VARCHAR` | `"DC"` |
 | `nombre` | `VARCHAR` | `"Partido Demócrata Cristiano"` |
 | `sigla` | `VARCHAR` | `"DC"` |
-| `estado_legal` | `VARCHAR` | `"constituido"` (nulo si no matchea con SERVEL) |
-| `fecha_constitucion` | `DATE` | `1988-05-02` |
-| `ambito` | `VARCHAR` | `null` (sin fuente que lo provea) |
+| `estado_legal` | `VARCHAR` | `"constituido"` (nulo si no matchea con SERVEL)"` |
+| `fecha_constitucion` | `DATE` | `"1988-05-02"` |
+| `ambito` | `VARCHAR` | `"null` (sin fuente que lo provea)"` |
 | `fuente` | `VARCHAR` | `"Cámara de Diputadas y Diputados"` |
 
-**19. autoridades_electas** — Diputados y senadores en ejercicio, con partido y distrito/circunscripción
+**19. autoridades_electas** — Autoridades electas en ejercicio de Chile (diputados y senadores): partido, distrito electoral/circunscripción senatorial, región y período de mandato. (PK: id_autoridad)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
 | `id_autoridad` | `VARCHAR` | `"diputado_1009"` |
@@ -412,32 +414,34 @@ chile-hub health       # severidad, frescura, drift y cobertura
 | `cargo` | `VARCHAR` | `"diputado"` / `"senador"` |
 | `institucion` | `VARCHAR` | `"Cámara de Diputadas y Diputados"` / `"Senado"` |
 | `partido` | `VARCHAR` | `"Unión Demócrata Independiente"` |
-| `distrito_electoral` | `VARCHAR` | `"10"` (solo diputados) |
-| `circunscripcion_senatorial` | `VARCHAR` | `"3"` (solo senadores) |
-| `codigo_region` | `VARCHAR(2)` | `"02"` (solo senadores) |
-| `periodo_inicio` / `periodo_fin` | `DATE` | `2026-03-11` / `2030-03-10` |
+| `distrito_electoral` | `VARCHAR` | `"10"` (solo diputados)"` |
+| `circunscripcion_senatorial` | `VARCHAR` | `"3"` (solo senadores)"` |
+| `codigo_region` | `VARCHAR(2)` | `"02"` (solo senadores)"` |
+| `periodo_inicio` / `periodo_fin` | `DATE` | `"2026-03-11` / `2030-03-10"` |
 | `estado_mandato` | `VARCHAR` | `"vigente"` |
 
-**20. delincuencia_comunal** — Casos policiales por comuna (CEAD/SPD) ⚠️ _en carril candidate — datos no incluidos en el bundle público_
+**20. delincuencia_comunal** — Casos policiales de Delitos de Mayor Connotación Social (DMCS) y otras categorías por comuna y mes, reportados por Carabineros y PDI al Ministerio del Interior. Fuente: CEAD (Centro de Estudios y Análisis del Delito), Subsecretaría de Prevención del Delito. (en carril candidate — datos no incluidos en el bundle público) (PK: anio, mes, codigo_comuna, familia_delito)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
-| `codigo_comuna` | `VARCHAR(5)` | `"13101"` |
+| `codigo_comuna` | `VARCHAR(5)` | `"01101"` |
 | `nombre_comuna` | `VARCHAR` | `"Santiago"` |
 | `anio` | `INTEGER` | `2024` |
 | `mes` | `INTEGER` | `1` |
 | `familia_delito` | `VARCHAR` | `"robos_violentos"` |
 | `casos` | `INTEGER` | `245` |
 
-**21. autoridades_locales** — Gobernadores regionales (Wikipedia) y alcaldes (BCN SIIT, 100% cobertura) ⚠️ _en carril candidate — datos no incluidos en el bundle público_
+**21. autoridades_locales** — Autoridades locales/subnacionales de Chile: gobernadores regionales (Wikipedia, CC-BY-SA) y alcaldes (BCN SIIT, dato público gubernamental). Wikipedia se mantiene como fuente de gobernadores y enriquecimiento opcional de periodo_inicio para alcaldes. Dataset segregado de autoridades_electas por licencia mixta. (en carril candidate — datos no incluidos en el bundle público) (PK: id_autoridad)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
 | `id_autoridad` | `VARCHAR` | `"gobernador_01"` |
-| `nombre` | `VARCHAR` | `null` si no hay evidencia clara del titular |
+| `nombre` | `VARCHAR` | `"null` si no hay evidencia clara del titular"` |
 | `cargo` | `VARCHAR` | `"gobernador_regional"` / `"alcalde"` |
 | `codigo_region` | `VARCHAR(2)` | `"01"` |
-| `codigo_comuna` | `VARCHAR(5)` | `"01101"` (solo alcaldes) |
-| `partido` | `VARCHAR` | nulo si no identificado |
+| `codigo_comuna` | `VARCHAR(5)` | `"01101"` (solo alcaldes)"` |
+| `partido` | `VARCHAR` | `"nulo si no identificado"` |
 | `estado_mandato` | `VARCHAR` | `"vigente"` / `"sin_identificar"` |
+
+<!-- END_SCHEMA_DETAILS -->
 
 </details>
 

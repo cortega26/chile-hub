@@ -1,6 +1,11 @@
 {
   "dataset": "delincuencia_comunal",
-  "primary_key": ["anio", "mes", "codigo_comuna", "familia_delito"],
+  "primary_key": [
+    "anio",
+    "mes",
+    "codigo_comuna",
+    "familia_delito"
+  ],
   "required_columns": [
     "anio",
     "mes",
@@ -26,7 +31,9 @@
   },
   "expected_record_count": null,
   "coverage_policy": "partial_expected",
-  "publish_outputs": ["csv"],
+  "publish_outputs": [
+    "csv"
+  ],
   "_carril": "candidate",
   "_review_by": "2026-09-21",
   "_notas": [
@@ -34,5 +41,38 @@
     "Fuente frágil: scraping de tabla HTML vía POST al endpoint PHP de CEAD.",
     "review_by: 2026-09-21. stalled_after_days: 90.",
     "Los casos son reportados por Carabineros y PDI a la SPD."
+  ],
+  "columns": [
+    {
+      "name": "codigo_comuna",
+      "type": "string",
+      "width": 5,
+      "example": "01101"
+    },
+    {
+      "name": "nombre_comuna",
+      "type": "string",
+      "example": "Santiago"
+    },
+    {
+      "name": "anio",
+      "type": "integer",
+      "example": 2024
+    },
+    {
+      "name": "mes",
+      "type": "integer",
+      "example": 1
+    },
+    {
+      "name": "familia_delito",
+      "type": "string",
+      "example": "robos_violentos"
+    },
+    {
+      "name": "casos",
+      "type": "integer",
+      "example": 245
+    }
   ]
 }

@@ -1,7 +1,15 @@
 {
   "dataset": "establecimientos_salud",
-  "primary_key": ["codigo_establecimiento"],
-  "required_columns": ["codigo_establecimiento", "nombre_establecimiento", "tipo_establecimiento", "codigo_region", "codigo_comuna"],
+  "primary_key": [
+    "codigo_establecimiento"
+  ],
+  "required_columns": [
+    "codigo_establecimiento",
+    "nombre_establecimiento",
+    "tipo_establecimiento",
+    "codigo_region",
+    "codigo_comuna"
+  ],
   "column_types": {
     "codigo_establecimiento": "string",
     "codigo_region": "string",
@@ -14,5 +22,51 @@
   },
   "expected_record_count": null,
   "coverage_policy": "not_applicable",
-  "publish_outputs": ["parquet", "json"]
+  "publish_outputs": [
+    "parquet",
+    "json"
+  ],
+  "columns": [
+    {
+      "name": "codigo_establecimiento",
+      "type": "string",
+      "example": "101101"
+    },
+    {
+      "name": "nombre_establecimiento",
+      "type": "string",
+      "example": "Hospital Dr. Ernesto Torres Galdames"
+    },
+    {
+      "name": "tipo_establecimiento",
+      "type": "string",
+      "example": "Hospital"
+    },
+    {
+      "name": "nivel_atencion",
+      "type": "string",
+      "example": "Alta Complejidad"
+    },
+    {
+      "name": "codigo_comuna",
+      "type": "string",
+      "width": 5,
+      "example": "01101"
+    },
+    {
+      "name": "tiene_servicio_urgencia",
+      "type": "string",
+      "example": "SI\"` / `\"NO"
+    },
+    {
+      "name": "latitud` / `longitud",
+      "type": "float",
+      "example": "Coordenadas geográficas"
+    },
+    {
+      "name": "estado_funcionamiento",
+      "type": "string",
+      "example": "Vigente"
+    }
+  ]
 }

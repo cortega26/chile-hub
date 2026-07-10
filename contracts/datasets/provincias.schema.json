@@ -1,7 +1,14 @@
 {
   "dataset": "provincias",
-  "primary_key": ["codigo_provincia"],
-  "required_columns": ["codigo_region", "nombre_region", "codigo_provincia", "nombre_provincia"],
+  "primary_key": [
+    "codigo_provincia"
+  ],
+  "required_columns": [
+    "codigo_region",
+    "nombre_region",
+    "codigo_provincia",
+    "nombre_provincia"
+  ],
   "column_types": {
     "codigo_region": "string",
     "codigo_provincia": "string"
@@ -13,5 +20,32 @@
   },
   "expected_record_count": 56,
   "coverage_policy": "full",
-  "publish_outputs": ["parquet", "json"]
+  "publish_outputs": [
+    "parquet",
+    "json"
+  ],
+  "columns": [
+    {
+      "name": "codigo_region",
+      "type": "string",
+      "width": 2,
+      "example": "01"
+    },
+    {
+      "name": "nombre_region",
+      "type": "string",
+      "example": "Tarapacá"
+    },
+    {
+      "name": "codigo_provincia",
+      "type": "string",
+      "width": 3,
+      "example": "011"
+    },
+    {
+      "name": "nombre_provincia",
+      "type": "string",
+      "example": "Iquique"
+    }
+  ]
 }

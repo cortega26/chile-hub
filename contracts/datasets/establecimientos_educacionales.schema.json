@@ -1,7 +1,16 @@
 {
   "dataset": "establecimientos_educacionales",
-  "primary_key": ["rbd"],
-  "required_columns": ["rbd", "dv_rbd", "nombre_establecimiento", "codigo_region", "codigo_comuna", "estado_funcionamiento"],
+  "primary_key": [
+    "rbd"
+  ],
+  "required_columns": [
+    "rbd",
+    "dv_rbd",
+    "nombre_establecimiento",
+    "codigo_region",
+    "codigo_comuna",
+    "estado_funcionamiento"
+  ],
   "column_types": {
     "rbd": "string",
     "codigo_region": "string",
@@ -14,5 +23,46 @@
   },
   "expected_record_count": null,
   "coverage_policy": "not_applicable",
-  "publish_outputs": ["parquet", "json"]
+  "publish_outputs": [
+    "parquet",
+    "json"
+  ],
+  "columns": [
+    {
+      "name": "rbd",
+      "type": "string",
+      "example": "1234-5"
+    },
+    {
+      "name": "dv_rbd",
+      "type": "string",
+      "example": "4"
+    },
+    {
+      "name": "nombre_establecimiento",
+      "type": "string",
+      "example": "Liceo Abate Molina"
+    },
+    {
+      "name": "codigo_comuna",
+      "type": "string",
+      "width": 5,
+      "example": "01101"
+    },
+    {
+      "name": "dependencia_administrativa",
+      "type": "string",
+      "example": "Municipal"
+    },
+    {
+      "name": "latitud` / `longitud",
+      "type": "float",
+      "example": "Coordenadas geográficas"
+    },
+    {
+      "name": "estado_funcionamiento",
+      "type": "string",
+      "example": "Vigente"
+    }
+  ]
 }

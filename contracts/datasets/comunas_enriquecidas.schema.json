@@ -1,7 +1,17 @@
 {
   "dataset": "comunas_enriquecidas",
-  "primary_key": ["codigo_comuna"],
-  "required_columns": ["codigo_region", "codigo_provincia", "codigo_comuna", "nombre_comuna", "latitud_cabecera", "longitud_cabecera", "poblacion_estimada"],
+  "primary_key": [
+    "codigo_comuna"
+  ],
+  "required_columns": [
+    "codigo_region",
+    "codigo_provincia",
+    "codigo_comuna",
+    "nombre_comuna",
+    "latitud_cabecera",
+    "longitud_cabecera",
+    "poblacion_estimada"
+  ],
   "column_types": {
     "codigo_region": "string",
     "codigo_provincia": "string",
@@ -17,5 +27,53 @@
   },
   "expected_record_count": 346,
   "coverage_policy": "full",
-  "publish_outputs": ["parquet", "json"]
+  "publish_outputs": [
+    "parquet",
+    "json"
+  ],
+  "columns": [
+    {
+      "name": "codigo_comuna",
+      "type": "string",
+      "width": 5,
+      "example": "01101"
+    },
+    {
+      "name": "nombre_comuna",
+      "type": "string",
+      "example": "Iquique"
+    },
+    {
+      "name": "nombre_comuna_clean",
+      "type": "string",
+      "example": "iquique"
+    },
+    {
+      "name": "codigo_provincia",
+      "type": "string",
+      "width": 3,
+      "example": "011"
+    },
+    {
+      "name": "codigo_region",
+      "type": "string",
+      "width": 2,
+      "example": "01"
+    },
+    {
+      "name": "latitud_cabecera",
+      "type": "float",
+      "example": -20.2138
+    },
+    {
+      "name": "longitud_cabecera",
+      "type": "float",
+      "example": -70.1508
+    },
+    {
+      "name": "poblacion_estimada",
+      "type": "integer",
+      "example": 223400
+    }
+  ]
 }

@@ -1,6 +1,8 @@
 {
   "dataset": "autoridades_locales",
-  "primary_key": ["id_autoridad"],
+  "primary_key": [
+    "id_autoridad"
+  ],
   "required_columns": [
     "id_autoridad",
     "nombre",
@@ -30,5 +32,47 @@
   ],
   "expected_record_count": 362,
   "coverage_policy": "roster",
-  "publish_outputs": ["parquet", "json"]
+  "publish_outputs": [
+    "parquet",
+    "json"
+  ],
+  "columns": [
+    {
+      "name": "id_autoridad",
+      "type": "string",
+      "example": "gobernador_01"
+    },
+    {
+      "name": "nombre",
+      "type": "string",
+      "example": "null` si no hay evidencia clara del titular"
+    },
+    {
+      "name": "cargo",
+      "type": "string",
+      "example": "gobernador_regional\"` / `\"alcalde"
+    },
+    {
+      "name": "codigo_region",
+      "type": "string",
+      "width": 2,
+      "example": "01"
+    },
+    {
+      "name": "codigo_comuna",
+      "type": "string",
+      "width": 5,
+      "example": "01101\"` (solo alcaldes)"
+    },
+    {
+      "name": "partido",
+      "type": "string",
+      "example": "nulo si no identificado"
+    },
+    {
+      "name": "estado_mandato",
+      "type": "string",
+      "example": "vigente\"` / `\"sin_identificar"
+    }
+  ]
 }

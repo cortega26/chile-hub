@@ -1,7 +1,18 @@
 {
   "dataset": "indicadores_urbanos_siedu",
-  "primary_key": ["anio", "codigo_comuna", "codigo_indicador"],
-  "required_columns": ["anio", "codigo_comuna", "codigo_indicador", "nombre_indicador", "valor", "unidad"],
+  "primary_key": [
+    "anio",
+    "codigo_comuna",
+    "codigo_indicador"
+  ],
+  "required_columns": [
+    "anio",
+    "codigo_comuna",
+    "codigo_indicador",
+    "nombre_indicador",
+    "valor",
+    "unidad"
+  ],
   "column_types": {
     "anio": "integer",
     "codigo_comuna": "string",
@@ -14,5 +25,36 @@
   },
   "expected_record_count": null,
   "coverage_policy": "partial_expected",
-  "publish_outputs": ["parquet", "json"]
+  "publish_outputs": [
+    "parquet",
+    "json"
+  ],
+  "columns": [
+    {
+      "name": "anio",
+      "type": "integer",
+      "example": 2024
+    },
+    {
+      "name": "codigo_comuna",
+      "type": "string",
+      "width": 5,
+      "example": "01101"
+    },
+    {
+      "name": "codigo_indicador",
+      "type": "string",
+      "example": "siedu_acceso_areas_verdes"
+    },
+    {
+      "name": "categoria",
+      "type": "string",
+      "example": "Espacio publico"
+    },
+    {
+      "name": "valor` / `unidad",
+      "type": "float",
+      "example": "71.4` / `\"porcentaje"
+    }
+  ]
 }

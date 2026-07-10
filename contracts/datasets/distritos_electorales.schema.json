@@ -1,7 +1,14 @@
 {
   "dataset": "distritos_electorales",
-  "primary_key": ["codigo_comuna"],
-  "required_columns": ["codigo_comuna", "nombre_comuna", "distrito_electoral", "circunscripcion_senatorial"],
+  "primary_key": [
+    "codigo_comuna"
+  ],
+  "required_columns": [
+    "codigo_comuna",
+    "nombre_comuna",
+    "distrito_electoral",
+    "circunscripcion_senatorial"
+  ],
   "column_types": {
     "codigo_comuna": "string",
     "distrito_electoral": "string"
@@ -12,5 +19,31 @@
   },
   "expected_record_count": 346,
   "coverage_policy": "full",
-  "publish_outputs": ["parquet", "json"]
+  "publish_outputs": [
+    "parquet",
+    "json"
+  ],
+  "columns": [
+    {
+      "name": "codigo_comuna",
+      "type": "string",
+      "width": 5,
+      "example": "01101"
+    },
+    {
+      "name": "nombre_comuna",
+      "type": "string",
+      "example": "Las Condes"
+    },
+    {
+      "name": "distrito_electoral",
+      "type": "string",
+      "example": "10"
+    },
+    {
+      "name": "circunscripcion_senatorial",
+      "type": "string",
+      "example": "3"
+    }
+  ]
 }

@@ -1,7 +1,16 @@
 {
   "dataset": "resultados_educacionales",
-  "primary_key": ["anio", "codigo_comuna"],
-  "required_columns": ["anio", "codigo_comuna", "matricula_total", "asistencia_promedio", "tasa_aprobacion"],
+  "primary_key": [
+    "anio",
+    "codigo_comuna"
+  ],
+  "required_columns": [
+    "anio",
+    "codigo_comuna",
+    "matricula_total",
+    "asistencia_promedio",
+    "tasa_aprobacion"
+  ],
   "column_types": {
     "anio": "integer",
     "codigo_comuna": "string",
@@ -13,5 +22,36 @@
   },
   "expected_record_count": null,
   "coverage_policy": "partial_expected",
-  "publish_outputs": ["parquet", "json"]
+  "publish_outputs": [
+    "parquet",
+    "json"
+  ],
+  "columns": [
+    {
+      "name": "anio",
+      "type": "integer",
+      "example": 2024
+    },
+    {
+      "name": "codigo_comuna",
+      "type": "string",
+      "width": 5,
+      "example": "01101"
+    },
+    {
+      "name": "matricula_total",
+      "type": "integer",
+      "example": 122000
+    },
+    {
+      "name": "asistencia_promedio",
+      "type": "float",
+      "example": 86.2
+    },
+    {
+      "name": "tasa_aprobacion` / `tasa_retiro",
+      "type": "float",
+      "example": "91.4` / `4.5"
+    }
+  ]
 }

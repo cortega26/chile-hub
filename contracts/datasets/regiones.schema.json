@@ -1,7 +1,12 @@
 {
   "dataset": "regiones",
-  "primary_key": ["codigo_region"],
-  "required_columns": ["codigo_region", "nombre_region"],
+  "primary_key": [
+    "codigo_region"
+  ],
+  "required_columns": [
+    "codigo_region",
+    "nombre_region"
+  ],
   "column_types": {
     "codigo_region": "string",
     "nombre_region": "string"
@@ -12,5 +17,21 @@
   },
   "expected_record_count": 16,
   "coverage_policy": "full",
-  "publish_outputs": ["parquet", "json"]
+  "publish_outputs": [
+    "parquet",
+    "json"
+  ],
+  "columns": [
+    {
+      "name": "codigo_region",
+      "type": "string",
+      "width": 2,
+      "example": "01"
+    },
+    {
+      "name": "nombre_region",
+      "type": "string",
+      "example": "Tarapacá"
+    }
+  ]
 }

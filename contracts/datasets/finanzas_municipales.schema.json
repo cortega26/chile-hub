@@ -1,7 +1,16 @@
 {
   "dataset": "finanzas_municipales",
-  "primary_key": ["anio", "codigo_comuna"],
-  "required_columns": ["anio", "codigo_comuna", "nombre_comuna", "ingresos_totales", "gastos_totales"],
+  "primary_key": [
+    "anio",
+    "codigo_comuna"
+  ],
+  "required_columns": [
+    "anio",
+    "codigo_comuna",
+    "nombre_comuna",
+    "ingresos_totales",
+    "gastos_totales"
+  ],
   "column_types": {
     "anio": "integer",
     "codigo_comuna": "string",
@@ -13,5 +22,36 @@
   },
   "expected_record_count": null,
   "coverage_policy": "partial_expected",
-  "publish_outputs": ["parquet", "json"]
+  "publish_outputs": [
+    "parquet",
+    "json"
+  ],
+  "columns": [
+    {
+      "name": "anio",
+      "type": "integer",
+      "example": 2024
+    },
+    {
+      "name": "codigo_comuna",
+      "type": "string",
+      "width": 5,
+      "example": "01101"
+    },
+    {
+      "name": "ingresos_totales` / `gastos_totales",
+      "type": "float",
+      "example": 245000000000.0
+    },
+    {
+      "name": "ingresos_propios_permanentes",
+      "type": "float",
+      "example": 162000000000.0
+    },
+    {
+      "name": "fondo_comun_municipal",
+      "type": "float",
+      "example": 39000000000.0
+    }
+  ]
 }

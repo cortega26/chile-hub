@@ -1,6 +1,10 @@
 {
   "dataset": "pobreza_comunal",
-  "primary_key": ["codigo_comuna", "anio", "dimension"],
+  "primary_key": [
+    "codigo_comuna",
+    "anio",
+    "dimension"
+  ],
   "required_columns": [
     "codigo_region",
     "codigo_comuna",
@@ -40,5 +44,62 @@
   },
   "expected_record_count": null,
   "coverage_policy": "partial",
-  "publish_outputs": ["parquet", "json"]
+  "publish_outputs": [
+    "parquet",
+    "json"
+  ],
+  "columns": [
+    {
+      "name": "codigo_region",
+      "type": "string",
+      "width": 2,
+      "example": "01"
+    },
+    {
+      "name": "codigo_comuna",
+      "type": "string",
+      "width": 5,
+      "example": "01101"
+    },
+    {
+      "name": "nombre_comuna",
+      "type": "string",
+      "example": "Santiago"
+    },
+    {
+      "name": "anio",
+      "type": "integer",
+      "example": 2022
+    },
+    {
+      "name": "dimension",
+      "type": "string",
+      "example": "ingresos\"` / `\"multidimensional"
+    },
+    {
+      "name": "tasa",
+      "type": "float",
+      "example": 15.3
+    },
+    {
+      "name": "limite_inferior",
+      "type": "float",
+      "example": 12.1
+    },
+    {
+      "name": "limite_superior",
+      "type": "float",
+      "example": 18.9
+    },
+    {
+      "name": "metodologia",
+      "type": "string",
+      "example": "SAE"
+    },
+    {
+      "name": "fuente",
+      "type": "string",
+      "example": "Observatorio Social — MDS"
+    }
+  ]
 }

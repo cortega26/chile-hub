@@ -1,6 +1,10 @@
 {
   "dataset": "consumo_electrico_comunal",
-  "primary_key": ["codigo_comuna", "anio", "tipo_cliente"],
+  "primary_key": [
+    "codigo_comuna",
+    "anio",
+    "tipo_cliente"
+  ],
   "required_columns": [
     "codigo_region",
     "codigo_comuna",
@@ -34,5 +38,52 @@
   },
   "expected_record_count": null,
   "coverage_policy": "full",
-  "publish_outputs": ["parquet", "json"]
+  "publish_outputs": [
+    "parquet",
+    "json"
+  ],
+  "columns": [
+    {
+      "name": "codigo_region",
+      "type": "string",
+      "width": 2,
+      "example": "01"
+    },
+    {
+      "name": "codigo_comuna",
+      "type": "string",
+      "width": 5,
+      "example": "01101"
+    },
+    {
+      "name": "nombre_comuna",
+      "type": "string",
+      "example": "Santiago"
+    },
+    {
+      "name": "anio",
+      "type": "integer",
+      "example": 2023
+    },
+    {
+      "name": "tipo_cliente",
+      "type": "string",
+      "example": "Residencial"
+    },
+    {
+      "name": "consumo_kwh",
+      "type": "float",
+      "example": 1523400.5
+    },
+    {
+      "name": "numero_clientes",
+      "type": "integer",
+      "example": 45800
+    },
+    {
+      "name": "fuente",
+      "type": "string",
+      "example": "CNE — Energía Abierta"
+    }
+  ]
 }

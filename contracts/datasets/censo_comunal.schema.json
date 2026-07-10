@@ -1,7 +1,17 @@
 {
   "dataset": "censo_comunal",
-  "primary_key": ["codigo_comuna"],
-  "required_columns": ["codigo_region", "codigo_provincia", "codigo_comuna", "nombre_comuna", "poblacion_censada", "hombres", "mujeres"],
+  "primary_key": [
+    "codigo_comuna"
+  ],
+  "required_columns": [
+    "codigo_region",
+    "codigo_provincia",
+    "codigo_comuna",
+    "nombre_comuna",
+    "poblacion_censada",
+    "hombres",
+    "mujeres"
+  ],
   "column_types": {
     "codigo_region": "string",
     "codigo_provincia": "string",
@@ -16,5 +26,53 @@
   },
   "expected_record_count": 346,
   "coverage_policy": "full",
-  "publish_outputs": ["parquet", "json"]
+  "publish_outputs": [
+    "parquet",
+    "json"
+  ],
+  "columns": [
+    {
+      "name": "codigo_region",
+      "type": "string",
+      "width": 2,
+      "example": "01"
+    },
+    {
+      "name": "codigo_provincia",
+      "type": "string",
+      "width": 3,
+      "example": "011"
+    },
+    {
+      "name": "codigo_comuna",
+      "type": "string",
+      "width": 5,
+      "example": "01101"
+    },
+    {
+      "name": "nombre_comuna",
+      "type": "string",
+      "example": "Iquique"
+    },
+    {
+      "name": "poblacion_censada",
+      "type": "integer",
+      "example": 223400
+    },
+    {
+      "name": "hombres` / `mujeres",
+      "type": "integer",
+      "example": "111200` / `112200"
+    },
+    {
+      "name": "razon_hombre_mujer",
+      "type": "float",
+      "example": 99.11
+    },
+    {
+      "name": "poblacion_0_14` … `poblacion_65_mas",
+      "type": "integer",
+      "example": "5 tramos etarios"
+    }
+  ]
 }

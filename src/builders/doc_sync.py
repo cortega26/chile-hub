@@ -8,6 +8,7 @@ propietarios canónicos y dónde corre la generación/verificación.
 """
 
 import ast
+import json
 import os
 
 from src.builders._shared import DATASET_CATALOG_CONFIG, NORMALIZED_DIR, ROOT_DIR
@@ -342,6 +343,84 @@ def sync_agents_dataset_count(check_only=False):
     )
 
 
+def _contract_type_to_sql(col_type, width=None):
+    """Convierte tipo de contrato a formato SQL para el README."""
+    mapping = {
+        "string": "VARCHAR",
+        "integer": "INTEGER",
+        "float": "DOUBLE",
+        "date": "DATE",
+        "boolean": "BOOLEAN",
+    }
+    base = mapping.get(col_type, col_type.upper())
+    if width and col_type == "string":
+        return f"{base}({width})"
+    return base
+
+
+def sync_readme_schema_details(check_only=False):
+    """Tablas de schema en README.md desde contratos enriquecidos."""
+    catalog = DATASET_CATALOG_CONFIG
+    built_names = [n for n in catalog if catalog[n].get("outputs")]
+    upcoming_names = [n for n in catalog if not catalog[n].get("outputs")]
+    ordered_names = built_names + upcoming_names
+
+    sections = []
+    for i, ds_name in enumerate(ordered_names, 1):
+        contract_path = os.path.join(CONTRACTS_DIR, f"{ds_name}.schema.json")
+        if not os.path.exists(contract_path):
+            continue
+
+        with open(contract_path, "r", encoding="utf-8") as f:
+            contract = json.load(f)
+
+        columns_list = contract.get("columns", [])
+        if not columns_list:
+            continue
+
+        cfg = catalog.get(ds_name, {})
+        description = cfg.get("description", "")
+        primary_key = contract.get("primary_key", [])
+        has_outputs = bool(cfg.get("outputs"))
+
+        notes = []
+        if not has_outputs:
+            notes.append("en carril candidate — datos no incluidos en el bundle público")
+        pk_hint = f"PK: {', '.join(primary_key)}" if primary_key else ""
+
+        header = f"**{i}. {ds_name}**"
+        if description:
+            header += f" — {description}"
+        if notes:
+            header += f" ({'; '.join(notes)})"
+        if pk_hint:
+            header += f" ({pk_hint})"
+
+        table_header = "| Columna | Tipo | Ejemplo |\n|:---|:---|:---|"
+        table_rows = []
+        for col in columns_list:
+            col_name = col["name"]
+            col_type = _contract_type_to_sql(col.get("type", "string"), col.get("width"))
+            example = col.get("example")
+            if example is None:
+                example_str = "—"
+            elif isinstance(example, bool):
+                example_str = "`true`" if example else "`false`"
+            elif isinstance(example, (int, float)):
+                example_str = f"`{example}`"
+            else:
+                example_str = f'`"{example}"`'
+            table_rows.append(f"| `{col_name}` | `{col_type}` | {example_str} |")
+
+        sections.append("\n".join([header, table_header] + table_rows))
+
+    body = "\n\n".join(sections)
+
+    return replace_delimited_block(
+        README_PATH, "SCHEMA_DETAILS", body, check_only=check_only, separator="\n\n"
+    )
+
+
 SYNC_FUNCS = [
     sync_readme_test_count,
     sync_readme_adr_count,
@@ -354,6 +433,7 @@ SYNC_FUNCS = [
     sync_agents_dataset_count,
     sync_agents_test_table,
     sync_agents_extractor_list,
+    sync_readme_schema_details,
 ]
 
 

@@ -1,7 +1,14 @@
 {
   "dataset": "indicadores",
-  "primary_key": ["fecha", "codigo_indicador"],
-  "required_columns": ["fecha", "codigo_indicador", "valor"],
+  "primary_key": [
+    "fecha",
+    "codigo_indicador"
+  ],
+  "required_columns": [
+    "fecha",
+    "codigo_indicador",
+    "valor"
+  ],
   "column_types": {
     "fecha": "date",
     "codigo_indicador": "string",
@@ -11,5 +18,25 @@
   "fixed_width_columns": {},
   "expected_record_count": null,
   "coverage_policy": "not_applicable",
-  "publish_outputs": ["parquet", "json"]
+  "publish_outputs": [
+    "parquet",
+    "json"
+  ],
+  "columns": [
+    {
+      "name": "fecha",
+      "type": "date",
+      "example": "2026-05-30"
+    },
+    {
+      "name": "codigo_indicador",
+      "type": "string",
+      "example": "uf"
+    },
+    {
+      "name": "valor",
+      "type": "float",
+      "example": 39420.5
+    }
+  ]
 }

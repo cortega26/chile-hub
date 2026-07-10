@@ -1,7 +1,15 @@
 {
   "dataset": "empresas",
-  "primary_key": ["rut"],
-  "required_columns": ["rut", "razon_social", "codigo_sociedad", "capital", "anio"],
+  "primary_key": [
+    "rut"
+  ],
+  "required_columns": [
+    "rut",
+    "razon_social",
+    "codigo_sociedad",
+    "capital",
+    "anio"
+  ],
   "column_types": {
     "rut": "string",
     "razon_social": "string",
@@ -13,5 +21,49 @@
   "fixed_width_columns": {},
   "expected_record_count": null,
   "coverage_policy": "not_applicable",
-  "publish_outputs": ["parquet"]
+  "publish_outputs": [
+    "parquet"
+  ],
+  "columns": [
+    {
+      "name": "rut",
+      "type": "string",
+      "example": "76286049-K"
+    },
+    {
+      "name": "razon_social",
+      "type": "string",
+      "example": "COMERCIALIZADORA EJEMPLO SPA"
+    },
+    {
+      "name": "codigo_sociedad",
+      "type": "string",
+      "example": "SPA"
+    },
+    {
+      "name": "capital",
+      "type": "integer",
+      "example": 5000000
+    },
+    {
+      "name": "fecha_actuacion",
+      "type": "date",
+      "example": "2020-06-15"
+    },
+    {
+      "name": "anio",
+      "type": "integer",
+      "example": 2020
+    },
+    {
+      "name": "comuna_tributaria",
+      "type": "string",
+      "example": "SANTIAGO"
+    },
+    {
+      "name": "region_tributaria",
+      "type": "string",
+      "example": "13"
+    }
+  ]
 }
