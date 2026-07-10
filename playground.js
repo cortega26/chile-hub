@@ -16,29 +16,16 @@ const MANUAL_BUNDLES = {
   },
 };
 
-let dbPromise = null; // se crea en el primer "Ejecutar"
+let dbPromise = null;
 
 async function getDb() {
   if (!dbPromise) {
     dbPromise = (async () => {
-      // Pre-fetch WASM in the main thread to avoid CDN compression issues
-      // that corrupt the binary in the worker's fetch context.
-      const wasmUrl = new URL(
-        "./vendor/duckdb/duckdb-mvp.wasm",
-        import.meta.url
-      ).href;
-      const wasmResponse = await fetch(wasmUrl);
-      const wasmBuffer = await wasmResponse.arrayBuffer();
-      const wasmBlob = new Blob([wasmBuffer], { type: "application/wasm" });
-      const wasmObjectUrl = URL.createObjectURL(wasmBlob);
-
-      const worker = new Worker("./vendor/duckdb/duckdb-browser-mvp.worker.js");
+      const bundle = MANUAL_BUNDLES.mvp;
+      const worker = new Worker(bundle.mainWorker);
       const logger = new duckdb.ConsoleLogger();
       const db = new duckdb.AsyncDuckDB(logger, worker);
-      // Pass the object URL instead of the raw path — the worker fetches
-      // it from the blob: URL, bypassing Cloudflare's compression.
-      await db.instantiate(wasmObjectUrl, null);
-      URL.revokeObjectURL(wasmObjectUrl);
+      await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
       return db;
     })();
   }
@@ -80,10 +67,6 @@ async function runQuery(sql, statusEl, resultEl) {
     const db = await getDb();
     const base = new URL(".", window.location.href).href;
 
-    // DuckDB-Wasm no soporta read_parquet con URLs HTTP. Cada archivo debe
-    // registrarse como buffer: fetch() desde el hilo principal (el navegador
-    // maneja decompresión) y registerFileBuffer (evita que CDN sirva bytes
-    // comprimidos que DuckDB no puede interpretar).
     const parquetRegex = /read_parquet\s*\(\s*'([^']+)'\s*\)/g;
     let modifiedSql = sql;
     let match;
@@ -122,7 +105,7 @@ async function runQuery(sql, statusEl, resultEl) {
 
 function init() {
   const runBtn = document.getElementById("sql-run-btn");
-  if (!runBtn) return; // la sección puede no existir en otras páginas
+  if (!runBtn) return;
   const sqlInput = document.getElementById("sql-input");
   const statusEl = document.getElementById("sql-status");
   const resultEl = document.getElementById("sql-result");
