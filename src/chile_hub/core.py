@@ -418,6 +418,122 @@ class ChileHub:
 
         return con.execute(query).pl()  # type: ignore[no-any-return]
 
+    @classmethod
+    def from_datapackage(cls, path_or_url: str | Path) -> "ChileHub":
+        """Abre un ChileHub a partir de un descriptor ``datapackage.json`` externo.
+
+        Resuelve el directorio de datos a partir del descriptor: si el descriptor
+        esta en un directorio con los archivos Parquet referenciados en
+        ``resources[].path``, esos archivos se usaran directamente. Si no, se
+        asume que los paths son relativos al directorio del descriptor.
+
+        Args:
+            path_or_url: Ruta local o URL a un archivo ``datapackage.json``.
+
+        Returns:
+            Instancia de ``ChileHub`` configurada para usar los datos del
+            descriptor.
+
+        Raises:
+            FileNotFoundError: Si el descriptor no existe en la ruta local.
+            ImportError: Si ``frictionless`` no esta instalado.
+                Instalalo con ``pip install chile-hub[validation]``.
+
+        Example:
+            >>> hub = ChileHub.from_datapackage("data/normalized/datapackage.json")
+            >>> hub.summary()
+        """
+        try:
+            import frictionless
+        except ImportError:
+            raise ImportError(
+                "Para usar from_datapackage necesitas instalar frictionless: "
+                "pip install chile-hub[validation]"
+            )
+
+        path = Path(path_or_url)
+        if not path.exists():
+            raise FileNotFoundError(f"Descriptor no encontrado: {path}")
+
+        _ = frictionless.Package(str(path))
+        data_dir = path.parent
+        return cls(data_dir=data_dir)
+
+    def frictionless_validate(self, dataset_name: str | None = None) -> dict:
+        """Valida el bundle local contra el descriptor ``datapackage.json``.
+
+        Usa ``frictionless.Package.validate_descriptor()`` para verificar la
+        estructura del descriptor. Es una validacion de metadatos (no carga
+        los datos completos).
+
+        Args:
+            dataset_name: Si se especifica, se verifica que el dataset exista
+                como recurso en el descriptor. Si es ``None``, se valida el
+                descriptor completo.
+
+        Returns:
+            Diccionario con:
+            - ``valid`` (bool): ``True`` si el descriptor es valido.
+            - ``errors`` (list[str]): Errores encontrados (vacio si es valido).
+            - ``stats`` (dict): Metadatos del resultado (``tasks``, ``warnings``).
+
+        Raises:
+            FileNotFoundError: Si ``datapackage.json`` no existe en el
+                directorio de datos.
+            ImportError: Si ``frictionless`` no esta instalado.
+                Instalalo con ``pip install chile-hub[validation]``.
+
+        Example:
+            >>> hub = ChileHub()
+            >>> result = hub.frictionless_validate()
+            >>> print(result["valid"])
+            True
+        """
+        try:
+            import frictionless
+        except ImportError:
+            raise ImportError(
+                "Para validar datapackage.json necesitas instalar frictionless: "
+                "pip install chile-hub[validation]"
+            )
+
+        descriptor_path = self.normalized_dir / "datapackage.json"
+        if not descriptor_path.exists():
+            raise FileNotFoundError(
+                f"datapackage.json no encontrado en {self.normalized_dir}. "
+                "Ejecuta el build primero o descarga un bundle."
+            )
+
+        if dataset_name is not None:
+            # Validate that the dataset name exists as a resource
+            package = frictionless.Package(str(descriptor_path))
+            names = [r.name for r in package.resources]
+            if dataset_name not in names:
+                return {
+                    "valid": False,
+                    "errors": [
+                        f"Dataset '{dataset_name}' no encontrado en datapackage.json. "
+                        f"Disponibles: {', '.join(sorted(names))}"
+                    ],
+                    "stats": {"resources_total": len(names)},
+                }
+            return {
+                "valid": True,
+                "errors": [],
+                "stats": {"resources_total": len(names), "checked": dataset_name},
+            }
+
+        report = frictionless.Package.validate_descriptor(str(descriptor_path))
+        errors = [str(e) for e in report.errors] if report.errors else []
+        return {
+            "valid": report.valid,
+            "errors": errors,
+            "stats": {
+                "tasks": getattr(report, "tasks", []),
+                "warnings": getattr(report, "warnings", []),
+            },
+        }
+
     def validate_dataset(self, dataset_name: str | Dataset) -> dict:
         """Valida los datos publicados del hub contra su contrato JSON Schema.
 

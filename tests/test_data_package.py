@@ -182,6 +182,46 @@ class DataPackageBuilderTests(unittest.TestCase):
         self.assertEqual(package["resources"][0]["schema"]["missingValues"], [""])
 
 
+class DataPackageConsumerTests(unittest.TestCase):
+    """Tests para los metodos consumer de datapackage.json en ChileHub."""
+
+    @classmethod
+    def setUpClass(cls):
+        from chile_hub import ChileHub
+
+        cls.hub = ChileHub(data_dir=ROOT_DIR / "data" / "normalized")
+
+    def test_frictionless_validate_full_descriptor_passes(self):
+        """El descriptor del repositorio es valido segun frictionless."""
+        result = self.hub.frictionless_validate()
+        self.assertTrue(result["valid"], f"Errores: {result['errors']}")
+        self.assertEqual(result["errors"], [])
+
+    def test_frictionless_validate_specific_dataset_exists(self):
+        """Validar un dataset que existe en el descriptor retorna valid=True."""
+        result = self.hub.frictionless_validate(dataset_name="comunas")
+        self.assertTrue(result["valid"])
+        self.assertIn("checked", result["stats"])
+
+    def test_frictionless_validate_nonexistent_dataset_fails(self):
+        """Validar un dataset que no existe en el descriptor retorna valid=False."""
+        result = self.hub.frictionless_validate(dataset_name="no_existe_xyz")
+        self.assertFalse(result["valid"])
+        self.assertIn("no_existe_xyz", result["errors"][0])
+
+    def test_from_datapackage_returns_chilehub(self):
+        """from_datapackage con el descriptor local retorna un ChileHub funcional."""
+        from chile_hub import ChileHub
+
+        descriptor = ROOT_DIR / "data" / "normalized" / "datapackage.json"
+        hub = ChileHub.from_datapackage(str(descriptor))
+        self.assertIsInstance(hub, ChileHub)
+        # Deberia poder listar datasets
+        summary = hub.summary()
+        self.assertIsInstance(summary, list)
+        self.assertGreater(len(summary), 0)
+
+
 if __name__ == "__main__":
     import pytest
 

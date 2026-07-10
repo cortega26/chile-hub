@@ -56,6 +56,9 @@ pipeline = [
 query = [
     "duckdb>=1.5.4",
 ]
+validation = [
+    "frictionless>=5.18,<6",
+]
 dev = [
     "build==1.5.0",
     "twine==6.2.0",
