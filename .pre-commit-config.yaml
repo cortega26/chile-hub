@@ -32,7 +32,7 @@ repos:
         entry: bash -c 'make sync-docs && git add README.md'
         language: system
         pass_filenames: false
-        files: ^(pyproject\.toml|README\.md|src/chile_hub/datasets\.py|src/builders/doc_sync\.py|scripts/sync_docs\.py|docs/adr/|tests/)$
+        files: ^(pyproject\.toml|README\.md|src/chile_hub/datasets\.py|src/builders/|scripts/sync_docs\.py|docs/adr/|tests/|data/dataset_catalog_config\.json|contracts/datasets/)$
       - id: pip-audit
         name: pip-audit
         entry: uv run pip-audit
