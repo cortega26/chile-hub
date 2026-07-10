@@ -644,20 +644,20 @@
     "documentation": "docs/datasets/autoridades_electas.md"
   },
   "autoridades_locales": {
-    "description": "Autoridades locales/subnacionales de Chile (gobernadores regionales y alcaldes) compiladas desde Wikipedia. Dataset segregado de autoridades_electas por su licencia CC-BY-SA (share-alike).",
+    "description": "Autoridades locales/subnacionales de Chile: gobernadores regionales (Wikipedia, CC-BY-SA) y alcaldes (BCN SIIT, dato público gubernamental). Wikipedia se mantiene como fuente de gobernadores y enriquecimiento opcional de periodo_inicio para alcaldes. Dataset segregado de autoridades_electas por licencia mixta.",
     "join_keys": [
       "codigo_region",
       "codigo_comuna"
     ],
     "confidence_tier": "Tier C",
-    "expected_record_count": 240,
+    "expected_record_count": 362,
     "reuse_policy": {
       "status": "open-attribution",
-      "license": "CC-BY-SA",
+      "license": "CC BY / CC BY-SA",
       "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
       "attribution_required": true,
       "redistribution_ok": false,
-      "summary": "Autoridades locales (gobernadores regionales y alcaldes) desde Wikipedia, CC-BY-SA (share-alike). Carril CANDIDATE — NO redistribuible en el bundle público mientras no se asegure una fuente no share-alike o se acepte explícitamente esta licencia en el bundle."
+      "summary": "Autoridades locales: alcaldes desde BCN SIIT (dato público gubernamental, 346/346 comunas, 100% cobertura) y gobernadores regionales desde Wikipedia (CC-BY-SA, 16 regiones). Carril CANDIDATE — NO redistribuible en el bundle público mientras los gobernadores dependan de fuente share-alike."
     },
     "freshness_policy": {
       "max_age_hours": 87600,

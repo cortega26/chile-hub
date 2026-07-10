@@ -777,7 +777,7 @@ _SOURCE_NAMES = {
     "delincuencia_comunal": "CEAD / SPD",
     "partidos_politicos": "Cámara de Diputados",
     "autoridades_electas": "Cámara de Diputados + Senado",
-    "autoridades_locales": "Wikipedia",
+    "autoridades_locales": "BCN SIIT + Wikipedia",
 }
 
 _LICENSE_LABELS = {
@@ -801,7 +801,7 @@ _LICENSE_LABELS = {
     "delincuencia_comunal": "Revisión términos",
     "partidos_politicos": "CC BY",
     "autoridades_electas": "CC BY",
-    "autoridades_locales": "CC BY-SA",
+    "autoridades_locales": "CC BY / CC BY-SA",
 }
 
 # Dataset cuyos registros varían entre builds (directorios vivos).

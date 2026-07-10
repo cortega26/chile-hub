@@ -166,7 +166,7 @@ Pipeline determinista en GitHub Actions: extracción → build → verificación
 | 18 | **Partidos Políticos** | 36 | 🟢 live | Cámara de Diputados | CC BY | Bajo_demanda |
 | 19 | **Autoridades Electas** | 205 | 🟢 live | Cámara de Diputados + Senado | CC BY | Bajo_demanda |
 | 20 | **Delincuencia Comunal** 🆕 | — | 🔜 próximamente | CEAD / SPD | Revisión términos | — |
-| 21 | **Autoridades Locales** 🆕 | — | 🔜 próximamente | Wikipedia | CC BY-SA | — |
+| 21 | **Autoridades Locales** 🆕 | — | 🔜 próximamente | BCN SIIT + Wikipedia | CC BY / CC BY-SA | — |
 
 > **🟢 live**: datos extraídos directamente desde la fuente oficial en cada ejecución del pipeline.
 > **🟡 fallback**: datos servidos desde un respaldo curado mientras se completa la extracción en vivo.
@@ -516,7 +516,7 @@ print(df.head())
 > **Versionado:** Para entornos productivos, fija la versión exacta en `requirements.txt`
 > (revisa el badge de PyPI al inicio de este README para la versión más reciente):
 > ```
-> chile-hub==1.20.0
+> chile-hub==1.21.0
 > ```
 > El bundle de datos se publica con cada release. La API del módulo `ChileHub` sigue
 > versionado semántico: cambios de interfaz pública solo en _major releases_.
