@@ -102,7 +102,7 @@ chile-hub = "chile_hub.cli:main"
 Homepage = "https://tooltician.com/chile-hub/"
 Repository = "https://github.com/cortega26/chile-hub"
 Issues = "https://github.com/cortega26/chile-hub/issues"
-Documentation = "https://github.com/cortega26/chile-hub#readme"
+Documentation = "https://tooltician.com/chile-hub/reference/"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/chile_hub"]
