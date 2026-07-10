@@ -103,7 +103,7 @@ bump-version:
 
 release:
 	@printf "Detectando próxima versión con semantic-release...\n"
-	@$(PYTHON) -m semantic_release version --no-commit --no-tag --no-push
+	@$(PYTHON) -m semantic_release version --no-commit --no-tag --no-push --skip-build
 	@printf "Sincronizando README.md...\n"
 	@$(PYTHON) scripts/sync_docs.py
 	@git add pyproject.toml README.md CHANGELOG.md
