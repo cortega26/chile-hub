@@ -44,10 +44,29 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 >    abajo deben seguir siendo válidos tras el cambio; ajústalos si una dependencia se resolvió o
 >    cambió de prioridad.
 
+> **Auditoría `/improve` UX/UI, contenido, layout, estilo, espaciado y tipografía
+> (2026-07-13, commit `901f5b9`)**: planes **043–049**, enfocados exclusivamente en la
+> landing page (`index.html`, `app.js`, `playground.js`, `privacy.html` — el único
+> frontend del repo). Todos los hallazgos se verificaron empíricamente con Playwright
+> (estilos computados + capturas de pantalla contra el sitio servido en local), no sólo
+> por lectura de código. Se confirmó con `src/builders/landing.py` que estos 4 archivos
+> son fuente editable directamente (el builder sólo parchea el bloque JSON-LD y dos
+> constantes de versión, nada más — no hay generación de la que preocuparse). Ver
+> "Hallazgos considerados y diferidos (2026-07-13)" para lo que quedó fuera de alcance
+> a propósito (vocabulario del dashboard de salud, `freshness.status`, la línea
+> "Warnings: N" del drawer verificada por `scripts/verify_landing.py`).
+
 ## Planes activos
 
 | # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
 |---|------|----------|----------|--------|-----------|--------|
+| 043 | [Scroll horizontal en resultados del Explorador SQL](043-sql-explorer-result-overflow.md) | P1 | S | LOW | — | DONE — `.sql-result-wrap`/`.sql-result-table`/`.sql-result-empty` agregadas a `index.html`; `renderResult` en `playground.js` envuelve la tabla; verificado con Playwright (wrap con `overflow-x: auto`, `scrollLeft` responde, `body.scrollWidth` ya no se desborda con tabla de 42 columnas); `make verify-landing` OK. |
+| 044 | [Estilizar `.dataset-tag` (pills "key:"/"warnings")](044-style-dataset-tag-pills.md) | P1 | S | LOW | — | TODO |
+| 045 | [Color del badge `.dataset-badge.monthly`](045-dataset-badge-monthly-color.md) | P1 | S | LOW | — | TODO |
+| 046 | [`privacy.html` fuera de marca](046-privacy-page-brand-consistency.md) | P2 | S | LOW | — | TODO |
+| 047 | [`--space-lg` no definida + fuente Fira Code no cargada](047-fix-space-lg-and-fira-code-fallback.md) | P2 | S | LOW | — | TODO |
+| 048 | [CSS duplicado de `.dataset-card` + `!important` en `.catalog-grid`](048-cleanup-duplicate-dataset-card-css.md) | P2 | M | MED | — | TODO |
+| 049 | [Unificar idioma + tokens de color en tarjetas del catálogo](049-unify-landing-language-and-color-tokens.md) | P3 | M | LOW-MED | 045 | TODO |
 | 020 | [Explorador SQL en la landing con DuckDB-Wasm](020-duckdb-wasm-playground.md) | P2 | M | MED | — | DONE — implementado 2026-07-10. 5 archivos DuckDB-Wasm + apache-arrow/flatbuffers/tslib vendorizados, CSP con `wasm-unsafe-eval`, `playground.js` con lazy init, smoke test pasa con presencia confirmada, funcional manual 10 filas ✅. |
 
 ## Planes archivados (auditoría 2026-07-07)
@@ -140,6 +159,13 @@ Auditoría 2026-07-07 (024–041):
 
 Planes previos:
   020 (independiente)  ← DONE 2026-07-10 (desbloqueado por decisión de producto: construir primero, generar demanda después).
+
+Auditoría UX/UI 2026-07-13 (043–049):
+  043, 044, 045, 046, 047 (todos independientes entre sí — archivos/zonas de CSS distintas)
+  045 → 049  (049 toca la misma región CSS de .dataset-badge.* que 045; ejecutar 045
+              primero evita que ambos editen la misma línea en paralelo)
+  048 (independiente — toca la región CSS *vieja*/muerta de .dataset-card, distinta de
+       la que 045/049 tocan)
 ```
 
 **Interacciones clave de la auditoría 2026-07-07:** **026** (regenerar lock), **032** (adelgazar deps),
@@ -165,6 +191,34 @@ Planes previos:
 Planes previos aún vigentes:
 - **020** — DuckDB-Wasm playground: solo si lo aprueba una re-evaluación futura del gate 4.3. **Plan 040**
   entrega el mismo valor "explora los datos" a la audiencia que sí existe, sin depender del tráfico de la landing.
+
+**Auditoría UX/UI 2026-07-13 (043–049) — orden sugerido:**
+
+1. **Bugs visibles de mayor impacto, sin dependencias entre sí** — **043** (scroll del
+   Explorador SQL, la feature más nueva del sitio), **044** (pills `.dataset-tag` sin
+   estilo, visible en las 15 tarjetas del catálogo), **045** (badge `monthly` sin
+   color).
+2. **Consistencia de marca, bajo riesgo** — **046** (`privacy.html`), **047**
+   (`--space-lg` + fuente `Fira Code`).
+3. **Higiene de CSS** — **048** (consolidar `.dataset-card` duplicado; M/MED, requiere
+   verificación visual antes/después).
+4. **Pulido de contenido** — **049** (unificar idioma + tokens de color), después de
+   **045** por tocar la misma región de `.dataset-badge.*`.
+
+## Hallazgos considerados y diferidos (2026-07-13 — auditoría UX/UI)
+
+Considerados en la auditoría `/improve` (foco: UX/UI, contenido, layout, estilo,
+espaciado, fuentes; commit `901f5b9`) y **no** convertidos en plan, para que no se
+re-auditen:
+
+| Hallazgo | Motivo |
+|----------|--------|
+| **Contraste de color / WCAG** | **Fuera de alcance deliberado.** Cubierto por la skill dedicada `accessibility`; auditar contraste desde una sesión de `/improve` enfocada en UX/UI hubiera duplicado esa cobertura en vez de complementarla. |
+| **Vocabulario inglés del dashboard "Estado operativo"** (`ok`/`warn`/`error`, `.pill.live/fallback/stale/drifted`, `.health-badge.*`) | **Diferido — distinto del Plan 049.** Es terminología operacional de un panel de estado (patrón común en dashboards técnicos), no copy orientado al usuario final. Varios de esos textos los verifica textualmente `scripts/verify_landing.py:373-387`; tocarlos tiene su propio riesgo de romper CI y merece un plan propio si se decide unificar. |
+| **`app.js:563` — "Warnings: N" del drawer, en inglés** | **Diferido — explícitamente excluido del Plan 049.** Verificado byte a byte por `scripts/verify_landing.py:496,573`; traducirlo requiere tocar el smoke test en el mismo cambio. Anotado como follow-up dentro del propio Plan 049. |
+| **`formatFreshness()` — valores "fresh"/"stale"/"unknown" en inglés** (`app.js:118-125`) | **Diferido — vocabulario de contrato de datos.** `freshness.status` es un valor compartido entre el pipeline Python, el dashboard de salud y las tarjetas del catálogo; traducirlo de forma consistente en todos los consumidores es un esfuerzo mayor (toca `src/`, no sólo la landing) y no encaja en el alcance "UX/UI de la landing" de esta auditoría. |
+| **Rediseño visual de `.dataset-card`** (más allá de consolidar el CSS duplicado del Plan 048) | **No se propuso.** El Plan 048 preserva el resultado visual actual a propósito (es limpieza, no rediseño); un rediseño deliberado de las tarjetas es una decisión de producto/diseño que le corresponde al mantenedor, no un hallazgo de auditoría. |
+| **Auditoría del pipeline Python** (extractores, validación, builders) | **Fuera de alcance.** El usuario pidió explícitamente UX/UI/contenido/diseño; el pipeline ya tiene su propia cola de planes vigentes (024–038) de auditorías previas. |
 
 ## Hallazgos considerados y diferidos (2026-07-07 — auditoría deep)
 
