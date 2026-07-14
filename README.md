@@ -1,3 +1,26 @@
+---
+title: "chile-hub — Datos públicos de Chile, curados y listos para análisis"
+description: >
+  Hub de datos abiertos de Chile — parte del ecosistema Tooltician.
+  19 capas de datos públicos curados: DPA, Censo 2024, indicadores económicos,
+  salud, educación, finanzas municipales, empresas, electoral y más.
+  Instalable vía pip, consumible en Python, DuckDB, Parquet o Excel.
+category: readme
+audience: [user, developer, data-scientist, ai-agent]
+priority: critical
+canonical_source: false
+repository: https://github.com/cortega26/chile-hub
+pypi: https://pypi.org/project/chile-hub/
+website: https://tooltician.com/chile-hub/
+related_docs:
+  - AGENTS.md              # Guía de trabajo para agentes de IA
+  - SOURCE_OF_TRUTH.md     # Índice de navegación y 5 invariantes
+  - CONTRIBUTING.md        # Guía de contribución
+  - DATA_LICENSES.md       # Licencias de datos
+  - docs/api.md            # Referencia de API
+last_updated: 2026-07-14
+---
+
 <div align="center">
 
 <h1>
@@ -179,16 +202,17 @@ Pipeline determinista en GitHub Actions: extracción → build → verificación
 ## 🔒 Por qué puedes confiar en estos datos
 
 Cada decisión de ingeniería de este proyecto está diseñada para que **no tengas que
-confiar ciegamente**. Los datos vienen con la evidencia que los respalda.
+confiar ciegamente**. Los datos vienen con la evidencia que los respalda. Seis pilares de
+confiabilidad, auditables y verificables en cada build:
 
-| Pilar | Qué significa | Evidencia auditables |
+| Pilar | Descripción | Artefacto auditable |
 |:---|:---|:---|
 | **Procedencia documentada** | Cada dataset declara su fuente oficial exacta con URL directa al organismo público emisor (BCN, INE, MINEDUC, BCCh, MINSAL, datos.gob.cl). | [`provenance_report.md`](data/normalized/provenance_report.md) — fuente, modo y timestamp por capa |
 | **Auditoría legal explícita** | <!-- START_REDISTRIBUTION_SUMMARY -->Licencia, atribución requerida y permiso de redistribución verificados dataset por dataset. **19 de 19 capas** pasan la auditoría (`ready`).<!-- END_REDISTRIBUTION_SUMMARY --> | [`redistribution_report.md`](data/normalized/redistribution_report.md) + [`AGENTS.md §6`](AGENTS.md) |
-| **Pipeline que falla con estridencia** | Si una validación falla, el pipeline **aborta** — no publica datos corruptos, no emite advertencias silenciosas. | [`ADR-001`](docs/adr/ADR-001-pipeline-lineal-determinista.md) — fail-loud como decisión de arquitectura |
-| **Contratos de esquema verificados** | <!-- START_CONTRACT_COUNT -->21 contratos JSON Schema ([`contracts/datasets/`](contracts/datasets/)) definen columnas esperadas, tipos, claves primarias y cobertura. Se validan **en cada build** automáticamente.<!-- END_CONTRACT_COUNT --> | [`ADR-005`](docs/adr/ADR-005-contratos-esquema-json-schema.md) + `contracts/datasets/*.json` |
+| **Pipeline fail-loud** | Si una validación falla, el pipeline **aborta** — no publica datos corruptos, no emite advertencias silenciosas. | [`ADR-001`](docs/adr/ADR-001-pipeline-lineal-determinista.md) — fail-loud como decisión de arquitectura |
+| **Contratos de esquema** | <!-- START_CONTRACT_COUNT -->21 contratos JSON Schema ([`contracts/datasets/`](contracts/datasets/)) definen columnas esperadas, tipos, claves primarias y cobertura. Se validan **en cada build** automáticamente.<!-- END_CONTRACT_COUNT --> | [`ADR-005`](docs/adr/ADR-005-contratos-esquema-json-schema.md) + `contracts/datasets/*.json` |
 | **Salud transparente** | <!-- START_HEALTH_SUMMARY -->Dashboard público con severidad, frescura, cobertura, drift y degradación por dataset. 12 capas `ok`, 7 `warn`, 0 `error`.<!-- END_HEALTH_SUMMARY --> | [`hub_health.md`](data/normalized/hub_health.md) — estado completo actualizado en cada build |
-| **Calidad medida y pública** | <!-- START_QUALITY_SUMMARY -->Puntuación compuesta A-F por dataset: **promedio 94.2/100** (18 A, 1 B). Dimensiones: validación, contrato, madurez de fuente, frescura, cobertura, política de reúso.<!-- END_QUALITY_SUMMARY --> | [`dataset_quality.md`](data/normalized/dataset_quality.md) — scorecard completo |
+| **Calidad medida** | <!-- START_QUALITY_SUMMARY -->Puntuación compuesta A-F por dataset: **promedio 94.2/100** (18 A, 1 B). Dimensiones: validación, contrato, madurez de fuente, frescura, cobertura, política de reúso.<!-- END_QUALITY_SUMMARY --> | [`dataset_quality.md`](data/normalized/dataset_quality.md) — scorecard completo |
 
 Cada pilar se audita automáticamente en cada ejecución del pipeline. Los reportes se
 regeneran en cada build — no son documentos estáticos mantenidos a mano. Para auditar
@@ -910,15 +934,15 @@ Consulta [DATA_LICENSES.md](DATA_LICENSES.md), `chile-hub redistribution` y
 
 El roadmap actual prioriza crecer en usabilidad y confianza antes que agregar más capas.
 
-| Horizonte | Foco | Resultado esperado |
-|:---|:---|:---|
-| Now | Ejemplos, notebooks, errores claros y referencia API | Usuarios cargan y cruzan datos sin leer el pipeline completo. |
-| Next | Contratos de schema, source readiness y criterios públicos | Contribuidores proponen datasets con reglas claras y verificables. |
-| Later | Nuevas capas solo si pasan criterios de inclusión | El catálogo crece sin perder mantenibilidad ni claridad legal. |
+| Horizonte | Foco | Entregable | Estado |
+|:---|:---|:---|:---:|
+| **Now** | Ejemplos, notebooks, errores claros, referencia API | Usuarios cargan y cruzan datos sin leer el pipeline completo | 🟢 En progreso |
+| **Next** | Contratos de schema, source readiness, criterios públicos | Contribuidores proponen datasets con reglas claras y verificables | 🔵 Planeado |
+| **Later** | Nuevas capas solo si pasan criterios de inclusión | El catálogo crece sin perder mantenibilidad ni claridad legal | ⚪ Futuro |
 
-> La especificación completa del producto está en [`docs/product-spec.md`](./docs/product-spec.md).
-> Los criterios públicos para solicitar nuevas capas están en [`docs/dataset-inclusion-criteria.md`](./docs/dataset-inclusion-criteria.md).
-> El estado de la última corrida se documenta en `data/normalized/pipeline_status.md` tras cada build.
+> **Especificación completa:** [`docs/product-spec.md`](./docs/product-spec.md)
+> **Criterios de inclusión:** [`docs/dataset-inclusion-criteria.md`](./docs/dataset-inclusion-criteria.md)
+> **Estado del último build:** `data/normalized/pipeline_status.md`
 
 ---
 

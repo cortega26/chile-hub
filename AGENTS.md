@@ -1,4 +1,35 @@
+---
+title: "chile-hub — AGENTS.md"
+description: >
+  Guía de trabajo canónica para agentes de IA y colaboradores del repositorio chile-hub.
+  Define arquitectura, invariantes, pipeline, CI/CD, convenciones y flujo de contribución.
+category: ai-instructions
+audience: [ai-agent, contributor]
+priority: critical
+scope: >
+  Repositorio completo — arquitectura, reglas no negociables, flujo de trabajo,
+  pipeline (extract → build → verify → test → publish), testing, CI/CD.
+  NO cubre: documentación de usuario final ni detalles de cada dataset.
+canonical_source: true
+source_of_truth_for: >
+  Estructura del repositorio, invariantes críticas (§4), flujo de pipeline (§3),
+  cómo agregar datasets (§5), política legal (§6), convenciones de código (§7),
+  testing (§8), CI/CD (§9), antipatrones (§10).
+related_docs:
+  - SOURCE_OF_TRUTH.md    # Índice de navegación, 5 invariantes, mapa de archivos
+  - CLAUDE.md             # Punto de entrada rápido para sesiones Claude Code
+  - CONTRIBUTING.md       # Verificaciones locales y flujo de PR
+  - docs/dataset-inclusion-criteria.md  # Criterios de aceptación/deprecación
+  - docs/release.md       # Proceso de release con python-semantic-release
+last_updated: 2026-07-14
+---
+
 # AGENTS.md — Guía de Trabajo para Agentes de IA
+
+> **Audiencia:** Agentes de IA, Claude Code, GitHub Copilot, colaboradores humanos.
+> **Modo de lectura:** Secuencial obligatorio para primera visita; por sección para consultas puntuales.
+> **Cardinalidad:** Este documento es la **fuente de verdad canónica** para todas las reglas de ingeniería del repositorio.
+> **Entrypoint rápido:** Si solo necesitas orientarte, comienza por [`SOURCE_OF_TRUTH.md`](./SOURCE_OF_TRUTH.md).
 
 Este documento define cómo trabajar correctamente en el repositorio `chile-hub`.
 Es la fuente de verdad para cualquier agente de IA o colaborador nuevo que necesite
@@ -132,19 +163,22 @@ JSON no coinciden, confía en el JSON y actualiza esta lista.
 
 ---
 
-## Navegar el código — CodeGraph y lecturas acotadas
+## 2½. Navegación del código — CodeGraph y lecturas acotadas
 
-CodeGraph está instalado (`.codegraph/codegraph.db`). Úsalo antes de abrir archivos grandes.
+> **Tooling AI-native:** CodeGraph está instalado (`.codegraph/codegraph.db`) como índice
+> estructural del repositorio. Consúltalo antes de abrir archivos manualmente — resuelve
+> preguntas de "dónde está X" y "qué llama a Y" en una sola llamada, sin abrir archivos.
 
 ```bash
 codegraph search "<query>"                         # Buscar símbolo, función o concepto
-codegraph refs src/build_dev_db.py::validate_comunas  # Callers y callees de una función
-codegraph graph src/chile_hub.py                   # Grafo de imports del módulo
-codegraph find <symbol_name>                       # En qué archivo está definido
+codegraph callers src/build_dev_db.py::validate_comunas  # Qué llama a esta función
+codegraph callees src/build_dev_db.py::main         # Qué llama esta función
+codegraph explore "validación de comunas"           # Contexto completo de un área
+codegraph impact validate_comunas                   # Qué se rompe si cambio esto
 ```
 
 **Reglas para acotar lecturas y ahorrar tokens:**
-- Usar `view_file` con `StartLine`/`EndLine` — nunca leer archivos grandes enteros de golpe.
+- Usar `Read` con `offset`/`limit` — nunca leer archivos grandes enteros de golpe.
 - `base.py` (73 líneas) es seguro de leer completo. `validation.py` (1 194 líneas) — leer por validador individual.
 - `build_dev_db.py` (867 líneas) y `src/chile_hub/core.py` (2 302 líneas) — usar estas áncoras:
 

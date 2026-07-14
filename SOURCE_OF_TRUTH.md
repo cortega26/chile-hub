@@ -1,16 +1,37 @@
+---
+title: "chile-hub — SOURCE_OF_TRUTH.md"
+description: >
+  Índice maestro de navegación para chile-hub. Resumen de 5 invariantes, mapa de archivos,
+  flujo del pipeline y tabla de tareas comunes con punteros a la documentación relevante.
+category: navigation-index
+audience: [ai-agent, contributor, developer]
+priority: critical
+entrypoint: true
+source_of_truth_for: >
+  Navegación general del repositorio, invariantes críticas resumidas,
+  mapa de archivos anotado, tareas comunes y punteros.
+related_docs:
+  - AGENTS.md              # Reglas completas del pipeline, legal, testing, CI/CD
+  - CLAUDE.md              # Punto de entrada para sesiones Claude Code
+  - CONTRIBUTING.md        # Verificaciones locales y flujo de PR
+  - docs/dataset-inclusion-criteria.md  # Criterios de aceptación/deprecación
+last_updated: 2026-07-14
+---
+
 # SOURCE_OF_TRUTH.md — Índice Maestro de Navegación
 
-Lee esto primero. Luego sigue los punteros. No leas archivos completos en frío.
+> **Lee esto primero.** Luego sigue los punteros. No leas archivos completos en frío.
+> **Tiempo de lectura:** ~3 minutos. **Propósito:** Orientarte antes de abrir cualquier archivo.
 
 ---
 
 ## ¿Qué es este repositorio?
 
 `chile-hub` es una capa de datos reproducible y curada sobre datasets públicos oficiales de Chile.
-Ejecuta un pipeline de extraccion → construccion → validacion → publicacion que produce artefactos
-Parquet, DuckDB, JSON y ZIP consumibles en una sola linea de codigo, ademas de una landing page
-estatica y una CLI/API de Python (`ChileHub`). El objetivo es tener menos datasets, mas limpios y
-confiables — no una cobertura exhaustiva.
+Ejecuta un pipeline de extracción → construcción → validación → publicación que produce artefactos
+Parquet, DuckDB, JSON y ZIP consumibles en una sola línea de código, además de una landing page
+estática y una CLI/API de Python (`ChileHub`). El objetivo es tener **menos datasets, más limpios y
+confiables** — no una cobertura exhaustiva.
 
 ---
 
