@@ -61,7 +61,7 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 | # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
 |---|------|----------|----------|--------|-----------|--------|
 | 043 | [Scroll horizontal en resultados del Explorador SQL](043-sql-explorer-result-overflow.md) | P1 | S | LOW | — | DONE — `.sql-result-wrap`/`.sql-result-table`/`.sql-result-empty` agregadas a `index.html`; `renderResult` en `playground.js` envuelve la tabla; verificado con Playwright (wrap con `overflow-x: auto`, `scrollLeft` responde, `body.scrollWidth` ya no se desborda con tabla de 42 columnas); `make verify-landing` OK. |
-| 044 | [Estilizar `.dataset-tag` (pills "key:"/"warnings")](044-style-dataset-tag-pills.md) | P1 | S | LOW | — | TODO |
+| 044 | [Estilizar `.dataset-tag` (pills "key:"/"warnings")](044-style-dataset-tag-pills.md) | P1 | S | LOW | — | DONE — opción (A) implementada: reglas `.dataset-tag`/`.dataset-tag.key-tag`/`.dataset-tag.warning` agregadas a `index.html` (reutilizan tokens de `.dataset-badge`); verificado con Playwright (background/padding/border-radius ya no en cero, font-size 10.88px vs 16px original, capturas desktop+móvil OK); `make verify-landing` exit 0. Ejecutado en worktree `worktree-agent-afe5a6a7768f37423`, commit `a965e8e`. |
 | 045 | [Color del badge `.dataset-badge.monthly`](045-dataset-badge-monthly-color.md) | P1 | S | LOW | — | TODO |
 | 046 | [`privacy.html` fuera de marca](046-privacy-page-brand-consistency.md) | P2 | S | LOW | — | TODO |
 | 047 | [`--space-lg` no definida + fuente Fira Code no cargada](047-fix-space-lg-and-fira-code-fallback.md) | P2 | S | LOW | — | TODO |
