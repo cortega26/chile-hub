@@ -830,109 +830,6 @@
             white-space: nowrap;
         }
 
-        .catalog-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 1.25rem;
-            align-items: start;
-        }
-
-        /* Dataset Card - emulating high-end archive card index */
-        .dataset-card {
-            background-color: #ffffff;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 1.35rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.1rem;
-            transition: var(--transition);
-            position: relative;
-            min-width: 0;
-            overflow: hidden;
-        }
-
-        .dataset-card::before {
-            content: '';
-            position: absolute;
-            top: -1px;
-            left: 20px;
-            right: 20px;
-            height: 2px;
-            background-color: var(--accent-green);
-            opacity: 0;
-            transition: var(--transition);
-        }
-
-        .dataset-card:hover {
-            border-color: var(--border-color-dark);
-            box-shadow: 0 4px 12px rgba(25, 33, 30, 0.03);
-        }
-
-        .dataset-card:hover::before {
-            opacity: 1;
-        }
-
-        .dataset-card:target {
-            scroll-margin-top: 1.5rem;
-            border-color: var(--accent-green);
-            box-shadow: 0 0 0 3px rgba(18, 61, 48, 0.08);
-        }
-
-        .dataset-card-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 1rem;
-            min-width: 0;
-        }
-
-        .dataset-name {
-            font-family: var(--font-display);
-            font-size: 1.15rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            line-height: 1.25;
-            overflow-wrap: anywhere;
-        }
-
-        .dataset-desc {
-            font-size: 0.88rem;
-            color: var(--text-secondary);
-            line-height: 1.55;
-            margin-top: 0.35rem;
-            overflow-wrap: anywhere;
-        }
-
-        .dataset-badges {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.35rem;
-            flex: 0 0 auto;
-        }
-
-        .dataset-badge {
-            font-family: var(--font-mono);
-            font-size: 0.68rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            padding: 0.2rem 0.45rem;
-            border-radius: 4px;
-            border: 1px solid transparent;
-        }
-
-        .dataset-badge.live {
-            color: var(--accent-green);
-            background: var(--accent-green-light);
-            border-color: rgba(18, 61, 48, 0.15);
-        }
-
-        .dataset-badge.fallback {
-            color: var(--accent-warm);
-            background: var(--accent-warm-bg);
-            border-color: var(--accent-warm-border);
-        }
-
         .dataset-tag {
             display: inline-flex;
             align-items: center;
@@ -969,10 +866,6 @@
             min-width: 0;
         }
 
-        .dataset-facts-primary {
-            margin-top: 0.15rem;
-        }
-
         .dataset-fact {
             display: flex;
             flex-direction: column;
@@ -995,14 +888,6 @@
             line-height: 1.25;
             overflow-wrap: anywhere;
             word-break: normal;
-        }
-
-        .dataset-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: auto;
-            min-width: 0;
         }
 
         .dataset-action {
@@ -1041,65 +926,6 @@
             background: var(--bg-color);
         }
 
-        .dataset-details {
-            border-top: 1px solid var(--border-color);
-            padding-top: 0.85rem;
-            margin-top: 0.25rem;
-            min-width: 0;
-            max-width: 100%;
-        }
-
-        .dataset-details[open] summary {
-            margin-bottom: 0.9rem;
-        }
-
-        .dataset-details-body {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr);
-            gap: 0.8rem;
-        }
-
-        .dataset-detail-section {
-            padding: 0.85rem;
-            border: 1px solid rgba(214, 212, 201, 0.55);
-            border-radius: 6px;
-            background: rgba(247, 246, 240, 0.42);
-            min-width: 0;
-        }
-
-        .dataset-detail-section:first-of-type {
-            border-top: 1px solid rgba(214, 212, 201, 0.55);
-            padding-top: 0.85rem;
-        }
-
-        .dataset-detail-section.wide {
-            grid-column: auto;
-        }
-
-        .dataset-details .dataset-facts {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-
-        .dataset-detail-heading {
-            font-size: 0.76rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 0.65rem;
-        }
-
-        .dataset-detail-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 0.45rem;
-        }
-
-        .dataset-detail-row {
-            display: grid;
-            grid-template-columns: minmax(6rem, 0.34fr) minmax(0, 1fr);
-            gap: 0.65rem;
-            align-items: baseline;
-        }
-
         .dataset-meta-line {
             font-size: 0.78rem;
             color: var(--text-secondary);
@@ -1108,20 +934,8 @@
             overflow-wrap: anywhere;
         }
 
-        .dataset-meta-label {
-            color: var(--text-secondary);
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
-
         .dataset-meta-line strong {
             color: var(--text-primary);
-        }
-
-        .dataset-artifacts {
-            display: grid;
-            gap: 0.35rem;
-            margin-top: 0.55rem;
         }
 
         .dataset-artifact-meta {
@@ -1132,18 +946,7 @@
             overflow-wrap: anywhere;
         }
 
-        .dataset-tags {
-            display: none; /* hidden developer metadata */
-        }
-
         /* Interactive Preview Panel inside details */
-        .dataset-preview {
-            border-top: 1px solid var(--border-color);
-            padding-top: 0.75rem;
-            margin-top: 0.75rem;
-            min-width: 0;
-        }
-
         .dataset-preview-table-wrap {
             overflow-x: auto;
             border: 1px solid var(--border-color);
@@ -1958,17 +1761,8 @@
             .dataset-card {
                 padding: 1.15rem;
             }
-            .dataset-facts,
-            .dataset-detail-grid,
-            .dataset-details-body {
+            .dataset-facts {
                 grid-template-columns: 1fr;
-            }
-            .dataset-detail-section.wide {
-                grid-column: auto;
-            }
-            .dataset-detail-row {
-                grid-template-columns: 1fr;
-                gap: 0.15rem;
             }
             .intro-proof dl {
                 grid-template-columns: 1fr;
@@ -2311,9 +2105,9 @@
         }
 
         .catalog-grid {
-            display: flex !important;
-            flex-direction: column !important;
-            gap: 2.5rem !important;
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
         }
 
         .catalog-grid-sub {
@@ -2363,15 +2157,30 @@
 
         /* Compact card details styling */
         .dataset-card {
+            background: #ffffff;
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            background: #ffffff;
             padding: 1.25rem;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             gap: 1rem;
             transition: border-color 0.2s, box-shadow 0.2s;
+            position: relative;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .dataset-card::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 20px;
+            right: 20px;
+            height: 2px;
+            background-color: var(--accent-green);
+            opacity: 0;
+            transition: var(--transition);
         }
 
         .dataset-card:hover {
@@ -2379,11 +2188,22 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
         }
 
+        .dataset-card:hover::before {
+            opacity: 1;
+        }
+
+        .dataset-card:target {
+            scroll-margin-top: 1.5rem;
+            border-color: var(--accent-green);
+            box-shadow: 0 0 0 3px rgba(18, 61, 48, 0.08);
+        }
+
         .dataset-card-top {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             gap: 1rem;
+            min-width: 0;
         }
 
         .dataset-name {
@@ -2391,6 +2211,8 @@
             font-size: 1.1rem;
             font-weight: 600;
             color: var(--text-primary);
+            line-height: 1.25;
+            overflow-wrap: anywhere;
             margin: 0;
         }
 
@@ -2399,6 +2221,7 @@
             color: var(--text-secondary);
             margin-top: 0.35rem;
             line-height: 1.4;
+            overflow-wrap: anywhere;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
@@ -2406,23 +2229,27 @@
         }
 
         .dataset-badge {
+            font-family: var(--font-mono);
             font-size: 0.72rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             padding: 0.15rem 0.45rem;
             border-radius: 4px;
+            border: 1px solid transparent;
             white-space: nowrap;
         }
 
         .dataset-badge.live {
             background: #ecfdf5;
             color: #065f46;
+            border-color: rgba(18, 61, 48, 0.15);
         }
 
         .dataset-badge.fallback {
             background: #fffbeb;
             color: #92400e;
+            border-color: var(--accent-warm-border);
         }
 
         .dataset-badge.monthly {
