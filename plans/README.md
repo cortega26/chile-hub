@@ -2,6 +2,34 @@
 
 Planes de implementación generados por auditoría `/improve deep` en commits `ba2f434` (2026-06-13), `a2cd288` (2026-06-19) y `c486e7c` (2026-07-07), y por `/improve plan` (mejoras de librerías/dependencias) en commit `140c8ea` (2026-06-29).
 
+> **Auditoría `/improve next` — dirección/roadmap (2026-07-14, commit `7ebf94b`)**: planes
+> **050–052**. Foco exclusivo en la categoría *dirección* (hacia dónde llevar el proyecto),
+> no en bugs. Contexto: repo muy maduro — la lista "deseable post-MVP" del `product-spec`
+> ya está casi entera entregada (`search_datasets`, `cross_view`, `sql`, `from_datapackage`,
+> `validate_user_data`, dashboard, playground), y el anti-patrón #10 prohíbe sumar datasets
+> antes de validar adopción. Por eso los hallazgos **no** son "más features ni más datasets"
+> sino cerrar 3 asimetrías de superficie ya insinuadas por la arquitectura: un resolutor
+> público de nombres→CUT (**050**, el más grounded, ataca el criterio de éxito #4 del
+> product-spec), documentar+cosechar la capa HTTP estática que ya se sirve y consume
+> (**051**, absorbe el fix de `from_datapackage(url)`), y una señal de adopción PyPI/Releases
+> que desbloquea el anti-patrón #10 (**052**). Los 3 seleccionados por el usuario. Ver
+> "Hallazgos considerados y diferidos (2026-07-14 — dirección)" para lo excluido.
+
+> **Decisión de producto — construir capacidad por delante de la demanda (2026-07-14)**:
+> el mantenedor autorizó explícitamente desafiar el anti-patrón #10 con "a veces hay que
+> crear la oferta para generar la demanda". **Principio arquitectónico que la
+> reconcilia con la tesis del proyecto** ("menos datasets, más limpios"): la excepción
+> aplica a **profundidad de capacidad y distribución sobre fuentes existentes de alta
+> calidad** (geometría, capa HTTP/DCAT, resolución de entidades) — que *generan* demanda
+> —, **NO** a amplitud de datasets sobre fuentes frágiles (scraping HTML), que sigue
+> gated por adopción. Fruto de esta decisión: planes **053** (geometría comunal
+> GeoParquet + `resolve_by_coords()` reverse geocoding — el *flagship* generador de
+> demanda) y **054** (validación de anomalías temporales — foso de confianza que respalda
+> la apuesta). La decisión debe ratificarse en **ADR-011** (el Plan 053 lo escribe como
+> Step 0; requiere aprobación humana `proposed`→`accepted`). El Plan 052 (señal de
+> adopción) pasa de "desbloquear crecimiento" a **medir la demanda que esta oferta
+> genere**.
+
 > **Última auditoría `/improve deep` (2026-07-07, commit `c486e7c`)**: planes **024–041**.
 > Repo maduro; los grandes ítems previos ya están hechos. Lo restante es una cola de
 > defectos pequeños de alta confianza (024–031; 027–031 DONE ✅), higiene de deps/CI (032, 033, 034 DONE ✅), backfill
@@ -62,6 +90,19 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 > "Planes archivados (auditoría UX/UI 2026-07-13)" para el detalle de cada uno.
 
 ## Planes activos
+
+| # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
+|---|------|----------|----------|--------|-----------|--------|
+| 050 | [Resolutor público `resolve_comunas()` (nombres → CUT)](050-resolve-comunas-name-to-cut.md) | P2 | M | LOW-MED | — | TODO — spike con entregable de código: resolutor determinista + `ADR-009`; fuzzy queda como pregunta abierta. |
+| 051 | [Capa de acceso HTTP estática + catálogo DCAT `data.json`](051-static-http-access-and-dcat-catalog.md) | P2 | M | LOW | — | TODO — spike: contrato + `ADR-010` + prototipo generador DCAT + fix `from_datapackage(url)` + docs. Sólo archivos estáticos, sin servidor. |
+| 052 | [Señal de adopción PyPI + GitHub Releases (badge/artefacto)](052-adoption-signal-pypi-release-stats.md) | P3 | S | LOW | — | TODO — script CI stdlib + workflow semanal + badge; cero telemetría en el paquete. Ahora: **mide** la demanda que genere la estrategia construir-oferta→demanda. |
+| 053 | [Geometría comunal (GeoParquet) + `resolve_by_coords()` reverse geocoding](053-comuna-geometry-and-reverse-geocoding.md) | **P1** | L | MED | — (complementa 050) | TODO — **flagship** de la estrategia construir-por-delante-de-demanda. Feasibility-spike: Step 0 escribe ADR-011 (estrategia); Step 1 es un **gate de licencia que puede matar el plan**. Entregable primario = artefacto GeoParquet (dep-cero); `resolve_by_coords()` tras extra `[geo]`. Geometría **nunca** como columna de `comunas`. |
+| 054 | [Validación de anomalías temporales sobre series numéricas](054-temporal-anomaly-validation-numeric-series.md) | P2 | M | MED | — | TODO — foso de confianza (no generador de demanda; respalda 053). Anomalía = warning + flag de drift + gate de publicación override-able, **nunca** `SystemExit` del build. Alcance inicial: `indicadores`. |
+| 055 | [Overhaul tipográfico: legibilidad profesional de datos](055-typography-and-readability-overhaul.md) | **P1** | M | LOW | — | TODO — Source Serif 4 + Inter + JetBrains Mono. 14 líneas de CSS, 2 `<link>`. Sin cambios de layout. |
+| 056 | [Ritmo visual, espaciado y jerarquía de secciones](056-visual-rhythm-spacing-hierarchy.md) | P2 | M | LOW | 055 | TODO — sticky header + 3 tiers de espaciado + separadores visuales. Depende de 055 (métricas de fuente). |
+| 057 | [Skeleton loading states + polish de interacción](057-loading-skeletons-and-interaction-polish.md) | P2 | M | LOW | — (055 recomendado) | TODO — skeletons para catálogo y KPIs, empty state de búsqueda, tarjetas clickeables, tecla Escape en drawer. |
+
+### Planes activos — DONE pendientes de archivar
 
 | # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
 |---|------|----------|----------|--------|-----------|--------|
@@ -173,12 +214,32 @@ Auditoría 2026-07-07 (024–041):
 Planes previos:
   020 (independiente)  ← DONE 2026-07-10 (desbloqueado por decisión de producto: construir primero, generar demanda después).
 
+Auditoría /improve next — dirección (050–052):
+  050, 051, 052   (los tres independientes entre sí — archivos/áreas distintas, sin orden forzado).
+                   051 absorbe el fix de from_datapackage(url) (antes considerado DIR-C aparte).
+                   052 es prerrequisito conceptual para reevaluar el anti-patrón #10 (ingesta de datasets nuevos).
+
+Decisión construir-por-delante-de-demanda (053–054):
+  053 (flagship, P1)   independiente; complementa 050 (resolución por nombre + por coordenada)
+                       pero NO lo bloquea. Step 0 = ADR-011 (estrategia). Step 1 = gate de
+                       licencia (kill-switch). Entregable primario = artefacto GeoParquet.
+  054 (P2)             independiente; secuencia DESPUÉS de 053 (es foso de confianza, no
+                       generador de demanda). Alimenta drift + gate de publicación, no el build.
+  051 sube de relevancia bajo esta estrategia (distribución = alcance = demanda);
+  052 pasa a medir la demanda generada.
+
 Auditoría UX/UI 2026-07-13 (043–049) — TODOS DONE Y ARCHIVADOS (2026-07-14):
   043, 044, 045, 046, 047 (todos independientes entre sí — archivos/zonas de CSS distintas)
   045 → 049  (049 tocaba la misma región CSS de .dataset-badge.* que 045; se ejecutó 045
               primero para evitar que ambos editaran la misma línea en paralelo)
   048 (independiente — tocaba la región CSS *vieja*/muerta de .dataset-card, distinta de
        la que 045/049 tocaban)
+
+Auditoría UX/UI 2026-07-14 (055–057) — diseño y experiencia de usuario:
+  055 (P1, tipografía)   independiente — sólo toca index.html (3 vars CSS + <link> Google Fonts)
+  055 → 056 (P2)         el espaciado usa métricas de fuente que dependen de las nuevas familias
+  057 (P2)               independiente — recomendado ejecutar después de 055 para probar skeletons
+                         con las nuevas fuentes, pero no es dependencia dura
 ```
 
 **Interacciones clave de la auditoría 2026-07-07:** **026** (regenerar lock), **032** (adelgazar deps),
@@ -218,6 +279,19 @@ ver "Planes archivados (auditoría UX/UI 2026-07-13)"). Orden en que se ejecutar
    verificación visual antes/después).
 4. **Pulido de contenido** — **049** (unificar idioma + tokens de color), después de
    **045** por tocar la misma región de `.dataset-badge.*`.
+
+## Hallazgos considerados y diferidos (2026-07-14 — dirección)
+
+Auditoría `/improve next` (foco: dirección/roadmap; commit `7ebf94b`). Considerados y
+**no** convertidos en plan propio, para que no se re-auditen:
+
+| Hallazgo | Motivo |
+|----------|--------|
+| **DIR-C: `from_datapackage()` promete URL pero sólo maneja paths locales** (`core.py:454-460`) | **No es un plan de dirección aparte — es un defecto, absorbido por el Plan 051.** El docstring dice "Ruta local o URL" pero `Path(path_or_url).exists()` hace fallar cualquier URL. Es el lado cliente natural de la capa HTTP estática, así que se arregla como primer entregable del Plan 051, no como hallazgo de dirección independiente. |
+| **DIR-D: decisión `delincuencia_comunal` (CEAD) antes de `review_by 2026-09-21`** (`source_registry.json:388`) | **Decisión del mantenedor con fecha, no plan de código.** El extractor y el workflow existen; el `next_action` ("buscar fuente estructurada oficial; degradar a `rejected` si no madura") ya está escrito. Igual que se manejó DIR-05 en la auditoría 2026-07-07. Sólo tener presente que la fecha cae ~2 meses después de esta auditoría. |
+| **Añadir datasets nuevos** (`plus-codes`, `entrepreneurship`, ambos `needs-research` en `docs/dataset-ideas/`) | **Sigue gated tras la decisión construir-por-delante-de-demanda (2026-07-14).** El matiz de esa decisión (ADR-011) es preciso: autoriza **profundidad de capacidad sobre fuentes existentes de alta calidad** (por eso el Plan 053 de geometría procede), pero **NO** amplitud hacia fuentes frágiles/scraping. `plus-codes` y `entrepreneurship` son `needs-research` sobre fuentes no consolidadas → siguen bloqueados hasta que el Plan 052 muestre adopción. La geometría (053) NO cae aquí: es la misma fuente BCN ya usada, no una fuente nueva. |
+| **API Premium / ChileHub Cloud** | **Rechazado por evaluación previa (ME8, `docs/backlog/08-...md`).** El dato es CC-BY redistribuible y pequeño; no justifica un paywall ni infra 24/7 con mantenedor único. El Plan 051 entrega justamente la alternativa que ME8 sí recomienda (API gratuita estática). |
+| **Instrumentar el paquete/bundle para medir uso** | **Rechazado por ética de apertura.** Telemetría en el artefacto que corre en la máquina del usuario contradice el modelo de valor. El Plan 052 mide adopción sólo vía APIs públicas de plataforma (PyPI/GitHub) en CI. |
 
 ## Hallazgos considerados y diferidos (2026-07-13 — auditoría UX/UI)
 
