@@ -933,6 +933,32 @@
             border-color: var(--accent-warm-border);
         }
 
+        .dataset-tag {
+            display: inline-flex;
+            align-items: center;
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            line-height: 1.25;
+        }
+
+        .dataset-tag.key-tag {
+            color: var(--accent-green);
+            background: var(--accent-green-light);
+            border-color: rgba(18, 61, 48, 0.15);
+        }
+
+        .dataset-tag.warning {
+            color: var(--accent-warm);
+            background: var(--accent-warm-bg);
+            border-color: var(--accent-warm-border);
+        }
+
         /* Grid Data Table in card */
         .dataset-facts {
             display: grid;
