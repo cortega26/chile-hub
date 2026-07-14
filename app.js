@@ -115,6 +115,12 @@ function formatBytes(sizeBytes) {
     return `${(sizeBytes / (1024 * 1024)).toFixed(2)} MB`;
 }
 
+const SOURCE_MODE_LABELS = {
+    live: "en vivo",
+    fallback: "respaldo",
+    monthly: "mensual",
+};
+
 function formatFreshness(freshness) {
     if (!freshness) return "N/D";
     const status = freshness.status || "unknown";
@@ -487,7 +493,7 @@ async function loadDrawerPreview(dataset) {
         container.dataset.loadedFor = dataset.dataset;
     } catch (error) {
         console.error("No se pudo cargar la vista previa en drawer:", error);
-        container.innerHTML = `<p class="dataset-preview-state error" style="padding:1.5rem; text-align:center; color: #ef4444;">No se pudo cargar la muestra. El archivo JSON sigue disponible para descarga.</p>`;
+        container.innerHTML = `<p class="dataset-preview-state error" style="padding:1.5rem; text-align:center; color: var(--accent-warm);">No se pudo cargar la muestra. El archivo JSON sigue disponible para descarga.</p>`;
     }
 }
 
@@ -563,7 +569,7 @@ function showDatasetDrawer(dataset) {
                     <div class="dataset-meta-line">Procedencia técnica: <strong>${escapeHtml(dataset.source_detail || "N/D")}</strong> · Warnings: <strong>${escapeHtml(String(dataset.warning_count ?? 0))}</strong></div>
                     <div class="dataset-meta-line">Freshness build: ${escapeHtml(formatFreshness(dataset.freshness))} · Freshness actual: ${escapeHtml(formatFreshness(runtimeFreshness))}</div>
                     ${dataset.warning_count > 0 && (dataset.degradation?.recommended_action || dataset.drift?.recommended_action)
-                        ? `<div class="dataset-meta-line" style="background: #fffbeb; border: 1px solid #fef3c7; padding: 0.75rem; border-radius: 6px; color: #92400e; margin-top: 0.5rem;">
+                        ? `<div class="dataset-meta-line" style="background: var(--accent-warm-bg); border: 1px solid var(--accent-warm-border); padding: 0.75rem; border-radius: 6px; color: var(--accent-warm); margin-top: 0.5rem;">
                              <strong>Acción recomendada:</strong> ${escapeHtml(dataset.degradation?.recommended_action || dataset.drift?.recommended_action)}
                            </div>`
                         : ""}
@@ -894,7 +900,7 @@ function renderCatalog(bundle) {
             const parquetMeta = dataset.outputs?.parquet ? artifactManifestByPath[dataset.outputs.parquet] || packageManifestByPath[dataset.outputs.parquet] : null;
             const sizeBytes = parquetMeta?.size_bytes ? formatBytes(parquetMeta.size_bytes) : "N/D";
             const warningBadge = dataset.warning_count > 0
-                ? `<span class="dataset-tag warning">${dataset.warning_count} warnings</span>`
+                ? `<span class="dataset-tag warning">${dataset.warning_count} advertencias</span>`
                 : "";
 
             return `
@@ -904,7 +910,7 @@ function renderCatalog(bundle) {
                             <h4 class="dataset-name">${escapeHtml(dataset.dataset)}</h4>
                             <div class="dataset-desc">${escapeHtml(dataset.description || "")}</div>
                         </div>
-                        <span class="dataset-badge ${escapeHtml(dataset.source_mode || "fallback")}">${escapeHtml(dataset.source_mode || "unknown")}</span>
+                        <span class="dataset-badge ${escapeHtml(dataset.source_mode || "fallback")}">${escapeHtml(SOURCE_MODE_LABELS[dataset.source_mode] || dataset.source_mode || "desconocido")}</span>
                     </div>
 
                     <div class="dataset-facts-grid">
@@ -917,7 +923,7 @@ function renderCatalog(bundle) {
                             <span class="dataset-fact-mini-value">${escapeHtml(recordCount)}</span>
                         </div>
                         <div class="dataset-fact-mini">
-                            <span class="dataset-fact-mini-label">Freshness</span>
+                            <span class="dataset-fact-mini-label">Frescura</span>
                             <span class="dataset-fact-mini-value">${escapeHtml(formatFreshness(runtimeFreshness))}</span>
                         </div>
                         <div class="dataset-fact-mini">
@@ -1076,7 +1082,7 @@ function loadComunas() {
             console.error("Error cargando comunas:", err);
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="6" class="no-results" style="color: #f87171;">
+                    <td colspan="6" class="no-results" style="color: var(--accent-warm);">
                         Error al cargar los datos territoriales. Levanta un servidor local y compila los datos en data/normalized/.
                     </td>
                 </tr>
