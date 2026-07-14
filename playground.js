@@ -37,11 +37,11 @@ function escapeHtml(text) {
 
 function renderResult(rows, container) {
   if (!rows || rows.length === 0) {
-    container.innerHTML = "<p>La consulta no devolvió filas.</p>";
+    container.innerHTML = '<p class="sql-result-empty">La consulta no devolvió filas.</p>';
     return;
   }
   const columns = Object.keys(rows[0]);
-  let html = "<table><thead><tr>";
+  let html = '<div class="sql-result-wrap"><table class="sql-result-table"><thead><tr>';
   for (const col of columns) {
     html += `<th>${escapeHtml(col)}</th>`;
   }
@@ -53,7 +53,7 @@ function renderResult(rows, container) {
     }
     html += "</tr>";
   }
-  html += "</tbody></table>";
+  html += "</tbody></table></div>";
   container.innerHTML = html;
 }
 

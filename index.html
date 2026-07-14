@@ -1659,6 +1659,46 @@
             gap: 0.5rem;
         }
 
+        /* SQL Explorer result table */
+        .sql-result-wrap {
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            max-width: 100%;
+            margin-top: 0.75rem;
+        }
+
+        .sql-result-table {
+            width: max-content;
+            min-width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+            text-align: left;
+        }
+
+        .sql-result-table th {
+            font-family: var(--font-mono);
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .sql-result-table td {
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+
+        .sql-result-empty {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            margin-top: 0.5rem;
+        }
+
         /* Comunas Table Data Grid */
         .table-container {
             overflow: hidden;
