@@ -30,6 +30,23 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 > adopción) pasa de "desbloquear crecimiento" a **medir la demanda que esta oferta
 > genere**.
 
+> **Auditoría `/improve next` — dirección/roadmap (2026-07-18, commit `6bf6b08`)**: planes
+> **058–063**. Segunda auditoría de dirección sobre el mismo estado estratégico (decisión
+> construir-por-delante-de-demanda del 2026-07-14; drift desde la última: 2 commits
+> docs-only). El foco ya no es "qué construir de capacidad" (050–054) ni diseño de landing
+> (055–057) sino **los canales que esa capacidad no cubre**: distribución por
+> descubrimiento (**059**, Hugging Face — complemento de 051, que es capa de acceso, no de
+> descubrimiento), cierre del último hueco anti-drift que `AGENTS.md §12` nombra explícito
+> (**058**, campo `extractor` en el catálogo + tabla README auto-generada), demostración de
+> la tesis de cruce (**060**, notebook flagship), expansión barata de audiencia (**061**,
+> quickstart R), conversión de la gobernanza existente en embudo de contribuciones
+> (**062**, playbook de extractores — el issue template `dataset_request.yml` **ya existe**,
+> verificado en recon, por eso el plan es solo el lado código) y profundidad del dashboard
+> de salud (**063**, historial JSONL + sparkline; secuencia después de 054). Los 6
+> seleccionados por el usuario de 6 presentados. Ver "Hallazgos considerados y diferidos
+> (2026-07-18 — dirección)" para lo excluido (Kaggle, conda-forge, docs en inglés,
+> Release 2.0.0 forzado).
+
 > **Última auditoría `/improve deep` (2026-07-07, commit `c486e7c`)**: planes **024–041**.
 > Repo maduro; los grandes ítems previos ya están hechos. Lo restante es una cola de
 > defectos pequeños de alta confianza (024–031; 027–031 DONE ✅), higiene de deps/CI (032, 033, 034 DONE ✅), backfill
@@ -101,6 +118,12 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 | 055 | [Overhaul tipográfico: legibilidad profesional de datos](055-typography-and-readability-overhaul.md) | **P1** | M | LOW | — | TODO — Source Serif 4 + Inter + JetBrains Mono. 14 líneas de CSS, 2 `<link>`. Sin cambios de layout. |
 | 056 | [Ritmo visual, espaciado y jerarquía de secciones](056-visual-rhythm-spacing-hierarchy.md) | P2 | M | LOW | 055 | TODO — sticky header + 3 tiers de espaciado + separadores visuales. Depende de 055 (métricas de fuente). |
 | 057 | [Skeleton loading states + polish de interacción](057-loading-skeletons-and-interaction-polish.md) | P2 | M | LOW | — (055 recomendado) | TODO — skeletons para catálogo y KPIs, empty state de búsqueda, tarjetas clickeables, tecla Escape en drawer. |
+| 058 | [Campo `extractor` en el catálogo + tabla de extractores auto-generada en README](058-catalogo-campo-extractor-y-tabla-readme.md) | P2 | M | LOW | — | TODO — cierra el hueco que `AGENTS.md §12` nombra explícito: campo `extractor` en las 21 entradas + validación en `check_companion_paths registry` + `sync_readme_extractor_table()`. Disjunto de 050–057. |
+| 059 | [Publicación del bundle en Hugging Face Hub](059-publicacion-huggingface-hub.md) | P2 | M | MED | — (052 recomendado antes, no gate) | TODO — canal de *descubrimiento* (complementa 051 = capa de acceso). Script `--dry-run` + job `hf-publish` en `pypi-release.yml` + dataset card. Requiere secret `HF_TOKEN` (paso manual del mantenedor). Carril `candidate` excluido por construcción. |
+| 060 | [Notebook flagship — cruce multi-capa por `codigo_comuna`](060-notebook-flagship-cruce-capas.md) | P2 | S | LOW | — | TODO — `examples/notebooks/04_perfil_territorial_pobreza.ipynb`: demuestra el criterio de éxito #4 del product-spec (join sin limpieza). Insumo para la dataset card de 059. |
+| 061 | [Quickstart de consumo desde R (arrow + duckdb)](061-quickstart-r.md) | P3 | S | LOW | — | TODO — solo docs (`docs/r-quickstart.md` + nav mkdocs): los artefactos ya son R-consumibles. Verificar URLs con `curl` antes de publicar recetas. |
+| 062 | [Playbook de contribución de extractores](062-playbook-contribucion-extractores.md) | P3 | S | LOW | — | TODO — sección en `CONTRIBUTING.md` del camino issue→PR mergeado vía carril `candidate`. Re-scope verificado: el issue template `dataset_request.yml` ya existe; no duplicarlo. |
+| 063 | [Historial de salud del hub + sparkline en landing](063-historial-salud-hub.md) | P3 | M | MED | — (054 recomendado antes) | TODO — `hub_health_history.jsonl` append-only (cap 400, idempotente por timestamp) + sparkline SVG en el dashboard. Primer artefacto acumulativo del pipeline — Step 1 verifica la premisa de persistencia con un probe. |
 
 ### Planes activos — DONE pendientes de archivar
 
@@ -220,13 +243,18 @@ Auditoría /improve next — dirección (050–052):
                    052 es prerrequisito conceptual para reevaluar el anti-patrón #10 (ingesta de datasets nuevos).
 
 Decisión construir-por-delante-de-demanda (053–054):
-  053 (flagship, P1)   independiente; complementa 050 (resolución por nombre + por coordenada)
-                       pero NO lo bloquea. Step 0 = ADR-011 (estrategia). Step 1 = gate de
-                       licencia (kill-switch). Entregable primario = artefacto GeoParquet.
-  054 (P2)             independiente; secuencia DESPUÉS de 053 (es foso de confianza, no
-                       generador de demanda). Alimenta drift + gate de publicación, no el build.
+  053 (flagship, P1)   Step 0 = ADR-011 (estrategia, requiere aprobación humana
+                       proposed→accepted). Step 1 = gate de licencia (kill-switch).
+                       ADR-011 es la compuerta de aprobación humana del sub-carril
+                       ENTERO: gate de 053 Y de 054 (054 "respalda la apuesta"). Si
+                       ADR-011 se rechaza, 053+054 caen y 050/051 pasan a ser toda la
+                       historia de datos. Entregable primario = artefacto GeoParquet.
+  054 (P2)             secuencia DESPUÉS de 053 (foso de confianza, no generador de
+                       demanda). Alimenta drift + gate de publicación, no el build.
+  050 ∩ 053            solapan en core.py y subdere_extractor.py — NO correr en worktrees
+                       simultáneos; secuenciar o merge-coordinar.
   051 sube de relevancia bajo esta estrategia (distribución = alcance = demanda);
-  052 pasa a medir la demanda generada.
+  052 pasa a medir la demanda generada (S/LOW; baseline conveniente pre-053, no gate).
 
 Auditoría UX/UI 2026-07-13 (043–049) — TODOS DONE Y ARCHIVADOS (2026-07-14):
   043, 044, 045, 046, 047 (todos independientes entre sí — archivos/zonas de CSS distintas)
@@ -240,6 +268,21 @@ Auditoría UX/UI 2026-07-14 (055–057) — diseño y experiencia de usuario:
   055 → 056 (P2)         el espaciado usa métricas de fuente que dependen de las nuevas familias
   057 (P2)               independiente — recomendado ejecutar después de 055 para probar skeletons
                          con las nuevas fuentes, pero no es dependencia dura
+
+Auditoría /improve next 2026-07-18 (058–063) — dirección, canales y superficie:
+  058 (catálogo+README)  independiente — archivos disjuntos de 050–057 (catálogo JSON,
+                         check_companion_paths, doc_sync, README, AGENTS.md §12)
+  059 (Hugging Face)     lazo blando: 052 antes da baseline de medición limpio (no gate).
+                         060 alimenta su dataset card (contenido, no bloqueo).
+  060 (notebook)         independiente — sólo crea examples/notebooks/04_*.ipynb
+  061 (quickstart R)     independiente — sólo docs (docs/r-quickstart.md + mkdocs.yml;
+                         su Step 3 opcional toca README.md — ver nota abajo)
+  062 (playbook contrib) independiente — sólo CONTRIBUTING.md
+  058 ∩ 059 ∩ 061        co-toque de README.md (058 obligatorio; 059 Step 6 y 061 Step 3
+                         opcionales): en worktrees paralelos, esos pasos van tras 058.
+  063 (historial salud)  lazo blando: 054 antes le da señal de anomalías que mostrar (no gate).
+                         Solapa con 055–057 en index.html/app.js — NO correr en worktrees
+                         simultáneos con el carril B de landing; secuenciar.
 ```
 
 **Interacciones clave de la auditoría 2026-07-07:** **026** (regenerar lock), **032** (adelgazar deps),
@@ -251,6 +294,94 @@ Auditoría UX/UI 2026-07-14 (055–057) — diseño y experiencia de usuario:
 **020** DONE ✅ (explorador SQL DuckDB-Wasm en la landing, 2026-07-10).
 
 ## Orden de ejecución recomendado
+
+**Planes activos (050–063) — tres carriles paralelos (actualizado 2026-07-18):**
+
+050–054 tocan el **paquete Python / capa de datos** (carril A); 055–057 tocan la
+**landing** (`index.html`/`app.js`/`playground.js`) (carril B); 058–063 son
+**canales/superficie** (carril C — catálogo/docs/ejemplos/CI, mayormente disjunto de A y
+B). Los tres carriles apenas comparten archivos entre sí, así que el óptimo son
+**tres carriles en paralelo** (el repo ya opera así vía worktrees), cada uno ordenado
+internamente — ver la secuencia serial unificada más abajo para el modo de un solo hilo.
+
+**Carril A — datos/librería (Python):**
+
+1. **053 Step 0 + Step 1 primero** — ADR-011 (aprobación humana) + gate de licencia
+   (kill-switch). Es la compuerta de todo el sub-carril construir-por-delante-de-demanda:
+   gate de 053 **Y** 054. Barato de saber temprano; si se rechaza, 053+054 caen y 050/051
+   pasan a ser toda la historia de datos.
+2. **053** completo — sólo si la compuerta pasa. Artefacto GeoParquet (generador de
+   demanda) + `resolve_by_coords()`.
+3. **050** — superficie hermana (resolución por nombre); la más grounded (criterio #4 del
+   product-spec).
+4. **051** — capa de distribución; absorbe el fix `from_datapackage(url)`.
+5. **054** — foso de confianza; secuencia DESPUÉS de 053.
+
+> ⚠ **050 y 053 solapan** en `src/chile_hub/core.py` y `src/extractors/subdere_extractor.py`
+> (comparar sus drift-check globs): NO correrlos en worktrees simultáneos — secuenciar o
+> merge-coordinar. El resto del carril A es disjunto en archivos.
+
+**Carril B — landing (en paralelo al carril A):**
+
+`055 → { 056, 057 }`. **055** (P1, LOW) es la base; **056** depende **duro** de él
+(métricas de fuente). **057** sólo tiene el lazo blando "055 recomendado", así que tras
+055, **056 y 057 pueden ir en paralelo**.
+
+**052 (P3, S, LOW)** es el quick-win independiente: su hueco ideal es la **espera de
+aprobación de ADR-011** (mientras un humano ratifica el ADR, el ejecutor no está bloqueado;
+llena la ventana con 055 del carril B y 052). Landearlo antes de que 053 publique da un
+baseline pre-flagship limpio — conveniente, **no** un gate (los conteos de GitHub Releases
+son acumulativos y PyPI `recent` es backfillable).
+
+**Secuencia serial unificada (si un solo ejecutor, un hilo) — los 14 planes activos
+(actualizada 2026-07-18; reemplaza al interleaving 2026-07-14, que sólo cubría 050–057):**
+
+> **053 Step 0 → 053 Step 1** (dispara el reloj humano: aprobación ADR-011 y gate de
+> licencia; en paralelo el mantenedor crea el secret `HF_TOKEN`) →
+> **062 → 061 → 060** (trío S/LOW — quick wins que además sirven de *capability probe*
+> del ejecutor; 060 produce contenido para la dataset card de 059) →
+> **055 → 056 ∥ 057** (carril B; P1 de landing) →
+> **052** (baseline de adopción — debe estar vivo antes de que 053 y 059 generen
+> demanda, o el efecto no es medible) →
+> **058** (M/LOW, disjunto; cierra el hueco de `AGENTS.md §12`) →
+> **053 completo** (tras aprobación ADR-011; flagship) → **050** (solapa archivos con
+> 053 — nunca en paralelo) → **051** → **054** →
+> **059** (con 052 ya midiendo y `HF_TOKEN` creado) →
+> **063** (último: necesita la señal de 054 y que el carril B haya cerrado, por solape
+> en `index.html`/`app.js`)
+
+Criterios que ordenan esa secuencia (para reevaluarla si cambia el contexto):
+
+1. **Los relojes asíncronos se disparan primero** — la aprobación humana de ADR-011 y la
+   creación manual de `HF_TOKEN` no consumen ejecutor; arrancarlos en el paso 1 elimina
+   el único cuello de botella que no es código.
+2. **Riesgo creciente del ejecutor** — el trío S/LOW primero (sonda de capacidad), M/LOW
+   después, los dos planes con más superficie de deriva (059: CI+servicio externo; 063:
+   estado+frontend) al final, cuando ya hay confianza y revisión acumulada.
+3. **Medición antes que demanda** — 052 precede a 053 y 059, o sus efectos son
+   indistinguibles del ruido.
+4. **Nunca dos planes en los mismos archivos en paralelo** — 050∩053
+   (`core.py`/`subdere_extractor.py`), 063∩055–057 (`index.html`/`app.js`).
+
+**Auditoría 2026-07-18 (058–063) — notas de encaje con los carriles existentes:**
+
+1. **058 primero dentro del carril C por leverage** — S–M, LOW, cierra un hueco que el
+   propio `AGENTS.md §12` nombra; deja el mapeo dataset↔extractor como dato validado en
+   CI (beneficia a todo lo demás). En la secuencia serial unificada cede el paso al trío
+   S/LOW sólo por granularidad de riesgo, no por prioridad.
+2. **060, 061, 062** — los tres S/LOW, independientes entre sí y de casi todo lo activo;
+   ideales como relleno de ventanas de espera (p. ej. la aprobación de ADR-011).
+   ⚠ Matiz de "independencia": 058 (obligatorio), 059 (Step 6 opcional) y 061 (Step 3
+   opcional) pueden tocar **README.md** — en modo worktrees paralelos, correr esos pasos
+   de README sólo después de mergeado 058, o descartar los pasos opcionales.
+3. **059** — tras 052 (baseline de medición) y con el secret `HF_TOKEN` ya creado por el
+   mantenedor; es el generador de demanda del batch.
+4. **063 al final** — después de 054 (señal de anomalías) y sin solaparse con 055–057 en
+   `index.html`/`app.js` (si el carril B sigue activo, secuenciar).
+
+> ⚠ **063 solapa con 055–057** en `index.html`/`app.js`: no correr en worktrees
+> simultáneos con el carril B. El resto del carril C es disjunto en archivos con A y B
+> (salvo el matiz de README.md del punto 2).
 
 **Auditoría 2026-07-07 (024–041) — orden sugerido por olas (actualizado 2026-07-09; 024, 025, 026, 032, 033 y
 034 ya están DONE/archivados, no aparecen abajo):**
@@ -279,6 +410,21 @@ ver "Planes archivados (auditoría UX/UI 2026-07-13)"). Orden en que se ejecutar
    verificación visual antes/después).
 4. **Pulido de contenido** — **049** (unificar idioma + tokens de color), después de
    **045** por tocar la misma región de `.dataset-badge.*`.
+
+## Hallazgos considerados y diferidos (2026-07-18 — dirección)
+
+Auditoría `/improve next` (foco: dirección/roadmap; commit `6bf6b08`). Los 6 hallazgos
+presentados (D1–D6) fueron **todos seleccionados** y son los planes 058–063. Lo
+considerado y **no** convertido en plan, para que no se re-audite:
+
+| Hallazgo | Motivo |
+|----------|--------|
+| **Kaggle Datasets como canal de distribución** | **Diferido — hacer 059 (HF) primero.** Mismo mecanismo de valor (descubrimiento), pero upload manual/fricción mayor y automatización más débil que HF Hub. Reconsiderar cuando 059 esté live y 052 muestre su efecto. |
+| **Publicación en conda-forge** | **Diferido — sin tracción que lo justifique.** La audiencia objetivo resuelve hoy con `pip` (paquete puro-Python, 4 deps runtime); conda-forge agrega un feedstock que mantener. Reevaluar si PyPI muestra adopción del segmento científico (052). |
+| **README/docs en inglés** | **Rechazado por ahora — contradice la decisión i18n recién landeada.** El plan 049 (2026-07-14) unificó deliberadamente la landing al español; el producto es datos chilenos para audiencia primaria chilena (product-spec). Una versión inglesa es decisión de producto nueva, no extensión obvia. |
+| **Forzar Release 2.0.0** (nota stale de `NEXT_STEPS.md` 2026-06-29) | **Decisión del mantenedor, no plan de código.** El versionado es automático vía python-semantic-release; un bump major forzado es un acto de comunicación, no de ingeniería. La nota de NEXT_STEPS quedó stale (el proyecto ya está en 1.21.x). |
+| **Re-scope de D3 (carril de contribución)** | **Verificado en recon, no es hallazgo nuevo.** El issue template `.github/ISSUE_TEMPLATE/dataset_request.yml` **ya existe** y cubre las preguntas bloqueantes — por eso el plan 062 es solo el playbook del lado código en `CONTRIBUTING.md`. |
+| **Tests de notebooks en CI** (ejecutar `examples/` en un job) | **Diferido — convención actual es notebooks sin ejecutar en CI.** El plan 060 se verifica localmente con `nbconvert --execute`. Un job de CI para notebooks es discutible pero requiere decidir caching del bundle en CI; abrir solo si 060 drifta una vez. |
 
 ## Hallazgos considerados y diferidos (2026-07-14 — dirección)
 
