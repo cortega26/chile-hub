@@ -52,6 +52,7 @@ nav:
   - Sitio público: https://tooltician.com/chile-hub/
   - Inicio: index.md
   - Instalación: installation.md
+  - Uso desde R: r-quickstart.md
   - Referencia de API: api.md
   - Criterios de inclusión: dataset-inclusion-criteria.md
   - Compatibilidad de datasets: dataset-compatibility-policy.md
