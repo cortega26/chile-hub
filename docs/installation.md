@@ -58,3 +58,9 @@ Fija los datos seleccionando el tag de release correspondiente al actualizar la 
 ```bash
 chile-hub cache update --data-version v1.15.0
 ```
+
+## Desde R
+
+Los artefactos del hub (Parquet, DuckDB, ZIP) son consumibles directamente
+desde R sin instalar el paquete Python. Ver
+[Uso desde R](r-quickstart.md) para recetas con `arrow` y `duckdb`.
