@@ -125,11 +125,11 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 | 062 | [Playbook de contribución de extractores](062-playbook-contribucion-extractores.md) | P3 | S | LOW | — | TODO — sección en `CONTRIBUTING.md` del camino issue→PR mergeado vía carril `candidate`. Re-scope verificado: el issue template `dataset_request.yml` ya existe; no duplicarlo. |
 | 063 | [Historial de salud del hub + sparkline en landing](063-historial-salud-hub.md) | P3 | M | MED | — (054 recomendado antes) | TODO — `hub_health_history.jsonl` append-only (cap 400, idempotente por timestamp) + sparkline SVG en el dashboard. Primer artefacto acumulativo del pipeline — Step 1 verifica la premisa de persistencia con un probe. |
 
-### Planes activos — DONE pendientes de archivar
+## Planes archivados (2026-07-10)
 
-| # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
-|---|------|----------|----------|--------|-----------|--------|
-| 020 | [Explorador SQL en la landing con DuckDB-Wasm](020-duckdb-wasm-playground.md) | P2 | M | MED | — | DONE — implementado 2026-07-10. 5 archivos DuckDB-Wasm + apache-arrow/flatbuffers/tslib vendorizados, CSP con `wasm-unsafe-eval`, `playground.js` con lazy init, smoke test pasa con presencia confirmada, funcional manual 10 filas ✅. |
+| # | Plan | Esfuerzo | Riesgo | Estado |
+|---|------|----------|--------|--------|
+| 020 | [Explorador SQL en la landing con DuckDB-Wasm](archive/020-duckdb-wasm-playground.md) | M | MED | DONE — implementado 2026-07-10, archivado 2026-07-18. 5 archivos DuckDB-Wasm + apache-arrow/flatbuffers/tslib vendorizados, CSP con `wasm-unsafe-eval`, `playground.js` con lazy init, smoke test pasa con presencia confirmada, funcional manual 10 filas ✅. |
 
 ## Planes archivados (auditoría UX/UI 2026-07-13)
 
@@ -233,9 +233,6 @@ Auditoría 2026-07-07 (024–041):
   035 (DONE) → —          (035 ya archivado: gate de publicación con 26 tests)
   041 (DONE)                    (041 DONE: from_datapackage() + frictionless_validate(), ADR-008)
   — (DONE)                     (039 DONE: ADR-006 escrito, decisiones ya implementadas)
-
-Planes previos:
-  020 (independiente)  ← DONE 2026-07-10 (desbloqueado por decisión de producto: construir primero, generar demanda después).
 
 Auditoría /improve next — dirección (050–052):
   050, 051, 052   (los tres independientes entre sí — archivos/áreas distintas, sin orden forzado).
@@ -392,10 +389,6 @@ Criterios que ordenan esa secuencia (para reevaluarla si cambia el contexto):
 3. **Backfill de tests**: **COMPLETA** 🎉: **035** ✅ DONE (gate de publicación) y **036** ✅ DONE (writers).
 4. **Refactors** — **COMPLETA** 🎉: **037** ✅ (vectoriza RUT) y **038** ✅ (dedup pipeline_status_utils).
 5. **Diseño/spikes**: **COMPLETA** 🎉: **039** ✅ DONE (ADR-006), **040** ✅ DONE (hub.sql() + ADR-007), **041** ✅ DONE (from_datapackage() + ADR-008).
-
-Planes previos aún vigentes:
-- **020** — DuckDB-Wasm playground: solo si lo aprueba una re-evaluación futura del gate 4.3. **Plan 040**
-  entrega el mismo valor "explora los datos" a la audiencia que sí existe, sin depender del tráfico de la landing.
 
 **Auditoría UX/UI 2026-07-13 (043–049) — COMPLETA 🎉 (los 7 planes DONE y archivados,
 ver "Planes archivados (auditoría UX/UI 2026-07-13)"). Orden en que se ejecutaron:**
