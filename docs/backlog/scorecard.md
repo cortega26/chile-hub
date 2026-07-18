@@ -1,23 +1,30 @@
 # Scorecard de Mejoras Estratégicas — ChileHub
 
-**Ultima actualizacion:** 2026-06-20 (Mejora #1 completada — refactor de `build_dev_db.py`)
-**Revision semanal:** viernes
+**Ultima actualizacion:** 2026-06-29 (backlog completado 7/7 — ver Semana 4). Documento cerrado como registro historico el 2026-07-18; el seguimiento de mejoras activas vive en `plans/README.md`.
+**Revision semanal:** cerrada (backlog completado — ya no aplica)
 **Version del proyecto:** ver `pyproject.toml` (fuente unica de verdad) · etapa Alpha
-**Estado general:** En desarrollo activo · Progreso total: 57% (4/7 completadas)
+**Estado general:** Backlog completado · Progreso total: 100% (7/7 completadas)
 
 ---
 
 ## Resumen ejecutivo
 
-ChileHub (Alpha) es una libreria Python open-source que cura, normaliza, valida
-y publica ~15 datasets oficiales de Chile. El proyecto se encuentra en etapa temprana:
-el modulo `build_dev_db.py` concentra 3206 lineas (God module), la validacion de
-contratos JSON Schema existe pero solo se ejecuta en `scripts/verify_pipeline.py`
-(fuera del pipeline principal), los nombres de dataset se pasan como strings magicos
-sin constantes tipadas, 4 datasets operan en modo fallback no estabilizado, y la
-landing page no muestra el estado operativo en tiempo real.
+> **Foto de partida (2026-06-18), conservada como registro historico.** Todos
+> los problemas descritos abajo fueron resueltos por las 7 mejoras del backlog
+> (completado 2026-06-29, 7/7 — ver "Revisiones semanales" y
+> `docs/backlog/NEXT_STEPS.md`).
 
-Las 5 mejoras que siguen atacan estos puntos en orden de impacto estrategico.
+ChileHub (Alpha) es una libreria Python open-source que cura, normaliza, valida
+y publica ~15 datasets oficiales de Chile. Al crear este scorecard el proyecto
+se encontraba en etapa temprana:
+el modulo `build_dev_db.py` concentraba 3206 lineas (God module), la validacion de
+contratos JSON Schema existia pero solo se ejecutaba en `scripts/verify_pipeline.py`
+(fuera del pipeline principal), los nombres de dataset se pasaban como strings magicos
+sin constantes tipadas, 4 datasets operaban en modo fallback no estabilizado, y la
+landing page no mostraba el estado operativo en tiempo real.
+
+Las 7 mejoras que siguen atacaron estos puntos en orden de impacto estrategico —
+todas completadas (7/7).
 
 ---
 
@@ -31,7 +38,7 @@ Las 5 mejoras que siguen atacan estos puntos en orden de impacto estrategico.
 | 4 | Estabilizacion de datasets en modo fallback | Alto | Alto | Medio | Completado | 2026-06-19 | Acceso a fuentes origen (URLs externas) |
 | 5 | Dashboard publico de salud operativa del hub | Medio | Medio | Bajo | Completado | 2026-06-29 | #4 completado (para no mostrar falsos positivos) |
 | 6 | Robustecer manejo de errores en API publica | Medio | Bajo | Bajo | Completado | 2026-06-19 | — |
-| 7 | Nuevas capacidades de API (cruces, validacion, busqueda) | Medio | Medio | Bajo | Pendiente | Futuro | #6 completado |
+| 7 | Nuevas capacidades de API (cruces, validacion, busqueda) | Medio | Medio | Bajo | Completado | 2026-06-29 | #6 completado |
 
 ---
 
