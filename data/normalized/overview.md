@@ -1,15 +1,15 @@
 # chile-hub overview
 
-- `generated_at_utc`: `2026-07-08T22:02:42.124535+00:00`
+- `generated_at_utc`: `2026-07-20T01:57:09.237058+00:00`
 - `overall_status`: `warn`
 - `dataset_count`: `19`
-- `live_count`: `16`
-- `fallback_count`: `3`
+- `live_count`: `17`
+- `fallback_count`: `2`
 - `stale_count`: `0`
 - `drifted_count`: `8`
 - `degraded_count`: `0`
 - `partial_coverage_count`: `2`
-- `warning_count`: `11`
+- `warning_count`: `10`
 - `shared_artifact_count`: `24`
 - `package_count`: `1`
 - `top_issue`: `empresas` (freshness=fresh, drift=drifted, warnings=3)
@@ -34,7 +34,7 @@
 | `indicadores_urbanos_siedu` | `live` | `ok` | `fresh` | `partial` | `drifted` |
 | `partidos_politicos` | `live` | `ok` | `fresh` | `full` | `drifted` |
 | `perfil_territorial_comunal` | `fallback` | `ok` | `fresh` | `full` | `drifted` |
-| `pobreza_comunal` | `fallback` | `ok` | `fresh` | `not_applicable` | `drifted` |
+| `pobreza_comunal` | `live` | `ok` | `fresh` | `not_applicable` | `drifted` |
 | `provincias` | `live` | `ok` | `fresh` | `full` | `healthy` |
 | `regiones` | `live` | `ok` | `fresh` | `full` | `healthy` |
 | `resultados_educacionales` | `live` | `ok` | `fresh` | `not_applicable` | `healthy` |
@@ -43,7 +43,7 @@
 
 - `path`: `data/normalized/chile-hub-publishable-bundle.zip`
 - `package_type`: `zip`
-- `size_bytes`: `29300576`
+- `size_bytes`: `29355029`
 - `checksum`: `sha256` via `data/normalized/chile-hub-publishable-bundle.zip.sha256`
 - `verification_command`: `shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256`
 

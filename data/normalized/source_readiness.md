@@ -1,6 +1,6 @@
 # chile-hub — Madurez de fuente
 
-- `generated_at_utc`: `2026-07-08T22:02:42.124535+00:00`
+- `generated_at_utc`: `2026-07-20T01:57:09.237058+00:00`
 - `stable_count`: `17`
 - `candidate_count`: `3`
 - `experimental_count`: `0`
@@ -26,7 +26,7 @@
 | `indicadores_urbanos_siedu` | `stable` | `ine_siedu_indicadores` | `live` | `✓` | `permitido` | `✓` | `implemented` | `—` | Monitorear si INE publica una 6ta medición (post-2022) y actualizar URL y SHEET_YEARS. |
 | `perfil_territorial_comunal` | `candidate` | `chile_hub_perfil_territorial` | `fallback` | `✗` | `permitido` | `✓` | `derived` | `—` | Track readiness inherited from upstream component datasets. |
 | `empresas` | `stable` | `ministerio_economia_res` | `live` | `✓` | `no` | `✓` | `implemented` | `—` | Keep large-output behavior documented and verify Parquet-first consumption. |
-| `pobreza_comunal` | `stable` | `mds_pobreza_comunal` | `fallback` | `✓` | `permitido` | `—` | `implemented` | `—` | Monitorear publicación de próxima ronda CASEN (2024-2025). |
+| `pobreza_comunal` | `stable` | `mds_pobreza_comunal` | `live` | `✓` | `permitido` | `—` | `implemented` | `—` | Monitorear publicación de próxima ronda CASEN (2024-2025). |
 | `consumo_electrico_comunal` | `deprecated` | `cne_consumo_electrico_comunal` | `fallback` | `✗` | `permitido` | `✓` | `fallback_only` | `—` | Fuente confirmada caída de forma permanente (investigado 2026-07-07): CNE decomisionó el catálogo Junar de energiaabierta.cl; la página del dataset no ofrece archivo ni API de reemplazo (el enlace API del sitio apunta a /visualizaciones/en-mantencion/). El dataset nunca tuvo un fetch en vivo exitoso — solo publica FALLBACK_ROWS de muestra. Degradado a deprecated/candidate por AGENTS.md §6 (protocolo de fuente permanentemente caída); reevaluar solo si CNE publica un reemplazo oficial. |
 | `delincuencia_comunal` | `candidate` | `cead_delincuencia_comunal` | `not_built` | `✗` | `permitido` | `✓` | `implemented` | `—` | Monitorear estabilidad del scraping; buscar fuente estructurada oficial (datos.gob.cl, export CEAD). Degradar a rejected si no madura para review_by. |
 | `partidos_politicos` | `stable` | `camara_partidos_politicos` | `live` | `✓` | `permitido` | `✓` | `implemented` | `—` | estado_legal/fecha_constitucion completados desde SERVEL (15/36 partidos matcheados por nombre; el resto son históricos no listados en SERVEL). ambito (nacional/regional) queda nullable: no se encontró esa señal en ninguna fuente institucional disponible. |

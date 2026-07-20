@@ -8,7 +8,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "AMPL",
@@ -19,7 +19,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "COMUNES",
@@ -30,7 +30,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "DC",
@@ -41,7 +41,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "DEM",
@@ -52,7 +52,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "EVOP",
@@ -63,7 +63,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "FA",
@@ -74,7 +74,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "FRA",
@@ -85,7 +85,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "FRVS",
@@ -96,7 +96,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "IC",
@@ -107,7 +107,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "IGUAL",
@@ -118,7 +118,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "IND",
@@ -129,7 +129,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "LIBERAL",
@@ -140,7 +140,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "MIRAS",
@@ -151,7 +151,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "PAH",
@@ -162,7 +162,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "PAR",
@@ -173,7 +173,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "PC",
@@ -184,7 +184,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "PCC",
@@ -195,7 +195,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "PCS",
@@ -206,7 +206,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "PDG",
@@ -217,7 +217,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "PEV",
@@ -228,7 +228,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "PH",
@@ -239,7 +239,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "PL",
@@ -250,7 +250,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "PNL",
@@ -261,7 +261,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "PPD",
@@ -272,7 +272,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "PR",
@@ -283,7 +283,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "PREP",
@@ -294,7 +294,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "PRI",
@@ -305,7 +305,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "PRO",
@@ -316,7 +316,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "PS",
@@ -327,7 +327,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "PSC",
@@ -338,7 +338,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "RD",
@@ -349,7 +349,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "RN",
@@ -360,7 +360,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "SUR",
@@ -371,7 +371,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "UCP",
@@ -382,7 +382,7 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_partido": "UDI",
@@ -393,6 +393,6 @@
     "ambito": null,
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   }
 ]

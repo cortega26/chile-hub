@@ -1,9 +1,9 @@
 {
-  "generated_at_utc": "2026-07-08T22:02:42.124535+00:00",
+  "generated_at_utc": "2026-07-20T01:57:09.237058+00:00",
   "dataset_count": 19,
   "drifted_count": 8,
   "healthy_count": 11,
-  "fallback_count": 3,
+  "fallback_count": 2,
   "partial_coverage_count": 2,
   "degraded_count": 0,
   "datasets": [
@@ -235,15 +235,15 @@
     {
       "dataset": "pobreza_comunal",
       "drift_status": "drifted",
-      "source_mode": "fallback",
+      "source_mode": "live",
       "coverage_status": "not_applicable",
       "coverage_ratio": null,
       "coverage_summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
       "degradation_status": "warning",
-      "degradation_impact": "cobertura SAE: 2/346 comunas (0.6%) — parcial por diseño; comunas sin muestra no tienen estimación; pobreza_comunal source_mode is fallback; usando datos de muestra mínima.",
-      "drift_summary": "Drift detectado: mode=fallback, coverage=not_applicable, degradation=warning.",
-      "warning_count": 2,
-      "diagnostic_summary": "cobertura SAE: 2/346 comunas (0.6%) — parcial por diseño; comunas sin muestra no tienen estimación",
+      "degradation_impact": "cobertura SAE: 345/346 comunas (99.7%) — parcial por diseño; comunas sin muestra no tienen estimación",
+      "drift_summary": "Drift detectado: mode=live, coverage=not_applicable, degradation=warning.",
+      "warning_count": 1,
+      "diagnostic_summary": "cobertura SAE: 345/346 comunas (99.7%) — parcial por diseño; comunas sin muestra no tienen estimación",
       "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción.",
       "documentation": "docs/datasets/pobreza_comunal.md"
     },

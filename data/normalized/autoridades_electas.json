@@ -15,7 +15,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1012",
@@ -33,7 +33,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1013",
@@ -51,7 +51,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1015",
@@ -69,7 +69,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1017",
@@ -87,7 +87,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1021",
@@ -105,7 +105,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1025",
@@ -123,7 +123,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1028",
@@ -141,7 +141,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1038",
@@ -159,7 +159,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1039",
@@ -177,7 +177,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1044",
@@ -195,7 +195,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1054",
@@ -213,7 +213,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1056",
@@ -231,7 +231,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1059",
@@ -249,7 +249,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1060",
@@ -267,7 +267,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1061",
@@ -285,7 +285,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1062",
@@ -303,7 +303,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1065",
@@ -321,7 +321,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1073",
@@ -339,7 +339,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1074",
@@ -357,7 +357,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1075",
@@ -375,7 +375,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1077",
@@ -393,7 +393,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1082",
@@ -411,7 +411,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1086",
@@ -429,7 +429,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1087",
@@ -447,7 +447,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1099",
@@ -465,7 +465,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1100",
@@ -483,7 +483,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1102",
@@ -501,7 +501,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1104",
@@ -519,7 +519,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1105",
@@ -537,7 +537,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1107",
@@ -555,7 +555,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1108",
@@ -573,7 +573,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1110",
@@ -591,7 +591,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1114",
@@ -609,7 +609,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1116",
@@ -627,7 +627,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1117",
@@ -645,7 +645,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1119",
@@ -663,7 +663,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1122",
@@ -681,7 +681,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1127",
@@ -699,7 +699,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1128",
@@ -717,7 +717,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1131",
@@ -735,7 +735,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1132",
@@ -753,7 +753,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1133",
@@ -771,7 +771,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1140",
@@ -789,7 +789,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1141",
@@ -807,7 +807,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1142",
@@ -825,7 +825,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1143",
@@ -843,7 +843,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1146",
@@ -861,7 +861,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1148",
@@ -879,7 +879,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1150",
@@ -897,7 +897,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1152",
@@ -915,7 +915,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1153",
@@ -933,7 +933,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1157",
@@ -951,7 +951,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1159",
@@ -969,7 +969,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1165",
@@ -987,7 +987,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1166",
@@ -1005,7 +1005,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1170",
@@ -1023,7 +1023,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1171",
@@ -1041,7 +1041,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1172",
@@ -1059,7 +1059,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1173",
@@ -1077,7 +1077,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1174",
@@ -1095,7 +1095,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1175",
@@ -1113,7 +1113,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1176",
@@ -1131,7 +1131,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1177",
@@ -1149,7 +1149,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1178",
@@ -1167,7 +1167,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1180",
@@ -1185,7 +1185,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1181",
@@ -1203,7 +1203,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1182",
@@ -1221,7 +1221,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1183",
@@ -1239,7 +1239,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1184",
@@ -1257,7 +1257,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1186",
@@ -1275,7 +1275,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1187",
@@ -1293,7 +1293,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1188",
@@ -1311,7 +1311,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1189",
@@ -1329,7 +1329,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1190",
@@ -1347,7 +1347,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1191",
@@ -1365,7 +1365,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1192",
@@ -1383,7 +1383,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1193",
@@ -1401,7 +1401,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1194",
@@ -1419,7 +1419,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1195",
@@ -1437,7 +1437,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1196",
@@ -1455,7 +1455,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1197",
@@ -1473,7 +1473,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1198",
@@ -1491,7 +1491,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1199",
@@ -1509,7 +1509,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1200",
@@ -1527,7 +1527,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1201",
@@ -1545,7 +1545,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1202",
@@ -1563,7 +1563,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1203",
@@ -1581,7 +1581,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1204",
@@ -1599,7 +1599,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1205",
@@ -1617,7 +1617,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1206",
@@ -1635,7 +1635,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1207",
@@ -1653,7 +1653,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1208",
@@ -1671,7 +1671,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1209",
@@ -1689,7 +1689,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1210",
@@ -1707,7 +1707,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1211",
@@ -1725,7 +1725,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1212",
@@ -1743,7 +1743,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1213",
@@ -1761,7 +1761,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1214",
@@ -1779,7 +1779,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1215",
@@ -1797,7 +1797,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1216",
@@ -1815,7 +1815,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1217",
@@ -1833,7 +1833,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1218",
@@ -1851,7 +1851,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1219",
@@ -1869,7 +1869,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1220",
@@ -1887,7 +1887,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1221",
@@ -1905,7 +1905,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1222",
@@ -1923,7 +1923,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1223",
@@ -1941,7 +1941,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1224",
@@ -1959,7 +1959,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1225",
@@ -1977,7 +1977,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1226",
@@ -1995,7 +1995,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1227",
@@ -2013,7 +2013,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1228",
@@ -2031,7 +2031,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1229",
@@ -2049,7 +2049,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1230",
@@ -2067,7 +2067,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1231",
@@ -2085,7 +2085,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1232",
@@ -2103,7 +2103,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1233",
@@ -2121,7 +2121,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1234",
@@ -2139,7 +2139,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1235",
@@ -2157,7 +2157,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1236",
@@ -2175,7 +2175,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1237",
@@ -2193,7 +2193,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1238",
@@ -2211,7 +2211,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1239",
@@ -2229,7 +2229,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1240",
@@ -2247,7 +2247,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1241",
@@ -2265,7 +2265,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1242",
@@ -2283,7 +2283,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1243",
@@ -2301,7 +2301,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1244",
@@ -2319,7 +2319,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1245",
@@ -2337,7 +2337,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1246",
@@ -2355,7 +2355,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1247",
@@ -2373,7 +2373,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1248",
@@ -2391,7 +2391,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1249",
@@ -2409,7 +2409,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1250",
@@ -2427,7 +2427,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1251",
@@ -2445,7 +2445,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1252",
@@ -2463,7 +2463,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1253",
@@ -2481,7 +2481,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1254",
@@ -2499,7 +2499,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1255",
@@ -2517,7 +2517,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1256",
@@ -2535,7 +2535,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1257",
@@ -2553,7 +2553,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1258",
@@ -2571,7 +2571,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1259",
@@ -2589,7 +2589,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1260",
@@ -2607,7 +2607,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1261",
@@ -2625,7 +2625,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1262",
@@ -2643,7 +2643,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1263",
@@ -2661,7 +2661,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1264",
@@ -2679,7 +2679,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_803",
@@ -2697,7 +2697,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_815",
@@ -2715,7 +2715,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_843",
@@ -2733,7 +2733,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_872",
@@ -2751,7 +2751,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_915",
@@ -2769,7 +2769,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_986",
@@ -2787,7 +2787,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1110",
@@ -2805,7 +2805,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1115",
@@ -2823,7 +2823,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1117",
@@ -2841,7 +2841,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1120",
@@ -2859,7 +2859,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1215",
@@ -2877,7 +2877,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1222",
@@ -2895,7 +2895,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1224",
@@ -2913,7 +2913,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1320",
@@ -2931,7 +2931,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1324",
@@ -2949,7 +2949,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1325",
@@ -2967,7 +2967,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1326",
@@ -2985,7 +2985,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1327",
@@ -3003,7 +3003,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1328",
@@ -3021,7 +3021,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1329",
@@ -3039,7 +3039,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1330",
@@ -3057,7 +3057,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1331",
@@ -3075,7 +3075,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1332",
@@ -3093,7 +3093,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1333",
@@ -3111,7 +3111,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1334",
@@ -3129,7 +3129,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1335",
@@ -3147,7 +3147,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1336",
@@ -3165,7 +3165,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1337",
@@ -3183,7 +3183,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1338",
@@ -3201,7 +3201,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1339",
@@ -3219,7 +3219,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1340",
@@ -3237,7 +3237,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1341",
@@ -3255,7 +3255,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1342",
@@ -3273,7 +3273,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1343",
@@ -3291,7 +3291,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1344",
@@ -3309,7 +3309,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1450",
@@ -3327,7 +3327,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1500",
@@ -3345,7 +3345,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1501",
@@ -3363,7 +3363,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1502",
@@ -3381,7 +3381,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1503",
@@ -3399,7 +3399,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1504",
@@ -3417,7 +3417,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1505",
@@ -3435,7 +3435,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1506",
@@ -3453,7 +3453,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1507",
@@ -3471,7 +3471,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1508",
@@ -3489,7 +3489,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1509",
@@ -3507,7 +3507,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1510",
@@ -3525,7 +3525,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1511",
@@ -3543,7 +3543,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1512",
@@ -3561,7 +3561,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1513",
@@ -3579,7 +3579,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1514",
@@ -3597,7 +3597,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1515",
@@ -3615,7 +3615,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1516",
@@ -3633,7 +3633,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1517",
@@ -3651,7 +3651,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1518",
@@ -3669,7 +3669,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_911",
@@ -3687,6 +3687,6 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-06"
+    "fecha_consulta": "2026-07-20"
   }
 ]

@@ -184,7 +184,7 @@ Pipeline determinista en GitHub Actions: extracción → build → verificación
 | 13 | **Indicadores Urbanos SIEDU** | 6 701 (parcial) | 🟢 live | INE / SIEDU | Datos abiertos INE | Anual |
 | 14 | **Perfil Territorial Comunal** | 346 | 🟡 fallback | chile-hub derivado | Fuentes abiertas | Derivada |
 | 15 | **Empresas (RES)** | ~1 572 116 | 🟢 live | Min. Economía / datos.gob.cl | CC-BY 3.0 CL | Mensual |
-| 16 | **Pobreza Comunal (SAE)** | 3 | 🟡 fallback | MDS / Observatorio Social | Datos abiertos MDS | Bienal/trienal |
+| 16 | **Pobreza Comunal (SAE)** | 690 | 🟢 live | MDS / Observatorio Social | Datos abiertos MDS | Bienal/trienal |
 | 17 | **Consumo Eléctrico Comunal** | 3 | 🟡 fallback | CNE / Energía Abierta | CC BY | Anual |
 | 18 | **Partidos Políticos** | 36 | 🟢 live | Cámara de Diputados | CC BY | Bajo_demanda |
 | 19 | **Autoridades Electas** | 205 | 🟢 live | Cámara de Diputados + Senado | CC BY | Bajo_demanda |

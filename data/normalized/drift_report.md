@@ -1,10 +1,10 @@
 # chile-hub drift report
 
-- `generated_at_utc`: `2026-07-08T22:02:42.124535+00:00`
+- `generated_at_utc`: `2026-07-20T01:57:09.237058+00:00`
 - `dataset_count`: `19`
 - `drifted_count`: `8`
 - `healthy_count`: `11`
-- `fallback_count`: `3`
+- `fallback_count`: `2`
 - `partial_coverage_count`: `2`
 - `degraded_count`: `0`
 
@@ -25,7 +25,7 @@
 | `indicadores_urbanos_siedu` | `drifted` | `live` | `partial` | `warning` | 1 | Revisar warnings operativos del dataset antes de consumirlo en producción. |
 | `perfil_territorial_comunal` | `drifted` | `fallback` | `full` | `none` | 0 | Ninguna. |
 | `empresas` | `drifted` | `live` | `not_applicable` | `warning` | 3 | Revisar warnings operativos del dataset antes de consumirlo en producción. |
-| `pobreza_comunal` | `drifted` | `fallback` | `not_applicable` | `warning` | 2 | Revisar warnings operativos del dataset antes de consumirlo en producción. |
+| `pobreza_comunal` | `drifted` | `live` | `not_applicable` | `warning` | 1 | Revisar warnings operativos del dataset antes de consumirlo en producción. |
 | `consumo_electrico_comunal` | `drifted` | `fallback` | `not_applicable` | `warning` | 3 | Revisar warnings operativos del dataset antes de consumirlo en producción. |
 | `partidos_politicos` | `drifted` | `live` | `full` | `warning` | 1 | Revisar warnings operativos del dataset antes de consumirlo en producción. |
 | `autoridades_electas` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
@@ -183,11 +183,11 @@
 ## pobreza_comunal
 
 - `drift_status`: `drifted`
-- `source_mode`: `fallback`
+- `source_mode`: `live`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
-- `degradation`: cobertura SAE: 2/346 comunas (0.6%) — parcial por diseño; comunas sin muestra no tienen estimación; pobreza_comunal source_mode is fallback; usando datos de muestra mínima.
-- `warning_count`: `2`
-- `diagnostic_summary`: cobertura SAE: 2/346 comunas (0.6%) — parcial por diseño; comunas sin muestra no tienen estimación
+- `degradation`: cobertura SAE: 345/346 comunas (99.7%) — parcial por diseño; comunas sin muestra no tienen estimación
+- `warning_count`: `1`
+- `diagnostic_summary`: cobertura SAE: 345/346 comunas (99.7%) — parcial por diseño; comunas sin muestra no tienen estimación
 - `recommended_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.
 
 ## consumo_electrico_comunal

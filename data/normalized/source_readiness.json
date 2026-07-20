@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-07-08T22:02:42.124535+00:00",
+  "generated_at_utc": "2026-07-20T01:57:09.237058+00:00",
   "dataset_count": 21,
   "stable_count": 17,
   "candidate_count": 3,
@@ -362,7 +362,7 @@
       "official_url": "https://observatorio.ministeriodesarrollosocial.gob.cl/pobreza-comunal-2022",
       "access_method": "xlsx",
       "license_status": "open-attribution",
-      "source_mode": "fallback",
+      "source_mode": "live",
       "source_detail": "Estimaciones de Pobreza Comunal vía SAE desde encuesta CASEN",
       "live_ready": true,
       "fallback_allowed": true,
