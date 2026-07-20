@@ -1,10 +1,10 @@
 {
-  "publish_input": false,
-  "require_live": false,
+  "publish_input": true,
+  "require_live": true,
   "source_ref": "refs/heads/main",
-  "source_run_event": "push",
-  "source_run_id": "29111972950",
-  "source_sha": "bd42251073dd9db0112de758c687e6537ed5db8d",
-  "verification_profile": "readiness",
+  "source_run_event": "workflow_dispatch",
+  "source_run_id": "29762982811",
+  "source_sha": "a04fe3fe1314adc6aa3d9b44bb798a24c81cd295",
+  "verification_profile": "publication",
   "workflow": "Pipeline Check"
 }
