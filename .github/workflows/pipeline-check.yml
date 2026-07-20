@@ -163,7 +163,13 @@ jobs:
             python src/extractors/pobreza_extractor.py
             python src/extractors/consumo_electrico_extractor.py
             python src/extractors/partidos_politicos_extractor.py
-            python src/extractors/autoridades_electas_extractor.py
+            # autoridades_electas necesita scrapling (anti-403 en camara.cl/senado.cl),
+            # que no puede coexistir con el extra dev en el venv del job (conflicto
+            # de click via python-semantic-release — ver pyproject.toml). Se ejecuta
+            # en un entorno efímero de uv en vez del venv del proyecto. Sin esto, un
+            # cache-miss produce 155 registros (0 senadores) y el paso
+            # "Check build-synced files" aborta el publish diario (2026-07-19/20).
+            PYTHONPATH=src uv run --no-project --with "scrapling[fetchers]" --with polars --with requests --with structlog --with tenacity --with curl_cffi python src/extractors/autoridades_electas_extractor.py
           fi
 
       - name: Restore versioned SINIM snapshot

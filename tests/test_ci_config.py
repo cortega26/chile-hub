@@ -67,6 +67,48 @@ class SinimDailyJobGuardrailTests(unittest.TestCase):
         self.assertNotIn('git add "$path"', content)
 
 
+class AutoridadesElectasScraplingGuardrailTests(unittest.TestCase):
+    """Regresión: en el job diario de Pipeline Check (cache-miss → extracción
+    completa), autoridades_electas_extractor.py corría con el python del venv
+    del job, que no puede incluir scrapling (el extra scraping conflicta con
+    dev vía click — ver pyproject.toml). El extractor degradaba a 155 registros
+    (155 diputados, 0 senadores) mientras lo publicado tiene 205 (155+50), y el
+    paso "Check build-synced files" abortó los schedule de 2026-07-19 y
+    2026-07-20 bloqueando el publish diario. Fix: invocar el extractor vía
+    `uv run --no-project` (entorno efímero con scrapling).
+    """
+
+    def test_daily_extract_uses_ephemeral_scrapling_env_for_autoridades(self):
+        content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        ephemeral_lines = [
+            line
+            for line in content.splitlines()
+            if "autoridades_electas_extractor.py" in line and "uv run --no-project" in line
+        ]
+        self.assertTrue(
+            ephemeral_lines,
+            "pipeline-check.yml debe invocar autoridades_electas_extractor.py "
+            "vía `uv run --no-project` (entorno efímero con scrapling) — el "
+            "venv del job no puede incluirlo (conflicto de click).",
+        )
+        self.assertIn("scrapling[fetchers]", ephemeral_lines[0])
+
+    def test_no_bare_venv_invocation_of_autoridades_electas_remains(self):
+        content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        bare = [
+            line.strip()
+            for line in content.splitlines()
+            if line.strip() == "python src/extractors/autoridades_electas_extractor.py"
+        ]
+        self.assertEqual(
+            bare,
+            [],
+            "Queda una invocación directa (venv) de "
+            "autoridades_electas_extractor.py — sin scrapling degrada a "
+            "155 registros (0 senadores) y rompe el publish diario.",
+        )
+
+
 class MkDocsReferenceSlugGuardrailTests(unittest.TestCase):
     """Regresión: la documentación se publica bajo /reference/ y la página de
     API también se llamaba reference.md, por lo que los enlaces generados desde

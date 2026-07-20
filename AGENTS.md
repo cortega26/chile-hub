@@ -218,6 +218,15 @@ codegraph impact validate_comunas                   # Qué se rompe si cambio es
              pipeline diario — nunca invocarlo desde un job programado (ver
              `tests/test_ci_config.py::SinimDailyJobGuardrailTests`).
 
+             Nota CI — `autoridades_electas`: en `pipeline-check.yml` este extractor
+             se invoca vía `uv run --no-project --with "scrapling[fetchers]" …`
+             (entorno efímero), porque scrapling no puede coexistir con el extra
+             `dev` en el venv del job (conflicto de `click` — ver `pyproject.toml`).
+             Sin scrapling el extractor degrada a 155 registros (0 senadores) y el
+             guard "Check build-synced files" aborta el publish diario (regresión
+             2026-07-19/20; ver
+             `tests/test_ci_config.py::AutoridadesElectasScraplingGuardrailTests`).
+
 2. BUILD     src/build_dev_db.py
              Lee: data/staging/
              → Produce: data/normalized/ (todos los artefactos)
