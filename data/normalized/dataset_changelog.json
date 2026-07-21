@@ -1,6 +1,6 @@
 {
-  "generated_at_utc": "2026-07-20T17:19:49.387572+00:00",
-  "previous_generated_at_utc": "2026-07-20T01:57:09.237058+00:00",
+  "generated_at_utc": "2026-07-21T10:44:52.718145+00:00",
+  "previous_generated_at_utc": "2026-07-20T17:19:49.387572+00:00",
   "dataset_count": 19,
   "datasets": [
     {
@@ -226,8 +226,8 @@
     {
       "dataset": "indicadores",
       "previous_record_count": 504,
-      "current_record_count": 504,
-      "record_count_delta": 0,
+      "current_record_count": 506,
+      "record_count_delta": 2,
       "added_fields": [],
       "removed_fields": [],
       "previous_source_mode": "live",
@@ -236,7 +236,7 @@
       "current_freshness_status": "fresh",
       "previous_validation_status": "ok",
       "current_validation_status": "ok",
-      "change_severity": "none",
+      "change_severity": "patch",
       "breaking_changes": [],
       "new_columns": [],
       "removed_columns": [],
