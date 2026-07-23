@@ -19,6 +19,19 @@ if str(SRC_DIR) not in sys.path:
 
 from chile_hub import pipeline_status_utils as _pipeline_canonical
 from scripts import package_publishable_bundle
+from scripts.fetch_adoption_stats import (
+    build_badge as build_adoption_badge,
+)
+from scripts.fetch_adoption_stats import (
+    build_payload as build_adoption_payload,
+)
+from scripts.fetch_adoption_stats import (
+    load_offline_fixture as load_adoption_offline_fixture,
+)
+from scripts.fetch_adoption_stats import (
+    parse_pypi_stats,
+    sum_github_downloads,
+)
 from scripts.verify_pipeline import (
     UTC,
     _verify_stagnation,
@@ -2965,6 +2978,81 @@ class DocSyncTests(unittest.TestCase):
 
         changed = doc_sync.sync_all_docs(check_only=True)
         self.assertIsInstance(changed, list)
+
+
+class AdoptionStatsTests(unittest.TestCase):
+    """Tests sin red del parseo/construcción de la señal de adopción (Plan 052).
+
+    Sólo ejercitan funciones puras sobre el fixture offline; el fetch real de
+    red (pypistats.org, api.github.com) no se testea aquí a propósito (no
+    determinista, depende de servicios externos) — ver `--offline` en
+    `scripts/fetch_adoption_stats.py`.
+    """
+
+    FIXTURE_PATH = ROOT_DIR / "tests" / "fixtures" / "adoption_sample.json"
+
+    def _load_fixture(self):
+        return json.loads(self.FIXTURE_PATH.read_text(encoding="utf-8"))
+
+    def test_adoption_parse_pypi_stats_happy_path_from_fixture(self):
+        fixture = self._load_fixture()
+        stats = parse_pypi_stats(fixture["pypi_recent"])
+        self.assertEqual(stats, {"last_day": 41, "last_week": 310, "last_month": 1234})
+
+    def test_adoption_sum_github_downloads_happy_path_from_fixture(self):
+        fixture = self._load_fixture()
+        total = sum_github_downloads(fixture["github_releases"])
+        self.assertEqual(total, 567)
+
+    def test_adoption_parse_pypi_stats_degrades_gracefully_when_source_missing(self):
+        stats = parse_pypi_stats(None)
+        self.assertEqual(stats, {"last_day": None, "last_week": None, "last_month": None})
+
+    def test_adoption_sum_github_downloads_degrades_gracefully_when_source_missing(self):
+        self.assertEqual(sum_github_downloads(None), 0)
+        self.assertEqual(sum_github_downloads([]), 0)
+
+    def test_adoption_badge_uses_pypi_last_month_when_present(self):
+        badge = build_adoption_badge(1234)
+        self.assertEqual(badge["schemaVersion"], 1)
+        self.assertEqual(badge["label"], "instalaciones/mes")
+        self.assertEqual(badge["message"], "1234")
+        self.assertIn("color", badge)
+
+    def test_adoption_badge_degrades_to_nd_without_raising_when_pypi_missing(self):
+        badge = build_adoption_badge(None)
+        self.assertEqual(badge["schemaVersion"], 1)
+        self.assertEqual(badge["message"], "n/d")
+        self.assertIn("label", badge)
+        self.assertIn("color", badge)
+
+    def test_adoption_payload_contains_pypi_and_github_releases_keys(self):
+        fixture = self._load_fixture()
+        pypi_stats = parse_pypi_stats(fixture["pypi_recent"])
+        github_total = sum_github_downloads(fixture["github_releases"])
+        payload = build_adoption_payload(pypi_stats, github_total)
+        self.assertIn("generated_at_utc", payload)
+        self.assertEqual(payload["pypi"], pypi_stats)
+        self.assertEqual(payload["github_releases"], {"total_downloads": 567})
+
+    def test_adoption_offline_fixture_end_to_end_matches_shields_contract(self):
+        pypi_recent, github_releases = load_adoption_offline_fixture(self.FIXTURE_PATH)
+        pypi_stats = parse_pypi_stats(pypi_recent)
+        github_total = sum_github_downloads(github_releases)
+        badge = build_adoption_badge(pypi_stats["last_month"])
+
+        self.assertEqual(
+            badge,
+            {
+                "schemaVersion": 1,
+                "label": "instalaciones/mes",
+                "message": "1234",
+                "color": "blue",
+                "namedLogo": "pypi",
+                "cacheSeconds": 86400,
+            },
+        )
+        self.assertEqual(github_total, 567)
 
 
 class ExcelGuardTests(unittest.TestCase):

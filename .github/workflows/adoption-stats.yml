@@ -1,0 +1,74 @@
+name: Adoption Stats (PyPI + GitHub Releases)
+
+on:
+  schedule:
+    # Cada lunes, 04:00 UTC (00:00 CLT / 01:00 CLST)
+    - cron: "0 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write  # Para commit automático de la señal de adopción
+
+env:
+  PYTHON_VERSION: "3.13"
+
+concurrency:
+  group: adoption-stats
+  cancel-in-progress: false
+
+jobs:
+  fetch-adoption-stats:
+    name: Descargas PyPI + GitHub Releases
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@d31148d669074a8d0a63714ba94f3201e7020bc3 # v8.3.0
+        with:
+          enable-cache: true
+
+      - name: Fetch adoption stats (PyPI + GitHub Releases)
+        id: fetch
+        continue-on-error: true
+        run: |
+          uv run python scripts/fetch_adoption_stats.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Report fetch failure (non-blocking)
+        if: steps.fetch.outcome == 'failure'
+        run: |
+          echo "⚠️ El script de adopción falló de forma inesperada (no debería — degrada con gracia)."
+          echo "Revisar manualmente scripts/fetch_adoption_stats.py y los logs de este paso."
+          # No hacemos exit 1 — una señal informativa caída no debe romper el workflow.
+
+      - name: Commit updated adoption stats (if changed)
+        if: steps.fetch.outcome == 'success'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/normalized/adoption.json data/normalized/adoption_badge.json
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore(data): refresh adoption stats [skip ci]"
+            git push
+          fi
+
+      - name: Summary
+        run: |
+          echo "## Adoption Stats — $(date -u +%Y-%m-%d)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.fetch.outcome }}" = "success" ]; then
+            echo "✅ Señal de adopción actualizada (PyPI + GitHub Releases)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Fetch falló — revisar manualmente" >> $GITHUB_STEP_SUMMARY
+          fi
