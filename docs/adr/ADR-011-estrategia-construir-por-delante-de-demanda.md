@@ -1,7 +1,7 @@
 # ADR-011: Estrategia — construir capacidad por delante de la demanda
 
 **Fecha:** 2026-07-23
-**Estado:** proposed
+**Estado:** accepted (ratificado por Carlos Ortega, mantenedor, 2026-07-23)
 **Decision:** Se autoriza construir capacidad de producto por delante de la demanda ("crear la oferta para generar la demanda"), matizando el anti-patrón #10 (`AGENTS.md:714`, "Inflar el MVP con más datasets antes de validar adopción") para un subconjunto acotado de trabajo.
 
 ## Contexto
@@ -69,9 +69,9 @@ evita que esto se convierta en barra libre para inflar el catálogo:
 
 ## Ratificación
 
-Estado `proposed`: esta ADR fue escrita por un agente ejecutando el Step 0 del Plan 053. La
-decisión de estrategia de producto que documenta ya fue autorizada verbalmente por el
-mantenedor (`plans/README.md`, 2026-07-14), pero requiere su ratificación explícita
-(`proposed` → `accepted`) antes de que el resto del Plan 053 (Steps 2-5, entregable de datos) se
-considere autorizado para publicación. El gate de licencia del Step 1 (ADR-012) es independiente
-de esta ratificación y puede ejecutarse en paralelo — es una compuerta técnica distinta.
+Esta ADR fue escrita en estado `proposed` por un agente ejecutando el Step 0 del Plan 053. La
+decisión de estrategia de producto que documenta ya había sido autorizada verbalmente por el
+mantenedor (`plans/README.md`, 2026-07-14). **Ratificada explícitamente** (`proposed` →
+`accepted`) por Carlos Ortega, mantenedor, el 2026-07-23, habilitando el resto del Plan 053
+(Steps 2-5, entregable de datos). El gate de licencia del Step 1 (ADR-012) es una compuerta
+técnica independiente, ya resuelta por separado (PASA).
