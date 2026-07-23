@@ -90,7 +90,7 @@ chile-hub/
 │
 ├── src/
 <!-- START_AGENTS_EXTRACTOR_LIST -->
-│   ├── extractors/                 18 extractores por dataset + 4 módulos compartidos (ver nota abajo)
+│   ├── extractors/                 19 extractores por dataset + 4 módulos compartidos (ver nota abajo)
 │   │   ├── base.py                                       BaseExtractor ABC (contrato para todos los extractores)
 │   │   ├── http_utils.py                                 Reintentos/backoff HTTP compartidos
 │   │   ├── region_utils.py                               Normalización de nombres de región compartida
@@ -103,6 +103,7 @@ chile-hub/
 │   │   ├── censo_hogares_viviendas_extractor.py          Censo 2024 — hogares y viviendas (INE) → data/staging/
 │   │   ├── consumo_electrico_extractor.py                Consumo eléctrico comunal (CNE) → data/staging/
 │   │   ├── electoral_extractor.py                        Distritos electorales (BCN/SERVEL) → data/staging/
+│   │   ├── geometria_comunal_extractor.py                Geometría comunal — límites poligonales (BCN ArcGIS); carril `candidate` → data/staging/
 │   │   ├── mineduc_establecimientos_extractor.py         Establecimientos educacionales (MINEDUC) → data/staging/
 │   │   ├── mineduc_resultados_extractor.py               Resultados educacionales agregados (MINEDUC) → data/staging/
 │   │   ├── partidos_politicos_extractor.py               Partidos políticos vigentes (SERVEL) → data/staging/
