@@ -3107,6 +3107,38 @@ class ExcelGuardTests(unittest.TestCase):
             self.assertNotIn("test_oversized", wb.sheetnames)
 
 
+class NormalizeComunaNameTests(unittest.TestCase):
+    """Tests para src/chile_hub/text.py::normalize_comuna_name (Plan 050, ADR-009).
+
+    No requiere data/normalized/ — es una función pura sobre strings.
+    """
+
+    def test_strips_accents_and_enye(self):
+        from src.chile_hub.text import normalize_comuna_name
+
+        self.assertEqual(normalize_comuna_name("Ñuñoa"), "nunoa")
+
+    def test_uppercase_with_accent(self):
+        from src.chile_hub.text import normalize_comuna_name
+
+        self.assertEqual(normalize_comuna_name("CONCÓN"), "concon")
+
+    def test_strips_surrounding_whitespace(self):
+        from src.chile_hub.text import normalize_comuna_name
+
+        self.assertEqual(normalize_comuna_name("  Concón "), "concon")
+
+    def test_already_clean_string_unchanged(self):
+        from src.chile_hub.text import normalize_comuna_name
+
+        self.assertEqual(normalize_comuna_name("santiago"), "santiago")
+
+    def test_empty_string(self):
+        from src.chile_hub.text import normalize_comuna_name
+
+        self.assertEqual(normalize_comuna_name(""), "")
+
+
 if __name__ == "__main__":
     import pytest
 

@@ -510,5 +510,65 @@ class ChileHubSQLTests(unittest.TestCase):
             self.assertIn("chile-hub[query]", str(ctx.exception))
 
 
+class ChileHubResolveComunasTests(unittest.TestCase):
+    """Tests para ChileHub.resolve_comunas() (Plan 050, ADR-009)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.hub = _hub()
+
+    def test_resolve_comunas_happy_path(self):
+        """Un nombre conocido resuelve a su codigo CUT de 5 caracteres."""
+        result = self.hub.resolve_comunas(["Ñuñoa"])
+        row = result.to_dicts()[0]
+        self.assertTrue(row["matched"])
+        self.assertEqual(len(row["codigo_comuna"]), 5)
+        self.assertEqual(row["nombre_comuna"], "Ñuñoa")
+
+    def test_resolve_comunas_no_match_returns_null_without_raising(self):
+        """Un nombre inexistente devuelve matched=False y codigos null, sin excepcion."""
+        result = self.hub.resolve_comunas(["No Existe Como Comuna"])
+        row = result.to_dicts()[0]
+        self.assertFalse(row["matched"])
+        self.assertIsNone(row["codigo_comuna"])
+        self.assertIsNone(row["nombre_comuna"])
+        self.assertIsNone(row["codigo_region"])
+
+    def test_resolve_comunas_preserves_order_and_duplicates(self):
+        """El orden y los duplicados del input se preservan fila a fila."""
+        result = self.hub.resolve_comunas(["Ñuñoa", "Ñuñoa", "Concón"])
+        self.assertEqual(result.height, 3)
+        rows = result.to_dicts()
+        self.assertEqual(rows[0]["input"], "Ñuñoa")
+        self.assertEqual(rows[1]["input"], "Ñuñoa")
+        self.assertEqual(rows[2]["input"], "Concón")
+        self.assertEqual(rows[0]["codigo_comuna"], rows[1]["codigo_comuna"])
+
+    def test_resolve_comunas_codigo_comuna_is_pl_string(self):
+        """Invariante CUT: codigo_comuna nunca es int, siempre pl.String."""
+        result = self.hub.resolve_comunas(["Ñuñoa"])
+        self.assertEqual(result.schema["codigo_comuna"], pl.String)
+
+    def test_normalize_matches_published_nombre_comuna_clean(self):
+        """Guardrail anti-divergencia: normalize_comuna_name debe reproducir
+        exactamente nombre_comuna_clean para las 346 comunas publicadas. Si
+        diverge, resolve_comunas normalizaria el input del usuario distinto
+        a como se construyo nombre_comuna_clean, produciendo no-matches
+        silenciosos contra datos publicados."""
+        from chile_hub.text import normalize_comuna_name
+
+        comunas = self.hub.load_polars("comunas")
+        for row in comunas.iter_rows(named=True):
+            self.assertEqual(
+                normalize_comuna_name(row["nombre_comuna"]),
+                row["nombre_comuna_clean"],
+                msg=(
+                    f"divergencia en {row['codigo_comuna']}: "
+                    f"{normalize_comuna_name(row['nombre_comuna'])!r} != "
+                    f"{row['nombre_comuna_clean']!r}"
+                ),
+            )
+
+
 if __name__ == "__main__":
     unittest.main()
