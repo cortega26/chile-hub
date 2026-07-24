@@ -88,6 +88,16 @@ ver Preguntas abiertas #4 para el seguimiento.
   divergen. El acople real (DRY) queda como follow-up (ver Maintenance notes
   del plan 050).
 
+  **Una divergencia intencional ya existe y es segura**: `normalize_comuna_name`
+  recorta espacios al borde (`.strip()`) antes de normalizar; la cadena Polars
+  del extractor no lo hace (no lo necesita: `nombre_comuna` ya llega limpio de
+  BCN). El recorte no puede producir un match falso (ninguna comuna publicada
+  tiene espacios al borde en su forma limpia hoy) y existe para tolerar input de
+  usuario tipeado a mano, el caso de uso real de `resolve_comunas`. Documentado
+  en el docstring de `text.py`; cubierto por un test dedicado en
+  `tests/test_pipeline_logic.py` (separado del test de paridad, que sólo
+  verifica el resto de la cadena contra datos reales sin espacios al borde).
+
 ## Preguntas abiertas
 
 1. **¿Se agrega un modo fuzzy opcional (`method="fuzzy"`) con edit-distance?**
