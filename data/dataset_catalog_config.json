@@ -5,6 +5,7 @@
       "codigo_region"
     ],
     "confidence_tier": "Tier B",
+    "extractor": "src/extractors/subdere_extractor.py",
     "expected_record_count": 16,
     "reuse_policy": {
       "status": "open-attribution",
@@ -39,6 +40,7 @@
       "codigo_region"
     ],
     "confidence_tier": "Tier B",
+    "extractor": "src/extractors/subdere_extractor.py",
     "expected_record_count": 56,
     "reuse_policy": {
       "status": "open-attribution",
@@ -73,6 +75,7 @@
       "codigo_region"
     ],
     "confidence_tier": "Tier B",
+    "extractor": "src/extractors/subdere_extractor.py",
     "expected_record_count": 346,
     "reuse_policy": {
       "status": "open-attribution",
@@ -107,6 +110,7 @@
       "codigo_comuna"
     ],
     "confidence_tier": "Tier B",
+    "extractor": "src/extractors/subdere_extractor.py",
     "expected_record_count": 346,
     "reuse_policy": {
       "status": "open-attribution",
@@ -141,6 +145,7 @@
       "codigo_indicador"
     ],
     "confidence_tier": "Tier A/B",
+    "extractor": "src/extractors/bcentral_extractor.py",
     "reuse_policy": {
       "status": "open-attribution",
       "license": "Reproducción libre con citación (BCCh / INE)",
@@ -174,6 +179,7 @@
       "codigo_region"
     ],
     "confidence_tier": "Tier A",
+    "extractor": "src/extractors/censo_extractor.py",
     "expected_record_count": 346,
     "reuse_policy": {
       "status": "open-attribution",
@@ -208,6 +214,7 @@
       "codigo_region"
     ],
     "confidence_tier": "Tier A",
+    "extractor": "src/extractors/censo_hogares_viviendas_extractor.py",
     "expected_record_count": 346,
     "reuse_policy": {
       "status": "open-attribution",
@@ -239,6 +246,7 @@
       "codigo_comuna"
     ],
     "confidence_tier": "Tier A",
+    "extractor": "src/extractors/salud_extractor.py",
     "reuse_policy": {
       "status": "open-attribution",
       "license": "CC0",
@@ -271,6 +279,7 @@
       "codigo_comuna"
     ],
     "confidence_tier": "Tier A",
+    "extractor": "src/extractors/electoral_extractor.py",
     "expected_record_count": 346,
     "reuse_policy": {
       "status": "open-attribution",
@@ -301,6 +310,7 @@
       "codigo_comuna"
     ],
     "confidence_tier": "Tier A",
+    "extractor": "src/extractors/mineduc_establecimientos_extractor.py",
     "reuse_policy": {
       "status": "open-attribution",
       "license": "CC-BY-3.0",
@@ -334,6 +344,10 @@
       "codigo_comuna"
     ],
     "confidence_tier": "Tier B",
+    "extractor": [
+      "src/extractors/sinim_finanzas_extractor.py",
+      "src/extractors/sinim_finanzas_live_extractor.py"
+    ],
     "coverage_note": "parcial_candidato_3_de_346_comunas",
     "coverage_pct": 0.9,
     "expected_record_count": 346,
@@ -370,6 +384,7 @@
       "codigo_comuna"
     ],
     "confidence_tier": "Tier B",
+    "extractor": "src/extractors/mineduc_resultados_extractor.py",
     "reuse_policy": {
       "status": "open-attribution",
       "license": "CC-BY-3.0",
@@ -404,6 +419,7 @@
       "codigo_indicador"
     ],
     "confidence_tier": "Tier B",
+    "extractor": "src/extractors/siedu_extractor.py",
     "reuse_policy": {
       "status": "open-attribution",
       "license": "Licencia de Datos Abiertos INE",
@@ -436,6 +452,7 @@
       "codigo_comuna"
     ],
     "confidence_tier": "Tier B",
+    "extractor": null,
     "expected_record_count": 346,
     "reuse_policy": {
       "status": "open-attribution",
@@ -469,6 +486,7 @@
       "rut"
     ],
     "confidence_tier": "Tier B",
+    "extractor": "src/extractors/res_extractor.py",
     "reuse_policy": {
       "status": "open-attribution",
       "license": "CC-BY",
@@ -501,6 +519,7 @@
       "codigo_region"
     ],
     "confidence_tier": "Tier A",
+    "extractor": "src/extractors/pobreza_extractor.py",
     "expected_record_count": null,
     "reuse_policy": {
       "status": "open-attribution",
@@ -532,6 +551,7 @@
       "codigo_region"
     ],
     "confidence_tier": "Tier C",
+    "extractor": "src/extractors/consumo_electrico_extractor.py",
     "expected_record_count": null,
     "reuse_policy": {
       "status": "open-attribution",
@@ -562,6 +582,7 @@
       "codigo_comuna"
     ],
     "confidence_tier": "Tier B",
+    "extractor": "src/extractors/geometria_comunal_extractor.py",
     "expected_record_count": 345,
     "reuse_policy": {
       "status": "open-attribution",
@@ -588,6 +609,7 @@
       "codigo_comuna"
     ],
     "confidence_tier": "Tier C",
+    "extractor": "src/extractors/cead_delincuencia_live_extractor.py",
     "expected_record_count": null,
     "reuse_policy": {
       "status": "public-api-review-terms",
@@ -613,6 +635,7 @@
       "id_partido"
     ],
     "confidence_tier": "Tier B",
+    "extractor": "src/extractors/partidos_politicos_extractor.py",
     "expected_record_count": 36,
     "reuse_policy": {
       "status": "open-attribution",
@@ -645,6 +668,7 @@
       "codigo_region"
     ],
     "confidence_tier": "Tier B",
+    "extractor": "src/extractors/autoridades_electas_extractor.py",
     "expected_record_count": 205,
     "reuse_policy": {
       "status": "open-attribution",
@@ -676,6 +700,7 @@
       "codigo_comuna"
     ],
     "confidence_tier": "Tier B",
+    "extractor": "src/extractors/autoridades_locales_extractor.py",
     "expected_record_count": 362,
     "reuse_policy": {
       "status": "open-attribution",
