@@ -114,15 +114,20 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 | 051 | [Capa de acceso HTTP estática + catálogo DCAT `data.json`](051-static-http-access-and-dcat-catalog.md) | P2 | M | LOW | — | TODO — spike: contrato + `ADR-010` + prototipo generador DCAT + fix `from_datapackage(url)` + docs. Sólo archivos estáticos, sin servidor. |
 | 053 | [Geometría comunal (GeoParquet) + `resolve_by_coords()` reverse geocoding](053-comuna-geometry-and-reverse-geocoding.md) | **P1** | L | MED | — (complementa 050) | 🔶 Steps 0-3 ✓ (2026-07-23) — ADR-011 **ratificado** (accepted) por Carlos Ortega. ADR-012 (`accepted`): gate de licencia PASA (fuente `tematico/Comunas_Generalizadas` en `arcgiswebad.bcn.cl`, uso libre con atribución). Extractor (345/346 comunas, fallback Magallanes), validador y writer GeoParquet 1.0 (WKB, EPSG:4326) implementados; carril `candidate`/`bajo_demanda` **fuera** de `make extract`/`build_dev_db.py` (patrón `delincuencia_comunal`), script standalone `scripts/build_geometria_comunal.py`. Commit `56cd9d5` en worktree `worktree-053-comuna-geometry`. Suite completa (681 tests) sin regresiones. **Pendiente**: el artefacto GeoParquet (5.1 MB) aún **no está publicado** — excede el límite de 500 KB de `check-added-large-files`, requiere decisión (subir el límite o workflow de CI dedicado, como `empresas.parquet`). Step 4 (`resolve_by_coords()`, extra `[geo]`) y el wiring de CI de Step 5 quedan **diferidos** a una sesión futura. |
 | 054 | [Validación de anomalías temporales sobre series numéricas](054-temporal-anomaly-validation-numeric-series.md) | P2 | M | MED | — | TODO — foso de confianza (no generador de demanda; respalda 053). Anomalía = warning + flag de drift + gate de publicación override-able, **nunca** `SystemExit` del build. Alcance inicial: `indicadores`. |
-| 055 | [Overhaul tipográfico: legibilidad profesional de datos](055-typography-and-readability-overhaul.md) | **P1** | M | LOW | — | DONE — Source Serif 4, Inter, and JetBrains Mono integrated in `index.html`; Google Fonts link updated; verified with `make verify-landing` and CI checks; commit in `advisor/055-typography-overhaul`. |
-| 056 | [Ritmo visual, espaciado y jerarquía de secciones](056-visual-rhythm-spacing-hierarchy.md) | P2 | M | LOW | 055 | DONE — header sticky con backdrop blur; 3 tiers de espaciado (`--space-section-tight/normal/loose`) con overrides contextuales; separadores `::before` en `.section-shell` y `.manifesto`; verificado con `make verify-landing`, `make lint`, `make format-check`, `make doctor`; commits en `advisor/056-visual-rhythm-spacing`. |
 | 057 | [Skeleton loading states + polish de interacción](057-loading-skeletons-and-interaction-polish.md) | P2 | M | LOW | — (055 recomendado) | TODO — skeletons para catálogo y KPIs, empty state de búsqueda, tarjetas clickeables, tecla Escape en drawer. |
 | 058 | [Campo `extractor` en el catálogo + tabla de extractores auto-generada en README](058-catalogo-campo-extractor-y-tabla-readme.md) | P2 | M | LOW | — | TODO — cierra el hueco que `AGENTS.md §12` nombra explícito: campo `extractor` en las 21 entradas + validación en `check_companion_paths registry` + `sync_readme_extractor_table()`. Disjunto de 050–057. |
 | 059 | [Publicación del bundle en Hugging Face Hub](059-publicacion-huggingface-hub.md) | P2 | M | MED | — (052 recomendado antes, no gate) | TODO — canal de *descubrimiento* (complementa 051 = capa de acceso). Script `--dry-run` + job `hf-publish` en `pypi-release.yml` + dataset card. Requiere secret `HF_TOKEN` (paso manual del mantenedor). Carril `candidate` excluido por construcción. |
-| 060 | [Notebook flagship — cruce multi-capa por `codigo_comuna`](060-notebook-flagship-cruce-capas.md) | P2 | S | LOW | — | DONE — `examples/notebooks/04_perfil_territorial_pobreza.ipynb` created and verified to run successfully on Python 3 with clean outputs; joins `perfil_territorial_comunal`, `pobreza_comunal`, and `resultados_educacionales`; commit in `advisor/060-flagship-notebook`. |
-| 061 | [Quickstart de consumo desde R (arrow + duckdb)](061-quickstart-r.md) | P3 | S | LOW | — | DONE — `docs/r-quickstart.md` created, nav entry added, `docs/installation.md` updated, checked with `make doctor` and `make docs-build`. |
-| 062 | [Playbook de contribución de extractores](062-playbook-contribucion-extractores.md) | P3 | S | LOW | — | DONE — sección `## Contribuir un extractor (dataset nuevo)` añadida a `CONTRIBUTING.md`; checklist 8-pasos + encuadre + nota de expectativa; `make doctor` exit 0; commit `928cec1` en `advisor/062-extractor-contribution-playbook`. |
 | 063 | [Historial de salud del hub + sparkline en landing](063-historial-salud-hub.md) | P3 | M | MED | — (054 recomendado antes) | TODO — `hub_health_history.jsonl` append-only (cap 400, idempotente por timestamp) + sparkline SVG en el dashboard. Primer artefacto acumulativo del pipeline — Step 1 verifica la premisa de persistencia con un probe. |
+
+## Planes archivados (2026-07-24)
+
+| # | Plan | Esfuerzo | Riesgo | Estado |
+|---|------|----------|--------|--------|
+| 055 | [Overhaul tipográfico: legibilidad profesional de datos](archive/055-typography-and-readability-overhaul.md) | M | LOW | DONE — Source Serif 4, Inter, and JetBrains Mono integrated in `index.html`; Google Fonts link updated; verified with `make verify-landing` and CI checks; commit in `advisor/055-typography-overhaul`. |
+| 056 | [Ritmo visual, espaciado y jerarquía de secciones](archive/056-visual-rhythm-spacing-hierarchy.md) | M | LOW | DONE — header sticky con backdrop blur; 3 tiers de espaciado (`--space-section-tight/normal/loose`) con overrides contextuales; separadores `::before` en `.section-shell` y `.manifesto`; verificado con `make verify-landing`, `make lint`, `make format-check`, `make doctor`; commits en `advisor/056-visual-rhythm-spacing`; mergeado a `main` en `8259e09`. |
+| 060 | [Notebook flagship — cruce multi-capa por `codigo_comuna`](archive/060-notebook-flagship-cruce-capas.md) | S | LOW | DONE — `examples/notebooks/04_perfil_territorial_pobreza.ipynb` created and verified to run successfully on Python 3 with clean outputs; joins `perfil_territorial_comunal`, `pobreza_comunal`, and `resultados_educacionales`; commit in `advisor/060-flagship-notebook`. |
+| 061 | [Quickstart de consumo desde R (arrow + duckdb)](archive/061-quickstart-r.md) | S | LOW | DONE — `docs/r-quickstart.md` created, nav entry added, `docs/installation.md` updated, checked with `make doctor` and `make docs-build`. |
+| 062 | [Playbook de contribución de extractores](archive/062-playbook-contribucion-extractores.md) | S | LOW | DONE — sección `## Contribuir un extractor (dataset nuevo)` añadida a `CONTRIBUTING.md`; checklist 8-pasos + encuadre + nota de expectativa; `make doctor` exit 0; commit `928cec1` en `advisor/062-extractor-contribution-playbook`. |
 
 ## Planes archivados (2026-07-23)
 
@@ -296,6 +301,15 @@ Auditoría /improve next 2026-07-18 (058–063) — dirección, canales y superf
 **020** DONE ✅ (explorador SQL DuckDB-Wasm en la landing, 2026-07-10).
 
 ## Orden de ejecución recomendado
+
+> **Actualización 2026-07-24**: 055, 056, 060, 061 y 062 quedaron `DONE` y se archivaron
+> (ver "Planes archivados (2026-07-24)"). El resto de la secuencia de abajo (redactada
+> 2026-07-18) sigue válida tal cual para los planes que quedan activos — sólo se
+> saltan los pasos ya archivados al recorrerla. Carril A activo: 050, 051, 053 (🔶
+> Steps 0-3 done, Step 4/5 diferidos), 054. Carril B activo: sólo 057. Carril C activo:
+> 058, 059, 063. Ejecución inline y secuencial de aquí en más (sin worktrees paralelos
+> por plan) — ver `spec.md`/`todo.md` en la raíz del repo para el orden concreto elegido
+> esta sesión.
 
 **Planes activos (050–063) — tres carriles paralelos (actualizado 2026-07-18):**
 
