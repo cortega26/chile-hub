@@ -8,6 +8,7 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 DATASET_CATALOG_PATH = ROOT_DIR / "data" / "dataset_catalog_config.json"
 CONTRACTS_DIR = ROOT_DIR / "contracts" / "datasets"
 DOCS_DIR = ROOT_DIR / "docs" / "datasets"
+EXTRACTORS_DIR = ROOT_DIR / "src" / "extractors"
 
 # Excepciones documentadas: datasets sin contrato o doc dedicado todavía.
 # Vacío hoy — agregar aquí solo con una razón explícita si aparece un caso legítimo.
@@ -64,6 +65,28 @@ def check_registry() -> list[str]:
             doc_path = DOCS_DIR / f"{key}.md"
             if not doc_path.is_file():
                 errors.append(f"falta documentación de dataset para '{key}': {doc_path}")
+    return errors
+
+
+def check_extractors() -> list[str]:
+    errors = []
+    with open(DATASET_CATALOG_PATH, "r", encoding="utf-8") as f:
+        catalog = json.load(f)
+    referenced: set[str] = set()
+    for key, cfg in sorted(catalog.items()):
+        if "extractor" not in cfg:
+            errors.append(f"'{key}': falta el campo 'extractor' (usa null si es derivado)")
+            continue
+        value = cfg["extractor"]
+        paths = [] if value is None else ([value] if isinstance(value, str) else list(value))
+        for rel in paths:
+            if not (ROOT_DIR / rel).is_file():
+                errors.append(f"'{key}': extractor no existe: {rel}")
+            referenced.add(rel)
+    for f in sorted(EXTRACTORS_DIR.glob("*_extractor.py")):
+        rel = f.relative_to(ROOT_DIR).as_posix()
+        if rel not in referenced:
+            errors.append(f"extractor huérfano (ningún dataset lo referencia): {rel}")
     return errors
 
 
@@ -128,7 +151,8 @@ def main() -> None:
     subparsers.add_parser(
         "registry",
         help="Verifica que cada dataset de data/dataset_catalog_config.json tenga "
-        "su contrato de esquema y su doc en docs/datasets/.",
+        "su contrato de esquema, su doc en docs/datasets/ y su campo 'extractor' "
+        "apuntando a un archivo existente en src/extractors/ (sin extractores huérfanos).",
     )
 
     companions_parser = subparsers.add_parser(
@@ -146,7 +170,7 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.mode == "registry":
-        errors = check_registry()
+        errors = check_registry() + check_extractors()
     else:
         changed_files = (
             read_changed_files_from(args.changed_files_from)
