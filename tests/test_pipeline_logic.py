@@ -3107,6 +3107,77 @@ class ExcelGuardTests(unittest.TestCase):
             self.assertNotIn("test_oversized", wb.sheetnames)
 
 
+class DcatCatalogTests(unittest.TestCase):
+    """Tests para build_dcat_catalog (Plan 051, ADR-010) sobre un
+    datapackage.json sintetico (misma fixture que DataPackageBuilderTests)."""
+
+    def _fixture_data_package(self):
+        return {
+            "name": "chile-hub",
+            "title": "chile-hub -- Datos publicos de Chile curados",
+            "description": "Descripcion de prueba",
+            "version": "1.0.0",
+            "homepage": "https://tooltician.com/chile-hub/",
+            "created": "2026-07-24T00:00:00+00:00",
+            "resources": [
+                {
+                    "name": "test_dataset",
+                    "path": "test_dataset.parquet",
+                    "format": "parquet",
+                    "mediatype": "application/vnd.apache.parquet",
+                    "title": "test_dataset",
+                    "description": "Test dataset",
+                    "schema": {"fields": []},
+                    "licenses": [{"title": "CC BY", "path": "https://example.com/license"}],
+                }
+            ],
+        }
+
+    def test_dataset_list_not_empty(self):
+        from src.builders.dcat_catalog import build_dcat_catalog
+
+        catalog = build_dcat_catalog(self._fixture_data_package())
+        self.assertTrue(catalog["dataset"])
+
+    def test_download_url_is_absolute_under_base_url(self):
+        from src.builders.dcat_catalog import build_dcat_catalog
+
+        catalog = build_dcat_catalog(self._fixture_data_package())
+        download_url = catalog["dataset"][0]["distribution"][0]["downloadURL"]
+        self.assertEqual(
+            download_url,
+            "https://tooltician.com/chile-hub/data/normalized/test_dataset.parquet",
+        )
+        self.assertTrue(download_url.startswith("https://"))
+
+    def test_license_propagated_when_present(self):
+        from src.builders.dcat_catalog import build_dcat_catalog
+
+        catalog = build_dcat_catalog(self._fixture_data_package())
+        self.assertEqual(catalog["dataset"][0]["license"], "https://example.com/license")
+
+    def test_no_license_key_when_absent(self):
+        from src.builders.dcat_catalog import build_dcat_catalog
+
+        data_package = self._fixture_data_package()
+        del data_package["resources"][0]["licenses"]
+        catalog = build_dcat_catalog(data_package)
+        self.assertNotIn("license", catalog["dataset"][0])
+
+    def test_write_dcat_catalog_json_writes_file(self):
+        from src.builders import dcat_catalog
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with patch.object(dcat_catalog, "NORMALIZED_DIR", tmpdir):
+                output_path = dcat_catalog.write_dcat_catalog_json(self._fixture_data_package())
+
+            written = json.loads(Path(output_path).read_text(encoding="utf-8"))
+            self.assertTrue(written["dataset"])
+            self.assertTrue(
+                written["dataset"][0]["distribution"][0]["downloadURL"].startswith("https://")
+            )
+
+
 if __name__ == "__main__":
     import pytest
 

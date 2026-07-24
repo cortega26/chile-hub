@@ -1,0 +1,292 @@
+{
+  "title": "chile-hub -- Datos publicos de Chile curados",
+  "description": "Capa de datos reproducible y curada sobre datasets publicos oficiales de Chile: geografia, demografia, salud, educacion, finanzas municipales e indicadores.",
+  "homepage": "https://tooltician.com/chile-hub/",
+  "dataset": [
+    {
+      "identifier": "regiones",
+      "title": "regiones",
+      "description": "Capa derivada de regiones para filtros, joins y referencias administrativas de alto nivel.",
+      "modified": "2026-07-24T21:54:27.725041+00:00",
+      "distribution": [
+        {
+          "downloadURL": "https://tooltician.com/chile-hub/data/normalized/regiones.parquet",
+          "mediaType": "application/vnd.apache.parquet",
+          "format": "parquet",
+          "title": "regiones"
+        }
+      ],
+      "license": "https://datos.bcn.cl/es/informacion/lo-que-esta-haciendo-bcn"
+    },
+    {
+      "identifier": "provincias",
+      "title": "provincias",
+      "description": "Capa derivada de provincias para cruces intermedios entre region y comuna.",
+      "modified": "2026-07-24T21:54:27.725041+00:00",
+      "distribution": [
+        {
+          "downloadURL": "https://tooltician.com/chile-hub/data/normalized/provincias.parquet",
+          "mediaType": "application/vnd.apache.parquet",
+          "format": "parquet",
+          "title": "provincias"
+        }
+      ],
+      "license": "https://datos.bcn.cl/es/informacion/lo-que-esta-haciendo-bcn"
+    },
+    {
+      "identifier": "comunas",
+      "title": "comunas",
+      "description": "Base territorial normalizada para cruces por region, provincia y comuna.",
+      "modified": "2026-07-24T21:54:27.725041+00:00",
+      "distribution": [
+        {
+          "downloadURL": "https://tooltician.com/chile-hub/data/normalized/comunas.parquet",
+          "mediaType": "application/vnd.apache.parquet",
+          "format": "parquet",
+          "title": "comunas"
+        }
+      ],
+      "license": "https://datos.bcn.cl/es/informacion/lo-que-esta-haciendo-bcn"
+    },
+    {
+      "identifier": "comunas_enriquecidas",
+      "title": "comunas_enriquecidas",
+      "description": "Comunas con coordenadas de cabecera y poblacion estimada INE, listas para analisis territorial sin joins adicionales.",
+      "modified": "2026-07-24T21:54:27.725041+00:00",
+      "distribution": [
+        {
+          "downloadURL": "https://tooltician.com/chile-hub/data/normalized/comunas.parquet",
+          "mediaType": "application/vnd.apache.parquet",
+          "format": "parquet",
+          "title": "comunas_enriquecidas"
+        }
+      ],
+      "license": "https://datos.bcn.cl/es/informacion/lo-que-esta-haciendo-bcn"
+    },
+    {
+      "identifier": "indicadores",
+      "title": "indicadores",
+      "description": "Serie de indicadores economicos diarios de referencia para analisis y software.",
+      "modified": "2026-07-24T21:54:27.725041+00:00",
+      "distribution": [
+        {
+          "downloadURL": "https://tooltician.com/chile-hub/data/normalized/indicadores.parquet",
+          "mediaType": "application/vnd.apache.parquet",
+          "format": "parquet",
+          "title": "indicadores"
+        }
+      ],
+      "license": "https://www.bcentral.cl/web/banco-central/terminos-y-condiciones"
+    },
+    {
+      "identifier": "censo_comunal",
+      "title": "censo_comunal",
+      "description": "Perfil demografico comunal del Censo 2024 con sexo y grandes grupos de edad.",
+      "modified": "2026-07-24T21:54:27.725041+00:00",
+      "distribution": [
+        {
+          "downloadURL": "https://tooltician.com/chile-hub/data/normalized/censo_comunal.parquet",
+          "mediaType": "application/vnd.apache.parquet",
+          "format": "parquet",
+          "title": "censo_comunal"
+        }
+      ],
+      "license": "https://www.ine.gob.cl/terminos-de-uso"
+    },
+    {
+      "identifier": "establecimientos_salud",
+      "title": "establecimientos_salud",
+      "description": "Directorio vigente de establecimientos de salud con tipo, dependencia, urgencia y ubicacion.",
+      "modified": "2026-07-24T21:54:27.725041+00:00",
+      "distribution": [
+        {
+          "downloadURL": "https://tooltician.com/chile-hub/data/normalized/establecimientos_salud.parquet",
+          "mediaType": "application/vnd.apache.parquet",
+          "format": "parquet",
+          "title": "establecimientos_salud"
+        }
+      ],
+      "license": "http://www.opendefinition.org/licenses/cc-zero"
+    },
+    {
+      "identifier": "establecimientos_educacionales",
+      "title": "establecimientos_educacionales",
+      "description": "Directorio oficial del Ministerio de Educación (MINEDUC) con Rol Base de Datos (RBD), ubicación y dependencia administrativa.",
+      "modified": "2026-07-24T21:54:27.725041+00:00",
+      "distribution": [
+        {
+          "downloadURL": "https://tooltician.com/chile-hub/data/normalized/establecimientos_educacionales.parquet",
+          "mediaType": "application/vnd.apache.parquet",
+          "format": "parquet",
+          "title": "establecimientos_educacionales"
+        }
+      ],
+      "license": "https://creativecommons.org/licenses/by/3.0/cl/"
+    },
+    {
+      "identifier": "censo_hogares_viviendas",
+      "title": "censo_hogares_viviendas",
+      "description": "Viviendas y hogares censados por comuna, ocupacion y tamano medio del hogar.",
+      "modified": "2026-07-24T21:54:27.725041+00:00",
+      "distribution": [
+        {
+          "downloadURL": "https://tooltician.com/chile-hub/data/normalized/censo_hogares_viviendas.parquet",
+          "mediaType": "application/vnd.apache.parquet",
+          "format": "parquet",
+          "title": "censo_hogares_viviendas"
+        }
+      ],
+      "license": "https://www.ine.gob.cl/terminos-de-uso"
+    },
+    {
+      "identifier": "distritos_electorales",
+      "title": "distritos_electorales",
+      "description": "Asociación de comunas a distritos electorales (diputados) y circunscripciones senatoriales.",
+      "modified": "2026-07-24T21:54:27.725041+00:00",
+      "distribution": [
+        {
+          "downloadURL": "https://tooltician.com/chile-hub/data/normalized/distritos_electorales.parquet",
+          "mediaType": "application/vnd.apache.parquet",
+          "format": "parquet",
+          "title": "distritos_electorales"
+        }
+      ],
+      "license": "http://www.opendefinition.org/licenses/cc-zero"
+    },
+    {
+      "identifier": "finanzas_municipales",
+      "title": "finanzas_municipales",
+      "description": "Indicadores financieros municipales anuales desde SINIM/SUBDERE. CAPA PARCIAL/CANDIDATO: 3 de 346 comunas (0.9%). Usar con precaución; no representa cobertura nacional.",
+      "modified": "2026-07-24T21:54:27.725041+00:00",
+      "distribution": [
+        {
+          "downloadURL": "https://tooltician.com/chile-hub/data/normalized/finanzas_municipales.parquet",
+          "mediaType": "application/vnd.apache.parquet",
+          "format": "parquet",
+          "title": "finanzas_municipales"
+        }
+      ],
+      "license": "https://datos.sinim.gov.cl/"
+    },
+    {
+      "identifier": "resultados_educacionales",
+      "title": "resultados_educacionales",
+      "description": "Resultados educacionales agregados por comuna y año, sin registros personales.",
+      "modified": "2026-07-24T21:54:27.725041+00:00",
+      "distribution": [
+        {
+          "downloadURL": "https://tooltician.com/chile-hub/data/normalized/resultados_educacionales.parquet",
+          "mediaType": "application/vnd.apache.parquet",
+          "format": "parquet",
+          "title": "resultados_educacionales"
+        }
+      ],
+      "license": "https://creativecommons.org/licenses/by/3.0/cl/"
+    },
+    {
+      "identifier": "indicadores_urbanos_siedu",
+      "title": "indicadores_urbanos_siedu",
+      "description": "Indicadores urbanos SIEDU en formato largo con cobertura comunal parcial esperada.",
+      "modified": "2026-07-24T21:54:27.725041+00:00",
+      "distribution": [
+        {
+          "downloadURL": "https://tooltician.com/chile-hub/data/normalized/indicadores_urbanos_siedu.parquet",
+          "mediaType": "application/vnd.apache.parquet",
+          "format": "parquet",
+          "title": "indicadores_urbanos_siedu"
+        }
+      ],
+      "license": "https://www.ine.gob.cl/terminos-de-uso"
+    },
+    {
+      "identifier": "perfil_territorial_comunal",
+      "title": "perfil_territorial_comunal",
+      "description": "Perfil comunal curado que consolida DPA, censo, salud, educación, finanzas, SIEDU y distritos.",
+      "modified": "2026-07-24T21:54:27.725041+00:00",
+      "distribution": [
+        {
+          "downloadURL": "https://tooltician.com/chile-hub/data/normalized/perfil_territorial_comunal.parquet",
+          "mediaType": "application/vnd.apache.parquet",
+          "format": "parquet",
+          "title": "perfil_territorial_comunal"
+        }
+      ],
+      "license": "https://github.com/cortega26/chile-hub"
+    },
+    {
+      "identifier": "empresas",
+      "title": "empresas",
+      "description": "Registro de Empresas y Sociedades (RES) con RUT, razon social, tipo societario, capital, fecha de constitucion y comuna de domicilio.",
+      "modified": "2026-07-24T21:54:27.725041+00:00",
+      "distribution": [
+        {
+          "downloadURL": "https://tooltician.com/chile-hub/data/normalized/empresas.parquet",
+          "mediaType": "application/vnd.apache.parquet",
+          "format": "parquet",
+          "title": "empresas"
+        }
+      ],
+      "license": "https://creativecommons.org/licenses/by/3.0/cl/"
+    },
+    {
+      "identifier": "pobreza_comunal",
+      "title": "pobreza_comunal",
+      "description": "Estimaciones de pobreza comunal por ingresos y multidimensional derivadas de la encuesta CASEN mediante metodología SAE (Estimación de Áreas Pequeñas). Incluye tasa, límite inferior y superior del intervalo de confianza por comuna, año y dimensión.",
+      "modified": "2026-07-24T21:54:27.725041+00:00",
+      "distribution": [
+        {
+          "downloadURL": "https://tooltician.com/chile-hub/data/normalized/pobreza_comunal.parquet",
+          "mediaType": "application/vnd.apache.parquet",
+          "format": "parquet",
+          "title": "pobreza_comunal"
+        }
+      ],
+      "license": "https://observatorio.ministeriodesarrollosocial.gob.cl/"
+    },
+    {
+      "identifier": "consumo_electrico_comunal",
+      "title": "consumo_electrico_comunal",
+      "description": "Consumo eléctrico anual por comuna y tipo de cliente (Residencial, Comercial, Industrial, Agrícola, Alumbrado Público, Otros), publicado por la Comisión Nacional de Energía (CNE) en el portal Energía Abierta. DEPRECATED: la fuente Junar de energiaabierta.cl fue decomisionada (investigado 2026-07-07); el dataset solo publica datos de muestra (FALLBACK_ROWS), no está en el bundle público. Ver data/source_registry.json.",
+      "modified": "2026-07-24T21:54:27.725041+00:00",
+      "distribution": [
+        {
+          "downloadURL": "https://tooltician.com/chile-hub/data/normalized/consumo_electrico_comunal.parquet",
+          "mediaType": "application/vnd.apache.parquet",
+          "format": "parquet",
+          "title": "consumo_electrico_comunal"
+        }
+      ],
+      "license": "http://energiaabierta.cl/"
+    },
+    {
+      "identifier": "partidos_politicos",
+      "title": "partidos_politicos",
+      "description": "Roster de partidos políticos de Chile (Cámara de Diputadas y Diputados), con estado_legal y fecha_constitucion completados por join de nombre contra el registro público de SERVEL.",
+      "modified": "2026-07-24T21:54:27.725041+00:00",
+      "distribution": [
+        {
+          "downloadURL": "https://tooltician.com/chile-hub/data/normalized/partidos_politicos.parquet",
+          "mediaType": "application/vnd.apache.parquet",
+          "format": "parquet",
+          "title": "partidos_politicos"
+        }
+      ],
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    {
+      "identifier": "autoridades_electas",
+      "title": "autoridades_electas",
+      "description": "Autoridades electas en ejercicio de Chile (diputados y senadores): partido, distrito electoral/circunscripción senatorial, región y período de mandato.",
+      "modified": "2026-07-24T21:54:27.725041+00:00",
+      "distribution": [
+        {
+          "downloadURL": "https://tooltician.com/chile-hub/data/normalized/autoridades_electas.parquet",
+          "mediaType": "application/vnd.apache.parquet",
+          "format": "parquet",
+          "title": "autoridades_electas"
+        }
+      ],
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    }
+  ]
+}
