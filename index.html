@@ -335,6 +335,11 @@
             display: none !important;
         }
 
+        html {
+            scroll-padding-top: 72px;
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: var(--font-sans);
             background-color: var(--bg-color);
@@ -396,11 +401,17 @@
         }
 
         header {
-            padding: 2rem;
+            padding: 1.25rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(247, 246, 240, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
 
         .logo-section h1 {
