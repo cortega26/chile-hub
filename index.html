@@ -1707,6 +1707,76 @@
             to { transform: rotate(360deg); }
         }
 
+        /* Skeleton loading placeholder */
+        .skeleton-pulse {
+            background: linear-gradient(
+                90deg,
+                var(--border-color) 25%,
+                #e8e6dc 37%,
+                var(--border-color) 63%
+            );
+            background-size: 400% 100%;
+            animation: skeleton-shimmer 1.4s ease infinite;
+            border-radius: 4px;
+        }
+
+        @keyframes skeleton-shimmer {
+            0% { background-position: 100% 50%; }
+            100% { background-position: 0 50%; }
+        }
+
+        /* Skeleton card shape — matches .dataset-card dimensions */
+        .skeleton-card {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            background: var(--panel-bg);
+        }
+
+        .skeleton-card .skeleton-title {
+            height: 1.1rem;
+            width: 55%;
+        }
+
+        .skeleton-card .skeleton-desc {
+            height: 0.875rem;
+            width: 90%;
+        }
+
+        .skeleton-card .skeleton-meta {
+            height: 0.75rem;
+            width: 40%;
+        }
+
+        /* Skeleton KPI — matches .kpi-value/.kpi-date dimensions */
+        .skeleton-value {
+            display: inline-block;
+            height: 1.45rem;
+            width: 80%;
+        }
+
+        .skeleton-label {
+            display: inline-block;
+            height: 0.74rem;
+            width: 60%;
+        }
+
+        /* Empty state for no search results */
+        .no-results-message {
+            padding: 3rem 1.5rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+
+        .no-results-message strong {
+            color: var(--text-primary);
+        }
+
         /* Page Footer styling */
         footer {
             padding: 3rem 2rem;
@@ -2226,6 +2296,7 @@
             position: relative;
             min-width: 0;
             overflow: hidden;
+            cursor: pointer;
         }
 
         .dataset-card::before {
@@ -2600,23 +2671,23 @@ curl -s <span class="string">"https://tooltician.com/chile-hub/data/normalized/h
         <section class="kpi-container" id="kpi-container">
             <div class="kpi-card" id="kpi-uf">
                 <span class="kpi-label">Unidad de Fomento (UF)</span>
-                <span class="kpi-value"><div class="spinner"></div></span>
-                <span class="kpi-date">Cargando...</span>
+                <span class="kpi-value"><div class="skeleton-pulse skeleton-value"></div></span>
+                <span class="kpi-date"><span class="skeleton-pulse skeleton-label"></span></span>
             </div>
             <div class="kpi-card" id="kpi-dolar">
                 <span class="kpi-label">Dólar Observado</span>
-                <span class="kpi-value"><div class="spinner"></div></span>
-                <span class="kpi-date">Cargando...</span>
+                <span class="kpi-value"><div class="skeleton-pulse skeleton-value"></div></span>
+                <span class="kpi-date"><span class="skeleton-pulse skeleton-label"></span></span>
             </div>
             <div class="kpi-card" id="kpi-euro">
                 <span class="kpi-label">Euro</span>
-                <span class="kpi-value"><div class="spinner"></div></span>
-                <span class="kpi-date">Cargando...</span>
+                <span class="kpi-value"><div class="skeleton-pulse skeleton-value"></div></span>
+                <span class="kpi-date"><span class="skeleton-pulse skeleton-label"></span></span>
             </div>
             <div class="kpi-card" id="kpi-utm">
                 <span class="kpi-label">U. Tributaria Mensual (UTM)</span>
-                <span class="kpi-value"><div class="spinner"></div></span>
-                <span class="kpi-date">Cargando...</span>
+                <span class="kpi-value"><div class="skeleton-pulse skeleton-value"></div></span>
+                <span class="kpi-date"><span class="skeleton-pulse skeleton-label"></span></span>
             </div>
         </section>
 
@@ -2671,11 +2742,11 @@ curl -s <span class="string">"https://tooltician.com/chile-hub/data/normalized/h
                 </label>
                 <div class="catalog-count" id="catalog-count" aria-live="polite">Cargando capas...</div>
             </div>
-            <div class="catalog-grid" id="catalog-grid">
-                <div class="dataset-card">
-                    <div class="dataset-name">Cargando catálogo...</div>
-                    <div class="dataset-desc">Compilando los datasets disponibles.</div>
-                </div>
+            <div class="catalog-grid" id="catalog-grid" aria-label="Cargando catálogo">
+                <div class="skeleton-card"><div class="skeleton-pulse skeleton-title"></div><div class="skeleton-pulse skeleton-desc"></div><div class="skeleton-pulse skeleton-meta"></div></div>
+                <div class="skeleton-card"><div class="skeleton-pulse skeleton-title"></div><div class="skeleton-pulse skeleton-desc"></div><div class="skeleton-pulse skeleton-meta"></div></div>
+                <div class="skeleton-card"><div class="skeleton-pulse skeleton-title"></div><div class="skeleton-pulse skeleton-desc"></div><div class="skeleton-pulse skeleton-meta"></div></div>
+                <div class="skeleton-card"><div class="skeleton-pulse skeleton-title"></div><div class="skeleton-pulse skeleton-desc"></div><div class="skeleton-pulse skeleton-meta"></div></div>
             </div>
         </section>
 
