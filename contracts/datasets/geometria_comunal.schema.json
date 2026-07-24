@@ -1,0 +1,66 @@
+{
+  "dataset": "geometria_comunal",
+  "primary_key": [
+    "codigo_comuna"
+  ],
+  "required_columns": [
+    "codigo_region",
+    "codigo_comuna",
+    "nombre_comuna",
+    "nombre_comuna_clean",
+    "nombre_region",
+    "geometry"
+  ],
+  "column_types": {
+    "codigo_region": "string",
+    "codigo_comuna": "string",
+    "nombre_comuna": "string",
+    "nombre_comuna_clean": "string",
+    "nombre_region": "string",
+    "geometry": "binary"
+  },
+  "nullable_columns": [],
+  "fixed_width_columns": {
+    "codigo_region": 2,
+    "codigo_comuna": 5
+  },
+  "expected_record_count": 345,
+  "coverage_policy": "partial",
+  "publish_outputs": [
+    "parquet"
+  ],
+  "columns": [
+    {
+      "name": "codigo_region",
+      "type": "string",
+      "width": 2,
+      "example": "01"
+    },
+    {
+      "name": "codigo_comuna",
+      "type": "string",
+      "width": 5,
+      "example": "01101"
+    },
+    {
+      "name": "nombre_comuna",
+      "type": "string",
+      "example": "Iquique"
+    },
+    {
+      "name": "nombre_comuna_clean",
+      "type": "string",
+      "example": "iquique"
+    },
+    {
+      "name": "nombre_region",
+      "type": "string",
+      "example": "Región de Tarapacá"
+    },
+    {
+      "name": "geometry",
+      "type": "binary",
+      "example": "WKB — Polygon o MultiPolygon en EPSG:4326 (WGS84), geoparquet 1.0"
+    }
+  ]
+}

@@ -23,6 +23,7 @@ from src.extractors import (
     censo_extractor,
     censo_hogares_viviendas_extractor,
     electoral_extractor,
+    geometria_comunal_extractor,
     mineduc_establecimientos_extractor,
     mineduc_resultados_extractor,
     partidos_politicos_extractor,
@@ -2156,6 +2157,107 @@ class SinimFinanzasLiveExtractorTests(unittest.TestCase):
 
         with self.assertRaisesRegex(RuntimeError, "solo 2 filas"):
             _parse_xml_spreadsheet(xml)
+
+
+class GeometriaComunalExtractorTests(unittest.TestCase):
+    """Tests unitarios para el extractor de geometría comunal (BCN ArcGIS)."""
+
+    def _feature(self, cod_comuna, nom_com="Santiago", codregion=13, nom_reg="RM"):
+        return {
+            "type": "Feature",
+            "properties": {
+                "cod_comuna": cod_comuna,
+                "nom_com": nom_com,
+                "nom_reg": nom_reg,
+                "codregion": codregion,
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [[[-70.6, -33.4], [-70.5, -33.4], [-70.5, -33.5], [-70.6, -33.4]]],
+            },
+        }
+
+    def test_normalize_features_zero_pads_codigo_comuna(self):
+        """Invariante #1: cod_comuna=1101 (Tarapacá) no debe perder el cero inicial."""
+        df = geometria_comunal_extractor.normalize_features(
+            [self._feature(1101, "Iquique", 1, "Tarapacá")]
+        )
+        self.assertEqual(df["codigo_comuna"].to_list(), ["01101"])
+        self.assertEqual(df["codigo_region"].to_list(), ["01"])
+        self.assertEqual(df["nombre_comuna_clean"].to_list(), ["iquique"])
+
+    def test_normalize_features_drops_placeholder_and_dedupes(self):
+        """cod_comuna=0 ('Zona sin demarcar') se descarta; duplicados se colapsan."""
+        features = [
+            self._feature(0, "Zona sin demarcar", 0, "Zona sin demarcar"),
+            self._feature(13101),
+            self._feature(13101),  # duplicado real observado en la fuente (Rancagua-like)
+        ]
+        df = geometria_comunal_extractor.normalize_features(features)
+        self.assertEqual(df.height, 1)
+        self.assertEqual(df["codigo_comuna"].to_list(), ["13101"])
+
+    def test_normalize_empty_features(self):
+        df = geometria_comunal_extractor.normalize_features([])
+        required = {
+            "codigo_region",
+            "codigo_comuna",
+            "nombre_comuna",
+            "nombre_comuna_clean",
+            "nombre_region",
+            "geometry_wkt",
+        }
+        self.assertTrue(required.issubset(set(df.columns)))
+        self.assertEqual(df.height, 0)
+
+    def test_dataset_name(self):
+        extractor = geometria_comunal_extractor.GeometriaComunalExtractor()
+        self.assertEqual(extractor.dataset_name, "geometria_comunal")
+
+    def test_validate_ok_for_full_coverage(self):
+        df = geometria_comunal_extractor.normalize_features(
+            [self._feature(i, f"Comuna {i}") for i in range(1, 341)]
+        )
+        extractor = geometria_comunal_extractor.GeometriaComunalExtractor()
+        result = extractor.validate(df, {})
+        self.assertEqual(result["status"], "ok")
+
+    def test_validate_warns_on_partial_coverage(self):
+        df = geometria_comunal_extractor.normalize_features(
+            [self._feature(i, f"Comuna {i}") for i in range(1, 51)]
+        )
+        extractor = geometria_comunal_extractor.GeometriaComunalExtractor()
+        result = extractor.validate(df, {})
+        self.assertEqual(result["status"], "ok")
+        self.assertTrue(any("cobertura parcial" in w for w in result["warnings"]))
+
+    def test_validate_empty_dataset_is_warning_not_error(self):
+        """Carril candidate: dataset vacío es advertencia, no bloquea el build."""
+        df = geometria_comunal_extractor.normalize_features([])
+        extractor = geometria_comunal_extractor.GeometriaComunalExtractor()
+        result = extractor.validate(df, {})
+        self.assertEqual(result["status"], "ok")
+        self.assertTrue(any("vacío" in w for w in result["warnings"]))
+
+    def test_run_dry_run_returns_validation_without_writing(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            staging_csv = Path(tmpdir) / "geometria_comunal.csv"
+            metadata_path = Path(tmpdir) / "geometria_comunal.metadata.json"
+            fixture_features = [self._feature(i, f"Comuna {i}") for i in range(1, 341)]
+            with (
+                patch.object(geometria_comunal_extractor, "STAGING_CSV_PATH", staging_csv),
+                patch.object(geometria_comunal_extractor, "METADATA_PATH", metadata_path),
+                patch.object(geometria_comunal_extractor, "RAW_DIR", Path(tmpdir)),
+                patch.object(geometria_comunal_extractor, "STAGING_DIR", Path(tmpdir)),
+                patch.object(
+                    geometria_comunal_extractor,
+                    "fetch_geometria_comunal",
+                    return_value=(fixture_features, ["test"]),
+                ),
+            ):
+                result = geometria_comunal_extractor.GeometriaComunalExtractor().run(dry_run=True)
+                self.assertEqual(result["status"], "ok")
+                self.assertFalse(staging_csv.exists())
 
 
 if __name__ == "__main__":

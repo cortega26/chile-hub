@@ -8,6 +8,12 @@ BUILD_PATH = ROOT_DIR / "src" / "build_dev_db.py"
 ALLOWED_UNREGISTERED_VALIDATORS = {
     # Removed from the active catalog, retained for a future official POI source.
     "puntos_interes",
+    # geometria_comunal es candidate/bajo_demanda (como delincuencia_comunal y
+    # autoridades_locales): su extractor NO corre en `make extract`, por lo que
+    # no participa del build diario de build_dev_db.py. Se valida y publica vía
+    # su propio script (scripts/build_geometria_comunal.py), no en el pipeline
+    # diario -- ver ADR-012.
+    "geometria_comunal",
 }
 
 ALLOWED_WITHOUT_DEDICATED_VALIDATOR = {

@@ -281,6 +281,9 @@ _AGENTS_EXTRACTOR_DESCRIPTIONS = {
     "autoridades_locales_extractor.py": (
         "Autoridades locales (BCN SIIT + Wikipedia); carril `candidate`, sin cadencia automática"
     ),
+    "geometria_comunal_extractor.py": (
+        "Geometría comunal — límites poligonales (BCN ArcGIS); carril `candidate` → data/staging/"
+    ),
 }
 
 EXTRACTORS_DIR = os.path.join(ROOT_DIR, "src", "extractors")

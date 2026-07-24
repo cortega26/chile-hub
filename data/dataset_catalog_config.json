@@ -556,6 +556,32 @@
     },
     "documentation": "docs/datasets/consumo_electrico_comunal.md"
   },
+  "geometria_comunal": {
+    "description": "Límites poligonales de las 346 comunas de Chile (GeoParquet, geometría 'generalizada' — simplificada para cartografía a escala nacional, no apta para trabajo de precisión geodésica ni catastral). Fuente: BCN ArcGIS (tematico/Comunas_Generalizadas). Artefacto separado de `comunas`, unido por `codigo_comuna`.",
+    "join_keys": [
+      "codigo_comuna"
+    ],
+    "confidence_tier": "Tier B",
+    "expected_record_count": 345,
+    "reuse_policy": {
+      "status": "open-attribution",
+      "license": "Uso libre con atribución a la Biblioteca del Congreso Nacional de Chile (bcn.cl/siit/mapas_vectoriales). Geometría generalizada, no apta para precisión geodésica.",
+      "license_url": "https://www.bcn.cl/siit/mapas_vectoriales/index_html",
+      "attribution_required": true,
+      "redistribution_ok": true,
+      "summary": "Límites comunales (geometría generalizada) desde BCN ArcGIS. Carril CANDIDATE mientras madura la cobertura (345/346 comunas — falta codigo_comuna=12202/Antártica, ver ADR-012). Ver ADR-012 para el gate de licencia completo."
+    },
+    "freshness_policy": {
+      "max_age_hours": 87600,
+      "label": "bajo_demanda"
+    },
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars(\"geometria_comunal\")\n# geometry llega como WKB; usa geopandas para trabajar con la columna geometrica\nimport geopandas as gpd\ngdf = gpd.read_parquet(\"data/normalized/geometria_comunal.parquet\")",
+      "duckdb": "-- DuckDB con la extension spatial puede leer GeoParquet directamente\nINSTALL spatial; LOAD spatial;\nSELECT codigo_comuna, nombre_comuna, ST_Area(geometry) AS area\nFROM 'data/normalized/geometria_comunal.parquet'\nORDER BY area DESC;",
+      "cli": "chile-hub show geometria_comunal"
+    },
+    "documentation": "docs/datasets/geometria_comunal.md"
+  },
   "delincuencia_comunal": {
     "description": "Casos policiales de Delitos de Mayor Connotación Social (DMCS) y otras categorías por comuna y mes, reportados por Carabineros y PDI al Ministerio del Interior. Fuente: CEAD (Centro de Estudios y Análisis del Delito), Subsecretaría de Prevención del Delito.",
     "join_keys": [

@@ -373,6 +373,27 @@
     "cadencia": "bajo_demanda"
   },
   {
+    "source_id": "bcn_arcgis_geometria_comunal",
+    "dataset": "geometria_comunal",
+    "source_name": "BCN ArcGIS — tematico/Comunas_Generalizadas",
+    "official_url": "https://www.bcn.cl/siit/mapas_vectoriales/index_html",
+    "access_method": "api",
+    "license_status": "open-attribution",
+    "live_extractor_status": "implemented",
+    "fallback_policy": "fallback_to_last_snapshot",
+    "maturity_status": "candidate",
+    "live_ready": false,
+    "fallback_allowed": true,
+    "publish_blocking": true,
+    "review_by": "2026-10-21",
+    "stalled_after_days": 90,
+    "owner": "core",
+    "next_action": "Cobertura 345/346 (falta codigo_comuna=12202/Antártica, hueco conocido de la fuente BCN — ver ADR-012). Evaluar promoción a stable_publishable una vez confirmada cadencia de refresco y estabilidad del endpoint ArcGIS (region 12/Magallanes requiere fallback comuna-por-comuna por payload combinado grande).",
+    "publication_track": "candidate",
+    "public_bundle_eligible": false,
+    "cadencia": "bajo_demanda"
+  },
+  {
     "source_id": "cead_delincuencia_comunal",
     "dataset": "delincuencia_comunal",
     "source_name": "CEAD — Subsecretaría de Prevención del Delito",

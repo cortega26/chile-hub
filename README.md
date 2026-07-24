@@ -188,8 +188,9 @@ Pipeline determinista en GitHub Actions: extracción → build → verificación
 | 17 | **Consumo Eléctrico Comunal** | 3 | 🟡 fallback | CNE / Energía Abierta | CC BY | Anual |
 | 18 | **Partidos Políticos** | 36 | 🟢 live | Cámara de Diputados | CC BY | Bajo_demanda |
 | 19 | **Autoridades Electas** | 205 | 🟢 live | Cámara de Diputados + Senado | CC BY | Bajo_demanda |
-| 20 | **Delincuencia Comunal** 🆕 | — | 🔜 próximamente | CEAD / SPD | Revisión términos | — |
-| 21 | **Autoridades Locales** 🆕 | — | 🔜 próximamente | BCN SIIT + Wikipedia | CC BY / CC BY-SA | — |
+| 20 | **geometria_comunal** 🆕 | — | 🔜 próximamente | — | — | — |
+| 21 | **Delincuencia Comunal** 🆕 | — | 🔜 próximamente | CEAD / SPD | Revisión términos | — |
+| 22 | **Autoridades Locales** 🆕 | — | 🔜 próximamente | BCN SIIT + Wikipedia | CC BY / CC BY-SA | — |
 
 > **🟢 live**: datos extraídos directamente desde la fuente oficial en cada ejecución del pipeline.
 > **🟡 fallback**: datos servidos desde un respaldo curado mientras se completa la extracción en vivo.
@@ -210,7 +211,7 @@ confiabilidad, auditables y verificables en cada build:
 | **Procedencia documentada** | Cada dataset declara su fuente oficial exacta con URL directa al organismo público emisor (BCN, INE, MINEDUC, BCCh, MINSAL, datos.gob.cl). | [`provenance_report.md`](data/normalized/provenance_report.md) — fuente, modo y timestamp por capa |
 | **Auditoría legal explícita** | <!-- START_REDISTRIBUTION_SUMMARY -->Licencia, atribución requerida y permiso de redistribución verificados dataset por dataset. **19 de 19 capas** pasan la auditoría (`ready`).<!-- END_REDISTRIBUTION_SUMMARY --> | [`redistribution_report.md`](data/normalized/redistribution_report.md) + [`AGENTS.md §6`](AGENTS.md) |
 | **Pipeline fail-loud** | Si una validación falla, el pipeline **aborta** — no publica datos corruptos, no emite advertencias silenciosas. | [`ADR-001`](docs/adr/ADR-001-pipeline-lineal-determinista.md) — fail-loud como decisión de arquitectura |
-| **Contratos de esquema** | <!-- START_CONTRACT_COUNT -->21 contratos JSON Schema ([`contracts/datasets/`](contracts/datasets/)) definen columnas esperadas, tipos, claves primarias y cobertura. Se validan **en cada build** automáticamente.<!-- END_CONTRACT_COUNT --> | [`ADR-005`](docs/adr/ADR-005-contratos-esquema-json-schema.md) + `contracts/datasets/*.json` |
+| **Contratos de esquema** | <!-- START_CONTRACT_COUNT -->22 contratos JSON Schema ([`contracts/datasets/`](contracts/datasets/)) definen columnas esperadas, tipos, claves primarias y cobertura. Se validan **en cada build** automáticamente.<!-- END_CONTRACT_COUNT --> | [`ADR-005`](docs/adr/ADR-005-contratos-esquema-json-schema.md) + `contracts/datasets/*.json` |
 | **Salud transparente** | <!-- START_HEALTH_SUMMARY -->Dashboard público con severidad, frescura, cobertura, drift y degradación por dataset. 12 capas `ok`, 7 `warn`, 0 `error`.<!-- END_HEALTH_SUMMARY --> | [`hub_health.md`](data/normalized/hub_health.md) — estado completo actualizado en cada build |
 | **Calidad medida** | <!-- START_QUALITY_SUMMARY -->Puntuación compuesta A-F por dataset: **promedio 94.2/100** (18 A, 1 B). Dimensiones: validación, contrato, madurez de fuente, frescura, cobertura, política de reúso.<!-- END_QUALITY_SUMMARY --> | [`dataset_quality.md`](data/normalized/dataset_quality.md) — scorecard completo |
 
@@ -226,10 +227,10 @@ chile-hub health       # severidad, frescura, drift y cobertura
 ### Respaldo adicional
 
 <!-- START_TEST_COUNT -->
-- **666 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
+- **682 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
 <!-- END_TEST_COUNT -->
 <!-- START_ADR_COUNT -->
-- **8 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
+- **10 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
 <!-- END_ADR_COUNT -->
 - **Drift monitoreado:** todos los datasets bajo vigilancia de deriva de esquema; cualquier
   cambio en la fuente se detecta y registra ([`drift_report.md`](data/normalized/drift_report.md)).
@@ -444,7 +445,17 @@ chile-hub health       # severidad, frescura, drift y cobertura
 | `periodo_inicio` / `periodo_fin` | `DATE` | `"2026-03-11` / `2030-03-10"` |
 | `estado_mandato` | `VARCHAR` | `"vigente"` |
 
-**20. delincuencia_comunal** — Casos policiales de Delitos de Mayor Connotación Social (DMCS) y otras categorías por comuna y mes, reportados por Carabineros y PDI al Ministerio del Interior. Fuente: CEAD (Centro de Estudios y Análisis del Delito), Subsecretaría de Prevención del Delito. (en carril candidate — datos no incluidos en el bundle público) (PK: anio, mes, codigo_comuna, familia_delito)
+**20. geometria_comunal** — Límites poligonales de las 346 comunas de Chile (GeoParquet, geometría 'generalizada' — simplificada para cartografía a escala nacional, no apta para trabajo de precisión geodésica ni catastral). Fuente: BCN ArcGIS (tematico/Comunas_Generalizadas). Artefacto separado de `comunas`, unido por `codigo_comuna`. (en carril candidate — datos no incluidos en el bundle público) (PK: codigo_comuna)
+| Columna | Tipo | Ejemplo |
+|:---|:---|:---|
+| `codigo_region` | `VARCHAR(2)` | `"01"` |
+| `codigo_comuna` | `VARCHAR(5)` | `"01101"` |
+| `nombre_comuna` | `VARCHAR` | `"Iquique"` |
+| `nombre_comuna_clean` | `VARCHAR` | `"iquique"` |
+| `nombre_region` | `VARCHAR` | `"Región de Tarapacá"` |
+| `geometry` | `BINARY` | `"WKB — Polygon o MultiPolygon en EPSG:4326 (WGS84), geoparquet 1.0"` |
+
+**21. delincuencia_comunal** — Casos policiales de Delitos de Mayor Connotación Social (DMCS) y otras categorías por comuna y mes, reportados por Carabineros y PDI al Ministerio del Interior. Fuente: CEAD (Centro de Estudios y Análisis del Delito), Subsecretaría de Prevención del Delito. (en carril candidate — datos no incluidos en el bundle público) (PK: anio, mes, codigo_comuna, familia_delito)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
 | `codigo_comuna` | `VARCHAR(5)` | `"01101"` |
@@ -454,7 +465,7 @@ chile-hub health       # severidad, frescura, drift y cobertura
 | `familia_delito` | `VARCHAR` | `"robos_violentos"` |
 | `casos` | `INTEGER` | `245` |
 
-**21. autoridades_locales** — Autoridades locales/subnacionales de Chile: gobernadores regionales (Wikipedia, CC-BY-SA) y alcaldes (BCN SIIT, dato público gubernamental). Wikipedia se mantiene como fuente de gobernadores y enriquecimiento opcional de periodo_inicio para alcaldes. Dataset segregado de autoridades_electas por licencia mixta. (en carril candidate — datos no incluidos en el bundle público) (PK: id_autoridad)
+**22. autoridades_locales** — Autoridades locales/subnacionales de Chile: gobernadores regionales (Wikipedia, CC-BY-SA) y alcaldes (BCN SIIT, dato público gubernamental). Wikipedia se mantiene como fuente de gobernadores y enriquecimiento opcional de periodo_inicio para alcaldes. Dataset segregado de autoridades_electas por licencia mixta. (en carril candidate — datos no incluidos en el bundle público) (PK: id_autoridad)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
 | `id_autoridad` | `VARCHAR` | `"gobernador_01"` |

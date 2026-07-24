@@ -52,6 +52,8 @@ pipeline = [
     "openpyxl==3.1.5",
     "structlog==26.1.0",
     "tenacity==9.1.4",
+    "shapely>=2.1.2",
+    "geopandas>=1.1.4",
 ]
 query = [
     "duckdb>=1.5.4",
