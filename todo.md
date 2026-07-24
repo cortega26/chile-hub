@@ -11,20 +11,25 @@ el done-criteria completo del plan pasa (no cuando "parece listo").
 - [x] Crear `todo.md` (este archivo)
 - [ ] Crear `tests/e2e/` con un script de verificación por plan + `run_all.sh`
 
-## Plan 058 — campo `extractor` + tabla README
+## Plan 058 — campo `extractor` + tabla README — ✅ DONE (2026-07-24)
 
-- [ ] Drift check corrido, sin discrepancias
-- [ ] Branch `advisor/058-catalog-extractor-field` creado
-- [ ] Step 1: campo `extractor` en las 21 entradas del catálogo
-- [ ] Step 2: `check_extractors()` en `check_companion_paths.py`
-- [ ] Step 3: `sync_readme_extractor_table()` en `doc_sync.py`
-- [ ] Step 4: marcadores en README + `make sync-docs`
-- [ ] Step 5: `AGENTS.md` §12 actualizado
-- [ ] Step 6: tests `ExtractorRegistryAndReadmeTableTests`
-- [ ] Todos los done criteria (9 ítems) verificados
-- [ ] `tests/e2e/verify_058.sh` escrito y en verde
-- [ ] Fila de `plans/README.md` actualizada a DONE
-- [ ] Commit(s) en el branch
+- [x] Drift check corrido — discrepancia real encontrada y resuelta: catálogo tenía
+      22 entradas, no 21 (Plan 053 agregó `geometria_comunal` después de que este
+      plan se escribiera); se mapeó como la 22ª entrada siguiendo el mismo patrón.
+- [x] Branch `advisor/058-catalog-extractor-field` creado
+- [x] Step 1: campo `extractor` en las 22 entradas del catálogo
+- [x] Step 2: `check_extractors()` en `check_companion_paths.py`
+- [x] Step 3: `sync_readme_extractor_table()` en `doc_sync.py`
+- [x] Step 4: marcadores en README + `make sync-docs`
+- [x] Step 5: `AGENTS.md` §12 actualizado
+- [x] Step 6: tests `ExtractorRegistryTests` + 3 tests nuevos en `DocSyncTests` (7 total)
+- [x] Todos los done criteria verificados (incluye fix incidental: `uv.lock` tenía
+      drift acumulado de bumps de dependabot sin relockear, causando que cualquier
+      `uv run` de los hooks de pre-commit lo reescribiera como side-effect — se
+      regeneró una vez en un commit aparte en `main` antes de continuar)
+- [x] `tests/e2e/verify_058.sh` escrito y en verde
+- [x] Fila de `plans/README.md` actualizada a DONE y archivada
+- [x] Commits en el branch (6 commits, sin merge/push — pendiente confirmación operador)
 
 ## Plan 057 — skeletons de carga + polish de interacción
 
