@@ -9,7 +9,7 @@ el done-criteria completo del plan pasa (no cuando "parece listo").
 - [x] Actualizar tabla de planes activos + grafo de dependencias en `plans/README.md`
 - [x] Crear `spec.md` (orquestación delgada, sin duplicar los planes)
 - [x] Crear `todo.md` (este archivo)
-- [ ] Crear `tests/e2e/` con un script de verificación por plan + `run_all.sh`
+- [x] Crear `tests/e2e/` con un script de verificación por plan + `run_all.sh`
 
 ## Plan 058 — campo `extractor` + tabla README — ✅ DONE (2026-07-24)
 
@@ -31,15 +31,23 @@ el done-criteria completo del plan pasa (no cuando "parece listo").
 - [x] Fila de `plans/README.md` actualizada a DONE y archivada
 - [x] Commits en el branch (6 commits, sin merge/push — pendiente confirmación operador)
 
-## Plan 057 — skeletons de carga + polish de interacción
+## Plan 057 — skeletons de carga + polish de interacción — ✅ DONE (2026-07-24)
 
-- [ ] Drift check corrido
-- [ ] Branch `advisor/057-loading-skeletons` creado
-- [ ] Steps del plan ejecutados (leer plan completo antes de empezar)
-- [ ] Done criteria (12 ítems) verificados
-- [ ] `tests/e2e/verify_057.sh` escrito y en verde
-- [ ] Fila de `plans/README.md` actualizada a DONE
-- [ ] Commit(s) en el branch
+- [x] Drift check corrido — el plan citaba excerpts de `app.js` (spinner inyectado
+      por JS, `filteredCount`) que **nunca existieron** en el código real (diff
+      contra el commit base del plan: 0 líneas en `app.js`). Implementación
+      adaptada al código real (ver fila archivada en `plans/README.md`).
+- [x] Branch `advisor/057-loading-skeletons` creado
+- [x] Skeletons estáticos en `index.html` (catálogo + KPIs), no inyección JS
+- [x] `.no-results-message` en `filterCatalog()` real (`app.js`)
+- [x] Tarjeta clickeable vía handler delegado + enrutamiento por hash existente
+- [x] Tecla Escape — ya existía en el código real, sin cambios necesarios
+- [x] Done criteria verificados (adaptados; ver script)
+- [x] `tests/e2e/verify_057.sh` escrito y en verde
+- [x] Verificación visual/funcional con Playwright ad-hoc (skeleton, click→drawer,
+      Escape, "Ver Ficha" intacto, no-results aparece/desaparece)
+- [x] Fila de `plans/README.md` actualizada a DONE y archivada
+- [x] Commits en el branch (2 commits, sin merge/push — pendiente confirmación operador)
 
 ## Plan 050 — `resolve_comunas()` (nombres → CUT)
 
