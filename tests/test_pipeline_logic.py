@@ -2979,6 +2979,131 @@ class DocSyncTests(unittest.TestCase):
         changed = doc_sync.sync_all_docs(check_only=True)
         self.assertIsInstance(changed, list)
 
+    def test_extractor_table_generated_from_real_catalog(self):
+        """Regresión: la tabla generada preserva el agrupamiento editorial y
+        cierra con la fila de perfil_territorial_comunal (Plan 058)."""
+        from src.builders import doc_sync
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            readme = self._readme(tmpdir, "EXTRACTOR_TABLE")
+
+            with patch.object(doc_sync, "README_PATH", str(readme)):
+                changed = doc_sync.sync_readme_extractor_table()
+
+            self.assertTrue(changed)
+            content = readme.read_text(encoding="utf-8")
+            self.assertIn("| Dominio | Extractores |", content)
+            self.assertIn("`subdere_extractor.py`", content)
+            self.assertIn(
+                "| Derivado en `build_dev_db.py` (sin extractor) | `perfil_territorial_comunal` |",
+                content,
+            )
+
+    def test_extractor_table_check_only_false_when_unchanged(self):
+        from src.builders import doc_sync
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            readme = self._readme(tmpdir, "EXTRACTOR_TABLE")
+
+            with patch.object(doc_sync, "README_PATH", str(readme)):
+                doc_sync.sync_readme_extractor_table()
+                changed_again = doc_sync.sync_readme_extractor_table(check_only=True)
+
+            self.assertFalse(changed_again)
+
+    def test_extractor_table_raises_on_dataset_missing_domain(self):
+        from src.builders import doc_sync
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            readme = self._readme(tmpdir, "EXTRACTOR_TABLE")
+            fake_catalog = {"dataset_nuevo_sin_dominio": {"extractor": "src/extractors/x.py"}}
+
+            with (
+                patch.object(doc_sync, "DATASET_CATALOG_CONFIG", fake_catalog),
+                patch.object(doc_sync, "README_PATH", str(readme)),
+            ):
+                with self.assertRaises(SystemExit):
+                    doc_sync.sync_readme_extractor_table()
+
+
+class ExtractorRegistryTests(unittest.TestCase):
+    """Tests para check_extractors() en scripts/check_companion_paths.py —
+    valida el campo `extractor` del catalogo (Plan 058)."""
+
+    def _write_catalog(self, tmpdir, catalog):
+        path = Path(tmpdir) / "dataset_catalog_config.json"
+        path.write_text(json.dumps(catalog), encoding="utf-8")
+        return path
+
+    def test_check_extractors_against_real_catalog_has_no_errors(self):
+        from scripts import check_companion_paths
+
+        errors = check_companion_paths.check_extractors()
+        self.assertEqual(errors, [])
+
+    def test_missing_extractor_file_is_reported(self):
+        from scripts import check_companion_paths
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            extractors_dir = root / "src" / "extractors"
+            extractors_dir.mkdir(parents=True)
+            catalog_path = self._write_catalog(
+                tmpdir, {"foo": {"extractor": "src/extractors/no_existe.py"}}
+            )
+
+            with (
+                patch.object(check_companion_paths, "ROOT_DIR", root),
+                patch.object(check_companion_paths, "DATASET_CATALOG_PATH", catalog_path),
+                patch.object(check_companion_paths, "EXTRACTORS_DIR", extractors_dir),
+            ):
+                errors = check_companion_paths.check_extractors()
+
+            self.assertTrue(any("extractor no existe" in e for e in errors))
+
+    def test_orphan_extractor_file_is_reported(self):
+        from scripts import check_companion_paths
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            extractors_dir = root / "src" / "extractors"
+            extractors_dir.mkdir(parents=True)
+            (extractors_dir / "foo_extractor.py").write_text("", encoding="utf-8")
+            (extractors_dir / "huerfano_extractor.py").write_text("", encoding="utf-8")
+            catalog_path = self._write_catalog(
+                tmpdir, {"foo": {"extractor": "src/extractors/foo_extractor.py"}}
+            )
+
+            with (
+                patch.object(check_companion_paths, "ROOT_DIR", root),
+                patch.object(check_companion_paths, "DATASET_CATALOG_PATH", catalog_path),
+                patch.object(check_companion_paths, "EXTRACTORS_DIR", extractors_dir),
+            ):
+                errors = check_companion_paths.check_extractors()
+
+            self.assertTrue(
+                any("extractor huérfano" in e and "huerfano_extractor.py" in e for e in errors)
+            )
+            self.assertFalse(any("foo_extractor.py" in e and "huérfano" in e for e in errors))
+
+    def test_missing_extractor_field_is_reported(self):
+        from scripts import check_companion_paths
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            extractors_dir = root / "src" / "extractors"
+            extractors_dir.mkdir(parents=True)
+            catalog_path = self._write_catalog(tmpdir, {"foo": {"description": "sin extractor"}})
+
+            with (
+                patch.object(check_companion_paths, "ROOT_DIR", root),
+                patch.object(check_companion_paths, "DATASET_CATALOG_PATH", catalog_path),
+                patch.object(check_companion_paths, "EXTRACTORS_DIR", extractors_dir),
+            ):
+                errors = check_companion_paths.check_extractors()
+
+            self.assertTrue(any("falta el campo" in e for e in errors))
+
 
 class AdoptionStatsTests(unittest.TestCase):
     """Tests sin red del parseo/construcción de la señal de adopción (Plan 052).
