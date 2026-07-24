@@ -28,6 +28,7 @@ from src.validation import (
     validate_empresas,
     validate_establecimientos_educacionales,
     validate_establecimientos_salud,
+    validate_geometria_comunal,
     validate_indicadores,
     validate_partidos_politicos,
     validate_pobreza_comunal,
@@ -1739,6 +1740,84 @@ class ValidatePuntosInteresTests(unittest.TestCase):
             any("5-char" in e for e in result["errors"]),
             msg=f"Expected '5-char' error, got: {result['errors']}",
         )
+
+
+class GeometriaComunalValidatorTests(unittest.TestCase):
+    """Tests unitarios para validate_geometria_comunal."""
+
+    def _make_df(self, rows):
+        return pl.DataFrame(
+            rows,
+            schema={
+                "codigo_region": pl.String,
+                "codigo_comuna": pl.String,
+                "nombre_comuna": pl.String,
+                "nombre_comuna_clean": pl.String,
+                "nombre_region": pl.String,
+                "geometry_wkt": pl.String,
+            },
+        )
+
+    def _row(self, **overrides):
+        row = {
+            "codigo_region": "13",
+            "codigo_comuna": "13101",
+            "nombre_comuna": "Santiago",
+            "nombre_comuna_clean": "santiago",
+            "nombre_region": "Región Metropolitana de Santiago",
+            "geometry_wkt": "POLYGON ((-70.6 -33.4, -70.5 -33.4, -70.5 -33.5, -70.6 -33.4))",
+        }
+        row.update(overrides)
+        return row
+
+    def test_valid_data_returns_ok(self):
+        df = self._make_df([self._row()])
+        result = validate_geometria_comunal(df)
+        self.assertEqual(result["status"], "ok")
+        self.assertEqual(result["errors"], [])
+
+    def test_empty_dataframe_returns_error(self):
+        df = self._make_df([])
+        result = validate_geometria_comunal(df)
+        self.assertEqual(result["status"], "error")
+
+    def test_missing_columns_returns_error(self):
+        df = pl.DataFrame({"columna_random": [1]})
+        result = validate_geometria_comunal(df)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("missing" in e for e in result["errors"]))
+
+    def test_duplicate_codigo_comuna_returns_error(self):
+        df = self._make_df([self._row(), self._row()])
+        result = validate_geometria_comunal(df)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("unique" in e for e in result["errors"]))
+
+    def test_invalid_cut_format_returns_error(self):
+        df = self._make_df([self._row(codigo_comuna="1101")])
+        result = validate_geometria_comunal(df)
+        self.assertEqual(result["status"], "error")
+
+    def test_empty_geometry_returns_error(self):
+        df = self._make_df([self._row(geometry_wkt="")])
+        result = validate_geometria_comunal(df)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("empty geometry_wkt" in e for e in result["errors"]))
+
+    def test_unknown_commune_returns_error(self):
+        df = self._make_df([self._row(codigo_comuna="99999")])
+        result = validate_geometria_comunal(df, valid_commune_codes=VALID_COMMUNE_CODES)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("unknown communes" in e for e in result["errors"]))
+
+    def test_partial_coverage_below_340_returns_warning_not_error(self):
+        rows = [
+            self._row(codigo_comuna=f"{i:05d}", nombre_comuna=f"Comuna {i}") for i in range(1, 301)
+        ]
+        df = self._make_df(rows)
+        result = validate_geometria_comunal(df, valid_commune_codes=VALID_COMMUNE_CODES)
+        self.assertEqual(result["status"], "ok")
+        self.assertTrue(any("cobertura parcial" in w for w in result["warnings"]))
 
 
 if __name__ == "__main__":

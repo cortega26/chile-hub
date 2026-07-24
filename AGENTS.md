@@ -43,7 +43,7 @@ entender la arquitectura, las reglas no negociables y las convenciones del proye
 ## 1. Propósito del proyecto
 
 `chile-hub` es una capa de datos pública, curada y reproducible sobre **datos oficiales de Chile**.
-Actualmente publica diecinueve (<!-- START_AGENTS_DATASET_COUNT -->21<!-- END_AGENTS_DATASET_COUNT -->) capas:
+Actualmente publica diecinueve (<!-- START_AGENTS_DATASET_COUNT -->22<!-- END_AGENTS_DATASET_COUNT -->) capas:
 
 | Capa | Fuente | Descripción |
 |:---|:---|:---|

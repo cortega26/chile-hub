@@ -1219,3 +1219,85 @@ def validate_autoridades_electas(
         "errors": errors,
         "warnings": warnings,
     }
+
+
+def validate_geometria_comunal(
+    df: pl.DataFrame,
+    metadata: dict[str, Any] | None = None,
+    valid_commune_codes: list[str] | None = None,
+) -> dict[str, Any]:
+    """Valida el dataset de geometría comunal (límites poligonales, BCN ArcGIS).
+
+    Carril CANDIDATE — cobertura parcial es esperada por diseño (un warning, no
+    un error): la fuente BCN no expone geometría para `codigo_comuna=12202`
+    (Antártica), el mismo hueco que `subdere_extractor.py` ya suplementa a mano
+    para el dataset `comunas`. La integridad referencial (todo código presente
+    aquí debe existir en el DPA) sí es un error — ver ADR-012.
+    """
+    errors: list[str] = []
+    warnings: list[str] = []
+    row_count = df.height
+
+    required = [
+        "codigo_region",
+        "codigo_comuna",
+        "nombre_comuna",
+        "nombre_comuna_clean",
+        "nombre_region",
+        "geometry_wkt",
+    ]
+    missing = _missing_columns(df, required)
+    if missing:
+        errors.append(f"missing required columns: {missing}")
+        return {
+            "dataset": "geometria_comunal",
+            "status": "error",
+            "record_count": row_count,
+            "errors": errors,
+            "warnings": warnings,
+        }
+
+    if row_count == 0:
+        errors.append("geometria_comunal dataset is empty")
+        return {
+            "dataset": "geometria_comunal",
+            "status": "error",
+            "record_count": row_count,
+            "errors": errors,
+            "warnings": warnings,
+        }
+
+    dup_count = _duplicate_count(df, ["codigo_comuna"])
+    if dup_count > 0:
+        errors.append(f"codigo_comuna must be unique, found {dup_count} duplicate rows")
+
+    invalid_cut = _invalid_fixed_length_count(df, "codigo_comuna", 5)
+    if invalid_cut > 0:
+        errors.append(f"found {invalid_cut} codigo_comuna with invalid length (expected 5)")
+
+    empty_geom = df.filter(
+        pl.col("geometry_wkt").is_null() | (pl.col("geometry_wkt").str.len_chars() == 0)
+    ).height
+    if empty_geom > 0:
+        errors.append(f"found {empty_geom} rows with empty geometry_wkt")
+
+    unknown = _unknown_codes(df, "codigo_comuna", valid_commune_codes)
+    if unknown:
+        errors.append(f"geometria_comunal references unknown communes: {unknown}")
+
+    if row_count < 340:
+        warnings.append(
+            f"solo {row_count}/346 comunas con geometría — cobertura parcial "
+            "(candidate; la fuente BCN no cubre codigo_comuna=12202/Antártica)"
+        )
+
+    if metadata and metadata.get("source_mode") == "fallback":
+        warnings.append("geometria_comunal source_mode is fallback; usando snapshot versionado.")
+
+    return {
+        "dataset": "geometria_comunal",
+        "status": "error" if errors else "ok",
+        "record_count": row_count,
+        "errors": errors,
+        "warnings": warnings,
+    }
