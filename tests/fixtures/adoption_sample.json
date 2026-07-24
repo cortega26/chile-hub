@@ -1,0 +1,24 @@
+{
+  "pypi_recent": {
+    "data": {
+      "last_day": 41,
+      "last_week": 310,
+      "last_month": 1234
+    }
+  },
+  "github_releases": [
+    {
+      "tag_name": "v0.3.0",
+      "assets": [
+        {"name": "chile-hub-bundle.zip", "download_count": 100},
+        {"name": "chile-hub-bundle.sha256", "download_count": 23}
+      ]
+    },
+    {
+      "tag_name": "v0.2.0",
+      "assets": [
+        {"name": "chile-hub-bundle.zip", "download_count": 444}
+      ]
+    }
+  ]
+}
