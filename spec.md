@@ -66,7 +66,11 @@ de límite de CI) se anotan pero no bloquean el resto de la cola.
 10. **No hacer merge a `main` ni push a `origin` sin confirmación explícita del
     operador.** El branch queda listo para review; se batchea la confirmación de
     merge/push en checkpoints, no plan por plan (evita interrumpir el flujo por algo
-    que no cambia de respuesta).
+    que no cambia de respuesta). **Conflicto esperado al mergear**: como cada branch
+    parte de `main` y cada uno archiva su propio plan en `plans/README.md`, dos
+    branches que borran filas vecinas de la tabla "Planes activos" van a chocar ahí
+    al mergear en secuencia (delete/delete adyacente) — es cosmético y se resuelve
+    borrando ambas líneas; no es señal de un problema real.
 11. Marcar el ítem correspondiente en `todo.md`.
 12. Cada ~20 iteraciones (steps + fixes acumulados across planes), lanzar un subagente
     fresco con el prompt "review spec.md and the current implementation for gaps" y
@@ -89,8 +93,12 @@ tests/e2e/run_all.sh      # todos los planes ya marcados DONE esta sesión, en o
 Cada script:
 - Sale con el código de salida del primer comando que falle (`set -euo pipefail`).
 - Imprime cada done-criterion y su resultado (no silencia salida).
-- No modifica `main` ni hace red/push — sólo lee y corre comandos locales (`make`,
-  `pytest`, `grep`, `python3 -c`).
+- No toca git (ni commits, ni `main`, ni red/push) — pero **puede escribir archivos
+  locales generados** cuando el propio done-criteria del plan lo pide (p. ej.
+  `verify_058.sh` corre `make sync-docs`, que reescribe bloques delimitados de
+  README.md/AGENTS.md si están desincronizados — igual que en CI). Esa escritura es
+  intencional y reproduce el done-criteria tal cual está escrito en el plan, no un
+  efecto secundario oculto.
 
 Un plan se considera "verificado" cuando su script `verify_NNN.sh` sale con exit 0 en
 el branch del plan, **y** `make doctor` sigue en exit 0 (regresión global).

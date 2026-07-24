@@ -3,6 +3,12 @@
 Ver `spec.md` para el detalle de cómo se trabaja cada ítem. Marcar `[x]` sólo cuando
 el done-criteria completo del plan pasa (no cuando "parece listo").
 
+**Nota sobre "DONE" en este archivo**: cuando un plan queda `[x]` aquí, su archivado en
+`plans/README.md` vive en el branch de ESE plan (`advisor/NNN-slug`), no en `main`
+todavía — `main` sigue mostrando la fila activa hasta que el operador confirme el
+merge (ver spec.md, paso 10). No es drift; es el estado esperado mientras los branches
+están pendientes de review.
+
 ## Housekeeping
 
 - [x] Archivar planes DONE (055, 056, 060, 061, 062) a `plans/archive/`
