@@ -323,6 +323,10 @@
             --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, 'Cascadia Code', 'Fira Code', Menlo, Monaco, monospace;
 
             --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+            --space-section-tight: 2rem;
+            --space-section-normal: 3.5rem;
+            --space-section-loose: 5rem;
         }
 
         * {
@@ -462,15 +466,56 @@
         }
 
         main {
-            padding: 3.5rem 2rem;
+            padding: 3.5rem 2rem 4rem;
             display: flex;
             flex-direction: column;
-            gap: 3rem;
+            gap: var(--space-section-normal);
             flex: 1;
         }
 
         main#main-content:focus {
             outline: none;
+        }
+
+        /* Hero → next section: tighter connection */
+        .intro + .kpi-container {
+            margin-top: calc(var(--space-section-normal) - var(--space-section-tight));
+        }
+
+        /* After catalog → coverage/trust: larger separator for visual break */
+        .catalog-section + .section-shell {
+            margin-top: calc(var(--space-section-loose) - var(--space-section-normal));
+        }
+
+        /* Manifesto → next section: more breathing room after a dark block */
+        .manifesto + * {
+            margin-top: calc(var(--space-section-loose) - var(--space-section-normal));
+        }
+
+        /* Last sections before footer: tighter */
+        .participate-section + .support-section {
+            margin-top: calc(var(--space-section-tight) - var(--space-section-normal));
+        }
+
+        .section-shell::before {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 3px;
+            background: var(--accent-green);
+            border-radius: 2px;
+            margin-bottom: 1.5rem;
+            opacity: 0.25;
+        }
+
+        .manifesto::before {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            margin-bottom: 1.5rem;
         }
 
         /* Intro / Hero Section */
