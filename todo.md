@@ -74,16 +74,22 @@ están pendientes de review.
       `fail-under = 0` para el hook local; `make docs-coverage`/CI siguen con su
       `--fail-under=80` explícito sin cambios (informativo, `\|\| true`).
 
-## Plan 051 — capa HTTP estática + catálogo DCAT
+## Plan 051 — capa HTTP estática + catálogo DCAT — ✅ DONE (2026-07-24)
 
-- [ ] Drift check corrido
-- [ ] Branch creado
-- [ ] Steps del plan ejecutados
-- [ ] ADR-010 escrito
-- [ ] Fix `from_datapackage(url)` incluido
-- [ ] Done criteria (8 ítems) verificados
-- [ ] `tests/e2e/verify_051.sh` escrito y en verde
-- [ ] Fila de `plans/README.md` actualizada a DONE
+- [x] Drift check corrido, sin discrepancias
+- [x] Branch `advisor/051-static-http-dcat` creado
+- [x] `src/builders/dcat_catalog.py` genera `data.json` (DCAT-US) desde `datapackage.json`
+- [x] `from_datapackage(url)` ya no lanza `FileNotFoundError` — valida vía frictionless,
+      levanta `ChileHubDataError` explícito (verificado en código: `ChileHub.__init__`
+      no soporta `data_dir` remoto; no se fuerza ese rediseño, queda como follow-up
+      en ADR-010 #5)
+- [x] ADR-010 escrito (perfil DCAT-US default, datos.gob.cl no verificable → pregunta
+      abierta; sin pinning por versión)
+- [x] `docs/http-access.md` + entrada en `mkdocs.yml` nav
+- [x] Done criteria verificados
+- [x] `tests/e2e/verify_051.sh` escrito y en verde
+- [x] Fila de `plans/README.md` actualizada a DONE y archivada
+- [x] Commits en el branch (5 commits, sin merge/push — pendiente confirmación operador)
 - [ ] Commit(s) en el branch
 
 ## Plan 054 — validación de anomalías temporales
