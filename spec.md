@@ -66,11 +66,23 @@ de límite de CI) se anotan pero no bloquean el resto de la cola.
 10. **No hacer merge a `main` ni push a `origin` sin confirmación explícita del
     operador.** El branch queda listo para review; se batchea la confirmación de
     merge/push en checkpoints, no plan por plan (evita interrumpir el flujo por algo
-    que no cambia de respuesta). **Conflicto esperado al mergear**: como cada branch
-    parte de `main` y cada uno archiva su propio plan en `plans/README.md`, dos
-    branches que borran filas vecinas de la tabla "Planes activos" van a chocar ahí
-    al mergear en secuencia (delete/delete adyacente) — es cosmético y se resuelve
-    borrando ambas líneas; no es señal de un problema real.
+    que no cambia de respuesta). **Conflictos esperados al mergear** (todos
+    cosméticos, verificados con `git merge-tree` en Checkpoint 2 — ninguno indica
+    un problema real, no re-litigar cuando aparezcan):
+    - `plans/README.md`: dos branches que borran filas vecinas de la tabla
+      "Planes activos" chocan ahí (delete/delete adyacente) — se resuelve
+      borrando ambas líneas.
+    - `plans/README.md` badge de conteo de ADRs: si dos branches bumpean el mismo
+      número (ej. 10→11 en ambos), el merge NO marca conflicto (mismo texto en
+      ambos lados) pero el resultado queda desincronizado con la realidad
+      (debería ser 12) — **no confiar en el valor tal cual mergea; correr
+      `make sync-docs` después de cada merge y commitear el resultado**, nunca
+      elegir un lado a mano.
+    - `tests/test_core.py` / `tests/test_pipeline_logic.py`: dos branches que
+      agregan su clase de test nueva justo antes de
+      `if __name__ == "__main__":` (el patrón que este spec usa) producen un
+      conflicto real de texto ahí — trivial de resolver (conservar ambas clases),
+      pero no es "sin conflictos" como podría sugerir un vistazo rápido.
 11. Marcar el ítem correspondiente en `todo.md`.
 12. Cada ~20 iteraciones (steps + fixes acumulados across planes), lanzar un subagente
     fresco con el prompt "review spec.md and the current implementation for gaps" y
