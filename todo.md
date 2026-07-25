@@ -90,18 +90,27 @@ están pendientes de review.
 - [x] `tests/e2e/verify_051.sh` escrito y en verde
 - [x] Fila de `plans/README.md` actualizada a DONE y archivada
 - [x] Commits en el branch (5 commits, sin merge/push — pendiente confirmación operador)
-- [ ] Commit(s) en el branch
 
-## Plan 054 — validación de anomalías temporales
+## Plan 054 — validación de anomalías temporales — ✅ DONE (2026-07-25)
 
-- [ ] Drift check corrido
-- [ ] Branch creado
-- [ ] Steps del plan ejecutados (warn + drift flag, nunca SystemExit)
-- [ ] ADR-013 escrito
-- [ ] Done criteria (10 ítems) verificados
-- [ ] `tests/e2e/verify_054.sh` escrito y en verde
-- [ ] Fila de `plans/README.md` actualizada a DONE
-- [ ] Commit(s) en el branch
+- [x] Drift check corrido — `src/validation.py` tenía drift (82 líneas, un
+      validador nuevo `validate_geometria_comunal` de Plan 053, sin relación con
+      `validate_indicadores`); `reports.py`/`verify_pipeline.py` sin drift
+- [x] Branch `advisor/054-anomaly-validation` creado
+- [x] `detect_series_anomalies()` (z-score robusto MAD sobre log-retornos),
+      calibrado contra datos reales (cero falsos positivos) y 4 casos
+      adversariales; integrado en `validate_indicadores` sólo como warning
+- [x] Propagado a `drift_status: "drifted"` vía `build_degradation()`/`build_drift()`
+      en `metadata.py` (el plan sugería `reports.py`; el cómputo real vive en
+      `metadata.py`, `reports.py` hereda sin cambios — sin canal nuevo)
+- [x] Gate de publicación (`verify_pipeline.py --profile publication`) rechaza
+      ante anomalía no revisada; override real `--allow-known-anomalies`; build
+      nunca aborta
+- [x] ADR-013 escrito con método, calibración, ruta de override, 4 preguntas abiertas
+- [x] Done criteria verificados
+- [x] `tests/e2e/verify_054.sh` escrito y en verde
+- [x] Fila de `plans/README.md` actualizada a DONE y archivada
+- [x] Commits en el branch (5 commits, sin merge/push — pendiente confirmación operador)
 
 ## Plan 059 — publicación Hugging Face Hub
 
