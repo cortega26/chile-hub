@@ -178,12 +178,36 @@ class HfPublishJobGuardrailTests(unittest.TestCase):
 
     def test_hf_publish_is_not_a_blocking_dependency(self):
         """Ningún otro job debe listar hf-publish en su `needs` — es el
-        último eslabón de la cadena y su falla no debe afectar a nadie más."""
+        último eslabón de la cadena y su falla no debe afectar a nadie más.
+
+        Cubre tanto `needs: hf-publish` / `needs: [hf-publish]` (inline, en la
+        misma línea) como el estilo YAML de lista de bloque:
+            needs:
+              - hf-publish
+        """
         content = PYPI_RELEASE_WORKFLOW.read_text(encoding="utf-8")
-        for line in content.splitlines():
+        lines = content.splitlines()
+        in_needs_block = False
+        needs_indent = None
+        for line in lines:
             stripped = line.strip()
-            if stripped.startswith("needs:") and "hf-publish" in stripped:
-                self.fail(f"Un job depende de hf-publish, lo que lo volveria bloqueante: {line!r}")
+            if stripped.startswith("needs:"):
+                if "hf-publish" in stripped:
+                    self.fail(
+                        f"Un job depende de hf-publish, lo que lo volveria bloqueante: {line!r}"
+                    )
+                # `needs:` sin valor en la misma linea -> puede venir una lista
+                # de bloque en las lineas siguientes, mas indentadas.
+                in_needs_block = stripped == "needs:"
+                needs_indent = len(line) - len(line.lstrip(" "))
+                continue
+            if in_needs_block:
+                current_indent = len(line) - len(line.lstrip(" "))
+                if stripped.startswith("-") and current_indent > needs_indent:
+                    if "hf-publish" in stripped:
+                        self.fail(f"Un job depende de hf-publish (lista de bloque): {line!r}")
+                    continue
+                in_needs_block = False
 
 
 if __name__ == "__main__":

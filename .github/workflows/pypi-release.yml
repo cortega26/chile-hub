@@ -24,6 +24,7 @@ jobs:
     outputs:
       released: ${{ steps.semantic-release.outputs.released }}
       ready: ${{ steps.pipeline-assets.outputs.ready }}
+      run_id: ${{ steps.pipeline-assets.outputs.run_id }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -62,6 +63,7 @@ jobs:
           fi
 
           if [[ -n "$run_id" ]]; then
+            echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
             gh run download "$run_id" \
               --name "pipeline-output-$run_id" \
               --dir data/normalized
@@ -216,18 +218,21 @@ jobs:
           rm -rf data/normalized
           mkdir -p data/normalized
 
-          if [[ "${{ github.event_name }}" == "workflow_run" ]]; then
-            run_id="${{ github.event.workflow_run.id }}"
-          else
-            run_id=$(gh run list --workflow "Pipeline Check" --branch main --status success --limit 1 --json databaseId --jq '.[0].databaseId' || true)
-          fi
+          # Reusa el run_id exacto que release ya resolvio y valido (job output
+          # run_id), en vez de re-resolver "el ultimo run exitoso" de forma
+          # independiente. Evita una condicion de carrera en workflow_dispatch:
+          # release puede pushear un commit de release que dispare un nuevo
+          # Pipeline Check run en main antes de que este job corra; re-resolver
+          # aqui podria bajar un artefacto distinto al que needs.release.outputs.ready
+          # efectivamente valido.
+          run_id="${{ needs.release.outputs.run_id }}"
 
           if [[ -n "$run_id" ]]; then
             gh run download "$run_id" \
               --name "pipeline-output-$run_id" \
               --dir data/normalized
           else
-            echo "Error: No verified pipeline data assets found."
+            echo "Error: No verified pipeline data assets found (release no expuso run_id)."
             exit 1
           fi
 

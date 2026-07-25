@@ -66,7 +66,13 @@ def select_publishable_files() -> tuple[list[tuple[str, Path]], list[Path]]:
                 "no se puede publicar en Hugging Face Hub sin redistribución "
                 "confirmada. Revisa data/dataset_catalog_config.json."
             )
-        parquet_path = ROOT_DIR / outputs["parquet"]
+        parquet_rel_path = outputs.get("parquet")
+        if not parquet_rel_path:
+            raise SystemExit(
+                f"ERROR: '{name}' tiene outputs pero sin clave 'parquet'; "
+                "revisa data/dataset_catalog_config.json (drift de esquema)."
+            )
+        parquet_path = ROOT_DIR / parquet_rel_path
         if not parquet_path.is_file():
             raise SystemExit(
                 f"ERROR: '{name}' es publicable pero falta su Parquet en "
