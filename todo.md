@@ -147,10 +147,20 @@ están pendientes de review.
 
 ## Checkpoints de revisión (cada ~20 iteraciones)
 
-- [ ] Checkpoint 1 (tras 058 + 057): subagente "review spec.md and the current
-      implementation for gaps"
-- [ ] Checkpoint 2 (tras 050 + 051): subagente de revisión
-- [ ] Checkpoint 3 (tras 054 + 059): subagente de revisión
+- [x] Checkpoint 1 (tras 058 + 057) — hallazgos: afirmación incorrecta en spec.md
+      sobre que los scripts e2e nunca escriben archivos (corregida), conflicto de
+      merge esperado documentado, stash redundante descartado.
+- [x] Checkpoint 2 (tras 050 + 051) — hallazgo real: `.strip()` en
+      `normalize_comuna_name` divergía silenciosamente de la cadena Polars del
+      extractor (documentado + test adversarial agregado); typo aritmético en
+      fila de plan 051 corregido.
+- [x] Checkpoint 3 (tras 054 + 059) — 2 hallazgos medium arreglados en código:
+      condición de carrera en la resolución de `run_id` de `hf-publish` (ahora
+      reusa el output de `release` en vez de re-resolver), y la precedencia
+      fallback-vs-anomalía en `build_degradation()` (intencional, ahora
+      documentada + testeada). 2 hallazgos low arreglados: `KeyError` sin
+      contexto en `select_publishable_files()`, y blind spot del test de
+      guardrail para el estilo YAML de lista de bloque en `needs:`.
 - [ ] Checkpoint 4 (tras 063, final): subagente de revisión + resumen para el operador
       sobre qué branches quedan listos para merge/push (decisión del operador, no
       autónoma)
