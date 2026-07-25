@@ -719,6 +719,17 @@ Si el job `publish` rechaza un dataset (por fallback, fetch fallido, o dato stal
 4. Si la fuente desapareció permanentemente: aplicar el protocolo de §6 (marcar como
    `stale` y evaluar exclusión del bundle).
 
+### Workflow de release (`pypi-release.yml`)
+
+Corre tras un `Pipeline Check` exitoso en `main` (`workflow_run`) o
+`workflow_dispatch` manual. Job `release`: baja el artefacto de pipeline
+verificado, corre `python-semantic-release` (§7), publica el paquete en PyPI y
+adjunta los artefactos de datos al GitHub Release cuando son
+publication-grade. Tras cada release, el job `hf-publish` de
+`pypi-release.yml` replica las 19 capas publicables (Parquet + catálogo) a
+Hugging Face Hub (`cortega26/chile-hub`, requiere secret `HF_TOKEN`); nunca
+incluye el carril `candidate` y no bloquea el release si falla.
+
 ---
 
 ## 10. Antipatrones — nunca hacer esto
@@ -808,6 +819,9 @@ make hub-runtime-status-table
 
 # Bundle publicable
 make package-bundle     # ZIP desde artifact_manifest.json
+
+# Distribución
+./.venv/bin/python scripts/publish_hf_dataset.py --dry-run   # Simula el job hf-publish (sin subir nada)
 
 # API Python
 from src.chile_hub import ChileHub
