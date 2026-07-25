@@ -112,16 +112,23 @@ están pendientes de review.
 - [x] Fila de `plans/README.md` actualizada a DONE y archivada
 - [x] Commits en el branch (5 commits, sin merge/push — pendiente confirmación operador)
 
-## Plan 059 — publicación Hugging Face Hub
+## Plan 059 — publicación Hugging Face Hub — ✅ DONE (2026-07-25)
 
-- [ ] Drift check corrido
-- [ ] Branch creado
-- [ ] Steps del plan ejecutados (script --dry-run, job CI, dataset card)
-- [ ] Nota registrada: secret `HF_TOKEN` pendiente de creación manual por el mantenedor (no bloquea implementación)
-- [ ] Done criteria (9 ítems) verificados
-- [ ] `tests/e2e/verify_059.sh` escrito y en verde
-- [ ] Fila de `plans/README.md` actualizada a DONE
-- [ ] Commit(s) en el branch
+- [x] Drift check corrido — sólo bump trivial de SHA en pypi-release.yml
+- [x] Branch `advisor/059-huggingface-publish` creado
+- [x] `scripts/publish_hf_dataset.py` (`--dry-run` + subida real perezosa) + job
+      `hf-publish` en `pypi-release.yml` + `docs/hf/dataset-card.md`
+- [x] **Fix sobre el propio plan**: `comunas_enriquecidas` es alias de `comunas`
+      (mismo Parquet, Plan 014/PERF-08) — nombrar por basename fuente colapsaba
+      a 18 archivos; corregido nombrando por clave de catálogo (19 exactos)
+- [x] `release` expone `outputs: released/ready`; `hf-publish` gatea en ambos
+      (no sólo `released`) para no publicar sin datos verificados
+- [x] Nota registrada: secret `HF_TOKEN` pendiente de creación manual por el
+      mantenedor (no bloquea implementación — script + CI completos y testeados)
+- [x] Done criteria verificados
+- [x] `tests/e2e/verify_059.sh` escrito y en verde
+- [x] Fila de `plans/README.md` actualizada a DONE y archivada
+- [x] Commits en el branch (5 commits, sin merge/push — pendiente confirmación operador)
 
 ## Plan 063 — historial de salud + sparkline
 
