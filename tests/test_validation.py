@@ -19,6 +19,7 @@ if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
 from src.validation import (
+    detect_series_anomalies,
     validate_autoridades_electas,
     validate_censo_comunal,
     validate_censo_hogares_viviendas,
@@ -412,6 +413,79 @@ class ValidateIndicadoresTests(unittest.TestCase):
         result = validate_indicadores(df, {"source_mode": "fallback"})
         self.assertEqual(result["status"], "ok")
         self.assertTrue(any("synthetic" in w for w in result["warnings"]))
+
+    def test_temporal_anomaly_adds_warning_not_error(self):
+        """Regresión de contrato de valor (Plan 054, ADR-013): un salto 10x fuera
+        de rango se publicaba antes sin ninguna señal; este test falla sin la
+        detección y pasa con ella. La anomalía NUNCA debe llegar a errors."""
+        rows = []
+        for code in ["dolar", "euro", "utm", "ipc"]:
+            for i in range(1, 7):
+                rows.append({"codigo_indicador": code, "fecha": f"2024-01-0{i}", "valor": 100.0})
+        for i, valor in enumerate([100.0, 100.1, 100.2, 100.1, 100.3, 1000.0], start=1):
+            rows.append({"codigo_indicador": "uf", "fecha": f"2024-01-0{i}", "valor": valor})
+        df = pl.DataFrame(rows)
+
+        result = validate_indicadores(df, None)
+
+        self.assertNotEqual(result["status"], "error")
+        self.assertTrue(any("anomal" in w.lower() for w in result["warnings"]))
+        self.assertEqual(len(result["anomalies"]), 1)
+        self.assertEqual(result["anomalies"][0]["codigo_indicador"], "uf")
+
+
+# ── detect_series_anomalies ─────────────────────────────────────────────────────
+
+
+class DetectSeriesAnomaliesTests(unittest.TestCase):
+    def _make_series(self, values, *, code="uf", start_day=1):
+        return pl.DataFrame(
+            {
+                "codigo_indicador": [code] * len(values),
+                "fecha": [
+                    f"2024-01-{day:02d}" for day in range(start_day, start_day + len(values))
+                ],
+                "valor": values,
+            }
+        )
+
+    def test_detects_injected_10x_jump(self):
+        df = self._make_series([100.0, 100.1, 100.2, 100.1, 100.3, 1000.0])
+        anomalies = detect_series_anomalies(df, z_threshold=4.0, min_history=4)
+        self.assertEqual(len(anomalies), 1)
+        self.assertEqual(anomalies[0]["codigo_indicador"], "uf")
+        self.assertEqual(anomalies[0]["fecha"], "2024-01-06")
+
+    def test_stable_series_with_normal_noise_not_flagged(self):
+        # Ruido pequeño y consistente, sin salto real al final.
+        values = [100.0, 100.05, 99.98, 100.02, 100.1, 99.95, 100.03, 100.01]
+        df = self._make_series(values)
+        anomalies = detect_series_anomalies(df, z_threshold=4.0, min_history=4)
+        self.assertEqual(anomalies, [])
+
+    def test_short_series_below_min_history_not_flagged(self):
+        # Mismo salto 10x del test positivo, pero con muy poco histórico previo.
+        df = self._make_series([100.0, 100.0, 1000.0])
+        anomalies = detect_series_anomalies(df, z_threshold=4.0, min_history=4)
+        self.assertEqual(anomalies, [])
+
+    def test_gradual_legitimate_trend_not_flagged(self):
+        # Tendencia real (ej. inflación sostenida): mismo log-retorno cada día.
+        values = [100.0 * (1.01**i) for i in range(10)]
+        df = self._make_series(values)
+        anomalies = detect_series_anomalies(df, z_threshold=4.0, min_history=4)
+        self.assertEqual(anomalies, [])
+
+    def test_no_false_positives_on_real_indicadores_data(self):
+        """Regresión de calibración: el umbral elegido no debe generar ruido
+        sobre los datos reales publicados (ver ADR-013)."""
+        normalized_dir = Path(__file__).resolve().parents[1] / "data" / "normalized"
+        parquet_path = normalized_dir / "indicadores.parquet"
+        if not parquet_path.exists():
+            self.skipTest("data/normalized/indicadores.parquet no disponible (correr make build)")
+        df = pl.read_parquet(parquet_path)
+        anomalies = detect_series_anomalies(df)
+        self.assertEqual(anomalies, [], f"falsos positivos inesperados: {anomalies}")
 
 
 # ── validate_distritos_electorales ─────────────────────────────────────────────
