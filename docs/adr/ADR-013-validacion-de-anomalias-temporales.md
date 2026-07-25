@@ -81,6 +81,28 @@ tocar `reports.py` ni inventar un campo nuevo en `drift_report.json`: el
 `recommended_action` específico llega ahí gratis porque `build_drift()` ya lo
 hereda de `degradation`.
 
+**Precedencia frente al fallback de `source_mode` (co-ocurrencia rara, revisada
+en checkpoint de sesión)**: las ramas específicas de `source_mode == "fallback"`
+para `comunas`/`regiones`/`provincias`/`indicadores` (líneas previas de
+`build_degradation()`) retornan **antes** de llegar a la rama de anomalías. Si
+`indicadores` está simultáneamente en modo fallback **y** tiene una anomalía
+detectada, `degradation`/`drift_report.json` muestran sólo el mensaje de
+fallback ("valores provenientes de fallback local..."), no el de la anomalía —
+`anomaly_detected`/`anomaly_indicator_codes` no se poblarían en ese caso. Esto
+es **intencional, no un bug**: en modo fallback los valores son datos sintéticos
+de desarrollo (ver warning "synthetic development data" en
+`validate_indicadores`), así que una anomalía estadística sobre datos ya
+sabidos-no-reales no aporta señal útil — el mensaje de fallback es la
+información más accionable. Tampoco crea un hueco de seguridad: la publicación
+ya se rechaza de forma independiente para cualquier dataset en `source_mode ==
+"fallback"` (`verify_publication_policy()`,
+`scripts/verify_pipeline.py`, chequeo de `source_mode` sobre datasets
+`stable_publishable`) — el gate de anomalías (§4) es una capa adicional, no la
+única que bloquea ese caso. El único costo es de observabilidad: la anomalía
+en sí queda visible únicamente en `warnings` dentro de `pipeline_metadata.json`
+(vía `validate_indicadores`), no en `drift_report.json`, mientras coincida con
+fallback. Se documenta aquí para que quede explícito, no oculto.
+
 ### 4. Gate de publicación: rechazo override-able, no `SystemExit` del build
 
 `scripts/verify_pipeline.py` agrega, dentro de los "Strict checks for
