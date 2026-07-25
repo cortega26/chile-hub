@@ -16,9 +16,11 @@ if str(ROOT_DIR) not in sys.path:
 
 PIPELINE_CHECK_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "pipeline-check.yml"
 MONTHLY_SCRAPE_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "monthly-scrape.yml"
+PYPI_RELEASE_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "pypi-release.yml"
 MAKEFILE = ROOT_DIR / "Makefile"
 MKDOCS_CONFIG = ROOT_DIR / "mkdocs.yml"
 DOCS_DIR = ROOT_DIR / "docs"
+PUBLISH_HF_SCRIPT = ROOT_DIR / "scripts" / "publish_hf_dataset.py"
 
 
 class SinimDailyJobGuardrailTests(unittest.TestCase):
@@ -143,6 +145,45 @@ def _extract_make_target(makefile_content: str, target_name: str) -> str:
             else:
                 break
     return "\n".join(body_lines)
+
+
+class HfPublishJobGuardrailTests(unittest.TestCase):
+    """Canal de distribución Hugging Face Hub agregado 2026-07 (Plan 059).
+
+    Regresiones a evitar: que el job desaparezca silenciosamente del
+    workflow de release, que el script deje de excluir el carril
+    `candidate` por construcción, o que otro job pase a depender de
+    `hf-publish` convirtiéndolo en bloqueante del release (viola el diseño:
+    HF es un canal de descubrimiento best-effort, nunca debe bloquear PyPI
+    ni GitHub Releases).
+    """
+
+    def test_workflow_has_hf_publish_job_with_token_secret(self):
+        content = PYPI_RELEASE_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("hf-publish:", content)
+        self.assertIn("secrets.HF_TOKEN", content)
+
+    def test_publish_script_exists_with_redistribution_and_dry_run(self):
+        content = PUBLISH_HF_SCRIPT.read_text(encoding="utf-8")
+        self.assertIn("redistribution_ok", content)
+        self.assertIn("--dry-run", content)
+
+    def test_workflow_never_names_candidate_lane_datasets(self):
+        """El carril candidate se excluye por construcción (ausencia de
+        `outputs` en el catálogo) — nunca por una lista hardcodeada en el
+        workflow, que podría quedar stale si se agrega un candidate nuevo."""
+        content = PYPI_RELEASE_WORKFLOW.read_text(encoding="utf-8")
+        self.assertNotIn("delincuencia_comunal", content)
+        self.assertNotIn("autoridades_locales", content)
+
+    def test_hf_publish_is_not_a_blocking_dependency(self):
+        """Ningún otro job debe listar hf-publish en su `needs` — es el
+        último eslabón de la cadena y su falla no debe afectar a nadie más."""
+        content = PYPI_RELEASE_WORKFLOW.read_text(encoding="utf-8")
+        for line in content.splitlines():
+            stripped = line.strip()
+            if stripped.startswith("needs:") and "hf-publish" in stripped:
+                self.fail(f"Un job depende de hf-publish, lo que lo volveria bloqueante: {line!r}")
 
 
 if __name__ == "__main__":
