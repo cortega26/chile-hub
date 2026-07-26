@@ -87,6 +87,7 @@ from src.builders.metadata import (  # noqa: E402, F401
     load_schema_contract,
 )
 from src.builders.reports import (  # noqa: E402
+    append_hub_health_history,
     build_dataset_changelog,
     build_dataset_quality,
     build_dataset_status,
@@ -773,6 +774,7 @@ def _generate_reports(pipeline_metadata, previous_pipeline_metadata, metadata_ou
     hub_health = build_hub_health(pipeline_metadata)
     write_status_markdown_file(pipeline_metadata, health=hub_health)
     hub_health_output = write_hub_health_json(hub_health)
+    hub_health_history_output = append_hub_health_history(hub_health)
     hub_status = build_hub_status(hub_health)
     hub_status_output = write_hub_status_json(hub_status)
     dataset_status_output = write_dataset_status_json(build_dataset_status(pipeline_metadata))
@@ -822,6 +824,7 @@ def _generate_reports(pipeline_metadata, previous_pipeline_metadata, metadata_ou
         "reports_written",
         metadata=metadata_output,
         hub_health=hub_health_output,
+        hub_health_history=hub_health_history_output,
         hub_status=hub_status_output,
         dataset_status=dataset_status_output,
         dataset_changelog=dataset_changelog_output,

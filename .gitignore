@@ -7,6 +7,7 @@ data/*
 !data/normalized/
 data/normalized/*
 !data/normalized/*.json
+!data/normalized/*.jsonl
 !data/normalized/*.md
 !data/normalized/*.parquet
 !data/normalized/*.zip
