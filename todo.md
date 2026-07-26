@@ -130,15 +130,26 @@ están pendientes de review.
 - [x] Fila de `plans/README.md` actualizada a DONE y archivada
 - [x] Commits en el branch (5 commits, sin merge/push — pendiente confirmación operador)
 
-## Plan 063 — historial de salud + sparkline
+## Plan 063 — historial de salud + sparkline ✅ DONE (2026-07-25)
 
-- [ ] Drift check corrido
-- [ ] Branch creado
-- [ ] Steps del plan ejecutados (JSONL append-only + sparkline SVG)
-- [ ] Done criteria (8 ítems) verificados
-- [ ] `tests/e2e/verify_063.sh` escrito y en verde
-- [ ] Fila de `plans/README.md` actualizada a DONE
-- [ ] Commit(s) en el branch
+- [x] Drift check corrido
+- [x] Branch creado (`advisor/063-hub-health-history`)
+- [x] Steps del plan ejecutados (JSONL append-only + sparkline SVG)
+- [x] Done criteria (8 ítems) verificados
+- [x] `tests/e2e/verify_063.sh` escrito y en verde — con excepción deliberada:
+      no revierte `index.html` (contiene markup/CSS a mano, no sólo build noise)
+- [x] Fila de `plans/README.md` actualizada a DONE y archivada
+- [x] Commits en el branch (5 commits: mecanismo backend, sparkline landing,
+      tests, docs, chore de sync JSON-LD; sin merge/push — pendiente
+      confirmación operador)
+- Hallazgos corregidos durante la implementación: `.gitignore` no re-incluía
+  `*.jsonl` bajo `data/normalized/*` (habría quedado gitignoreado para
+  siempre); `hub_health_history.jsonl` no aparecía en `artifact_manifest.json`
+  por `PUBLISHABLE_ARTIFACT_SUFFIXES` + `shared_artifacts` incompletos.
+- Incidente autocausado y autocorregido: el primer borrador de
+  `verify_063.sh` reusaba `git checkout -- ... index.html` de otros planes y
+  borró los cambios a mano del sparkline una vez; recuperados manualmente y
+  corregido el script para excluir `index.html` de su limpieza.
 
 ## Plan 053 (Steps 4-5) — revisar al final
 
