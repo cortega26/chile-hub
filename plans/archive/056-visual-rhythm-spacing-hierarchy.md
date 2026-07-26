@@ -294,7 +294,9 @@ Playwright screenshots, but that is out of scope for this plan.
 
 ## Done criteria
 
-- [ ] `grep -n "position: sticky" index.html` returns exactly 1 match (the header rule)
+- [ ] `sed -n '/^        header {/,/^        }/p' index.html | grep -c "position: sticky"` returns exactly 1
+      (scoped to the header rule; `.drawer-preview-table th` has its own unrelated `position: sticky`,
+      so a whole-file grep for this property returns 2 by design)
 - [ ] `grep -n "backdrop-filter" index.html` returns ≥ 1 match
 - [ ] `grep -n "scroll-padding-top" index.html` returns 1 match
 - [ ] `grep -c "space-section" index.html` returns ≥ 8
