@@ -149,7 +149,8 @@ chile-hub/
 │   ├── verify_landing.py              Smoke tests de la landing page con Playwright
 │   ├── pipeline_status.py             Genera pipeline_status.md
 │   ├── check_validation_registration.py  Valida que cada validate_*() esté registrada en build_dev_db.py
-│   └── check_companion_paths.py       Anti-drift: dataset registry↔docs/contratos + co-cambio de rutas (§12)
+│   ├── check_companion_paths.py       Anti-drift: dataset registry↔docs/contratos + co-cambio de rutas (§12)
+│   └── check_landing_sync.py          Anti-drift: JSON-LD de index.html + app.js ↔ catálogo (§12)
 │
 ├── docs/datasets/          Documentación por dataset (fuente, schema, licencia, recetas)
 └── examples/               Notebooks y scripts de demostración para usuarios
@@ -863,6 +864,32 @@ protegido por un chequeo automatizado en vez de depender solo de buena voluntad.
 | Resumen de salud (`ok`/`warn`/`error`) en README | `data/normalized/hub_health.json` | `scripts/sync_docs.py --check` |
 | Score de calidad (A-F) en README | `data/normalized/dataset_quality.json` | `scripts/sync_docs.py --check` |
 | Ejemplo de pin de versión en README | `pyproject.toml` vía `read_project_version()` | `scripts/sync_docs.py --check` |
+| Bloque JSON-LD `DataCatalog` de `index.html` | `data/dataset_catalog_config.json` vía `render_catalog_json_ld_block()` | `scripts/check_landing_sync.py` |
+| `PUBLIC_DATA_BASE` de `app.js` y cache-buster `app.js?v=` | `pyproject.toml` (`[tool.chile_hub] public_site_url`, `[project] version`) | `scripts/check_landing_sync.py` |
+
+### Mecanismo: `scripts/check_landing_sync.py`
+
+`index.html` y `app.js` son artefactos **derivados**: `sync_landing_metadata()`
+los regenera en cada `make build`. Editarlos a mano o cambiar el catálogo sin
+rebuild produce deriva.
+
+El gate de CI que la detecta —`Check build-synced files`, un `git diff` después
+del build— solo corre en la vía `schedule`/`workflow_dispatch`. Es decir: la
+deriva queda latente hasta el siguiente run programado, donde aborta el publish
+diario. Pasó dos veces (`autoridades_locales`, Pipeline Check #270; y
+`geometria_comunal`, que rompió el publish del 2026-07-24 al 26).
+
+`check_landing_sync.py` adelanta esa detección al job `quality`, que corre en
+**cada push y PR**: reconstruye el bloque con la misma función que usa el
+pipeline y lo compara byte a byte, sin ejecutar el pipeline (solo stdlib). Un
+marcador `START_DATA_CATALOG_JSON_LD` ausente es error duro, porque ese es
+justamente el modo de falla silenciosa de `sync_landing_metadata()` (su
+`except Exception` degrada a advertencia).
+
+> **No dupliques la lógica de render.** `render_catalog_json_ld_block()` en
+> `src/builders/landing.py` es la fuente única: si el gate reconstruyera el
+> bloque por su cuenta, tendrías dos representaciones que pueden divergir —
+> exactamente el problema que el gate existe para evitar.
 
 ### Mecanismo: `scripts/check_companion_paths.py`
 
