@@ -2723,6 +2723,88 @@ class SyncLandingMetadataTests(unittest.TestCase):
                 landing.sync_landing_metadata("https://example.cl/chile-hub/")
 
 
+class CheckLandingSyncTests(unittest.TestCase):
+    """Tests para scripts/check_landing_sync.py, el gate que corre en cada
+    push/PR.
+
+    Los tests de SyncLandingMetadataTests ejercitan la función contra un fixture
+    temporal, así que pasaban en verde mientras el index.html **commiteado**
+    llevaba días desfasado: por eso la deriva de geometria_comunal (agregado al
+    catálogo en 56cd9d5) no se detectó hasta que el run programado del
+    2026-07-24 abortó en "Check build-synced files", y volvió a abortar el 25 y
+    el 26. Estos tests apuntan al archivo real del repo.
+    """
+
+    def _index_html(self):
+        return (ROOT_DIR / "index.html").read_text(encoding="utf-8")
+
+    def test_committed_index_html_is_in_sync(self):
+        """El artefacto commiteado debe estar sincronizado — este es el test que
+        habría atrapado la deriva antes de romper el publish diario."""
+        from scripts.check_landing_sync import main
+
+        main()  # No debe levantar SystemExit.
+
+    def test_detects_dataset_missing_from_json_ld(self):
+        """Regresión exacta de geometria_comunal: un dataset del catálogo que
+        no está en el JSON-LD commiteado."""
+        from scripts.check_landing_sync import check_json_ld_block
+
+        index_html = self._index_html()
+        entry_pattern = re.compile(
+            r"\s*\{\n[^{}]*?\"url\": \"[^\"]*#dataset-geometria_comunal\".*?\n\s*\},",
+            re.DOTALL,
+        )
+        drifted = entry_pattern.sub("", index_html, count=1)
+        self.assertNotIn("#dataset-geometria_comunal", drifted)
+
+        problems = check_json_ld_block(drifted, "https://tooltician.com/chile-hub/")
+        self.assertTrue(problems)
+        self.assertIn("geometria_comunal", problems[0])
+
+    def test_detects_missing_marker(self):
+        """Sin marcadores, sync_landing_metadata() no puede regenerar el bloque
+        y falla en silencio dentro de su `except Exception` — el gate debe
+        tratarlo como error, no comparar contra una extracción vacía."""
+        from scripts.check_landing_sync import check_json_ld_block
+
+        problems = check_json_ld_block("<html>sin marcadores</html>", "https://example.cl/hub/")
+        self.assertTrue(problems)
+        self.assertIn("marcador", problems[0])
+
+    def test_detects_stale_app_data_base(self):
+        from scripts.check_landing_sync import check_app_data_base
+
+        stale = 'const PUBLIC_DATA_BASE = "https://stale.example.com/data/normalized";'
+        problems = check_app_data_base(stale, "https://tooltician.com/chile-hub/")
+        self.assertTrue(problems)
+
+        fresh = 'const PUBLIC_DATA_BASE = "https://tooltician.com/chile-hub/data/normalized";'
+        self.assertEqual(check_app_data_base(fresh, "https://tooltician.com/chile-hub/"), [])
+
+    def test_detects_stale_cache_buster(self):
+        """Un bump de versión sin regenerar index.html rompe el gate de CI
+        ("Check build-synced files"); el guard debe verlo igual."""
+        from scripts.check_landing_sync import check_app_cache_buster
+
+        index_html = '<script src="app.js?v=1.0.0" defer></script>'
+        self.assertTrue(check_app_cache_buster(index_html, "9.9.9"))
+        self.assertEqual(check_app_cache_buster(index_html, "1.0.0"), [])
+
+    def test_render_block_is_byte_identical_to_committed_block(self):
+        """El gate solo es fiable si compara exactamente lo que el build escribe."""
+        from src.builders.landing import (
+            extract_catalog_json_ld_block,
+            render_catalog_json_ld_block,
+        )
+
+        committed = extract_catalog_json_ld_block(self._index_html())
+        self.assertIsNotNone(committed)
+        self.assertEqual(
+            committed, render_catalog_json_ld_block("https://tooltician.com/chile-hub/")
+        )
+
+
 class ReplaceDelimitedBlockTests(unittest.TestCase):
     """Tests para io_utils.replace_delimited_block(): el helper compartido que
     generaliza el patrón de sync_readme_layers_table() a cualquier bloque

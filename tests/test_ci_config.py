@@ -176,6 +176,30 @@ class AdoptionBadgeGuardrailTests(unittest.TestCase):
         self.assertEqual(badge["label"], "instalaciones/mes")
 
 
+class LandingSyncGateGuardrailTests(unittest.TestCase):
+    """El gate real de la landing ("Check build-synced files") solo corre en la
+    vía schedule/workflow_dispatch y después de un build completo, así que una
+    deriva de index.html queda latente hasta el siguiente run programado — pasó
+    con autoridades_locales (#270) y se repitió con geometria_comunal, que
+    reventó el publish diario del 2026-07-24 al 26.
+
+    check_landing_sync.py adelanta esa detección a cada push/PR; estos guardrails
+    evitan que se desconecte silenciosamente del job rápido o de `make doctor`.
+    """
+
+    def test_quality_job_runs_landing_sync_gate(self):
+        content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("python scripts/check_landing_sync.py", content)
+
+    def test_doctor_target_runs_landing_sync_gate(self):
+        body = _extract_make_target(MAKEFILE.read_text(encoding="utf-8"), "doctor")
+        self.assertIn(
+            "scripts/check_landing_sync.py",
+            body,
+            "`make doctor` debe correr el gate de landing antes de commit.",
+        )
+
+
 def _extract_make_target(makefile_content: str, target_name: str) -> str:
     """Extrae el cuerpo (líneas con tab-indent) de un target de Makefile."""
     lines = makefile_content.splitlines()

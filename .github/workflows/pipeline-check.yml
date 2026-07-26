@@ -79,6 +79,12 @@ jobs:
       - name: Check docs sync (README hardcoded facts)
         run: python scripts/sync_docs.py --check
 
+      # Adelanta a cada push/PR la deriva que "Check build-synced files" solo
+      # detecta en la vía schedule, tras un build completo (ver #270 con
+      # autoridades_locales y 56cd9d5 con geometria_comunal).
+      - name: Check landing sync (JSON-LD/app.js derivados del catálogo)
+        run: python scripts/check_landing_sync.py
+
       - name: Fetch PR base commit for companion-path diff
         if: github.event_name == 'pull_request'
         run: git fetch --no-tags --depth=1 origin "${{ github.event.pull_request.base.sha }}"

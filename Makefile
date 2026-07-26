@@ -88,6 +88,7 @@ doctor:
 	@$(PYTHON) scripts/check_validation_registration.py
 	@$(PYTHON) scripts/check_companion_paths.py registry
 	@$(PYTHON) scripts/sync_docs.py --check
+	@$(PYTHON) scripts/check_landing_sync.py
 
 bump-version:
 	@if [ -z "$(VERSION)" ]; then \
