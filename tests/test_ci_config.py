@@ -6,6 +6,7 @@ transitivo como pyyaml que no es dependencia directa del proyecto); usan
 comprobaciones de texto simples y suficientes para el guardrail específico.
 """
 
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -13,9 +14,15 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
+SCRIPTS_DIR = ROOT_DIR / "scripts"
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
+
+from check_companion_paths import check_companions
 
 PIPELINE_CHECK_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "pipeline-check.yml"
 MONTHLY_SCRAPE_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "monthly-scrape.yml"
+ADOPTION_STATS_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "adoption-stats.yml"
 MAKEFILE = ROOT_DIR / "Makefile"
 MKDOCS_CONFIG = ROOT_DIR / "mkdocs.yml"
 DOCS_DIR = ROOT_DIR / "docs"
@@ -123,6 +130,50 @@ class MkDocsReferenceSlugGuardrailTests(unittest.TestCase):
         self.assertNotIn("- Referencia de API: reference.md", content)
         self.assertTrue((DOCS_DIR / "api.md").is_file())
         self.assertFalse((DOCS_DIR / "reference.md").exists())
+
+
+class DependabotWorkflowGuardrailTests(unittest.TestCase):
+    """Dependency-only workflow PRs must not require unrelated documentation.
+
+    Dependabot updates action pins across all workflows. The companion checker
+    previously required AGENTS.md for pipeline/monthly workflow edits, causing
+    PRs #31 and #35 to fail before their actual checks ran.
+    """
+
+    def test_action_pin_updates_do_not_require_agents_documentation(self):
+        changed_workflows = [
+            ".github/workflows/adoption-stats.yml",
+            ".github/workflows/monthly-scrape.yml",
+            ".github/workflows/pages-deploy.yml",
+            ".github/workflows/pipeline-check.yml",
+            ".github/workflows/pypi-release.yml",
+            ".github/workflows/testpypi.yml",
+        ]
+        self.assertEqual(check_companions(changed_workflows), [])
+
+
+class AdoptionBadgeGuardrailTests(unittest.TestCase):
+    """The README badge must resolve to a versioned Pages artifact."""
+
+    def test_adoption_workflow_stages_both_published_badge_artifacts(self):
+        content = ADOPTION_STATS_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn(
+            "git add data/normalized/adoption.json data/normalized/adoption_badge.json",
+            content,
+        )
+
+    def test_adoption_stats_completion_triggers_pages_deploy(self):
+        content = (ROOT_DIR / ".github" / "workflows" / "pages-deploy.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn('"Adoption Stats (PyPI + GitHub Releases)"', content)
+
+    def test_adoption_badge_artifact_exists_and_has_shields_schema(self):
+        badge_path = ROOT_DIR / "data" / "normalized" / "adoption_badge.json"
+        self.assertTrue(badge_path.is_file(), "Falta el recurso del badge de instalaciones")
+        badge = json.loads(badge_path.read_text(encoding="utf-8"))
+        self.assertEqual(badge["schemaVersion"], 1)
+        self.assertEqual(badge["label"], "instalaciones/mes")
 
 
 def _extract_make_target(makefile_content: str, target_name: str) -> str:
