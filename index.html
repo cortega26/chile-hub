@@ -2468,6 +2468,31 @@
         .health-badge.warn { background: #fef3c7; color: #92400e; }
         .health-badge.error { background: #fee2e2; color: #991b1b; }
 
+        /* Historial de salud (sparkline) — reusa los mismos colores ok/warn/error
+           que .health-badge.* de arriba; no existe un token --accent-* dedicado
+           a esta paleta semántica (los --accent-* del sitio son de marca, no
+           de estado), así que se reutilizan los valores ya establecidos aquí
+           en vez de introducir un cuarto conjunto de colores. */
+        #health-history-wrap {
+            margin-bottom: 1.5rem;
+        }
+
+        #health-history-sparkline {
+            display: block;
+            width: 100%;
+            height: 48px;
+        }
+
+        .health-history-caption {
+            margin: 0.35rem 0 0;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+        }
+
+        .health-history-bar-ok { fill: #065f46; }
+        .health-history-bar-warn { fill: #92400e; }
+        .health-history-bar-error { fill: #991b1b; }
+
         .health-table-wrap {
             overflow-x: auto;
             border: 1px solid var(--border-color);
@@ -2900,6 +2925,11 @@ LIMIT 10;</pre>
                 <span class="health-summary-item">
                     Drifted: <strong id="health-drifted-count">—</strong>
                 </span>
+            </div>
+
+            <div id="health-history-wrap" class="health-hidden">
+                <svg id="health-history-sparkline" role="img" aria-label="Historial de salud del hub"></svg>
+                <p class="health-history-caption">Historial reciente: capas ok / warn / error por build</p>
             </div>
 
             <div id="health-table-wrap" class="health-table-wrap health-hidden">
