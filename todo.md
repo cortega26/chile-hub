@@ -153,8 +153,11 @@ están pendientes de review.
 
 ## Plan 053 (Steps 4-5) — revisar al final
 
-- [ ] Confirmar si sigue bloqueado (límite 500 KB `check-added-large-files`) o si
-      cambió el contexto; si sigue bloqueado, no re-litigar — anotar y dejar tal cual.
+- [x] Confirmado (2026-07-25): sigue bloqueado. `.pre-commit-config.yaml:11` aún
+      tiene `--maxkb=500`, sin cambios desde que se escribió la fila de
+      `plans/README.md`. No hay contexto nuevo que ameritara re-litigar — se
+      deja tal cual, pendiente de decisión del mantenedor (subir el límite o
+      workflow de CI dedicado, como `empresas.parquet`).
 
 ## Checkpoints de revisión (cada ~20 iteraciones)
 
@@ -172,6 +175,24 @@ están pendientes de review.
       documentada + testeada). 2 hallazgos low arreglados: `KeyError` sin
       contexto en `select_publishable_files()`, y blind spot del test de
       guardrail para el estilo YAML de lista de bloque en `needs:`.
-- [ ] Checkpoint 4 (tras 063, final): subagente de revisión + resumen para el operador
-      sobre qué branches quedan listos para merge/push (decisión del operador, no
-      autónoma)
+- [x] Checkpoint 4 (tras 063, final) — revisión de los 7 branches
+      (050/051/054/057/058/059/063) uno por uno: `git diff` de tres puntos contra
+      su base, `tests/e2e/verify_0NN.sh` corrido en cada checkout, árbol limpio
+      después de cada uno. **Los 7 quedan READY** — ningún hallazgo bloqueante,
+      sin violaciones de las 5 reglas de `CLAUDE.md`, sin código de debug ni
+      TODOs sueltos. Corrección de premisa del subagente: los 7 branches NO
+      comparten un único merge-base (cada uno partió de `main` justo después
+      del commit de `todo.md` del plan anterior) — benigno, pero significa que
+      los diffs de tres puntos son correctos "a la punta de cada branch", no
+      "post-merge". Único caveat no bloqueante: la cobertura de 057 en
+      `verify_057.sh` es por grep de presencia de clases CSS/JS, no un test
+      real de comportamiento — el chequeo Playwright fue manual, no repetible.
+      Notas de orden de merge / conflictos esperados (todos triviales de
+      resolver, ninguno de lógica): `plans/README.md` (los 7 branches),
+      `tests/test_pipeline_logic.py` (050/051/054/058/063 agregan clases antes
+      del `if __name__`), `README.md` (050/051/054/058/059/063 — badges/conteos,
+      correr `make sync-docs` tras cada merge en vez de resolver a mano),
+      `index.html`/`app.js` (057 + 063, secciones distintas), `AGENTS.md`
+      (058/059/063), `core.py` (050/051, métodos distintos),
+      `build_dev_db.py` (051/063, líneas distintas). Orden sugerido
+      (menor → mayor conflicto): 050 → 058 → 059 → 054 → 051 → 057 → 063.
