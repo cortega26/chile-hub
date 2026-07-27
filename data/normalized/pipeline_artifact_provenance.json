@@ -3,8 +3,8 @@
   "require_live": true,
   "source_ref": "refs/heads/main",
   "source_run_event": "schedule",
-  "source_run_id": "29823230486",
-  "source_sha": "5f7a8c41c85cc0d9f0befcde90395d8071b4b7bb",
+  "source_run_id": "30260413514",
+  "source_sha": "c68072e4fe6156d9ec57f0f7e52fc6bd876f9b87",
   "verification_profile": "publication",
   "workflow": "Pipeline Check"
 }

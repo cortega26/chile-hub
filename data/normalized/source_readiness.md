@@ -1,13 +1,13 @@
 # chile-hub — Madurez de fuente
 
-- `generated_at_utc`: `2026-07-21T10:44:52.718145+00:00`
+- `generated_at_utc`: `2026-07-27T11:05:44.886970+00:00`
 - `stable_count`: `17`
-- `candidate_count`: `3`
+- `candidate_count`: `4`
 - `experimental_count`: `0`
 - `deprecated_count`: `1`
 - `live_ready_count`: `17`
 - `fallback_only_count`: `1`
-- `publish_blocking_count`: `19`
+- `publish_blocking_count`: `20`
 
 | Dataset | Madurez | Source ID | Modo | Live Ready | Fallback | Bloquea Pub | Extractor | Estancado | Próxima acción |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -28,6 +28,7 @@
 | `empresas` | `stable` | `ministerio_economia_res` | `live` | `✓` | `no` | `✓` | `implemented` | `—` | Keep large-output behavior documented and verify Parquet-first consumption. |
 | `pobreza_comunal` | `stable` | `mds_pobreza_comunal` | `live` | `✓` | `permitido` | `—` | `implemented` | `—` | Monitorear publicación de próxima ronda CASEN (2024-2025). |
 | `consumo_electrico_comunal` | `deprecated` | `cne_consumo_electrico_comunal` | `fallback` | `✗` | `permitido` | `✓` | `fallback_only` | `—` | Fuente confirmada caída de forma permanente (investigado 2026-07-07): CNE decomisionó el catálogo Junar de energiaabierta.cl; la página del dataset no ofrece archivo ni API de reemplazo (el enlace API del sitio apunta a /visualizaciones/en-mantencion/). El dataset nunca tuvo un fetch en vivo exitoso — solo publica FALLBACK_ROWS de muestra. Degradado a deprecated/candidate por AGENTS.md §6 (protocolo de fuente permanentemente caída); reevaluar solo si CNE publica un reemplazo oficial. |
+| `geometria_comunal` | `candidate` | `bcn_arcgis_geometria_comunal` | `not_built` | `✗` | `permitido` | `✓` | `implemented` | `—` | Cobertura 345/346 (falta codigo_comuna=12202/Antártica, hueco conocido de la fuente BCN — ver ADR-012). Evaluar promoción a stable_publishable una vez confirmada cadencia de refresco y estabilidad del endpoint ArcGIS (region 12/Magallanes requiere fallback comuna-por-comuna por payload combinado grande). |
 | `delincuencia_comunal` | `candidate` | `cead_delincuencia_comunal` | `not_built` | `✗` | `permitido` | `✓` | `implemented` | `—` | Monitorear estabilidad del scraping; buscar fuente estructurada oficial (datos.gob.cl, export CEAD). Degradar a rejected si no madura para review_by. |
 | `partidos_politicos` | `stable` | `camara_partidos_politicos` | `live` | `✓` | `permitido` | `✓` | `implemented` | `—` | estado_legal/fecha_constitucion completados desde SERVEL (15/36 partidos matcheados por nombre; el resto son históricos no listados en SERVEL). ambito (nacional/regional) queda nullable: no se encontró esa señal en ninguna fuente institucional disponible. |
 | `autoridades_electas` | `stable` | `camara_senado_autoridades_electas` | `live` | `✓` | `permitido` | `✓` | `implemented` | `—` | codigo_region/periodo de senadores completados desde senado.cl (REGION/PERIODOS). gobernador_regional y alcalde viven en el dataset segregado autoridades_locales (CC-BY-SA, candidate) por decisión de licencia. |

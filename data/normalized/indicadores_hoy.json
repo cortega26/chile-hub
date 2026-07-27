@@ -2431,13 +2431,43 @@
   },
   {
     "fecha": "2026-07-22",
+    "codigo_indicador": "dolar",
+    "valor": 932.84
+  },
+  {
+    "fecha": "2026-07-22",
+    "codigo_indicador": "euro",
+    "valor": 1063.55
+  },
+  {
+    "fecha": "2026-07-22",
     "codigo_indicador": "uf",
     "valor": 40844.79
   },
   {
     "fecha": "2026-07-23",
+    "codigo_indicador": "dolar",
+    "valor": 936.39
+  },
+  {
+    "fecha": "2026-07-23",
+    "codigo_indicador": "euro",
+    "valor": 1068.33
+  },
+  {
+    "fecha": "2026-07-23",
     "codigo_indicador": "uf",
     "valor": 40844.79
+  },
+  {
+    "fecha": "2026-07-24",
+    "codigo_indicador": "dolar",
+    "valor": 946.24
+  },
+  {
+    "fecha": "2026-07-24",
+    "codigo_indicador": "euro",
+    "valor": 1076.37
   },
   {
     "fecha": "2026-07-24",
@@ -2453,6 +2483,16 @@
     "fecha": "2026-07-26",
     "codigo_indicador": "uf",
     "valor": 40844.79
+  },
+  {
+    "fecha": "2026-07-27",
+    "codigo_indicador": "dolar",
+    "valor": 946.14
+  },
+  {
+    "fecha": "2026-07-27",
+    "codigo_indicador": "euro",
+    "valor": 1075.65
   },
   {
     "fecha": "2026-07-27",
