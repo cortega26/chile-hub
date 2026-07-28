@@ -1,23 +1,23 @@
 # chile-hub health summary
 
-- `generated_at_utc`: `2026-07-27T11:05:44.886970+00:00`
+- `generated_at_utc`: `2026-07-28T16:08:31.972912+00:00`
 - `overall_status`: `warn`
 - `dataset_count`: `19`
-- `ok_count`: `12`
-- `warn_count`: `7`
+- `ok_count`: `16`
+- `warn_count`: `3`
 - `error_count`: `0`
-- `live_count`: `17`
-- `fallback_count`: `2`
-- `stale_count`: `0`
+- `live_count`: `18`
+- `fallback_count`: `1`
+- `stale_count`: `1`
 - `publishable_count`: `19`
 - `review_terms_count`: `0`
 - `unknown_reuse_count`: `0`
 - `degraded_count`: `0`
-- `degradation_warning_count`: `6`
+- `degradation_warning_count`: `3`
 - `partial_coverage_count`: `2`
 - `unknown_coverage_count`: `0`
-- `drifted_count`: `8`
-- `warning_count`: `10`
+- `drifted_count`: `3`
+- `warning_count`: `11`
 - `top_issue`: `empresas` (freshness=fresh, drift=drifted, warnings=3)
 - `top_issue_reason`: found 1 RUTs with invalid format
 - `top_issue_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.
@@ -35,12 +35,12 @@
 | `empresas` | `warn` | `live` | `fresh` | `not_applicable` | `drifted` | `ready` | `warning` | `ok` | 3 |
 | `establecimientos_educacionales` | `ok` | `live` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `establecimientos_salud` | `ok` | `live` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 0 |
-| `finanzas_municipales` | `ok` | `monthly` | `fresh` | `partial` | `drifted` | `ready` | `none` | `ok` | 0 |
-| `indicadores` | `warn` | `live` | `fresh` | `not_applicable` | `drifted` | `ready` | `warning` | `ok` | 1 |
-| `indicadores_urbanos_siedu` | `warn` | `live` | `fresh` | `partial` | `drifted` | `ready` | `warning` | `ok` | 1 |
-| `partidos_politicos` | `warn` | `live` | `fresh` | `full` | `drifted` | `ready` | `warning` | `ok` | 1 |
-| `perfil_territorial_comunal` | `warn` | `fallback` | `fresh` | `full` | `drifted` | `ready` | `none` | `ok` | 0 |
-| `pobreza_comunal` | `warn` | `live` | `fresh` | `not_applicable` | `drifted` | `ready` | `warning` | `ok` | 1 |
+| `finanzas_municipales` | `ok` | `monthly` | `fresh` | `partial` | `healthy` | `ready` | `none` | `ok` | 0 |
+| `indicadores` | `warn` | `live` | `stale` | `not_applicable` | `drifted` | `ready` | `warning` | `ok` | 2 |
+| `indicadores_urbanos_siedu` | `ok` | `live` | `fresh` | `partial` | `healthy` | `ready` | `none` | `ok` | 1 |
+| `partidos_politicos` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 1 |
+| `perfil_territorial_comunal` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
+| `pobreza_comunal` | `ok` | `live` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 1 |
 | `provincias` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `regiones` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `resultados_educacionales` | `ok` | `live` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 0 |

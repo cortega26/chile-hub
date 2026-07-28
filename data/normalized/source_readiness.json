@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-07-27T11:05:44.886970+00:00",
+  "generated_at_utc": "2026-07-28T16:08:31.972912+00:00",
   "dataset_count": 22,
   "stable_count": 17,
   "candidate_count": 4,
@@ -316,7 +316,7 @@
       "official_url": "https://github.com/cortega26/chile-hub",
       "access_method": "derived",
       "license_status": "open-attribution",
-      "source_mode": "fallback",
+      "source_mode": "live",
       "source_detail": "derived_from_validated_chile_hub_layers",
       "live_ready": false,
       "fallback_allowed": true,

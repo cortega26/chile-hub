@@ -220,6 +220,12 @@ def build_hub_health(metadata):
         dataset = datasets[dataset_name]
         validation = validations.get(dataset_name, {})
         warning_count = len(validation.get("warnings", []))
+        # Los warnings esperados describen diseño confirmado, no degradación:
+        # se cuentan aparte para que la severidad refleje trabajo real (ADR-014).
+        expected_warning_set = set(validation.get("expected_warnings", []))
+        actionable_warning_count = sum(
+            1 for warning in validation.get("warnings", []) if warning not in expected_warning_set
+        )
         freshness_status = dataset.get("freshness", {}).get("status", "unknown")
         source_mode = dataset.get("source_mode", "unknown")
         validation_status = validation.get("status", "unknown")
@@ -230,6 +236,7 @@ def build_hub_health(metadata):
         coverage = dataset.get("coverage", {})
         coverage_status = coverage.get("status", "unknown")
         coverage_ratio = coverage.get("coverage_ratio")
+        coverage_expected = coverage.get("expected") is True
         drift_status = dataset.get("drift", {}).get("status", "healthy")
         warnings = validation.get("warnings", [])
         diagnostic_summary = "Sin observaciones operativas."
@@ -243,7 +250,7 @@ def build_hub_health(metadata):
             severity = "error"
         elif freshness_status in {"stale", "unknown"}:
             severity = "warn"
-        elif source_mode == "fallback" or warning_count > 0:
+        elif source_mode == "fallback" or actionable_warning_count > 0:
             severity = "warn"
 
         publishability_status = "ready"
@@ -260,6 +267,8 @@ def build_hub_health(metadata):
                 "freshness_status": freshness_status,
                 "validation_status": validation_status,
                 "warning_count": warning_count,
+                "actionable_warning_count": actionable_warning_count,
+                "coverage_expected": coverage_expected,
                 "reuse_status": reuse_status,
                 "redistribution_ok": redistribution_ok,
                 "publishability_status": publishability_status,

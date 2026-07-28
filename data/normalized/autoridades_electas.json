@@ -6,7 +6,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Unión Demócrata Independiente",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "10",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -15,7 +15,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1012",
@@ -24,7 +24,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Comunista",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "9",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -33,7 +33,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1013",
@@ -42,7 +42,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Liberal de Chile",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "26",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -51,7 +51,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1015",
@@ -60,7 +60,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Frente Amplio",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "7",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -69,7 +69,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1017",
@@ -78,7 +78,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Republicano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "12",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -87,7 +87,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1021",
@@ -96,7 +96,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Renovación Nacional",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "7",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -105,7 +105,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1025",
@@ -114,7 +114,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Republicano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "11",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -123,7 +123,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1028",
@@ -132,7 +132,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Renovación Nacional",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "13",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -141,7 +141,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1038",
@@ -150,7 +150,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Socialista",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "24",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -159,7 +159,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1039",
@@ -168,7 +168,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido de la Gente",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "12",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -177,7 +177,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1044",
@@ -186,7 +186,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Socialista",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "14",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -195,7 +195,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1054",
@@ -204,7 +204,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Social Cristiano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "20",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -213,7 +213,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1056",
@@ -222,7 +222,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Socialista",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "25",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -231,7 +231,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1059",
@@ -240,7 +240,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Renovación Nacional",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "12",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -249,7 +249,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1060",
@@ -258,7 +258,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Renovación Nacional",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "6",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -267,7 +267,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1061",
@@ -276,7 +276,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Por la Democracia",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "22",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -285,7 +285,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1062",
@@ -294,7 +294,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Demócratas Chile",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "21",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -303,7 +303,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1065",
@@ -312,7 +312,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Unión Demócrata Independiente",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "9",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -321,7 +321,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1073",
@@ -330,7 +330,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Socialista",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "4",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -339,7 +339,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1074",
@@ -348,7 +348,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Independientes",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "14",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -357,7 +357,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1075",
@@ -366,7 +366,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Renovación Nacional",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "11",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -375,7 +375,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1077",
@@ -384,7 +384,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Por la Democracia",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "15",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -393,7 +393,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1082",
@@ -402,7 +402,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Nacional Libertario",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "21",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -411,7 +411,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1086",
@@ -420,7 +420,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Frente Amplio",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "10",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -429,7 +429,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1087",
@@ -438,7 +438,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Frente Amplio",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "13",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -447,7 +447,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1099",
@@ -456,7 +456,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Independientes",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "3",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -465,7 +465,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1100",
@@ -474,7 +474,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Republicano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "11",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -483,7 +483,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1102",
@@ -492,7 +492,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Social Cristiano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "20",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -501,7 +501,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1104",
@@ -510,7 +510,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Republicano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "6",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -519,7 +519,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1105",
@@ -528,7 +528,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Demócrata Cristiano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "25",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -537,7 +537,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1107",
@@ -546,7 +546,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Frente Amplio",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "6",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -555,7 +555,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1108",
@@ -564,7 +564,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Renovación Nacional",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "22",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -573,7 +573,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1110",
@@ -582,7 +582,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Independientes",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "28",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -591,7 +591,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1114",
@@ -600,7 +600,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Frente Amplio",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "16",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -609,7 +609,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1116",
@@ -618,7 +618,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Independientes",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "19",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -627,7 +627,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1117",
@@ -636,7 +636,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Comunista",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "5",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -645,7 +645,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1119",
@@ -654,7 +654,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Social Cristiano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "19",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -663,7 +663,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1122",
@@ -672,7 +672,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Comunista",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "7",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -681,7 +681,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1127",
@@ -690,7 +690,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Frente Amplio",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "10",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -699,7 +699,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1128",
@@ -708,7 +708,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Acción Humanista",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "12",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -717,7 +717,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1131",
@@ -726,7 +726,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Renovación Nacional",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "26",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -735,7 +735,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1132",
@@ -744,7 +744,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Evolución Política",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "17",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -753,7 +753,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1133",
@@ -762,7 +762,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Republicano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "14",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -771,7 +771,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1140",
@@ -780,7 +780,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Unión Demócrata Independiente",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "25",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -789,7 +789,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1141",
@@ -798,7 +798,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Liberal de Chile",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "1",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -807,7 +807,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1142",
@@ -816,7 +816,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Socialista",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "5",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -825,7 +825,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1143",
@@ -834,7 +834,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Unión Demócrata Independiente",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "19",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -843,7 +843,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1146",
@@ -852,7 +852,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Republicano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "9",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -861,7 +861,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1148",
@@ -870,7 +870,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Frente Amplio",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "28",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -879,7 +879,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1150",
@@ -888,7 +888,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Republicano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "17",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -897,7 +897,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1152",
@@ -906,7 +906,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Nacional Libertario",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "22",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -915,7 +915,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1153",
@@ -924,7 +924,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Frente Amplio",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "23",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -933,7 +933,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1157",
@@ -942,7 +942,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Independientes",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "20",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -951,7 +951,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1159",
@@ -960,7 +960,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Comunista",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "13",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -969,7 +969,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1165",
@@ -978,7 +978,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Republicano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "8",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -987,7 +987,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1166",
@@ -996,7 +996,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Independientes",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "15",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1005,7 +1005,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1170",
@@ -1014,7 +1014,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Republicano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "7",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1023,7 +1023,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1171",
@@ -1032,7 +1032,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Frente Amplio",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "10",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1041,7 +1041,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1172",
@@ -1050,7 +1050,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Republicano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "23",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1059,7 +1059,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1173",
@@ -1068,7 +1068,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Comunista",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "12",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1077,7 +1077,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1174",
@@ -1086,7 +1086,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Unión Demócrata Independiente",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "5",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1095,7 +1095,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1175",
@@ -1104,7 +1104,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Independientes",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "4",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1113,7 +1113,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1176",
@@ -1122,7 +1122,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Independientes",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "7",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1131,7 +1131,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1177",
@@ -1140,7 +1140,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Frente Amplio",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "5",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1149,7 +1149,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1178",
@@ -1158,7 +1158,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Independientes",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "26",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1167,7 +1167,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1180",
@@ -1176,7 +1176,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Frente Amplio",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "18",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1185,7 +1185,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1181",
@@ -1194,7 +1194,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Socialista",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "6",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1203,7 +1203,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1182",
@@ -1212,7 +1212,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Independientes",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "3",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1221,7 +1221,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1183",
@@ -1230,7 +1230,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Unión Demócrata Independiente",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "21",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1239,7 +1239,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1184",
@@ -1248,7 +1248,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Independientes",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "17",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1257,7 +1257,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1186",
@@ -1266,7 +1266,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Frente Amplio",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "14",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1275,7 +1275,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1187",
@@ -1284,7 +1284,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Republicano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "3",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1293,7 +1293,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1188",
@@ -1302,7 +1302,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Comunista",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "8",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1311,7 +1311,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1189",
@@ -1320,7 +1320,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Frente Amplio",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "7",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1329,7 +1329,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1190",
@@ -1338,7 +1338,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Independientes",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "8",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1347,7 +1347,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1191",
@@ -1356,7 +1356,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Republicano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "13",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1365,7 +1365,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1192",
@@ -1374,7 +1374,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido de la Gente",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "21",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1383,7 +1383,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1193",
@@ -1392,7 +1392,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido de la Gente",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "20",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1401,7 +1401,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1194",
@@ -1410,7 +1410,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Republicano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "18",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1419,7 +1419,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1195",
@@ -1428,7 +1428,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Independientes",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "2",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1437,7 +1437,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1196",
@@ -1446,7 +1446,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Demócrata Cristiano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "17",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1455,7 +1455,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1197",
@@ -1464,7 +1464,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Renovación Nacional",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "19",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1473,7 +1473,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1198",
@@ -1482,7 +1482,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Republicano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "20",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1491,7 +1491,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1199",
@@ -1500,7 +1500,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Unión Demócrata Independiente",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "14",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1509,7 +1509,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1200",
@@ -1518,7 +1518,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido de la Gente",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "8",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1527,7 +1527,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1201",
@@ -1536,7 +1536,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido de la Gente",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "23",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1545,7 +1545,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1202",
@@ -1554,7 +1554,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Unión Demócrata Independiente",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "22",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1563,7 +1563,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1203",
@@ -1572,7 +1572,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Republicano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "16",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1581,7 +1581,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1204",
@@ -1590,7 +1590,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Socialista",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "19",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1599,7 +1599,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1205",
@@ -1608,7 +1608,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Por la Democracia",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "9",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1617,7 +1617,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1206",
@@ -1626,7 +1626,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Independientes",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "16",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1635,7 +1635,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1207",
@@ -1644,7 +1644,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Independientes",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "15",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1653,7 +1653,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1208",
@@ -1662,7 +1662,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Demócrata Cristiano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "1",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1671,7 +1671,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1209",
@@ -1680,7 +1680,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Frente Amplio",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "24",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1689,7 +1689,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1210",
@@ -1698,7 +1698,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Independientes",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "8",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1707,7 +1707,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1211",
@@ -1716,7 +1716,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Comunista",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "6",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1725,7 +1725,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1212",
@@ -1734,7 +1734,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Nacional Libertario",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "5",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1743,7 +1743,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1213",
@@ -1752,7 +1752,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Comunista",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "10",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1761,7 +1761,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1214",
@@ -1770,7 +1770,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Unión Demócrata Independiente",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "11",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1779,7 +1779,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1215",
@@ -1788,7 +1788,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Nacional Libertario",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "2",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1797,7 +1797,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1216",
@@ -1806,7 +1806,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Republicano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "1",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1815,7 +1815,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1217",
@@ -1824,7 +1824,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Nacional Libertario",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "8",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1833,7 +1833,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1218",
@@ -1842,7 +1842,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Republicano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "10",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1851,7 +1851,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1219",
@@ -1860,7 +1860,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Evolución Política",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "23",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1869,7 +1869,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1220",
@@ -1878,7 +1878,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Republicano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "24",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1887,7 +1887,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1221",
@@ -1896,7 +1896,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Republicano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "6",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1905,7 +1905,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1222",
@@ -1914,7 +1914,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Socialista",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "27",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1923,7 +1923,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1223",
@@ -1932,7 +1932,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Nacional Libertario",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "10",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1941,7 +1941,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1224",
@@ -1950,7 +1950,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Demócrata Cristiano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "6",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1959,7 +1959,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1225",
@@ -1968,7 +1968,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Independientes",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "18",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1977,7 +1977,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1226",
@@ -1986,7 +1986,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Independientes",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "23",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -1995,7 +1995,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1227",
@@ -2004,7 +2004,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Renovación Nacional",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "11",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2013,7 +2013,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1228",
@@ -2022,7 +2022,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Nacional Libertario",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "25",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2031,7 +2031,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1229",
@@ -2040,7 +2040,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Demócrata Cristiano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "17",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2049,7 +2049,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1230",
@@ -2058,7 +2058,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido de la Gente",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "26",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2067,7 +2067,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1231",
@@ -2076,7 +2076,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Independientes",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "2",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2085,7 +2085,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1232",
@@ -2094,7 +2094,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Republicano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "23",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2103,7 +2103,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1233",
@@ -2112,7 +2112,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Unión Demócrata Independiente",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "16",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2121,7 +2121,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1234",
@@ -2130,7 +2130,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Unión Demócrata Independiente",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "8",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2139,7 +2139,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1235",
@@ -2148,7 +2148,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido de la Gente",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "6",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2157,7 +2157,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1236",
@@ -2166,7 +2166,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido de la Gente",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "4",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2175,7 +2175,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1237",
@@ -2184,7 +2184,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Renovación Nacional",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "10",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2193,7 +2193,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1238",
@@ -2202,7 +2202,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Demócrata Cristiano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "20",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2211,7 +2211,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1239",
@@ -2220,7 +2220,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido de la Gente",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "3",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2229,7 +2229,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1240",
@@ -2238,7 +2238,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido de la Gente",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "12",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2247,7 +2247,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1241",
@@ -2256,7 +2256,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Demócrata Cristiano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "21",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2265,7 +2265,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1242",
@@ -2274,7 +2274,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Independientes",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "18",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2283,7 +2283,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1243",
@@ -2292,7 +2292,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido de la Gente",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "9",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2301,7 +2301,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1244",
@@ -2310,7 +2310,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Republicano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "26",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2319,7 +2319,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1245",
@@ -2328,7 +2328,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Republicano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "28",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2337,7 +2337,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1246",
@@ -2346,7 +2346,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Socialista",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "20",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2355,7 +2355,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1247",
@@ -2364,7 +2364,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Republicano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "9",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2373,7 +2373,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1248",
@@ -2382,7 +2382,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Republicano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "13",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2391,7 +2391,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1249",
@@ -2400,7 +2400,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Independientes",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "24",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2409,7 +2409,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1250",
@@ -2418,7 +2418,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Independientes",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "5",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2427,7 +2427,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1251",
@@ -2436,7 +2436,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Republicano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "12",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2445,7 +2445,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1252",
@@ -2454,7 +2454,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Frente Amplio",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "11",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2463,7 +2463,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1253",
@@ -2472,7 +2472,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Republicano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "15",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2481,7 +2481,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1254",
@@ -2490,7 +2490,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Republicano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "4",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2499,7 +2499,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1255",
@@ -2508,7 +2508,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido de la Gente",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "5",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2517,7 +2517,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1256",
@@ -2526,7 +2526,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Frente Amplio",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "8",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2535,7 +2535,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1257",
@@ -2544,7 +2544,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Unión Demócrata Independiente",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "27",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2553,7 +2553,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1258",
@@ -2562,7 +2562,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido de la Gente",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "17",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2571,7 +2571,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1259",
@@ -2580,7 +2580,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido de la Gente",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "7",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2589,7 +2589,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1260",
@@ -2598,7 +2598,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Socialista",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "9",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2607,7 +2607,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1261",
@@ -2616,7 +2616,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Independientes",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "24",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2625,7 +2625,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1262",
@@ -2634,7 +2634,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Republicano",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "14",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2643,7 +2643,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1263",
@@ -2652,7 +2652,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Independientes",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "7",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2661,7 +2661,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_1264",
@@ -2670,7 +2670,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Por la Democracia",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "15",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2679,7 +2679,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_803",
@@ -2688,7 +2688,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Independientes",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "27",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2697,7 +2697,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_815",
@@ -2706,7 +2706,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Unión Demócrata Independiente",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "20",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2715,7 +2715,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_843",
@@ -2724,7 +2724,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Renovación Nacional",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "23",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2733,7 +2733,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_872",
@@ -2742,7 +2742,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Federación Regionalista Verde Social",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "4",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2751,7 +2751,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_915",
@@ -2760,7 +2760,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Nacional Libertario",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "17",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2769,7 +2769,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "diputado_986",
@@ -2778,7 +2778,7 @@
     "institucion": "Cámara de Diputadas y Diputados",
     "partido": "Partido Radical de Chile",
     "pacto": null,
-    "distrito_electoral": null,
+    "distrito_electoral": "3",
     "circunscripcion_senatorial": null,
     "codigo_comuna": null,
     "codigo_region": null,
@@ -2787,7 +2787,7 @@
     "estado_mandato": "vigente",
     "fuente": "Cámara de Diputadas y Diputados (datos abiertos)",
     "url_fuente": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1110",
@@ -2805,7 +2805,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1115",
@@ -2823,7 +2823,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1117",
@@ -2841,7 +2841,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1120",
@@ -2859,7 +2859,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1215",
@@ -2877,7 +2877,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1222",
@@ -2895,7 +2895,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1224",
@@ -2913,7 +2913,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1320",
@@ -2931,7 +2931,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1324",
@@ -2949,7 +2949,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1325",
@@ -2967,7 +2967,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1326",
@@ -2985,7 +2985,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1327",
@@ -3003,7 +3003,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1328",
@@ -3021,7 +3021,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1329",
@@ -3039,7 +3039,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1330",
@@ -3057,7 +3057,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1331",
@@ -3075,7 +3075,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1332",
@@ -3093,7 +3093,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1333",
@@ -3111,7 +3111,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1334",
@@ -3129,7 +3129,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1335",
@@ -3147,7 +3147,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1336",
@@ -3165,7 +3165,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1337",
@@ -3183,7 +3183,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1338",
@@ -3201,7 +3201,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1339",
@@ -3219,7 +3219,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1340",
@@ -3237,7 +3237,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1341",
@@ -3255,7 +3255,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1342",
@@ -3273,7 +3273,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1343",
@@ -3291,7 +3291,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1344",
@@ -3309,7 +3309,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1450",
@@ -3327,7 +3327,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1500",
@@ -3345,7 +3345,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1501",
@@ -3363,7 +3363,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1502",
@@ -3381,7 +3381,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1503",
@@ -3399,7 +3399,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1504",
@@ -3417,7 +3417,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1505",
@@ -3435,7 +3435,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1506",
@@ -3453,7 +3453,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1507",
@@ -3471,7 +3471,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1508",
@@ -3489,7 +3489,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1509",
@@ -3507,7 +3507,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1510",
@@ -3525,7 +3525,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1511",
@@ -3543,7 +3543,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1512",
@@ -3561,7 +3561,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1513",
@@ -3579,7 +3579,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1514",
@@ -3597,7 +3597,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1515",
@@ -3615,7 +3615,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1516",
@@ -3633,7 +3633,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1517",
@@ -3651,7 +3651,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_1518",
@@ -3669,7 +3669,7 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   },
   {
     "id_autoridad": "senador_911",
@@ -3687,6 +3687,6 @@
     "estado_mandato": "vigente",
     "fuente": "Senado de Chile",
     "url_fuente": "https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores",
-    "fecha_consulta": "2026-07-27"
+    "fecha_consulta": "2026-07-20"
   }
 ]

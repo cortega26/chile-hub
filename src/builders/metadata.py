@@ -9,7 +9,13 @@ import json
 import os
 from datetime import datetime
 
-from src.builders._shared import DATASET_CATALOG_CONFIG, NORMALIZED_DIR, ROOT_DIR, UTC
+from src.builders._shared import (
+    DATASET_CATALOG_CONFIG,
+    NON_FALLBACK_SOURCE_MODES,
+    NORMALIZED_DIR,
+    ROOT_DIR,
+    UTC,
+)
 from src.pipeline_status_utils import compute_freshness
 
 
@@ -114,10 +120,22 @@ def build_indicator_delivery(metadata):
     return delivery
 
 
+def actionable_warnings(validation):
+    """Warnings que exigen acción: todos menos los declarados como esperados.
+
+    ``expected_warnings`` lo declara el validador que emite el mensaje
+    (``src/validation.py::_add_expected_warning``), nunca este consumidor.
+    ``warnings`` conserva siempre la lista completa (ver ADR-014).
+    """
+    expected = set(validation.get("expected_warnings", []))
+    return [warning for warning in validation.get("warnings", []) if warning not in expected]
+
+
 def build_degradation(dataset_name, dataset_metadata, validation):
     source_mode = dataset_metadata.get("source_mode")
     record_count = dataset_metadata.get("record_count")
-    warnings = validation.get("warnings", [])
+    warnings = actionable_warnings(validation)
+    expected_warnings = list(validation.get("expected_warnings", []))
 
     if source_mode == "fallback":
         if dataset_name == "comunas":
@@ -168,6 +186,17 @@ def build_degradation(dataset_name, dataset_metadata, validation):
             "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción.",
         }
 
+    if expected_warnings:
+        # Sin accionables, pero los esperados se enumeran: no se esconden.
+        return {
+            "status": "none",
+            "impact": (
+                f"{len(expected_warnings)} observación(es) esperada(s): "
+                + "; ".join(expected_warnings)
+            ),
+            "recommended_action": "Ninguna.",
+        }
+
     return {
         "status": "none",
         "impact": "Sin degradación operativa detectada en este build.",
@@ -175,19 +204,48 @@ def build_degradation(dataset_name, dataset_metadata, validation):
     }
 
 
-def build_coverage(dataset_name, dataset_metadata):
+def build_coverage(dataset_name, dataset_metadata, contract=None):
+    """Calcula la cobertura de un dataset y si su parcialidad es *esperada*.
+
+    ``coverage_policy`` del contrato (``contracts/datasets/<dataset>.schema.json``)
+    es la declaración de diseño: ``partial_expected`` significa que la fuente
+    nunca cubre el universo completo (p. ej. SIEDU sólo mide comunas urbanas).
+    El campo booleano ``expected`` está **siempre presente** para que sea
+    inspeccionable, y ``status`` conserva su enum original — ``partial`` sigue
+    describiendo correctamente la cobertura (ver ADR-014).
+    """
+    coverage_policy = (contract or {}).get("coverage_policy")
+
+    def _finalize(coverage, expected_reason=None):
+        is_expected = coverage["status"] == "partial" and (
+            coverage_policy == "partial_expected" or expected_reason is not None
+        )
+        coverage["expected"] = is_expected
+        if is_expected:
+            coverage["expected_reason"] = expected_reason or (
+                f"El contrato declara coverage_policy='{coverage_policy}': "
+                "la fuente no cubre el universo completo por diseño."
+            )
+        return coverage
+
     declared_coverage = dataset_metadata.get("coverage", {})
     if declared_coverage.get("status") == "partial_expected":
-        return {
-            "status": "partial",
-            "expected_record_count": None,
-            "actual_record_count": dataset_metadata.get("record_count"),
-            "coverage_ratio": declared_coverage.get("coverage_ratio"),
-            "summary": declared_coverage.get(
+        return _finalize(
+            {
+                "status": "partial",
+                "expected_record_count": None,
+                "actual_record_count": dataset_metadata.get("record_count"),
+                "coverage_ratio": declared_coverage.get("coverage_ratio"),
+                "summary": declared_coverage.get(
+                    "expected_scope",
+                    "Cobertura parcial esperada y declarada por la fuente.",
+                ),
+            },
+            expected_reason=declared_coverage.get(
                 "expected_scope",
-                "Cobertura parcial esperada y declarada por la fuente.",
+                "El extractor declara la cobertura parcial como esperada.",
             ),
-        }
+        )
 
     expected_record_count = DATASET_CATALOG_CONFIG.get(dataset_name, {}).get(
         "expected_record_count"
@@ -195,22 +253,26 @@ def build_coverage(dataset_name, dataset_metadata):
     actual_record_count = dataset_metadata.get("record_count")
 
     if expected_record_count is None:
-        return {
-            "status": "not_applicable",
-            "expected_record_count": None,
-            "actual_record_count": actual_record_count,
-            "coverage_ratio": None,
-            "summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
-        }
+        return _finalize(
+            {
+                "status": "not_applicable",
+                "expected_record_count": None,
+                "actual_record_count": actual_record_count,
+                "coverage_ratio": None,
+                "summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
+            }
+        )
 
     if actual_record_count is None or expected_record_count <= 0:
-        return {
-            "status": "unknown",
-            "expected_record_count": expected_record_count,
-            "actual_record_count": actual_record_count,
-            "coverage_ratio": None,
-            "summary": "No fue posible calcular cobertura contra el baseline esperado.",
-        }
+        return _finalize(
+            {
+                "status": "unknown",
+                "expected_record_count": expected_record_count,
+                "actual_record_count": actual_record_count,
+                "coverage_ratio": None,
+                "summary": "No fue posible calcular cobertura contra el baseline esperado.",
+            }
+        )
 
     coverage_ratio = round(actual_record_count / expected_record_count, 4)
     if actual_record_count >= expected_record_count:
@@ -226,13 +288,15 @@ def build_coverage(dataset_name, dataset_metadata):
             "respecto del baseline esperado."
         )
 
-    return {
-        "status": status,
-        "expected_record_count": expected_record_count,
-        "actual_record_count": actual_record_count,
-        "coverage_ratio": coverage_ratio,
-        "summary": summary,
-    }
+    return _finalize(
+        {
+            "status": status,
+            "expected_record_count": expected_record_count,
+            "actual_record_count": actual_record_count,
+            "coverage_ratio": coverage_ratio,
+            "summary": summary,
+        }
+    )
 
 
 def build_drift(dataset_metadata):
@@ -242,22 +306,25 @@ def build_drift(dataset_metadata):
     coverage_status = coverage.get("status", "unknown")
     degradation_status = degradation.get("status", "none")
 
-    drift_status = "healthy"
-    if (
-        source_mode == "fallback"
-        or coverage_status in {"partial", "unknown"}
-        or degradation_status in {"warning", "degraded"}
-    ):
-        drift_status = "drifted"
+    # Una cobertura parcial declarada como esperada en el contrato no es drift:
+    # es el diseño de la fuente (ver ADR-014). El resto de las condiciones no cambia.
+    coverage_expected = coverage.get("expected") is True
+
+    triggers = []
+    if source_mode == "fallback":
+        triggers.append(f"mode={source_mode}")
+    if coverage_status == "unknown" or (coverage_status == "partial" and not coverage_expected):
+        triggers.append(f"coverage={coverage_status}")
+    if degradation_status in {"warning", "degraded"}:
+        triggers.append(f"degradation={degradation_status}")
+
+    drift_status = "drifted" if triggers else "healthy"
 
     if drift_status == "healthy":
         summary = "Sin drift operativo detectado en este build."
         recommended_action = "Ninguna."
     else:
-        summary = (
-            f"Drift detectado: mode={source_mode}, coverage={coverage_status}, "
-            f"degradation={degradation_status}."
-        )
+        summary = "Drift detectado: " + ", ".join(triggers) + "."
         recommended_action = degradation.get(
             "recommended_action",
             "Revisar fuente, cobertura y warnings antes de consumir esta capa.",
@@ -274,10 +341,11 @@ def enrich_dataset_metadata(dataset_metadata, validations):
     enriched = {}
     for dataset_name, metadata in dataset_metadata.items():
         validation = validations.get(dataset_name, {})
-        degradation = build_degradation(dataset_name, metadata, validation)
-        coverage = build_coverage(dataset_name, metadata)
-        # Incrustar campos del contrato de esquema para comparación de changelog
+        # El contrato se carga una sola vez: alimenta tanto coverage_policy
+        # (build_coverage) como los campos incrustados para el changelog.
         contract = load_schema_contract(dataset_name)
+        degradation = build_degradation(dataset_name, metadata, validation)
+        coverage = build_coverage(dataset_name, metadata, contract)
         contract_fields = {}
         if contract:
             contract_fields = {
@@ -502,9 +570,12 @@ def build_dataset_metadata(dfs, meta):
             "dataset": "perfil_territorial_comunal",
             "source_name": "chile-hub",
             "source_url": "https://github.com/cortega26/chile-hub",
+            # Una capa derivada sólo es "fallback" si algún upstream lo es de
+            # verdad: "monthly" es fuente genuina (ver NON_FALLBACK_SOURCE_MODES
+            # y ADR-014), no un respaldo hardcodeado.
             "source_mode": "live"
             if all(
-                metadata.get("source_mode") == "live"
+                metadata.get("source_mode") in NON_FALLBACK_SOURCE_MODES
                 for metadata in (
                     comunas_metadata,
                     censo_metadata,

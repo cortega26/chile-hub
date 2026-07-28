@@ -3591,6 +3591,316 @@ class DcatCatalogTests(unittest.TestCase):
             )
 
 
+NORMALIZED_DIR = Path(__file__).resolve().parents[1] / "data" / "normalized"
+
+
+class DriftTaxonomyTests(unittest.TestCase):
+    """Plan 066 / ADR-014: drift esperado (de diseño) vs drift real.
+
+    Verifica que la clasificación distinga cobertura parcial declarada en el
+    contrato y warnings declarados como esperados, sin agregar valores a ningún
+    enum ni relajar gates.
+    """
+
+    # --- Step 1: source_mode de la capa derivada -------------------------
+
+    def test_non_fallback_source_modes_is_single_source_of_truth(self):
+        """verify_pipeline.py debe consumir el conjunto de _shared.py, no
+        redefinirlo (la duplicación fue el bug original)."""
+        from scripts.verify_pipeline import NON_FALLBACK_SOURCE_MODES as gate_set
+        from src.builders._shared import NON_FALLBACK_SOURCE_MODES
+
+        self.assertIs(NON_FALLBACK_SOURCE_MODES, gate_set)
+        self.assertEqual(NON_FALLBACK_SOURCE_MODES, {"live", "monthly"})
+
+    def test_monthly_upstream_does_not_make_derived_layer_fallback(self):
+        from src.builders._shared import NON_FALLBACK_SOURCE_MODES
+
+        upstreams = [{"source_mode": "live"}] * 8 + [{"source_mode": "monthly"}]
+        derived_mode = (
+            "live"
+            if all(m.get("source_mode") in NON_FALLBACK_SOURCE_MODES for m in upstreams)
+            else "fallback"
+        )
+        self.assertEqual(derived_mode, "live")
+
+    def test_real_fallback_upstream_makes_derived_layer_fallback(self):
+        from src.builders._shared import NON_FALLBACK_SOURCE_MODES
+
+        upstreams = [{"source_mode": "live"}] * 8 + [{"source_mode": "fallback"}]
+        derived_mode = (
+            "live"
+            if all(m.get("source_mode") in NON_FALLBACK_SOURCE_MODES for m in upstreams)
+            else "fallback"
+        )
+        self.assertEqual(derived_mode, "fallback")
+
+    def test_perfil_territorial_comunal_is_live_and_healthy_in_artifacts(self):
+        """Regresión sobre el artefacto real: la capa derivada dejó de driftar."""
+        report = json.loads((NORMALIZED_DIR / "drift_report.json").read_text(encoding="utf-8"))
+        entry = next(e for e in report["datasets"] if e["dataset"] == "perfil_territorial_comunal")
+        self.assertEqual(entry["source_mode"], "live")
+        self.assertEqual(entry["drift_status"], "healthy")
+
+    # --- Step 2: coverage_policy del contrato ----------------------------
+
+    def _coverage(self, policy, record_count=100, expected_record_count=None, name="x"):
+        from src.builders import metadata as metadata_mod
+
+        catalog = {name: {"expected_record_count": expected_record_count}}
+        with patch.object(metadata_mod, "DATASET_CATALOG_CONFIG", catalog):
+            return metadata_mod.build_coverage(
+                name,
+                {"record_count": record_count},
+                {"coverage_policy": policy} if policy else None,
+            )
+
+    def test_partial_expected_policy_marks_coverage_expected(self):
+        coverage = self._coverage("partial_expected", 200, 346)
+        self.assertEqual(coverage["status"], "partial")
+        self.assertTrue(coverage["expected"])
+        self.assertIn("coverage_policy", coverage["expected_reason"])
+
+    def test_partial_policy_without_expected_stays_unexpected(self):
+        coverage = self._coverage("partial", 200, 346)
+        self.assertEqual(coverage["status"], "partial")
+        self.assertFalse(coverage["expected"])
+        self.assertNotIn("expected_reason", coverage)
+
+    def test_expected_flag_always_present_for_every_policy(self):
+        """El campo es siempre inspeccionable, nunca ausente."""
+        for policy in ["full", "not_applicable", "roster", "partial", "partial_expected"]:
+            with self.subTest(policy=policy):
+                coverage = self._coverage(policy, 346, 346)
+                self.assertIn("expected", coverage)
+                self.assertIsInstance(coverage["expected"], bool)
+
+    def test_full_coverage_is_never_expected_partial(self):
+        coverage = self._coverage("partial_expected", 346, 346)
+        self.assertEqual(coverage["status"], "full")
+        self.assertFalse(coverage["expected"])
+
+    def test_not_applicable_coverage_is_not_expected(self):
+        coverage = self._coverage("partial_expected", 346, None)
+        self.assertEqual(coverage["status"], "not_applicable")
+        self.assertFalse(coverage["expected"])
+
+    def test_extractor_declared_partial_expected_converges_on_same_flag(self):
+        """La ruta del metadata del extractor (SIEDU) produce el mismo campo."""
+        from src.builders.metadata import build_coverage
+
+        coverage = build_coverage(
+            "indicadores_urbanos_siedu",
+            {
+                "record_count": 10,
+                "coverage": {
+                    "status": "partial_expected",
+                    "coverage_ratio": 0.34,
+                    "expected_scope": "sólo comunas urbanas",
+                },
+            },
+        )
+        self.assertEqual(coverage["status"], "partial")
+        self.assertTrue(coverage["expected"])
+        self.assertEqual(coverage["expected_reason"], "sólo comunas urbanas")
+
+    def test_all_four_partial_expected_contracts_are_covered(self):
+        """Los 4 contratos con coverage_policy=partial_expected.
+
+        Hoy sólo finanzas_municipales e indicadores_urbanos_siedu alcanzan
+        coverage_status=partial; en resultados_educacionales y
+        delincuencia_comunal el flag queda INERTE (su cobertura no es partial:
+        no tienen expected_record_count o su actual >= esperado). Se cubren
+        igual para que, si mañana pasan a partial, no drifteen sin que ningún
+        test lo haya ejercitado.
+        """
+        contracts_dir = Path(__file__).resolve().parents[1] / "contracts" / "datasets"
+        declared = sorted(
+            path.stem.replace(".schema", "")
+            for path in contracts_dir.glob("*.schema.json")
+            if json.loads(path.read_text(encoding="utf-8")).get("coverage_policy")
+            == "partial_expected"
+        )
+        self.assertEqual(
+            declared,
+            [
+                "delincuencia_comunal",
+                "finanzas_municipales",
+                "indicadores_urbanos_siedu",
+                "resultados_educacionales",
+            ],
+        )
+        for name in declared:
+            with self.subTest(dataset=name):
+                coverage = self._coverage("partial_expected", 200, 346, name=name)
+                self.assertTrue(coverage["expected"])
+
+    # --- Step 3: warnings esperados vs accionables -----------------------
+
+    def test_only_expected_warnings_means_no_degradation(self):
+        from src.builders.metadata import build_degradation
+
+        degradation = build_degradation(
+            "pobreza_comunal",
+            {"source_mode": "live", "record_count": 10},
+            {"warnings": ["parcial por diseño"], "expected_warnings": ["parcial por diseño"]},
+        )
+        self.assertEqual(degradation["status"], "none")
+        self.assertIn("parcial por diseño", degradation["impact"])
+        self.assertEqual(degradation["recommended_action"], "Ninguna.")
+
+    def test_undeclared_warning_still_degrades(self):
+        """Guardrail anti-silenciador: sólo lo declarado se descuenta."""
+        from src.builders.metadata import build_degradation
+
+        degradation = build_degradation(
+            "empresas",
+            {"source_mode": "live", "record_count": 10},
+            {"warnings": ["RUT inválido"], "expected_warnings": []},
+        )
+        self.assertEqual(degradation["status"], "warning")
+        self.assertIn("RUT inválido", degradation["impact"])
+
+    def test_mixed_warnings_report_only_actionable_in_impact(self):
+        from src.builders.metadata import build_degradation
+
+        degradation = build_degradation(
+            "mixto",
+            {"source_mode": "live", "record_count": 10},
+            {
+                "warnings": ["esperado", "accionable"],
+                "expected_warnings": ["esperado"],
+            },
+        )
+        self.assertEqual(degradation["status"], "warning")
+        self.assertIn("accionable", degradation["impact"])
+        self.assertNotIn("esperado", degradation["impact"])
+
+    def test_validators_declare_expected_warnings(self):
+        """Los 3 warnings de diseño se declaran en el emisor, no en el consumidor."""
+        import inspect
+
+        import src.validation as validation_mod
+
+        source = inspect.getsource(validation_mod)
+        self.assertEqual(source.count("_add_expected_warning(\n"), 3)
+
+    # --- Step 4: build_drift y contadores --------------------------------
+
+    def test_expected_partial_coverage_does_not_drift(self):
+        from src.builders.metadata import build_drift
+
+        drift = build_drift(
+            {
+                "source_mode": "live",
+                "coverage": {"status": "partial", "expected": True},
+                "degradation": {"status": "none"},
+            }
+        )
+        self.assertEqual(drift["status"], "healthy")
+
+    def test_unexpected_partial_coverage_drifts(self):
+        from src.builders.metadata import build_drift
+
+        drift = build_drift(
+            {
+                "source_mode": "live",
+                "coverage": {"status": "partial", "expected": False},
+                "degradation": {"status": "none"},
+            }
+        )
+        self.assertEqual(drift["status"], "drifted")
+        self.assertIn("coverage=partial", drift["summary"])
+
+    def test_unknown_coverage_still_drifts(self):
+        from src.builders.metadata import build_drift
+
+        drift = build_drift(
+            {
+                "source_mode": "live",
+                "coverage": {"status": "unknown", "expected": False},
+                "degradation": {"status": "none"},
+            }
+        )
+        self.assertEqual(drift["status"], "drifted")
+
+    def test_fallback_source_mode_still_drifts(self):
+        from src.builders.metadata import build_drift
+
+        drift = build_drift(
+            {
+                "source_mode": "fallback",
+                "coverage": {"status": "full", "expected": False},
+                "degradation": {"status": "none"},
+            }
+        )
+        self.assertEqual(drift["status"], "drifted")
+        self.assertIn("mode=fallback", drift["summary"])
+
+    def test_drift_summary_names_only_the_triggering_condition(self):
+        from src.builders.metadata import build_drift
+
+        drift = build_drift(
+            {
+                "source_mode": "live",
+                "coverage": {"status": "full", "expected": False},
+                "degradation": {"status": "warning"},
+            }
+        )
+        self.assertEqual(drift["summary"], "Drift detectado: degradation=warning.")
+
+    def test_hub_health_reports_actionable_count_without_changing_warning_count(self):
+        from src.chile_hub.pipeline_status_utils import build_hub_health
+
+        health = build_hub_health(
+            {
+                "datasets": {
+                    "x": {
+                        "source_mode": "live",
+                        "freshness": {"status": "fresh"},
+                        "reuse_policy": {"status": "ok", "redistribution_ok": True},
+                        "degradation": {"status": "none"},
+                        "coverage": {"status": "partial", "expected": True},
+                        "drift": {"status": "healthy"},
+                    }
+                },
+                "validations": {
+                    "x": {
+                        "status": "ok",
+                        "warnings": ["esperado"],
+                        "expected_warnings": ["esperado"],
+                    }
+                },
+            }
+        )
+        entry = health["datasets"][0]
+        self.assertEqual(entry["warning_count"], 1)
+        self.assertEqual(entry["actionable_warning_count"], 0)
+        self.assertEqual(entry["severity"], "ok")
+
+    # --- Guardrail sobre los artefactos reales ---------------------------
+
+    def test_published_artifacts_report_exactly_three_real_problems(self):
+        """Guardrail: una regresión de clasificación debe ser ruidosa."""
+        health = json.loads((NORMALIZED_DIR / "hub_health.json").read_text(encoding="utf-8"))
+        self.assertEqual(health["drifted_count"], 3)
+        self.assertEqual(health["warn_count"], 3)
+        self.assertEqual(health["overall_status"], "warn")
+        report = json.loads((NORMALIZED_DIR / "drift_report.json").read_text(encoding="utf-8"))
+        drifted = sorted(e["dataset"] for e in report["datasets"] if e["drift_status"] == "drifted")
+        self.assertEqual(drifted, ["consumo_electrico_comunal", "empresas", "indicadores"])
+
+    def test_warnings_still_contain_every_message(self):
+        """`warnings` nunca pierde mensajes: los esperados siguen listados."""
+        status = json.loads((NORMALIZED_DIR / "dataset_status.json").read_text(encoding="utf-8"))
+        entries = status["datasets"] if isinstance(status, dict) else status
+        pobreza = next(e for e in entries if e["dataset"] == "pobreza_comunal")
+        self.assertTrue(
+            any("parcial por diseño" in w for w in pobreza.get("warnings", [])),
+            msg=f"warnings de pobreza_comunal: {pobreza.get('warnings')}",
+        )
+
+
 if __name__ == "__main__":
     import pytest
 

@@ -8,6 +8,7 @@ import tomllib
 from src.builders._shared import DATASET_CATALOG_CONFIG, NORMALIZED_DIR, ROOT_DIR, UTC
 from src.builders.io_utils import write_json_atomic
 from src.builders.landing import sync_landing_metadata
+from src.builders.metadata import actionable_warnings
 
 
 def write_pipeline_metadata(dataset_metadata, validations):
@@ -73,6 +74,8 @@ def write_dataset_catalog(pipeline_metadata):
                 "documentation": config.get("documentation"),
                 "validation_status": validation.get("status"),
                 "warnings": validation.get("warnings", []),
+                # Subconjunto que exige acción; `warnings` conserva todo (ADR-014).
+                "actionable_warnings": actionable_warnings(validation),
                 "degradation": dataset_metadata.get("degradation", {}),
                 "notes": dataset_metadata.get("notes", []),
             }

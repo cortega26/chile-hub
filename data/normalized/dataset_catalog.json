@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-07-27T11:05:44.886970+00:00",
+  "generated_at_utc": "2026-07-28T16:08:31.972912+00:00",
   "dataset_count": 19,
   "datasets": [
     {
@@ -10,7 +10,7 @@
       "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
       "source_mode": "live",
       "source_detail": "bcn_arcgis",
-      "refreshed_at_utc": "2026-07-27T11:04:29.257879+00:00",
+      "refreshed_at_utc": "2026-07-20T01:38:23.192789+00:00",
       "record_count": 16,
       "fields": [
         "codigo_region",
@@ -32,9 +32,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.02,
+        "age_hours": 206.5,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-07-27T11:05:44.883211+00:00"
+        "checked_at_utc": "2026-07-28T16:08:31.970483+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -45,7 +45,8 @@
         "expected_record_count": 16,
         "actual_record_count": 16,
         "coverage_ratio": 1.0,
-        "summary": "Cobertura completa: 16/16 filas respecto del baseline esperado."
+        "summary": "Cobertura completa: 16/16 filas respecto del baseline esperado.",
+        "expected": false
       },
       "drift": {
         "status": "healthy",
@@ -67,6 +68,7 @@
       "documentation": "docs/datasets/regiones.md",
       "validation_status": "ok",
       "warnings": [],
+      "actionable_warnings": [],
       "degradation": {
         "status": "none",
         "impact": "Sin degradación operativa detectada en este build.",
@@ -85,7 +87,7 @@
       "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
       "source_mode": "live",
       "source_detail": "bcn_arcgis",
-      "refreshed_at_utc": "2026-07-27T11:04:29.257879+00:00",
+      "refreshed_at_utc": "2026-07-20T01:38:23.192789+00:00",
       "record_count": 56,
       "fields": [
         "codigo_region",
@@ -110,9 +112,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.02,
+        "age_hours": 206.5,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-07-27T11:05:44.883248+00:00"
+        "checked_at_utc": "2026-07-28T16:08:31.970519+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -123,7 +125,8 @@
         "expected_record_count": 56,
         "actual_record_count": 56,
         "coverage_ratio": 1.0,
-        "summary": "Cobertura completa: 56/56 filas respecto del baseline esperado."
+        "summary": "Cobertura completa: 56/56 filas respecto del baseline esperado.",
+        "expected": false
       },
       "drift": {
         "status": "healthy",
@@ -145,6 +148,7 @@
       "documentation": "docs/datasets/provincias.md",
       "validation_status": "ok",
       "warnings": [],
+      "actionable_warnings": [],
       "degradation": {
         "status": "none",
         "impact": "Sin degradación operativa detectada en este build.",
@@ -163,7 +167,7 @@
       "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
       "source_mode": "live",
       "source_detail": "bcn_arcgis",
-      "refreshed_at_utc": "2026-07-27T11:04:29.257879+00:00",
+      "refreshed_at_utc": "2026-07-20T01:38:23.192789+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -195,9 +199,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.02,
+        "age_hours": 206.5,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-07-27T11:05:44.883262+00:00"
+        "checked_at_utc": "2026-07-28T16:08:31.970529+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -208,7 +212,8 @@
         "expected_record_count": 346,
         "actual_record_count": 346,
         "coverage_ratio": 1.0,
-        "summary": "Cobertura completa: 346/346 filas respecto del baseline esperado."
+        "summary": "Cobertura completa: 346/346 filas respecto del baseline esperado.",
+        "expected": false
       },
       "drift": {
         "status": "healthy",
@@ -230,6 +235,7 @@
       "documentation": "docs/datasets/comunas.md",
       "validation_status": "ok",
       "warnings": [],
+      "actionable_warnings": [],
       "degradation": {
         "status": "none",
         "impact": "Sin degradación operativa detectada en este build.",
@@ -248,7 +254,7 @@
       "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
       "source_mode": "live",
       "source_detail": "bcn_arcgis",
-      "refreshed_at_utc": "2026-07-27T11:04:29.257879+00:00",
+      "refreshed_at_utc": "2026-07-20T01:38:23.192789+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -279,9 +285,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.02,
+        "age_hours": 206.5,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-07-27T11:05:44.883268+00:00"
+        "checked_at_utc": "2026-07-28T16:08:31.970534+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -292,7 +298,8 @@
         "expected_record_count": 346,
         "actual_record_count": 346,
         "coverage_ratio": 1.0,
-        "summary": "Cobertura completa: 346/346 filas respecto del baseline esperado."
+        "summary": "Cobertura completa: 346/346 filas respecto del baseline esperado.",
+        "expected": false
       },
       "drift": {
         "status": "healthy",
@@ -314,6 +321,7 @@
       "documentation": "docs/datasets/comunas_enriquecidas.md",
       "validation_status": "ok",
       "warnings": [],
+      "actionable_warnings": [],
       "degradation": {
         "status": "none",
         "impact": "Sin degradación operativa detectada en este build.",
@@ -332,8 +340,8 @@
       "source_url": "https://mindicador.cl/api",
       "source_mode": "live",
       "source_detail": "public_api_with_published_backfill",
-      "refreshed_at_utc": "2026-07-27T11:04:36.330737+00:00",
-      "record_count": 514,
+      "refreshed_at_utc": "2026-07-20T01:38:29.663445+00:00",
+      "record_count": 504,
       "fields": [
         "fecha",
         "codigo_indicador",
@@ -367,10 +375,10 @@
         "summary": "Datos del Banco Central de Chile (BCCh) e INE. Libre reproducción con citación. Acceso vía mindicador.cl (API pública de la comunidad)."
       },
       "freshness": {
-        "status": "fresh",
-        "age_hours": 0.02,
+        "status": "stale",
+        "age_hours": 206.5,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-07-27T11:05:44.883505+00:00"
+        "checked_at_utc": "2026-07-28T16:08:31.970695+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 72,
@@ -379,13 +387,14 @@
       "coverage": {
         "status": "not_applicable",
         "expected_record_count": null,
-        "actual_record_count": 514,
+        "actual_record_count": 504,
         "coverage_ratio": null,
-        "summary": "Sin baseline de cobertura por cardinalidad para esta capa."
+        "summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
+        "expected": false
       },
       "drift": {
         "status": "drifted",
-        "summary": "Drift detectado: mode=live, coverage=not_applicable, degradation=warning.",
+        "summary": "Drift detectado: degradation=warning.",
         "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
       },
       "usage_examples": {
@@ -403,11 +412,16 @@
       "documentation": "docs/datasets/indicadores.md",
       "validation_status": "ok",
       "warnings": [
-        "indicadores live refresh reused last published artifact for missing codes: ipc"
+        "indicadores live refresh reused last published artifact for missing codes: ipc",
+        "indicadores freshness is stale: 206.5h since refresh, policy max is 72h"
+      ],
+      "actionable_warnings": [
+        "indicadores live refresh reused last published artifact for missing codes: ipc",
+        "indicadores freshness is stale: 206.5h since refresh, policy max is 72h"
       ],
       "degradation": {
         "status": "warning",
-        "impact": "indicadores live refresh reused last published artifact for missing codes: ipc",
+        "impact": "indicadores live refresh reused last published artifact for missing codes: ipc; indicadores freshness is stale: 206.5h since refresh, policy max is 72h",
         "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
       },
       "notes": [
@@ -422,7 +436,7 @@
       "source_url": "https://censo2024.ine.gob.cl/wp-content/uploads/2025/03/D1_Poblacion-censada-por-sexo-y-edad-en-grupos-quinquenales.xlsx",
       "source_mode": "live",
       "source_detail": "official_xlsx",
-      "refreshed_at_utc": "2026-07-27T11:04:38.943879+00:00",
+      "refreshed_at_utc": "2026-07-20T01:38:31.274348+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -458,9 +472,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.02,
+        "age_hours": 206.5,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-07-27T11:05:44.883521+00:00"
+        "checked_at_utc": "2026-07-28T16:08:31.970707+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -471,7 +485,8 @@
         "expected_record_count": 346,
         "actual_record_count": 346,
         "coverage_ratio": 1.0,
-        "summary": "Cobertura completa: 346/346 filas respecto del baseline esperado."
+        "summary": "Cobertura completa: 346/346 filas respecto del baseline esperado.",
+        "expected": false
       },
       "drift": {
         "status": "healthy",
@@ -493,6 +508,7 @@
       "documentation": "docs/datasets/censo_comunal.md",
       "validation_status": "ok",
       "warnings": [],
+      "actionable_warnings": [],
       "degradation": {
         "status": "none",
         "impact": "Sin degradación operativa detectada en este build.",
@@ -507,10 +523,10 @@
       "description": "Directorio vigente de establecimientos de salud con tipo, dependencia, urgencia y ubicacion.",
       "alias_for": null,
       "source_name": "Ministerio de Salud - Establecimientos de Salud",
-      "source_url": "https://datos.gob.cl/dataset/3bf4cf7c-f638-4735-9a01-f65faae4beca/resource/2c44d782-3365-44e3-aefb-2c8b8363a1bc/download/establecimientos_20260721.csv",
+      "source_url": "https://datos.gob.cl/dataset/3bf4cf7c-f638-4735-9a01-f65faae4beca/resource/2c44d782-3365-44e3-aefb-2c8b8363a1bc/download/establecimientos_20260714.csv",
       "source_mode": "live",
       "source_detail": "datos_gob_csv",
-      "refreshed_at_utc": "2026-07-27T11:04:41.711629+00:00",
+      "refreshed_at_utc": "2026-07-20T01:38:34.559778+00:00",
       "record_count": 5707,
       "fields": [
         "codigo_establecimiento",
@@ -545,9 +561,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.02,
+        "age_hours": 206.5,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-07-27T11:05:44.883531+00:00"
+        "checked_at_utc": "2026-07-28T16:08:31.970716+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 1080,
@@ -558,7 +574,8 @@
         "expected_record_count": null,
         "actual_record_count": 5707,
         "coverage_ratio": null,
-        "summary": "Sin baseline de cobertura por cardinalidad para esta capa."
+        "summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
+        "expected": false
       },
       "drift": {
         "status": "healthy",
@@ -580,6 +597,7 @@
       "documentation": "docs/datasets/establecimientos_salud.md",
       "validation_status": "ok",
       "warnings": [],
+      "actionable_warnings": [],
       "degradation": {
         "status": "none",
         "impact": "Sin degradación operativa detectada en este build.",
@@ -595,7 +613,7 @@
       "source_url": "https://datosabiertos.mineduc.cl/wp-content/uploads/2025/11/Directorio-Oficial-EE-2025.rar",
       "source_mode": "live",
       "source_detail": "mineduc_datos_abiertos_rar",
-      "refreshed_at_utc": "2026-07-27T11:04:44.243121+00:00",
+      "refreshed_at_utc": "2026-07-20T01:38:35.282380+00:00",
       "record_count": 12898,
       "fields": [
         "rbd",
@@ -624,9 +642,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.02,
+        "age_hours": 206.5,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-07-27T11:05:44.883540+00:00"
+        "checked_at_utc": "2026-07-28T16:08:31.970721+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -637,7 +655,8 @@
         "expected_record_count": null,
         "actual_record_count": 12898,
         "coverage_ratio": null,
-        "summary": "Sin baseline de cobertura por cardinalidad para esta capa."
+        "summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
+        "expected": false
       },
       "drift": {
         "status": "healthy",
@@ -659,6 +678,7 @@
       "documentation": "docs/datasets/establecimientos_educacionales.md",
       "validation_status": "ok",
       "warnings": [],
+      "actionable_warnings": [],
       "degradation": {
         "status": "none",
         "impact": "Sin degradación operativa detectada en este build.",
@@ -674,7 +694,7 @@
       "source_url": "https://censo2024.ine.gob.cl/wp-content/uploads/2025/03/V1_Viviendas-y-hogares-censados.xlsx",
       "source_mode": "live",
       "source_detail": "official_xlsx",
-      "refreshed_at_utc": "2026-07-27T11:04:40.238280+00:00",
+      "refreshed_at_utc": "2026-07-20T01:38:31.721058+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -707,9 +727,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.02,
+        "age_hours": 206.5,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-07-27T11:05:44.883547+00:00"
+        "checked_at_utc": "2026-07-28T16:08:31.970726+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -720,7 +740,8 @@
         "expected_record_count": 346,
         "actual_record_count": 346,
         "coverage_ratio": 1.0,
-        "summary": "Cobertura completa: 346/346 filas respecto del baseline esperado."
+        "summary": "Cobertura completa: 346/346 filas respecto del baseline esperado.",
+        "expected": false
       },
       "drift": {
         "status": "healthy",
@@ -739,6 +760,7 @@
       "documentation": "docs/datasets/censo_hogares_viviendas.md",
       "validation_status": "ok",
       "warnings": [],
+      "actionable_warnings": [],
       "degradation": {
         "status": "none",
         "impact": "Sin degradación operativa detectada en este build.",
@@ -754,7 +776,7 @@
       "source_url": "https://www.bcn.cl/siit/observatorio/ley20840",
       "source_mode": "live",
       "source_detail": "bcn_electoral_mapping_generated",
-      "refreshed_at_utc": "2026-07-27T11:04:41.891524+00:00",
+      "refreshed_at_utc": "2026-07-20T01:38:34.698640+00:00",
       "record_count": 346,
       "fields": [
         "codigo_comuna",
@@ -778,9 +800,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.02,
+        "age_hours": 206.5,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-07-27T11:05:44.883554+00:00"
+        "checked_at_utc": "2026-07-28T16:08:31.970731+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -791,7 +813,8 @@
         "expected_record_count": 346,
         "actual_record_count": 346,
         "coverage_ratio": 1.0,
-        "summary": "Cobertura completa: 346/346 filas respecto del baseline esperado."
+        "summary": "Cobertura completa: 346/346 filas respecto del baseline esperado.",
+        "expected": false
       },
       "drift": {
         "status": "healthy",
@@ -810,6 +833,7 @@
       "documentation": "docs/datasets/distritos_electorales.md",
       "validation_status": "ok",
       "warnings": [],
+      "actionable_warnings": [],
       "degradation": {
         "status": "none",
         "impact": "Sin degradación operativa detectada en este build.",
@@ -855,9 +879,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 447.64,
+        "age_hours": 476.69,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-07-27T11:05:44.883562+00:00"
+        "checked_at_utc": "2026-07-28T16:08:31.970736+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -868,11 +892,13 @@
         "expected_record_count": 346,
         "actual_record_count": 345,
         "coverage_ratio": 0.9971,
-        "summary": "Cobertura parcial: 345/346 filas respecto del baseline esperado."
+        "summary": "Cobertura parcial: 345/346 filas respecto del baseline esperado.",
+        "expected": true,
+        "expected_reason": "El contrato declara coverage_policy='partial_expected': la fuente no cubre el universo completo por diseño."
       },
       "drift": {
-        "status": "drifted",
-        "summary": "Drift detectado: mode=monthly, coverage=partial, degradation=none.",
+        "status": "healthy",
+        "summary": "Sin drift operativo detectado en este build.",
         "recommended_action": "Ninguna."
       },
       "usage_examples": {
@@ -890,6 +916,7 @@
       "documentation": "docs/datasets/finanzas_municipales.md",
       "validation_status": "ok",
       "warnings": [],
+      "actionable_warnings": [],
       "degradation": {
         "status": "none",
         "impact": "Sin degradación operativa detectada en este build.",
@@ -910,7 +937,7 @@
       "source_url": "https://datosabiertos.mineduc.cl/wp-content/uploads/2025/04/Rendimiento_2024.rar",
       "source_mode": "live",
       "source_detail": "mineduc_rendimiento_2024_rar_agregado_por_comuna",
-      "refreshed_at_utc": "2026-07-27T11:04:50.838251+00:00",
+      "refreshed_at_utc": "2026-07-20T01:38:41.833348+00:00",
       "record_count": 345,
       "fields": [
         "anio",
@@ -939,9 +966,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.02,
+        "age_hours": 206.5,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-07-27T11:05:44.883571+00:00"
+        "checked_at_utc": "2026-07-28T16:08:31.970740+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -952,7 +979,8 @@
         "expected_record_count": null,
         "actual_record_count": 345,
         "coverage_ratio": null,
-        "summary": "Sin baseline de cobertura por cardinalidad para esta capa."
+        "summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
+        "expected": false
       },
       "drift": {
         "status": "healthy",
@@ -974,6 +1002,7 @@
       "documentation": "docs/datasets/resultados_educacionales.md",
       "validation_status": "ok",
       "warnings": [],
+      "actionable_warnings": [],
       "degradation": {
         "status": "none",
         "impact": "Sin degradación operativa detectada en este build.",
@@ -993,7 +1022,7 @@
       "source_url": "https://www.ine.gob.cl/docs/default-source/sistema-de-indicadores-y-estandares-de-desarrollo-urbano/indicadores/actualizaci%C3%B3n-2019/matriz-siedu-publicacion.xlsm",
       "source_mode": "live",
       "source_detail": "ine_siedu_xlsm_cinco_mediciones_2018_2022",
-      "refreshed_at_utc": "2026-07-27T11:04:53.902014+00:00",
+      "refreshed_at_utc": "2026-07-20T01:38:43.216402+00:00",
       "record_count": 6701,
       "fields": [
         "anio",
@@ -1024,9 +1053,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.01,
+        "age_hours": 206.5,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-07-27T11:05:44.883604+00:00"
+        "checked_at_utc": "2026-07-28T16:08:31.970746+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -1037,12 +1066,14 @@
         "expected_record_count": null,
         "actual_record_count": 6701,
         "coverage_ratio": 0.3382,
-        "summary": "Comunas urbanas incluidas por SIEDU, no las 346 comunas del país."
+        "summary": "Comunas urbanas incluidas por SIEDU, no las 346 comunas del país.",
+        "expected": true,
+        "expected_reason": "Comunas urbanas incluidas por SIEDU, no las 346 comunas del país."
       },
       "drift": {
-        "status": "drifted",
-        "summary": "Drift detectado: mode=live, coverage=partial, degradation=warning.",
-        "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
+        "status": "healthy",
+        "summary": "Sin drift operativo detectado en este build.",
+        "recommended_action": "Ninguna."
       },
       "usage_examples": {
         "python": "from chile_hub import ChileHub\nhub = ChileHub()\ndf = hub.load_polars('indicadores_urbanos_siedu')",
@@ -1061,10 +1092,11 @@
       "warnings": [
         "indicadores_urbanos_siedu has intentionally partial urban coverage"
       ],
+      "actionable_warnings": [],
       "degradation": {
-        "status": "warning",
-        "impact": "indicadores_urbanos_siedu has intentionally partial urban coverage",
-        "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
+        "status": "none",
+        "impact": "1 observación(es) esperada(s): indicadores_urbanos_siedu has intentionally partial urban coverage",
+        "recommended_action": "Ninguna."
       },
       "notes": [
         "partial_urban_coverage_expected",
@@ -1079,9 +1111,9 @@
       "alias_for": null,
       "source_name": "chile-hub",
       "source_url": "https://github.com/cortega26/chile-hub",
-      "source_mode": "fallback",
+      "source_mode": "live",
       "source_detail": "derived_from_validated_chile_hub_layers",
-      "refreshed_at_utc": "2026-07-27T11:05:44.883617+00:00",
+      "refreshed_at_utc": "2026-07-28T16:08:31.970754+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -1145,7 +1177,7 @@
         "status": "fresh",
         "age_hours": 0.0,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-07-27T11:05:44.883633+00:00"
+        "checked_at_utc": "2026-07-28T16:08:31.970762+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 1080,
@@ -1156,11 +1188,12 @@
         "expected_record_count": 346,
         "actual_record_count": 346,
         "coverage_ratio": 1.0,
-        "summary": "Cobertura completa: 346/346 filas respecto del baseline esperado."
+        "summary": "Cobertura completa: 346/346 filas respecto del baseline esperado.",
+        "expected": false
       },
       "drift": {
-        "status": "drifted",
-        "summary": "Drift detectado: mode=fallback, coverage=full, degradation=none.",
+        "status": "healthy",
+        "summary": "Sin drift operativo detectado en este build.",
         "recommended_action": "Ninguna."
       },
       "usage_examples": {
@@ -1178,6 +1211,7 @@
       "documentation": "docs/datasets/perfil_territorial_comunal.md",
       "validation_status": "ok",
       "warnings": [],
+      "actionable_warnings": [],
       "degradation": {
         "status": "none",
         "impact": "Sin degradación operativa detectada en este build.",
@@ -1196,7 +1230,7 @@
       "source_url": "https://datos.gob.cl/dataset/registro-de-empresas-y-sociedades",
       "source_mode": "live",
       "source_detail": "datos_gob_cl_ckan_api",
-      "refreshed_at_utc": "2026-07-27T11:05:14.774633+00:00",
+      "refreshed_at_utc": "2026-07-20T01:43:45.518085+00:00",
       "record_count": 1572116,
       "fields": [
         "rut",
@@ -1230,9 +1264,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.01,
+        "age_hours": 206.41,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-07-27T11:05:44.883646+00:00"
+        "checked_at_utc": "2026-07-28T16:08:31.970769+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 1080,
@@ -1243,11 +1277,12 @@
         "expected_record_count": null,
         "actual_record_count": 1572116,
         "coverage_ratio": null,
-        "summary": "Sin baseline de cobertura por cardinalidad para esta capa."
+        "summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
+        "expected": false
       },
       "drift": {
         "status": "drifted",
-        "summary": "Drift detectado: mode=live, coverage=not_applicable, degradation=warning.",
+        "summary": "Drift detectado: degradation=warning.",
         "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
       },
       "usage_examples": {
@@ -1263,6 +1298,11 @@
       "documentation": "docs/datasets/empresas.md",
       "validation_status": "ok",
       "warnings": [
+        "found 1 RUTs with invalid format",
+        "unknown sociedad codes (new types?): ['SpA']",
+        "RES solo cubre constituciones bajo Ley 20.659 (regimen simplificado). No incluye empresas del regimen tradicional (Diario Oficial) ni empresas anteriores a mayo 2013."
+      ],
+      "actionable_warnings": [
         "found 1 RUTs with invalid format",
         "unknown sociedad codes (new types?): ['SpA']",
         "RES solo cubre constituciones bajo Ley 20.659 (regimen simplificado). No incluye empresas del regimen tradicional (Diario Oficial) ni empresas anteriores a mayo 2013."
@@ -1288,7 +1328,7 @@
       "source_url": "https://observatorio.ministeriodesarrollosocial.gob.cl/storage/docs/pobreza-comunal/2022/Estimaciones_Tasa_Pobreza_Ingresos_Comunas_2022.xlsx",
       "source_mode": "live",
       "source_detail": "Estimaciones de Pobreza Comunal vía SAE desde encuesta CASEN",
-      "refreshed_at_utc": "2026-07-27T11:05:18.111712+00:00",
+      "refreshed_at_utc": "2026-07-20T01:43:46.418827+00:00",
       "record_count": 690,
       "fields": [
         "codigo_region",
@@ -1321,9 +1361,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.01,
+        "age_hours": 206.41,
         "max_age_hours": 175200,
-        "checked_at_utc": "2026-07-27T11:05:44.883657+00:00"
+        "checked_at_utc": "2026-07-28T16:08:31.970776+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 175200,
@@ -1334,12 +1374,13 @@
         "expected_record_count": null,
         "actual_record_count": 690,
         "coverage_ratio": null,
-        "summary": "Sin baseline de cobertura por cardinalidad para esta capa."
+        "summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
+        "expected": false
       },
       "drift": {
-        "status": "drifted",
-        "summary": "Drift detectado: mode=live, coverage=not_applicable, degradation=warning.",
-        "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
+        "status": "healthy",
+        "summary": "Sin drift operativo detectado en este build.",
+        "recommended_action": "Ninguna."
       },
       "usage_examples": {
         "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('pobreza_comunal')\n# Filtrar pobreza por ingresos 2022\npobreza_2022 = df.filter(pl.col('anio') == 2022, pl.col('dimension') == 'ingresos')",
@@ -1355,10 +1396,11 @@
       "warnings": [
         "cobertura SAE: 345/346 comunas (99.7%) — parcial por diseño; comunas sin muestra no tienen estimación"
       ],
+      "actionable_warnings": [],
       "degradation": {
-        "status": "warning",
-        "impact": "cobertura SAE: 345/346 comunas (99.7%) — parcial por diseño; comunas sin muestra no tienen estimación",
-        "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
+        "status": "none",
+        "impact": "1 observación(es) esperada(s): cobertura SAE: 345/346 comunas (99.7%) — parcial por diseño; comunas sin muestra no tienen estimación",
+        "recommended_action": "Ninguna."
       },
       "notes": [
         "ingresos: 345 comunas con estimación desde URL oficial",
@@ -1373,7 +1415,7 @@
       "source_url": "http://datos.energiaabierta.cl/dataviews/241686/consumo-electrico-anual-por-comuna-y-tipo-de-cliente/",
       "source_mode": "fallback",
       "source_detail": "Consumo eléctrico anual por comuna y tipo de cliente",
-      "refreshed_at_utc": "2026-07-27T11:05:23.170075+00:00",
+      "refreshed_at_utc": "2026-07-20T01:43:50.810444+00:00",
       "record_count": 3,
       "fields": [
         "codigo_region",
@@ -1404,9 +1446,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.01,
+        "age_hours": 206.41,
         "max_age_hours": 17520,
-        "checked_at_utc": "2026-07-27T11:05:44.883666+00:00"
+        "checked_at_utc": "2026-07-28T16:08:31.970781+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 17520,
@@ -1417,11 +1459,12 @@
         "expected_record_count": null,
         "actual_record_count": 3,
         "coverage_ratio": null,
-        "summary": "Sin baseline de cobertura por cardinalidad para esta capa."
+        "summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
+        "expected": false
       },
       "drift": {
         "status": "drifted",
-        "summary": "Drift detectado: mode=fallback, coverage=not_applicable, degradation=warning.",
+        "summary": "Drift detectado: mode=fallback, degradation=warning.",
         "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
       },
       "usage_examples": {
@@ -1436,6 +1479,11 @@
       "documentation": "docs/datasets/consumo_electrico_comunal.md",
       "validation_status": "ok",
       "warnings": [
+        "tipos de cliente: ['Comercial', 'Residencial']",
+        "años disponibles: [2023]",
+        "consumo_electrico_comunal source_mode is fallback; usando datos de muestra mínima."
+      ],
+      "actionable_warnings": [
         "tipos de cliente: ['Comercial', 'Residencial']",
         "años disponibles: [2023]",
         "consumo_electrico_comunal source_mode is fallback; usando datos de muestra mínima."
@@ -1457,7 +1505,7 @@
       "source_url": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
       "source_mode": "live",
       "source_detail": "WSComun.asmx/retornarPartidosPoliticos + servel.cl/partidos-politicos (estado legal)",
-      "refreshed_at_utc": "2026-07-27T11:05:26.376873+00:00",
+      "refreshed_at_utc": "2026-07-20T01:43:53.588800+00:00",
       "record_count": 36,
       "fields": [
         "id_partido",
@@ -1486,9 +1534,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.01,
+        "age_hours": 206.41,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-07-27T11:05:44.883675+00:00"
+        "checked_at_utc": "2026-07-28T16:08:31.970786+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -1499,12 +1547,13 @@
         "expected_record_count": 36,
         "actual_record_count": 36,
         "coverage_ratio": 1.0,
-        "summary": "Cobertura completa: 36/36 filas respecto del baseline esperado."
+        "summary": "Cobertura completa: 36/36 filas respecto del baseline esperado.",
+        "expected": false
       },
       "drift": {
-        "status": "drifted",
-        "summary": "Drift detectado: mode=live, coverage=full, degradation=warning.",
-        "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
+        "status": "healthy",
+        "summary": "Sin drift operativo detectado en este build.",
+        "recommended_action": "Ninguna."
       },
       "usage_examples": {
         "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars(\"partidos_politicos\")\n# Partidos con estado legal constituido\nconstituidos = df.filter(pl.col(\"estado_legal\") == \"constituido\")",
@@ -1520,10 +1569,11 @@
       "warnings": [
         "estado_legal poblado (vía SERVEL) en 15/36 partidos"
       ],
+      "actionable_warnings": [],
       "degradation": {
-        "status": "warning",
-        "impact": "estado_legal poblado (vía SERVEL) en 15/36 partidos",
-        "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
+        "status": "none",
+        "impact": "1 observación(es) esperada(s): estado_legal poblado (vía SERVEL) en 15/36 partidos",
+        "recommended_action": "Ninguna."
       },
       "notes": [
         "Roster de partidos de la Cámara (incluye vigentes e históricos).",
@@ -1539,7 +1589,7 @@
       "source_url": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
       "source_mode": "live",
       "source_detail": "WSDiputado.asmx/retornarDiputadosPeriodoActual + camara.cl + senado.cl (Scrapling)",
-      "refreshed_at_utc": "2026-07-27T11:05:33.737471+00:00",
+      "refreshed_at_utc": "2026-07-20T01:47:47.950965+00:00",
       "record_count": 205,
       "fields": [
         "id_autoridad",
@@ -1577,9 +1627,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.0,
+        "age_hours": 206.35,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-07-27T11:05:44.883685+00:00"
+        "checked_at_utc": "2026-07-28T16:08:31.970791+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -1590,7 +1640,8 @@
         "expected_record_count": 205,
         "actual_record_count": 205,
         "coverage_ratio": 1.0,
-        "summary": "Cobertura completa: 205/205 filas respecto del baseline esperado."
+        "summary": "Cobertura completa: 205/205 filas respecto del baseline esperado.",
+        "expected": false
       },
       "drift": {
         "status": "healthy",
@@ -1609,6 +1660,7 @@
       "documentation": "docs/datasets/autoridades_electas.md",
       "validation_status": "ok",
       "warnings": [],
+      "actionable_warnings": [],
       "degradation": {
         "status": "none",
         "impact": "Sin degradación operativa detectada en este build.",
@@ -1616,7 +1668,7 @@
       },
       "notes": [
         "v1: diputados (155) + senadores (50). Gobernador_regional/alcalde viven en el dataset segregado autoridades_locales (licencia CC-BY-SA).",
-        "distrito_electoral vía Scrapling: 0/155 diputados.",
+        "distrito_electoral vía Scrapling: 155/155 diputados.",
         "codigo_region/periodo de senadores: 50/50 poblados desde senado.cl (REGION/PERIODOS).",
         "RUT (Cámara) y email/teléfono (Senado) descartados (línea roja de datos personales)."
       ]
