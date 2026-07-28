@@ -3189,6 +3189,66 @@ class ExcelGuardTests(unittest.TestCase):
             self.assertNotIn("test_oversized", wb.sheetnames)
 
 
+class NormalizeComunaNameTests(unittest.TestCase):
+    """Tests para src/chile_hub/text.py::normalize_comuna_name (Plan 050, ADR-009).
+
+    No requiere data/normalized/ — es una función pura sobre strings.
+    """
+
+    def test_strips_accents_and_enye(self):
+        from src.chile_hub.text import normalize_comuna_name
+
+        self.assertEqual(normalize_comuna_name("Ñuñoa"), "nunoa")
+
+    def test_uppercase_with_accent(self):
+        from src.chile_hub.text import normalize_comuna_name
+
+        self.assertEqual(normalize_comuna_name("CONCÓN"), "concon")
+
+    def test_strips_surrounding_whitespace(self):
+        from src.chile_hub.text import normalize_comuna_name
+
+        self.assertEqual(normalize_comuna_name("  Concón "), "concon")
+
+    def test_already_clean_string_unchanged(self):
+        from src.chile_hub.text import normalize_comuna_name
+
+        self.assertEqual(normalize_comuna_name("santiago"), "santiago")
+
+    def test_matches_polars_chain_except_for_intentional_strip(self):
+        """normalize_comuna_name() debe coincidir EXACTAMENTE con la cadena Polars
+        de subdere_extractor.py:558-570 (mismo orden, mismos reemplazos) para
+        cualquier input sin espacios al borde. La única divergencia permitida es
+        el .strip() adicional (ver docstring de text.py y ADR-009)."""
+        import polars as pl
+
+        from src.chile_hub.text import normalize_comuna_name
+
+        def polars_chain(value):
+            df = pl.DataFrame({"nombre_comuna": [value]})
+            df = df.with_columns(
+                pl.col("nombre_comuna")
+                .str.to_lowercase()
+                .str.replace_all("á", "a")
+                .str.replace_all("é", "e")
+                .str.replace_all("í", "i")
+                .str.replace_all("ó", "o")
+                .str.replace_all("ú", "u")
+                .str.replace_all("ü", "u")
+                .str.replace_all("ñ", "n")
+                .alias("nombre_comuna_clean")
+            )
+            return df["nombre_comuna_clean"][0]
+
+        for value in ["Ñuñoa", "CONCÓN", "Aysén", "Curicó", "Máfil", "PUERTO MONTT"]:
+            self.assertEqual(normalize_comuna_name(value), polars_chain(value))
+
+    def test_empty_string(self):
+        from src.chile_hub.text import normalize_comuna_name
+
+        self.assertEqual(normalize_comuna_name(""), "")
+
+
 if __name__ == "__main__":
     import pytest
 

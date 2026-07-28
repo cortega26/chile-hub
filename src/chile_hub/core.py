@@ -26,6 +26,7 @@ from .pipeline_status_utils import (
     compute_top_issue,
     format_top_issue_summary,
 )
+from .text import normalize_comuna_name
 
 UTC = timezone.utc
 
@@ -370,6 +371,61 @@ class ChileHub:
         for df in dfs[1:]:
             result = result.join(df, on=on, how=how)
         return result
+
+    def resolve_comunas(self, names: list[str]) -> pl.DataFrame:
+        """Resuelve nombres de comuna (tipeados por humanos) a códigos CUT.
+
+        Match **determinista**: normaliza cada nombre a su forma ``nombre_comuna_clean``
+        (minúsculas, sin acentos, sin ``ñ``) y hace coincidencia exacta contra el
+        dataset ``comunas``. No corrige typos ni hace coincidencia difusa (ver
+        ``docs/adr/ADR-009-resolutor-nombres-comunales.md``).
+
+        Args:
+            names: Lista de nombres de comuna. Para resolver una columna de un
+                DataFrame, pásala como ``df["mi_columna"].to_list()``.
+
+        Returns:
+            DataFrame Polars con una fila por input (mismo orden, duplicados
+            preservados) y columnas: ``input``, ``codigo_comuna``, ``nombre_comuna``,
+            ``codigo_region``, ``matched`` (bool). Los no encontrados tienen
+            ``matched=False`` y códigos nulos — sin lanzar excepción.
+
+        Examples:
+            >>> hub = ChileHub()
+            >>> hub.resolve_comunas(["Ñuñoa", "concon", "No Existe"])
+        """
+        comunas = self.load_polars("comunas")
+        lookup = {
+            row["nombre_comuna_clean"]: (
+                row["codigo_comuna"],
+                row["nombre_comuna"],
+                row["codigo_region"],
+            )
+            for row in comunas.iter_rows(named=True)
+        }
+        rows = []
+        for original in names:
+            key = normalize_comuna_name(str(original))
+            hit = lookup.get(key)
+            rows.append(
+                {
+                    "input": original,
+                    "codigo_comuna": hit[0] if hit else None,
+                    "nombre_comuna": hit[1] if hit else None,
+                    "codigo_region": hit[2] if hit else None,
+                    "matched": hit is not None,
+                }
+            )
+        return pl.DataFrame(
+            rows,
+            schema={
+                "input": pl.String,
+                "codigo_comuna": pl.String,
+                "nombre_comuna": pl.String,
+                "codigo_region": pl.String,
+                "matched": pl.Boolean,
+            },
+        )
 
     def sql(self, query: str) -> pl.DataFrame:
         """Ejecuta una consulta SQL sobre los datasets publicados como vistas DuckDB.
@@ -2117,6 +2173,21 @@ def build_parser():  # pragma: no cover — entry point de CLI, testeado vía in
         "--output", default=None, help="Archivo de salida (.csv, .parquet, o .json)"
     )
 
+    # Subcomando: resolve
+    resolve_parser = subparsers.add_parser(
+        "resolve", help="Resuelve nombres de comuna a codigos CUT (match determinista)"
+    )
+    resolve_parser.add_argument("names", nargs="+", help="Nombres de comuna a resolver")
+    resolve_parser.add_argument(
+        "--format",
+        choices=["json", "table"],
+        default="table",
+        help="Formato de salida (default: table)",
+    )
+    resolve_parser.add_argument(
+        "--output", default=None, help="Archivo de salida (.csv, .parquet, o .json)"
+    )
+
     # Subcomando: search
     search_parser = subparsers.add_parser(
         "search", help="Busca datasets por keyword, fuente o madurez"
@@ -2406,6 +2477,11 @@ def _main(argv=None):  # pragma: no cover — dispatch de CLI, testeado vía smo
 
     if args.command == "cross":
         df = hub.cross_view(args.datasets, on=args.on)
+        _output_dataframe(df, args.output, args.format)
+        return
+
+    if args.command == "resolve":
+        df = hub.resolve_comunas(args.names)
         _output_dataframe(df, args.output, args.format)
         return
 
