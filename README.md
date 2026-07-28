@@ -1,26 +1,3 @@
----
-title: "chile-hub — Datos públicos de Chile, curados y listos para análisis"
-description: >
-  Hub de datos abiertos de Chile — parte del ecosistema Tooltician.
-  19 capas de datos públicos curados: DPA, Censo 2024, indicadores económicos,
-  salud, educación, finanzas municipales, empresas, electoral y más.
-  Instalable vía pip, consumible en Python, DuckDB, Parquet o Excel.
-category: readme
-audience: [user, developer, data-scientist, ai-agent]
-priority: critical
-canonical_source: false
-repository: https://github.com/cortega26/chile-hub
-pypi: https://pypi.org/project/chile-hub/
-website: https://tooltician.com/chile-hub/
-related_docs:
-  - AGENTS.md              # Guía de trabajo para agentes de IA
-  - SOURCE_OF_TRUTH.md     # Índice de navegación y 5 invariantes
-  - CONTRIBUTING.md        # Guía de contribución
-  - DATA_LICENSES.md       # Licencias de datos
-  - docs/api.md            # Referencia de API
-last_updated: 2026-07-14
----
-
 <div align="center">
 
 <h1>
