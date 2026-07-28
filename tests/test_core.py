@@ -14,7 +14,7 @@ from unittest import mock
 import polars as pl
 
 from chile_hub import ChileHub
-from chile_hub.exceptions import ChileHubDatasetError
+from chile_hub.exceptions import ChileHubDataError, ChileHubDatasetError
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 NORMALIZED_DIR = ROOT_DIR / "data" / "normalized"
@@ -568,6 +568,37 @@ class ChileHubResolveComunasTests(unittest.TestCase):
                     f"{row['nombre_comuna_clean']!r}"
                 ),
             )
+
+
+class FromDatapackageUrlTests(unittest.TestCase):
+    """Tests para from_datapackage(url) (Plan 051, ADR-010).
+
+    No dependen de red: mockean frictionless.Package para evitar resolver una
+    URL real. Modelados sobre DataPackageConsumerTests de test_data_package.py.
+    """
+
+    URL = "https://tooltician.com/chile-hub/data/normalized/datapackage.json"
+
+    def test_url_skips_local_path_check(self):
+        """Una URL no debe intentar Path(...).exists() ni lanzar FileNotFoundError."""
+        with mock.patch("frictionless.Package") as mock_package:
+            with self.assertRaises(ChileHubDataError):
+                ChileHub.from_datapackage(self.URL)
+            mock_package.assert_called_once_with(self.URL)
+
+    def test_url_validates_descriptor_before_raising(self):
+        """Si frictionless no puede resolver el descriptor remoto, ese error propaga
+        (no se enmascara con el ChileHubDataError de la limitación conocida)."""
+        with mock.patch("frictionless.Package", side_effect=RuntimeError("no accesible")):
+            with self.assertRaises(RuntimeError):
+                ChileHub.from_datapackage(self.URL)
+
+    def test_local_path_behavior_unchanged(self):
+        """El path local sigue funcionando exactamente igual (regresión)."""
+        descriptor = NORMALIZED_DIR / "datapackage.json"
+        hub = ChileHub.from_datapackage(str(descriptor))
+        self.assertIsInstance(hub, ChileHub)
+        self.assertGreater(len(hub.summary()), 0)
 
 
 if __name__ == "__main__":

@@ -484,7 +484,8 @@ class ChileHub:
         asume que los paths son relativos al directorio del descriptor.
 
         Args:
-            path_or_url: Ruta local o URL a un archivo ``datapackage.json``.
+            path_or_url: Ruta local o URL (``http://``/``https://``) a un archivo
+                ``datapackage.json``.
 
         Returns:
             Instancia de ``ChileHub`` configurada para usar los datos del
@@ -492,6 +493,14 @@ class ChileHub:
 
         Raises:
             FileNotFoundError: Si el descriptor no existe en la ruta local.
+            ChileHubDataError: Si ``path_or_url`` es una URL. El descriptor remoto
+                se valida (existe, es un Frictionless Data Package conforme), pero
+                ``ChileHub`` todavia no sabe leer Parquet remoto directamente desde
+                una URL arbitraria (``__init__`` asume un directorio local) — ver
+                ADR-010, Preguntas abiertas. Usa ``ChileHub()`` sin argumentos para
+                el bundle publicado (se descarga y cachea automaticamente), o
+                ``hub.sql(...)``/``docs/http-access.md`` para consumir el hosting
+                HTTP directamente sin pasar por esta API.
             ImportError: Si ``frictionless`` no esta instalado.
                 Instalalo con ``pip install chile-hub[validation]``.
 
@@ -505,6 +514,20 @@ class ChileHub:
             raise ImportError(
                 "Para usar from_datapackage necesitas instalar frictionless: "
                 "pip install chile-hub[validation]"
+            )
+
+        path_or_url_str = str(path_or_url)
+        if path_or_url_str.startswith(("http://", "https://")):
+            # Valida que el descriptor remoto exista y sea un Frictionless Data
+            # Package conforme (levanta si frictionless no puede resolverlo).
+            _ = frictionless.Package(path_or_url_str)
+            raise ChileHubDataError(
+                f"El descriptor remoto '{path_or_url_str}' es valido, pero "
+                "from_datapackage(url) todavia no soporta leer Parquet remoto "
+                "directamente (ChileHub asume un directorio de datos local). "
+                "Usa ChileHub() sin argumentos para el bundle publicado, o "
+                "consulta docs/http-access.md para consumir la URL directamente "
+                "(ej. con Polars/DuckDB/arrow). Ver ADR-010."
             )
 
         path = Path(path_or_url)

@@ -53,11 +53,12 @@ from src.builders.catalog import (  # noqa: E402
     write_dataset_catalog,
     write_pipeline_metadata,
 )
-from src.builders.data_package import write_data_package_json  # noqa: E402
+from src.builders.data_package import build_data_package, write_data_package_json  # noqa: E402
 from src.builders.datasets import (  # noqa: E402
     build_perfil_territorial_comunal,
     derive_geography_layers,
 )
+from src.builders.dcat_catalog import write_dcat_catalog_json  # noqa: E402
 from src.builders.doc_sync import sync_all_docs  # noqa: E402
 from src.builders.formats import (  # noqa: E402
     build_duckdb,
@@ -787,6 +788,13 @@ def _generate_reports(pipeline_metadata, previous_pipeline_metadata, metadata_ou
         pipeline_metadata["version"],
         pipeline_metadata["public_site_url"],
     )
+    dcat_catalog_output = write_dcat_catalog_json(
+        build_data_package(
+            dataset_catalog,
+            pipeline_metadata["version"],
+            pipeline_metadata["public_site_url"],
+        )
+    )
     redistribution_report = build_redistribution_report(dataset_catalog)
     redistribution_report_output = write_redistribution_report_json(redistribution_report)
     write_redistribution_report_markdown_file(redistribution_report)
@@ -835,6 +843,7 @@ def _generate_reports(pipeline_metadata, previous_pipeline_metadata, metadata_ou
         artifact_manifest=artifact_manifest_output,
         hub_bundle=hub_bundle_output,
         data_package=data_package_output,
+        dcat_catalog=dcat_catalog_output,
         zip=zip_output,
         sha256=sha256_output,
     )
