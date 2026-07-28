@@ -705,6 +705,72 @@ async function loadHubHealth() {
     }
 }
 
+// Historial de salud (sparkline) — degradación grácil: si el JSONL no existe
+// o está vacío, el wrap se queda oculto (mismo patrón que loadHubHealth).
+async function renderHealthHistory() {
+    const wrap = document.getElementById("health-history-wrap");
+    const svg = document.getElementById("health-history-sparkline");
+    if (!wrap || !svg) return;
+
+    try {
+        const res = await fetch(dataUrl("data/normalized/hub_health_history.jsonl"), {
+            cache: "no-store",
+        });
+        if (!res.ok) throw new Error("Not found");
+        const text = await res.text();
+        const entries = text
+            .split("\n")
+            .map(line => line.trim())
+            .filter(Boolean)
+            .map(line => {
+                try {
+                    return JSON.parse(line);
+                } catch (_e) {
+                    return null;
+                }
+            })
+            .filter(Boolean);
+
+        if (entries.length === 0) return;
+
+        const recent = entries.slice(-30);
+        const barWidth = 100 / recent.length;
+        const bars = recent.map((entry, i) => {
+            const total = entry.dataset_count || 0;
+            if (total <= 0) return "";
+            const ok = entry.ok_count || 0;
+            const warn = entry.warn_count || 0;
+            const error = entry.error_count || 0;
+            const x = i * barWidth;
+            const okHeight = (ok / total) * 100;
+            const warnHeight = (warn / total) * 100;
+            const errorHeight = (error / total) * 100;
+            let y = 100;
+            let rects = "";
+            for (const [height, cls] of [
+                [errorHeight, "health-history-bar-error"],
+                [warnHeight, "health-history-bar-warn"],
+                [okHeight, "health-history-bar-ok"],
+            ]) {
+                if (height > 0) {
+                    y -= height;
+                    rects += `<rect class="${cls}" x="${x.toFixed(2)}%" y="${y.toFixed(2)}%" width="${(barWidth * 0.85).toFixed(2)}%" height="${height.toFixed(2)}%" />`;
+                }
+            }
+            return rects;
+        }).join("");
+
+        if (!bars) return;
+
+        svg.setAttribute("viewBox", "0 0 100 100");
+        svg.setAttribute("preserveAspectRatio", "none");
+        svg.innerHTML = bars;
+        wrap.classList.remove("health-hidden");
+    } catch (_e) {
+        // Sin historial disponible — la sección queda oculta, sin errores de consola.
+    }
+}
+
 function loadCatalog() {
     Promise.all([
         fetch(dataUrl("data/normalized/hub_bundle.json"), { cache: "no-store" }).then(res => {
@@ -1253,6 +1319,7 @@ window.addEventListener("DOMContentLoaded", () => {
     renderSupportLinks();
     loadKPIs();
     loadHubHealth();
+    renderHealthHistory();
     loadCatalog();
     loadComunas();
 

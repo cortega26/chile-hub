@@ -71,6 +71,10 @@ def build_publishable_artifact_index():
             "shared_type": "hub_health",
             "format": "markdown",
         },
+        "data/normalized/hub_health_history.jsonl": {
+            "shared_type": "hub_health_history",
+            "format": "jsonl",
+        },
         "data/normalized/hub_status.json": {
             "shared_type": "hub_status",
             "format": "json",

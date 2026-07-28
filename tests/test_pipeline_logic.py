@@ -2534,6 +2534,108 @@ class ReportsBuilderTests(unittest.TestCase):
         self.assertEqual(status["top_issue"]["dataset"], "c_fallback")
 
 
+class HubHealthHistoryTests(unittest.TestCase):
+    """Tests para append_hub_health_history (Plan 063) — historial JSONL
+    append-only del hub_health.json de cada build."""
+
+    @staticmethod
+    def _health(generated_at_utc, **overrides):
+        base = {
+            "generated_at_utc": generated_at_utc,
+            "overall_status": "ok",
+            "ok_count": 19,
+            "warn_count": 0,
+            "error_count": 0,
+            "drifted_count": 0,
+            "fallback_count": 0,
+            "stale_count": 0,
+            "warning_count": 0,
+            "dataset_count": 19,
+        }
+        base.update(overrides)
+        return base
+
+    def test_append_creates_file_with_one_valid_line(self):
+        from src.builders import reports
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with patch.object(reports, "NORMALIZED_DIR", tmpdir):
+                path = reports.append_hub_health_history(self._health("2026-01-01T00:00:00Z"))
+            with open(path, encoding="utf-8") as f:
+                lines = [ln for ln in f.read().splitlines() if ln.strip()]
+            self.assertEqual(len(lines), 1)
+            entry = json.loads(lines[0])
+            self.assertEqual(len(entry), 10)
+
+    def test_append_same_timestamp_does_not_duplicate(self):
+        from src.builders import reports
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with patch.object(reports, "NORMALIZED_DIR", tmpdir):
+                health = self._health("2026-01-01T00:00:00Z")
+                path = reports.append_hub_health_history(health)
+                reports.append_hub_health_history(health)
+            with open(path, encoding="utf-8") as f:
+                lines = [ln for ln in f.read().splitlines() if ln.strip()]
+            self.assertEqual(len(lines), 1)
+
+    def test_append_distinct_timestamp_adds_line_in_chronological_order(self):
+        from src.builders import reports
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with patch.object(reports, "NORMALIZED_DIR", tmpdir):
+                path = reports.append_hub_health_history(self._health("2026-01-01T00:00:00Z"))
+                reports.append_hub_health_history(self._health("2026-01-02T00:00:00Z"))
+            with open(path, encoding="utf-8") as f:
+                lines = [ln for ln in f.read().splitlines() if ln.strip()]
+            self.assertEqual(len(lines), 2)
+            self.assertEqual(json.loads(lines[0])["generated_at_utc"], "2026-01-01T00:00:00Z")
+            self.assertEqual(json.loads(lines[1])["generated_at_utc"], "2026-01-02T00:00:00Z")
+
+    def test_append_caps_at_max_lines_keeping_most_recent(self):
+        from src.builders import reports
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = str(Path(tmpdir) / reports.HUB_HEALTH_HISTORY_NAME)
+            seeded = [
+                json.dumps(self._health(f"2025-01-{(i % 28) + 1:02d}T00:00:00Z-seed{i}"))
+                for i in range(reports.HUB_HEALTH_HISTORY_MAX_LINES)
+            ]
+            with open(path, "w", encoding="utf-8") as f:
+                f.write("\n".join(seeded) + "\n")
+
+            with patch.object(reports, "NORMALIZED_DIR", tmpdir):
+                reports.append_hub_health_history(self._health("2026-02-01T00:00:00Z"))
+
+            with open(path, encoding="utf-8") as f:
+                lines = [ln for ln in f.read().splitlines() if ln.strip()]
+            self.assertEqual(len(lines), reports.HUB_HEALTH_HISTORY_MAX_LINES)
+            # La primera línea sembrada (la más antigua) fue descartada; la
+            # segunda sembrada ahora es la primera retenida.
+            self.assertEqual(
+                json.loads(lines[0])["generated_at_utc"], json.loads(seeded[1])["generated_at_utc"]
+            )
+            self.assertEqual(json.loads(lines[-1])["generated_at_utc"], "2026-02-01T00:00:00Z")
+
+    def test_append_ignores_blank_and_malformed_lines_in_existing_file(self):
+        from src.builders import reports
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = str(Path(tmpdir) / reports.HUB_HEALTH_HISTORY_NAME)
+            with open(path, "w", encoding="utf-8") as f:
+                f.write("\n\n{not valid json\n\n")
+
+            with patch.object(reports, "NORMALIZED_DIR", tmpdir):
+                reports.append_hub_health_history(self._health("2026-01-01T00:00:00Z"))
+
+            with open(path, encoding="utf-8") as f:
+                lines = [ln for ln in f.read().splitlines() if ln.strip()]
+            # La línea espuria se conserva (no se valida retroactivamente),
+            # pero no rompe el append de la nueva entrada valida.
+            self.assertEqual(len(lines), 2)
+            self.assertEqual(json.loads(lines[-1])["generated_at_utc"], "2026-01-01T00:00:00Z")
+
+
 class HubBundleCandidateDatasetTests(unittest.TestCase):
     """Tests para write_hub_bundle_json (src/builders/artifacts.py), en
     particular el filtrado de candidate_datasets/candidate_dataset_count que

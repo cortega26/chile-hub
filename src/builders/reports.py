@@ -25,6 +25,54 @@ def write_hub_health_json(health):
     return output_path
 
 
+HUB_HEALTH_HISTORY_NAME = "hub_health_history.jsonl"
+HUB_HEALTH_HISTORY_MAX_LINES = 400  # ~13 meses de builds diarios
+
+
+def append_hub_health_history(health):
+    """Appende una línea JSONL con el resumen de salud del build.
+
+    Idempotente por timestamp: si la última línea tiene el mismo
+    generated_at_utc, no duplica (rebuilds del mismo artifact). Trunca a
+    HUB_HEALTH_HISTORY_MAX_LINES conservando las más recientes. La reescritura
+    completa (no un append de syscall) evita líneas parciales si el build
+    muere a mitad de escritura; el rename atómico vía os.replace (mismo
+    patrón que write_json_atomic) evita que un lector concurrente vea un
+    archivo truncado.
+    """
+    entry = {
+        "generated_at_utc": health.get("generated_at_utc"),
+        "overall_status": health.get("overall_status"),
+        "ok_count": health.get("ok_count"),
+        "warn_count": health.get("warn_count"),
+        "error_count": health.get("error_count"),
+        "drifted_count": health.get("drifted_count"),
+        "fallback_count": health.get("fallback_count"),
+        "stale_count": health.get("stale_count"),
+        "warning_count": health.get("warning_count"),
+        "dataset_count": health.get("dataset_count"),
+    }
+    path = os.path.join(NORMALIZED_DIR, HUB_HEALTH_HISTORY_NAME)
+    lines = []
+    if os.path.exists(path):
+        with open(path, "r", encoding="utf-8") as f:
+            lines = [ln for ln in f.read().splitlines() if ln.strip()]
+    if lines:
+        try:
+            last = json.loads(lines[-1])
+        except json.JSONDecodeError:
+            last = None
+        if last and last.get("generated_at_utc") == entry["generated_at_utc"]:
+            return path  # rebuild idempotente: nada que agregar
+    lines.append(json.dumps(entry, ensure_ascii=False))
+    lines = lines[-HUB_HEALTH_HISTORY_MAX_LINES:]
+    tmp_path = path + ".tmp"
+    with open(tmp_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines) + "\n")
+    os.replace(tmp_path, path)
+    return path
+
+
 def build_hub_status(hub_health):
     return {
         "generated_at_utc": hub_health.get("generated_at_utc"),

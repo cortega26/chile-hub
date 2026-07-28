@@ -876,6 +876,7 @@ protegido por un chequeo automatizado en vez de depender solo de buena voluntad.
 | Conteo de contratos en README | `contracts/datasets/*.schema.json` | `scripts/sync_docs.py --check` |
 | Badge "N capas" y resumen de auditoría legal en README | `data/dataset_catalog_config.json` / `data/normalized/redistribution_report.json` | `scripts/sync_docs.py --check` |
 | Resumen de salud (`ok`/`warn`/`error`) en README | `data/normalized/hub_health.json` | `scripts/sync_docs.py --check` |
+| Historial de salud del hub (sparkline en landing) | `data/normalized/hub_health_history.jsonl` — append-only, una línea por build, cap 400 líneas (~13 meses), idempotente por `generated_at_utc` | `append_hub_health_history()` (`src/builders/reports.py`); registrado en `artifact_manifest.json` |
 | Score de calidad (A-F) en README | `data/normalized/dataset_quality.json` | `scripts/sync_docs.py --check` |
 | Ejemplo de pin de versión en README | `pyproject.toml` vía `read_project_version()` | `scripts/sync_docs.py --check` |
 | Bloque JSON-LD `DataCatalog` de `index.html` | `data/dataset_catalog_config.json` vía `render_catalog_json_ld_block()` | `scripts/check_landing_sync.py` |
