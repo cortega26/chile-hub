@@ -45,3 +45,10 @@ La primera versión usa una capa fallback curada hasta configurar una exportaci�
 ## Registro de cambios
 
 - v1: Dataset agregado al pipeline con validación centralizada y artefactos Parquet/JSON/DuckDB/SQLite/Excel.
+
+## Clasificación de salud (ADR-014)
+
+El contrato declara `coverage_policy: "partial_expected"`: SINIM no publica el
+universo completo de municipios en cada corte. Cuando la cobertura resulta
+`partial`, el artefacto marca `coverage.expected: true` y el dataset **no**
+cuenta como drift — la parcialidad es de diseño, no una degradación.

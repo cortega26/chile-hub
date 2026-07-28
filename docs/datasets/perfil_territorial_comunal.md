@@ -34,3 +34,10 @@ Las columnas derivadas de capas parciales pueden venir nulas o en cero según co
 ## Registro de cambios
 
 - v1: Perfil derivado agregado con validación de 346 comunas únicas.
+
+## Clasificación de salud (ADR-014)
+
+Esta capa es **derivada** de capas ya validadas. Su `source_mode` se calcula a
+partir de los upstreams y sólo cae a `fallback` si alguno lo es de verdad:
+`monthly` (p. ej. `finanzas_municipales`) cuenta como fuente genuina, no como
+respaldo. Con 346/346 comunas y cero warnings, su `drift_status` es `healthy`.

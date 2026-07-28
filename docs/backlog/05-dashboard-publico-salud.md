@@ -41,6 +41,11 @@ lo que reduce la confianza en los datos.
   `ok_count`, `warn_count`, `error_count`, `live_count`, `fallback_count`,
   `stale_count`, `drifted_count`, `degraded_count`, `warning_count`, `generated_at_utc`,
   y detalle por dataset con severidad, modo, validacion, frescura, cobertura, drift.
+  Desde ADR-014 cada entrada trae además `actionable_warning_count` (subconjunto de
+  `warning_count`, descontando los warnings declarados como esperados) y
+  `coverage_expected` (parcialidad declarada en el contrato). La severidad y el
+  `drifted_count` se calculan con los accionables: un dataset cuya parcialidad o
+  cuyos warnings son de diseño ya no aparece como drift.
 - **`data/normalized/dataset_status.json`**: contiene status detallado por dataset.
 - **`data/normalized/hub_status.json`**: contiene status compacto con top_issue.
 - **`data/normalized/freshness_audit.json`**: (no existe como archivo independiente,

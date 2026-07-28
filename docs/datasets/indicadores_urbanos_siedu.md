@@ -45,3 +45,11 @@ FROM 'data/normalized/indicadores_urbanos_siedu.parquet';
 ## Registro de cambios
 
 - v1: Dataset agregado con cobertura parcial explícita y validación de claves largas.
+
+## Clasificación de salud (ADR-014)
+
+La cobertura urbana es intencional: SIEDU mide sólo comunas urbanas. El contrato
+lo declara con `coverage_policy: "partial_expected"` y el warning
+"intentionally partial urban coverage" está registrado como *esperado*, así que
+el dataset no cuenta como drift ni eleva la severidad del hub. El warning sigue
+apareciendo íntegro en `warnings`.

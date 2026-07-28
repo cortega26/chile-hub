@@ -48,3 +48,10 @@ ORDER BY tasa DESC;
 ## Registro de cambios
 
 - v1 (2026-06-30): Primera versión. Datos de la ronda CASEN 2022 con estimaciones SAE de pobreza por ingresos y multidimensional.
+
+## Clasificación de salud (ADR-014)
+
+La cobertura SAE (345/346 comunas) es **parcial por diseño**: las comunas sin
+muestra no tienen estimación. Ese warning está declarado como *esperado* en la
+regla que lo emite, por lo que no cuenta como degradación accionable ni como
+drift. El mensaje sigue listado en `warnings` de todos los artefactos.

@@ -236,6 +236,7 @@ def build_hub_health(metadata):
         coverage = dataset.get("coverage", {})
         coverage_status = coverage.get("status", "unknown")
         coverage_ratio = coverage.get("coverage_ratio")
+        coverage_expected = coverage.get("expected") is True
         drift_status = dataset.get("drift", {}).get("status", "healthy")
         warnings = validation.get("warnings", [])
         diagnostic_summary = "Sin observaciones operativas."
@@ -267,6 +268,7 @@ def build_hub_health(metadata):
                 "validation_status": validation_status,
                 "warning_count": warning_count,
                 "actionable_warning_count": actionable_warning_count,
+                "coverage_expected": coverage_expected,
                 "reuse_status": reuse_status,
                 "redistribution_ok": redistribution_ok,
                 "publishability_status": publishability_status,

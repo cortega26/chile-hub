@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-07-28T16:01:21.157984+00:00",
+  "generated_at_utc": "2026-07-28T16:08:31.972912+00:00",
   "dataset_count": 19,
   "drifted_count": 3,
   "healthy_count": 16,
@@ -75,7 +75,7 @@
       "coverage_ratio": null,
       "coverage_summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
       "degradation_status": "warning",
-      "degradation_impact": "indicadores live refresh reused last published artifact for missing codes: ipc; indicadores freshness is stale: 206.38h since refresh, policy max is 72h",
+      "degradation_impact": "indicadores live refresh reused last published artifact for missing codes: ipc; indicadores freshness is stale: 206.5h since refresh, policy max is 72h",
       "drift_summary": "Drift detectado: degradation=warning.",
       "warning_count": 2,
       "diagnostic_summary": "indicadores live refresh reused last published artifact for missing codes: ipc",

@@ -3607,8 +3607,8 @@ class DriftTaxonomyTests(unittest.TestCase):
     def test_non_fallback_source_modes_is_single_source_of_truth(self):
         """verify_pipeline.py debe consumir el conjunto de _shared.py, no
         redefinirlo (la duplicación fue el bug original)."""
-        from src.builders._shared import NON_FALLBACK_SOURCE_MODES
         from scripts.verify_pipeline import NON_FALLBACK_SOURCE_MODES as gate_set
+        from src.builders._shared import NON_FALLBACK_SOURCE_MODES
 
         self.assertIs(NON_FALLBACK_SOURCE_MODES, gate_set)
         self.assertEqual(NON_FALLBACK_SOURCE_MODES, {"live", "monthly"})

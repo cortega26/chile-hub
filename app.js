@@ -115,6 +115,14 @@ function formatBytes(sizeBytes) {
     return `${(sizeBytes / (1024 * 1024)).toFixed(2)} MB`;
 }
 
+function formatCoverageStatusLabel(entry) {
+    // Distingue la parcialidad de diseño (declarada en el contrato) de la
+    // inesperada, sin agregar un valor nuevo al enum coverage_status (ADR-014).
+    const status = entry.coverage_status || "unknown";
+    if (status === "partial" && entry.coverage_expected === true) return "partial esperada";
+    return status;
+}
+
 const SOURCE_MODE_LABELS = {
     live: "en vivo",
     fallback: "respaldo",
@@ -169,8 +177,16 @@ function computeRuntimeOverallStatus(buildStatus, runtimeFreshnessByDataset) {
         : buildStatus;
 }
 
+function actionableWarningCount(dataset) {
+    // Los warnings esperados describen diseño confirmado, no algo que revisar
+    // (ADR-014). Si el artefacto es previo al cambio, degrada al conteo total.
+    if (Array.isArray(dataset.actionable_warnings)) return dataset.actionable_warnings.length;
+    if (Array.isArray(dataset.warnings)) return dataset.warnings.length;
+    return dataset.warning_count ?? 0;
+}
+
 function computeAttentionPriority(dataset, runtimeFreshness) {
-    const warningCount = dataset.warning_count ?? 0;
+    const warningCount = actionableWarningCount(dataset);
     const runtimeStatus = runtimeFreshness?.status || "unknown";
     if (warningCount > 0 || runtimeStatus === "stale" || runtimeStatus === "unknown") {
         return 0;
@@ -693,7 +709,7 @@ async function loadHubHealth() {
                     '<td><span class="pill ' + (entry.source_mode || "unknown") + '">' + escapeHtml(entry.source_mode || "unknown") + '</span></td>' +
                     '<td><span class="pill ' + (entry.validation_status || "unknown") + '">' + escapeHtml(entry.validation_status || "unknown") + '</span></td>' +
                     '<td><span class="pill ' + (entry.freshness_status || "unknown") + '">' + escapeHtml(entry.freshness_status || "unknown") + '</span></td>' +
-                    '<td><span class="pill ' + (entry.coverage_status || "unknown") + '">' + escapeHtml(entry.coverage_status || "unknown") + '</span></td>' +
+                    '<td><span class="pill ' + (entry.coverage_status || "unknown") + '">' + escapeHtml(formatCoverageStatusLabel(entry)) + '</span></td>' +
                     '<td><span class="pill ' + (entry.drift_status || "unknown") + '">' + escapeHtml(entry.drift_status || "unknown") + '</span></td>' +
                     '<td>' + (entry.warning_count ?? 0) + '</td>' +
                     '</tr>';

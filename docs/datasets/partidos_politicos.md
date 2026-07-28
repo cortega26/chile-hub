@@ -61,3 +61,10 @@ ver `docs/legal/b2-2-electoral-research.md`).
 - SERVEL — partidos en formación: https://www.servel.cl/partidos-politicos/partidos-en-formacion/
 - Research electoral: `docs/legal/b2-2-electoral-research.md`
 - Plan 023 — Ola B: `plans/023-autoridades-electas-partidos-politicos.md`
+
+## Clasificación de salud (ADR-014)
+
+`estado_legal` viene poblado sólo para los partidos que SERVEL publica con ese
+dato (15/36 al último build). Es una característica de la fuente, no un fallo de
+extracción: el warning está declarado como *esperado* y no cuenta como
+degradación accionable ni como drift.
