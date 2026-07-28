@@ -2,6 +2,15 @@
 
 Planes de implementación generados por auditoría `/improve deep` en commits `ba2f434` (2026-06-13), `a2cd288` (2026-06-19) y `c486e7c` (2026-07-07), y por `/improve plan` (mejoras de librerías/dependencias) en commit `140c8ea` (2026-06-29).
 
+> **Auditoría `/improve next` — dirección/roadmap (2026-07-26, commit `63cc106`)**:
+> se revalidaron los cinco hallazgos con mayor palanca: resolución nombres→CUT
+> (**050**), acceso HTTP/DCAT (**051**), publicación de la geometría candidate
+> (**064**), resolución coordenadas→CUT (**065**), anomalías temporales (**054**) y
+> ownership catálogo→extractor (**058**). El Plan 053 dejó completos sus Steps 0–3;
+> sus dos entregables restantes se separan en 064/065 para aislar riesgos de CI y de
+> API runtime. No se propone un dataset nuevo: ADR-011 sigue priorizando profundidad
+> sobre fuentes oficiales existentes, no amplitud de fuentes frágiles.
+
 > **Auditoría `/improve next` — dirección/roadmap (2026-07-14, commit `7ebf94b`)**: planes
 > **050–052**. Foco exclusivo en la categoría *dirección* (hacia dónde llevar el proyecto),
 > no en bugs. Contexto: repo muy maduro — la lista "deseable post-MVP" del `product-spec`
@@ -112,12 +121,36 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 |---|------|----------|----------|--------|-----------|--------|
 | 050 | [Resolutor público `resolve_comunas()` (nombres → CUT)](050-resolve-comunas-name-to-cut.md) | P2 | M | LOW-MED | — | TODO — spike con entregable de código: resolutor determinista + `ADR-009`; fuzzy queda como pregunta abierta. |
 | 051 | [Capa de acceso HTTP estática + catálogo DCAT `data.json`](051-static-http-access-and-dcat-catalog.md) | P2 | M | LOW | — | TODO — spike: contrato + `ADR-010` + prototipo generador DCAT + fix `from_datapackage(url)` + docs. Sólo archivos estáticos, sin servidor. |
-| 053 | [Geometría comunal (GeoParquet) + `resolve_by_coords()` reverse geocoding](053-comuna-geometry-and-reverse-geocoding.md) | **P1** | L | MED | — (complementa 050) | 🔶 Steps 0-3 ✓ (2026-07-23) — ADR-011 **ratificado** (accepted) por Carlos Ortega. ADR-012 (`accepted`): gate de licencia PASA (fuente `tematico/Comunas_Generalizadas` en `arcgiswebad.bcn.cl`, uso libre con atribución). Extractor (345/346 comunas, fallback Magallanes), validador y writer GeoParquet 1.0 (WKB, EPSG:4326) implementados; carril `candidate`/`bajo_demanda` **fuera** de `make extract`/`build_dev_db.py` (patrón `delincuencia_comunal`), script standalone `scripts/build_geometria_comunal.py`. Commit `56cd9d5` en worktree `worktree-053-comuna-geometry`. Suite completa (681 tests) sin regresiones. **Pendiente**: el artefacto GeoParquet (5.1 MB) aún **no está publicado** — excede el límite de 500 KB de `check-added-large-files`, requiere decisión (subir el límite o workflow de CI dedicado, como `empresas.parquet`). Step 4 (`resolve_by_coords()`, extra `[geo]`) y el wiring de CI de Step 5 quedan **diferidos** a una sesión futura. |
+| 053 | [Geometría comunal — parent histórico](053-comuna-geometry-and-reverse-geocoding.md) | P1 | L | MED | — | SUPERSEDED — Steps 0–3 DONE (extractor, validación, writer, licencia y docs). Los pendientes se ejecutan exclusivamente como 064 y 065. |
 | 054 | [Validación de anomalías temporales sobre series numéricas](054-temporal-anomaly-validation-numeric-series.md) | P2 | M | MED | — | TODO — foso de confianza (no generador de demanda; respalda 053). Anomalía = warning + flag de drift + gate de publicación override-able, **nunca** `SystemExit` del build. Alcance inicial: `indicadores`. |
 | 057 | [Skeleton loading states + polish de interacción](057-loading-skeletons-and-interaction-polish.md) | P2 | M | LOW | — (055 recomendado) | TODO — skeletons para catálogo y KPIs, empty state de búsqueda, tarjetas clickeables, tecla Escape en drawer. |
-| 058 | [Campo `extractor` en el catálogo + tabla de extractores auto-generada en README](058-catalogo-campo-extractor-y-tabla-readme.md) | P2 | M | LOW | — | TODO — cierra el hueco que `AGENTS.md §12` nombra explícito: campo `extractor` en las 21 entradas + validación en `check_companion_paths registry` + `sync_readme_extractor_table()`. Disjunto de 050–057. |
+| 058 | [Campo `extractor` en el catálogo + tabla de extractores auto-generada en README](058-catalogo-campo-extractor-y-tabla-readme.md) | P2 | M | LOW | — | TODO — cierra el hueco que `AGENTS.md §12` nombra explícito: campo `extractor` en las 22 entradas + validación en `check_companion_paths registry` + `sync_readme_extractor_table()`. Disjunto de 050–057. |
+| 064 | [Publicar GeoParquet candidate desde CI](064-publish-geometry-artifact-from-ci.md) | **P1** | M | MED | — | IN PROGRESS — workflow manual, validación antes de commit y checksum implementados localmente; falta dispatch autorizado y lectura desde Pages para DONE. |
+| 065 | [Resolver coordenadas a comuna](065-add-coordinate-resolver.md) | **P1** | M | MED | 064 | TODO — extra opcional `geo`, cache con checksum y `resolve_by_coords()`; candidate nunca entra al bundle estable. |
 | 059 | [Publicación del bundle en Hugging Face Hub](059-publicacion-huggingface-hub.md) | P2 | M | MED | — (052 recomendado antes, no gate) | TODO — canal de *descubrimiento* (complementa 051 = capa de acceso). Script `--dry-run` + job `hf-publish` en `pypi-release.yml` + dataset card. Requiere secret `HF_TOKEN` (paso manual del mantenedor). Carril `candidate` excluido por construcción. |
 | 063 | [Historial de salud del hub + sparkline en landing](063-historial-salud-hub.md) | P3 | M | MED | — (054 recomendado antes) | TODO — `hub_health_history.jsonl` append-only (cap 400, idempotente por timestamp) + sparkline SVG en el dashboard. Primer artefacto acumulativo del pipeline — Step 1 verifica la premisa de persistencia con un probe. |
+| 066 | [Separar drift esperado de drift real](066-taxonomia-drift-esperado-vs-real.md) | P2 | M | MED | — (bloquea 063 en valor) | TODO — clasificación, **no** reparación de datos: `coverage_policy` del contrato hoy se ignora y todo warning pesa igual, así que 4 de 8 "drifted" son ruido estructural. Baja `drifted_count` 8→3 sin agregar valores a ningún enum ni relajar gates. Los 3 problemas de datos reales salen como issues separados. |
+
+## Orden de ejecución actualizado (2026-07-26)
+
+1. **064** — publica y verifica el artefacto que hoy falta; es el bloqueo real para la capacidad geoespacial.
+2. **051** — convierte el hosting estático ya existente en una superficie estándar y descubrible; puede avanzar mientras 064 espera revisión humana, pero debe integrar la URL publicada cuando exista.
+3. **065** — sólo después de 064: consume el GeoParquet y su checksum sin contaminar el bundle estable.
+4. **050**, **054** y **058** — independientes entre sí y de 064, salvo que no deben tocar los mismos archivos en paralelo. Recomendación de valor: 050 → 054 → 058.
+5. **059** y **063** conservan sus dependencias históricas; no son parte de los hallazgos de esta auditoría.
+6. **066** — independiente de todo lo anterior, pero conviene **antes de 063**: el historial de salud congelaría en JSONL una taxonomía que hoy clasifica mal 4 de 19 datasets. También cierra el pendiente "vocabulario del dashboard de salud" diferido en la auditoría 2026-07-13.
+
+### Dependencias de la auditoría 2026-07-26
+
+- 065 depende estrictamente de 064: sin una lectura remota exitosa y un checksum publicado, no hay contrato seguro de cache.
+- 051 y 064 deben coordinar la documentación de la URL estática, pero no se bloquean a nivel de código.
+- 054 sigue siendo el respaldo de confianza; no debe retrasar la publicación ni la API de geometría.
+- 050 y 065 modifican `src/chile_hub/core.py`; ejecútalos secuencialmente, no en worktrees paralelos.
+
+## Hallazgos considerados y rechazados (2026-07-26)
+
+- **Agregar un dataset nuevo**: rechazado por ahora. Las ideas restantes requieren fuentes o licencias aún no consolidadas; ADR-011 limita la estrategia actual a profundizar capacidad sobre la fuente BCN ya validada.
+- **Subir el límite global de 500 KB o saltar pre-commit**: rechazado. El flujo de CI de 064 resuelve la publicación de datos sin debilitar los controles locales para el código.
 
 ## Planes archivados (2026-07-24)
 
