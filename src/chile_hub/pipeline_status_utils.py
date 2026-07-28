@@ -221,7 +221,7 @@ def build_hub_health(metadata):
         validation = validations.get(dataset_name, {})
         warning_count = len(validation.get("warnings", []))
         # Los warnings esperados describen diseño confirmado, no degradación:
-        # se cuentan aparte para que la severidad refleje trabajo real (ADR-013).
+        # se cuentan aparte para que la severidad refleje trabajo real (ADR-014).
         expected_warning_set = set(validation.get("expected_warnings", []))
         actionable_warning_count = sum(
             1 for warning in validation.get("warnings", []) if warning not in expected_warning_set

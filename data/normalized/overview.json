@@ -1,14 +1,14 @@
 {
-  "generated_at_utc": "2026-07-27T11:05:44.886970+00:00",
+  "generated_at_utc": "2026-07-28T16:01:21.157984+00:00",
   "overall_status": "warn",
   "dataset_count": 19,
-  "live_count": 17,
-  "fallback_count": 2,
-  "stale_count": 0,
-  "drifted_count": 8,
+  "live_count": 18,
+  "fallback_count": 1,
+  "stale_count": 1,
+  "drifted_count": 3,
   "degraded_count": 0,
   "partial_coverage_count": 2,
-  "warning_count": 10,
+  "warning_count": 11,
   "top_issue": {
     "dataset": "empresas",
     "attention_priority": 0,
@@ -21,12 +21,12 @@
     "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
   },
   "top_issue_summary": "empresas: found 1 RUTs with invalid format [source_detail=datos_gob_cl_ckan_api; warnings=3; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]",
-  "shared_artifact_count": 24,
+  "shared_artifact_count": 25,
   "package_count": 1,
   "primary_package": {
     "path": "data/normalized/chile-hub-publishable-bundle.zip",
     "package_type": "zip",
-    "size_bytes": 29354912,
+    "size_bytes": 29356533,
     "checksum_algorithm": "sha256",
     "checksum_path": "data/normalized/chile-hub-publishable-bundle.zip.sha256",
     "verification_command": "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256"
@@ -142,13 +142,13 @@
       "validation_status": "ok",
       "freshness_status": "fresh",
       "coverage_status": "partial",
-      "drift_status": "drifted"
+      "drift_status": "healthy"
     },
     {
       "dataset": "indicadores",
       "source_mode": "live",
       "validation_status": "ok",
-      "freshness_status": "fresh",
+      "freshness_status": "stale",
       "coverage_status": "not_applicable",
       "drift_status": "drifted"
     },
@@ -158,7 +158,7 @@
       "validation_status": "ok",
       "freshness_status": "fresh",
       "coverage_status": "partial",
-      "drift_status": "drifted"
+      "drift_status": "healthy"
     },
     {
       "dataset": "partidos_politicos",
@@ -166,15 +166,15 @@
       "validation_status": "ok",
       "freshness_status": "fresh",
       "coverage_status": "full",
-      "drift_status": "drifted"
+      "drift_status": "healthy"
     },
     {
       "dataset": "perfil_territorial_comunal",
-      "source_mode": "fallback",
+      "source_mode": "live",
       "validation_status": "ok",
       "freshness_status": "fresh",
       "coverage_status": "full",
-      "drift_status": "drifted"
+      "drift_status": "healthy"
     },
     {
       "dataset": "pobreza_comunal",
@@ -182,7 +182,7 @@
       "validation_status": "ok",
       "freshness_status": "fresh",
       "coverage_status": "not_applicable",
-      "drift_status": "drifted"
+      "drift_status": "healthy"
     },
     {
       "dataset": "provincias",

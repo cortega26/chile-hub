@@ -43,7 +43,7 @@ AUTORIDADES_ELECTAS_METADATA_PATH = os.path.join(STAGING_DIR, "autoridades_elect
 #
 # Fuente única: tanto el build (src/builders/metadata.py) como el gate de
 # publicación (scripts/verify_pipeline.py) consumen estas constantes desde aquí.
-# Duplicarlas fue exactamente el bug que ADR-013 corrige: perfil_territorial_comunal
+# Duplicarlas fue exactamente el bug que ADR-014 corrige: perfil_territorial_comunal
 # se declaraba "fallback" porque su predicado exigía == "live" en los upstreams.
 VALID_SOURCE_MODES = {"live", "fallback", "monthly"}
 

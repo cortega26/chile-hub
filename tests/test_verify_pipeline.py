@@ -207,6 +207,74 @@ class VerifyGoldenCopyTests(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 vp.verify_artifact_manifest()
 
+    # -- Plan 066 / ADR-014: gates de la taxonomía de drift ---------------
+
+    def _hub_health_copy(self, mutate) -> None:
+        """Copia hub_health.json del golden, le aplica *mutate* y verifica."""
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            norm = base / "data" / "normalized"
+            norm.mkdir(parents=True)
+            dst = norm / "hub_health.json"
+            shutil.copy2(self._golden_dir / "data" / "normalized" / "hub_health.json", dst)
+
+            health = _read_json(dst)
+            mutate(health)
+            _write_json(dst, health)
+
+            self._patch_paths(base)
+            self.addCleanup(self.tearDown)
+            with self.assertRaises(SystemExit):
+                vp.verify_hub_health()
+
+    def test_hub_health_rejects_missing_actionable_warning_count(self) -> None:
+        def mutate(health: dict) -> None:
+            health["datasets"][0].pop("actionable_warning_count", None)
+
+        with patch("builtins.print"):
+            self._hub_health_copy(mutate)
+
+    def test_hub_health_rejects_actionable_greater_than_warning_count(self) -> None:
+        def mutate(health: dict) -> None:
+            entry = health["datasets"][0]
+            entry["warning_count"] = 1
+            entry["actionable_warning_count"] = 2
+
+        with patch("builtins.print"):
+            self._hub_health_copy(mutate)
+
+    def _catalog_copy(self, mutate) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            norm = base / "data" / "normalized"
+            norm.mkdir(parents=True)
+            dst = norm / "dataset_catalog.json"
+            shutil.copy2(self._golden_dir / "data" / "normalized" / "dataset_catalog.json", dst)
+
+            catalog = _read_json(dst)
+            mutate(catalog)
+            _write_json(dst, catalog)
+
+            self._patch_paths(base)
+            self.addCleanup(self.tearDown)
+            with self.assertRaises(SystemExit):
+                vp.verify_dataset_catalog()
+
+    def test_catalog_rejects_missing_coverage_expected(self) -> None:
+        def mutate(catalog: dict) -> None:
+            catalog["datasets"][0]["coverage"].pop("expected", None)
+
+        with patch("builtins.print"):
+            self._catalog_copy(mutate)
+
+    def test_catalog_rejects_expected_flag_on_non_partial_coverage(self) -> None:
+        def mutate(catalog: dict) -> None:
+            entry = next(e for e in catalog["datasets"] if e["coverage"]["status"] != "partial")
+            entry["coverage"]["expected"] = True
+
+        with patch("builtins.print"):
+            self._catalog_copy(mutate)
+
     def test_publishable_zip_rejects_empty_zip(self) -> None:
         """Truncate the zip to zero bytes -> SystemExit."""
         with tempfile.TemporaryDirectory() as td:

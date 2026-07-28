@@ -25,7 +25,7 @@ def _add_expected_warning(warnings: list[str], expected_warnings: list[str], mes
     El mensaje entra en ``warnings`` como cualquier otro — el registro sigue
     siendo completo y transparente — y además en ``expected_warnings``, que es
     el subconjunto que ``build_degradation`` descuenta para calcular los
-    warnings *accionables* (ver ADR-013).
+    warnings *accionables* (ver ADR-014).
 
     La declaración vive junto a la regla que emite el warning, nunca en el
     consumidor: clasificar por texto en el consumidor se rompe la primera vez

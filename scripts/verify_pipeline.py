@@ -102,7 +102,7 @@ REQUIRED_DATASETS = {
     name for name, config in DATASET_CATALOG_CONFIG.items() if config.get("outputs")
 }
 
-# Reexportados desde src/builders/_shared.py (fuente única, ver ADR-013): el
+# Reexportados desde src/builders/_shared.py (fuente única, ver ADR-014): el
 # build y este gate deben compartir la misma definición de "no es fallback".
 VALID_SOURCE_MODES = _VALID_SOURCE_MODES
 NON_FALLBACK_SOURCE_MODES = _NON_FALLBACK_SOURCE_MODES
@@ -904,7 +904,7 @@ def verify_dataset_catalog():
             fail(f"{entry.get('dataset')} catalog entry has invalid coverage.status")
         if not coverage.get("summary"):
             fail(f"{entry.get('dataset')} catalog entry is missing coverage.summary")
-        # coverage.expected: siempre presente y booleano (ADR-013). Distingue la
+        # coverage.expected: siempre presente y booleano (ADR-014). Distingue la
         # parcialidad declarada en el contrato (coverage_policy=partial_expected)
         # de la parcialidad inesperada, sin agregar valores al enum de status.
         if not isinstance(coverage.get("expected"), bool):
@@ -1144,7 +1144,7 @@ def verify_hub_health():
         if entry.get("drift_status") not in {"healthy", "drifted"}:
             fail(f"hub_health.json entry has invalid drift_status: {entry}")
         # actionable_warning_count nunca puede exceder warning_count: los
-        # accionables son un subconjunto de los warnings totales (ADR-013).
+        # accionables son un subconjunto de los warnings totales (ADR-014).
         actionable = entry.get("actionable_warning_count")
         if not isinstance(actionable, int) or actionable < 0:
             fail(f"hub_health.json entry has invalid actionable_warning_count: {entry}")

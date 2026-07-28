@@ -125,7 +125,7 @@ def actionable_warnings(validation):
 
     ``expected_warnings`` lo declara el validador que emite el mensaje
     (``src/validation.py::_add_expected_warning``), nunca este consumidor.
-    ``warnings`` conserva siempre la lista completa (ver ADR-013).
+    ``warnings`` conserva siempre la lista completa (ver ADR-014).
     """
     expected = set(validation.get("expected_warnings", []))
     return [warning for warning in validation.get("warnings", []) if warning not in expected]
@@ -212,7 +212,7 @@ def build_coverage(dataset_name, dataset_metadata, contract=None):
     nunca cubre el universo completo (p. ej. SIEDU sólo mide comunas urbanas).
     El campo booleano ``expected`` está **siempre presente** para que sea
     inspeccionable, y ``status`` conserva su enum original — ``partial`` sigue
-    describiendo correctamente la cobertura (ver ADR-013).
+    describiendo correctamente la cobertura (ver ADR-014).
     """
     coverage_policy = (contract or {}).get("coverage_policy")
 
@@ -307,7 +307,7 @@ def build_drift(dataset_metadata):
     degradation_status = degradation.get("status", "none")
 
     # Una cobertura parcial declarada como esperada en el contrato no es drift:
-    # es el diseño de la fuente (ver ADR-013). El resto de las condiciones no cambia.
+    # es el diseño de la fuente (ver ADR-014). El resto de las condiciones no cambia.
     coverage_expected = coverage.get("expected") is True
 
     triggers = []
@@ -572,7 +572,7 @@ def build_dataset_metadata(dfs, meta):
             "source_url": "https://github.com/cortega26/chile-hub",
             # Una capa derivada sólo es "fallback" si algún upstream lo es de
             # verdad: "monthly" es fuente genuina (ver NON_FALLBACK_SOURCE_MODES
-            # y ADR-013), no un respaldo hardcodeado.
+            # y ADR-014), no un respaldo hardcodeado.
             "source_mode": "live"
             if all(
                 metadata.get("source_mode") in NON_FALLBACK_SOURCE_MODES
