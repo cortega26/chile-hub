@@ -122,17 +122,19 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 | 053 | [Geometría comunal — parent histórico](053-comuna-geometry-and-reverse-geocoding.md) | P1 | L | MED | — | SUPERSEDED — Steps 0–3 DONE (extractor, validación, writer, licencia y docs). Los pendientes se ejecutan exclusivamente como 064 y 065. |
 | 064 | [Publicar GeoParquet candidate desde CI](064-publish-geometry-artifact-from-ci.md) | **P1** | M | MED | — | IN PROGRESS — workflow manual, validación antes de commit y checksum implementados localmente; falta dispatch autorizado y lectura desde Pages para DONE. |
 | 065 | [Resolver coordenadas a comuna](065-add-coordinate-resolver.md) | **P1** | M | MED | 064 | TODO — extra opcional `geo`, cache con checksum y `resolve_by_coords()`; candidate nunca entra al bundle estable. |
-| 059 | [Publicación del bundle en Hugging Face Hub](059-publicacion-huggingface-hub.md) | P2 | M | MED | — (052 recomendado antes, no gate) | TODO — canal de *descubrimiento* (complementa 051 = capa de acceso). Script `--dry-run` + job `hf-publish` en `pypi-release.yml` + dataset card. Requiere secret `HF_TOKEN` (paso manual del mantenedor). Carril `candidate` excluido por construcción. |
 | 066 | [Separar drift esperado de drift real](066-taxonomia-drift-esperado-vs-real.md) | P2 | M | MED | — (bloquea 063 en valor) | TODO — clasificación, **no** reparación de datos: `coverage_policy` del contrato hoy se ignora y todo warning pesa igual, así que 4 de 8 "drifted" son ruido estructural. Baja `drifted_count` 8→3 sin agregar valores a ningún enum ni relajar gates. Los 3 problemas de datos reales salen como issues separados. |
 
 ## Orden de ejecución actualizado (2026-07-26)
 
-1. **064** — publica y verifica el artefacto que hoy falta; es el bloqueo real para la capacidad geoespacial.
-2. **051** — convierte el hosting estático ya existente en una superficie estándar y descubrible; puede avanzar mientras 064 espera revisión humana, pero debe integrar la URL publicada cuando exista.
-3. **065** — sólo después de 064: consume el GeoParquet y su checksum sin contaminar el bundle estable.
-4. **050**, **054** y **058** — independientes entre sí y de 064, salvo que no deben tocar los mismos archivos en paralelo. Recomendación de valor: 050 → 054 → 058.
-5. **059** y **063** conservan sus dependencias históricas; no son parte de los hallazgos de esta auditoría.
-6. **066** — independiente de todo lo anterior, pero conviene **antes de 063**: el historial de salud congelaría en JSONL una taxonomía que hoy clasifica mal 4 de 19 datasets. También cierra el pendiente "vocabulario del dashboard de salud" diferido en la auditoría 2026-07-13.
+> **Actualización 2026-07-28 (merge de la cola)**: los planes **050, 051, 054, 057,
+> 058, 059 y 063** quedaron mergeados a `main` (commits `a065a38`…`5036257`) y
+> archivados; el **064** también está en `main` (PR #41) pero sigue `IN PROGRESS`
+> porque sus dos últimos done criteria (dispatch autorizado + lectura desde Pages)
+> dependen del operador. La secuencia vigente se reduce a los pasos 1–3 de abajo.
+
+1. **064** (cerrar) — dispatch manual del workflow ya mergeado + lectura de verificación desde Pages. Requiere aprobación del operador; es el bloqueo real para la capacidad geoespacial.
+2. **066** — independiente de todo lo demás y ya sin bloqueos: el historial de salud (063, ya mergeado) está congelando en JSONL una taxonomía que hoy clasifica mal 4 de 19 datasets, así que cuanto antes se corrija, menos historia mal etiquetada. También cierra el pendiente "vocabulario del dashboard de salud" diferido en la auditoría 2026-07-13.
+3. **065** — sólo después de que 064 cierre: consume el GeoParquet y su checksum sin contaminar el bundle estable.
 
 ### Dependencias de la auditoría 2026-07-26
 
