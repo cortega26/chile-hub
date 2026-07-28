@@ -321,6 +321,45 @@ class VerifySyntheticTests(unittest.TestCase):
         ):
             vp.verify_publication_policy({"datasets": datasets}, registry=registry)
 
+    # -- temporal anomaly gate (Plan 054, ADR-013) -------------------------
+
+    @staticmethod
+    def _indicadores_dataset(*, anomaly_codes=None) -> dict:
+        return {
+            "source_mode": "live",
+            "source_detail": "public_api",
+            "freshness": {"status": "fresh"},
+            "indicator_delivery": {code: "live" for code in ("uf", "dolar", "euro", "utm", "ipc")},
+            "degradation": (
+                {"anomaly_detected": True, "anomaly_indicator_codes": sorted(anomaly_codes)}
+                if anomaly_codes
+                else {}
+            ),
+        }
+
+    def test_publication_policy_rejects_unreviewed_anomaly(self) -> None:
+        """El build nunca aborta por esto -- sólo el gate de publicación
+        (perfil publication / --require-live) lo rechaza."""
+        datasets = {"indicadores": self._indicadores_dataset(anomaly_codes={"uf"})}
+        registry = [self._stable_registry_entry("indicadores")]
+        with patch("builtins.print") as mock_print:
+            with self.assertRaises(SystemExit):
+                vp.verify_publication_policy({"datasets": datasets}, registry=registry)
+        printed = " ".join(str(call.args[0]) for call in mock_print.call_args_list)
+        self.assertIn("anomaly", printed)
+
+    def test_publication_policy_accepts_anomaly_with_override(self) -> None:
+        datasets = {"indicadores": self._indicadores_dataset(anomaly_codes={"uf"})}
+        registry = [self._stable_registry_entry("indicadores")]
+        vp.verify_publication_policy(
+            {"datasets": datasets}, registry=registry, allow_known_anomalies={"uf"}
+        )
+
+    def test_publication_policy_accepts_dataset_without_anomaly(self) -> None:
+        datasets = {"indicadores": self._indicadores_dataset()}
+        registry = [self._stable_registry_entry("indicadores")]
+        vp.verify_publication_policy({"datasets": datasets}, registry=registry)
+
     # -- staging-not-newer-than-normalized (synthetic timestamps) ----------
 
     def test_staging_not_newer_passes(self) -> None:

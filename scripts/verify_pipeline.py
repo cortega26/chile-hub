@@ -452,7 +452,9 @@ def stable_publishable_dataset_names(registry):
     }
 
 
-def verify_publication_policy(metadata=None, registry=None, manifest=None):
+def verify_publication_policy(
+    metadata=None, registry=None, manifest=None, allow_known_anomalies=None
+):
     if metadata is None:
         metadata = load_json(NORMALIZED_DIR / "pipeline_metadata.json")
 
@@ -533,6 +535,15 @@ def verify_publication_policy(metadata=None, registry=None, manifest=None):
         }
         if unsafe_delivery:
             violations.append(f"indicadores: unsafe delivery={unsafe_delivery}")
+
+        anomaly_codes = set(indicadores.get("degradation", {}).get("anomaly_indicator_codes", []))
+        unreviewed_anomalies = sorted(anomaly_codes - (allow_known_anomalies or set()))
+        if unreviewed_anomalies:
+            violations.append(
+                f"indicadores: unreviewed temporal anomaly in {unreviewed_anomalies} "
+                f"(ver drift_report.json recommended_action; override con "
+                "--allow-known-anomalies tras confirmar con la fuente, ver ADR-013)"
+            )
 
     if violations:
         fail("Publication policy rejected this build: " + "; ".join(violations))
@@ -1619,6 +1630,13 @@ def build_parser():
         help="[deprecated] Reject fallback, failed recovery, or stale data. "
         "Use --profile publication instead.",
     )
+    parser.add_argument(
+        "--allow-known-anomalies",
+        default="",
+        help="Lista separada por comas de codigo_indicador cuya anomalía temporal "
+        "ya fue revisada y confirmada como shock legítimo (no error de fuente). "
+        "Ver ADR-013. Ej.: --allow-known-anomalies uf,dolar",
+    )
     return parser
 
 
@@ -1627,6 +1645,9 @@ def main():
 
     # Compatibilidad hacia atrás: --require-live fuerza perfil publication
     profile = "publication" if args.require_live else args.profile
+    allow_known_anomalies = {
+        code.strip() for code in args.allow_known_anomalies.split(",") if code.strip()
+    }
 
     # Verificaciones comunes a todos los perfiles
     verify_staging_not_newer_than_normalized()
@@ -1650,7 +1671,7 @@ def main():
         verify_readiness()
 
     if profile == "publication":
-        verify_publication_policy()
+        verify_publication_policy(allow_known_anomalies=allow_known_anomalies)
 
 
 if __name__ == "__main__":

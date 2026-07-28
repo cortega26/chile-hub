@@ -1,3 +1,5 @@
+import math
+import statistics
 from typing import Any
 
 import polars as pl
@@ -294,6 +296,92 @@ def validate_establecimientos_educacionales(
     }
 
 
+def detect_series_anomalies(
+    df: pl.DataFrame,
+    *,
+    value_col: str = "valor",
+    key_col: str = "codigo_indicador",
+    date_col: str = "fecha",
+    z_threshold: float = 4.0,
+    min_history: int = 4,
+) -> list[dict[str, Any]]:
+    """Detecta saltos atípicos en el punto más reciente de cada serie temporal.
+
+    Método: z-score robusto (MAD, median absolute deviation) sobre la variación
+    logarítmica día a día. Para cada serie (agrupada por ``key_col``, ordenada
+    por ``date_col``), compara el log-retorno del punto más reciente contra la
+    mediana y el MAD de los log-retornos de referencia (todos los anteriores).
+    Se prefiere MAD sobre media±desviación estándar simple porque la media y el
+    sigma clásico son frágiles ante los propios outliers que se buscan detectar
+    (un solo salto histórico grande infla el sigma y esconde saltos futuros).
+
+    Requiere al menos ``min_history`` log-retornos de referencia antes de
+    evaluar — series nuevas o cortas no emiten señal (ver ADR-013).
+
+    Un salto **legítimo** (shock cambiario real, revisión de censo) también
+    dispara esta señal, por diseño: la función sólo detecta que el valor es
+    estadísticamente atípico frente a su propio histórico reciente, no si es
+    "correcto". La decisión de si es un error de fuente o un evento real queda
+    para el warning + gate de publicación humano-override (nunca esta función
+    aborta nada).
+
+    Returns:
+        Lista de anomalías, una por serie con señal, con: ``codigo_indicador``,
+        ``fecha`` (del punto anómalo), ``valor``, ``esperado_rango`` (rango de
+        valores que NO habría disparado la señal, dado el histórico), ``z_score``,
+        ``motivo`` (texto legible).
+    """
+    anomalies: list[dict[str, Any]] = []
+    for key in df[key_col].unique().sort().to_list():
+        series = df.filter(pl.col(key_col) == key).sort(date_col)
+        values = series[value_col].to_list()
+        dates = series[date_col].to_list()
+
+        log_returns: list[float] = []
+        for i in range(1, len(values)):
+            prev_value, curr_value = values[i - 1], values[i]
+            if prev_value is None or curr_value is None:
+                continue
+            if prev_value <= 0 or curr_value <= 0:
+                continue
+            log_returns.append(math.log(curr_value / prev_value))
+
+        if len(log_returns) < min_history + 1:
+            continue  # no hay suficiente histórico de referencia + el punto a evaluar
+
+        reference = log_returns[:-1]
+        last_return = log_returns[-1]
+        median_ref = statistics.median(reference)
+        mad = statistics.median([abs(r - median_ref) for r in reference])
+        if mad == 0:
+            continue  # serie perfectamente constante en el histórico de referencia; sin base para z-score
+
+        z_score = 0.6745 * (last_return - median_ref) / mad
+        if abs(z_score) <= z_threshold:
+            continue
+
+        prev_value = values[-2]
+        low = prev_value * math.exp(median_ref - z_threshold * mad / 0.6745)
+        high = prev_value * math.exp(median_ref + z_threshold * mad / 0.6745)
+        anomalies.append(
+            {
+                "codigo_indicador": key,
+                "fecha": dates[-1],
+                "valor": values[-1],
+                "esperado_rango": [round(low, 4), round(high, 4)],
+                "z_score": round(z_score, 2),
+                "motivo": (
+                    f"Salto atípico en '{key}' el {dates[-1]}: valor {values[-1]} "
+                    f"implica un log-retorno diario de {last_return:.4f} vs. mediana "
+                    f"histórica de referencia {median_ref:.4f} (MAD={mad:.4f}, "
+                    f"z={z_score:.2f}, umbral={z_threshold}). Rango esperado sin "
+                    f"señal: [{round(low, 4)}, {round(high, 4)}]."
+                ),
+            }
+        )
+    return anomalies
+
+
 def validate_indicadores(
     df_indicadores: pl.DataFrame, metadata: dict[str, Any] | None
 ) -> dict[str, Any]:
@@ -334,6 +422,10 @@ def validate_indicadores(
             + ", ".join(metadata["published_backfills"])
         )
 
+    anomalies = detect_series_anomalies(df_indicadores) if row_count > 0 else []
+    for anomaly in anomalies:
+        warnings.append(f"indicadores anomaly: {anomaly['motivo']}")
+
     return {
         "dataset": "indicadores",
         "status": "error" if errors else "ok",
@@ -341,6 +433,7 @@ def validate_indicadores(
         "errors": errors,
         "warnings": warnings,
         "indicator_codes": sorted(codes),
+        "anomalies": anomalies,
     }
 
 

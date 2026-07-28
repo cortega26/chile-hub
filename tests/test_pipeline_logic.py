@@ -867,6 +867,50 @@ class PipelineLogicTests(unittest.TestCase):
         self.assertIn("freshness borderline", degradation["impact"])
         self.assertIn("warnings operativos", degradation["recommended_action"])
 
+    def test_build_degradation_flags_temporal_anomaly_with_actionable_message(self):
+        """Plan 054, ADR-013: una anomalia estructurada produce un
+        recommended_action especifico (no el generico de warnings), y expone
+        anomaly_detected/anomaly_indicator_codes para que el gate de
+        publicacion los lea sin tener que parsear texto."""
+        anomaly = {
+            "codigo_indicador": "uf",
+            "fecha": "2026-01-06",
+            "motivo": "Salto atipico en 'uf'...",
+        }
+        degradation = build_degradation(
+            "indicadores",
+            {"source_mode": "live", "record_count": 6},
+            {"warnings": ["indicadores anomaly: ..."], "anomalies": [anomaly]},
+        )
+
+        self.assertEqual(degradation["status"], "warning")
+        self.assertTrue(degradation["anomaly_detected"])
+        self.assertEqual(degradation["anomaly_indicator_codes"], ["uf"])
+        self.assertIn("uf", degradation["recommended_action"])
+        self.assertIn("2026-01-06", degradation["recommended_action"])
+
+    def test_build_degradation_fallback_precedence_over_anomaly_is_intentional(self):
+        """ADR-013: si indicadores esta en fallback (datos sinteticos de
+        desarrollo) Y tiene una anomalia detectada, gana el mensaje de
+        fallback -- una anomalia estadistica sobre datos ya sabidos-no-reales
+        no aporta señal util. No es un bug: la publicacion de datasets en
+        fallback ya se rechaza por una via completamente distinta
+        (verify_publication_policy chequea source_mode independientemente)."""
+        anomaly = {
+            "codigo_indicador": "uf",
+            "fecha": "2026-01-06",
+            "motivo": "Salto atipico en 'uf'...",
+        }
+        degradation = build_degradation(
+            "indicadores",
+            {"source_mode": "fallback", "record_count": 6},
+            {"warnings": [], "anomalies": [anomaly]},
+        )
+
+        self.assertEqual(degradation["status"], "degraded")
+        self.assertNotIn("anomaly_detected", degradation)
+        self.assertIn("fallback local", degradation["impact"])
+
     def test_build_drift_is_healthy_for_live_full_non_degraded_dataset(self):
         drift = build_drift(
             {

@@ -144,6 +144,23 @@ def build_degradation(dataset_name, dataset_metadata, validation):
                 "recommended_action": "Reintentar la API pública antes de redistribuir o usar en reporting.",
             }
 
+    anomalies = validation.get("anomalies", [])
+    if anomalies:
+        first = anomalies[0]
+        return {
+            "status": "warning",
+            "impact": (
+                f"Anomalía temporal detectada en {first['codigo_indicador']} "
+                f"el {first['fecha']}: {first['motivo']}"
+            ),
+            "recommended_action": (
+                f"Revisar valor atípico en {first['codigo_indicador']} del {first['fecha']}; "
+                "confirmar con la fuente antes de publicar (ver ADR-013)."
+            ),
+            "anomaly_detected": True,
+            "anomaly_indicator_codes": sorted({a["codigo_indicador"] for a in anomalies}),
+        }
+
     if warnings:
         return {
             "status": "warning",
