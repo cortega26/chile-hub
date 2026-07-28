@@ -596,9 +596,9 @@ def validate_indicadores_urbanos_siedu(
     metadata: dict[str, Any] | None,
     valid_commune_codes: list[str] | None = None,
 ) -> dict[str, Any]:
-    errors = []
-    warnings = []
-    expected_warnings = []
+    errors: list[str] = []
+    warnings: list[str] = []
+    expected_warnings: list[str] = []
     required = [
         "anio",
         "codigo_comuna",

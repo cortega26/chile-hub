@@ -196,3 +196,27 @@ están pendientes de review.
       (058/059/063), `core.py` (050/051, métodos distintos),
       `build_dev_db.py` (051/063, líneas distintas). Orden sugerido
       (menor → mayor conflicto): 050 → 058 → 059 → 054 → 051 → 057 → 063.
+
+## Plan 066 — taxonomía drift esperado vs real (2026-07-28)
+
+- [x] Cola previa (050/051/054/057/058/059/063) mergeada a `main` en el orden de
+      Checkpoint 4, con `make sync-docs` tras cada merge; hallazgo real: la
+      resolución del merge de 059 dejó una fila activa duplicada de 059 en
+      `plans/README.md` (corregida) — el resto de las 7 filas se auditó una por
+      una (`active=0 archived=1 file=1` en las 7).
+- [x] Step 0: baseline reproducido `19 8 7 warn` con los 8 datasets esperados
+      **antes** de tocar código.
+- [x] Steps 1-4: `NON_FALLBACK_SOURCE_MODES` como fuente única, `coverage.expected`
+      desde `coverage_policy`, `expected_warnings` declarados en el emisor,
+      `build_drift` nombra sólo la condición que dispara el drift.
+- [x] Step 5: landing (badge por accionables + píldora `partial esperada`),
+      ADR-014, `docs/datasets/` de los 5 reclasificados, `docs/backlog/05`.
+- [x] Step 6: issues #42/#43/#44 abiertos con autorización explícita del operador.
+- [x] `tests/e2e/verify_066.sh` en verde; 779 tests + 1 skip; `pre-commit
+      run --all-files` limpio salvo un hallazgo **preexistente en `main`** y fuera
+      de alcance: `data/staging/finanzas_municipales.metadata.json` no termina en
+      newline (viene del commit de CI `c8c7c70`), así que `end-of-file-fixer`
+      falla también sin mis cambios — no se tocó.
+- [x] Desviación: el plan pedía ADR-013, pero el Plan 054 lo tomó al mergearse;
+      el entregable es ADR-014. Registrada en el propio plan y en su fila.
+

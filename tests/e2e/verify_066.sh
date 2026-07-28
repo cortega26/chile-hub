@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Reproduce los "Done criteria" de plans/archive/066-taxonomia-drift-esperado-vs-real.md
+# Reproduce los "Done criteria" de plans/066-taxonomia-drift-esperado-vs-real.md
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/../.."
 
@@ -82,6 +82,11 @@ echo "-- pytest focal --"
 echo "-- landing --"
 .venv/bin/python scripts/check_landing_sync.py
 make verify-landing >/dev/null
+
+# Deja el arbol limpio: el build de arriba reescribe artefactos derivados.
+# No se revierte app.js: en este plan contiene cambios escritos a mano
+# (badge de atencion y pildora de cobertura esperada), no ruido de build.
+git checkout -- data/normalized/ README.md index.html 2>/dev/null || true
 
 echo "-- lint, format-check, doctor --"
 make lint

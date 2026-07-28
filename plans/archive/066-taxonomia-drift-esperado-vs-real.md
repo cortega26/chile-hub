@@ -144,7 +144,7 @@ ese pendiente.
   `partial_expected` (ver Step 2).
 - `scripts/verify_pipeline.py` — gates para los campos nuevos.
 - `app.js` / `index.html` — vocabulario y badge de atención.
-- Tests, `docs/datasets/`, ADR-013, `plans/README.md`.
+- Tests, `docs/datasets/`, ADR-014 (ver desviación en el Step 5), `plans/README.md`.
 
 **Fuera de alcance**:
 
@@ -324,7 +324,11 @@ quedó un caso sin clasificar o silenciaste uno de más.
 - Corre `make verify-landing` y `python3 scripts/check_landing_sync.py` (el gate
   agregado el 2026-07-26): un cambio de vocabulario que no pase por ahí se
   convierte en deriva silenciosa.
-- Escribe **ADR-013** (el siguiente libre; el último es ADR-012) documentando:
+- Escribe el ADR siguiente libre documentando:
+  > **Desviación registrada (2026-07-28)**: el plan decía "ADR-013 (el siguiente
+  > libre; el último es ADR-012)", pero el Plan 054 se mergeó entretanto y tomó
+  > ADR-013 (validación de anomalías temporales). El entregable de este plan es
+  > **`docs/adr/ADR-014-taxonomia-drift-esperado-vs-real.md`**.
   por qué no se agregó un tercer `drift_status`, por qué `warnings` conserva todos
   los mensajes, quién puede declarar un warning como esperado, y las preguntas
   abiertas de `pobreza_comunal` / `geometria_comunal` del Step 2.
@@ -349,6 +353,12 @@ No los arregles aquí. Abre un issue por cada uno, con el diagnóstico ya conoci
    correcto — debe seguir apareciendo en rojo.
 
 **Verifica**: los 3 issues existen y este plan los referencia por número.
+
+**Hecho (2026-07-28)**, con autorización explícita del operador:
+
+- `empresas` (RUT inválido) → [#42](https://github.com/cortega26/chile-hub/issues/42)
+- `indicadores` (`ipc` reusado) → [#43](https://github.com/cortega26/chile-hub/issues/43)
+- `consumo_electrico_comunal` (fuente CNE decomisionada) → [#44](https://github.com/cortega26/chile-hub/issues/44)
 
 ## Test plan
 
@@ -383,7 +393,7 @@ No los arregles aquí. Abre un issue por cada uno, con el diagnóstico ya conoci
 - [ ] `warnings` sigue conteniendo todos los mensajes en todos los artefactos.
 - [ ] Cero cambios en `data/raw/`, en reglas de validación y en datos extraídos.
 - [ ] `make build && make verify && make test && make verify-landing && make lint && make format-check && make doctor` → todos exit 0.
-- [ ] ADR-013 escrito; `docs/datasets/` de los 5 reclasificados actualizados.
+- [ ] ADR-014 escrito; `docs/datasets/` de los 5 reclasificados actualizados.
 - [ ] Los 3 issues del Step 6 abiertos y referenciados.
 - [ ] `tests/e2e/verify_066.sh` escrito y en verde.
 
