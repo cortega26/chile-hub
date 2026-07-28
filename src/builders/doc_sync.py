@@ -361,6 +361,77 @@ def _contract_type_to_sql(col_type, width=None):
     return base
 
 
+_README_DATASET_DOMAINS = {
+    "regiones": "Territorio",
+    "provincias": "Territorio",
+    "comunas": "Territorio",
+    "comunas_enriquecidas": "Territorio",
+    "distritos_electorales": "Territorio",
+    "geometria_comunal": "Territorio",
+    "censo_comunal": "Demografía",
+    "censo_hogares_viviendas": "Demografía",
+    "pobreza_comunal": "Demografía",
+    "establecimientos_salud": "Servicios públicos",
+    "establecimientos_educacionales": "Servicios públicos",
+    "resultados_educacionales": "Servicios públicos",
+    "indicadores": "Economía",
+    "finanzas_municipales": "Economía",
+    "empresas": "Economía",
+    "consumo_electrico_comunal": "Economía",
+    "indicadores_urbanos_siedu": "Indicadores urbanos",
+    "partidos_politicos": "Política",
+    "autoridades_electas": "Política",
+    "autoridades_locales": "Política",
+    "delincuencia_comunal": "Seguridad (carril `candidate`)",
+    "perfil_territorial_comunal": None,
+}
+
+_README_DOMAIN_ORDER = [
+    "Territorio",
+    "Demografía",
+    "Servicios públicos",
+    "Economía",
+    "Indicadores urbanos",
+    "Política",
+    "Seguridad (carril `candidate`)",
+]
+
+
+def sync_readme_extractor_table(check_only=False):
+    """Tabla de extractores por dominio en README.md desde el catálogo."""
+    catalog = DATASET_CATALOG_CONFIG
+    by_domain: dict[str, list[str]] = {domain: [] for domain in _README_DOMAIN_ORDER}
+
+    for key, cfg in catalog.items():
+        if key not in _README_DATASET_DOMAINS:
+            raise SystemExit(
+                f"ERROR: dataset '{key}' sin dominio en _README_DATASET_DOMAINS. "
+                "Agrega una entrada en src/builders/doc_sync.py."
+            )
+        domain = _README_DATASET_DOMAINS[key]
+        if domain is None:
+            continue
+        value = cfg.get("extractor")
+        paths = [] if value is None else ([value] if isinstance(value, str) else list(value))
+        for rel in paths:
+            basename = os.path.basename(rel)
+            if basename not in by_domain[domain]:
+                by_domain[domain].append(basename)
+
+    rows = []
+    for domain in _README_DOMAIN_ORDER:
+        extractors = ", ".join(f"`{name}`" for name in by_domain[domain])
+        rows.append(f"| {domain} | {extractors} |")
+    rows.append("| Derivado en `build_dev_db.py` (sin extractor) | `perfil_territorial_comunal` |")
+
+    header = "| Dominio | Extractores |\n|:---|:---|"
+    body = "\n".join([header] + rows)
+
+    return replace_delimited_block(
+        README_PATH, "EXTRACTOR_TABLE", body, check_only=check_only, separator="\n\n"
+    )
+
+
 def sync_readme_schema_details(check_only=False):
     """Tablas de schema en README.md desde contratos enriquecidos."""
     catalog = DATASET_CATALOG_CONFIG
@@ -437,6 +508,7 @@ SYNC_FUNCS = [
     sync_agents_test_table,
     sync_agents_extractor_list,
     sync_readme_schema_details,
+    sync_readme_extractor_table,
 ]
 
 

@@ -228,7 +228,7 @@ chile-hub health       # severidad, frescura, drift y cobertura
 ### Respaldo adicional
 
 <!-- START_TEST_COUNT -->
-- **718 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
+- **725 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
 <!-- END_TEST_COUNT -->
 <!-- START_ADR_COUNT -->
 - **11 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
@@ -693,15 +693,20 @@ flowchart TB
 <details>
 <summary><b>Extractores incluidos en el paso 1</b></summary>
 
+<!-- START_EXTRACTOR_TABLE -->
+
 | Dominio | Extractores |
 |:---|:---|
-| Territorio | `subdere_extractor.py`, `electoral_extractor.py` |
+| Territorio | `subdere_extractor.py`, `electoral_extractor.py`, `geometria_comunal_extractor.py` |
 | Demografía | `censo_extractor.py`, `censo_hogares_viviendas_extractor.py`, `pobreza_extractor.py` |
 | Servicios públicos | `salud_extractor.py`, `mineduc_establecimientos_extractor.py`, `mineduc_resultados_extractor.py` |
 | Economía | `bcentral_extractor.py`, `sinim_finanzas_extractor.py`, `sinim_finanzas_live_extractor.py`, `res_extractor.py`, `consumo_electrico_extractor.py` |
 | Indicadores urbanos | `siedu_extractor.py` |
 | Política | `partidos_politicos_extractor.py`, `autoridades_electas_extractor.py`, `autoridades_locales_extractor.py` |
 | Seguridad (carril `candidate`) | `cead_delincuencia_live_extractor.py` |
+| Derivado en `build_dev_db.py` (sin extractor) | `perfil_territorial_comunal` |
+
+<!-- END_EXTRACTOR_TABLE -->
 
 > El mapeo autoritativo dataset ↔ extractor vive en
 > [`data/dataset_catalog_config.json`](data/dataset_catalog_config.json); esta tabla

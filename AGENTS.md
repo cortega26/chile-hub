@@ -866,6 +866,8 @@ protegido por un chequeo automatizado en vez de depender solo de buena voluntad.
 | Ejemplo de pin de versión en README | `pyproject.toml` vía `read_project_version()` | `scripts/sync_docs.py --check` |
 | Bloque JSON-LD `DataCatalog` de `index.html` | `data/dataset_catalog_config.json` vía `render_catalog_json_ld_block()` | `scripts/check_landing_sync.py` |
 | `PUBLIC_DATA_BASE` de `app.js` y cache-buster `app.js?v=` | `pyproject.toml` (`[tool.chile_hub] public_site_url`, `[project] version`) | `scripts/check_landing_sync.py` |
+| Mapeo dataset ↔ extractor | `data/dataset_catalog_config.json` (campo `extractor`) | `check_companion_paths.py registry` |
+| Tabla de extractores por dominio en README | `data/dataset_catalog_config.json` vía `doc_sync.py::sync_readme_extractor_table()` | `scripts/sync_docs.py --check` |
 
 ### Mecanismo: `scripts/check_landing_sync.py`
 
@@ -948,10 +950,7 @@ la cubre el gate de co-cambio de `check_companion_paths.py` de arriba.
 **Seguimiento recomendado, no implementado todavía** (mayor alcance):
 automatizar la tabla "CLI de referencia" de README.md introspeccionando
 `build_parser()` (requiere agregar `uv sync` al job `quality`, hoy sin
-dependencias); y automatizar la tabla de extractores de README.md, lo que
-requiere agregar primero un campo `"extractor"` a las 21 entradas de
-`data/dataset_catalog_config.json` (beneficio adicional: permitiría extender
-`check_companion_paths.py registry` para validar que ese archivo existe).
+dependencias).
 
 ---
 
