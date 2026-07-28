@@ -17,6 +17,8 @@ if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
 from src.build_dev_db import DATASET_CATALOG_CONFIG
+from src.builders._shared import NON_FALLBACK_SOURCE_MODES as _NON_FALLBACK_SOURCE_MODES
+from src.builders._shared import VALID_SOURCE_MODES as _VALID_SOURCE_MODES
 from src.chile_hub.contracts import verify_dataset_contract as _lib_verify_contract
 from src.pipeline_status_utils import load_json
 
@@ -100,16 +102,10 @@ REQUIRED_DATASETS = {
     name for name, config in DATASET_CATALOG_CONFIG.items() if config.get("outputs")
 }
 
-# Valores estructuralmente válidos de source_mode en cualquier reporte generado.
-# "monthly" cubre datasets de cadencia mensual con extractor live real (p. ej.
-# finanzas_municipales vía sinim_finanzas_live_extractor.py + Monthly Scrape
-# workflow) — genuinamente obtenidos de la fuente, pero no re-fetcheados en
-# cada build diario. Ver Fase 3.4 en data/source_registry.json.
-VALID_SOURCE_MODES = {"live", "fallback", "monthly"}
-
-# Subconjunto de VALID_SOURCE_MODES que cuenta como "no es un fallback
-# hardcodeado" para efectos de elegibilidad de publicación.
-NON_FALLBACK_SOURCE_MODES = {"live", "monthly"}
+# Reexportados desde src/builders/_shared.py (fuente única, ver ADR-013): el
+# build y este gate deben compartir la misma definición de "no es fallback".
+VALID_SOURCE_MODES = _VALID_SOURCE_MODES
+NON_FALLBACK_SOURCE_MODES = _NON_FALLBACK_SOURCE_MODES
 
 
 def fail(message):
@@ -908,6 +904,19 @@ def verify_dataset_catalog():
             fail(f"{entry.get('dataset')} catalog entry has invalid coverage.status")
         if not coverage.get("summary"):
             fail(f"{entry.get('dataset')} catalog entry is missing coverage.summary")
+        # coverage.expected: siempre presente y booleano (ADR-013). Distingue la
+        # parcialidad declarada en el contrato (coverage_policy=partial_expected)
+        # de la parcialidad inesperada, sin agregar valores al enum de status.
+        if not isinstance(coverage.get("expected"), bool):
+            fail(
+                f"{entry.get('dataset')} catalog entry has missing or non-boolean "
+                f"coverage.expected: {coverage.get('expected')!r}"
+            )
+        if coverage.get("expected") and coverage.get("status") != "partial":
+            fail(
+                f"{entry.get('dataset')} catalog entry marks coverage.expected on a "
+                f"non-partial status: {coverage.get('status')}"
+            )
         drift = entry.get("drift", {})
         if drift.get("status") not in {"healthy", "drifted"}:
             fail(f"{entry.get('dataset')} catalog entry has invalid drift.status")
@@ -1134,6 +1143,16 @@ def verify_hub_health():
             fail(f"hub_health.json entry has invalid coverage_status: {entry}")
         if entry.get("drift_status") not in {"healthy", "drifted"}:
             fail(f"hub_health.json entry has invalid drift_status: {entry}")
+        # actionable_warning_count nunca puede exceder warning_count: los
+        # accionables son un subconjunto de los warnings totales (ADR-013).
+        actionable = entry.get("actionable_warning_count")
+        if not isinstance(actionable, int) or actionable < 0:
+            fail(f"hub_health.json entry has invalid actionable_warning_count: {entry}")
+        if actionable > entry.get("warning_count", 0):
+            fail(
+                f"hub_health.json entry has actionable_warning_count greater than "
+                f"warning_count: {entry}"
+            )
 
     if health.get("warning_count", 0) > 0:
         verify_top_issue(health.get("top_issue"), "hub_health.json")

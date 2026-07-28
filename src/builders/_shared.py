@@ -35,6 +35,22 @@ CONSUMO_ELECTRICO_COMUNAL_METADATA_PATH = os.path.join(
 )
 PARTIDOS_POLITICOS_METADATA_PATH = os.path.join(STAGING_DIR, "partidos_politicos.metadata.json")
 AUTORIDADES_ELECTAS_METADATA_PATH = os.path.join(STAGING_DIR, "autoridades_electas.metadata.json")
+# Valores estructuralmente válidos de source_mode en cualquier reporte generado.
+# "monthly" cubre datasets de cadencia mensual con extractor live real (p. ej.
+# finanzas_municipales vía sinim_finanzas_live_extractor.py + Monthly Scrape
+# workflow) — genuinamente obtenidos de la fuente, pero no re-fetcheados en
+# cada build diario. Ver Fase 3.4 en data/source_registry.json.
+#
+# Fuente única: tanto el build (src/builders/metadata.py) como el gate de
+# publicación (scripts/verify_pipeline.py) consumen estas constantes desde aquí.
+# Duplicarlas fue exactamente el bug que ADR-013 corrige: perfil_territorial_comunal
+# se declaraba "fallback" porque su predicado exigía == "live" en los upstreams.
+VALID_SOURCE_MODES = {"live", "fallback", "monthly"}
+
+# Subconjunto de VALID_SOURCE_MODES que cuenta como "no es un fallback
+# hardcodeado" para efectos de elegibilidad de publicación y de derivación.
+NON_FALLBACK_SOURCE_MODES = {"live", "monthly"}
+
 EXCEL_MAX_ROWS = 1_048_576  # Límite físico de Excel por hoja
 PUBLISHABLE_ARTIFACT_SUFFIXES = (".json", ".md", ".parquet", ".jsonl")
 PUBLISHABLE_BUNDLE_ZIP_NAME = "chile-hub-publishable-bundle.zip"

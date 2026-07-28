@@ -19,6 +19,22 @@ def _duplicate_count(df: pl.DataFrame, columns: list[str]) -> int:
     return df.height - df.select(columns).unique().height
 
 
+def _add_expected_warning(warnings: list[str], expected_warnings: list[str], message: str) -> None:
+    """Registra un warning que describe diseño confirmado, no degradación.
+
+    El mensaje entra en ``warnings`` como cualquier otro — el registro sigue
+    siendo completo y transparente — y además en ``expected_warnings``, que es
+    el subconjunto que ``build_degradation`` descuenta para calcular los
+    warnings *accionables* (ver ADR-013).
+
+    La declaración vive junto a la regla que emite el warning, nunca en el
+    consumidor: clasificar por texto en el consumidor se rompe la primera vez
+    que alguien reformula el mensaje.
+    """
+    warnings.append(message)
+    expected_warnings.append(message)
+
+
 def _invalid_fixed_length_count(df: pl.DataFrame, column: str, length: int) -> int:
     return df.filter(pl.col(column).cast(pl.String).str.len_chars() != length).height
 
@@ -582,6 +598,7 @@ def validate_indicadores_urbanos_siedu(
 ) -> dict[str, Any]:
     errors = []
     warnings = []
+    expected_warnings = []
     required = [
         "anio",
         "codigo_comuna",
@@ -620,7 +637,11 @@ def validate_indicadores_urbanos_siedu(
         if all_null:
             errors.append(f"found {all_null} SIEDU indicators with all-null values")
     if metadata and metadata.get("coverage", {}).get("status") in {"partial_expected", "partial"}:
-        warnings.append("indicadores_urbanos_siedu has intentionally partial urban coverage")
+        _add_expected_warning(
+            warnings,
+            expected_warnings,
+            "indicadores_urbanos_siedu has intentionally partial urban coverage",
+        )
     if metadata and metadata.get("source_mode") == "fallback":
         warnings.append(
             "indicadores_urbanos_siedu source_mode is fallback; review before publication"
@@ -631,6 +652,7 @@ def validate_indicadores_urbanos_siedu(
         "record_count": df.height,
         "errors": errors,
         "warnings": warnings,
+        "expected_warnings": expected_warnings,
     }
 
 
@@ -942,6 +964,7 @@ def validate_pobreza_comunal(
     """
     errors: list[str] = []
     warnings: list[str] = []
+    expected_warnings: list[str] = []
     row_count = df.height
 
     required = [
@@ -965,6 +988,7 @@ def validate_pobreza_comunal(
             "record_count": row_count,
             "errors": errors,
             "warnings": warnings,
+            "expected_warnings": expected_warnings,
         }
 
     if row_count == 0:
@@ -975,6 +999,7 @@ def validate_pobreza_comunal(
             "record_count": row_count,
             "errors": errors,
             "warnings": warnings,
+            "expected_warnings": expected_warnings,
         }
 
     # Duplicados de clave primaria
@@ -1019,9 +1044,11 @@ def validate_pobreza_comunal(
     comunas_con_dato = df["codigo_comuna"].n_unique()
     if valid_commune_codes is not None and len(valid_commune_codes) > 0:
         coverage_pct = round(comunas_con_dato / len(valid_commune_codes) * 100, 1)
-        warnings.append(
+        _add_expected_warning(
+            warnings,
+            expected_warnings,
             f"cobertura SAE: {comunas_con_dato}/{len(valid_commune_codes)} comunas "
-            f"({coverage_pct}%) — parcial por diseño; comunas sin muestra no tienen estimación"
+            f"({coverage_pct}%) — parcial por diseño; comunas sin muestra no tienen estimación",
         )
 
     # Verificar que el año es razonable
@@ -1039,6 +1066,7 @@ def validate_pobreza_comunal(
         "record_count": row_count,
         "errors": errors,
         "warnings": warnings,
+        "expected_warnings": expected_warnings,
     }
 
 
@@ -1170,6 +1198,7 @@ def validate_partidos_politicos(
     """
     errors: list[str] = []
     warnings: list[str] = []
+    expected_warnings: list[str] = []
     row_count = df.height
 
     required = ["id_partido", "nombre", "sigla", "fuente", "url_fuente", "fecha_consulta"]
@@ -1182,6 +1211,7 @@ def validate_partidos_politicos(
             "record_count": row_count,
             "errors": errors,
             "warnings": warnings,
+            "expected_warnings": expected_warnings,
         }
 
     if row_count == 0:
@@ -1192,6 +1222,7 @@ def validate_partidos_politicos(
             "record_count": row_count,
             "errors": errors,
             "warnings": warnings,
+            "expected_warnings": expected_warnings,
         }
 
     dup_count = _duplicate_count(df, ["id_partido"])
@@ -1204,7 +1235,11 @@ def validate_partidos_politicos(
         if unexpected:
             errors.append(f"estado_legal con valores fuera de dominio: {sorted(unexpected)}")
         con_estado = df["estado_legal"].drop_nulls().len()
-        warnings.append(f"estado_legal poblado (vía SERVEL) en {con_estado}/{row_count} partidos")
+        _add_expected_warning(
+            warnings,
+            expected_warnings,
+            f"estado_legal poblado (vía SERVEL) en {con_estado}/{row_count} partidos",
+        )
 
     personales = {"rut", "run", "domicilio"}
     if personales & {c.lower() for c in df.columns}:
@@ -1219,6 +1254,7 @@ def validate_partidos_politicos(
         "record_count": row_count,
         "errors": errors,
         "warnings": warnings,
+        "expected_warnings": expected_warnings,
     }
 
 
