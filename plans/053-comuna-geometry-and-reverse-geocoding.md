@@ -1,5 +1,13 @@
 # Plan 053: Geometría comunal (GeoParquet) + reverse geocoding `resolve_by_coords()`
 
+> **Execution state (2026-07-26):** Steps 0–3 are complete. Their resulting
+> extractor, validator, standalone builder, contract, documentation, and ADRs are
+> now the current state of the repository. The remaining work was deliberately
+> split into Plan 064 (CI-owned artifact publication) and Plan 065 (runtime
+> `resolve_by_coords()`), because publishing a candidate artifact and exposing a
+> consumer API have different failure modes and verification gates. Do not rerun
+> Steps 0–3 from this historical parent plan.
+
 > **Executor instructions**: Este es un **feasibility-spike con entregable de datos**.
 > Sigue los pasos en orden y respeta las compuertas (gates). El Step 1 es una
 > **compuerta de licencia que puede matar el plan** — si no se confirma, detente y

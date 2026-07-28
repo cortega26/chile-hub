@@ -7,7 +7,7 @@
 > in `plans/README.md` — unless a reviewer dispatched you and told you they
 > maintain the index.
 >
-> **Drift check (run first)**: `git diff --stat 6bf6b08..HEAD -- data/dataset_catalog_config.json scripts/check_companion_paths.py src/builders/doc_sync.py README.md AGENTS.md tests/test_pipeline_logic.py`
+> **Drift check (run first)**: `git diff --stat 63cc106..HEAD -- data/dataset_catalog_config.json scripts/check_companion_paths.py src/builders/doc_sync.py README.md AGENTS.md tests/test_pipeline_logic.py`
 > If any in-scope file changed since this plan was written, compare the
 > "Current state" excerpts against the live code before proceeding; on a
 > mismatch, treat it as a STOP condition.
@@ -19,12 +19,12 @@
 - **Risk**: LOW
 - **Depends on**: none (disjoint from plans 050–057)
 - **Category**: direction / dx
-- **Planned at**: commit `6bf6b08`, 2026-07-18
+- **Planned at**: commit `63cc106`, 2026-07-26 (revalidated)
 
 ## Why this matters
 
 `AGENTS.md` §12 (política anti-drift) lista explícitamente como "Seguimiento
-recomendado, no implementado todavía": agregar un campo `"extractor"` a las 21
+recomendado, no implementado todavía": agregar un campo `"extractor"` a las 22
 entradas de `data/dataset_catalog_config.json`, lo que permite (a) generar
 automáticamente la tabla de extractores de `README.md` — hoy manual y ya quedó
 stale una vez — y (b) extender `scripts/check_companion_paths.py registry` para
@@ -35,7 +35,7 @@ a dato validado en CI en cada push/PR.
 
 ## Current state
 
-- `data/dataset_catalog_config.json` — dict de 21 claves. Cada entrada tiene
+- `data/dataset_catalog_config.json` — dict de 22 claves. Cada entrada tiene
   `description`, `join_keys`, `confidence_tier`, `expected_record_count`,
   `reuse_policy`, `freshness_policy`, `usage_examples`, `outputs` (ausente en
   carril `candidate`), `documentation`. **No existe el campo `extractor`.**
@@ -44,7 +44,7 @@ a dato validado en CI en cada push/PR.
   distritos_electorales, establecimientos_educacionales, finanzas_municipales,
   resultados_educacionales, indicadores_urbanos_siedu,
   perfil_territorial_comunal, empresas, pobreza_comunal,
-  consumo_electrico_comunal, delincuencia_comunal, partidos_politicos,
+  consumo_electrico_comunal, geometria_comunal, delincuencia_comunal, partidos_politicos,
   autoridades_electas, autoridades_locales`.
 - `scripts/check_companion_paths.py` — `check_registry()` (L56–67) hoy valida
   contrato + doc por dataset:
@@ -103,6 +103,7 @@ a dato validado en CI en cada push/PR.
 | empresas | `"src/extractors/res_extractor.py"` |
 | pobreza_comunal | `"src/extractors/pobreza_extractor.py"` |
 | consumo_electrico_comunal | `"src/extractors/consumo_electrico_extractor.py"` |
+| geometria_comunal | `"src/extractors/geometria_comunal_extractor.py"` |
 | delincuencia_comunal | `"src/extractors/cead_delincuencia_live_extractor.py"` |
 | partidos_politicos | `"src/extractors/partidos_politicos_extractor.py"` |
 | autoridades_electas | `"src/extractors/autoridades_electas_extractor.py"` |
@@ -116,7 +117,8 @@ establecimientos_educacionales, resultados_educacionales · Economía:
 indicadores, finanzas_municipales, empresas, consumo_electrico_comunal ·
 Indicadores urbanos: indicadores_urbanos_siedu · Política: partidos_politicos,
 autoridades_electas, autoridades_locales · Seguridad (carril `candidate`):
-delincuencia_comunal · `perfil_territorial_comunal`: derivado (fila aparte).
+delincuencia_comunal · Territorio (carril `candidate`): geometria_comunal ·
+`perfil_territorial_comunal`: derivado (fila aparte).
 
 ## Commands you will need
 
@@ -151,14 +153,14 @@ delincuencia_comunal · `perfil_territorial_comunal`: derivado (fila aparte).
 
 - Branch: `advisor/058-catalog-extractor-field`
 - Conventional commits en español, estilo del repo: p. ej.
-  `feat(catalog): agrega campo extractor a las 21 entradas del catálogo`,
+  `feat(catalog): agrega campo extractor a las 22 entradas del catálogo`,
   `feat(ci): valida extractores en check_companion_paths registry`,
   `feat(docs): auto-genera tabla de extractores de README`.
 - No pushear ni abrir PR salvo instrucción del operador.
 
 ## Steps
 
-### Step 1: Agregar el campo `extractor` a las 21 entradas del catálogo
+### Step 1: Agregar el campo `extractor` a las 22 entradas del catálogo
 
 En `data/dataset_catalog_config.json`, agrega a cada entrada el campo
 `"extractor"` con el valor exacto de la tabla de mapeo de "Current state"
@@ -167,7 +169,7 @@ existentes (el archivo está ordenado por clave dentro de cada entrada:
 `confidence_tier`, `description`, `documentation`, `expected_record_count`,
 `extractor`, `freshness_policy`, …).
 
-**Verify**: `python3 -c "import json; d=json.load(open('data/dataset_catalog_config.json')); assert len(d)==21; missing=[k for k,v in d.items() if 'extractor' not in v]; assert not missing, missing; print('21/21 entradas con campo extractor')"` → `21/21 entradas con campo extractor`
+**Verify**: `python3 -c "import json; d=json.load(open('data/dataset_catalog_config.json')); assert len(d)==22; missing=[k for k,v in d.items() if 'extractor' not in v]; assert not missing, missing; print('22/22 entradas con campo extractor')"` → `22/22 entradas con campo extractor`
 
 ### Step 2: Extender `check_registry()` con validación de extractores
 
@@ -213,7 +215,7 @@ En `scripts/check_companion_paths.py`:
 
 En `src/builders/doc_sync.py`:
 
-1. Agrega `_README_DATASET_DOMAINS` dict de las 21 claves → dominio (strings
+1. Agrega `_README_DATASET_DOMAINS` dict de las 22 claves → dominio (strings
    del agrupamiento de "Current state"; `perfil_territorial_comunal` mapea a
    `None` = derivado), siguiendo el patrón de `_AGENTS_TEST_DESCRIPTIONS`.
 2. Agrega `sync_readme_extractor_table(check_only=False)`: agrupa datasets por
@@ -277,7 +279,7 @@ temporales) y sobre el mecanismo de import de scripts que use
 (importlib desde path, si ese es el patrón ahí; si no, subprocess). Casos:
 
 1. `check_extractors` con catálogo real → lista de errores vacía (regresión:
-   las 21 entradas referencian archivos existentes y no hay huérfanos).
+   las 22 entradas referencian archivos existentes y no hay huérfanos).
 2. Fixture temporal: entrada con `"extractor": "src/extractors/no_existe.py"`
    → error "extractor no existe".
 3. Fixture temporal: archivo `src/extractors/huerfano_extractor.py` creado en
@@ -310,8 +312,8 @@ pass, incluyendo los ≥6 nuevos tests.
 
 Stop and report back (do not improvise) if:
 
-- El catálogo tiene ≠21 entradas o alguna clave difiere de la tabla de mapeo
-  (drift desde `6bf6b08`).
+- El catálogo tiene ≠22 entradas o alguna clave difiere de la tabla de mapeo
+  (drift desde `63cc106`).
 - La tabla manual de README ya no está en L682–694 o su contenido difiere del
   excerpt de "Current state" (alguien la editó; reconciliar antes de generar).
 - El patrón `replace_delimited_block` no logra reproducir la tabla actual con

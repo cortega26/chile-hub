@@ -23,6 +23,7 @@ from check_companion_paths import check_companions
 PIPELINE_CHECK_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "pipeline-check.yml"
 MONTHLY_SCRAPE_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "monthly-scrape.yml"
 ADOPTION_STATS_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "adoption-stats.yml"
+GEOMETRIA_COMUNAL_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "geometria-comunal.yml"
 MAKEFILE = ROOT_DIR / "Makefile"
 MKDOCS_CONFIG = ROOT_DIR / "mkdocs.yml"
 DOCS_DIR = ROOT_DIR / "docs"
@@ -198,6 +199,77 @@ class LandingSyncGateGuardrailTests(unittest.TestCase):
             body,
             "`make doctor` debe correr el gate de landing antes de commit.",
         )
+
+
+class GeometriaCandidateWorkflowGuardrailTests(unittest.TestCase):
+    """La geometría comunal es candidate y supera el límite local de 500 KB.
+
+    Su publicación debe pasar por un workflow manual que valide el GeoParquet
+    antes de forzar exclusivamente los artefactos permitidos. Esto preserva el
+    guard de archivos grandes y evita que la geometría entre por accidente al
+    build diario o al bundle estable.
+    """
+
+    def setUp(self):
+        self.content = GEOMETRIA_COMUNAL_WORKFLOW.read_text(encoding="utf-8")
+
+    def test_workflow_is_manual_only_with_locked_pipeline_dependencies(self):
+        self.assertIn("workflow_dispatch:", self.content)
+        self.assertNotIn("schedule:", self.content)
+        self.assertIn("contents: write", self.content)
+        self.assertIn("uv lock --locked", self.content)
+        self.assertIn("uv sync --extra pipeline --extra dev --locked", self.content)
+
+    def test_validates_standalone_builder_before_commit(self):
+        build_index = self.content.index("scripts/build_geometria_comunal.py")
+        validation_index = self.content.index("Validate candidate GeoParquet")
+        commit_index = self.content.index("Commit validated candidate artifacts")
+        self.assertLess(build_index, validation_index)
+        self.assertLess(validation_index, commit_index)
+        self.assertIn("gpd.read_parquet", self.content)
+        self.assertIn("frame.crs.to_epsg() == 4326", self.content)
+        self.assertIn("frame.geometry.is_empty.any()", self.content)
+        self.assertIn('frame["codigo_comuna"].is_unique', self.content)
+        self.assertIn("len(value) == 5 and value.isdigit()", self.content)
+        self.assertIn("len(value) == 2 and value.isdigit()", self.content)
+        self.assertIn('metadata.get("source_mode") == "live"', self.content)
+        self.assertIn("Missing staging CSV", self.content)
+        self.assertIn("Missing staging metadata", self.content)
+        self.assertIn("Missing raw BCN geometry snapshot", self.content)
+
+    def test_workflow_never_reuses_staging_or_publishes_fallback_data(self):
+        self.assertNotIn("--skip-fetch", self.content)
+        self.assertIn('metadata.get("source_mode") == "live"', self.content)
+
+    def test_commit_stages_only_allowed_geometry_artifacts_and_checksum(self):
+        expected_paths = [
+            "data/normalized/geometria_comunal.parquet",
+            "data/staging/geometria_comunal.csv",
+            "data/staging/geometria_comunal.metadata.json",
+            "data/normalized/geometria_comunal.parquet.sha256",
+            "data/raw/bcn_geometria_comunal_*.json",
+        ]
+        for path in expected_paths:
+            self.assertIn(path, self.content)
+        self.assertIn("sha256sum -c geometria_comunal.parquet.sha256", self.content)
+        self.assertIn('git add -f "$path"', self.content)
+        self.assertIn("[skip ci]", self.content)
+
+        commit_block = self.content.split("Commit validated candidate artifacts", 1)[1].split(
+            "- name: Summary", 1
+        )[0]
+        staged_paths = [
+            line.strip().rstrip("\\").strip()
+            for line in commit_block.splitlines()
+            if "data/" in line
+        ]
+        self.assertEqual(staged_paths, expected_paths)
+
+    def test_workflow_does_not_call_stable_pipeline_or_bundle(self):
+        self.assertNotIn("make build", self.content)
+        self.assertNotIn("make extract", self.content)
+        self.assertNotIn("package-bundle", self.content)
+        self.assertNotIn("build_dev_db.py", self.content)
 
 
 def _extract_make_target(makefile_content: str, target_name: str) -> str:

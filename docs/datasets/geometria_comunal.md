@@ -49,6 +49,36 @@ FROM 'data/normalized/geometria_comunal.parquet'
 ORDER BY area DESC;
 ```
 
+## Publicación
+
+El artefacto se genera exclusivamente mediante el workflow manual
+`workflow_dispatch` **Refresh Candidate Comunal Geometry**. Tras una ejecución
+validada y el despliegue de Pages, está disponible para consumo directo en:
+
+- `https://tooltician.com/chile-hub/data/normalized/geometria_comunal.parquet`
+- `https://tooltician.com/chile-hub/data/normalized/geometria_comunal.parquet.sha256`
+
+Por ejemplo, se puede abrir directamente desde una herramienta GIS:
+
+```python
+import geopandas as gpd
+
+url = "https://tooltician.com/chile-hub/data/normalized/geometria_comunal.parquet"
+gdf = gpd.read_parquet(url)
+assert len(gdf) >= 340
+assert gdf.crs.to_epsg() == 4326
+```
+
+Verifica la descarga antes de usarla con `sha256sum -c` desde el directorio que
+contiene ambos archivos:
+
+```bash
+sha256sum -c geometria_comunal.parquet.sha256
+```
+
+Sigue siendo datos `candidate`: queda deliberadamente fuera de `ChileHub()`, del
+bundle estable y del build normal. El workflow no fija una cadencia de refresco.
+
 ## Limitaciones
 
 - **No usar para precisión geodésica ni catastral.** La fuente BCN es cartografía de referencia a escala nacional, no un catastro de límites legales.

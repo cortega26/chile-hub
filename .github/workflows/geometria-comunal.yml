@@ -1,0 +1,130 @@
+name: Refresh Candidate Comunal Geometry
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  PYTHON_VERSION: "3.13"
+
+concurrency:
+  group: geometria-comunal
+  cancel-in-progress: false
+
+jobs:
+  refresh-geometry:
+    name: Build and publish candidate GeoParquet
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          enable-cache: true
+
+      - name: Install locked dependencies
+        run: |
+          uv lock --locked
+          uv sync --extra pipeline --extra dev --locked
+
+      - name: Build candidate GeoParquet
+        run: uv run python scripts/build_geometria_comunal.py
+
+      - name: Validate candidate GeoParquet
+        run: |
+          uv run python - <<'PY'
+          import json
+          from pathlib import Path
+
+          import geopandas as gpd
+          import polars as pl
+
+          artifact = Path("data/normalized/geometria_comunal.parquet")
+          staging_csv = Path("data/staging/geometria_comunal.csv")
+          metadata_path = Path("data/staging/geometria_comunal.metadata.json")
+          raw_snapshots = list(Path("data/raw").glob("bcn_geometria_comunal_*.json"))
+          assert artifact.is_file(), f"Missing artifact: {artifact}"
+          assert staging_csv.is_file(), f"Missing staging CSV: {staging_csv}"
+          assert metadata_path.is_file(), f"Missing staging metadata: {metadata_path}"
+          assert raw_snapshots, "Missing raw BCN geometry snapshot"
+
+          frame = gpd.read_parquet(artifact)
+          assert len(frame) >= 340, f"Expected at least 340 geometries, got {len(frame)}"
+          assert frame.crs and frame.crs.to_epsg() == 4326, f"Unexpected CRS: {frame.crs}"
+          assert frame.geometry.notna().all(), "Geometry column contains null values"
+          assert not frame.geometry.is_empty.any(), "Geometry column contains empty geometries"
+          assert frame["codigo_comuna"].is_unique, "codigo_comuna must be unique"
+          assert frame["codigo_comuna"].map(
+              lambda value: isinstance(value, str) and len(value) == 5 and value.isdigit()
+          ).all(), "codigo_comuna must contain five-digit strings"
+          assert frame["codigo_region"].map(
+              lambda value: isinstance(value, str) and len(value) == 2 and value.isdigit()
+          ).all(), "codigo_region must contain two-digit strings"
+
+          metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+          assert metadata.get("dataset") == "geometria_comunal", "Unexpected staging dataset"
+          assert metadata.get("source_mode") == "live", "Candidate refresh must use live source data"
+          assert metadata.get("record_count") == len(frame), "Metadata record count does not match artifact"
+          staging_codes = set(
+              pl.read_csv(staging_csv, schema_overrides={"codigo_comuna": pl.String})[
+                  "codigo_comuna"
+              ]
+          )
+          assert set(frame["codigo_comuna"]).issubset(staging_codes), (
+              "GeoParquet codes do not match staging CSV"
+          )
+          print(f"Validated {len(frame)} geometries in EPSG:4326")
+          PY
+          uv run pytest tests/test_extractors.py tests/test_validation.py -v -k Geometria
+
+      - name: Generate GeoParquet checksum
+        run: |
+          (
+            cd data/normalized
+            sha256sum geometria_comunal.parquet > geometria_comunal.parquet.sha256
+            sha256sum -c geometria_comunal.parquet.sha256
+          )
+
+      - name: Commit validated candidate artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          for path in \
+            data/normalized/geometria_comunal.parquet \
+            data/staging/geometria_comunal.csv \
+            data/staging/geometria_comunal.metadata.json \
+            data/normalized/geometria_comunal.parquet.sha256 \
+            data/raw/bcn_geometria_comunal_*.json
+          do
+            [ -e "$path" ] && git add -f "$path"
+          done
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore(data): refresh candidate comunal geometry [skip ci]"
+            git push
+          fi
+
+      - name: Summary
+        run: |
+          records=$(uv run python -c "import geopandas as gpd; print(len(gpd.read_parquet('data/normalized/geometria_comunal.parquet')))" )
+          bytes=$(wc -c < data/normalized/geometria_comunal.parquet)
+          source_mode=$(uv run python -c "import json; print(json.load(open('data/staging/geometria_comunal.metadata.json', encoding='utf-8'))['source_mode'])")
+          {
+            echo "## Candidate comunal geometry"
+            echo ""
+            echo "- Records: ${records}"
+            echo "- Artifact size: ${bytes} bytes"
+            echo "- Source mode: ${source_mode}"
+            echo "- Boundary: candidate artifact only; excluded from the stable bundle and normal build."
+          } >> "$GITHUB_STEP_SUMMARY"

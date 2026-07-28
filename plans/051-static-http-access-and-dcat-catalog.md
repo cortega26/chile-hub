@@ -14,7 +14,7 @@
 > **para** (STOP condition).
 >
 > **Drift check (córrelo primero)**:
-> `git diff --stat 7ebf94b..HEAD -- src/chile_hub/core.py src/builders/data_package.py src/build_dev_db.py .github/workflows/pages-deploy.yml README.md`
+> `git diff --stat 63cc106..HEAD -- src/chile_hub/core.py src/builders/data_package.py src/build_dev_db.py .github/workflows/pages-deploy.yml README.md`
 > Si algo cambió, compara los excerptos de "Estado actual" contra el código vivo
 > antes de continuar; ante discrepancia, trátalo como STOP condition.
 
@@ -25,7 +25,7 @@
 - **Risk**: LOW
 - **Depends on**: none
 - **Category**: direction
-- **Planned at**: commit `7ebf94b`, 2026-07-14
+- **Planned at**: commit `63cc106`, 2026-07-26 (revalidated)
 
 ## Why this matters
 
@@ -261,7 +261,7 @@ por `sync_docs.py`).
 Detente y reporta si:
 
 - El código de `from_datapackage` o `data_package.py` no coincide con "Estado actual"
-  (drift desde `7ebf94b`).
+  (drift desde `63cc106`).
 - Te descubres diseñando un servidor, endpoint dinámico, auth o billing — eso viola la
   línea roja del product-spec; el spike es **sólo archivos estáticos**.
 - No puedes confirmar el base URL real en `README.md` — no inventes un dominio;

@@ -12,7 +12,7 @@
 > validación que corta el build. Ver Step 3.
 >
 > **Drift check (córrelo primero)**:
-> `git diff --stat 7ebf94b..HEAD -- src/validation.py src/builders/reports.py scripts/verify_pipeline.py`
+> `git diff --stat 63cc106..HEAD -- src/validation.py src/builders/reports.py scripts/verify_pipeline.py`
 > Ante discrepancia con los excerptos de "Estado actual", trátalo como STOP.
 
 ## Status
@@ -24,7 +24,7 @@
   eso el gate correcto es publicación, no build)
 - **Depends on**: none
 - **Category**: direction (confiabilidad como diferenciador de producto)
-- **Planned at**: commit `7ebf94b`, 2026-07-14
+- **Planned at**: commit `63cc106`, 2026-07-26 (revalidated)
 
 ## Why this matters
 
@@ -224,7 +224,7 @@ Detente y reporta si:
   `make build` (el gate rompería publicaciones sanas) — recalibra el umbral **una vez** y,
   si persiste, reporta antes de relajar la señal a inútil.
 - `validate_indicadores`, `build_drift_report` o `verify_pipeline.py` no coinciden con
-  "Estado actual" (drift desde `7ebf94b`).
+  "Estado actual" (drift desde `63cc106`).
 - Cualquier verificación falla dos veces tras un intento razonable.
 
 ## Maintenance notes

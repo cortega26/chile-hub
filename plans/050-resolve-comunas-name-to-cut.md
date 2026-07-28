@@ -13,7 +13,7 @@
 > explícita — ver STOP conditions.
 >
 > **Drift check (córrelo primero)**:
-> `git diff --stat 7ebf94b..HEAD -- src/chile_hub/core.py src/extractors/subdere_extractor.py src/extractors/autoridades_locales_extractor.py`
+> `git diff --stat 63cc106..HEAD -- src/chile_hub/core.py src/extractors/subdere_extractor.py src/extractors/autoridades_locales_extractor.py`
 > Si alguno de esos archivos cambió desde que se escribió este plan, compara los
 > excerptos de "Estado actual" contra el código vivo antes de continuar; ante una
 > discrepancia, trátalo como STOP condition.
@@ -25,7 +25,7 @@
 - **Risk**: LOW-MED (decisión de alcance determinista vs. fuzzy es el único riesgo real)
 - **Depends on**: none
 - **Category**: direction
-- **Planned at**: commit `7ebf94b`, 2026-07-14
+- **Planned at**: commit `63cc106`, 2026-07-26 (revalidated)
 
 ## Why this matters
 
@@ -354,7 +354,7 @@ Todas deben cumplirse:
 Detente y reporta (no improvises) si:
 
 - El código en `subdere_extractor.py:558-570` o `autoridades_locales_extractor.py:437`
-  no coincide con los excerptos de "Estado actual" (el repo derivó desde `7ebf94b`).
+  no coincide con los excerptos de "Estado actual" (el repo derivó desde `63cc106`).
 - El dataset `comunas` no tiene la columna `nombre_comuna_clean` al cargarlo (indica
   que el build cambió el schema; no inventes la columna).
 - El chequeo de colisiones del Step 4 revela `nombre_comuna_clean` duplicados **y** no
