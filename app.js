@@ -406,6 +406,15 @@ function filterCatalog() {
     });
 
     catalogCount.textContent = `${visibleCount} ${visibleCount === 1 ? "capa" : "capas"}`;
+
+    const existingNoResults = catalogGrid.querySelector(".no-results-message");
+    if (existingNoResults) existingNoResults.remove();
+    if (visibleCount === 0 && cards.length > 0) {
+        const noResults = document.createElement("div");
+        noResults.className = "no-results-message";
+        noResults.innerHTML = "<strong>Sin resultados</strong><br>Prueba con otro término de búsqueda.";
+        catalogGrid.appendChild(noResults);
+    }
 }
 
 function fallbackCopyText(text) {
@@ -1246,6 +1255,17 @@ window.addEventListener("DOMContentLoaded", () => {
     loadHubHealth();
     loadCatalog();
     loadComunas();
+
+    // Dataset cards: click anywhere on the card (outside links/buttons) opens the drawer,
+    // via el mismo enrutamiento por hash que usa el enlace "Ver Ficha".
+    if (catalogGrid) {
+        catalogGrid.addEventListener("click", (event) => {
+            const card = event.target.closest(".dataset-card");
+            if (!card || !card.id) return;
+            if (event.target.closest("a, button")) return;
+            window.location.hash = card.id;
+        });
+    }
 
     // Drawer and Routing Init
     window.addEventListener("hashchange", handleHashChange);
