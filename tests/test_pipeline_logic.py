@@ -3905,15 +3905,74 @@ class DriftTaxonomyTests(unittest.TestCase):
 
     # --- Guardrail sobre los artefactos reales ---------------------------
 
-    def test_published_artifacts_report_exactly_three_real_problems(self):
-        """Guardrail: una regresión de clasificación debe ser ruidosa."""
+    def test_published_artifacts_report_exactly_two_actionable_problems(self):
+        """Guardrail: una regresión de clasificación debe ser ruidosa.
+
+        Bajó de 3 a 2 por un mecanismo **distinto** al de ADR-014: el Plan 068
+        excluyó `consumo_electrico_comunal` de la contabilidad de salud por tener
+        la fuente muerta (ADR-015), no por declararlo "esperado". El dataset
+        sigue apareciendo como `drifted` en `drift_report.json` — lo que cambia
+        es que ya no cuenta en la señal.
+        """
         health = json.loads((NORMALIZED_DIR / "hub_health.json").read_text(encoding="utf-8"))
-        self.assertEqual(health["drifted_count"], 3)
-        self.assertEqual(health["warn_count"], 3)
+        self.assertEqual(health["drifted_count"], 2)
+        self.assertEqual(health["warn_count"], 2)
+        self.assertEqual(health["retired_count"], 1)
+        self.assertEqual(health["dataset_count"], 19)
         self.assertEqual(health["overall_status"], "warn")
         report = json.loads((NORMALIZED_DIR / "drift_report.json").read_text(encoding="utf-8"))
         drifted = sorted(e["dataset"] for e in report["datasets"] if e["drift_status"] == "drifted")
         self.assertEqual(drifted, ["consumo_electrico_comunal", "empresas", "indicadores"])
+        retired = sorted(e["dataset"] for e in health["datasets"] if e["retired"])
+        self.assertEqual(retired, ["consumo_electrico_comunal"])
+
+    # --- Plan 068 / ADR-015: fuentes retiradas ---------------------------
+
+    def test_retired_set_comes_from_registry_not_hardcoded(self):
+        from src.chile_hub.pipeline_status_utils import _load_retired_datasets
+
+        self.assertEqual(_load_retired_datasets(), {"consumo_electrico_comunal"})
+
+    def test_retired_dataset_excluded_from_counters_but_still_listed(self):
+        from src.chile_hub.pipeline_status_utils import build_hub_health
+
+        def _dataset(drift):
+            return {
+                "source_mode": "live",
+                "freshness": {"status": "fresh"},
+                "reuse_policy": {"status": "ok", "redistribution_ok": True},
+                "degradation": {"status": "none"},
+                "coverage": {"status": "full", "expected": False},
+                "drift": {"status": drift},
+            }
+
+        with patch(
+            "src.chile_hub.pipeline_status_utils._load_retired_datasets",
+            return_value={"muerto"},
+        ):
+            health = build_hub_health(
+                {
+                    "datasets": {"vivo": _dataset("healthy"), "muerto": _dataset("drifted")},
+                    "validations": {
+                        "vivo": {"status": "ok", "warnings": []},
+                        "muerto": {"status": "ok", "warnings": ["fuente caida"]},
+                    },
+                }
+            )
+
+        self.assertEqual(health["drifted_count"], 0)
+        self.assertEqual(health["retired_count"], 1)
+        self.assertEqual(health["dataset_count"], 2, "el inventario no cambia")
+        self.assertEqual(health["overall_status"], "ok")
+        listed = {entry["dataset"] for entry in health["datasets"]}
+        self.assertIn("muerto", listed, "el retirado se muestra marcado, no se esconde")
+
+    def test_non_deprecated_dataset_is_never_retired(self):
+        """Guardrail: solo el registry puede retirar; nada más."""
+        health = json.loads((NORMALIZED_DIR / "hub_health.json").read_text(encoding="utf-8"))
+        for entry in health["datasets"]:
+            if entry["dataset"] != "consumo_electrico_comunal":
+                self.assertFalse(entry["retired"], entry["dataset"])
 
     def test_warnings_still_contain_every_message(self):
         """`warnings` nunca pierde mensajes: los esperados siguen listados."""

@@ -1,13 +1,13 @@
 {
-  "generated_at_utc": "2026-07-29T14:32:53.985613+00:00",
+  "generated_at_utc": "2026-07-29T14:45:10.682740+00:00",
   "overall_status": "warn",
   "dataset_count": 19,
   "live_count": 18,
-  "fallback_count": 1,
+  "fallback_count": 0,
   "stale_count": 1,
-  "drifted_count": 3,
+  "drifted_count": 2,
   "degraded_count": 0,
-  "warning_count": 10,
+  "warning_count": 7,
   "top_issue": {
     "dataset": "empresas",
     "attention_priority": 0,

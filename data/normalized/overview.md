@@ -1,15 +1,15 @@
 # chile-hub overview
 
-- `generated_at_utc`: `2026-07-29T14:32:53.985613+00:00`
+- `generated_at_utc`: `2026-07-29T14:45:10.682740+00:00`
 - `overall_status`: `warn`
 - `dataset_count`: `19`
 - `live_count`: `18`
-- `fallback_count`: `1`
+- `fallback_count`: `0`
 - `stale_count`: `1`
-- `drifted_count`: `3`
+- `drifted_count`: `2`
 - `degraded_count`: `0`
 - `partial_coverage_count`: `2`
-- `warning_count`: `10`
+- `warning_count`: `7`
 - `shared_artifact_count`: `25`
 - `package_count`: `1`
 - `top_issue`: `empresas` (freshness=fresh, drift=drifted, warnings=2)
@@ -43,7 +43,7 @@
 
 - `path`: `data/normalized/chile-hub-publishable-bundle.zip`
 - `package_type`: `zip`
-- `size_bytes`: `29356319`
+- `size_bytes`: `29356254`
 - `checksum`: `sha256` via `data/normalized/chile-hub-publishable-bundle.zip.sha256`
 - `verification_command`: `shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256`
 

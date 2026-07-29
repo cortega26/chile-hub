@@ -1097,6 +1097,12 @@ def verify_hub_health():
     if health.get("dataset_count") != len(REQUIRED_DATASETS):
         fail(f"hub_health.json has unexpected dataset_count: {health.get('dataset_count')}")
 
+    retired_count = health.get("retired_count")
+    if not isinstance(retired_count, int) or retired_count < 0:
+        fail(f"hub_health.json has invalid retired_count: {retired_count}")
+    if retired_count > health.get("dataset_count", 0):
+        fail(f"hub_health.json has retired_count greater than dataset_count: {retired_count}")
+
     if health.get("overall_status") not in {"ok", "warn", "error"}:
         fail(f"hub_health.json has invalid overall_status: {health.get('overall_status')}")
     for key in (
@@ -1143,6 +1149,10 @@ def verify_hub_health():
             fail(f"hub_health.json entry has invalid coverage_status: {entry}")
         if entry.get("drift_status") not in {"healthy", "drifted"}:
             fail(f"hub_health.json entry has invalid drift_status: {entry}")
+        # retired: siempre presente y booleano. Marca fuentes muertas que siguen
+        # publicadas pero no participan en la señal de salud (ADR-015).
+        if not isinstance(entry.get("retired"), bool):
+            fail(f"hub_health.json entry has missing or non-boolean retired: {entry}")
         # actionable_warning_count nunca puede exceder warning_count: los
         # accionables son un subconjunto de los warnings totales (ADR-014).
         actionable = entry.get("actionable_warning_count")

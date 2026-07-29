@@ -63,3 +63,20 @@ ORDER BY consumo_kwh DESC;
 
 - v2 (2026-07-07): Degradado a `deprecated` / `candidate`, excluido del bundle público. La fuente Junar de `energiaabierta.cl` fue confirmada permanentemente caída; el dataset nunca tuvo un fetch en vivo exitoso y solo publicaba datos de muestra fabricados.
 - v1 (2026-06-30): Primera versión. Datos de consumo eléctrico anual por comuna desde Energía Abierta (CNE).
+
+## Estado: retirado de la señal de salud (ADR-015)
+
+La fuente está **permanentemente caída**: CNE decomisionó el catálogo Junar de
+energiaabierta.cl (investigado 2026-07-07, ver `AGENTS.md` §6 y el `next_action`
+de `data/source_registry.json`). No hay archivo ni API de reemplazo, y el
+dataset nunca tuvo un fetch en vivo exitoso — solo publica filas de muestra.
+
+Desde el 2026-07-29 aparece marcado `retired: true` en `hub_health.json` y
+**no participa en los contadores de salud** (`drifted_count`, `warn_count`,
+etc.). Esto no lo elimina: sigue en el catálogo, en el enum `Dataset` y
+accesible vía `hub.load_polars("consumo_electrico_comunal")`, y
+`drift_report.json` lo sigue reportando como `drifted`. Lo que cambia es que un
+drift que nadie puede resolver dejó de contar como señal.
+
+**No consumas este dataset para análisis.** Si CNE publica un reemplazo oficial,
+revertir el retiro es una línea en `data/source_registry.json`.
