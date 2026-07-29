@@ -82,10 +82,17 @@ def _assert_normalized_not_stale():
             "Run 'make build' (or 'python src/build_dev_db.py') before pytest."
         )
     sentinel_mtime = _NORMALIZED_SENTINEL.stat().st_mtime
+    # Misma exclusión que scripts/verify_pipeline.py: el staging que `make build`
+    # no consume por diseño (carril candidate, ADR-012) no puede implicar que los
+    # artefactos estén desactualizados. Se importa de allí para no mantener dos
+    # listas capaces de divergir.
+    from scripts.verify_pipeline import OUT_OF_BAND_STAGING_METADATA
+
     stale_files = [
         p
         for p in _STAGING_DIR.glob("*.metadata.json")
-        if p.stat().st_mtime > sentinel_mtime + 1  # 1-second grace
+        if p.name not in OUT_OF_BAND_STAGING_METADATA
+        and p.stat().st_mtime > sentinel_mtime + 1  # 1-second grace
     ]
     if stale_files:
         names = ", ".join(sorted(p.name for p in stale_files))
