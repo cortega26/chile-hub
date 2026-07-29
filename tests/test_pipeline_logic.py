@@ -3960,26 +3960,42 @@ class DriftTaxonomyTests(unittest.TestCase):
 
     # --- Guardrail sobre los artefactos reales ---------------------------
 
-    def test_published_artifacts_report_exactly_two_actionable_problems(self):
+    def test_published_artifacts_report_exactly_one_actionable_problem(self):
         """Guardrail: una regresión de clasificación debe ser ruidosa.
 
-        Bajó de 3 a 2 por un mecanismo **distinto** al de ADR-014: el Plan 068
-        excluyó `consumo_electrico_comunal` de la contabilidad de salud por tener
-        la fuente muerta (ADR-015), no por declararlo "esperado". El dataset
-        sigue apareciendo como `drifted` en `drift_report.json` — lo que cambia
-        es que ya no cuenta en la señal.
+        Historia del contador, cada baja por un mecanismo distinto y deliberado:
+
+        - 8 → 3 (Plan 066 / ADR-014): reclasificación — `coverage_policy` del
+          contrato y warnings declarados esperados en el emisor.
+        - 3 → 2 (Plan 068 / ADR-015): `consumo_electrico_comunal` salió de la
+          contabilidad por fuente muerta. Sigue `drifted` en `drift_report.json`.
+        - 2 → 1 (issue #42): una extracción real eliminó la fila con RUT
+          centinela `"0"`, así que `empresas` se quedó sin warnings accionables.
+          Su nota de cobertura RES sigue en `warnings`, declarada esperada.
+
+        Queda `indicadores`, que es un problema real y abierto (issue #43).
         """
         health = json.loads((NORMALIZED_DIR / "hub_health.json").read_text(encoding="utf-8"))
-        self.assertEqual(health["drifted_count"], 2)
-        self.assertEqual(health["warn_count"], 2)
+        self.assertEqual(health["drifted_count"], 1)
+        self.assertEqual(health["warn_count"], 1)
         self.assertEqual(health["retired_count"], 1)
         self.assertEqual(health["dataset_count"], 19)
         self.assertEqual(health["overall_status"], "warn")
         report = json.loads((NORMALIZED_DIR / "drift_report.json").read_text(encoding="utf-8"))
         drifted = sorted(e["dataset"] for e in report["datasets"] if e["drift_status"] == "drifted")
-        self.assertEqual(drifted, ["consumo_electrico_comunal", "empresas", "indicadores"])
+        self.assertEqual(drifted, ["consumo_electrico_comunal", "indicadores"])
         retired = sorted(e["dataset"] for e in health["datasets"] if e["retired"])
         self.assertEqual(retired, ["consumo_electrico_comunal"])
+
+    def test_empresas_keeps_its_expected_warning_after_the_sentinel_fix(self):
+        """El RUT centinela desapareció, pero la nota de cobertura RES no: el
+        registro sigue completo, solo dejó de contar como accionable."""
+        status = json.loads((NORMALIZED_DIR / "dataset_status.json").read_text(encoding="utf-8"))
+        entries = status["datasets"] if isinstance(status, dict) else status
+        empresas = next(e for e in entries if e["dataset"] == "empresas")
+        warnings = empresas.get("warnings", [])
+        self.assertTrue(any("Ley 20.659" in w for w in warnings), warnings)
+        self.assertFalse(any("invalid format" in w for w in warnings), warnings)
 
     # --- Plan 068 / ADR-015: fuentes retiradas ---------------------------
 

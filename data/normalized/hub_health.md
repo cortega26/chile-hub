@@ -1,10 +1,10 @@
 # chile-hub health summary
 
-- `generated_at_utc`: `2026-07-29T15:19:44.372544+00:00`
+- `generated_at_utc`: `2026-07-29T20:19:09.002749+00:00`
 - `overall_status`: `warn`
 - `dataset_count`: `19`
-- `ok_count`: `16`
-- `warn_count`: `2`
+- `ok_count`: `17`
+- `warn_count`: `1`
 - `error_count`: `0`
 - `live_count`: `18`
 - `fallback_count`: `0`
@@ -13,15 +13,15 @@
 - `review_terms_count`: `0`
 - `unknown_reuse_count`: `0`
 - `degraded_count`: `0`
-- `degradation_warning_count`: `2`
+- `degradation_warning_count`: `1`
 - `partial_coverage_count`: `2`
 - `unknown_coverage_count`: `0`
-- `drifted_count`: `2`
-- `warning_count`: `7`
-- `top_issue`: `empresas` (freshness=fresh, drift=drifted, warnings=2)
-- `top_issue_reason`: found 1 RUTs with invalid format
-- `top_issue_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.
-- `top_issue_summary`: empresas: found 1 RUTs with invalid format [source_detail=datos_gob_cl_ckan_api; warnings=2; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]
+- `drifted_count`: `1`
+- `warning_count`: `6`
+- `top_issue`: `empresas` (freshness=fresh, drift=healthy, warnings=1)
+- `top_issue_reason`: RES solo cubre constituciones bajo Ley 20.659 (regimen simplificado). No incluye empresas del regimen tradicional (Diario Oficial) ni empresas anteriores a mayo 2013.
+- `top_issue_action`: Ninguna.
+- `top_issue_summary`: empresas: RES solo cubre constituciones bajo Ley 20.659 (regimen simplificado). No incluye empresas del regimen tradicional (Diario Oficial) ni empresas anteriores a mayo 2013. [source_detail=datos_gob_cl_ckan_api; warnings=1; freshness=fresh; drift=healthy; action=Ninguna.]
 
 | Dataset | Severity | Mode | Freshness | Coverage | Drift | Publishability | Degradation | Validation | Warnings |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | ---: |
@@ -32,7 +32,7 @@
 | `comunas_enriquecidas` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `consumo_electrico_comunal` | `warn` | `fallback` | `fresh` | `not_applicable` | `drifted` | `ready` | `warning` | `ok` | 3 |
 | `distritos_electorales` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
-| `empresas` | `warn` | `live` | `fresh` | `not_applicable` | `drifted` | `ready` | `warning` | `ok` | 2 |
+| `empresas` | `ok` | `live` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 1 |
 | `establecimientos_educacionales` | `ok` | `live` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `establecimientos_salud` | `ok` | `live` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `finanzas_municipales` | `ok` | `monthly` | `fresh` | `partial` | `healthy` | `ready` | `none` | `ok` | 0 |

@@ -245,3 +245,32 @@ están pendientes de review.
       `data/staging/finanzas_municipales.metadata.json` y el snapshot xlsx de
       `data/raw/` no terminan en newline, así que `end-of-file-fixer` falla
       también sin ningún cambio mío. `data/raw/` es solo-append por la regla #3.
+
+## Cierre de los 3 pendientes (2026-07-29, tarde)
+
+- [x] **Issues #42 y #44 cerrados** en GitHub con comentario de diagnóstico y
+      decisión. **#43 queda abierto a propósito**: solo resta la decisión de
+      fuente para el IPC.
+- [x] **#43 — diagnóstico upstream RESUELTO** (había red hacia mindicador.cl,
+      solo respondía lento). No era ninguna de las 3 hipótesis del issue: la
+      serie IPC **del propio agregador** está congelada en 2025-12-01
+      (`/api/ipc/2026` responde 200 con `serie: []`; la raíz `/api` reporta
+      `ipc.fecha = 2025-12-01`). El extractor funciona correctamente. Hallazgo
+      secundario: el endpoint de `ipc` es errático (13.7s a 40s+ de timeout,
+      contra 1.2s de `euro`), y el `timeout=15` de `fetch_with_retry` queda por
+      debajo — parte de los fallos son por timeout, no por serie vacía.
+      Decisión pendiente del mantenedor: cambiar la fuente del IPC al BCCh/INE,
+      retirar la serie, o esperar.
+- [x] **Extracción real de `empresas` ejecutada** (`res_extractor.py`, live,
+      1.590.979 registros): el fix del centinela quedó confirmado end-to-end —
+      0 centinelas en staging y la nota de auditoría registró el descarte de 1
+      fila. `empresas` salió de `drifted`.
+- [x] `drifted_count` **2 → 1**. Guardrails actualizados deliberadamente en
+      `test_pipeline_logic.py` y `verify_066.sh`, documentando la historia
+      completa del contador (8→3 ADR-014, 3→2 ADR-015, 2→1 issue #42). Queda
+      solo `indicadores`, que es un problema real y abierto.
+- [ ] **BLOQUEADO — Plan 064**: el dispatch del workflow "Refresh Candidate
+      Comunal Geometry" fue denegado por el clasificador de permisos del
+      harness. Requiere que el mantenedor lo dispare (`gh workflow run` o la UI
+      de Actions) y luego la lectura de verificación desde Pages.
+

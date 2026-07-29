@@ -7,21 +7,23 @@ echo "-- build + verify (la taxonomia debe pasar los gates) --"
 make build >/dev/null
 make verify >/dev/null
 
-echo "-- drifted_count 8 -> 2, warn_count 7 -> 2, overall sigue warn --"
-# Nota: el Plan 066 dejo esto en 3/3. Bajo a 2/2 con el Plan 068 (ADR-015),
-# que excluyo consumo_electrico_comunal de la contabilidad por fuente muerta
-# — mecanismo distinto al de los warnings esperados de ADR-014.
+echo "-- drifted_count 8 -> 1, warn_count 7 -> 1, overall sigue warn --"
+# Historia del contador, cada baja por un mecanismo distinto:
+#   8 -> 3  Plan 066 / ADR-014 (reclasificacion: coverage_policy + esperados)
+#   3 -> 2  Plan 068 / ADR-015 (consumo_electrico_comunal: fuente muerta)
+#   2 -> 1  issue #42 (extraccion real elimino la fila con RUT centinela)
+# Queda indicadores, problema real y abierto (issue #43).
 .venv/bin/python -c "
 import json
 health = json.load(open('data/normalized/hub_health.json'))
-assert health['drifted_count'] == 2, health['drifted_count']
-assert health['warn_count'] == 2, health['warn_count']
+assert health['drifted_count'] == 1, health['drifted_count']
+assert health['warn_count'] == 1, health['warn_count']
 assert health['retired_count'] == 1, health['retired_count']
 assert health['dataset_count'] == 19, health['dataset_count']
 assert health['overall_status'] == 'warn', health['overall_status']
 report = json.load(open('data/normalized/drift_report.json'))
 drifted = sorted(e['dataset'] for e in report['datasets'] if e['drift_status'] == 'drifted')
-assert drifted == ['consumo_electrico_comunal', 'empresas', 'indicadores'], drifted
+assert drifted == ['consumo_electrico_comunal', 'indicadores'], drifted
 retired = sorted(e['dataset'] for e in health['datasets'] if e['retired'])
 assert retired == ['consumo_electrico_comunal'], retired
 print('drifted:', drifted, '| retired:', retired)
