@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "chile-hub"
-version = "1.21.1"
+version = "1.22.0"
 description = "Datos públicos de Chile curados, normalizados y validados: geografía, demografía, economía, salud, educación, finanzas municipales, indicadores urbanos y distritos electorales. Listos para consumir en una línea de código con Polars, DuckDB, SQLite y Excel."
 readme = "README.md"
 requires-python = ">=3.10,<3.15"

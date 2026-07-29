@@ -1,10 +1,10 @@
 {
   "publish_input": false,
-  "require_live": true,
+  "require_live": false,
   "source_ref": "refs/heads/main",
-  "source_run_event": "schedule",
-  "source_run_id": "30260413514",
-  "source_sha": "c68072e4fe6156d9ec57f0f7e52fc6bd876f9b87",
-  "verification_profile": "publication",
+  "source_run_event": "push",
+  "source_run_id": "30492608629",
+  "source_sha": "d0f9ca37aced2d341f315167506d3ced4d8c5276",
+  "verification_profile": "readiness",
   "workflow": "Pipeline Check"
 }
