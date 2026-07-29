@@ -7,7 +7,9 @@ metadatos antes de generar reportes.
 
 import json
 import os
-from datetime import datetime
+from datetime import date, datetime
+
+import polars as pl
 
 from src.builders._shared import (
     DATASET_CATALOG_CONFIG,
@@ -102,6 +104,36 @@ def build_freshness_warnings(dataset_name, freshness):
     if status == "unknown":
         return [f"{dataset_name} freshness is unknown: missing or invalid refreshed_at_utc"]
     return []
+
+
+def build_indicator_ages(df, today=None):
+    """Fecha máxima y antigüedad en días de cada serie de `indicadores`.
+
+    Se calcula en el **build**, sobre el DataFrame real, no en el extractor:
+    así la señal está siempre fresca aunque el extractor no haya vuelto a correr,
+    que es justamente el escenario donde una serie muerta se esconde (ADR-016).
+
+    La edad se mide sobre el dato entregado, no sobre `refreshed_at_utc` — ese
+    solo dice cuándo corrió el extractor, no cuán viejo es lo que trae. Las edades
+    negativas son normales y esperadas: la UF y la UTM se publican por adelantado.
+    """
+    today = today or datetime.now(UTC).date()
+    max_dates = {}
+    ages = {}
+    if df is None or df.height == 0:
+        return max_dates, ages
+    grouped = df.group_by("codigo_indicador").agg(pl.col("fecha").max().alias("max_fecha"))
+    for row in grouped.iter_rows(named=True):
+        fecha = row["max_fecha"]
+        if fecha is None:
+            continue
+        if isinstance(fecha, str):
+            fecha = date.fromisoformat(fecha)
+        if isinstance(fecha, datetime):
+            fecha = fecha.date()
+        max_dates[row["codigo_indicador"]] = fecha.isoformat()
+        ages[row["codigo_indicador"]] = (today - fecha).days
+    return max_dates, ages
 
 
 def build_indicator_delivery(metadata):
@@ -369,6 +401,7 @@ def build_dataset_metadata(dfs, meta):
     """Construye el diccionario de metadatos enriquecidos por dataset."""
     df_comunas = dfs["comunas"]
     df_indicadores = dfs["indicadores"]
+    _indicador_max_dates, _indicador_ages = build_indicator_ages(df_indicadores)
     df_censo = dfs["censo"]
     df_salud = dfs["salud"]
     df_censo_hogares = dfs["censo_hogares"]
@@ -453,6 +486,8 @@ def build_dataset_metadata(dfs, meta):
             "record_count": df_indicadores.height,
             "fields": df_indicadores.columns,
             "indicator_codes": sorted(df_indicadores["codigo_indicador"].unique().to_list()),
+            "indicator_max_date": _indicador_max_dates,
+            "indicator_age_days": _indicador_ages,
             "indicator_delivery": build_indicator_delivery(
                 {
                     **indicadores_metadata,

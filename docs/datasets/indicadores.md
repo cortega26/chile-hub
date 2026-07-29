@@ -117,3 +117,19 @@ Esta capa puede seguir en MVP, pero todavía conviene mejorar en:
 1. una estrategia más robusta para series que la API devuelve vacías aunque el resto del refresh siga sano
 2. una política explícita para distinguir backfill desde raw local versus backfill desde artifact publicado
 3. una estrategia histórica más clara para IPC y UTM frente a snapshots parciales del agregador
+
+## Vigencia de las series (ADR-016)
+
+`pipeline_metadata.json` expone `indicator_max_date` e `indicator_age_days` por
+serie: la antigüedad se mide sobre el **dato entregado**, no sobre cuándo corrió
+el extractor. Las edades negativas son normales — la UF y la UTM se publican por
+adelantado.
+
+Si una serie se entrega vía `published_backfill` (reuso del último artefacto
+publicado ante un hueco de la fuente) y su último dato supera el umbral de su
+cadencia — 70 días para mensuales (UTM, IPC), 10 para diarias (UF, dólar, euro)
+—, el gate de publicación **rechaza el build** hasta que alguien confirme el
+estado contra la fuente y use `--allow-stale-backfills`.
+
+**Estado conocido**: la serie `ipc` no recibe datos nuevos desde 2025-12-01. El
+diagnóstico upstream está abierto en el issue #43.
