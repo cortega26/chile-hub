@@ -29,6 +29,8 @@ chile-hub cache clear
 
 Configura `CHILE_HUB_CACHE_DIR` para sobrescribir la ubicación de la caché.
 
+Con la caché `latest`, chile-hub consulta GitHub Releases como máximo una vez por semana para avisar si existe una versión más reciente de los datos. No envía información de uso y los problemas de red no interrumpen la carga. Configura `CHILE_HUB_NO_UPDATE_CHECK=1` para desactivarlo o `CHILE_HUB_LANG=es|en` para elegir el idioma del aviso.
+
 ## Artefactos locales y sin conexión
 
 Para uso sin conexión, puebla la caché antes de desconectarte:

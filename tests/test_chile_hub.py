@@ -1,4 +1,5 @@
 import hashlib
+import io
 import json
 import os
 import shutil
@@ -6,11 +7,13 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import warnings
 import zipfile
+from contextlib import redirect_stdout
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import ClassVar
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import polars as pl
 
@@ -30,7 +33,8 @@ from chile_hub import (
     ChileHubExampleError,
     ChileHubOutputError,
 )
-from chile_hub.data_manager import ChileHubDataManager, ReleaseAsset
+from chile_hub.core import _main
+from chile_hub.data_manager import ChileHubDataManager, ChileHubUpdateWarning, ReleaseAsset
 from src.validation import validate_indicadores
 
 # ── Staleness guard ───────────────────────────────────────────────────────────
@@ -2074,6 +2078,95 @@ class ChileHubDataManagerUnitTests(unittest.TestCase):
         """_read_json() con archivo inexistente retorna {}."""
         result = ChileHubDataManager._read_json(Path("/tmp/no_existe_xyz_123.json"))
         self.assertEqual(result, {})
+
+    def test_ready_latest_cache_notifies_once_when_new_release_is_available(self):
+        """La caché latest consulta una vez por semana y avisa en español por defecto."""
+        response = Mock()
+        response.status_code = 200
+        response.json.return_value = {"tag_name": "v9.9.9"}
+        session = Mock()
+        session.get.return_value = response
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            manager = ChileHubDataManager(cache_dir=tmpdir, session=session)
+            manager.normalized_dir.mkdir(parents=True)
+            (manager.normalized_dir / "dataset_catalog.json").write_text("{}", encoding="utf-8")
+            manager.marker_path.write_text(
+                json.dumps({"release": {"tag_name": "v1.0.0"}}), encoding="utf-8"
+            )
+
+            with (
+                patch.dict(os.environ, {"CHILE_HUB_LANG": "es"}, clear=False),
+                warnings.catch_warnings(record=True) as caught,
+            ):
+                warnings.simplefilter("always", ChileHubUpdateWarning)
+                self.assertEqual(manager.ensure_data_dir(), manager.normalized_dir)
+
+            self.assertEqual(len(caught), 1)
+            message = str(caught[0].message)
+            self.assertIn("Hay una nueva versión", message)
+            self.assertIn("apoyar económicamente", message)
+            self.assertIn("https://github.com/sponsors/cortega26", message)
+            self.assertIn("https://www.buymeacoffee.com/cortega26", message)
+            self.assertEqual(session.get.call_args.kwargs["timeout"], 3)
+            self.assertEqual(
+                json.loads(manager.update_check_path.read_text(encoding="utf-8"))["latest_tag"],
+                "v9.9.9",
+            )
+
+    def test_ready_cache_skips_update_check_before_week_has_elapsed(self):
+        """El estado local evita una consulta de red en cada inicialización."""
+        session = Mock()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            manager = ChileHubDataManager(cache_dir=tmpdir, session=session)
+            manager.normalized_dir.mkdir(parents=True)
+            (manager.normalized_dir / "dataset_catalog.json").write_text("{}", encoding="utf-8")
+            manager.marker_path.write_text("{}", encoding="utf-8")
+            manager.update_check_path.write_text(
+                json.dumps({"checked_at_utc": datetime.now(UTC).isoformat()}), encoding="utf-8"
+            )
+
+            self.assertEqual(manager.ensure_data_dir(), manager.normalized_dir)
+
+        session.get.assert_not_called()
+
+    def test_update_check_opt_out_prevents_network_request(self):
+        """CHILE_HUB_NO_UPDATE_CHECK desactiva por completo la comprobación opcional."""
+        session = Mock()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            manager = ChileHubDataManager(cache_dir=tmpdir, session=session)
+            manager.normalized_dir.mkdir(parents=True)
+            (manager.normalized_dir / "dataset_catalog.json").write_text("{}", encoding="utf-8")
+            manager.marker_path.write_text("{}", encoding="utf-8")
+
+            with patch.dict(os.environ, {"CHILE_HUB_NO_UPDATE_CHECK": "1"}, clear=False):
+                self.assertEqual(manager.ensure_data_dir(), manager.normalized_dir)
+
+        session.get.assert_not_called()
+
+    def test_update_notice_uses_english_for_english_locale(self):
+        """La variable de idioma explícita traduce el mensaje para usuarios en inglés."""
+        with patch.dict(os.environ, {"CHILE_HUB_LANG": "en_US"}, clear=False):
+            message = ChileHubDataManager._format_update_notice(
+                current_tag="v1.0.0", latest_tag="v9.9.9"
+            )
+
+        self.assertIn("A new chile-hub data release is available", message)
+        self.assertIn("supporting its development", message)
+
+    def test_cache_update_cli_forces_bundle_download(self):
+        """cache update debe descargar aun cuando ya exista una caché verificada."""
+        with patch("chile_hub.core.ChileHubDataManager") as manager_class:
+            manager_class.return_value.update.return_value = Path("/tmp/chile-hub-data")
+            output = io.StringIO()
+            with redirect_stdout(output):
+                _main(["cache", "update"])
+
+        manager_class.return_value.update.assert_called_once_with()
+        manager_class.return_value.ensure_data_dir.assert_not_called()
+        self.assertIn("/tmp/chile-hub-data", output.getvalue())
 
     def test_cache_clear_when_not_exists_returns_early(self):
         """clear() cuando el caché no existe retorna sin error."""

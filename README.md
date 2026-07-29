@@ -66,6 +66,8 @@ chile-hub cache status     # Ubicación y estado del cache local
 chile-hub cache clear      # Liberar espacio
 ```
 
+Cuando se usa la caché `latest`, el paquete consulta GitHub Releases como máximo una vez por semana para avisar si hay datos nuevos. La comprobación no envía información de uso ni afecta la carga de datos si no hay red. Para desactivarla, configura `CHILE_HUB_NO_UPDATE_CHECK=1`; `CHILE_HUB_LANG=es|en` permite elegir el idioma del aviso.
+
 > **Variante para desarrolladores del pipeline:** `pip install chile-hub[pipeline]` agrega DuckDB, Pandas, XlsxWriter y curl_cffi para ejecutar el pipeline completo de extracción y build. La instalación mínima solo incluye Polars, PyArrow, requests y platformdirs — suficiente para consumir datos.
 
 > [!NOTE]
@@ -204,7 +206,7 @@ chile-hub health       # severidad, frescura, drift y cobertura
 ### Respaldo adicional
 
 <!-- START_TEST_COUNT -->
-- **805 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
+- **810 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
 <!-- END_TEST_COUNT -->
 <!-- START_ADR_COUNT -->
 - **16 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
