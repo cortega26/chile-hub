@@ -1,23 +1,23 @@
 # chile-hub health summary
 
-- `generated_at_utc`: `2026-07-29T14:32:53.985613+00:00`
+- `generated_at_utc`: `2026-07-29T14:45:10.682740+00:00`
 - `overall_status`: `warn`
 - `dataset_count`: `19`
 - `ok_count`: `16`
-- `warn_count`: `3`
+- `warn_count`: `2`
 - `error_count`: `0`
 - `live_count`: `18`
-- `fallback_count`: `1`
+- `fallback_count`: `0`
 - `stale_count`: `1`
-- `publishable_count`: `19`
+- `publishable_count`: `18`
 - `review_terms_count`: `0`
 - `unknown_reuse_count`: `0`
 - `degraded_count`: `0`
-- `degradation_warning_count`: `3`
+- `degradation_warning_count`: `2`
 - `partial_coverage_count`: `2`
 - `unknown_coverage_count`: `0`
-- `drifted_count`: `3`
-- `warning_count`: `10`
+- `drifted_count`: `2`
+- `warning_count`: `7`
 - `top_issue`: `empresas` (freshness=fresh, drift=drifted, warnings=2)
 - `top_issue_reason`: found 1 RUTs with invalid format
 - `top_issue_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.

@@ -1,23 +1,24 @@
 {
-  "generated_at_utc": "2026-07-29T14:32:53.985613+00:00",
+  "generated_at_utc": "2026-07-29T14:45:10.682740+00:00",
   "overall_status": "warn",
   "dataset_count": 19,
+  "retired_count": 1,
   "ok_count": 16,
-  "warn_count": 3,
+  "warn_count": 2,
   "error_count": 0,
   "live_count": 18,
-  "fallback_count": 1,
+  "fallback_count": 0,
   "stale_count": 1,
   "unknown_freshness_count": 0,
-  "publishable_count": 19,
+  "publishable_count": 18,
   "review_terms_count": 0,
   "unknown_reuse_count": 0,
   "degraded_count": 0,
-  "degradation_warning_count": 3,
+  "degradation_warning_count": 2,
   "partial_coverage_count": 2,
   "unknown_coverage_count": 0,
-  "drifted_count": 3,
-  "warning_count": 10,
+  "drifted_count": 2,
+  "warning_count": 7,
   "top_issue": {
     "dataset": "empresas",
     "attention_priority": 0,
@@ -49,7 +50,8 @@
       "drift_status": "healthy",
       "source_detail": "WSDiputado.asmx/retornarDiputadosPeriodoActual + camara.cl + senado.cl (Scrapling)",
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
-      "recommended_action": "Ninguna."
+      "recommended_action": "Ninguna.",
+      "retired": false
     },
     {
       "dataset": "censo_comunal",
@@ -69,7 +71,8 @@
       "drift_status": "healthy",
       "source_detail": "official_xlsx",
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
-      "recommended_action": "Ninguna."
+      "recommended_action": "Ninguna.",
+      "retired": false
     },
     {
       "dataset": "censo_hogares_viviendas",
@@ -89,7 +92,8 @@
       "drift_status": "healthy",
       "source_detail": "official_xlsx",
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
-      "recommended_action": "Ninguna."
+      "recommended_action": "Ninguna.",
+      "retired": false
     },
     {
       "dataset": "comunas",
@@ -109,7 +113,8 @@
       "drift_status": "healthy",
       "source_detail": "bcn_arcgis",
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
-      "recommended_action": "Ninguna."
+      "recommended_action": "Ninguna.",
+      "retired": false
     },
     {
       "dataset": "comunas_enriquecidas",
@@ -129,7 +134,8 @@
       "drift_status": "healthy",
       "source_detail": "bcn_arcgis",
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
-      "recommended_action": "Ninguna."
+      "recommended_action": "Ninguna.",
+      "retired": false
     },
     {
       "dataset": "consumo_electrico_comunal",
@@ -149,7 +155,8 @@
       "drift_status": "drifted",
       "source_detail": "Consumo eléctrico anual por comuna y tipo de cliente",
       "diagnostic_summary": "tipos de cliente: ['Comercial', 'Residencial']",
-      "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
+      "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción.",
+      "retired": true
     },
     {
       "dataset": "distritos_electorales",
@@ -169,7 +176,8 @@
       "drift_status": "healthy",
       "source_detail": "bcn_electoral_mapping_generated",
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
-      "recommended_action": "Ninguna."
+      "recommended_action": "Ninguna.",
+      "retired": false
     },
     {
       "dataset": "empresas",
@@ -189,7 +197,8 @@
       "drift_status": "drifted",
       "source_detail": "datos_gob_cl_ckan_api",
       "diagnostic_summary": "found 1 RUTs with invalid format",
-      "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
+      "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción.",
+      "retired": false
     },
     {
       "dataset": "establecimientos_educacionales",
@@ -209,7 +218,8 @@
       "drift_status": "healthy",
       "source_detail": "mineduc_datos_abiertos_rar",
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
-      "recommended_action": "Ninguna."
+      "recommended_action": "Ninguna.",
+      "retired": false
     },
     {
       "dataset": "establecimientos_salud",
@@ -229,7 +239,8 @@
       "drift_status": "healthy",
       "source_detail": "datos_gob_csv",
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
-      "recommended_action": "Ninguna."
+      "recommended_action": "Ninguna.",
+      "retired": false
     },
     {
       "dataset": "finanzas_municipales",
@@ -249,7 +260,8 @@
       "drift_status": "healthy",
       "source_detail": "curated_fallback_pending_direct_export",
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
-      "recommended_action": "Ninguna."
+      "recommended_action": "Ninguna.",
+      "retired": false
     },
     {
       "dataset": "indicadores",
@@ -269,7 +281,8 @@
       "drift_status": "drifted",
       "source_detail": "public_api_with_published_backfill",
       "diagnostic_summary": "indicadores live refresh reused last published artifact for missing codes: ipc",
-      "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
+      "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción.",
+      "retired": false
     },
     {
       "dataset": "indicadores_urbanos_siedu",
@@ -289,7 +302,8 @@
       "drift_status": "healthy",
       "source_detail": "ine_siedu_xlsm_cinco_mediciones_2018_2022",
       "diagnostic_summary": "indicadores_urbanos_siedu has intentionally partial urban coverage",
-      "recommended_action": "Ninguna."
+      "recommended_action": "Ninguna.",
+      "retired": false
     },
     {
       "dataset": "partidos_politicos",
@@ -309,7 +323,8 @@
       "drift_status": "healthy",
       "source_detail": "WSComun.asmx/retornarPartidosPoliticos + servel.cl/partidos-politicos (estado legal)",
       "diagnostic_summary": "estado_legal poblado (vía SERVEL) en 15/36 partidos",
-      "recommended_action": "Ninguna."
+      "recommended_action": "Ninguna.",
+      "retired": false
     },
     {
       "dataset": "perfil_territorial_comunal",
@@ -329,7 +344,8 @@
       "drift_status": "healthy",
       "source_detail": "derived_from_validated_chile_hub_layers",
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
-      "recommended_action": "Ninguna."
+      "recommended_action": "Ninguna.",
+      "retired": false
     },
     {
       "dataset": "pobreza_comunal",
@@ -349,7 +365,8 @@
       "drift_status": "healthy",
       "source_detail": "Estimaciones de Pobreza Comunal vía SAE desde encuesta CASEN",
       "diagnostic_summary": "cobertura SAE: 345/346 comunas (99.7%) — parcial por diseño; comunas sin muestra no tienen estimación",
-      "recommended_action": "Ninguna."
+      "recommended_action": "Ninguna.",
+      "retired": false
     },
     {
       "dataset": "provincias",
@@ -369,7 +386,8 @@
       "drift_status": "healthy",
       "source_detail": "bcn_arcgis",
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
-      "recommended_action": "Ninguna."
+      "recommended_action": "Ninguna.",
+      "retired": false
     },
     {
       "dataset": "regiones",
@@ -389,7 +407,8 @@
       "drift_status": "healthy",
       "source_detail": "bcn_arcgis",
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
-      "recommended_action": "Ninguna."
+      "recommended_action": "Ninguna.",
+      "retired": false
     },
     {
       "dataset": "resultados_educacionales",
@@ -409,7 +428,8 @@
       "drift_status": "healthy",
       "source_detail": "mineduc_rendimiento_2024_rar_agregado_por_comuna",
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
-      "recommended_action": "Ninguna."
+      "recommended_action": "Ninguna.",
+      "retired": false
     }
   ]
 }

@@ -1142,6 +1142,9 @@ class ChileHub:
             "build_overall_status": health.get("overall_status"),
             "current_overall_status": runtime_status.get("current_overall_status"),
             "dataset_count": health.get("dataset_count"),
+            # Los contadores describen el conjunto activo; sin retired_count el
+            # resumen no cuadraria con dataset_count (ADR-015).
+            "retired_count": health.get("retired_count"),
             "live_count": health.get("live_count"),
             "fallback_count": health.get("fallback_count"),
             "stale_count": health.get("stale_count"),

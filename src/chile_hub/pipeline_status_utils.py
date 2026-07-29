@@ -77,6 +77,26 @@ def _load_source_registry_datasets() -> tuple:
     return all_names, public_names
 
 
+def _load_retired_datasets():
+    """Nombres de datasets cuya fuente está declarada muerta en el registry.
+
+    `maturity_status: "deprecated"` en `data/source_registry.json` significa que
+    la fuente upstream desapareció sin reemplazo y que el `next_action` ya
+    documenta la investigación. Esos datasets siguen en el pipeline y en la API
+    pública, pero dejan de participar en la señal de salud: un drift que nadie
+    puede resolver no es señal, es ruido (ver ADR-015).
+
+    Tolerante igual que `_load_source_registry_datasets()`: si el registry no
+    existe (tests sintéticos), no retira nada.
+    """
+    try:
+        with open(SOURCE_REGISTRY_PATH, "r", encoding="utf-8") as f:
+            registry = json.load(f)
+    except FileNotFoundError:
+        return set()
+    return {entry["dataset"] for entry in registry if entry.get("maturity_status") == "deprecated"}
+
+
 REDISTRIBUTION_REPORT_MARKDOWN_PATH = NORMALIZED_DIR / "redistribution_report.md"
 PROVENANCE_REPORT_MARKDOWN_PATH = NORMALIZED_DIR / "provenance_report.md"
 DRIFT_REPORT_MARKDOWN_PATH = NORMALIZED_DIR / "drift_report.md"
@@ -214,6 +234,7 @@ def compute_top_issue(entries, freshness_field="freshness_status"):
 def build_hub_health(metadata):
     datasets = metadata.get("datasets", {})
     validations = metadata.get("validations", {})
+    retired_datasets = _load_retired_datasets()
     entries = []
 
     for dataset_name in sorted(datasets.keys()):
@@ -281,12 +302,21 @@ def build_hub_health(metadata):
                 "recommended_action": dataset.get("drift", {}).get("recommended_action")
                 or dataset.get("degradation", {}).get("recommended_action")
                 or "Ninguna.",
+                # Siempre presente, para que sea inspeccionable (mismo criterio
+                # que coverage.expected en ADR-014).
+                "retired": dataset_name in retired_datasets,
             }
         )
 
-    error_count = sum(1 for entry in entries if entry["severity"] == "error")
-    warn_count = sum(1 for entry in entries if entry["severity"] == "warn")
-    ok_count = sum(1 for entry in entries if entry["severity"] == "ok")
+    # Los datasets retirados siguen listados y visibles, pero no participan en
+    # los contadores ni en overall_status: su fuente está muerta y su drift no
+    # es accionable (ADR-015). `dataset_count` NO cambia — el dataset sigue en
+    # el pipeline y en los artefactos.
+    active = [entry for entry in entries if not entry["retired"]]
+    retired_count = len(entries) - len(active)
+    error_count = sum(1 for entry in active if entry["severity"] == "error")
+    warn_count = sum(1 for entry in active if entry["severity"] == "warn")
+    ok_count = sum(1 for entry in active if entry["severity"] == "ok")
     overall_status = "error" if error_count else "warn" if warn_count else "ok"
 
     # top_issue alimenta el enlace "Ver top issue" de la landing page, que
@@ -310,38 +340,41 @@ def build_hub_health(metadata):
         "generated_at_utc": metadata.get("generated_at_utc"),
         "overall_status": overall_status,
         "dataset_count": len(entries),
+        # Regla única: todos los contadores describen el conjunto ACTIVO.
+        # Solo `dataset_count` y `retired_count` describen el inventario (ADR-015).
+        "retired_count": retired_count,
         "ok_count": ok_count,
         "warn_count": warn_count,
         "error_count": error_count,
         # "monthly" cuenta como live_count: dato genuino de la fuente,
         # solo con cadencia menor (ver Fase 3.4, source_registry.json).
-        "live_count": sum(1 for entry in entries if entry["source_mode"] in {"live", "monthly"}),
-        "fallback_count": sum(1 for entry in entries if entry["source_mode"] == "fallback"),
-        "stale_count": sum(1 for entry in entries if entry["freshness_status"] == "stale"),
+        "live_count": sum(1 for entry in active if entry["source_mode"] in {"live", "monthly"}),
+        "fallback_count": sum(1 for entry in active if entry["source_mode"] == "fallback"),
+        "stale_count": sum(1 for entry in active if entry["freshness_status"] == "stale"),
         "unknown_freshness_count": sum(
-            1 for entry in entries if entry["freshness_status"] == "unknown"
+            1 for entry in active if entry["freshness_status"] == "unknown"
         ),
         "publishable_count": sum(
-            1 for entry in entries if entry["publishability_status"] == "ready"
+            1 for entry in active if entry["publishability_status"] == "ready"
         ),
         "review_terms_count": sum(
-            1 for entry in entries if entry["publishability_status"] == "review_terms"
+            1 for entry in active if entry["publishability_status"] == "review_terms"
         ),
         "unknown_reuse_count": sum(
-            1 for entry in entries if entry["publishability_status"] == "unknown"
+            1 for entry in active if entry["publishability_status"] == "unknown"
         ),
-        "degraded_count": sum(1 for entry in entries if entry["degradation_status"] == "degraded"),
+        "degraded_count": sum(1 for entry in active if entry["degradation_status"] == "degraded"),
         "degradation_warning_count": sum(
-            1 for entry in entries if entry["degradation_status"] == "warning"
+            1 for entry in active if entry["degradation_status"] == "warning"
         ),
         "partial_coverage_count": sum(
-            1 for entry in entries if entry["coverage_status"] == "partial"
+            1 for entry in active if entry["coverage_status"] == "partial"
         ),
         "unknown_coverage_count": sum(
-            1 for entry in entries if entry["coverage_status"] == "unknown"
+            1 for entry in active if entry["coverage_status"] == "unknown"
         ),
-        "drifted_count": sum(1 for entry in entries if entry["drift_status"] == "drifted"),
-        "warning_count": sum(entry["warning_count"] for entry in entries),
+        "drifted_count": sum(1 for entry in active if entry["drift_status"] == "drifted"),
+        "warning_count": sum(entry["warning_count"] for entry in active),
         "top_issue": top_issue,
         "top_issue_summary": format_top_issue_summary(top_issue),
         "datasets": entries,

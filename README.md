@@ -189,7 +189,7 @@ confiabilidad, auditables y verificables en cada build:
 | **Auditoría legal explícita** | <!-- START_REDISTRIBUTION_SUMMARY -->Licencia, atribución requerida y permiso de redistribución verificados dataset por dataset. **19 de 19 capas** pasan la auditoría (`ready`).<!-- END_REDISTRIBUTION_SUMMARY --> | [`redistribution_report.md`](data/normalized/redistribution_report.md) + [`AGENTS.md §6`](AGENTS.md) |
 | **Pipeline fail-loud** | Si una validación falla, el pipeline **aborta** — no publica datos corruptos, no emite advertencias silenciosas. | [`ADR-001`](docs/adr/ADR-001-pipeline-lineal-determinista.md) — fail-loud como decisión de arquitectura |
 | **Contratos de esquema** | <!-- START_CONTRACT_COUNT -->22 contratos JSON Schema ([`contracts/datasets/`](contracts/datasets/)) definen columnas esperadas, tipos, claves primarias y cobertura. Se validan **en cada build** automáticamente.<!-- END_CONTRACT_COUNT --> | [`ADR-005`](docs/adr/ADR-005-contratos-esquema-json-schema.md) + `contracts/datasets/*.json` |
-| **Salud transparente** | <!-- START_HEALTH_SUMMARY -->Dashboard público con severidad, frescura, cobertura, drift y degradación por dataset. 16 capas `ok`, 3 `warn`, 0 `error`.<!-- END_HEALTH_SUMMARY --> | [`hub_health.md`](data/normalized/hub_health.md) — estado completo actualizado en cada build |
+| **Salud transparente** | <!-- START_HEALTH_SUMMARY -->Dashboard público con severidad, frescura, cobertura, drift y degradación por dataset. 16 capas `ok`, 2 `warn`, 0 `error`.<!-- END_HEALTH_SUMMARY --> | [`hub_health.md`](data/normalized/hub_health.md) — estado completo actualizado en cada build |
 | **Calidad medida** | <!-- START_QUALITY_SUMMARY -->Puntuación compuesta A-F por dataset: **promedio 93.8/100** (17 A, 2 B). Dimensiones: validación, contrato, madurez de fuente, frescura, cobertura, política de reúso.<!-- END_QUALITY_SUMMARY --> | [`dataset_quality.md`](data/normalized/dataset_quality.md) — scorecard completo |
 
 Cada pilar se audita automáticamente en cada ejecución del pipeline. Los reportes se
@@ -204,10 +204,10 @@ chile-hub health       # severidad, frescura, drift y cobertura
 ### Respaldo adicional
 
 <!-- START_TEST_COUNT -->
-- **786 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
+- **789 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
 <!-- END_TEST_COUNT -->
 <!-- START_ADR_COUNT -->
-- **14 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
+- **15 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
 <!-- END_ADR_COUNT -->
 - **Drift monitoreado:** todos los datasets bajo vigilancia de deriva de esquema; cualquier
   cambio en la fuente se detecta y registra ([`drift_report.md`](data/normalized/drift_report.md)).

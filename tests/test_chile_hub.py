@@ -618,39 +618,47 @@ class ChileHubTests(unittest.TestCase):
         self.assertIn("Example 'sql' no existe", str(example_error.exception))
 
     def test_health_summary(self):
+        """Invariantes de suma de hub_health.
+
+        Desde ADR-015 los contadores describen el conjunto **activo**: el
+        inventario es `dataset_count`, y los datasets retirados (fuente muerta,
+        marcados `retired: true`) quedan fuera de cada suma. La diferencia entre
+        ambos es exactamente `retired_count`.
+        """
         health = self.health
         self.assertIn(health["overall_status"], {"ok", "warn", "error"})
         self.assertEqual(health["dataset_count"], EXPECTED_DATASET_COUNT)
+
+        active = [entry for entry in health["datasets"] if not entry["retired"]]
+        active_count = EXPECTED_DATASET_COUNT - health["retired_count"]
+        self.assertEqual(len(active), active_count)
+
         self.assertEqual(
             health["ok_count"] + health["warn_count"] + health["error_count"],
-            EXPECTED_DATASET_COUNT,
+            active_count,
         )
         self.assertEqual(
             health["publishable_count"]
             + health["review_terms_count"]
             + health["unknown_reuse_count"],
-            EXPECTED_DATASET_COUNT,
+            active_count,
         )
         self.assertEqual(
             health["degraded_count"]
             + health["degradation_warning_count"]
-            + sum(1 for entry in health["datasets"] if entry["degradation_status"] == "none"),
-            EXPECTED_DATASET_COUNT,
+            + sum(1 for entry in active if entry["degradation_status"] == "none"),
+            active_count,
         )
         self.assertEqual(
             health["partial_coverage_count"]
             + health["unknown_coverage_count"]
-            + sum(
-                1
-                for entry in health["datasets"]
-                if entry["coverage_status"] in {"full", "not_applicable"}
-            ),
-            EXPECTED_DATASET_COUNT,
+            + sum(1 for entry in active if entry["coverage_status"] in {"full", "not_applicable"}),
+            active_count,
         )
         self.assertEqual(
             health["drifted_count"]
-            + sum(1 for entry in health["datasets"] if entry["drift_status"] == "healthy"),
-            EXPECTED_DATASET_COUNT,
+            + sum(1 for entry in active if entry["drift_status"] == "healthy"),
+            active_count,
         )
 
     def test_health_table(self):
