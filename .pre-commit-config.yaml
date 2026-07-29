@@ -2,8 +2,13 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:
+      # data/raw/ son snapshots de auditoria solo-append (AGENTS.md, regla #3):
+      # ningun hook debe reescribirlos. Ademas son binarios (xlsx/rar), donde
+      # "trailing whitespace" no significa nada.
       - id: trailing-whitespace
+        exclude: ^data/raw/
       - id: end-of-file-fixer
+        exclude: ^data/raw/
       - id: check-yaml
       - id: check-merge-conflict
       - id: detect-private-key

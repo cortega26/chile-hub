@@ -24,6 +24,9 @@ def write_staging_metadata(path: str, metadata: dict[str, Any]) -> None:
     tmp_path = path + ".tmp"
     with open(tmp_path, "w", encoding="utf-8") as f:
         json.dump(metadata, f, ensure_ascii=False, indent=2)
+        # Newline final: sin él, el hook end-of-file-fixer reescribe el archivo
+        # en cada corrida de pre-commit y el arbol nunca queda limpio.
+        f.write("\n")
     os.replace(tmp_path, path)
 
 
