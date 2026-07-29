@@ -1,6 +1,6 @@
 # chile-hub drift report
 
-- `generated_at_utc`: `2026-07-28T16:08:31.972912+00:00`
+- `generated_at_utc`: `2026-07-29T14:32:53.985613+00:00`
 - `dataset_count`: `19`
 - `drifted_count`: `3`
 - `healthy_count`: `16`
@@ -24,7 +24,7 @@
 | `resultados_educacionales` | `healthy` | `live` | `not_applicable` | `none` | 0 | Ninguna. |
 | `indicadores_urbanos_siedu` | `healthy` | `live` | `partial` | `none` | 1 | Ninguna. |
 | `perfil_territorial_comunal` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
-| `empresas` | `drifted` | `live` | `not_applicable` | `warning` | 3 | Revisar warnings operativos del dataset antes de consumirlo en producción. |
+| `empresas` | `drifted` | `live` | `not_applicable` | `warning` | 2 | Revisar warnings operativos del dataset antes de consumirlo en producción. |
 | `pobreza_comunal` | `healthy` | `live` | `not_applicable` | `none` | 1 | Ninguna. |
 | `consumo_electrico_comunal` | `drifted` | `fallback` | `not_applicable` | `warning` | 3 | Revisar warnings operativos del dataset antes de consumirlo en producción. |
 | `partidos_politicos` | `healthy` | `live` | `full` | `none` | 1 | Ninguna. |
@@ -75,7 +75,7 @@
 - `drift_status`: `drifted`
 - `source_mode`: `live`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
-- `degradation`: indicadores live refresh reused last published artifact for missing codes: ipc; indicadores freshness is stale: 206.5h since refresh, policy max is 72h
+- `degradation`: indicadores live refresh reused last published artifact for missing codes: ipc; indicadores freshness is stale: 228.91h since refresh, policy max is 72h
 - `warning_count`: `2`
 - `diagnostic_summary`: indicadores live refresh reused last published artifact for missing codes: ipc
 - `recommended_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.
@@ -175,8 +175,8 @@
 - `drift_status`: `drifted`
 - `source_mode`: `live`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
-- `degradation`: found 1 RUTs with invalid format; unknown sociedad codes (new types?): ['SpA']; RES solo cubre constituciones bajo Ley 20.659 (regimen simplificado). No incluye empresas del regimen tradicional (Diario Oficial) ni empresas anteriores a mayo 2013.
-- `warning_count`: `3`
+- `degradation`: found 1 RUTs with invalid format
+- `warning_count`: `2`
 - `diagnostic_summary`: found 1 RUTs with invalid format
 - `recommended_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.
 

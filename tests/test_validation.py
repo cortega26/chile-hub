@@ -679,6 +679,56 @@ class ValidateEmpresasTests(unittest.TestCase):
         # Debe tener al menos el warning de cobertura limitada al régimen simplificado
         self.assertGreater(len(result["warnings"]), 0)
 
+    # -- issue #42: ruido de validación en empresas -----------------------
+
+    def _empresas_frame(self, codigo_sociedad):
+        return pl.DataFrame(
+            {
+                "rut": ["76286049-K"],
+                "razon_social": ["Empresa Uno SpA"],
+                "codigo_sociedad": [codigo_sociedad],
+                "tipo_actuacion": ["CONSTITUCION"],
+                "capital": [7000000],
+                "fecha_registro": [None],
+                "anio": [2022],
+                "mes": ["Mayo"],
+                "comuna_tributaria": ["Providencia"],
+                "region_tributaria": ["13"],
+                "comuna_social": ["Providencia"],
+                "region_social": ["13"],
+            }
+        )
+
+    def test_sociedad_codes_compared_case_insensitively(self):
+        """El extractor escribe la forma canónica ("SpA", "SCpA") a propósito
+        vía SOCIEDAD_MAP; el validador no debe reportarlas como tipo nuevo."""
+        for codigo in ["SpA", "SPA", "SCpA", "spa"]:
+            with self.subTest(codigo=codigo):
+                result = validate_empresas(self._empresas_frame(codigo), {"source_mode": "live"})
+                self.assertFalse(
+                    any("unknown sociedad" in w for w in result["warnings"]),
+                    msg=f"{codigo} no deberia reportarse como desconocido: {result['warnings']}",
+                )
+
+    def test_genuinely_unknown_sociedad_code_still_warns(self):
+        """Guardrail: normalizar el casing no debe silenciar un tipo realmente nuevo."""
+        result = validate_empresas(self._empresas_frame("XYZ"), {"source_mode": "live"})
+        self.assertTrue(any("unknown sociedad" in w for w in result["warnings"]))
+
+    def test_res_coverage_note_is_declared_expected(self):
+        """La cobertura acotada al régimen simplificado es alcance de diseño
+        (ADR-014): sigue en `warnings` y además en `expected_warnings`."""
+        result = validate_empresas(self._empresas_frame("SpA"), {"source_mode": "live"})
+        note = next(w for w in result["warnings"] if "Ley 20.659" in w)
+        self.assertIn(note, result["expected_warnings"])
+
+    def test_invalid_rut_format_is_never_declared_expected(self):
+        """Guardrail anti-silenciador: un RUT mal formado sigue siendo accionable."""
+        df = self._empresas_frame("SpA").with_columns(pl.lit("0").alias("rut"))
+        result = validate_empresas(df, {"source_mode": "live"})
+        self.assertTrue(any("invalid format" in w for w in result["warnings"]))
+        self.assertFalse(any("invalid format" in w for w in result["expected_warnings"]))
+
     def test_rejects_empty(self):
         """DataFrame vacío es rechazado."""
         df = pl.DataFrame()

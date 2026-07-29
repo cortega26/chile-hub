@@ -706,6 +706,7 @@ def validate_empresas(
     """
     errors: list[str] = []
     warnings: list[str] = []
+    expected_warnings: list[str] = []
     row_count = df.height
 
     required = [
@@ -725,6 +726,7 @@ def validate_empresas(
             "record_count": 0,
             "errors": errors,
             "warnings": warnings,
+            "expected_warnings": expected_warnings,
         }
 
     missing = _missing_columns(df, required)
@@ -736,6 +738,7 @@ def validate_empresas(
             "record_count": row_count,
             "errors": errors,
             "warnings": warnings,
+            "expected_warnings": expected_warnings,
         }
 
     # RUT: no nulos, formato esperado (con guion)
@@ -772,7 +775,14 @@ def validate_empresas(
         "COPROP",
     }
     if "codigo_sociedad" in df.columns:
-        unknown_soc = set(df["codigo_sociedad"].drop_nulls().unique().to_list()) - known_sociedad
+        # La fuente alterna el casing del mismo código ("SpA" vs "SPA"), así que
+        # se compara normalizado. NO se reescribe el valor almacenado: el dato
+        # publicado conserva lo que dice la fuente (issue #42).
+        unknown_soc = {
+            value
+            for value in df["codigo_sociedad"].drop_nulls().unique().to_list()
+            if value.upper() not in known_sociedad
+        }
         if unknown_soc:
             warnings.append(f"unknown sociedad codes (new types?): {sorted(unknown_soc)}")
 
@@ -799,11 +809,15 @@ def validate_empresas(
         if invalid_region:
             errors.append(f"found {invalid_region} invalid region_tributaria values")
 
-    # Advertencia sobre cobertura: solo regimen simplificado
-    warnings.append(
+    # Cobertura acotada al regimen simplificado: es el alcance de la fuente por
+    # diseño (la RES no registra el regimen tradicional), no una degradación.
+    # Declarado como esperado en el emisor, según ADR-014.
+    _add_expected_warning(
+        warnings,
+        expected_warnings,
         "RES solo cubre constituciones bajo Ley 20.659 (regimen simplificado). "
         "No incluye empresas del regimen tradicional (Diario Oficial) ni "
-        "empresas anteriores a mayo 2013."
+        "empresas anteriores a mayo 2013.",
     )
 
     if metadata and metadata.get("source_mode") == "fallback":
@@ -815,6 +829,7 @@ def validate_empresas(
         "record_count": row_count,
         "errors": errors,
         "warnings": warnings,
+        "expected_warnings": expected_warnings,
     }
 
 
