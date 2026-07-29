@@ -7,8 +7,10 @@ import json
 import os
 import shutil
 import tempfile
+import warnings
 import zipfile
 from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -21,12 +23,23 @@ DEFAULT_REPOSITORY = "cortega26/chile-hub"
 DEFAULT_BUNDLE_NAME = "chile-hub-publishable-bundle.zip"
 DEFAULT_CHECKSUM_NAME = "chile-hub-publishable-bundle.zip.sha256"
 ENV_CACHE_DIR = "CHILE_HUB_CACHE_DIR"
+ENV_DISABLE_UPDATE_CHECK = "CHILE_HUB_NO_UPDATE_CHECK"
+ENV_LANGUAGE = "CHILE_HUB_LANG"
+UPDATE_CHECK_INTERVAL = timedelta(days=7)
+UPDATE_CHECK_TIMEOUT = 3
+UTC = timezone.utc
+SUPPORT_URL = f"https://github.com/sponsors/{DEFAULT_REPOSITORY.split('/')[0]}"
+BUY_ME_A_COFFEE_URL = f"https://www.buymeacoffee.com/{DEFAULT_REPOSITORY.split('/')[0]}"
 
 
 @dataclass(frozen=True)
 class ReleaseAsset:
     name: str
     url: str
+
+
+class ChileHubUpdateWarning(UserWarning):
+    """Avisa que existe una nueva versión de los datos publicados."""
 
 
 class ChileHubDataManager:
@@ -57,6 +70,11 @@ class ChileHubDataManager:
     def marker_path(self) -> Path:
         return self.version_cache_dir / ".verified.json"
 
+    @property
+    def update_check_path(self) -> Path:
+        """Ruta del estado local del chequeo periódico de actualizaciones."""
+        return self.version_cache_dir / ".update_check.json"
+
     def status(self) -> dict[str, Any]:
         """Estado del caché local de datos: versión, rutas y si está listo para usarse."""
         catalog_path = self.normalized_dir / "dataset_catalog.json"
@@ -84,6 +102,7 @@ class ChileHubDataManager:
             ChileHubDataError: Si auto_update es False y no existe caché local verificado.
         """
         if (self.normalized_dir / "dataset_catalog.json").exists() and self.marker_path.exists():
+            self._check_for_update_if_due()
             return self.normalized_dir
         if not auto_update:
             raise ChileHubDataError(
@@ -190,7 +209,120 @@ class ChileHubDataManager:
             return  # nothing to clear
         shutil.rmtree(str(cache_path))
 
-    def _resolve_release(self) -> dict[str, Any]:
+    def _check_for_update_if_due(self) -> None:
+        """Avisa semanalmente si el bundle ``latest`` quedó desactualizado.
+
+        Es una comprobación de mejor esfuerzo: no envía telemetría ni interrumpe
+        el consumo de datos si GitHub, la red o el estado local no están disponibles.
+        """
+        if self.data_version != "latest" or self._update_checks_disabled():
+            return
+
+        state = self._read_json(self.update_check_path)
+        if not self._is_update_check_due(state):
+            return
+
+        checked_at = datetime.now(UTC)
+        try:
+            release = self._resolve_release(timeout=UPDATE_CHECK_TIMEOUT)
+            latest_tag = release.get("tag_name")
+            if not isinstance(latest_tag, str) or not latest_tag:
+                raise ValueError("GitHub release response does not include tag_name")
+
+            marker = self._read_json(self.marker_path)
+            current_tag = marker.get("release", {}).get("tag_name")
+            self._write_json(
+                self.update_check_path,
+                {
+                    "checked_at_utc": checked_at.isoformat(),
+                    "latest_tag": latest_tag,
+                    "status": "ok",
+                },
+            )
+        except Exception:
+            # Esta consulta es opcional: recordar el intento evita reintentos en
+            # cada inicialización si el usuario está sin conectividad.
+            try:
+                self._write_json(
+                    self.update_check_path,
+                    {
+                        "checked_at_utc": checked_at.isoformat(),
+                        "status": "unavailable",
+                    },
+                )
+            except OSError:
+                pass
+            return
+
+        if isinstance(current_tag, str) and current_tag and current_tag != latest_tag:
+            warnings.warn(
+                self._format_update_notice(current_tag=current_tag, latest_tag=latest_tag),
+                ChileHubUpdateWarning,
+                stacklevel=3,
+            )
+
+    @staticmethod
+    def _update_checks_disabled() -> bool:
+        value = os.environ.get(ENV_DISABLE_UPDATE_CHECK, "")
+        return value.strip().lower() in {"1", "true", "yes", "on"}
+
+    @staticmethod
+    def _is_update_check_due(state: dict[str, Any]) -> bool:
+        checked_at = state.get("checked_at_utc")
+        if not isinstance(checked_at, str):
+            return True
+        try:
+            parsed = datetime.fromisoformat(checked_at)
+        except ValueError:
+            return True
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=UTC)
+
+        now = datetime.now(UTC)
+        return parsed > now or now - parsed >= UPDATE_CHECK_INTERVAL
+
+    @staticmethod
+    def _preferred_language() -> str:
+        """Retorna ``en`` solo para una preferencia inglesa explícita; español es el fallback."""
+        language = os.environ.get(ENV_LANGUAGE)
+        if not language:
+            language = (
+                os.environ.get("LC_ALL")
+                or os.environ.get("LC_MESSAGES")
+                or os.environ.get("LANG")
+                or ""
+            )
+        return "en" if language.lower().startswith("en") else "es"
+
+    @classmethod
+    def _format_update_notice(cls, *, current_tag: str, latest_tag: str) -> str:
+        if cls._preferred_language() == "en":
+            return (
+                f"A new chile-hub data release is available: {latest_tag}\n"
+                f"Cached version: {current_tag}\n\n"
+                "Update it with:\n"
+                "    chile-hub cache update\n\n"
+                "chile-hub is an independent project developed and maintained by one person, "
+                "without institutional sponsors or affiliations. This independence lets it "
+                "prioritize verifiable data and deliver an objective, impartial, useful, "
+                "high-quality tool.\n\n"
+                "If chile-hub is useful to you, consider supporting its development and "
+                f"maintenance financially:\n{SUPPORT_URL}\n{BUY_ME_A_COFFEE_URL}"
+            )
+        return (
+            f"Hay una nueva versión de los datos de chile-hub: {latest_tag}\n"
+            f"Versión almacenada localmente: {current_tag}\n\n"
+            "Actualízala ejecutando:\n"
+            "    chile-hub cache update\n\n"
+            "chile-hub es un proyecto independiente, desarrollado y mantenido por una sola "
+            "persona, sin patrocinadores institucionales ni afiliaciones. Esta independencia "
+            "permite priorizar datos verificables y ofrecer una herramienta objetiva, "
+            "imparcial, útil y de calidad.\n\n"
+            "Si chile-hub te resulta útil, puedes apoyar económicamente su desarrollo y "
+            f"mantenimiento:\n{SUPPORT_URL}\n{BUY_ME_A_COFFEE_URL}"
+        )
+
+    def _resolve_release(self, *, timeout: float = 30) -> dict[str, Any]:
         suffix = (
             "releases/latest"
             if self.data_version == "latest"
@@ -200,7 +332,7 @@ class ChileHubDataManager:
         response = self.session.get(
             url,
             headers={"Accept": "application/vnd.github+json"},
-            timeout=30,
+            timeout=timeout,
         )
         if response.status_code != 200:
             raise ChileHubDataError(
@@ -260,3 +392,11 @@ class ChileHubDataManager:
         if not path.exists():
             return {}
         return json.loads(path.read_text(encoding="utf-8"))  # type: ignore[no-any-return]
+
+    @staticmethod
+    def _write_json(path: Path, payload: dict[str, Any]) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )

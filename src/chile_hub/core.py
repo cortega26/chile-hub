@@ -2272,7 +2272,7 @@ def _main(argv=None):  # pragma: no cover — dispatch de CLI, testeado vía smo
             print(json.dumps(manager.status(), ensure_ascii=False, indent=2))
             return
         if args.cache_command == "update":
-            data_dir = manager.ensure_data_dir(auto_update=True)
+            data_dir = manager.update()
             print(data_dir)
             return
         if args.cache_command == "clear":
