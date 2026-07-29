@@ -140,7 +140,15 @@ jobs:
               git commit -m "chore(release): ${after} [skip ci]"
               tag="v${after}"
               git tag "$tag"
-              git push origin HEAD:main "$tag"
+              # --atomic es obligatorio: `git push` NO es atomico por defecto y
+              # empuja cada ref por separado. Sin el, una carrera con otro commit
+              # de bot (refresh diario, adoption stats, monthly scrape) rechaza
+              # `main` pero deja el TAG publicado. Eso bloquea el release para
+              # siempre: semantic-release calcula la misma version, ve que su tag
+              # ya existe y responde "already released" en cada run posterior —
+              # en verde, porque los pasos de publish quedan skipped. Paso el
+              # 2026-07-10 con v1.22.0 y dejo 19 dias y 58 commits sin publicar.
+              git push --atomic origin HEAD:main "$tag"
 
               if gh release view "$tag" >/dev/null 2>&1; then
                 echo "Release $tag already exists"

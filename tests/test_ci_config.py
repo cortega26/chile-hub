@@ -171,6 +171,21 @@ class AdoptionBadgeGuardrailTests(unittest.TestCase):
         )
         self.assertIn('"Adoption Stats (PyPI + GitHub Releases)"', content)
 
+    def test_release_push_is_atomic(self):
+        """El push del commit de release y su tag debe ser atomico.
+
+        `git push` no es atomico por defecto: empuja cada ref por separado. Si
+        `main` es rechazado por una carrera con otro commit de bot, el tag queda
+        publicado igual y bloquea el release de forma permanente —
+        semantic-release ve su propio tag y responde "already released" en cada
+        run posterior, en verde. Ocurrio el 2026-07-10 con v1.22.0.
+        """
+        content = (ROOT_DIR / ".github" / "workflows" / "pypi-release.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("git push --atomic origin HEAD:main", content)
+        self.assertNotIn("git push origin HEAD:main", content)
+
     def test_out_of_band_staging_is_excluded_from_the_freshness_guard(self):
         """El carril candidate no lo construye `make build` (ADR-012), asi que su
         staging no puede disparar el guardian de frescura: seria un falso
