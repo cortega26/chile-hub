@@ -273,4 +273,3 @@ están pendientes de review.
       Comunal Geometry" fue denegado por el clasificador de permisos del
       harness. Requiere que el mantenedor lo dispare (`gh workflow run` o la UI
       de Actions) y luego la lectura de verificación desde Pages.
-
