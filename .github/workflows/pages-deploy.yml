@@ -10,7 +10,11 @@ on:
     # token, así que Pages nunca se redesplegaba tras esos cambios y el
     # sitio quedaba mostrando datos y versión desactualizados. Este
     # trigger cierra ese hueco.
-    workflows: ["Pipeline Check", "PyPI Release", "Adoption Stats (PyPI + GitHub Releases)"]
+    workflows:
+      - "Pipeline Check"
+      - "PyPI Release"
+      - "Adoption Stats (PyPI + GitHub Releases)"
+      - "Refresh Candidate Comunal Geometry"
     branches: [main]
     types: [completed]
   workflow_dispatch:

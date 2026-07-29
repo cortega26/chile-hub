@@ -171,6 +171,28 @@ class AdoptionBadgeGuardrailTests(unittest.TestCase):
         )
         self.assertIn('"Adoption Stats (PyPI + GitHub Releases)"', content)
 
+    def test_every_data_committing_workflow_triggers_pages_deploy(self):
+        """Todo workflow que commitea datos con GITHUB_TOKEN debe estar en el
+        `workflow_run` de Pages.
+
+        Los commits hechos con el GITHUB_TOKEN por defecto no disparan eventos
+        `push`, así que sin esta lista Pages nunca redespliega y el sitio sirve
+        datos viejos — o un 404, como pasó con el GeoParquet comunal: el
+        workflow del Plan 064 commiteó el artefacto y Pages siguió sin servirlo.
+        """
+        content = (ROOT_DIR / ".github" / "workflows" / "pages-deploy.yml").read_text(
+            encoding="utf-8"
+        )
+        trigger_block = content.split("workflow_dispatch")[0]
+        for workflow in (
+            "Pipeline Check",
+            "PyPI Release",
+            "Adoption Stats (PyPI + GitHub Releases)",
+            "Refresh Candidate Comunal Geometry",
+        ):
+            with self.subTest(workflow=workflow):
+                self.assertIn(f'"{workflow}"', trigger_block)
+
     def test_adoption_badge_artifact_exists_and_has_shields_schema(self):
         badge_path = ROOT_DIR / "data" / "normalized" / "adoption_badge.json"
         self.assertTrue(badge_path.is_file(), "Falta el recurso del badge de instalaciones")
