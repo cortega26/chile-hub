@@ -14,6 +14,47 @@ son la bitácora automática generada desde los Conventional Commits.
 
 ## 1.22.0 - 2026-07-29
 
+> 🎯 **Resumen:** El release más grande de la historia del proyecto, y no por
+> diseño: **la publicación estuvo bloqueada 19 días sin que nada lo señalara.**
+> El 2026-07-10 un `git push` no atómico dejó el tag `v1.22.0` publicado mientras
+> el commit de bump era rechazado por una carrera con otro bot. Desde entonces
+> `python-semantic-release` calculaba esa misma versión, veía su propio tag y
+> respondía *"already released"* — en verde, porque los pasos de build y publish
+> quedaban `skipped`. Resultado: 59 commits `feat`/`fix` acumulados en una sola
+> versión, en vez de las ~6 minor que habrían salido con cadencia normal. El tag
+> huérfano se eliminó y el push ahora usa `--atomic`, con un guardrail en
+> `tests/test_ci_config.py` porque este fallo no produce ninguna señal roja.
+>
+> **Nada se perdió**: estas notas cubren el rango completo desde `v1.21.1`, así
+> que los cambios que habrían aparecido en las versiones intermedias están todos
+> listados abajo. Lo que se perdió fue la *granularidad* — no el registro.
+>
+> Qué trae, agrupado por hilo de trabajo:
+>
+> - **Confianza en el dato.** Detección de anomalías temporales en series
+>   numéricas con rechazo de publicación override-able (ADR-013); backfill
+>   consciente de la edad, que impide que una serie muerta se esconda tras un
+>   reuso del último artefacto publicado (ADR-016 — descubierto porque `ipc`
+>   llevaba 240 días congelado y nadie lo veía); y separación de *drift esperado*
+>   vs *drift real* (ADR-014), que bajó `drifted_count` de 8 a 3 sin relajar un
+>   solo gate ni tocar un dato.
+> - **Salud legible.** Estado `retired` para fuentes muertas, derivado del
+>   registry (ADR-015); historial append-only `hub_health_history.jsonl` con
+>   sparkline en la landing; y contadores que por fin distinguen ruido
+>   estructural de trabajo pendiente.
+> - **Distribución.** Catálogo DCAT `data.json`, publicación del bundle en
+>   Hugging Face Hub, GeoParquet comunal publicado por CI y servido desde Pages
+>   (carril `candidate`, fuera del bundle estable), y señal de adopción
+>   PyPI + GitHub Releases.
+> - **API.** `resolve_comunas()` para mapear nombres a códigos CUT (ADR-009) y
+>   `from_datapackage()` aceptando URLs (ADR-010).
+> - **Landing.** Explorador SQL con DuckDB-Wasm, overhaul tipográfico, ritmo
+>   visual, skeletons de carga y unificación de idioma y tokens de color.
+> - **Anti-drift.** Campo `extractor` en las 22 entradas del catálogo, tabla de
+>   extractores auto-generada, y cuatro fases de `doc-sync` que eliminan bloques
+>   de documentación mantenidos a mano.
+
+
 ### Corregido
 
 - **api**: From_datapackage acepta URLs

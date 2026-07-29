@@ -55,27 +55,74 @@ jobs:
           rm -rf data/normalized
           mkdir -p data/normalized
 
+          # Descarga el artefacto de un run de Pipeline Check y responde si es
+          # publication-grade (perfil `publication` + require_live). Solo esos
+          # pueden adjuntarse a un release: los demas no verificaron la fuente
+          # en vivo.
+          is_publication_grade() {
+            local dir="$1"
+            [[ -f "$dir/pipeline_artifact_provenance.json" ]] || return 1
+            python - "$dir/pipeline_artifact_provenance.json" <<'PY' || return 1
+          import json, sys
+          p = json.load(open(sys.argv[1], encoding="utf-8"))
+          sys.exit(
+              0
+              if p.get("verification_profile") == "publication" and p.get("require_live") is True
+              else 1
+          )
+          PY
+          }
+
+          try_download() {
+            local candidate="$1"
+            rm -rf data/normalized
+            mkdir -p data/normalized
+            gh run download "$candidate" --name "pipeline-output-$candidate" \
+              --dir data/normalized 2>/dev/null || return 1
+            is_publication_grade data/normalized
+          }
+
           if [[ "${{ github.event_name }}" == "workflow_run" ]]; then
             run_id="${{ github.event.workflow_run.id }}"
           else
-            # Find the last successful run of Pipeline Check on main branch
             run_id=$(gh run list --workflow "Pipeline Check" --branch main --status success --limit 1 --json databaseId --jq '.[0].databaseId' || true)
           fi
 
-          if [[ -n "$run_id" ]]; then
-            echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
-            gh run download "$run_id" \
-              --name "pipeline-output-$run_id" \
-              --dir data/normalized
-          else
+          if [[ -z "$run_id" ]]; then
             echo "Error: No verified pipeline data assets found."
             exit 1
           fi
 
-          if [[ ! -f data/normalized/pipeline_artifact_provenance.json ]]; then
-            echo "::notice::Pipeline artifact has no provenance manifest; release data assets will not be attached."
-            echo "ready=false" >> "$GITHUB_OUTPUT"
-            exit 0
+          echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+
+          if try_download "$run_id"; then
+            echo "Artefacto publication-grade tomado del run disparador ($run_id)."
+          else
+            # El run que dispara el release casi siempre es `push`, y esos
+            # construyen con perfil `readiness` (sin verificacion live). Los
+            # artefactos publication-grade vienen de `schedule`/`workflow_dispatch`,
+            # que rara vez coinciden con commits publicables — por eso NINGUN
+            # release del proyecto llego a tener assets adjuntos. Se busca hacia
+            # atras el ultimo artefacto publication-grade disponible.
+            echo "::notice::El run disparador no es publication-grade; buscando el ultimo que lo sea."
+            found=""
+            for candidate in $(gh run list --workflow "Pipeline Check" --branch main \
+                --status success --limit 30 --json databaseId,event \
+                --jq '.[] | select(.event=="schedule" or .event=="workflow_dispatch") | .databaseId'); do
+              if try_download "$candidate"; then
+                found="$candidate"
+                break
+              fi
+            done
+
+            if [[ -z "$found" ]]; then
+              echo "::notice::No hay artefactos publication-grade disponibles (pueden haber expirado); no se adjuntan datos al release."
+              echo "ready=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+
+            echo "Artefacto publication-grade tomado del run $found."
+            echo "assets_run_id=$found" >> "$GITHUB_OUTPUT"
           fi
 
           set +e
