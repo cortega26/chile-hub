@@ -1,0 +1,45 @@
+{
+  "dataset": "geometria_comunal",
+  "source_name": "BCN ArcGIS — tematico/Comunas_Generalizadas",
+  "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/tematico/Comunas_Generalizadas/MapServer/0/query",
+  "source_mode": "live",
+  "source_detail": "bcn_arcgis_geometria_generalizada",
+  "refreshed_at_utc": "2026-07-29T21:05:00.773344+00:00",
+  "record_count": 345,
+  "fields": [
+    "codigo_region",
+    "codigo_comuna",
+    "nombre_comuna",
+    "nombre_comuna_clean",
+    "nombre_region",
+    "geometry_wkt"
+  ],
+  "notes": [
+    "región 1: 7 comunas",
+    "región 2: 9 comunas",
+    "región 3: 9 comunas",
+    "región 4: 15 comunas",
+    "región 5: 38 comunas",
+    "región 6: 34 comunas",
+    "región 7: 30 comunas",
+    "región 8: 33 comunas",
+    "región 9: 32 comunas",
+    "región 10: 30 comunas",
+    "región 11: 10 comunas",
+    "región 12: fetch por región falló (500 Server Error:  for url: https://arcgiswebad.bcn.cl/arcgis/rest/services/tematico/Comunas_Generalizadas/MapServer/0/query?where=codregion%3D12&outFields=cod_comuna%2Cnom_com%2Cnom_reg%2Ccodregion&outSR=4326&returnGeometry=true&f=geojson); reintentando comuna por comuna",
+    "región 12: 10/10 comunas vía fallback por-comuna",
+    "región 13: 52 comunas",
+    "región 14: 12 comunas",
+    "región 15: 4 comunas",
+    "región 16: 21 comunas",
+    "snapshot crudo: bcn_geometria_comunal_20260729T210456Z.json"
+  ],
+  "reuse_policy": {
+    "status": "open-attribution",
+    "license": "Uso libre con atribución a la Biblioteca del Congreso Nacional de Chile (\"Los mapas vectoriales son puestos a disposición en virtud del principio de transparencia de la función pública. Las personas o instituciones pueden usar libremente esta información, señalando como fuente a la Biblioteca del Congreso Nacional de Chile.\"). Geometría \"generalizada\": material de referencia, no apto para trabajo de precisión geodésica.",
+    "license_url": "https://www.bcn.cl/siit/mapas_vectoriales/index_html",
+    "attribution_required": true,
+    "redistribution_ok": true,
+    "summary": "Límites comunales (geometría generalizada) desde BCN ArcGIS (tematico/Comunas_Generalizadas). Ver ADR-012 para el gate de licencia."
+  }
+}
