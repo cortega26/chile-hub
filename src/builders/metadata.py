@@ -118,8 +118,8 @@ def build_indicator_ages(df, today=None):
     negativas son normales y esperadas: la UF y la UTM se publican por adelantado.
     """
     today = today or datetime.now(UTC).date()
-    max_dates = {}
-    ages = {}
+    max_dates: dict[str, str] = {}
+    ages: dict[str, int] = {}
     if df is None or df.height == 0:
         return max_dates, ages
     grouped = df.group_by("codigo_indicador").agg(pl.col("fecha").max().alias("max_fecha"))
