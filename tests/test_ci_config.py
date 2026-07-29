@@ -171,6 +171,27 @@ class AdoptionBadgeGuardrailTests(unittest.TestCase):
         )
         self.assertIn('"Adoption Stats (PyPI + GitHub Releases)"', content)
 
+    def test_release_falls_back_to_a_publication_grade_artifact(self):
+        """El release debe poder adjuntar datos verificados.
+
+        El run que dispara PyPI Release es casi siempre `push`, y esos
+        construyen con perfil `readiness`; los artefactos publication-grade
+        vienen de `schedule`/`workflow_dispatch`, que rara vez coinciden con
+        commits publicables. Sin fallback, la condicion `ready == 'true'` nunca
+        se cumple — de hecho ningun release del proyecto llego a tener assets
+        adjuntos. El fallback nunca debe relajar el criterio: solo acepta
+        `verification_profile == publication` con `require_live`.
+        """
+        content = (ROOT_DIR / ".github" / "workflows" / "pypi-release.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("is_publication_grade", content)
+        self.assertIn('select(.event=="schedule" or .event=="workflow_dispatch")', content)
+        self.assertIn('p.get("verification_profile") == "publication"', content)
+        self.assertIn('p.get("require_live") is True', content)
+        # Degradacion segura: si no hay artefacto verificado, no se adjunta nada.
+        self.assertIn('echo "ready=false" >> "$GITHUB_OUTPUT"', content)
+
     def test_release_push_is_atomic(self):
         """El push del commit de release y su tag debe ser atomico.
 
