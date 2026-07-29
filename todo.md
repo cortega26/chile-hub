@@ -220,3 +220,28 @@ están pendientes de review.
 - [x] Desviación: el plan pedía ADR-013, pero el Plan 054 lo tomó al mergearse;
       el entregable es ADR-014. Registrada en el propio plan y en su fila.
 
+## Issues #42 / #43 / #44 — cierre (2026-07-29)
+
+- [x] **#42 empresas** — el issue decía "1 RUT inválido"; eran 3 warnings y sólo
+      uno era dato: el casing de `codigo_sociedad` era un bug del validador
+      (`SOCIEDAD_MAP` escribe "SpA" a propósito) y la nota de cobertura RES es
+      alcance de diseño → declarada esperada (ADR-014). El RUT `"0"` es un
+      centinela de la fuente: se descarta con regla nombrada y conteo auditable.
+      **Efecto diferido**: el warning del RUT persiste en los artefactos hasta la
+      próxima extracción real (el fix vive en el extractor, y `make build` no
+      re-extrae).
+- [x] **#44 consumo_electrico_comunal** — Plan 068 + ADR-015. Estado `retired`
+      derivado del registry; contadores sobre el conjunto activo. Alcance
+      decidido por el mantenedor: NO se toca la superficie pública (habría sido
+      BREAKING CHANGE con 2.0.0 forzado).
+- [x] **#43 indicadores** — Plan 067 + ADR-016. El issue subestimaba el problema:
+      `ipc` lleva 240 días sin dato nuevo y el backfill lo re-publicaba en cada
+      build. Se cerró el modo de falla (gate override-able por edad), no la
+      serie: el diagnóstico upstream necesita red y sigue abierto en el issue.
+- [x] Hallazgo ajeno al trabajo: `uv.lock` estaba desincronizado en `main` por
+      los PRs #37/#38 de dependabot (bumpearon `pyproject.toml` sin regenerar el
+      lock) → el gate `uv lock --locked` del Plan 026 fallaba en CI. Corregido.
+- [x] Hallazgo preexistente NO corregido (fuera de alcance):
+      `data/staging/finanzas_municipales.metadata.json` y el snapshot xlsx de
+      `data/raw/` no terminan en newline, así que `end-of-file-fixer` falla
+      también sin ningún cambio mío. `data/raw/` es solo-append por la regla #3.
