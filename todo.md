@@ -269,7 +269,10 @@ están pendientes de review.
       `test_pipeline_logic.py` y `verify_066.sh`, documentando la historia
       completa del contador (8→3 ADR-014, 3→2 ADR-015, 2→1 issue #42). Queda
       solo `indicadores`, que es un problema real y abierto.
-- [ ] **BLOQUEADO — Plan 064**: el dispatch del workflow "Refresh Candidate
-      Comunal Geometry" fue denegado por el clasificador de permisos del
-      harness. Requiere que el mantenedor lo dispare (`gh workflow run` o la UI
-      de Actions) y luego la lectura de verificación desde Pages.
+- [x] **Plan 064 CERRADO** (el mantenedor disparó el workflow; run 30490817948).
+      Lectura remota desde Pages verificada: 345 registros, EPSG:4326, checksum
+      coincidente, CUT con cero inicial. Aparecieron **dos defectos que solo se
+      revelaron al ejecutarlo de verdad**: el trigger de Pages faltante (la URL
+      daba 404 pese al commit exitoso) y el guardián de frescura en falso
+      positivo permanente frente al carril candidate. Ambos corregidos con su
+      guardrail.
