@@ -171,6 +171,14 @@ class AdoptionBadgeGuardrailTests(unittest.TestCase):
         )
         self.assertIn('"Adoption Stats (PyPI + GitHub Releases)"', content)
 
+    def test_out_of_band_staging_is_excluded_from_the_freshness_guard(self):
+        """El carril candidate no lo construye `make build` (ADR-012), asi que su
+        staging no puede disparar el guardian de frescura: seria un falso
+        positivo permanente tras cada refresh de CI (Plan 064)."""
+        from scripts.verify_pipeline import OUT_OF_BAND_STAGING_METADATA
+
+        self.assertIn("geometria_comunal.metadata.json", OUT_OF_BAND_STAGING_METADATA)
+
     def test_every_data_committing_workflow_triggers_pages_deploy(self):
         """Todo workflow que commitea datos con GITHUB_TOKEN debe estar en el
         `workflow_run` de Pages.

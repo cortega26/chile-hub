@@ -108,6 +108,14 @@ REQUIRED_DATASETS = {
 VALID_SOURCE_MODES = _VALID_SOURCE_MODES
 NON_FALLBACK_SOURCE_MODES = _NON_FALLBACK_SOURCE_MODES
 
+# Staging que `make build` NO consume por diseño, así que su mtime no puede
+# implicar que los artefactos normalizados estén desactualizados.
+# `geometria_comunal` es carril candidate: lo produce
+# scripts/build_geometria_comunal.py fuera del pipeline diario (ADR-012), y su
+# refresh por CI (Plan 064) dejaba el guardián de frescura en falso positivo
+# permanente — pedía un rebuild que jamás iba a tocar esa capa.
+OUT_OF_BAND_STAGING_METADATA = {"geometria_comunal.metadata.json"}
+
 
 def fail(message):
     print(f"ERROR: {message}")
@@ -429,7 +437,8 @@ def verify_staging_not_newer_than_normalized():
     stale = [
         p
         for p in STAGING_DIR.glob("*.metadata.json")
-        if p.stat().st_mtime > sentinel_mtime + 1  # 1-second grace
+        if p.name not in OUT_OF_BAND_STAGING_METADATA
+        and p.stat().st_mtime > sentinel_mtime + 1  # 1-second grace
     ]
     if stale:
         names = ", ".join(sorted(p.name for p in stale))
