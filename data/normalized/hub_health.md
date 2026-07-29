@@ -1,6 +1,6 @@
 # chile-hub health summary
 
-- `generated_at_utc`: `2026-07-28T16:08:31.972912+00:00`
+- `generated_at_utc`: `2026-07-29T14:32:53.985613+00:00`
 - `overall_status`: `warn`
 - `dataset_count`: `19`
 - `ok_count`: `16`
@@ -17,11 +17,11 @@
 - `partial_coverage_count`: `2`
 - `unknown_coverage_count`: `0`
 - `drifted_count`: `3`
-- `warning_count`: `11`
-- `top_issue`: `empresas` (freshness=fresh, drift=drifted, warnings=3)
+- `warning_count`: `10`
+- `top_issue`: `empresas` (freshness=fresh, drift=drifted, warnings=2)
 - `top_issue_reason`: found 1 RUTs with invalid format
 - `top_issue_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.
-- `top_issue_summary`: empresas: found 1 RUTs with invalid format [source_detail=datos_gob_cl_ckan_api; warnings=3; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]
+- `top_issue_summary`: empresas: found 1 RUTs with invalid format [source_detail=datos_gob_cl_ckan_api; warnings=2; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]
 
 | Dataset | Severity | Mode | Freshness | Coverage | Drift | Publishability | Degradation | Validation | Warnings |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | ---: |
@@ -32,7 +32,7 @@
 | `comunas_enriquecidas` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `consumo_electrico_comunal` | `warn` | `fallback` | `fresh` | `not_applicable` | `drifted` | `ready` | `warning` | `ok` | 3 |
 | `distritos_electorales` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
-| `empresas` | `warn` | `live` | `fresh` | `not_applicable` | `drifted` | `ready` | `warning` | `ok` | 3 |
+| `empresas` | `warn` | `live` | `fresh` | `not_applicable` | `drifted` | `ready` | `warning` | `ok` | 2 |
 | `establecimientos_educacionales` | `ok` | `live` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `establecimientos_salud` | `ok` | `live` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `finanzas_municipales` | `ok` | `monthly` | `fresh` | `partial` | `healthy` | `ready` | `none` | `ok` | 0 |

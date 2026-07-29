@@ -3776,14 +3776,39 @@ class DriftTaxonomyTests(unittest.TestCase):
         self.assertIn("accionable", degradation["impact"])
         self.assertNotIn("esperado", degradation["impact"])
 
-    def test_validators_declare_expected_warnings(self):
-        """Los 3 warnings de diseño se declaran en el emisor, no en el consumidor."""
+    def test_validators_declaring_expected_warnings_are_exactly_the_known_set(self):
+        """Los warnings de diseño se declaran en el emisor, no en el consumidor.
+
+        Aserción estructural (AST), no de formato: agregar una declaración nueva
+        obliga a actualizar esta lista deliberadamente — que es justamente el
+        control que ADR-014 pide para que `expected_warnings` no se convierta en
+        un basurero de warnings molestos.
+        """
+        import ast
         import inspect
 
         import src.validation as validation_mod
 
-        source = inspect.getsource(validation_mod)
-        self.assertEqual(source.count("_add_expected_warning(\n"), 3)
+        tree = ast.parse(inspect.getsource(validation_mod))
+        declaring = {
+            node.name
+            for node in ast.walk(tree)
+            if isinstance(node, ast.FunctionDef)
+            and any(
+                isinstance(call.func, ast.Name) and call.func.id == "_add_expected_warning"
+                for call in ast.walk(node)
+                if isinstance(call, ast.Call)
+            )
+        }
+        self.assertEqual(
+            declaring,
+            {
+                "validate_indicadores_urbanos_siedu",  # cobertura urbana intencional
+                "validate_pobreza_comunal",  # cobertura SAE parcial por diseño
+                "validate_partidos_politicos",  # estado_legal segun SERVEL
+                "validate_empresas",  # RES solo cubre Ley 20.659 (issue #42)
+            },
+        )
 
     # --- Step 4: build_drift y contadores --------------------------------
 

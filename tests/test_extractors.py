@@ -600,6 +600,40 @@ class ResExtractorTests(unittest.TestCase):
         self.assertIn("SpA", sociedades)  # SPA -> SpA (title case canonico)
         self.assertIn("SRL", sociedades)
 
+    def test_parse_resources_drops_rut_sentinel_rows(self):
+        """El RUT "0" es un marcador de "sin dato" de la fuente, no un RUT:
+        se descarta y el conteo queda expuesto para los metadatos (issue #42)."""
+        csv_content = (
+            "ID;RUT;Razon Social;Fecha de actuacion (1era firma);"
+            "Fecha de registro (ultima firma);Fecha de aprobacion x SII;"
+            "Anio;Mes;Comuna Tributaria;Region Tributaria;"
+            "Codigo de sociedad;Tipo de actuacion;Capital;Comuna Social;Region Social\n"
+            "1;76286049-K;Servicios Digitales EIRL;02-05-2022;02-05-2022;02-05-2022;"
+            "2022;Mayo;Providencia;13;EIRL;CONSTITUCION;7000000;Providencia;13\n"
+            "2;0;Empresa Sin RUT Spa;03-06-2022;03-06-2022;03-06-2022;"
+            "2022;Junio;Las Condes;13;SPA;CONSTITUCION;25000000;Las Condes;13\n"
+        )
+        df = res_extractor.parse_resources([csv_content.encode("utf-8")])
+
+        self.assertEqual(df.height, 1)
+        self.assertNotIn("0", df["rut"].to_list())
+        self.assertEqual(res_extractor._LAST_SENTINEL_DROP_COUNT, 1)
+
+    def test_parse_resources_keeps_valid_ruts_and_resets_sentinel_count(self):
+        """Sin centinelas, el contador vuelve a cero (no arrastra la corrida previa)."""
+        csv_content = (
+            "ID;RUT;Razon Social;Fecha de actuacion (1era firma);"
+            "Fecha de registro (ultima firma);Fecha de aprobacion x SII;"
+            "Anio;Mes;Comuna Tributaria;Region Tributaria;"
+            "Codigo de sociedad;Tipo de actuacion;Capital;Comuna Social;Region Social\n"
+            "1;76286049-K;Servicios Digitales EIRL;02-05-2022;02-05-2022;02-05-2022;"
+            "2022;Mayo;Providencia;13;EIRL;CONSTITUCION;7000000;Providencia;13\n"
+        )
+        df = res_extractor.parse_resources([csv_content.encode("utf-8")])
+
+        self.assertEqual(df.height, 1)
+        self.assertEqual(res_extractor._LAST_SENTINEL_DROP_COUNT, 0)
+
     def test_parse_resources_handles_empty(self):
         """Parseo de lista vacia lanza SystemExit."""
         with self.assertRaises(SystemExit):

@@ -83,6 +83,17 @@ COLUMN_RENAME = {
     "Region Social": "region_social",
 }
 
+# Valores de RUT que la fuente usa como marcador de "sin dato" en vez de como
+# identificador. Se descartan en la normalización (ver normalize_rows) y el
+# conteo queda en los metadatos de staging para que un alza sea visible.
+RUT_SENTINELS = ["0"]
+
+# Filas descartadas por centinela en la última corrida de parse_resources().
+# Se expone como estado de módulo (el pipeline es secuencial y de un solo hilo)
+# para que process() pueda registrarlo en los metadatos de staging sin cambiar
+# la firma de parse_resources(), que es parte del contrato del extractor.
+_LAST_SENTINEL_DROP_COUNT = 0
+
 # Tipos de sociedad que mapean a abreviaturas canónicas
 SOCIEDAD_MAP = {
     "SRL": "SRL",
@@ -226,6 +237,17 @@ def parse_resources(contents: list[bytes]) -> pl.DataFrame:
     # Eliminar filas sin RUT (encabezados repetidos u otros artefactos)
     df = df.filter(pl.col("rut").is_not_null() & (pl.col("rut").str.len_chars() > 0))
 
+    # Centinelas de la fuente: filas donde el RUT es un marcador de "sin dato"
+    # ("0") en vez de un identificador. No es un RUT mal tipeado, así que
+    # corregir el dígito verificador no aplica; y dejarlo en null tampoco sirve,
+    # porque validate_empresas() trata los RUT nulos como error duro. Se
+    # descartan y se cuentan: un alza en este contador es señal de que la
+    # fuente cambió de comportamiento (issue #42).
+    global _LAST_SENTINEL_DROP_COUNT
+    _LAST_SENTINEL_DROP_COUNT = df.filter(pl.col("rut").is_in(RUT_SENTINELS)).height
+    if _LAST_SENTINEL_DROP_COUNT:
+        df = df.filter(~pl.col("rut").is_in(RUT_SENTINELS))
+
     # Eliminar duplicados exactos (puede haber overlap entre archivos anuales)
     df = df.unique()
 
@@ -311,6 +333,7 @@ def process() -> str:
         "record_count": df.height,
         "fields": df.columns,
         "notes": [
+            f"filas descartadas por RUT centinela {RUT_SENTINELS}: {_LAST_SENTINEL_DROP_COUNT}",
             "Solo incluye empresas constituidas bajo el Regimen Simplificado "
             "(Ley 20.659) desde mayo 2013.",
             "No contiene dirección postal (solo comuna y región).",
