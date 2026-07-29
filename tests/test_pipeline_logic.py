@@ -3594,6 +3594,61 @@ class DcatCatalogTests(unittest.TestCase):
 NORMALIZED_DIR = Path(__file__).resolve().parents[1] / "data" / "normalized"
 
 
+class IndicatorAgeTests(unittest.TestCase):
+    """Plan 067 / ADR-016: edad del dato entregado por serie."""
+
+    def _frame(self, rows):
+        return pl.DataFrame(
+            {"codigo_indicador": [r[0] for r in rows], "fecha": [r[1] for r in rows]}
+        )
+
+    def test_age_measured_on_delivered_data_per_series(self):
+        from src.builders.metadata import build_indicator_ages
+
+        max_dates, ages = build_indicator_ages(
+            self._frame([("ipc", "2025-12-01"), ("dolar", "2026-07-20")]),
+            today=datetime.date(2026, 7, 29),
+        )
+        self.assertEqual(max_dates["ipc"], "2025-12-01")
+        self.assertEqual(ages["ipc"], 240)
+        self.assertEqual(ages["dolar"], 9)
+
+    def test_future_dated_series_yield_negative_age(self):
+        """La UF y la UTM se publican por adelantado: no es un error."""
+        from src.builders.metadata import build_indicator_ages
+
+        _, ages = build_indicator_ages(
+            self._frame([("uf", "2026-08-09")]), today=datetime.date(2026, 7, 29)
+        )
+        self.assertEqual(ages["uf"], -11)
+
+    def test_empty_frame_returns_empty_maps(self):
+        from src.builders.metadata import build_indicator_ages
+
+        max_dates, ages = build_indicator_ages(pl.DataFrame(), today=datetime.date(2026, 7, 29))
+        self.assertEqual(max_dates, {})
+        self.assertEqual(ages, {})
+
+    def test_threshold_depends_on_cadence(self):
+        from src.extractors.bcentral_extractor import (
+            MAX_BACKFILL_AGE_DAYS_DAILY,
+            MAX_BACKFILL_AGE_DAYS_MONTHLY,
+            max_backfill_age_days,
+        )
+
+        self.assertEqual(max_backfill_age_days("ipc"), MAX_BACKFILL_AGE_DAYS_MONTHLY)
+        self.assertEqual(max_backfill_age_days("utm"), MAX_BACKFILL_AGE_DAYS_MONTHLY)
+        self.assertEqual(max_backfill_age_days("dolar"), MAX_BACKFILL_AGE_DAYS_DAILY)
+        self.assertGreater(MAX_BACKFILL_AGE_DAYS_MONTHLY, MAX_BACKFILL_AGE_DAYS_DAILY)
+
+    def test_published_artifacts_expose_ages(self):
+        metadata = json.loads(
+            (NORMALIZED_DIR / "pipeline_metadata.json").read_text(encoding="utf-8")
+        )
+        ages = metadata["datasets"]["indicadores"]["indicator_age_days"]
+        self.assertEqual(set(ages), {"uf", "dolar", "euro", "utm", "ipc"})
+
+
 class DriftTaxonomyTests(unittest.TestCase):
     """Plan 066 / ADR-014: drift esperado (de diseño) vs drift real.
 

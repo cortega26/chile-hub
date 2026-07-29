@@ -405,6 +405,59 @@ class VerifySyntheticTests(unittest.TestCase):
             ),
         }
 
+    # -- Plan 067 / ADR-016: backfill consciente de la edad ----------------
+
+    @staticmethod
+    def _indicadores_with_backfill(*, code="ipc", age_days=240, status="published_backfill"):
+        return {
+            "source_mode": "live",
+            "source_detail": "public_api_with_published_backfill",
+            "freshness": {"status": "fresh"},
+            "indicator_delivery": {
+                **{c: "live" for c in ("uf", "dolar", "euro", "utm", "ipc")},
+                code: status,
+            },
+            "indicator_age_days": {"uf": -11, "dolar": 2, "euro": 2, "utm": -3, code: age_days},
+            "degradation": {},
+        }
+
+    def _run_policy(self, indicadores, **kwargs):
+        registry = [self._stable_registry_entry("indicadores")]
+        return vp.verify_publication_policy(
+            {"datasets": {"indicadores": indicadores}}, registry=registry, **kwargs
+        )
+
+    def test_stale_monthly_backfill_is_rejected(self) -> None:
+        """ipc a 240 dias supera el umbral mensual (70)."""
+        with patch("builtins.print"), self.assertRaises(SystemExit):
+            self._run_policy(self._indicadores_with_backfill(age_days=240))
+
+    def test_recent_monthly_backfill_is_accepted(self) -> None:
+        """Un hueco transitorio en una serie mensual sigue siendo degradacion con gracia."""
+        self._run_policy(self._indicadores_with_backfill(age_days=60))
+
+    def test_daily_backfill_uses_the_stricter_threshold(self) -> None:
+        """El umbral diario (10) es mucho mas estricto que el mensual."""
+        self._run_policy(self._indicadores_with_backfill(code="dolar", age_days=8))
+        with patch("builtins.print"), self.assertRaises(SystemExit):
+            self._run_policy(self._indicadores_with_backfill(code="dolar", age_days=12))
+
+    def test_live_delivery_is_never_flagged_by_the_backfill_gate(self) -> None:
+        """Una serie vieja pero entregada en vivo es problema de frescura,
+        no de backfill: este gate no debe dispararse (STOP condition del plan)."""
+        self._run_policy(self._indicadores_with_backfill(code="ipc", age_days=240, status="live"))
+
+    def test_stale_backfill_override_allows_publication(self) -> None:
+        self._run_policy(
+            self._indicadores_with_backfill(age_days=240), allow_stale_backfills={"ipc"}
+        )
+
+    def test_missing_age_metadata_does_not_crash_the_gate(self) -> None:
+        """Artefactos previos a ADR-016 no traen indicator_age_days."""
+        indicadores = self._indicadores_with_backfill()
+        del indicadores["indicator_age_days"]
+        self._run_policy(indicadores)
+
     def test_publication_policy_rejects_unreviewed_anomaly(self) -> None:
         """El build nunca aborta por esto -- sólo el gate de publicación
         (perfil publication / --require-live) lo rechaza."""

@@ -57,6 +57,51 @@ INDICATOR_CODES = ["uf", "dolar", "euro", "utm", "ipc"]
 # año en curso si el dato del mes aún no fue publicado — eso es esperado, no un error.
 MONTHLY_INDICATORS = {"utm", "ipc"}
 
+# Antigüedad máxima tolerada del ÚLTIMO dato de una serie entregada por
+# `published_backfill` antes de que el gate de publicación la rechace (ADR-016).
+# El umbral depende de la cadencia: 40 días de atraso en el dólar son una
+# emergencia y en el IPC son normales.
+#   - mensual: 70 días ≈ dos publicaciones perdidas (el INE publica el IPC
+#     alrededor del día 8 del mes siguiente, así que ~40 días es lo normal).
+#   - diaria: 10 días, holgura para feriados largos y ventanas de reintento.
+MAX_BACKFILL_AGE_DAYS_MONTHLY = 70
+MAX_BACKFILL_AGE_DAYS_DAILY = 10
+
+
+def max_backfill_age_days(codigo: str) -> int:
+    """Umbral de antigüedad aplicable a una serie, según su cadencia."""
+    return (
+        MAX_BACKFILL_AGE_DAYS_MONTHLY
+        if codigo in MONTHLY_INDICATORS
+        else MAX_BACKFILL_AGE_DAYS_DAILY
+    )
+
+
+def compute_indicator_ages(df, today=None):
+    """Fecha máxima y antigüedad en días de cada serie del DataFrame final.
+
+    Se calcula para TODOS los códigos, no solo los backfilleados: la señal debe
+    existir antes de que haga falta. La edad se mide sobre el dato entregado, no
+    sobre `refreshed_at_utc` — ese solo dice cuándo corrió el extractor, no cuán
+    viejo es lo que trae (ADR-016).
+    """
+    today = today or datetime.date.today()
+    max_dates = {}
+    ages = {}
+    if df is None or df.height == 0:
+        return max_dates, ages
+    grouped = df.group_by("codigo_indicador").agg(pl.col("fecha").max().alias("max_fecha"))
+    for row in grouped.iter_rows(named=True):
+        fecha = row["max_fecha"]
+        if fecha is None:
+            continue
+        if isinstance(fecha, str):
+            fecha = datetime.date.fromisoformat(fecha)
+        max_dates[row["codigo_indicador"]] = fecha.isoformat()
+        ages[row["codigo_indicador"]] = (today - fecha).days
+    return max_dates, ages
+
+
 # Política de reutilización: los datos provienen del BCCh/INE (libre reproducción
 # con citación). mindicador.cl es el agregador/punto de acceso, no la fuente original.
 REUSE_POLICY = {
@@ -381,6 +426,8 @@ def process_indicators() -> str:
     for code in diagnostics.get("published_backfills", []):
         indicator_delivery[code] = "published_backfill"
 
+    indicator_max_date, indicator_age_days = compute_indicator_ages(df)
+
     df.write_csv(STAGING_CSV_PATH)
 
     metadata = {
@@ -395,6 +442,8 @@ def process_indicators() -> str:
         "fields": df.columns,
         "indicator_codes": indicator_codes,
         "indicator_delivery": indicator_delivery,
+        "indicator_max_date": indicator_max_date,
+        "indicator_age_days": indicator_age_days,
         "history_start_year": HISTORY_START_YEAR,
         "notes": notes,
         "fetch_failures": diagnostics.get("fetch_failures", []),

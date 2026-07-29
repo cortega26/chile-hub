@@ -20,6 +20,7 @@ from src.build_dev_db import DATASET_CATALOG_CONFIG
 from src.builders._shared import NON_FALLBACK_SOURCE_MODES as _NON_FALLBACK_SOURCE_MODES
 from src.builders._shared import VALID_SOURCE_MODES as _VALID_SOURCE_MODES
 from src.chile_hub.contracts import verify_dataset_contract as _lib_verify_contract
+from src.extractors.bcentral_extractor import max_backfill_age_days as _max_backfill_age_days
 from src.pipeline_status_utils import load_json
 
 STAGING_DIR = ROOT_DIR / "data" / "staging"
@@ -449,7 +450,11 @@ def stable_publishable_dataset_names(registry):
 
 
 def verify_publication_policy(
-    metadata=None, registry=None, manifest=None, allow_known_anomalies=None
+    metadata=None,
+    registry=None,
+    manifest=None,
+    allow_known_anomalies=None,
+    allow_stale_backfills=None,
 ):
     if metadata is None:
         metadata = load_json(NORMALIZED_DIR / "pipeline_metadata.json")
@@ -531,6 +536,34 @@ def verify_publication_policy(
         }
         if unsafe_delivery:
             violations.append(f"indicadores: unsafe delivery={unsafe_delivery}")
+
+        # Backfill consciente de la edad (ADR-016): `published_backfill` es una
+        # degradación con gracia legítima ante un hueco transitorio, pero repetida
+        # build tras build esconde una serie muerta. Se mide la edad del dato
+        # ENTREGADO, con umbral por cadencia.
+        delivery = indicadores.get("indicator_delivery", {})
+        ages = indicadores.get("indicator_age_days", {})
+        stale_backfills = {}
+        for code, status in delivery.items():
+            if status != "published_backfill":
+                continue
+            age = ages.get(code)
+            if age is None:
+                continue
+            threshold = _max_backfill_age_days(code)
+            if age > threshold:
+                stale_backfills[code] = (age, threshold)
+        unreviewed_stale = sorted(set(stale_backfills) - (allow_stale_backfills or set()))
+        if unreviewed_stale:
+            detail = ", ".join(
+                f"{code}: {stale_backfills[code][0]}d > {stale_backfills[code][1]}d"
+                for code in unreviewed_stale
+            )
+            violations.append(
+                f"indicadores: stale published_backfill in {unreviewed_stale} ({detail}); "
+                "la serie lleva demasiado tiempo sin dato nuevo de la fuente "
+                "(override con --allow-stale-backfills tras confirmar upstream, ver ADR-016)"
+            )
 
         anomaly_codes = set(indicadores.get("degradation", {}).get("anomaly_indicator_codes", []))
         unreviewed_anomalies = sorted(anomaly_codes - (allow_known_anomalies or set()))
@@ -1666,6 +1699,13 @@ def build_parser():
         "ya fue revisada y confirmada como shock legítimo (no error de fuente). "
         "Ver ADR-013. Ej.: --allow-known-anomalies uf,dolar",
     )
+    parser.add_argument(
+        "--allow-stale-backfills",
+        default="",
+        help="Lista separada por comas de codigo_indicador entregado por "
+        "published_backfill cuya antigüedad ya fue revisada contra la fuente. "
+        "Ver ADR-016. Ej.: --allow-stale-backfills ipc",
+    )
     return parser
 
 
@@ -1676,6 +1716,9 @@ def main():
     profile = "publication" if args.require_live else args.profile
     allow_known_anomalies = {
         code.strip() for code in args.allow_known_anomalies.split(",") if code.strip()
+    }
+    allow_stale_backfills = {
+        code.strip() for code in args.allow_stale_backfills.split(",") if code.strip()
     }
 
     # Verificaciones comunes a todos los perfiles
@@ -1700,7 +1743,10 @@ def main():
         verify_readiness()
 
     if profile == "publication":
-        verify_publication_policy(allow_known_anomalies=allow_known_anomalies)
+        verify_publication_policy(
+            allow_known_anomalies=allow_known_anomalies,
+            allow_stale_backfills=allow_stale_backfills,
+        )
 
 
 if __name__ == "__main__":
