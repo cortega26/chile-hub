@@ -2857,7 +2857,7 @@
             <div class="intro-copy">
                 <p class="intro-eyebrow">Datos oficiales de Chile, curados y reproducibles</p>
                 <h2>Un punto de partida curado para datos abiertos de Chile.</h2>
-                <p>Veintidós capas normalizadas y versionadas — geografía, demografía, economía, salud, educación, gobierno y más — listas para consumir en una línea de código. Con resolución de entidades por nombre y por coordenadas.</p>
+                <p>Diecisiete capas publicadas y normalizadas — geografía, demografía, economía, salud, educación, gobierno y más — listas para consumir en una línea de código. Con resolución de entidades por nombre y por coordenadas.</p>
                 <div class="intro-links">
                     <a class="btn btn-primary" href="#catalogo">Explorar datos</a>
                     <a class="btn btn-secondary" href="reference/">Ver documentación</a>
@@ -2907,8 +2907,8 @@ curl -s <span class="string">"https://tooltician.com/chile-hub/data/normalized/h
             </aside>
         </section>
         <div class="hero-signals" aria-label="Señales del hub">
-            <span class="hero-signal"><strong>22</strong> capas publicadas</span>
-            <span class="hero-signal"><strong>346</strong> comunas con cobertura</span>
+            <span class="hero-signal"><strong>17</strong> capas publicadas</span>
+            <span class="hero-signal"><strong>346</strong> comunas en el catálogo</span>
             <span class="hero-signal"><strong>100%</strong> códigos CUT normalizados</span>
             <span class="hero-signal"><strong>Diaria</strong> actualización automática</span>
         </div>
@@ -2962,7 +2962,7 @@ curl -s <span class="string">"https://tooltician.com/chile-hub/data/normalized/h
                         <h3>Resolución de entidades</h3>
                         <span class="capability-code">resolve_comunas()</span>
                     </div>
-                    <p>Convierte nombres de comunas en códigos CUT normalizados, con sugerencias ante errores de escritura.</p>
+                    <p>Convierte nombres de comunas en códigos CUT normalizados (normaliza acentos y mayúsculas; match exacto).</p>
                     <pre class="capability-example">from chile_hub import ChileHub
 hub = ChileHub()
 hub.resolve_comunas(["santiago", "nunoa"])</pre>
@@ -2982,7 +2982,7 @@ hub.resolve_comunas(["santiago", "nunoa"])</pre>
                         <h3>Geometría comunal</h3>
                         <span class="capability-code">GeoParquet</span>
                     </div>
-                    <p>Límites poligonales de las 346 comunas en GeoParquet, listos para QGIS, geopandas o deck.gl.</p>
+                    <p>Límites poligonales de 345 de las 346 comunas en GeoParquet (Antártica es un gap upstream documentado), listos para QGIS, geopandas o deck.gl.</p>
                     <pre class="capability-example">gdf = gpd.read_parquet(
   "…/geometria_comunal.parquet")</pre>
                 </article>
