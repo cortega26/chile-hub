@@ -702,15 +702,20 @@ async function loadHubHealth() {
         if (tbody && Array.isArray(health.datasets)) {
             tableWrap?.classList.remove("health-hidden");
             tbody.innerHTML = health.datasets.map(function(entry) {
-                const sev = entry.severity || "unknown";
+                const sev = escapeHtml(entry.severity || "unknown");
+                const sourceMode = escapeHtml(entry.source_mode || "unknown");
+                const validationStatus = escapeHtml(entry.validation_status || "unknown");
+                const freshnessStatus = escapeHtml(entry.freshness_status || "unknown");
+                const coverageStatus = escapeHtml(entry.coverage_status || "unknown");
+                const driftStatus = escapeHtml(entry.drift_status || "unknown");
                 return '<tr class="severity-' + sev + '">' +
                     '<td>' + escapeHtml(entry.dataset) + '</td>' +
                     '<td><span class="pill ' + sev + '">' + sev + '</span></td>' +
-                    '<td><span class="pill ' + (entry.source_mode || "unknown") + '">' + escapeHtml(entry.source_mode || "unknown") + '</span></td>' +
-                    '<td><span class="pill ' + (entry.validation_status || "unknown") + '">' + escapeHtml(entry.validation_status || "unknown") + '</span></td>' +
-                    '<td><span class="pill ' + (entry.freshness_status || "unknown") + '">' + escapeHtml(entry.freshness_status || "unknown") + '</span></td>' +
-                    '<td><span class="pill ' + (entry.coverage_status || "unknown") + '">' + escapeHtml(formatCoverageStatusLabel(entry)) + '</span></td>' +
-                    '<td><span class="pill ' + (entry.drift_status || "unknown") + '">' + escapeHtml(entry.drift_status || "unknown") + '</span></td>' +
+                    '<td><span class="pill ' + sourceMode + '">' + escapeHtml(entry.source_mode || "unknown") + '</span></td>' +
+                    '<td><span class="pill ' + validationStatus + '">' + escapeHtml(entry.validation_status || "unknown") + '</span></td>' +
+                    '<td><span class="pill ' + freshnessStatus + '">' + escapeHtml(entry.freshness_status || "unknown") + '</span></td>' +
+                    '<td><span class="pill ' + coverageStatus + '">' + escapeHtml(formatCoverageStatusLabel(entry)) + '</span></td>' +
+                    '<td><span class="pill ' + driftStatus + '">' + escapeHtml(entry.drift_status || "unknown") + '</span></td>' +
                     '<td>' + (entry.warning_count ?? 0) + '</td>' +
                     '</tr>';
             }).join("");

@@ -76,6 +76,38 @@ class SinimDailyJobGuardrailTests(unittest.TestCase):
         self.assertIn('git add -f "$path"', content)
         self.assertNotIn('git add "$path"', content)
 
+    def test_extractors_belong_to_exactly_one_lane(self):
+        """TECHDEBT-06: un extractor no puede correr en dos carriles.
+
+        Los extractores del carril diario viven solo en `make extract`
+        (Makefile); los mensuales solo en `monthly-scrape.yml`; el stub SINIM
+        y los candidate en ningún job programado. Un extractor en dos carriles
+        duplicaría trabajo o sobrescribiría snapshots (el caso SINIM bloqueó el
+        publish diario en 2026-06).
+        """
+        daily = _extract_make_target(MAKEFILE.read_text(encoding="utf-8"), "extract")
+        daily_extractors = {
+            line.strip()
+            for line in daily.splitlines()
+            if "extractors/" in line and "_extractor.py" in line
+        }
+        monthly = MONTHLY_SCRAPE_WORKFLOW.read_text(encoding="utf-8")
+        monthly_extractors = {
+            f"src/extractors/{name}"
+            for name in ("sinim_finanzas_live_extractor.py", "cead_delincuencia_live_extractor.py")
+            if f"{name}" in monthly
+        }
+        overlap = daily_extractors & monthly_extractors
+        self.assertEqual(overlap, set(), f"Extractores en dos carriles: {overlap}")
+        self.assertNotIn("sinim_finanzas_extractor.py", daily_extractors)
+
+    def test_extraction_lanes_doc_is_referenced_from_agents(self):
+        """TECHDEBT-06: la vista de carriles (`docs/extraction-lanes.md`) debe
+        seguir referenciada desde AGENTS.md §3 para que el split diario/mensual
+        no vuelva a quedar solo en el código."""
+        agents = (ROOT_DIR / "AGENTS.md").read_text(encoding="utf-8")
+        self.assertIn("docs/extraction-lanes.md", agents)
+
 
 class AutoridadesElectasScraplingGuardrailTests(unittest.TestCase):
     """Regresión: en el job diario de Pipeline Check (cache-miss → extracción
@@ -356,6 +388,30 @@ class LandingSyncGateGuardrailTests(unittest.TestCase):
             body,
             "`make doctor` debe correr el gate de landing antes de commit.",
         )
+
+    def test_health_table_escapes_status_values_in_class_attributes(self):
+        """SEC-03: los valores de estado del dashboard de salud deben escaparse
+        también en los atributos `class`, no solo en el texto.
+
+        `hub_health.json` es generado por el pipeline (valores enum internos),
+        pero la tabla de salud es la unica superficie donde un valor externo
+        (p. ej. un severity malformado) se interpolaba crudo en `class=` — un
+        vector de attribute injection. Los seis estados (severity, source_mode,
+        validation_status, freshness_status, coverage_status, drift_status)
+        deben pasar por escapeHtml antes de entrar a la clase.
+        """
+        content = (ROOT_DIR / "app.js").read_text(encoding="utf-8")
+        for var, status in (
+            ("sev", "severity"),
+            ("sourceMode", "source_mode"),
+            ("validationStatus", "validation_status"),
+            ("freshnessStatus", "freshness_status"),
+            ("coverageStatus", "coverage_status"),
+            ("driftStatus", "drift_status"),
+        ):
+            with self.subTest(status=status):
+                self.assertIn(f"const {var} = escapeHtml(entry.{status}", content)
+                self.assertIn(f"class=\"pill ' + {var}", content)
 
 
 class AgentsSyncGateGuardrailTests(unittest.TestCase):
