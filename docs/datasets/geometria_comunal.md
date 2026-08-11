@@ -76,8 +76,46 @@ contiene ambos archivos:
 sha256sum -c geometria_comunal.parquet.sha256
 ```
 
-Sigue siendo datos `candidate`: queda deliberadamente fuera de `ChileHub()`, del
-bundle estable y del build normal. El workflow no fija una cadencia de refresco.
+Sigue siendo datos `candidate`: queda deliberadamente fuera del bundle estable y
+del build normal (el acceso es directo al archivo o vía `resolve_by_coords()`,
+que lo consume bajo demanda). El workflow no fija una cadencia de refresco.
+
+## Resolución de coordenadas a comuna (`resolve_by_coords`)
+
+`ChileHub.resolve_by_coords()` (Plan 065) convierte coordenadas GPS en el CUT de
+su comuna, contra este mismo artefacto candidate:
+
+```bash
+pip install "chile-hub[geo]"
+```
+
+```python
+from chile_hub import ChileHub
+
+hub = ChileHub()
+df = hub.resolve_by_coords([(-33.4489, -70.6693), (-33.1, -72.0)])
+# input_lat, input_lon, codigo_comuna, nombre_comuna, matched
+```
+
+- **Tuplas `(latitud, longitud)`** en grados decimales; se preservan el orden y
+  los duplicados del input (una fila por punto).
+- **Esquema de salida** (Polars): `input_lat` (f64), `input_lon` (f64),
+  `codigo_comuna` (str, 5 chars), `nombre_comuna` (str), `matched` (bool).
+- **Fuera de Chile o de todo polígono**: `matched=False` y comuna nula — sin
+  excepción. Coordenadas fuera de rango (lat ∉ [-90, 90], lon ∉ [-180, 180])
+  sí lanzan `ValueError` nombrando el input.
+- **Bordes**: un punto exactamente sobre un límite matchea (`covers`, no
+  `contains`). Si varias comunas cubren un punto, gana el `codigo_comuna`
+  lexicográficamente menor (tie-break determinístico, con warning).
+- **Caché**: el artefacto se descarga una vez, se verifica contra el compañero
+  `.sha256` (ADR-012) y se guarda en `platformdirs.user_cache_dir("chile-hub")`;
+  un caché verificado se reutiliza sin red. `refresh_geometry=True` fuerza
+  re-descarga; `geometry_path=` permite un archivo local (validado igual).
+- **Límite candidate**: el artefacto se consume verificando su checksum, pero
+  **no** entra al bundle estable, al catálogo ni a `load_polars()`.
+- **Precisión**: la geometría generalizada + simplificación de ~100 m puede
+  desplazar bordes; no usar los resultados para disputas de límites ni
+  medición de precisión geodésica.
 
 ## Limitaciones
 
@@ -90,3 +128,19 @@ bundle estable y del build normal. El workflow no fija una cadencia de refresco.
 ## Registro de cambios
 
 - v1 (2026-07-23): Primera versión. Geometría comunal generalizada desde BCN ArcGIS, GeoParquet 1.0/WKB/EPSG:4326, 345/346 comunas.
+- v2 (2026-08-11): API `resolve_by_coords()` (Plan 065): contrato de distribución/caché con verificación SHA-256 y decisiones de borde/tie-break en ADR-012.
+
+<!-- START_DATASET_SCHEMA -->
+
+## Schema (auto-generado desde `contracts/datasets/geometria_comunal.schema.json`)
+
+| Columna | Tipo | Ejemplo | Requerida | Nota |
+|:---|:---|:---|:---:|:---|
+| `codigo_region` | `VARCHAR(2)` | `"01"` | Sí | — |
+| `codigo_comuna` | `VARCHAR(5)` | `"01101"` | Sí | PK |
+| `nombre_comuna` | `VARCHAR` | `"Iquique"` | Sí | — |
+| `nombre_comuna_clean` | `VARCHAR` | `"iquique"` | Sí | — |
+| `nombre_region` | `VARCHAR` | `"Región de Tarapacá"` | Sí | — |
+| `geometry` | `BINARY` | `"WKB — Polygon o MultiPolygon en EPSG:4326 (WGS84), geoparquet 1.0"` | Sí | — |
+
+<!-- END_DATASET_SCHEMA -->

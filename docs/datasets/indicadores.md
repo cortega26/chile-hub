@@ -133,3 +133,15 @@ estado contra la fuente y use `--allow-stale-backfills`.
 
 **Estado conocido**: la serie `ipc` no recibe datos nuevos desde 2025-12-01. El
 diagnóstico upstream está abierto en el issue #43.
+
+<!-- START_DATASET_SCHEMA -->
+
+## Schema (auto-generado desde `contracts/datasets/indicadores.schema.json`)
+
+| Columna | Tipo | Ejemplo | Requerida | Nota |
+|:---|:---|:---|:---:|:---|
+| `fecha` | `DATE` | `"2026-05-30"` | Sí | PK |
+| `codigo_indicador` | `VARCHAR` | `"uf"` | Sí | PK |
+| `valor` | `DOUBLE` | `39420.5` | Sí | — |
+
+<!-- END_DATASET_SCHEMA -->

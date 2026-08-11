@@ -85,6 +85,13 @@ jobs:
       - name: Check landing sync (JSON-LD/app.js derivados del catálogo)
         run: python scripts/check_landing_sync.py
 
+      # AGENTS.md es prosa curada (no bloque delimitado): verifica sus hechos
+      # contables (anclas de líneas, listas de módulos, tabla de capas del §1)
+      # contra el código — el caso real que motivó este gate fue la deriva de
+      # conteos de líneas y módulos en el árbol del §2 (2026-08).
+      - name: Check AGENTS.md countable facts
+        run: python scripts/check_agents_sync.py
+
       - name: Fetch PR base commit for companion-path diff
         if: github.event_name == 'pull_request'
         run: git fetch --no-tags --depth=1 origin "${{ github.event.pull_request.base.sha }}"

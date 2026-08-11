@@ -68,3 +68,19 @@ ver `docs/legal/b2-2-electoral-research.md`).
 dato (15/36 al último build). Es una característica de la fuente, no un fallo de
 extracción: el warning está declarado como *esperado* y no cuenta como
 degradación accionable ni como drift.
+
+<!-- START_DATASET_SCHEMA -->
+
+## Schema (auto-generado desde `contracts/datasets/partidos_politicos.schema.json`)
+
+| Columna | Tipo | Ejemplo | Requerida | Nota |
+|:---|:---|:---|:---:|:---|
+| `id_partido` | `VARCHAR` | `"DC"` | Sí | PK |
+| `nombre` | `VARCHAR` | `"Partido Demócrata Cristiano"` | Sí | — |
+| `sigla` | `VARCHAR` | `"DC"` | Sí | — |
+| `estado_legal` | `VARCHAR` | `"constituido"` (nulo si no matchea con SERVEL)"` | No | — |
+| `fecha_constitucion` | `DATE` | `"1988-05-02"` | No | — |
+| `ambito` | `VARCHAR` | `"null` (sin fuente que lo provea)"` | No | — |
+| `fuente` | `VARCHAR` | `"Cámara de Diputadas y Diputados"` | Sí | — |
+
+<!-- END_DATASET_SCHEMA -->

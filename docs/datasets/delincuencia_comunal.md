@@ -74,3 +74,18 @@ sigue rompiéndose, este dataset se degrada a `rejected` y se archiva.
 - Scraper R de referencia: https://github.com/bastianolea/delincuencia_chile
 - Revisión legal: `docs/legal/fase-3-legal-review.md` §2
 - Plan 022 — Ola B2.1: `plans/022-plan-avance-narrativa-confiabilidad.md`
+
+<!-- START_DATASET_SCHEMA -->
+
+## Schema (auto-generado desde `contracts/datasets/delincuencia_comunal.schema.json`)
+
+| Columna | Tipo | Ejemplo | Requerida | Nota |
+|:---|:---|:---|:---:|:---|
+| `codigo_comuna` | `VARCHAR(5)` | `"01101"` | Sí | PK |
+| `nombre_comuna` | `VARCHAR` | `"Santiago"` | No | — |
+| `anio` | `INTEGER` | `2024` | Sí | PK |
+| `mes` | `INTEGER` | `1` | Sí | PK |
+| `familia_delito` | `VARCHAR` | `"robos_violentos"` | Sí | PK |
+| `casos` | `INTEGER` | `245` | Sí | — |
+
+<!-- END_DATASET_SCHEMA -->

@@ -17,6 +17,7 @@ Uso:
 ```bash
 tests/e2e/verify_058.sh     # un plan puntual
 tests/e2e/run_all.sh        # todos los planes ya marcados DONE, en orden de la cola
+make e2e                    # equivalente a run_all.sh desde la raíz
 ```
 
 Salida: cada script imprime cada criterio antes de correrlo y sale con el código de

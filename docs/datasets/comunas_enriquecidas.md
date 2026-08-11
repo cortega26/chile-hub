@@ -45,3 +45,20 @@ LIMIT 10;
 Las coordenadas representan cabeceras comunales, no centroides administrativos.
 Los valores de población son estimaciones de referencia y no reemplazan cifras
 censales oficiales para decisiones regulatorias.
+
+<!-- START_DATASET_SCHEMA -->
+
+## Schema (auto-generado desde `contracts/datasets/comunas_enriquecidas.schema.json`)
+
+| Columna | Tipo | Ejemplo | Requerida | Nota |
+|:---|:---|:---|:---:|:---|
+| `codigo_comuna` | `VARCHAR(5)` | `"01101"` | Sí | PK |
+| `nombre_comuna` | `VARCHAR` | `"Iquique"` | Sí | — |
+| `nombre_comuna_clean` | `VARCHAR` | `"iquique"` | No | — |
+| `codigo_provincia` | `VARCHAR(3)` | `"011"` | Sí | — |
+| `codigo_region` | `VARCHAR(2)` | `"01"` | Sí | — |
+| `latitud_cabecera` | `DOUBLE` | `-20.2138` | Sí | — |
+| `longitud_cabecera` | `DOUBLE` | `-70.1508` | Sí | — |
+| `poblacion_estimada` | `INTEGER` | `223400` | Sí | — |
+
+<!-- END_DATASET_SCHEMA -->

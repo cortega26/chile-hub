@@ -78,3 +78,19 @@ bloquea las requests, se degrada a `rejected`.
 - Wikipedia — Gobernador regional de Chile: https://es.wikipedia.org/wiki/Gobernador_regional_de_Chile
 - Licencias: `DATA_LICENSES.md`
 - Plan 042 — BCN SIIT alcaldes: `plans/042-ampliar-cobertura-alcaldes-main-article.md`
+
+<!-- START_DATASET_SCHEMA -->
+
+## Schema (auto-generado desde `contracts/datasets/autoridades_locales.schema.json`)
+
+| Columna | Tipo | Ejemplo | Requerida | Nota |
+|:---|:---|:---|:---:|:---|
+| `id_autoridad` | `VARCHAR` | `"gobernador_01"` | Sí | PK |
+| `nombre` | `VARCHAR` | `"null` si no hay evidencia clara del titular"` | Sí | — |
+| `cargo` | `VARCHAR` | `"gobernador_regional"` / `"alcalde"` | Sí | — |
+| `codigo_region` | `VARCHAR(2)` | `"01"` | No | — |
+| `codigo_comuna` | `VARCHAR(5)` | `"01101"` (solo alcaldes)"` | No | — |
+| `partido` | `VARCHAR` | `"nulo si no identificado"` | No | — |
+| `estado_mandato` | `VARCHAR` | `"vigente"` / `"sin_identificar"` | No | — |
+
+<!-- END_DATASET_SCHEMA -->

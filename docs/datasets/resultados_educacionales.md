@@ -44,3 +44,17 @@ La capa se publica solo agregada por comuna y año. No contiene registros de est
 ## Registro de cambios
 
 - v1: Dataset agregado con validación de porcentajes, conteos no negativos y privacidad por agregación.
+
+<!-- START_DATASET_SCHEMA -->
+
+## Schema (auto-generado desde `contracts/datasets/resultados_educacionales.schema.json`)
+
+| Columna | Tipo | Ejemplo | Requerida | Nota |
+|:---|:---|:---|:---:|:---|
+| `anio` | `INTEGER` | `2024` | Sí | PK |
+| `codigo_comuna` | `VARCHAR(5)` | `"01101"` | Sí | PK |
+| `matricula_total` | `INTEGER` | `122000` | Sí | — |
+| `asistencia_promedio` | `DOUBLE` | `86.2` | Sí | — |
+| `tasa_aprobacion` / `tasa_retiro` | `DOUBLE` | `"91.4` / `4.5"` | No | — |
+
+<!-- END_DATASET_SCHEMA -->
