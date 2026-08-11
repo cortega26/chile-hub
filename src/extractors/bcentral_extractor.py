@@ -310,7 +310,12 @@ def fetch_all_history():
                             "valor": ine_reading.value,
                         }
                     )
-                    refreshed_pairs.add((codigo, year))
+                    # NO marcar (ipc, year) en refreshed_pairs: eso haria que el
+                    # merge eliminara TODO el slice ipc del año en curso del
+                    # staging existente y lo reemplazara solo por el registro
+                    # INE (un mes), truncando los meses que mindicador si habia
+                    # entregado. El concat + unique(keep="last") final fusiona
+                    # el registro INE con el historial existente por fecha.
                     diagnostics.setdefault("ine_override_pairs", []).append(f"{codigo}/{year}")
                 else:
                     print("  Advertencia: no se pudo obtener IPC desde INE.")

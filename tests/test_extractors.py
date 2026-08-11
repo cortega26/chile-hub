@@ -533,6 +533,54 @@ class IneIpcOverrideIntegrationTests(unittest.TestCase):
         self.assertEqual(ipc_rows.height, 1)
         self.assertEqual(ipc_rows["valor"][0], 0.1)
 
+    def test_ine_override_preserves_prior_mindicador_months(self):
+        """El override INE no debe truncar los meses del año ya entregados por
+        mindicador (regresion detectada en review, PR #56).
+
+        El registro INE se fusiona por fecha con el staging existente; no marca
+        (ipc, year) como refreshed, porque eso haria que el merge eliminara
+        TODO el slice ipc del año y lo reemplazara solo por el mes del INE.
+        """
+        current_year = datetime.date.today().year
+
+        def fetch(codigo, year):
+            if codigo == "ipc" and year == current_year:
+                return []  # mindicador muerto para ipc este año
+            return [{"fecha": f"{year}-01-01", "codigo_indicador": codigo, "valor": 1.0}]
+
+        existing = pl.DataFrame(
+            {
+                "fecha": [f"{current_year}-01-01", f"{current_year}-03-01"],
+                "codigo_indicador": ["ipc", "ipc"],
+                "valor": [0.5, 0.7],
+            }
+        ).with_columns(pl.col("fecha").str.to_date("%Y-%m-%d"))
+        with (
+            patch.object(
+                bcentral_extractor,
+                "load_existing_staging",
+                return_value=(existing, current_year, []),
+            ),
+            patch.object(bcentral_extractor, "HISTORY_START_YEAR", current_year),
+            patch.object(bcentral_extractor, "fetch_indicator_year", side_effect=fetch),
+            patch.object(
+                bcentral_extractor,
+                "fetch_ine_ipc",
+                return_value=IneIpcReading(value=0.1, date_iso=f"{current_year}-07-01"),
+            ),
+        ):
+            df, diagnostics = bcentral_extractor.fetch_all_history()
+
+        ipc_rows = df.filter(pl.col("codigo_indicador") == "ipc").sort("fecha")
+        # Los meses previos de mindicador se preservan + el mes del INE se suma
+        self.assertEqual(ipc_rows.height, 3)
+        dates = ipc_rows["fecha"].dt.strftime("%Y-%m-%d").to_list()
+        self.assertEqual(
+            dates,
+            [f"{current_year}-01-01", f"{current_year}-03-01", f"{current_year}-07-01"],
+        )
+        self.assertIn(f"ipc/{current_year}", diagnostics["ine_override_pairs"])
+
     def test_no_override_when_mindicador_delivers_ipc(self):
         current_year = datetime.date.today().year
 

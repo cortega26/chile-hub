@@ -17,16 +17,35 @@ from __future__ import annotations
 from pathlib import Path
 
 
+def _is_chile_hub_pyproject(path: Path) -> bool:
+    """True si el pyproject.toml declara el paquete chile-hub.
+
+    El sentinel no puede ser solo la presencia de ``pyproject.toml``: en un
+    entorno instalado (wheel dentro del .venv del consumidor), el ascenso
+    desde site-packages alcanza el pyproject.toml del proyecto CONSUMIDOR y
+    lo aceptaría como raíz, reportando su versión como ``chile_hub.__version__``
+    y resolviendo ROOT_DIR/NORMALIZED_DIR contra su árbol. Se exige que el
+    archivo declare ``name = "chile-hub"``.
+    """
+    try:
+        text = path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return False
+    return 'name = "chile-hub"' in text
+
+
 def find_root() -> Path:
-    """Localiza la raíz del proyecto buscando ``pyproject.toml`` como sentinel.
+    """Localiza la raíz del proyecto buscando el pyproject.toml de chile-hub.
 
     Funciona desde ``src/chile_hub/`` (wheel empaquetado o checkout) y desde
     ``src/`` (importaciones de build_dev_db.py). En un entorno instalado sin
-    ``pyproject.toml``, devuelve un fallback razonable.
+    el pyproject del proyecto (p. ej. el .venv de un consumidor), devuelve un
+    fallback razonable.
     """
     current = Path(__file__).resolve().parent
     for _ in range(6):
-        if (current / "pyproject.toml").exists():
+        candidate = current / "pyproject.toml"
+        if candidate.exists() and _is_chile_hub_pyproject(candidate):
             return current
         current = current.parent
     # Fallback para rueda instalada: parents[2] desde src/chile_hub/ da
