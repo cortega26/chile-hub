@@ -37,6 +37,18 @@ COMPANION_RULES: dict[str, list[str]] = {
     # the documented pipeline contract, so requiring AGENTS.md makes valid
     # dependency-only PRs fail before their workflow checks can run.
     "Makefile": ["AGENTS.md", "README.md"],
+    # El gate de hechos contables de AGENTS.md: cambiar el verificador sin tocar
+    # el documento que protege (o viceversa) es señal de drift.
+    "scripts/check_agents_sync.py": ["AGENTS.md"],
+    # El liveness checker y su workflow semanal co-evolucionan con el registro
+    # de fuentes que inspeccionan.
+    "scripts/check_source_urls.py": [
+        "data/source_registry.json",
+        ".github/workflows/source-urls.yml",
+    ],
+    # Cambiar el generador de bloques delimitados sin regenerar los documentos
+    # que escribe (README/AGENTS/docs de datasets) deja deriva latente.
+    "src/builders/doc_sync.py": ["AGENTS.md", "README.md", "docs/datasets/"],
 }
 
 # Módulos compartidos de src/extractors/ que no representan un dataset propio;

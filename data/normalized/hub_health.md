@@ -1,6 +1,6 @@
 # chile-hub health summary
 
-- `generated_at_utc`: `2026-07-29T21:17:07.793049+00:00`
+- `generated_at_utc`: `2026-08-11T20:29:11.293314+00:00`
 - `overall_status`: `warn`
 - `dataset_count`: `19`
 - `ok_count`: `17`
@@ -8,7 +8,7 @@
 - `error_count`: `0`
 - `live_count`: `18`
 - `fallback_count`: `0`
-- `stale_count`: `1`
+- `stale_count`: `0`
 - `publishable_count`: `18`
 - `review_terms_count`: `0`
 - `unknown_reuse_count`: `0`
@@ -17,7 +17,7 @@
 - `partial_coverage_count`: `2`
 - `unknown_coverage_count`: `0`
 - `drifted_count`: `1`
-- `warning_count`: `6`
+- `warning_count`: `5`
 - `top_issue`: `empresas` (freshness=fresh, drift=healthy, warnings=1)
 - `top_issue_reason`: RES solo cubre constituciones bajo Ley 20.659 (regimen simplificado). No incluye empresas del regimen tradicional (Diario Oficial) ni empresas anteriores a mayo 2013.
 - `top_issue_action`: Ninguna.
@@ -36,7 +36,7 @@
 | `establecimientos_educacionales` | `ok` | `live` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `establecimientos_salud` | `ok` | `live` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `finanzas_municipales` | `ok` | `monthly` | `fresh` | `partial` | `healthy` | `ready` | `none` | `ok` | 0 |
-| `indicadores` | `warn` | `live` | `stale` | `not_applicable` | `drifted` | `ready` | `warning` | `ok` | 2 |
+| `indicadores` | `warn` | `live` | `fresh` | `not_applicable` | `drifted` | `ready` | `warning` | `ok` | 1 |
 | `indicadores_urbanos_siedu` | `ok` | `live` | `fresh` | `partial` | `healthy` | `ready` | `none` | `ok` | 1 |
 | `partidos_politicos` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 1 |
 | `perfil_territorial_comunal` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |

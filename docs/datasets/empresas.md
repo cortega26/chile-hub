@@ -118,3 +118,20 @@ chile-hub path empresas --output parquet
 
 - **2026-06-17:** Dataset agregado a chile-hub (extractor, validación, tests,
   documentación).
+
+<!-- START_DATASET_SCHEMA -->
+
+## Schema (auto-generado desde `contracts/datasets/empresas.schema.json`)
+
+| Columna | Tipo | Ejemplo | Requerida | Nota |
+|:---|:---|:---|:---:|:---|
+| `rut` | `VARCHAR` | `"76286049-K"` | Sí | PK |
+| `razon_social` | `VARCHAR` | `"COMERCIALIZADORA EJEMPLO SPA"` | Sí | — |
+| `codigo_sociedad` | `VARCHAR` | `"SPA"` | Sí | — |
+| `capital` | `INTEGER` | `5000000` | Sí | — |
+| `fecha_actuacion` | `DATE` | `"2020-06-15"` | No | — |
+| `anio` | `INTEGER` | `2020` | Sí | — |
+| `comuna_tributaria` | `VARCHAR` | `"SANTIAGO"` | No | — |
+| `region_tributaria` | `VARCHAR` | `"13"` | No | — |
+
+<!-- END_DATASET_SCHEMA -->

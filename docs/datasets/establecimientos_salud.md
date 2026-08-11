@@ -35,3 +35,20 @@ El directorio mezcla establecimientos públicos y privados y conserva las clasif
 ## Registro de cambios
 
 - 2026-06: primera versión con identidad, clasificación, urgencia, estado y coordenadas.
+
+<!-- START_DATASET_SCHEMA -->
+
+## Schema (auto-generado desde `contracts/datasets/establecimientos_salud.schema.json`)
+
+| Columna | Tipo | Ejemplo | Requerida | Nota |
+|:---|:---|:---|:---:|:---|
+| `codigo_establecimiento` | `VARCHAR` | `"101101"` | Sí | PK |
+| `nombre_establecimiento` | `VARCHAR` | `"Hospital Dr. Ernesto Torres Galdames"` | Sí | — |
+| `tipo_establecimiento` | `VARCHAR` | `"Hospital"` | Sí | — |
+| `nivel_atencion` | `VARCHAR` | `"Alta Complejidad"` | No | — |
+| `codigo_comuna` | `VARCHAR(5)` | `"01101"` | Sí | — |
+| `tiene_servicio_urgencia` | `VARCHAR` | `"SI"` / `"NO"` | No | — |
+| `latitud` / `longitud` | `DOUBLE` | `"Coordenadas geográficas"` | No | — |
+| `estado_funcionamiento` | `VARCHAR` | `"Vigente"` | No | — |
+
+<!-- END_DATASET_SCHEMA -->

@@ -55,3 +55,22 @@ La cobertura SAE (345/346 comunas) es **parcial por diseño**: las comunas sin
 muestra no tienen estimación. Ese warning está declarado como *esperado* en la
 regla que lo emite, por lo que no cuenta como degradación accionable ni como
 drift. El mensaje sigue listado en `warnings` de todos los artefactos.
+
+<!-- START_DATASET_SCHEMA -->
+
+## Schema (auto-generado desde `contracts/datasets/pobreza_comunal.schema.json`)
+
+| Columna | Tipo | Ejemplo | Requerida | Nota |
+|:---|:---|:---|:---:|:---|
+| `codigo_region` | `VARCHAR(2)` | `"01"` | Sí | — |
+| `codigo_comuna` | `VARCHAR(5)` | `"01101"` | Sí | PK |
+| `nombre_comuna` | `VARCHAR` | `"Santiago"` | Sí | — |
+| `anio` | `INTEGER` | `2022` | Sí | PK |
+| `dimension` | `VARCHAR` | `"ingresos"` / `"multidimensional"` | Sí | PK |
+| `tasa` | `DOUBLE` | `15.3` | Sí | — |
+| `limite_inferior` | `DOUBLE` | `12.1` | Sí | — |
+| `limite_superior` | `DOUBLE` | `18.9` | Sí | — |
+| `metodologia` | `VARCHAR` | `"SAE"` | Sí | — |
+| `fuente` | `VARCHAR` | `"Observatorio Social — MDS"` | Sí | — |
+
+<!-- END_DATASET_SCHEMA -->

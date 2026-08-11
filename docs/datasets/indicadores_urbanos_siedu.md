@@ -53,3 +53,17 @@ lo declara con `coverage_policy: "partial_expected"` y el warning
 "intentionally partial urban coverage" está registrado como *esperado*, así que
 el dataset no cuenta como drift ni eleva la severidad del hub. El warning sigue
 apareciendo íntegro en `warnings`.
+
+<!-- START_DATASET_SCHEMA -->
+
+## Schema (auto-generado desde `contracts/datasets/indicadores_urbanos_siedu.schema.json`)
+
+| Columna | Tipo | Ejemplo | Requerida | Nota |
+|:---|:---|:---|:---:|:---|
+| `anio` | `INTEGER` | `2024` | Sí | PK |
+| `codigo_comuna` | `VARCHAR(5)` | `"01101"` | Sí | PK |
+| `codigo_indicador` | `VARCHAR` | `"siedu_acceso_areas_verdes"` | Sí | PK |
+| `categoria` | `VARCHAR` | `"Espacio publico"` | No | — |
+| `valor` / `unidad` | `DOUBLE` | `"71.4` / `"porcentaje"` | No | — |
+
+<!-- END_DATASET_SCHEMA -->

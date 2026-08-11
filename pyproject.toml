@@ -58,6 +58,15 @@ pipeline = [
 query = [
     "duckdb>=1.5.4",
 ]
+# Consumo geoespacial opcional para resolve_by_coords(): el mismo set que el
+# pipeline usa para ESCRIBIR el GeoParquet (geopandas/shapely/pyarrow), expuesto
+# ahora al consumidor. No toca [project.dependencies] — sin este extra,
+# resolve_by_coords() levanta ImportError con la instrucción exacta.
+geo = [
+    "geopandas>=1.1.4",
+    "shapely>=2.1.2",
+    "pyarrow>=24.0.0",
+]
 validation = [
     "frictionless>=5.18,<6",
 ]

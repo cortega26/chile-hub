@@ -97,3 +97,21 @@ Esta capa debería seguir en MVP, pero necesita:
 1. validación de cobertura esperada contra un total oficial de comunas
 2. reducir o eliminar el parche manual para `Antártica (12202)` con una fuente territorial más completa
 3. tests de schema y unicidad de `codigo_comuna`
+
+<!-- START_DATASET_SCHEMA -->
+
+## Schema (auto-generado desde `contracts/datasets/comunas.schema.json`)
+
+| Columna | Tipo | Ejemplo | Requerida | Nota |
+|:---|:---|:---|:---:|:---|
+| `codigo_comuna` | `VARCHAR(5)` | `"01101"` | Sí | PK |
+| `nombre_comuna` | `VARCHAR` | `"Iquique"` | Sí | — |
+| `nombre_comuna_clean` | `VARCHAR` | `"iquique"` | Sí | — |
+| `codigo_provincia` | `VARCHAR(3)` | `"011"` | Sí | — |
+| `codigo_region` | `VARCHAR(2)` | `"01"` | Sí | — |
+| `nombre_region` | `VARCHAR` | `"Tarapacá"` | No | — |
+| `latitud_cabecera` | `DOUBLE` | `-20.2138` | No | — |
+| `longitud_cabecera` | `DOUBLE` | `-70.1508` | No | — |
+| `poblacion_estimada` | `INTEGER` | `223400` | No | — |
+
+<!-- END_DATASET_SCHEMA -->

@@ -21,6 +21,7 @@ from .exceptions import (
     ChileHubExampleError,
     ChileHubOutputError,
 )
+from .geo import acquire_geometry, load_geometry, resolve_points
 from .pipeline_status_utils import (
     compute_freshness,
     compute_top_issue,
@@ -423,6 +424,92 @@ class ChileHub:
                 "codigo_comuna": pl.String,
                 "nombre_comuna": pl.String,
                 "codigo_region": pl.String,
+                "matched": pl.Boolean,
+            },
+        )
+
+    def resolve_by_coords(
+        self,
+        points: list[tuple[float, float]],
+        *,
+        refresh_geometry: bool = False,
+        geometry_path: Path | None = None,
+    ) -> pl.DataFrame:
+        """Resuelve coordenadas ``(latitud, longitud)`` al código CUT de su comuna.
+
+        Reverse geocoding contra el GeoParquet candidate ``geometria_comunal``
+        (fuente BCN, ADR-012): un punto dentro del polígono (incluyendo el
+        borde, vía ``covers``) matchea a la comuna. Usa un caché verificado por
+        SHA-256 (contrato de distribución congelado en ADR-012); un caché
+        existente se reutiliza sin red y ``refresh_geometry=True`` fuerza
+        re-descarga. Requiere el extra opcional ``geo``.
+
+        Args:
+            points: Lista de tuplas ``(latitud, longitud)`` en grados decimales.
+                Se preserva el orden de entrada y los duplicados.
+            refresh_geometry: Si ``True``, re-descarga el GeoParquet aunque el
+                caché verificado exista (útil cuando la fuente publica
+                actualizaciones).
+            geometry_path: Ruta local alternativa al GeoParquet (offline/tests).
+                Aun así debe pasar la validación estructural.
+
+        Returns:
+            DataFrame Polars con una fila por input y columnas ``input_lat``,
+            ``input_lon``, ``codigo_comuna``, ``nombre_comuna`` y ``matched``
+            (bool). Puntos válidos fuera de Chile: ``matched=False`` y comuna
+            nula. Si varias comunas cubren un punto, gana la de menor
+            ``codigo_comuna`` (tie-break lexicográfico determinístico).
+
+        Raises:
+            ValueError: Si alguna coordenada está fuera de rango (latitud
+                fuera de ``[-90, 90]`` o longitud fuera de ``[-180, 180]``),
+                nombrando el input inválido.
+            ImportError: Si falta el extra ``geo`` (``pip install chile-hub[geo]``).
+            ChileHubDataError: Si el artefacto no puede descargarse/verificarse
+                o no pasa la validación estructural.
+
+        Examples:
+            >>> hub = ChileHub()
+            >>> hub.resolve_by_coords([(-33.4489, -70.6693)])  # centro de Santiago
+        """
+        for i, point in enumerate(points):
+            lat, lon = point
+            if not (-90.0 <= lat <= 90.0) or not (-180.0 <= lon <= 180.0):
+                raise ValueError(
+                    f"Coordenada inválida en el input {i}: ({lat}, {lon}). "
+                    "Se espera (latitud en [-90, 90], longitud en [-180, 180])."
+                )
+
+        try:
+            if geometry_path is not None:
+                path = geometry_path
+            else:
+                path = acquire_geometry(refresh_geometry=refresh_geometry)
+            gdf = load_geometry(path)
+        except ImportError:
+            raise
+        except ChileHubDataError:
+            raise
+        except Exception as exc:
+            raise ChileHubDataError(f"No se pudo cargar la geometría comunal: {exc}") from exc
+
+        results = resolve_points(gdf, points)
+        return pl.DataFrame(
+            [
+                {
+                    "input_lat": lat,
+                    "input_lon": lon,
+                    "codigo_comuna": code,
+                    "nombre_comuna": name,
+                    "matched": matched,
+                }
+                for (lat, lon), (code, name, matched) in zip(points, results)
+            ],
+            schema={
+                "input_lat": pl.Float64,
+                "input_lon": pl.Float64,
+                "codigo_comuna": pl.String,
+                "nombre_comuna": pl.String,
                 "matched": pl.Boolean,
             },
         )
