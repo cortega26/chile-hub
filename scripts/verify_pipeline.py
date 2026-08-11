@@ -726,6 +726,13 @@ def verify_top_issue_summary(summary, top_issue, origin):
 def required_files_for_profile(profile):
     if profile == "readiness":
         return PUBLISHABLE_REQUIRED_FILES
+    if profile == "release":
+        # Perfil del job PyPI Release: verifica el artefacto publication-grade
+        # descargado (data/normalized/), que NO incluye staging (gitignored,
+        # 298 MB) ni los outputs de build local (duckdb/db/xlsx). Exigirlos
+        # aqui hacia fallar todo release: "Missing required files:
+        # data/staging/..." (regresion 2026-08-11, run 31539295351).
+        return PUBLISHABLE_REQUIRED_FILES
     return REQUIRED_FILES
 
 
@@ -1691,9 +1698,9 @@ def build_parser():
     parser = argparse.ArgumentParser(description="Verify generated chile-hub pipeline artifacts.")
     parser.add_argument(
         "--profile",
-        choices=["dev", "readiness", "publication"],
+        choices=["dev", "readiness", "publication", "release"],
         default="dev",
-        help="Perfil de verificación: dev (default), readiness, o publication",
+        help="Perfil de verificación: dev (default), readiness, publication, o release",
     )
     parser.add_argument(
         "--require-live",
@@ -1731,7 +1738,12 @@ def main():
     }
 
     # Verificaciones comunes a todos los perfiles
-    verify_staging_not_newer_than_normalized()
+    if profile != "release":
+        # El perfil release no tiene staging en el checkout: la comparacion
+        # staging vs normalized (anti-build-olvidado) no aplica y fallaria
+        # con staging ausente. La provenance del artefacto ya garantiza que
+        # el pipeline lo verifico publication-grade antes de subirlo.
+        verify_staging_not_newer_than_normalized()
     verify_required_files(required_files_for_profile(profile))
     verify_pipeline_metadata()
     verify_hub_health()
@@ -1751,7 +1763,7 @@ def main():
     if profile in ("readiness", "publication"):
         verify_readiness()
 
-    if profile == "publication":
+    if profile in ("publication", "release"):
         verify_publication_policy(
             allow_known_anomalies=allow_known_anomalies,
             allow_stale_backfills=allow_stale_backfills,

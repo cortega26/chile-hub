@@ -180,6 +180,33 @@ class VerifyGoldenCopyTests(unittest.TestCase):
         ):
             vp.main()
 
+    def test_release_profile_skips_staging_and_runs_publication_policy(self) -> None:
+        """El perfil `release` no exige staging (no viaja en el artefacto del
+        release job) y aplica la publication policy.
+
+        Regresion 2026-08-11 (run 31539295351): el release re-verificaba con
+        --require-live (perfil publication), que exige data/staging/*.csv
+        (gitignored) y mataba TODO release con "Missing required files:
+        data/staging/...". El perfil `release` usa solo los required files de
+        normalized + publication policy, sin el anti-build-olvidado de staging.
+        """
+        self.assertNotIn("data/staging", str(vp.required_files_for_profile("release")))
+        self.assertNotIn("duckdb", str(vp.required_files_for_profile("release")))
+        release_required = {p.name for p in vp.required_files_for_profile("release")}
+        publishable_required = {p.name for p in vp.required_files_for_profile("readiness")}
+        self.assertEqual(release_required, publishable_required)
+
+        test_args = ["verify_pipeline.py", "--profile", "release"]
+        with (
+            patch.object(sys, "argv", test_args),
+            patch("builtins.print"),
+            patch.object(vp, "verify_staging_not_newer_than_normalized") as staging_check,
+            patch.object(vp, "verify_publication_policy") as policy_check,
+        ):
+            vp.main()
+        staging_check.assert_not_called()
+        policy_check.assert_called_once()
+
     # -- corruption tests (isolated temp-dir per test) ---------------------
 
     def test_artifact_manifest_rejects_missing_expected_path(self) -> None:

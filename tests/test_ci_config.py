@@ -326,7 +326,38 @@ class AdoptionBadgeGuardrailTests(unittest.TestCase):
         )
         self.assertIn('p.get("allow_stale_backfills", "")', release_content)
         self.assertIn("--allow-stale-backfills", release_content)
-        self.assertIn("python scripts/verify_pipeline.py --require-live", release_content)
+        self.assertIn("python scripts/verify_pipeline.py --profile release", release_content)
+
+    def test_release_verifies_with_release_profile_not_require_live(self):
+        """El release debe re-verificar con el perfil `release`, no con
+        `--require-live` (perfil publication).
+
+        Regresion 2026-08-11 (run 31539295351): `--require-live` exige
+        `data/staging/*.csv` (gitignored, 298 MB, no viaja en el artefacto),
+        asi que la re-verificacion fallaba con "Missing required files:
+        data/staging/..." en TODO release. El perfil `release` verifica la
+        publication policy sobre lo que viaja (normalized) sin staging.
+        """
+        release_content = (ROOT_DIR / ".github" / "workflows" / "pypi-release.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("--profile release", release_content)
+        # La invocacion real de verify_pipeline en el release no puede usar
+        # --require-live (perfil publication, exige staging). Los comentarios
+        # pueden mencionarlo al documentar la regresion — se filtra la primera
+        # columna de comando (lineas sin `#`).
+        command_lines = [
+            line
+            for line in release_content.splitlines()
+            if line.strip() and not line.lstrip().startswith("#")
+        ]
+        self.assertFalse(
+            any("verify_pipeline.py --require-live" in line for line in command_lines),
+            "verify_pipeline.py --require-live no debe invocarse en el release",
+        )
+        verify_content = (ROOT_DIR / "scripts" / "verify_pipeline.py").read_text(encoding="utf-8")
+        self.assertIn('if profile == "release":', verify_content)
+        self.assertIn('choices=["dev", "readiness", "publication", "release"]', verify_content)
 
     def test_out_of_band_staging_is_excluded_from_the_freshness_guard(self):
         """El carril candidate no lo construye `make build` (ADR-012), asi que su

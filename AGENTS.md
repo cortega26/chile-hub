@@ -711,8 +711,11 @@ El workflow `.github/workflows/pipeline-check.yml` corre en `push` a `main`,
    (`check_companion_paths.py registry` siempre; `companions` solo en `pull_request`).
 2. `build-and-test` — extractores, build, verificación, tests y status.
 3. `landing` — smoke test Playwright usando exactamente los outputs del job anterior.
-4. `publish` — solo en `schedule` o dispatch con `publish=true`; exige
-   `verify_pipeline.py --require-live` y publica `data/normalized/` en `main`.
+ 4. `publish` — solo en `schedule` o dispatch con `publish=true`; exige
+    `verify_pipeline.py --profile publication` y publica `data/normalized/` en `main`.
+    El job `publish` de PyPI Release re-verifica con el perfil `release`
+    (publication policy sobre `data/normalized/` sin exigir staging — que no
+    viaja en el artefacto; ver `docs/release.md`).
 
 El cron corre a las `10:00 UTC`: `06:00 CLT` o `07:00 CLST`. La publicación rechaza
 fallbacks, datos stale, fallas de fetch, recuperación raw y preservación de staging. Solo permite

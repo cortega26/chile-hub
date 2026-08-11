@@ -1809,7 +1809,7 @@ class WorkflowContractTests(unittest.TestCase):
     def test_pypi_release_requires_publication_grade_data_assets(self):
         self.assertIn("pipeline_artifact_provenance.json", self.release_workflow_text)
         self.assertIn(
-            "python scripts/verify_pipeline.py --require-live", self.release_workflow_text
+            "python scripts/verify_pipeline.py --profile release", self.release_workflow_text
         )
         self.assertIn("steps.pipeline-assets.outputs.ready == 'true'", self.release_workflow_text)
         self.assertIn("release data assets will not be attached", self.release_workflow_text)
