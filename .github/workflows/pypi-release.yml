@@ -189,13 +189,23 @@ jobs:
           print(p.get("allow_stale_backfills", ""))
           PY
           )"
-              if [[ -n "$stale_backfills" ]]; then
-                python scripts/verify_pipeline.py --profile release \
-                  --allow-stale-backfills "$stale_backfills"
+              # `if` (no capturar $?): el step corre bajo `set -e`, y con un
+              # fallo de verify_pipeline bash moriria ANTES de asignar el exit
+              # code — el ready=false nunca se emitiria y el release abortaria
+              # igual (regresion 2026-08-11, detectada en review PR #57).
+              if python scripts/verify_pipeline.py --profile release \
+                  ${stale_backfills:+--allow-stale-backfills "$stale_backfills"}; then
+                echo "ready=true" >> "$GITHUB_OUTPUT"
               else
-                python scripts/verify_pipeline.py --profile release
+                # La re-verificacion fallo (p. ej. el artefacto publication-grade
+                # mas reciente quedo stale entre el publish y el release, o su
+                # provenance es de antes de que el override se registrara). El
+                # paquete PyPI se publica igual; solo no se adjuntan datos.
+                # Regresion 2026-08-11 (run 31544671830): abortar aqui mataba el
+                # release completo en vez de degradar a ready=false.
+                echo "::notice::El artefacto publication-grade no paso la re-verificacion del release; el paquete se publica sin adjuntar datos."
+                echo "ready=false" >> "$GITHUB_OUTPUT"
               fi
-              echo "ready=true" >> "$GITHUB_OUTPUT"
               ;;
             2)
               echo "ready=false" >> "$GITHUB_OUTPUT"
