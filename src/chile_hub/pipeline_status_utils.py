@@ -1,8 +1,8 @@
 """Constructores de reportes operativos y utilidades del pipeline de chile-hub.
 
-La raíz del proyecto se detecta con _find_root() (busca pyproject.toml como
-sentinel) para que el mismo código funcione desde src/ y desde src/chile_hub/
-sin divergencia.
+La raíz del proyecto se resuelve con ``_paths.find_root()`` (busca
+pyproject.toml como sentinel, TECHDEBT-05) para que el mismo código funcione
+desde src/ y desde src/chile_hub/ sin divergencia.
 """
 
 import json
@@ -10,25 +10,7 @@ import os
 from datetime import datetime, timezone
 from pathlib import Path
 
-
-def _find_root() -> Path:
-    """Localiza la raíz del proyecto buscando pyproject.toml como sentinel.
-
-    Funciona desde src/chile_hub/ (wheel empaquetado o checkout) y desde
-    src/ (importaciones de build_dev_db.py).  En un entorno instalado sin
-    pyproject.toml, devuelve un fallback razonable.
-    """
-    current = Path(__file__).resolve().parent
-    for _ in range(6):
-        if (current / "pyproject.toml").exists():
-            return current
-        current = current.parent
-    # Fallback para rueda instalada: parents[2] desde src/chile_hub/ da
-    # site-packages/, que no es la raíz real pero es inocuo porque en
-    # ese contexto solo se usan compute_freshness/compute_top_issue/
-    # format_top_issue_summary (ninguna depende de paths en disco).
-    return Path(__file__).resolve().parents[2]
-
+from ._paths import ROOT_DIR  # fuente única de raíz del proyecto (TECHDEBT-05)
 
 UTC = timezone.utc
 
@@ -40,7 +22,6 @@ def write_text_atomic(content, path):
     os.replace(str(tmp_path), str(path_obj))
 
 
-ROOT_DIR = _find_root()
 NORMALIZED_DIR = ROOT_DIR / "data" / "normalized"
 PIPELINE_METADATA_PATH = NORMALIZED_DIR / "pipeline_metadata.json"
 STATUS_MARKDOWN_PATH = NORMALIZED_DIR / "pipeline_status.md"
@@ -57,7 +38,7 @@ def _load_source_registry_datasets() -> tuple:
     instalado), así que leer source_registry.json aquí es seguro — a
     diferencia de compute_top_issue, que sí debe seguir siendo puro/sin
     I/O porque el paquete instalado la llama en runtime sin acceso a
-    data/ (ver _find_root()). Se retorna también el set completo de
+    data/ (ver _paths.find_root()). Se retorna también el set completo de
     nombres para que el llamador pueda distinguir "estos entries son
     del pipeline real" de fixtures sintéticos de tests (que no aparecen
     en el registry) y así no filtrar en ese segundo caso.

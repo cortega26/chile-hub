@@ -53,6 +53,7 @@ nav:
   - Inicio: index.md
   - Instalación: installation.md
   - Acceso HTTP estático: http-access.md
+  - Carriles de extracción: extraction-lanes.md
   - Uso desde R: r-quickstart.md
   - Referencia de API: api.md
   - Criterios de inclusión: dataset-inclusion-criteria.md

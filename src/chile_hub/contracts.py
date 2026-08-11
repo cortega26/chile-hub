@@ -14,6 +14,8 @@ from typing import Any
 
 import polars as pl
 
+from ._paths import find_root
+
 __all__ = ["verify_dataset_contract", "contract_type"]
 
 
@@ -77,7 +79,7 @@ def verify_dataset_contract(
         ``errors`` y ``warnings``.
     """
     if root_dir is None:
-        root_dir = Path(__file__).resolve().parents[2]
+        root_dir = find_root()
     root_dir = Path(root_dir)
 
     errors: list[str] = []
