@@ -15,7 +15,13 @@ Es una capa de conveniencia: evita que cada proyecto tenga que consultar o parse
 
 ## Fuente
 
-- consumo actual desde `mindicador.cl`
+- consumo actual desde `mindicador.cl` (agregador; fuente original BCCh e INE)
+- **override de IPC desde el INE** (`src/extractors/ine_ipc.py`): cuando
+  mindicador.cl no entrega la serie `ipc` del año en curso (muerta upstream
+  desde 2025-12, issue #43), la variación mensual se toma de la página pública
+  del INE — la fuente autoritativa — antes de recurrir al backfill. El patrón
+  de parseo (anclado al `<h1>` del IPC) es el validado en el proyecto Monedario
+  desde 2026-05-16.
 - procesamiento local desde [`src/extractors/bcentral_extractor.py`](https://github.com/cortega26/chile-hub/blob/main/src/extractors/bcentral_extractor.py)
 
 ## Método de acceso actual
@@ -23,6 +29,9 @@ Es una capa de conveniencia: evita que cada proyecto tenga que consultar o parse
 - llamada HTTP a `https://mindicador.cl/api`
 - refresh incremental del año en curso cuando ya existe staging
 - si una serie falla, recuperación desde `data/raw` cuando hay snapshot utilizable
+- si `ipc` del año en curso viene vacío o falla, override desde el INE
+  (`https://www.ine.gob.cl/.../indice-de-precios-al-consumidor`) — solo para
+  el año en curso (el INE publica el último mes, no historial)
 - si un código esperado ya no está en staging, reuso del último artifact publicado para no degradar silenciosamente la capa
 - si no se logra construir un dataset usable, generación local de registros de fallback
 
@@ -35,9 +44,9 @@ Campos relevantes:
 - `source_mode`: `live` o `fallback`
 - `source_detail`: distingue live sano de recuperación parcial
 - `indicator_codes`: lista de códigos esperados presentes en el artifact
-- `indicator_delivery`: mapa compacto por código con estado `live`, `raw_recovery`, `preserved_existing` o `published_backfill`
+- `indicator_delivery`: mapa compacto por código con estado `live`, `raw_recovery`, `preserved_existing`, `ine_override` o `published_backfill`
 - `warnings`: explica fallas parciales detectadas durante el refresh
-- `notes`: deja trazabilidad compacta de series vacías, backfills y recuperaciones
+- `notes`: deja trazabilidad compacta de series vacías, overrides INE, backfills y recuperaciones
 - `degradation`, `drift` y `top_issue`: consolidan la acción operativa sugerida
 
 Ejemplo real del estado actual:
