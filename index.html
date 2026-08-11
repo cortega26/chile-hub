@@ -470,6 +470,12 @@
             color: var(--text-primary);
         }
 
+        .site-nav a.is-active {
+            color: var(--accent-green);
+            border-bottom: 1.5px solid var(--accent-green);
+            padding-bottom: 2px;
+        }
+
         .site-nav .nav-github {
             color: var(--text-primary);
             font-weight: 600;
@@ -542,13 +548,24 @@
             max-width: 760px;
         }
 
+        .intro .intro-eyebrow {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--accent-warm);
+            margin-bottom: 1.1rem;
+        }
+
         .intro h2 {
             font-family: var(--font-display);
             font-weight: 500;
-            font-size: clamp(2rem, 5vw, 3.75rem);
-            line-height: 1.05;
+            font-size: clamp(2.25rem, 5vw, 4rem);
+            line-height: 1.04;
             letter-spacing: -0.03em;
             color: var(--text-primary);
+            text-wrap: balance;
         }
 
         .intro p {
@@ -556,6 +573,142 @@
             color: var(--text-secondary);
             font-size: 1.1rem;
             line-height: 1.6;
+            max-width: 56ch;
+        }
+
+        /* Señales del hub: cinta de hechos verificables bajo el hero */
+        .hero-signals {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem 2.5rem;
+            margin-top: calc(var(--space-section-tight) * -0.5);
+            padding: 1.1rem 0;
+            border-block: 1px solid var(--border-color);
+        }
+
+        .hero-signal {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.01em;
+        }
+
+        .hero-signal strong {
+            font-family: var(--font-display);
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-right: 0.25rem;
+        }
+
+        /* Capacidades: tarjetas de capacidades de producto */
+        .capabilities-section {
+            scroll-margin-top: 5rem;
+        }
+
+        .capabilities-section .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .capabilities-title {
+            font-family: var(--font-display);
+            font-size: clamp(1.6rem, 3vw, 2.1rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+        }
+
+        .capabilities-section .section-heading p {
+            color: var(--text-secondary);
+            font-size: 0.98rem;
+            line-height: 1.55;
+            max-width: 52ch;
+            margin: 0;
+        }
+
+        .capabilities-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
+        }
+
+        .capability-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1.5rem 1.4rem 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+            transition: var(--transition);
+        }
+
+        .capability-card:hover {
+            border-color: var(--border-color-dark);
+            box-shadow: 0 6px 14px -6px rgba(18, 61, 48, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .capability-head {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .capability-head h3 {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .capability-code {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            color: var(--accent-warm);
+            background: var(--accent-warm-bg);
+            border: 1px solid var(--accent-warm-border);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        .capability-card > p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.55;
+            margin: 0;
+        }
+
+        .capability-card > p code {
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            color: var(--text-primary);
+            background: var(--accent-green-light);
+            padding: 0.05rem 0.3rem;
+            border-radius: 3px;
+        }
+
+        .capability-example {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            line-height: 1.5;
+            color: var(--text-primary);
+            background: #f1f0ea;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 0.7rem 0.85rem;
+            overflow-x: auto;
+            margin: 0.25rem 0 0;
+            white-space: pre;
         }
 
         .intro-links {
@@ -1202,11 +1355,12 @@
 
         .section-heading h2 {
             font-family: var(--font-display);
-            font-size: 1.5rem;
+            font-size: clamp(1.5rem, 2.6vw, 2rem);
             font-weight: 600;
-            line-height: 1.25;
-            letter-spacing: -0.01em;
+            line-height: 1.22;
+            letter-spacing: -0.02em;
             color: var(--text-primary);
+            text-wrap: balance;
         }
 
         .section-heading p {
@@ -1446,10 +1600,11 @@
 
         .manifesto h2 {
             font-family: var(--font-display);
-            font-size: 1.65rem;
+            font-size: clamp(1.65rem, 3vw, 2.2rem);
             font-weight: 500;
-            line-height: 1.25;
-            letter-spacing: -0.01em;
+            line-height: 1.22;
+            letter-spacing: -0.02em;
+            text-wrap: balance;
         }
 
         .manifesto p {
@@ -1790,18 +1945,27 @@
 
         /* Page Footer styling */
         footer {
-            padding: 3rem 2rem;
+            padding: 3rem 2rem 2.5rem;
             border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
+            display: grid;
+            grid-template-columns: 1.2fr 1.4fr 1fr auto;
             gap: 2rem;
+            align-items: start;
+        }
+
+        .footer-col h3 {
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
         }
 
         footer p {
             font-size: 0.8rem;
             color: var(--text-secondary);
-            line-height: 1.5;
+            line-height: 1.55;
+            margin-bottom: 0.35rem;
         }
 
         footer a {
@@ -1816,6 +1980,11 @@
             text-decoration: underline;
         }
 
+        .footer-issue {
+            white-space: nowrap;
+            align-self: center;
+        }
+
         /* Responsive Breakpoints */
         @media (max-width: 960px) {
             header {
@@ -1828,6 +1997,9 @@
             .intro-playground {
                 width: 100%;
                 margin-top: 1rem;
+            }
+            .capabilities-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
             .kpi-container {
                 grid-template-columns: repeat(2, 1fr);
@@ -1868,11 +2040,14 @@
                 gap: 2rem;
             }
             footer {
-                flex-direction: column;
+                grid-template-columns: 1fr;
                 gap: 1.5rem;
                 align-items: stretch;
             }
             footer a {
+                align-self: flex-start;
+            }
+            .footer-issue {
                 align-self: flex-start;
             }
         }
@@ -1887,6 +2062,12 @@
             .site-nav {
                 width: 100%;
                 gap: 0.75rem 1rem;
+            }
+            .capabilities-grid {
+                grid-template-columns: 1fr;
+            }
+            .hero-signals {
+                gap: 0.6rem 1.5rem;
             }
             main {
                 padding: 2rem 1rem;
@@ -1989,6 +2170,21 @@
             opacity: 0;
         }
 
+        /* Reveal on scroll (app.js IntersectionObserver). Complementa revealUp:
+           revealUp anima la carga; reveal anima la entrada al viewport. */
+        .reveal {
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+
+        .reveal.is-visible {
+            opacity: 1;
+            transform: none;
+        }
+
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
                 scroll-behavior: auto !important;
@@ -2000,6 +2196,11 @@
                 opacity: 1 !important;
                 transform: none !important;
                 animation: none !important;
+            }
+            .reveal {
+                opacity: 1 !important;
+                transform: none !important;
+                transition: none !important;
             }
         }
 
@@ -2640,6 +2841,7 @@
         </div>
         <nav class="site-nav" aria-label="Navegación principal">
             <a href="#catalogo">Datos</a>
+            <a href="#capacidades">Capacidades</a>
             <a href="#cobertura">Cobertura</a>
             <a href="#confianza">Metodología</a>
             <a href="#uso">Desarrolladores</a>
@@ -2653,8 +2855,9 @@
     <main id="main-content" tabindex="-1">
         <section class="intro">
             <div class="intro-copy">
+                <p class="intro-eyebrow">Datos oficiales de Chile, curados y reproducibles</p>
                 <h2>Un punto de partida curado para datos abiertos de Chile.</h2>
-                <p>División político-administrativa con coordenadas y población, e indicadores económicos diarios — normalizados, versionados y listos para consumir en una línea de código.</p>
+                <p>Veintidós capas normalizadas y versionadas — geografía, demografía, economía, salud, educación, gobierno y más — listas para consumir en una línea de código. Con resolución de entidades por nombre y por coordenadas.</p>
                 <div class="intro-links">
                     <a class="btn btn-primary" href="#catalogo">Explorar datos</a>
                     <a class="btn btn-secondary" href="reference/">Ver documentación</a>
@@ -2679,7 +2882,7 @@
                         <div class="console-panel active" id="play-py">
                             <pre><code><span class="keyword">import</span> polars <span class="keyword">as</span> pl
 
-# Cargar comunas de Chile
+<span class="comment"># Cargar comunas de Chile en una línea</span>
 df = pl.read_parquet(
     <span class="string">"https://tooltician.com/chile-hub/data/normalized/comunas.parquet"</span>
 )
@@ -2703,6 +2906,12 @@ curl -s <span class="string">"https://tooltician.com/chile-hub/data/normalized/h
                 </div>
             </aside>
         </section>
+        <div class="hero-signals" aria-label="Señales del hub">
+            <span class="hero-signal"><strong>22</strong> capas publicadas</span>
+            <span class="hero-signal"><strong>346</strong> comunas con cobertura</span>
+            <span class="hero-signal"><strong>100%</strong> códigos CUT normalizados</span>
+            <span class="hero-signal"><strong>Diaria</strong> actualización automática</span>
+        </div>
         <!-- KPI Indicators -->
         <section class="kpi-container" id="kpi-container">
             <div class="kpi-card" id="kpi-uf">
@@ -2738,6 +2947,70 @@ curl -s <span class="string">"https://tooltician.com/chile-hub/data/normalized/h
                 <div class="status-pills" id="status-pills"><span class="status-pill">Cargando...</span></div>
                 <div class="status-actions" id="status-actions"></div>
             </details>
+        </section>
+
+        <section class="capabilities-section" id="capacidades" aria-labelledby="capabilities-title">
+            <div class="section-heading reveal">
+                <div>
+                    <h2 id="capabilities-title" class="capabilities-title">Más que datasets: capacidades para construir</h2>
+                    <p>La capa de datos se acompaña de resolutores, geometría y canales de distribución para que el dato llegue donde lo necesitas.</p>
+                </div>
+            </div>
+            <div class="capabilities-grid">
+                <article class="capability-card reveal">
+                    <div class="capability-head">
+                        <h3>Resolución de entidades</h3>
+                        <span class="capability-code">resolve_comunas()</span>
+                    </div>
+                    <p>Convierte nombres de comunas en códigos CUT normalizados, con sugerencias ante errores de escritura.</p>
+                    <pre class="capability-example">from chile_hub import ChileHub
+hub = ChileHub()
+hub.resolve_comunas(["santiago", "nunoa"])</pre>
+                </article>
+                <article class="capability-card reveal">
+                    <div class="capability-head">
+                        <h3>Reverse geocoding</h3>
+                        <span class="capability-code">resolve_by_coords()</span>
+                    </div>
+                    <p>De un par de coordenadas a la comuna que las contiene — sin servicios externos ni claves.</p>
+                    <pre class="capability-example">hub.resolve_by_coords(
+    [(-33.4489, -70.6693)]  # centro de Santiago
+)</pre>
+                </article>
+                <article class="capability-card reveal">
+                    <div class="capability-head">
+                        <h3>Geometría comunal</h3>
+                        <span class="capability-code">GeoParquet</span>
+                    </div>
+                    <p>Límites poligonales de las 346 comunas en GeoParquet, listos para QGIS, geopandas o deck.gl.</p>
+                    <pre class="capability-example">gdf = gpd.read_parquet(
+  "…/geometria_comunal.parquet")</pre>
+                </article>
+                <article class="capability-card reveal">
+                    <div class="capability-head">
+                        <h3>Indicadores en vivo</h3>
+                        <span class="capability-code">UF · UTM · IPC</span>
+                    </div>
+                    <p>Series diarias y mensuales actualizadas automáticamente, con IPC desde la fuente oficial INE.</p>
+                    <pre class="capability-example">hub.load_polars("indicadores")</pre>
+                </article>
+                <article class="capability-card reveal">
+                    <div class="capability-head">
+                        <h3>Distribución abierta</h3>
+                        <span class="capability-code">PyPI · Hugging Face · DCAT</span>
+                    </div>
+                    <p>El paquete instalable, el mirror en Hugging Face Hub y el catálogo DCAT <code>data.json</code> para descubrimiento.</p>
+                    <pre class="capability-example">pip install chile-hub</pre>
+                </article>
+                <article class="capability-card reveal">
+                    <div class="capability-head">
+                        <h3>Salud verificable</h3>
+                        <span class="capability-code">build → verify → publish</span>
+                    </div>
+                    <p>Cada build valida contratos, integridad SHA-256, frescura y procedencia antes de publicar.</p>
+                    <pre class="capability-example">hub.health()</pre>
+                </article>
+            </div>
         </section>
 
         <section class="package-section" id="package-section">
@@ -2787,7 +3060,7 @@ curl -s <span class="string">"https://tooltician.com/chile-hub/data/normalized/h
         </section>
 
         <section class="section-shell" id="cobertura">
-            <div class="section-heading">
+            <div class="section-heading reveal">
                 <h2>Un modelo de datos nacional, capa por capa</h2>
                 <p>Cada capa nueva pasa un filtro de utilidad real, estabilidad de la fuente y licencia verificable. Lo que está publicado funciona; lo que está en evaluación, todavía no.</p>
             </div>
@@ -2802,7 +3075,7 @@ curl -s <span class="string">"https://tooltician.com/chile-hub/data/normalized/h
         </section>
 
         <section class="section-shell" id="confianza">
-            <div class="section-heading">
+            <div class="section-heading reveal">
                 <h2>Los datos son tan buenos como su procedencia</h2>
                 <p>Cada capa incluye la información que necesitas para decidir si sirve en producción, análisis o investigación.</p>
             </div>
@@ -2818,7 +3091,7 @@ curl -s <span class="string">"https://tooltician.com/chile-hub/data/normalized/h
         </section>
 
         <section class="quickstart-section" id="uso">
-            <div class="catalog-header">
+            <div class="catalog-header reveal">
                 <div>
                     <h2 class="catalog-title">Uso rápido</h2>
                     <div class="catalog-meta">Consume archivos publicados sin clonar el repositorio ni instalar el helper.</div>
@@ -3035,13 +3308,23 @@ LIMIT 10;</pre>
     </main>
 
     <footer>
-        <div style="display:flex;flex-direction:column;gap:0.35rem;">
+        <div class="footer-col">
+            <h3>chile-hub</h3>
             <p>Construido con Python, Polars y DuckDB.</p>
-            <p>Fuentes: <a href="https://www.bcn.cl" target="_blank" rel="noopener noreferrer">BCN ArcGIS</a>, <a href="https://www.ine.gob.cl" target="_blank" rel="noopener noreferrer">INE</a>, <a href="https://www.minsal.cl" target="_blank" rel="noopener noreferrer">MINSAL</a>, <a href="https://www.mineduc.cl" target="_blank" rel="noopener noreferrer">MINEDUC</a>, <a href="https://mindicador.cl" target="_blank" rel="noopener noreferrer">mindicador.cl</a> y <a href="https://www.servel.cl" target="_blank" rel="noopener noreferrer">SERVEL</a>. Atribución individual en el catálogo.</p>
             <p>Licencia del Consolidado: <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener noreferrer">CC-BY-4.0</a></p>
+        </div>
+        <div class="footer-col">
+            <h3>Fuentes</h3>
+            <p>BCN ArcGIS, INE, MINSAL, MINEDUC, mindicador.cl y SERVEL — atribución individual en el catálogo.</p>
+        </div>
+        <div class="footer-col">
+            <h3>Comunidad</h3>
+            <p><a href="https://github.com/cortega26/chile-hub" target="_blank" rel="noopener noreferrer">GitHub</a> ·
+            <a href="https://github.com/sponsors/cortega26" target="_blank" rel="noopener noreferrer">Sponsors</a> ·
+            <a href="https://www.buymeacoffee.com/cortega26" target="_blank" rel="noopener noreferrer">Buy Me a Coffee</a></p>
             <p><a href="privacy.html">Privacidad</a> — este sitio no usa cookies ni recolecta datos personales.</p>
         </div>
-        <a href="https://github.com/cortega26/chile-hub/issues" target="_blank" rel="noopener noreferrer" style="white-space:nowrap;align-self:center;">Reportar un error →</a>
+        <a href="https://github.com/cortega26/chile-hub/issues" target="_blank" rel="noopener noreferrer" class="footer-issue">Reportar un error →</a>
     </footer>
 
     <!-- Slide-over Drawer for Dataset Details -->
