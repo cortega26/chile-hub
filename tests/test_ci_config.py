@@ -207,6 +207,95 @@ class AdoptionBadgeGuardrailTests(unittest.TestCase):
         self.assertIn("git push --atomic origin HEAD:main", content)
         self.assertNotIn("git push origin HEAD:main", content)
 
+    def test_release_downloads_to_staging_and_only_adopts_verified_artifacts(self):
+        """El paso pipeline-assets no debe borrar `data/normalized/` del checkout
+        antes de validar un artefacto publication-grade.
+
+        Regresion 2026-08-11 (runs 31530278428 y 31532875763): el paso hacia
+        `rm -rf data/normalized` al inicio y en cada `try_download`. Cuando no
+        existia ningun artefacto publication-grade (caso tipico: el run que
+        dispara el release es `push`, perfil `readiness`), el paso terminaba con
+        `ready=false` pero con `data/normalized/` vacio; el paso siguiente
+        (`sync_release_artifact_version.py`) fallaba con "Missing generated
+        artifacts: pipeline_metadata.json, hub_bundle.json, datapackage.json" y
+        el release entero moria. Ahora la descarga va a `.pipeline-assets/` y
+        solo se copia sobre `data/normalized/` tras validar el artefacto, de
+        modo que sin artefacto verificado el release procede usando los
+        artefactos commiteados.
+        """
+        content = (ROOT_DIR / ".github" / "workflows" / "pypi-release.yml").read_text(
+            encoding="utf-8"
+        )
+        # La descarga nunca adopta sobre data/normalized sin pasar por la validacion.
+        self.assertLess(
+            content.index("is_publication_grade"),
+            content.index("rm -rf data/normalized"),
+            "rm -rf data/normalized debe aparecer despues de is_publication_grade",
+        )
+        # La validacion ocurre sobre el staging, no sobre el checkout.
+        self.assertIn('is_publication_grade "$staging_dir"', content)
+        self.assertIn('staging_dir=".pipeline-assets/$candidate"', content)
+        # Sin artefacto publication-grade, el release continua con los artefactos
+        # commiteados (no se aborta): el wipe solo ocurre en la ruta de adopcion.
+        self.assertIn('echo "ready=false" >> "$GITHUB_OUTPUT"', content)
+
+    def test_release_installs_pipeline_extra_for_require_live_verification(self):
+        """El job release debe instalar el extra `pipeline`, no solo `dev`.
+
+        El paso pipeline-assets corre `verify_pipeline.py --require-live`
+        sobre el artefacto descargado; ese script importa `duckdb` vía
+        `build_dev_db` → `builders.formats`, y `duckdb` vive en el extra
+        `pipeline`. Regresion 2026-08-11 (run 31533777382): el primer release
+        que encontró un artefacto publication-grade murió con
+        "ModuleNotFoundError: No module named 'duckdb'" en la verificación
+        --require-live — con `uv sync --extra dev` a secas, la verificación
+        nunca pudo pasar en el entorno del release.
+        """
+        content = (ROOT_DIR / ".github" / "workflows" / "pypi-release.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("uv sync --extra dev --extra pipeline", content)
+        self.assertNotIn("uv sync --extra dev\n", content)
+
+    def test_hf_publish_uses_the_adopted_publication_grade_run(self):
+        """hf-publish debe bajar el run que release efectivamente adopto.
+
+        En la ruta fallback, el artefacto publication-grade viene de
+        `assets_run_id` (un run schedule/dispatch), no del run que disparo el
+        release (`run_id`, casi siempre push/readiness). Si hf-publish bajara
+        `run_id`, publicaria en HF el artefacto no verificado del push.
+        """
+        content = (ROOT_DIR / ".github" / "workflows" / "pypi-release.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("assets_run_id: ${{ steps.pipeline-assets.outputs.assets_run_id }}", content)
+        self.assertIn('run_id="${{ needs.release.outputs.assets_run_id }}"', content)
+        self.assertIn('if [[ -z "$run_id" ]]; then', content)
+
+    def test_release_replays_stale_backfill_override_from_provenance(self):
+        """El release debe re-verificar el artefacto con el mismo override con
+        el que se publico.
+
+        Regresion 2026-08-11: el pipeline publico el artefacto con
+        `--allow-stale-backfills ipc` (issue #43), pero el release re-corria
+        `verify_pipeline.py --require-live` sin ese override, con lo que el
+        gate de ADR-016 rechazaba un artefacto ya verificado. La provenance
+        debe registrar el override y el release debe releerlo y pasarlo.
+        """
+        pipeline_content = (ROOT_DIR / ".github" / "workflows" / "pipeline-check.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            '"allow_stale_backfills": "${{ inputs.allow_stale_backfills }}"',
+            pipeline_content,
+        )
+        release_content = (ROOT_DIR / ".github" / "workflows" / "pypi-release.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn('p.get("allow_stale_backfills", "")', release_content)
+        self.assertIn("--allow-stale-backfills", release_content)
+        self.assertIn("python scripts/verify_pipeline.py --require-live", release_content)
+
     def test_out_of_band_staging_is_excluded_from_the_freshness_guard(self):
         """El carril candidate no lo construye `make build` (ADR-012), asi que su
         staging no puede disparar el guardian de frescura: seria un falso

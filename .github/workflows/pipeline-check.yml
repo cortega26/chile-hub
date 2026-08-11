@@ -259,6 +259,11 @@ jobs:
               "source_ref": "${{ github.ref }}",
               "workflow": "${{ github.workflow }}",
               "publish_input": os.environ.get("PUBLISH_INPUT", "false").lower() == "true",
+              # Override con el que se verifico este artefacto (ADR-016). El
+              # release re-verifica con --require-live; sin este campo el
+              # override aplicado al publicar (p. ej. --allow-stale-backfills ipc)
+              # se perderia y el release rechazaria un artefacto ya verificado.
+              "allow_stale_backfills": "${{ inputs.allow_stale_backfills }}",
           }
           Path("data/normalized/pipeline_artifact_provenance.json").write_text(
               json.dumps(metadata, indent=2, sort_keys=True) + "\n",

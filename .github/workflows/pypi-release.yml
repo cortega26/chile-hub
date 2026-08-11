@@ -25,6 +25,7 @@ jobs:
       released: ${{ steps.semantic-release.outputs.released }}
       ready: ${{ steps.pipeline-assets.outputs.ready }}
       run_id: ${{ steps.pipeline-assets.outputs.run_id }}
+      assets_run_id: ${{ steps.pipeline-assets.outputs.assets_run_id }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -42,7 +43,15 @@ jobs:
           enable-cache: true
 
       - name: Install package build dependencies
-        run: uv sync --extra dev
+        # El paso pipeline-assets corre `verify_pipeline.py --require-live`
+        # sobre el artefacto descargado; ese script importa `duckdb` vía
+        # build_dev_db → builders.formats, y `duckdb` vive en el extra
+        # `pipeline`, no en `dev`. Regresion 2026-08-11 (run 31533777382):
+        # con `uv sync --extra dev` a secas, el primer release que encontró un
+        # artefacto publication-grade murió con
+        # "ModuleNotFoundError: No module named 'duckdb'" en la verificacion
+        # --require-live.
+        run: uv sync --extra dev --extra pipeline
 
       - name: Add .venv to PATH
         run: echo "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"
@@ -52,13 +61,20 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          rm -rf data/normalized
-          mkdir -p data/normalized
-
           # Descarga el artefacto de un run de Pipeline Check y responde si es
           # publication-grade (perfil `publication` + require_live). Solo esos
           # pueden adjuntarse a un release: los demas no verificaron la fuente
           # en vivo.
+          #
+          # IMPORTANTE: nunca borrar `data/normalized/` del checkout. Es el
+          # artefacto commiteado del ultimo publish, y
+          # `sync_release_artifact_version.py` (paso "Python semantic release")
+          # lo necesita aunque no haya artefacto publication-grade disponible
+          # (release sin assets adjuntos). Regresion 2026-08-11: borrarlo antes
+          # de saber si existe un artefacto verificable mato los releases
+          # (runs 31530278428 y 31532875763, "Missing generated artifacts").
+          # Por eso la descarga va a staging y solo se adopta sobre
+          # data/normalized tras validar el artefacto.
           is_publication_grade() {
             local dir="$1"
             [[ -f "$dir/pipeline_artifact_provenance.json" ]] || return 1
@@ -75,11 +91,16 @@ jobs:
 
           try_download() {
             local candidate="$1"
+            local staging_dir=".pipeline-assets/$candidate"
+            rm -rf "$staging_dir"
+            mkdir -p "$staging_dir"
+            gh run download "$candidate" --name "pipeline-output-$candidate" \
+              --dir "$staging_dir" 2>/dev/null || return 1
+            is_publication_grade "$staging_dir" || return 1
+            # Solo al validar el artefacto se adopta sobre data/normalized.
             rm -rf data/normalized
             mkdir -p data/normalized
-            gh run download "$candidate" --name "pipeline-output-$candidate" \
-              --dir data/normalized 2>/dev/null || return 1
-            is_publication_grade data/normalized
+            cp -a "$staging_dir/." data/normalized/
           }
 
           if [[ "${{ github.event_name }}" == "workflow_run" ]]; then
@@ -151,7 +172,27 @@ jobs:
 
           case "$validation_status" in
             0)
-              python scripts/verify_pipeline.py --require-live
+              # Re-verifica el artefacto adoptado con el mismo criterio con el
+              # que se publico (perfil publication + require_live). Replay del
+              # override de ADR-016 registrado en la provenance al momento de
+              # publicar: sin el, el release rechazaria aqui un artefacto que el
+              # pipeline ya verifico con --allow-stale-backfills (p. ej. ipc,
+              # issue #43). Regresion 2026-08-11 (run 31533777382).
+              stale_backfills="$(python - <<'PY'
+          import json, os
+          try:
+              p = json.load(open("data/normalized/pipeline_artifact_provenance.json", encoding="utf-8"))
+          except OSError:
+              p = {}
+          print(p.get("allow_stale_backfills", ""))
+          PY
+          )"
+              if [[ -n "$stale_backfills" ]]; then
+                python scripts/verify_pipeline.py --require-live \
+                  --allow-stale-backfills "$stale_backfills"
+              else
+                python scripts/verify_pipeline.py --require-live
+              fi
               echo "ready=true" >> "$GITHUB_OUTPUT"
               ;;
             2)
@@ -280,7 +321,15 @@ jobs:
           # Pipeline Check run en main antes de que este job corra; re-resolver
           # aqui podria bajar un artefacto distinto al que needs.release.outputs.ready
           # efectivamente valido.
-          run_id="${{ needs.release.outputs.run_id }}"
+          #
+          # En la ruta fallback, el artefacto publication-grade adoptado viene
+          # de `assets_run_id` (un run schedule/dispatch distinto del que
+          # disparo el release); si se bajara `run_id` aqui, HF publicaria el
+          # artefacto readiness del push, no el que release valido.
+          run_id="${{ needs.release.outputs.assets_run_id }}"
+          if [[ -z "$run_id" ]]; then
+            run_id="${{ needs.release.outputs.run_id }}"
+          fi
 
           if [[ -n "$run_id" ]]; then
             gh run download "$run_id" \
