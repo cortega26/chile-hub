@@ -289,6 +289,27 @@ class AdoptionBadgeGuardrailTests(unittest.TestCase):
         self.assertIn("uv sync --extra dev --extra pipeline", content)
         self.assertNotIn("uv sync --extra dev\n", content)
 
+    def test_release_degrades_to_ready_false_when_recheck_fails(self):
+        """La re-verificacion del artefacto no debe matar el release.
+
+        Regresion 2026-08-11 (run 31544671830): el release adopto el unico
+        artefacto publication-grade disponible, cuya provenance era de antes
+        de que el override se registrara (sin allow_stale_backfills), y la
+        re-verificacion rechazo ipc stale — el case abortaba el release
+        COMPLETO con exit 1. El diseno correcto (y el del propio workflow en
+        ready=false) es degradar: el paquete PyPI se publica igual, solo no se
+        adjuntan datos.
+        """
+        content = (ROOT_DIR / ".github" / "workflows" / "pypi-release.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn('recheck_status="$?"', content)
+        self.assertIn('if [[ "$recheck_status" -eq 0 ]]', content)
+        self.assertIn("se publica sin adjuntar datos", content)
+        # La degradacion ocurre DENTRO del case 0 (tras la re-verificacion),
+        # no en el branch de error (*) que aborta.
+        self.assertIn('echo "ready=false" >> "$GITHUB_OUTPUT"', content)
+
     def test_hf_publish_uses_the_adopted_publication_grade_run(self):
         """hf-publish debe bajar el run que release efectivamente adopto.
 
