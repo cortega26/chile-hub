@@ -12,6 +12,22 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.23.1 - 2026-08-11
+
+### Corregido
+
+- **release**: Degrada a ready=false cuando la re-verificacion del artefacto falla
+  ([`e72c176`](https://github.com/cortega26/chile-hub/commit/e72c176b83c36332e4612457442a292176b54c95))
+
+- **release**: Usa 'if' para capturar el fallo de re-verificacion bajo set -e
+  ([`d119bb1`](https://github.com/cortega26/chile-hub/commit/d119bb1d90e2acc88d578eec7de335ed08207fba))
+
+### Documentación
+
+- Sincroniza README tras merge de main (856 tests, pin 1.23.0)
+  ([`4f9969f`](https://github.com/cortega26/chile-hub/commit/4f9969fcf42529be502bdbb9119decbf0b42c2ac))
+
+
 ## 1.23.0 - 2026-08-11
 
 ### Corregido
