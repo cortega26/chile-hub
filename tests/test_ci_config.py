@@ -303,8 +303,11 @@ class AdoptionBadgeGuardrailTests(unittest.TestCase):
         content = (ROOT_DIR / ".github" / "workflows" / "pypi-release.yml").read_text(
             encoding="utf-8"
         )
-        self.assertIn('recheck_status="$?"', content)
-        self.assertIn('if [[ "$recheck_status" -eq 0 ]]', content)
+        # `if` en vez de capturar $?: el step corre bajo set -e y un fallo de
+        # verify_pipeline mataria bash antes de asignar el exit code (P1 de la
+        # review del PR #57) — el ready=false nunca se emitiria.
+        self.assertIn("if python scripts/verify_pipeline.py --profile release", content)
+        self.assertNotIn('recheck_status="$?"', content)
         self.assertIn("se publica sin adjuntar datos", content)
         # La degradacion ocurre DENTRO del case 0 (tras la re-verificacion),
         # no en el branch de error (*) que aborta.
