@@ -35,3 +35,20 @@ Es un corte censal de 2024, no una estimación anual. No incluye microdatos ni v
 ## Registro de cambios
 
 - 2026-06: primera versión comunal con sexo y cinco grupos amplios de edad.
+
+<!-- START_DATASET_SCHEMA -->
+
+## Schema (auto-generado desde `contracts/datasets/censo_comunal.schema.json`)
+
+| Columna | Tipo | Ejemplo | Requerida | Nota |
+|:---|:---|:---|:---:|:---|
+| `codigo_region` | `VARCHAR(2)` | `"01"` | Sí | — |
+| `codigo_provincia` | `VARCHAR(3)` | `"011"` | Sí | — |
+| `codigo_comuna` | `VARCHAR(5)` | `"01101"` | Sí | PK |
+| `nombre_comuna` | `VARCHAR` | `"Iquique"` | Sí | — |
+| `poblacion_censada` | `INTEGER` | `223400` | Sí | — |
+| `hombres` / `mujeres` | `INTEGER` | `"111200` / `112200"` | No | — |
+| `razon_hombre_mujer` | `DOUBLE` | `99.11` | No | — |
+| `poblacion_0_14` … `poblacion_65_mas` | `INTEGER` | `"5 tramos etarios"` | No | — |
+
+<!-- END_DATASET_SCHEMA -->

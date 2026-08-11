@@ -52,3 +52,17 @@ El contrato declara `coverage_policy: "partial_expected"`: SINIM no publica el
 universo completo de municipios en cada corte. Cuando la cobertura resulta
 `partial`, el artefacto marca `coverage.expected: true` y el dataset **no**
 cuenta como drift — la parcialidad es de diseño, no una degradación.
+
+<!-- START_DATASET_SCHEMA -->
+
+## Schema (auto-generado desde `contracts/datasets/finanzas_municipales.schema.json`)
+
+| Columna | Tipo | Ejemplo | Requerida | Nota |
+|:---|:---|:---|:---:|:---|
+| `anio` | `INTEGER` | `2024` | Sí | PK |
+| `codigo_comuna` | `VARCHAR(5)` | `"01101"` | Sí | PK |
+| `ingresos_totales` / `gastos_totales` | `DOUBLE` | `245000000000.0` | No | — |
+| `ingresos_propios_permanentes` | `DOUBLE` | `162000000000.0` | No | — |
+| `fondo_comun_municipal` | `DOUBLE` | `39000000000.0` | No | — |
+
+<!-- END_DATASET_SCHEMA -->

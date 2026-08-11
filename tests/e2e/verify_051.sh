@@ -25,6 +25,10 @@ print('datasets:', len(d['dataset']), 'ejemplo:', u)
 # (comparten repo con data/normalized/data.json, que SI es el deliverable). Revierte
 # ese ruido para dejar el working tree igual a como estaba antes de este script.
 git checkout -- data/normalized/ README.md index.html 2>/dev/null || true
+# README.md es generado (bloques de sync_docs): revertirlo a HEAD re-introduce
+# conteos stale cuando HEAD no está en sync con el código actual (p. ej. tests
+# nuevos sin commitear) — restaurarlo al estado del código, no al de HEAD.
+make sync-docs >/dev/null
 
 echo "-- docs/http-access.md existe y mkdocs build pasa --"
 test -f docs/http-access.md

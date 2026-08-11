@@ -1,0 +1,57 @@
+name: Source URL Liveness
+
+# Verifica semanalmente que las official_url de data/source_registry.json
+# sigan vivas. Detección temprana de fuentes movidas/caídas (protocolo §6 de
+# AGENTS.md). NUNCA bloquea publish — su señal es fallar este job semanal.
+#
+# 4xx no falla (bloqueo anti-bot común); solo fallan errores de red o 5xx
+# persistentes (ver scripts/check_source_urls.py).
+
+on:
+  schedule:
+    # Cada lunes, 06:00 UTC (02:00 CLT / 03:00 CLST)
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-url-liveness
+  cancel-in-progress: false
+
+env:
+  PYTHON_VERSION: "3.13"
+
+jobs:
+  check-source-urls:
+    name: URLs de fuentes del catálogo
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          enable-cache: true
+
+      - name: Check source URLs
+        run: uv run python scripts/check_source_urls.py
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Source URL Liveness — $(date -u +%Y-%m-%d)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ job.status }}" = "success" ]; then
+            echo "✅ Todas las official_url responden (OK o WARN no bloqueante)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Hay URLs DEAD — revisar logs y evaluar protocolo §6 de AGENTS.md" >> $GITHUB_STEP_SUMMARY
+          fi

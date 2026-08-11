@@ -80,3 +80,20 @@ drift que nadie puede resolver dejó de contar como señal.
 
 **No consumas este dataset para análisis.** Si CNE publica un reemplazo oficial,
 revertir el retiro es una línea en `data/source_registry.json`.
+
+<!-- START_DATASET_SCHEMA -->
+
+## Schema (auto-generado desde `contracts/datasets/consumo_electrico_comunal.schema.json`)
+
+| Columna | Tipo | Ejemplo | Requerida | Nota |
+|:---|:---|:---|:---:|:---|
+| `codigo_region` | `VARCHAR(2)` | `"01"` | Sí | — |
+| `codigo_comuna` | `VARCHAR(5)` | `"01101"` | Sí | PK |
+| `nombre_comuna` | `VARCHAR` | `"Santiago"` | Sí | — |
+| `anio` | `INTEGER` | `2023` | Sí | PK |
+| `tipo_cliente` | `VARCHAR` | `"Residencial"` | Sí | PK |
+| `consumo_kwh` | `DOUBLE` | `1523400.5` | Sí | — |
+| `numero_clientes` | `INTEGER` | `45800` | Sí | — |
+| `fuente` | `VARCHAR` | `"CNE — Energía Abierta"` | Sí | — |
+
+<!-- END_DATASET_SCHEMA -->

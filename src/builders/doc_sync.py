@@ -19,6 +19,7 @@ AGENTS_PATH = os.path.join(ROOT_DIR, "AGENTS.md")
 TESTS_DIR = os.path.join(ROOT_DIR, "tests")
 ADR_DIR = os.path.join(ROOT_DIR, "docs", "adr")
 CONTRACTS_DIR = os.path.join(ROOT_DIR, "contracts", "datasets")
+DATASET_DOCS_DIR = os.path.join(ROOT_DIR, "docs", "datasets")
 
 GRADE_ORDER = ["A", "B", "C", "D", "F"]
 
@@ -432,6 +433,62 @@ def sync_readme_extractor_table(check_only=False):
     )
 
 
+def sync_docs_schema_blocks(check_only=False):
+    """Bloque Schema en cada docs/datasets/{dataset}.md desde su contrato.
+
+    El contrato (`contracts/datasets/{dataset}.schema.json`) es la fuente de
+    verdad del esquema; la sección "Schema (auto-generado)" de cada doc es un
+    artefacto derivado. Sin esto, la tabla de columnas del doc stale se
+    desincronizaba del contrato sin que nada lo detectara (el gate de
+    `check_companion_paths.py` solo fuerza que el doc se TOQUE, no que su
+    contenido siga correcto).
+    """
+    catalog = DATASET_CATALOG_CONFIG
+    for ds_name in sorted(catalog):
+        contract_path = os.path.join(CONTRACTS_DIR, f"{ds_name}.schema.json")
+        doc_path = os.path.join(DATASET_DOCS_DIR, f"{ds_name}.md")
+        if not os.path.exists(contract_path) or not os.path.exists(doc_path):
+            continue
+
+        with open(contract_path, "r", encoding="utf-8") as f:
+            contract = json.load(f)
+
+        columns_list = contract.get("columns", [])
+        if not columns_list:
+            continue
+
+        required = set(contract.get("required_columns", []))
+        primary_key = set(contract.get("primary_key", []))
+
+        header = f"## Schema (auto-generado desde `contracts/datasets/{ds_name}.schema.json`)"
+        table_header = (
+            "| Columna | Tipo | Ejemplo | Requerida | Nota |\n|:---|:---|:---|:---:|:---|"
+        )
+        rows = []
+        for col in columns_list:
+            col_name = col["name"]
+            col_type = _contract_type_to_sql(col.get("type", "string"), col.get("width"))
+            example = col.get("example")
+            if example is None:
+                example_str = "—"
+            elif isinstance(example, bool):
+                example_str = "`true`" if example else "`false`"
+            elif isinstance(example, (int, float)):
+                example_str = f"`{example}`"
+            else:
+                example_str = f'`"{example}"`'
+            required_str = "Sí" if col_name in required else "No"
+            note = "PK" if col_name in primary_key else "—"
+            rows.append(
+                f"| `{col_name}` | `{col_type}` | {example_str} | {required_str} | {note} |"
+            )
+
+        body = header + "\n\n" + "\n".join([table_header] + rows)
+        replace_delimited_block(
+            doc_path, "DATASET_SCHEMA", body, check_only=check_only, separator="\n\n"
+        )
+
+
 def sync_readme_schema_details(check_only=False):
     """Tablas de schema en README.md desde contratos enriquecidos."""
     catalog = DATASET_CATALOG_CONFIG
@@ -509,6 +566,7 @@ SYNC_FUNCS = [
     sync_agents_extractor_list,
     sync_readme_schema_details,
     sync_readme_extractor_table,
+    sync_docs_schema_blocks,
 ]
 
 

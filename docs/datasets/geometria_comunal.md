@@ -90,3 +90,18 @@ bundle estable y del build normal. El workflow no fija una cadencia de refresco.
 ## Registro de cambios
 
 - v1 (2026-07-23): Primera versión. Geometría comunal generalizada desde BCN ArcGIS, GeoParquet 1.0/WKB/EPSG:4326, 345/346 comunas.
+
+<!-- START_DATASET_SCHEMA -->
+
+## Schema (auto-generado desde `contracts/datasets/geometria_comunal.schema.json`)
+
+| Columna | Tipo | Ejemplo | Requerida | Nota |
+|:---|:---|:---|:---:|:---|
+| `codigo_region` | `VARCHAR(2)` | `"01"` | Sí | — |
+| `codigo_comuna` | `VARCHAR(5)` | `"01101"` | Sí | PK |
+| `nombre_comuna` | `VARCHAR` | `"Iquique"` | Sí | — |
+| `nombre_comuna_clean` | `VARCHAR` | `"iquique"` | Sí | — |
+| `nombre_region` | `VARCHAR` | `"Región de Tarapacá"` | Sí | — |
+| `geometry` | `BINARY` | `"WKB — Polygon o MultiPolygon en EPSG:4326 (WGS84), geoparquet 1.0"` | Sí | — |
+
+<!-- END_DATASET_SCHEMA -->
