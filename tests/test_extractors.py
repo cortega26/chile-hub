@@ -34,6 +34,7 @@ from src.extractors import (
     subdere_extractor,
 )
 from src.extractors.base import BaseExtractor
+from src.extractors.ine_ipc import IneIpcReading
 
 # ROOT_DIR is defined above
 
@@ -418,6 +419,264 @@ class BCentralExtractorTests(unittest.TestCase):
         )
         uf_rows = df.filter(pl.col("codigo_indicador") == "uf")
         self.assertIn(39001.0, uf_rows["valor"].to_list())
+
+
+class IneIpcExtractorTests(unittest.TestCase):
+    """Override de IPC desde la fuente autoritativa INE (issue #43).
+
+    El patrón de parseo replica el validado en el proyecto Monedario
+    (ineIpc.ts): anclado al <h1> del IPC para no tomar tarjetas hermanas
+    (ICT/IPP). El fixture es el HTML real descargado del INE (2026-08-11).
+    """
+
+    FIXTURE = ROOT_DIR / "tests" / "fixtures" / "ine_ipc_page.html"
+
+    def _load_fixture(self) -> str:
+        return self.FIXTURE.read_text(encoding="utf-8")
+
+    def test_parse_real_ine_page_returns_july_2026(self):
+        from src.extractors.ine_ipc import parse_ine_ipc
+
+        reading = parse_ine_ipc(self._load_fixture())
+        self.assertIsNotNone(reading)
+        self.assertEqual(reading.date_iso, "2026-07-01")
+        self.assertAlmostEqual(reading.value, 0.1, places=6)
+
+    def test_parse_anchors_to_ipc_card_not_sibling_card(self):
+        """El match debe anclar al <h1> del IPC: la página contiene ICT (-2,9%)
+        e IPP (0,6%) con las mismas clases; el resultado debe ser el IPC."""
+        from src.extractors.ine_ipc import parse_ine_ipc
+
+        reading = parse_ine_ipc(self._load_fixture())
+        self.assertIsNotNone(reading)
+        self.assertAlmostEqual(reading.value, 0.1, places=6)
+
+    def test_parse_negative_variation(self):
+        from src.extractors.ine_ipc import parse_ine_ipc
+
+        html = (
+            "<h1>Índice de Precios al Consumidor - IPC</h1>"
+            '<p class="cifraV3">-1,3%</p>'
+            '<p class="periodoCifraV3">Variación mensual abril 2026'
+            "<br>Base anual 2023=100</p>"
+        )
+        reading = parse_ine_ipc(html)
+        self.assertIsNotNone(reading)
+        self.assertEqual(reading.date_iso, "2026-04-01")
+        self.assertAlmostEqual(reading.value, -1.3, places=6)
+
+    def test_parse_returns_none_on_redesigned_page(self):
+        from src.extractors.ine_ipc import parse_ine_ipc
+
+        self.assertIsNone(parse_ine_ipc("<html><body>sin tarjetas</body></html>"))
+
+    def test_parse_tolerates_adjacent_classes(self):
+        from src.extractors.ine_ipc import parse_ine_ipc
+
+        html = (
+            "<h1>Índice de Precios al Consumidor - IPC</h1>"
+            '<p class="cifraV3 highlight">0,2%</p>'
+            '<p class="periodoCifraV3 xyz">Variación mensual mayo 2026</p>'
+        )
+        reading = parse_ine_ipc(html)
+        self.assertIsNotNone(reading)
+        self.assertAlmostEqual(reading.value, 0.2, places=6)
+        self.assertEqual(reading.date_iso, "2026-05-01")
+
+    def test_fetch_uses_injected_getter(self):
+        """fetch_ine_ipc con get_html inyectado no toca la red."""
+        from src.extractors.ine_ipc import fetch_ine_ipc
+
+        reading = fetch_ine_ipc(get_html=lambda url: self._load_fixture())
+        self.assertIsNotNone(reading)
+        self.assertAlmostEqual(reading.value, 0.1, places=6)
+
+    def test_fetch_returns_none_on_http_failure(self):
+        from src.extractors.ine_ipc import fetch_ine_ipc
+
+        reading = fetch_ine_ipc(get_html=lambda url: None)
+        self.assertIsNone(reading)
+
+
+class IneIpcOverrideIntegrationTests(unittest.TestCase):
+    """El override INE debe activarse solo cuando mindicador no entrega `ipc`
+    del año en curso, y debe marcar el par como refreshed (no backfill)."""
+
+    def test_empty_ipc_year_triggers_ine_override(self):
+        current_year = datetime.date.today().year
+
+        def fetch(codigo, year):
+            if codigo == "ipc" and year == current_year:
+                return []  # mindicador no entrega IPC (serie muerta)
+            return [{"fecha": f"{year}-01-01", "codigo_indicador": codigo, "valor": 1.0}]
+
+        with (
+            patch.object(
+                bcentral_extractor,
+                "load_existing_staging",
+                return_value=(None, None, []),
+            ),
+            patch.object(bcentral_extractor, "HISTORY_START_YEAR", current_year),
+            patch.object(bcentral_extractor, "fetch_indicator_year", side_effect=fetch),
+            patch.object(
+                bcentral_extractor,
+                "fetch_ine_ipc",
+                return_value=IneIpcReading(value=0.1, date_iso=f"{current_year}-07-01"),
+            ),
+        ):
+            df, diagnostics = bcentral_extractor.fetch_all_history()
+
+        self.assertIsNotNone(df)
+        self.assertIn(f"ipc/{current_year}", diagnostics["ine_override_pairs"])
+        self.assertNotIn("ipc", diagnostics["published_backfills"])
+        ipc_rows = df.filter(pl.col("codigo_indicador") == "ipc")
+        self.assertEqual(ipc_rows.height, 1)
+        self.assertEqual(ipc_rows["valor"][0], 0.1)
+
+    def test_ine_override_preserves_prior_mindicador_months(self):
+        """El override INE no debe truncar los meses del año ya entregados por
+        mindicador (regresion detectada en review, PR #56).
+
+        El registro INE se fusiona por fecha con el staging existente; no marca
+        (ipc, year) como refreshed, porque eso haria que el merge eliminara
+        TODO el slice ipc del año y lo reemplazara solo por el mes del INE.
+        """
+        current_year = datetime.date.today().year
+
+        def fetch(codigo, year):
+            if codigo == "ipc" and year == current_year:
+                return []  # mindicador muerto para ipc este año
+            return [{"fecha": f"{year}-01-01", "codigo_indicador": codigo, "valor": 1.0}]
+
+        existing = pl.DataFrame(
+            {
+                "fecha": [f"{current_year}-01-01", f"{current_year}-03-01"],
+                "codigo_indicador": ["ipc", "ipc"],
+                "valor": [0.5, 0.7],
+            }
+        ).with_columns(pl.col("fecha").str.to_date("%Y-%m-%d"))
+        with (
+            patch.object(
+                bcentral_extractor,
+                "load_existing_staging",
+                return_value=(existing, current_year, []),
+            ),
+            patch.object(bcentral_extractor, "HISTORY_START_YEAR", current_year),
+            patch.object(bcentral_extractor, "fetch_indicator_year", side_effect=fetch),
+            patch.object(
+                bcentral_extractor,
+                "fetch_ine_ipc",
+                return_value=IneIpcReading(value=0.1, date_iso=f"{current_year}-07-01"),
+            ),
+        ):
+            df, diagnostics = bcentral_extractor.fetch_all_history()
+
+        ipc_rows = df.filter(pl.col("codigo_indicador") == "ipc").sort("fecha")
+        # Los meses previos de mindicador se preservan + el mes del INE se suma
+        self.assertEqual(ipc_rows.height, 3)
+        dates = ipc_rows["fecha"].dt.strftime("%Y-%m-%d").to_list()
+        self.assertEqual(
+            dates,
+            [f"{current_year}-01-01", f"{current_year}-03-01", f"{current_year}-07-01"],
+        )
+        self.assertIn(f"ipc/{current_year}", diagnostics["ine_override_pairs"])
+
+    def test_no_override_when_mindicador_delivers_ipc(self):
+        current_year = datetime.date.today().year
+
+        def fetch(codigo, year):
+            return [{"fecha": f"{year}-01-01", "codigo_indicador": codigo, "valor": 1.0}]
+
+        with (
+            patch.object(
+                bcentral_extractor,
+                "load_existing_staging",
+                return_value=(None, None, []),
+            ),
+            patch.object(bcentral_extractor, "HISTORY_START_YEAR", current_year),
+            patch.object(bcentral_extractor, "fetch_indicator_year", side_effect=fetch),
+            patch.object(bcentral_extractor, "fetch_ine_ipc") as ine_mock,
+        ):
+            df, diagnostics = bcentral_extractor.fetch_all_history()
+
+        ine_mock.assert_not_called()
+        self.assertEqual(diagnostics["ine_override_pairs"], [])
+
+    def test_no_override_for_historical_years(self):
+        """El override solo aplica al año en curso (el INE publica el último
+        mes, no historial)."""
+        current_year = datetime.date.today().year
+
+        def fetch(codigo, year):
+            if codigo == "ipc":
+                return []  # vacío en TODOS los años
+            return [{"fecha": f"{year}-01-01", "codigo_indicador": codigo, "valor": 1.0}]
+
+        with (
+            patch.object(
+                bcentral_extractor,
+                "load_existing_staging",
+                return_value=(None, None, []),
+            ),
+            patch.object(bcentral_extractor, "HISTORY_START_YEAR", current_year - 1),
+            patch.object(bcentral_extractor, "fetch_indicator_year", side_effect=fetch),
+            patch.object(
+                bcentral_extractor,
+                "fetch_ine_ipc",
+                return_value=IneIpcReading(value=0.1, date_iso=f"{current_year}-07-01"),
+            ) as ine_mock,
+        ):
+            df, diagnostics = bcentral_extractor.fetch_all_history()
+
+        ine_mock.assert_called_once()
+        self.assertEqual(len(diagnostics["ine_override_pairs"]), 1)
+
+    def test_process_indicators_records_ine_override_in_metadata(self):
+        """El metadata debe registrar `ine_override` en indicator_delivery y
+        el note correspondiente (provenance honesta: la serie llegó del INE,
+        no de un backfill del artefacto publicado)."""
+        current_year = datetime.date.today().year
+
+        def fetch(codigo, year):
+            if codigo == "ipc" and year == current_year:
+                return []
+            return [{"fecha": f"{year}-01-01", "codigo_indicador": codigo, "valor": 1.0}]
+
+        with (
+            tempfile.TemporaryDirectory() as tmpdir,
+            patch.object(bcentral_extractor, "RAW_DIR", tmpdir),
+            patch.object(bcentral_extractor, "STAGING_DIR", tmpdir),
+            patch.object(
+                bcentral_extractor,
+                "METADATA_PATH",
+                str(Path(tmpdir) / "indicadores.metadata.json"),
+            ),
+            patch.object(
+                bcentral_extractor,
+                "STAGING_CSV_PATH",
+                str(Path(tmpdir) / "indicadores.csv"),
+            ),
+            patch.object(
+                bcentral_extractor,
+                "load_existing_staging",
+                return_value=(None, None, []),
+            ),
+            patch.object(bcentral_extractor, "HISTORY_START_YEAR", current_year),
+            patch.object(bcentral_extractor, "fetch_indicator_year", side_effect=fetch),
+            patch.object(
+                bcentral_extractor,
+                "fetch_ine_ipc",
+                return_value=IneIpcReading(value=0.1, date_iso=f"{current_year}-07-01"),
+            ),
+        ):
+            bcentral_extractor.process_indicators()
+            metadata = json.loads(
+                (Path(tmpdir) / "indicadores.metadata.json").read_text(encoding="utf-8")
+            )
+
+        self.assertEqual(metadata["indicator_delivery"]["ipc"], "ine_override")
+        self.assertNotIn("ipc", metadata.get("published_backfills", []))
+        self.assertTrue(any("ine_override_used_for_pairs" in n for n in metadata.get("notes", [])))
 
 
 class SinimFinanzasExtractorTests(unittest.TestCase):

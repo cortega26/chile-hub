@@ -197,9 +197,9 @@ class ChileHubDataManager:
             ChileHubDataError: Si cache_root no está bajo el directorio de caché esperado.
         """
         # Validar que cache_root es un subdirectorio esperado
-        expected_parent = user_cache_dir("chile-hub")
+        expected_parent = Path(user_cache_dir("chile-hub")).resolve()
         cache_path = Path(self.cache_root).resolve()
-        if not str(cache_path).startswith(str(Path(expected_parent).resolve())):
+        if not cache_path.is_relative_to(expected_parent):
             raise ChileHubDataError(
                 f"Por seguridad, 'cache clear' solo opera dentro del directorio de cache "
                 f"esperado ({expected_parent}). El directorio configurado es {cache_path}. "

@@ -121,13 +121,13 @@ chile-hub/
 │   ├── builders/                  Módulos del pipeline extraídos de build_dev_db.py (formats, metadata, reports, artifacts, datasets, catalog, landing, io_utils, _shared, dcat_catalog, data_package, doc_sync, geo, _logging)
 │   ├── chile_hub.py               Compatibility shim (21 líneas) — delega al paquete
 │   ├── chile_hub/                 Paquete Python instalable (ChileHub API + CLI + data manager)
-│   │   ├── core.py                ChileHub class + API pública (2 654 líneas)
-│   │   ├── cli.py                 CLI entry points
+│   │   ├── core.py                ChileHub class + API pública (1 950 líneas)
+│   │   ├── cli.py                 CLI entry points (build_parser/_main/main — TECHDEBT-02, movido de core.py)
 │   │   ├── contracts.py           Schemas de contrato runtime
 │   │   ├── datasets.py            Definición de Dataset(StrEnum) y tipos
 │   │   ├── exceptions.py          Excepciones de dominio de la API
 │   │   ├── data_manager.py        Descarga de bundle, cache, verificación SHA256
-│   │   ├── pipeline_status_utils.py  Reportes Markdown de salud, catálogo y redistribución (974 líneas)
+│   │   ├── pipeline_status_utils.py  Reportes Markdown de salud, catálogo y redistribución (955 líneas)
 │   │   ├── _render.py             Helper de renderizado de tablas
 │   │   └── text.py                Utils de texto compartidas
 │   └── pipeline_status_utils.py   Shim de compatibilidad (21 líneas) — re-exporta del paquete; NO duplicar lógica aquí
@@ -139,7 +139,7 @@ chile-hub/
 │   ├── staging/      Datos parseados y cercanos a la fuente (CSV + metadata.json por dataset).
 │   └── normalized/   Artefactos finales publicables (Parquet, JSON, DuckDB, Excel, ZIP, reportes).
 │
-├── tests/                        12 archivos pytest — ver tabla completa en §8, no la dupliques aquí
+├── tests/                        13 archivos pytest — ver tabla completa en §8, no la dupliques aquí
 │   ├── test_chile_hub.py         API/CLI de ChileHub, contratos de artefactos, workflow, Makefile
 │   ├── test_extractors.py        Un test class por extractor + contrato de BaseExtractor
 │   ├── test_pipeline_logic.py    Lógica interna de build_dev_db.py, invariantes CUT, changelog
@@ -190,7 +190,7 @@ codegraph impact validate_comunas                   # Qué se rompe si cambio es
 **Reglas para acotar lecturas y ahorrar tokens:**
 - Usar `Read` con `offset`/`limit` — nunca leer archivos grandes enteros de golpe.
 - `base.py` (76 líneas) es seguro de leer completo. `validation.py` (1 447 líneas) — leer por validador individual.
-- `build_dev_db.py` (883 líneas) y `src/chile_hub/core.py` (2 654 líneas) — usar estas áncoras:
+- `build_dev_db.py` (883 líneas) y `src/chile_hub/core.py` (1 950 líneas) — usar estas áncoras:
 
 | Archivo | Líneas de interés |
 |---|---|
@@ -223,10 +223,12 @@ codegraph impact validate_comunas                   # Qué se rompe si cambio es
 
              Cadencia distinta / carril `candidate` (NO corren en `make extract`):
              sinim_finanzas_live_extractor.py y cead_delincuencia_live_extractor.py
-             (vía `monthly-scrape.yml`); autoridades_locales_extractor.py (ad hoc).
+             (vía `monthly-scrape.yml`); autoridades_locales_extractor.py (ad hoc);
+             geometria_comunal_extractor.py (vía `geometria-comunal.yml`, ADR-012).
              sinim_finanzas_extractor.py es un stub de fallback, no un paso del
              pipeline diario — nunca invocarlo desde un job programado (ver
              `tests/test_ci_config.py::SinimDailyJobGuardrailTests`).
+             Vista de referencia de los carriles: `docs/extraction-lanes.md`.
 
              Nota CI — `autoridades_electas`: en `pipeline-check.yml` este extractor
              se invoca vía `uv run --no-project --with "scrapling[fetchers]" …`
@@ -619,7 +621,7 @@ pytest tests/test_chile_hub.py::ChileHubTests::test_load_polars -v
 
 <!-- START_AGENTS_TEST_TABLE -->
 
-**12 archivos** en `tests/`. Esta tabla es de **navegación por archivo**, no un
+**13 archivos** en `tests/`. Esta tabla es de **navegación por archivo**, no un
 inventario de clases — las clases cambian con frecuencia y una lista exhaustiva
 aquí quedaría stale de inmediato. Para el inventario vivo de clases:
 ```bash
@@ -633,6 +635,7 @@ grep -n "^class " tests/*.py
 | `test_chile_hub.py` | Sí (`make build` antes) | API Python de `ChileHub`, CLI, contratos de artefactos (SHA256, catálogo, ZIP), contratos de workflow/Makefile, `Dataset(StrEnum)` |
 | `test_ci_config.py` | No | Guardrails de texto simple para regresiones **reales** ya ocurridas de CI/Makefile |
 | `test_core.py` | Sí (`make build` antes) | Métodos públicos de `ChileHub` (`core.py`): metadatos, reportes operativos, inspección — no cubre CLI |
+| `test_data_manager.py` | No | Unit tests de `ChileHubDataManager` y contrato de caché de geometría — sin `data/normalized/` (TC-07: extraídos de `test_chile_hub.py`) |
 | `test_data_package.py` | Sí (`make build` antes) | Builder de Frictionless Data Package |
 | `test_extractors.py` | No | Un test class por extractor (fetch, normalización, staging) + contrato ABC de `BaseExtractor` + reintentos HTTP |
 | `test_packaging_runtime.py` | Sí (`make build` antes) | Empaquetado del bundle publicable (ZIP, SHA256) en runtime |
@@ -708,8 +711,11 @@ El workflow `.github/workflows/pipeline-check.yml` corre en `push` a `main`,
    (`check_companion_paths.py registry` siempre; `companions` solo en `pull_request`).
 2. `build-and-test` — extractores, build, verificación, tests y status.
 3. `landing` — smoke test Playwright usando exactamente los outputs del job anterior.
-4. `publish` — solo en `schedule` o dispatch con `publish=true`; exige
-   `verify_pipeline.py --require-live` y publica `data/normalized/` en `main`.
+ 4. `publish` — solo en `schedule` o dispatch con `publish=true`; exige
+    `verify_pipeline.py --profile publication` y publica `data/normalized/` en `main`.
+    El job `publish` de PyPI Release re-verifica con el perfil `release`
+    (publication policy sobre `data/normalized/` sin exigir staging — que no
+    viaja en el artefacto; ver `docs/release.md`).
 
 El cron corre a las `10:00 UTC`: `06:00 CLT` o `07:00 CLST`. La publicación rechaza
 fallbacks, datos stale, fallas de fetch, recuperación raw y preservación de staging. Solo permite

@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import re
 import sys
-from pathlib import Path
 
-from .core import ChileHub, main
+from .cli import main
+from .core import ChileHub
 from .exceptions import (
     ChileHubDataError,
     ChileHubDatasetError,
@@ -36,7 +36,9 @@ def _get_version() -> str:
     incrustada en los metadatos de la rueda por el build backend.
     """
     # 1. Development checkout — lectura directa de pyproject.toml.
-    _pyproject = Path(__file__).resolve().parents[2] / "pyproject.toml"
+    from ._paths import find_root
+
+    _pyproject = find_root() / "pyproject.toml"
     if _pyproject.is_file():
         try:
             _text = _pyproject.read_text(encoding="utf-8")

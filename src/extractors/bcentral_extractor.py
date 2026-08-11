@@ -36,6 +36,11 @@ try:
 except ModuleNotFoundError:
     from http_utils import fetch_with_retry
 
+try:
+    from src.extractors.ine_ipc import fetch_ine_ipc
+except ModuleNotFoundError:
+    from ine_ipc import fetch_ine_ipc
+
 # ── Rutas ─────────────────────────────────────────────────────────────────────
 DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data"))
 RAW_DIR = os.path.join(DATA_DIR, "raw")
@@ -230,6 +235,7 @@ def fetch_all_history():
         "preserved_existing_pairs": [],
         "empty_live_pairs": [],
         "published_backfills": published_backfills,
+        "ine_override_pairs": [],
     }
 
     if existing_df is not None:
@@ -248,6 +254,7 @@ def fetch_all_history():
         for year in years_to_fetch:
             call_n += 1
             print(f"  [{call_n}/{total_calls}] Descargando {codigo}/{year}…")
+            records = []
             try:
                 records = fetch_indicator_year(codigo, year)
                 if records:
@@ -277,6 +284,41 @@ def fetch_all_history():
                     diagnostics["raw_recoveries"].append(f"{codigo}/{year}")
                 elif existing_df is not None:
                     diagnostics["preserved_existing_pairs"].append(f"{codigo}/{year}")
+
+            # Override de último recurso para `ipc` en el año en curso: si
+            # mindicador.cl no lo entrega (serie muerta upstream desde
+            # 2025-12, issue #43), la fuente autoritativa INE publica la
+            # variación mensual en su página pública. Solo aplica cuando el
+            # dato no llegó por la vía normal, y solo para el año en curso
+            # (el INE publica el último mes, no historial).
+            if (
+                codigo == "ipc"
+                and year == current_year
+                and not records
+                and (codigo, year) not in refreshed_pairs
+            ):
+                ine_reading = fetch_ine_ipc()
+                if ine_reading is not None:
+                    print(
+                        f"  IPC desde INE (fuente autoritativa): "
+                        f"{ine_reading.date_iso} = {ine_reading.value}%"
+                    )
+                    new_records.append(
+                        {
+                            "fecha": ine_reading.date_iso,
+                            "codigo_indicador": "ipc",
+                            "valor": ine_reading.value,
+                        }
+                    )
+                    # NO marcar (ipc, year) en refreshed_pairs: eso haria que el
+                    # merge eliminara TODO el slice ipc del año en curso del
+                    # staging existente y lo reemplazara solo por el registro
+                    # INE (un mes), truncando los meses que mindicador si habia
+                    # entregado. El concat + unique(keep="last") final fusiona
+                    # el registro INE con el historial existente por fecha.
+                    diagnostics.setdefault("ine_override_pairs", []).append(f"{codigo}/{year}")
+                else:
+                    print("  Advertencia: no se pudo obtener IPC desde INE.")
             time.sleep(REQUEST_DELAY_SECONDS)
 
     if not new_records and existing_df is not None:
@@ -406,6 +448,8 @@ def process_indicators() -> str:
         notes.append(
             "published_backfills_used_for_codes: " + ", ".join(diagnostics["published_backfills"])
         )
+    if source_mode == "live" and diagnostics.get("ine_override_pairs"):
+        notes.append("ine_override_used_for_pairs: " + ", ".join(diagnostics["ine_override_pairs"]))
 
     indicator_codes = sorted(df["codigo_indicador"].unique().to_list())
     indicator_delivery = {code: "live" for code in indicator_codes}
@@ -413,6 +457,8 @@ def process_indicators() -> str:
         indicator_delivery[pair.split("/", 1)[0]] = "raw_recovery"
     for pair in diagnostics.get("preserved_existing_pairs", []):
         indicator_delivery[pair.split("/", 1)[0]] = "preserved_existing"
+    for pair in diagnostics.get("ine_override_pairs", []):
+        indicator_delivery[pair.split("/", 1)[0]] = "ine_override"
     for code in diagnostics.get("published_backfills", []):
         indicator_delivery[code] = "published_backfill"
 
@@ -437,6 +483,7 @@ def process_indicators() -> str:
         "preserved_existing_pairs": diagnostics.get("preserved_existing_pairs", []),
         "empty_live_pairs": diagnostics.get("empty_live_pairs", []),
         "published_backfills": diagnostics.get("published_backfills", []),
+        "ine_override_pairs": diagnostics.get("ine_override_pairs", []),
         "reuse_policy": REUSE_POLICY,
     }
     write_metadata(metadata)

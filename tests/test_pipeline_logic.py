@@ -1580,6 +1580,7 @@ class IndicatorFallbackTests(unittest.TestCase):
                     side_effect=requests.RequestException("timeout"),
                 ),
                 patch.object(bcentral_extractor, "load_latest_raw_snapshot", return_value=[]),
+                patch.object(bcentral_extractor, "fetch_ine_ipc", return_value=None),
                 patch.object(bcentral_extractor.time, "sleep"),
             ):
                 df, diagnostics = bcentral_extractor.fetch_all_history()
@@ -2311,6 +2312,58 @@ class RemainingValidatorTests(unittest.TestCase):
 
 class PipelineStatusUtilsTests(unittest.TestCase):
     """Tests para funciones puras de pipeline_status_utils."""
+
+    def test_root_resolution_is_unified_in_paths_module(self):
+        """TECHDEBT-05: todos los módulos del paquete resuelven la raíz desde
+        `_paths`, no con `parents[N]` propios.
+
+        Antes había cuatro idiomas (parents[2] en core/contracts/__init__,
+        _find_root() en pipeline_status_utils). La fuente única es
+        `_paths.find_root()`; los re-exports deben coincidir.
+        """
+        from chile_hub import _paths, contracts, core, pipeline_status_utils
+
+        expected = _paths.find_root()
+        self.assertEqual(core.ROOT_DIR, expected)
+        self.assertEqual(pipeline_status_utils.ROOT_DIR, expected)
+        self.assertEqual(contracts.find_root(), expected)
+        self.assertTrue((expected / "pyproject.toml").is_file())
+
+    def test_root_resolution_falls_back_without_pyproject(self):
+        """TECHDEBT-05: sin pyproject.toml visible, find_root() no explota y
+        devuelve un path absoluto (fallback de wheel instalada)."""
+        from chile_hub import _paths
+
+        with patch.object(_paths.Path, "exists", return_value=False):
+            fallback = _paths.find_root()
+        self.assertTrue(fallback.is_absolute())
+
+    def test_root_resolution_rejects_foreign_pyproject(self):
+        """El sentinel de find_root() debe ser el pyproject de chile-hub, no
+        cualquier pyproject.toml.
+
+        Regresion detectada en review (PR #56): en un entorno instalado (wheel
+        dentro del .venv de un consumidor), el ascenso desde site-packages
+        alcanza el pyproject.toml del proyecto CONSUMIDOR y lo aceptaria como
+        raiz — reportando su version como chile_hub.__version__ y resolviendo
+        ROOT_DIR/NORMALIZED_DIR contra su arbol. El sentinel exige
+        name = "chile-hub".
+        """
+        from chile_hub import _paths
+
+        with tempfile.TemporaryDirectory() as tmp:
+            foreign = Path(tmp) / "pyproject.toml"
+            foreign.write_text('name = "otra-app"\nversion = "9.9.9"\n', encoding="utf-8")
+            self.assertFalse(_paths._is_chile_hub_pyproject(foreign))
+
+            own = Path(tmp) / "pyproject-own.toml"
+            own.write_text('name = "chile-hub"\n', encoding="utf-8")
+            self.assertTrue(_paths._is_chile_hub_pyproject(own))
+
+            # Caso limite: name presente pero con comillas simples
+            own_single = Path(tmp) / "pyproject-single.toml"
+            own_single.write_text("name = 'chile-hub'\n", encoding="utf-8")
+            self.assertFalse(_paths._is_chile_hub_pyproject(own_single))
 
     def test_format_top_issue_summary_empty(self):
         from src.pipeline_status_utils import format_top_issue_summary

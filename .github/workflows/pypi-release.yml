@@ -172,12 +172,14 @@ jobs:
 
           case "$validation_status" in
             0)
-              # Re-verifica el artefacto adoptado con el mismo criterio con el
-              # que se publico (perfil publication + require_live). Replay del
-              # override de ADR-016 registrado en la provenance al momento de
-              # publicar: sin el, el release rechazaria aqui un artefacto que el
-              # pipeline ya verifico con --allow-stale-backfills (p. ej. ipc,
-              # issue #43). Regresion 2026-08-11 (run 31533777382).
+              # Re-verifica el artefacto adoptado con perfil `release` (el mismo
+              # criterio de publicacion: publication policy + required files de
+              # normalized, SIN staging — el artefacto no lo incluye, y exigirlo
+              # mataba el release con "Missing required files: data/staging/...",
+              # regresion 2026-08-11 run 31539295351). Replay del override de
+              # ADR-016 registrado en la provenance al momento de publicar: sin
+              # el, el release rechazaria aqui un artefacto que el pipeline ya
+              # verifico con --allow-stale-backfills (p. ej. ipc, issue #43).
               stale_backfills="$(python - <<'PY'
           import json, os
           try:
@@ -188,10 +190,10 @@ jobs:
           PY
           )"
               if [[ -n "$stale_backfills" ]]; then
-                python scripts/verify_pipeline.py --require-live \
+                python scripts/verify_pipeline.py --profile release \
                   --allow-stale-backfills "$stale_backfills"
               else
-                python scripts/verify_pipeline.py --require-live
+                python scripts/verify_pipeline.py --profile release
               fi
               echo "ready=true" >> "$GITHUB_OUTPUT"
               ;;

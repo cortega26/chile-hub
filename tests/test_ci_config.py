@@ -76,6 +76,38 @@ class SinimDailyJobGuardrailTests(unittest.TestCase):
         self.assertIn('git add -f "$path"', content)
         self.assertNotIn('git add "$path"', content)
 
+    def test_extractors_belong_to_exactly_one_lane(self):
+        """TECHDEBT-06: un extractor no puede correr en dos carriles.
+
+        Los extractores del carril diario viven solo en `make extract`
+        (Makefile); los mensuales solo en `monthly-scrape.yml`; el stub SINIM
+        y los candidate en ningún job programado. Un extractor en dos carriles
+        duplicaría trabajo o sobrescribiría snapshots (el caso SINIM bloqueó el
+        publish diario en 2026-06).
+        """
+        daily = _extract_make_target(MAKEFILE.read_text(encoding="utf-8"), "extract")
+        daily_extractors = {
+            line.strip()
+            for line in daily.splitlines()
+            if "extractors/" in line and "_extractor.py" in line
+        }
+        monthly = MONTHLY_SCRAPE_WORKFLOW.read_text(encoding="utf-8")
+        monthly_extractors = {
+            f"src/extractors/{name}"
+            for name in ("sinim_finanzas_live_extractor.py", "cead_delincuencia_live_extractor.py")
+            if f"{name}" in monthly
+        }
+        overlap = daily_extractors & monthly_extractors
+        self.assertEqual(overlap, set(), f"Extractores en dos carriles: {overlap}")
+        self.assertNotIn("sinim_finanzas_extractor.py", daily_extractors)
+
+    def test_extraction_lanes_doc_is_referenced_from_agents(self):
+        """TECHDEBT-06: la vista de carriles (`docs/extraction-lanes.md`) debe
+        seguir referenciada desde AGENTS.md §3 para que el split diario/mensual
+        no vuelva a quedar solo en el código."""
+        agents = (ROOT_DIR / "AGENTS.md").read_text(encoding="utf-8")
+        self.assertIn("docs/extraction-lanes.md", agents)
+
 
 class AutoridadesElectasScraplingGuardrailTests(unittest.TestCase):
     """Regresión: en el job diario de Pipeline Check (cache-miss → extracción
@@ -294,7 +326,38 @@ class AdoptionBadgeGuardrailTests(unittest.TestCase):
         )
         self.assertIn('p.get("allow_stale_backfills", "")', release_content)
         self.assertIn("--allow-stale-backfills", release_content)
-        self.assertIn("python scripts/verify_pipeline.py --require-live", release_content)
+        self.assertIn("python scripts/verify_pipeline.py --profile release", release_content)
+
+    def test_release_verifies_with_release_profile_not_require_live(self):
+        """El release debe re-verificar con el perfil `release`, no con
+        `--require-live` (perfil publication).
+
+        Regresion 2026-08-11 (run 31539295351): `--require-live` exige
+        `data/staging/*.csv` (gitignored, 298 MB, no viaja en el artefacto),
+        asi que la re-verificacion fallaba con "Missing required files:
+        data/staging/..." en TODO release. El perfil `release` verifica la
+        publication policy sobre lo que viaja (normalized) sin staging.
+        """
+        release_content = (ROOT_DIR / ".github" / "workflows" / "pypi-release.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("--profile release", release_content)
+        # La invocacion real de verify_pipeline en el release no puede usar
+        # --require-live (perfil publication, exige staging). Los comentarios
+        # pueden mencionarlo al documentar la regresion — se filtra la primera
+        # columna de comando (lineas sin `#`).
+        command_lines = [
+            line
+            for line in release_content.splitlines()
+            if line.strip() and not line.lstrip().startswith("#")
+        ]
+        self.assertFalse(
+            any("verify_pipeline.py --require-live" in line for line in command_lines),
+            "verify_pipeline.py --require-live no debe invocarse en el release",
+        )
+        verify_content = (ROOT_DIR / "scripts" / "verify_pipeline.py").read_text(encoding="utf-8")
+        self.assertIn('if profile == "release":', verify_content)
+        self.assertIn('choices=["dev", "readiness", "publication", "release"]', verify_content)
 
     def test_out_of_band_staging_is_excluded_from_the_freshness_guard(self):
         """El carril candidate no lo construye `make build` (ADR-012), asi que su
@@ -356,6 +419,30 @@ class LandingSyncGateGuardrailTests(unittest.TestCase):
             body,
             "`make doctor` debe correr el gate de landing antes de commit.",
         )
+
+    def test_health_table_escapes_status_values_in_class_attributes(self):
+        """SEC-03: los valores de estado del dashboard de salud deben escaparse
+        también en los atributos `class`, no solo en el texto.
+
+        `hub_health.json` es generado por el pipeline (valores enum internos),
+        pero la tabla de salud es la unica superficie donde un valor externo
+        (p. ej. un severity malformado) se interpolaba crudo en `class=` — un
+        vector de attribute injection. Los seis estados (severity, source_mode,
+        validation_status, freshness_status, coverage_status, drift_status)
+        deben pasar por escapeHtml antes de entrar a la clase.
+        """
+        content = (ROOT_DIR / "app.js").read_text(encoding="utf-8")
+        for var, status in (
+            ("sev", "severity"),
+            ("sourceMode", "source_mode"),
+            ("validationStatus", "validation_status"),
+            ("freshnessStatus", "freshness_status"),
+            ("coverageStatus", "coverage_status"),
+            ("driftStatus", "drift_status"),
+        ):
+            with self.subTest(status=status):
+                self.assertIn(f"const {var} = escapeHtml(entry.{status}", content)
+                self.assertIn(f"class=\"pill ' + {var}", content)
 
 
 class AgentsSyncGateGuardrailTests(unittest.TestCase):
