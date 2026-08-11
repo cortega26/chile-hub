@@ -191,6 +191,10 @@ _AGENTS_TEST_DESCRIPTIONS = {
     "test_verify_pipeline.py": (
         "Verificación de pipeline (`verify_pipeline.py`) — guardia pre-publicación de artefactos"
     ),
+    "test_data_manager.py": (
+        "Unit tests de `ChileHubDataManager` y contrato de caché de geometría — sin "
+        "`data/normalized/` (TC-07: extraídos de `test_chile_hub.py`)"
+    ),
 }
 
 
