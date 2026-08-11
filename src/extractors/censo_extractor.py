@@ -38,6 +38,15 @@ CENSO_URL = (
     "https://censo2024.ine.gob.cl/wp-content/uploads/2025/03/"
     "D1_Poblacion-censada-por-sexo-y-edad-en-grupos-quinquenales.xlsx"
 )
+# Anti-bot: censo2024.ine.gob.cl responde 404 al UA por defecto de requests
+# (bloqueo introducido ~2026-08-04; mismo patrón que mineduc_establecimientos).
+# Verificado: con UA de navegador la misma URL entrega el XLSX completo (505 KB).
+REQUEST_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+    )
+}
 REUSE_POLICY = {
     "status": "open-attribution",
     "license": "CC BY 4.0",
@@ -71,7 +80,7 @@ def fetch_workbook() -> tuple[Path, str]:
     ensure_staging_directories()
     target = _snapshot_path()
     try:
-        with fetch_with_retry(CENSO_URL, timeout=60) as response:
+        with fetch_with_retry(CENSO_URL, timeout=60, headers=REQUEST_HEADERS) as response:
             response.raise_for_status()
             target.write_bytes(response.content)
         return target, "live"

@@ -26,6 +26,14 @@ METADATA_PATH = STAGING_DIR / "censo_hogares_viviendas.metadata.json"
 SOURCE_URL = (
     "https://censo2024.ine.gob.cl/wp-content/uploads/2025/03/V1_Viviendas-y-hogares-censados.xlsx"
 )
+# Anti-bot: censo2024.ine.gob.cl responde 404 al UA por defecto de requests
+# (bloqueo introducido ~2026-08-04; mismo patrón que mineduc_establecimientos).
+REQUEST_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+    )
+}
 REUSE_POLICY = {
     "status": "open-attribution",
     "license": "CC BY 4.0",
@@ -73,7 +81,7 @@ def fetch_workbook():
         / f"ine_censo2024_hogares_viviendas_{datetime.datetime.now(UTC):%Y%m%dT%H%M%SZ}.xlsx"
     )
     try:
-        with fetch_with_retry(SOURCE_URL, timeout=60) as response:
+        with fetch_with_retry(SOURCE_URL, timeout=60, headers=REQUEST_HEADERS) as response:
             response.raise_for_status()
             target.write_bytes(response.content)
         return target, "live"

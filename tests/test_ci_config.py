@@ -269,6 +269,27 @@ class LandingSyncGateGuardrailTests(unittest.TestCase):
         )
 
 
+class AgentsSyncGateGuardrailTests(unittest.TestCase):
+    """AGENTS.md es prosa curada: sus hechos contables (anclas de líneas,
+    listas de módulos del §2, tabla de capas del §1) no se regeneran con
+    `sync_docs.py` y por eso stale (conteos de líneas y módulos desactualizados
+    detectados 2026-08). `check_agents_sync.py` los verifica contra el código;
+    estos guardrails evitan que el gate se desconecte del job rápido o de
+    `make doctor`."""
+
+    def test_quality_job_runs_agents_sync_gate(self):
+        content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("python scripts/check_agents_sync.py", content)
+
+    def test_doctor_target_runs_agents_sync_gate(self):
+        body = _extract_make_target(MAKEFILE.read_text(encoding="utf-8"), "doctor")
+        self.assertIn(
+            "scripts/check_agents_sync.py",
+            body,
+            "`make doctor` debe correr el gate de AGENTS.md antes de commit.",
+        )
+
+
 class GeometriaCandidateWorkflowGuardrailTests(unittest.TestCase):
     """La geometría comunal es candidate y supera el límite local de 500 KB.
 

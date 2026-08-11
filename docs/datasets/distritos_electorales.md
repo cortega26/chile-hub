@@ -38,3 +38,16 @@ ORDER BY codigo_comuna;
 ## Limitaciones
 
 Este mapeo representa la división político-electoral estipulada por la legislación chilena vigente. No incluye locales de votación ni padrón electoral, únicamente la definición geográfica-jurisdiccional de los distritos y circunscripciones.
+
+<!-- START_DATASET_SCHEMA -->
+
+## Schema (auto-generado desde `contracts/datasets/distritos_electorales.schema.json`)
+
+| Columna | Tipo | Ejemplo | Requerida | Nota |
+|:---|:---|:---|:---:|:---|
+| `codigo_comuna` | `VARCHAR(5)` | `"01101"` | Sí | PK |
+| `nombre_comuna` | `VARCHAR` | `"Las Condes"` | Sí | — |
+| `distrito_electoral` | `VARCHAR` | `"10"` | Sí | — |
+| `circunscripcion_senatorial` | `VARCHAR` | `"3"` | Sí | — |
+
+<!-- END_DATASET_SCHEMA -->

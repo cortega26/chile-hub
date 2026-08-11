@@ -30,3 +30,18 @@ ORDER BY hogares_censados DESC;
 ## Limitaciones
 
 Los valores representan el Censo 2024 y no deben interpretarse como estimaciones intercensales.
+
+<!-- START_DATASET_SCHEMA -->
+
+## Schema (auto-generado desde `contracts/datasets/censo_hogares_viviendas.schema.json`)
+
+| Columna | Tipo | Ejemplo | Requerida | Nota |
+|:---|:---|:---|:---:|:---|
+| `codigo_comuna` | `VARCHAR(5)` | `"01101"` | Sí | PK |
+| `viviendas_censadas` | `INTEGER` | `85000` | Sí | — |
+| `viviendas_particulares_ocupadas` | `INTEGER` | `75000` | No | — |
+| `viviendas_colectivas` | `INTEGER` | `200` | No | — |
+| `hogares_censados` | `INTEGER` | `73000` | Sí | — |
+| `promedio_personas_hogar` | `DOUBLE` | `3.06` | No | — |
+
+<!-- END_DATASET_SCHEMA -->

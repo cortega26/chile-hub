@@ -79,3 +79,14 @@ Esta capa puede seguir en MVP sin mucha complejidad extra, pero conviene:
 
 1. fijar un conteo esperado mínimo de regiones en tests y validaciones
 2. documentar explícitamente cambios administrativos si alguna fuente futura altera nombres oficiales
+
+<!-- START_DATASET_SCHEMA -->
+
+## Schema (auto-generado desde `contracts/datasets/regiones.schema.json`)
+
+| Columna | Tipo | Ejemplo | Requerida | Nota |
+|:---|:---|:---|:---:|:---|
+| `codigo_region` | `VARCHAR(2)` | `"01"` | Sí | PK |
+| `nombre_region` | `VARCHAR` | `"Tarapacá"` | Sí | — |
+
+<!-- END_DATASET_SCHEMA -->

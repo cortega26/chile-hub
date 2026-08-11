@@ -35,6 +35,7 @@ from chile_hub import (
 )
 from chile_hub.core import _main
 from chile_hub.data_manager import ChileHubDataManager, ChileHubUpdateWarning, ReleaseAsset
+from chile_hub.geo import acquire_geometry, load_geometry, validate_geometry
 from src.validation import validate_indicadores
 
 # ── Staleness guard ───────────────────────────────────────────────────────────
@@ -2234,6 +2235,240 @@ class ChileHubDataManagerUnitTests(unittest.TestCase):
         finally:
             if cache_root.exists():
                 shutil.rmtree(str(cache_root))
+
+
+class GeoCacheIntegrityTests(unittest.TestCase):
+    """Contrato de distribución/caché de la geometría (Plan 065, ADR-012).
+
+    Modelado sobre ChileHubDataManagerUnitTests: sin red real — requests.get
+    se reemplaza con Mocks y los archivos son sintéticos (geo_fixtures).
+    """
+
+    # --- helpers para fabricar respuestas HTTP falsas ---------------------
+
+    @staticmethod
+    def _fake_artifact_response(payload: bytes):
+        class FakeArtifact:
+            def __init__(self, payload):
+                self._chunks = [payload[i : i + 1024] for i in range(0, len(payload), 1024)] or [
+                    b""
+                ]
+
+            def raise_for_status(self):
+                pass
+
+            def iter_content(self, chunk_size=1024):
+                return iter(self._chunks)
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                return False
+
+        return FakeArtifact(payload)
+
+    @staticmethod
+    def _fake_sha_response(body: str):
+        class FakeSha:
+            def __init__(self, body):
+                self._body = body
+
+            def raise_for_status(self):
+                pass
+
+            @property
+            def text(self):
+                return self._body
+
+        return FakeSha(body)
+
+    @staticmethod
+    def _sha_body(digest: str, basename: str = "geometria_comunal.parquet") -> str:
+        return f"{digest}  {basename}"
+
+    # --- descarga y verificación ------------------------------------------
+
+    def test_download_success_replaces_cache(self):
+        """Descarga + digest correcto reemplazan el caché con el payload."""
+        from geo_fixtures import payload_and_digest
+
+        payload, digest = payload_and_digest(b"geom-data-v2")
+
+        def fake_get(url, **kwargs):
+            if url.endswith(".sha256"):
+                return self._fake_sha_response(self._sha_body(digest))
+            return self._fake_artifact_response(payload)
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            cache = Path(tmpdir) / "geometria_comunal.parquet"
+            with patch("chile_hub.geo.requests.get", side_effect=fake_get):
+                result = acquire_geometry(
+                    refresh_geometry=True,
+                    cache_file=cache,
+                    artifact_url="https://x/geometria_comunal.parquet",
+                    sha_url="https://x/geometria_comunal.parquet.sha256",
+                )
+            self.assertEqual(result, cache)
+            self.assertEqual(cache.read_bytes(), payload)
+
+    def test_checksum_mismatch_preserves_existing_cache(self):
+        """Digest distinto al compañero: se preserva el caché anterior y se
+        levanta ChileHubDataError (nunca se reemplaza con datos malos)."""
+        from geo_fixtures import payload_and_digest
+
+        old_payload = b"verified-cache-from-earlier"
+        # El compañero declara la digest de X, pero el artefacto entrega Y:
+        # el SHA-256 del payload descargado NO coincide con el declarado.
+        _declared, declared_digest = payload_and_digest(b"declared-content")
+        actual_payload = b"actual-content-different"
+
+        def fake_get(url, **kwargs):
+            if url.endswith(".sha256"):
+                return self._fake_sha_response(self._sha_body(declared_digest))
+            return self._fake_artifact_response(actual_payload)
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            cache = Path(tmpdir) / "geometria_comunal.parquet"
+            cache.write_bytes(old_payload)
+            with patch("chile_hub.geo.requests.get", side_effect=fake_get):
+                with self.assertRaises(ChileHubDataError):
+                    acquire_geometry(
+                        refresh_geometry=True,
+                        cache_file=cache,
+                        artifact_url="https://x/geometria_comunal.parquet",
+                        sha_url="https://x/geometria_comunal.parquet.sha256",
+                    )
+            self.assertEqual(cache.read_bytes(), old_payload)
+
+    def test_offline_reuses_verified_cache_without_network(self):
+        """Con caché verificado existente no hay ninguna llamada de red."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            cache = Path(tmpdir) / "geometria_comunal.parquet"
+            cache.write_bytes(b"cached")
+
+            def fake_get(*args, **kwargs):
+                raise AssertionError("no debería haber red con caché verificado")
+
+            with patch("chile_hub.geo.requests.get", side_effect=fake_get):
+                result = acquire_geometry(cache_file=cache)
+            self.assertEqual(result, cache)
+
+    def test_offline_without_cache_raises_with_hints(self):
+        """Sin caché y sin red: ChileHubDataError con las alternativas."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            cache = Path(tmpdir) / "geometria_comunal.parquet"
+            with patch("chile_hub.geo.requests.get", side_effect=ConnectionError("sin red")):
+                with self.assertRaises(ChileHubDataError) as ctx:
+                    acquire_geometry(cache_file=cache)
+            message = str(ctx.exception)
+            self.assertIn("refresh_geometry", message)
+            self.assertIn("geometry_path", message)
+
+    def test_malformed_sha_companion_raises(self):
+        """Compañero .sha256 malformado o con basename equivocado = error de contrato."""
+        from geo_fixtures import payload_and_digest
+
+        _payload, digest = payload_and_digest(b"x")
+        bad_bodies = [
+            "garbage",
+            "abc123  geometria_comunal.parquet",
+            f"{digest}  otro.parquet",
+            f"{digest}",
+        ]
+        for body in bad_bodies:
+            with self.subTest(body=body):
+                with tempfile.TemporaryDirectory() as tmpdir:
+                    cache = Path(tmpdir) / "geometria_comunal.parquet"
+                    with patch(
+                        "chile_hub.geo.requests.get",
+                        return_value=self._fake_sha_response(body),
+                    ):
+                        with self.assertRaises(ChileHubDataError):
+                            acquire_geometry(
+                                refresh_geometry=True,
+                                cache_file=cache,
+                                sha_url="https://x/geometria_comunal.parquet.sha256",
+                            )
+
+    # --- validación estructural del GeoParquet ----------------------------
+
+    def test_too_few_geometries_fails_structural_validation(self):
+        """Menos de 340 geometrías (umbral de contrato) es error estructural."""
+        from geo_fixtures import write_synthetic_parquet
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = write_synthetic_parquet(Path(tmpdir) / "fixture.parquet")  # 3 comunas
+            with self.assertRaises(ChileHubDataError) as ctx:
+                load_geometry(path)
+            self.assertIn("340", str(ctx.exception))
+
+    def test_structural_validation_missing_geometry_and_crs(self):
+        """Sin columna geometry o CRS distinto de EPSG:4326 = error estructural."""
+        import geopandas as gpd
+        from geo_fixtures import build_synthetic_gdf
+
+        no_geometry = gpd.GeoDataFrame({"codigo_comuna": ["01101"], "nombre_comuna": ["A"]})
+        with self.assertRaises(ChileHubDataError) as ctx:
+            validate_geometry(no_geometry)
+        self.assertIn("geometry", str(ctx.exception))
+
+        wrong_crs = build_synthetic_gdf().to_crs("EPSG:3857")
+        with self.assertRaises(ChileHubDataError) as ctx:
+            validate_geometry(wrong_crs)
+        self.assertIn("4326", str(ctx.exception))
+
+    def test_structural_validation_bad_cut_width_and_duplicates(self):
+        """CUT sin 5 caracteres o duplicado = error estructural."""
+        from geo_fixtures import build_synthetic_gdf
+
+        bad_width = build_synthetic_gdf(
+            [
+                {
+                    "codigo_comuna": "123",
+                    "nombre_comuna": "A",
+                    "lat_min": -20.0,
+                    "lat_max": -19.0,
+                    "lon_min": -70.5,
+                    "lon_max": -69.5,
+                },
+                {
+                    "codigo_comuna": "01102",
+                    "nombre_comuna": "B",
+                    "lat_min": -19.0,
+                    "lat_max": -18.0,
+                    "lon_min": -69.5,
+                    "lon_max": -68.5,
+                },
+            ]
+        )
+        with self.assertRaises(ChileHubDataError) as ctx:
+            validate_geometry(bad_width)
+        self.assertIn("5 caracteres", str(ctx.exception))
+
+        duplicated = build_synthetic_gdf(
+            [
+                {
+                    "codigo_comuna": "01101",
+                    "nombre_comuna": "A",
+                    "lat_min": -20.0,
+                    "lat_max": -19.0,
+                    "lon_min": -70.5,
+                    "lon_max": -69.5,
+                },
+                {
+                    "codigo_comuna": "01101",
+                    "nombre_comuna": "A2",
+                    "lat_min": -19.0,
+                    "lat_max": -18.0,
+                    "lon_min": -69.5,
+                    "lon_max": -68.5,
+                },
+            ]
+        )
+        with self.assertRaises(ChileHubDataError) as ctx:
+            validate_geometry(duplicated)
+        self.assertIn("duplicados", str(ctx.exception))
 
 
 if __name__ == "__main__":

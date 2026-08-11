@@ -43,7 +43,7 @@ entender la arquitectura, las reglas no negociables y las convenciones del proye
 ## 1. Propósito del proyecto
 
 `chile-hub` es una capa de datos pública, curada y reproducible sobre **datos oficiales de Chile**.
-Actualmente publica diecinueve (<!-- START_AGENTS_DATASET_COUNT -->22<!-- END_AGENTS_DATASET_COUNT -->) capas:
+Actualmente publica veintidós (<!-- START_AGENTS_DATASET_COUNT -->22<!-- END_AGENTS_DATASET_COUNT -->) capas:
 
 | Capa | Fuente | Descripción |
 |:---|:---|:---|
@@ -54,6 +54,7 @@ Actualmente publica diecinueve (<!-- START_AGENTS_DATASET_COUNT -->22<!-- END_AG
 | **Censo Hogares y Viviendas 2024** | INE | Viviendas y hogares por comuna, incluyendo promedios de personas por hogar |
 | **Establecimientos de Salud** | MINSAL / datos.gob.cl | Directorio vigente con tipo, dependencia, urgencia, estado y coordenadas |
 | **Distritos Electorales** | BCN / SERVEL | Asociación de comunas a distritos electorales de diputados y circunscripciones senatoriales |
+| **Geometría Comunal** | BCN ArcGIS | Límites poligonales de las 346 comunas en GeoParquet simplificado (carril `candidate`, ADR-012) |
 | **Establecimientos Educacionales** | MINEDUC | Directorio oficial con RBD, dependencia, ubicación y estado de funcionamiento |
 | **Finanzas Municipales** | SINIM / SUBDERE | Indicadores financieros municipales anuales por comuna |
 | **Resultados Educacionales** | MINEDUC | Métricas educacionales agregadas por comuna y año, sin registros personales |
@@ -115,16 +116,21 @@ chile-hub/
 │   │   ├── sinim_finanzas_live_extractor.py              Finanzas municipales — scraper real; corre en `monthly-scrape.yml`
 │   │   └── subdere_extractor.py                          DPA: regiones/provincias/comunas/comunas_enriquecidas (BCN ArcGIS) → data/staging/
 <!-- END_AGENTS_EXTRACTOR_LIST -->
-│   ├── validation.py              Todas las funciones validate_*() — módulo independiente (1 194 líneas)
-│   ├── build_dev_db.py            Orquestador (867 líneas): main() + fases (_load_inputs, _compute_validations, _write_data_artifacts, _generate_reports)
-│   ├── builders/                  Módulos del pipeline extraídos de build_dev_db.py (formats, metadata, reports, artifacts, datasets, catalog, landing, io_utils, _shared)
+│   ├── validation.py              Todas las funciones validate_*() — módulo independiente (1 447 líneas)
+│   ├── build_dev_db.py            Orquestador (883 líneas): main() + fases (_load_inputs, _compute_validations, _write_data_artifacts, _generate_reports)
+│   ├── builders/                  Módulos del pipeline extraídos de build_dev_db.py (formats, metadata, reports, artifacts, datasets, catalog, landing, io_utils, _shared, dcat_catalog, data_package, doc_sync, geo, _logging)
 │   ├── chile_hub.py               Compatibility shim (21 líneas) — delega al paquete
 │   ├── chile_hub/                 Paquete Python instalable (ChileHub API + CLI + data manager)
-│   │   ├── core.py                ChileHub class + API pública (2 302 líneas)
+│   │   ├── core.py                ChileHub class + API pública (2 654 líneas)
 │   │   ├── cli.py                 CLI entry points
+│   │   ├── contracts.py           Schemas de contrato runtime
+│   │   ├── datasets.py            Definición de Dataset(StrEnum) y tipos
+│   │   ├── exceptions.py          Excepciones de dominio de la API
 │   │   ├── data_manager.py        Descarga de bundle, cache, verificación SHA256
-│   │   └── pipeline_status_utils.py  Reportes Markdown de salud, catálogo y redistribución (888 líneas)
-│   └── pipeline_status_utils.py   Copia para imports de build_dev_db.py (888 líneas)
+│   │   ├── pipeline_status_utils.py  Reportes Markdown de salud, catálogo y redistribución (974 líneas)
+│   │   ├── _render.py             Helper de renderizado de tablas
+│   │   └── text.py                Utils de texto compartidas
+│   └── pipeline_status_utils.py   Shim de compatibilidad (21 líneas) — re-exporta del paquete; NO duplicar lógica aquí
 │
 ├── data/
 │   ├── dataset_catalog_config.json  Fuente de verdad de qué datasets existen (cargado por _shared.py)
@@ -133,7 +139,7 @@ chile-hub/
 │   ├── staging/      Datos parseados y cercanos a la fuente (CSV + metadata.json por dataset).
 │   └── normalized/   Artefactos finales publicables (Parquet, JSON, DuckDB, Excel, ZIP, reportes).
 │
-├── tests/                        12 archivos — ver tabla completa en §8, no la dupliques aquí
+├── tests/                        12 archivos pytest — ver tabla completa en §8, no la dupliques aquí
 │   ├── test_chile_hub.py         API/CLI de ChileHub, contratos de artefactos, workflow, Makefile
 │   ├── test_extractors.py        Un test class por extractor + contrato de BaseExtractor
 │   ├── test_pipeline_logic.py    Lógica interna de build_dev_db.py, invariantes CUT, changelog
@@ -142,7 +148,9 @@ chile-hub/
 │   ├── test_data_package.py      Builder de Frictionless Data Package
 │   ├── test_packaging_runtime.py Empaquetado del bundle publicable en runtime
 │   ├── test_render.py            Helper de renderizado de tablas (_render.py)
-│   └── test_ci_config.py         Guardrails de regresiones reales de CI/Makefile
+│   ├── test_ci_config.py         Guardrails de regresiones reales de CI/Makefile
+│   ├── e2e/                      Scripts shell de "Done criteria" de planes (NO pytest — correr con run_all.sh)
+│   └── fixtures/                 Fixtures JSON compartidos (p. ej. adoption_sample.json)
 │
 ├── scripts/
 │   ├── verify_pipeline.py             Verifica integridad de artefactos post-build
@@ -181,8 +189,8 @@ codegraph impact validate_comunas                   # Qué se rompe si cambio es
 
 **Reglas para acotar lecturas y ahorrar tokens:**
 - Usar `Read` con `offset`/`limit` — nunca leer archivos grandes enteros de golpe.
-- `base.py` (73 líneas) es seguro de leer completo. `validation.py` (1 194 líneas) — leer por validador individual.
-- `build_dev_db.py` (867 líneas) y `src/chile_hub/core.py` (2 302 líneas) — usar estas áncoras:
+- `base.py` (76 líneas) es seguro de leer completo. `validation.py` (1 447 líneas) — leer por validador individual.
+- `build_dev_db.py` (883 líneas) y `src/chile_hub/core.py` (2 654 líneas) — usar estas áncoras:
 
 | Archivo | Líneas de interés |
 |---|---|
@@ -635,6 +643,12 @@ grep -n "^class " tests/*.py
 
 <!-- END_AGENTS_TEST_TABLE -->
 
+> **No es pytest:** `tests/e2e/` contiene scripts shell que verifican los "Done
+> criteria" de planes archivados — no se auto-descubren por pytest ni `make test`;
+> correr `tests/e2e/verify_NNN.sh` (individual), `tests/e2e/run_all.sh` o
+> `make e2e` desde la raíz con `.venv` creado. `tests/fixtures/` son JSON
+> compartidos por los tests.
+
 ### Reglas al agregar tests
 
 - Los tests que leen `data/normalized/` (`test_chile_hub.py`, `test_core.py`)
@@ -810,7 +824,11 @@ make refresh            # extract → build → verify → test → verify-landi
 make extract            # Corre los 14 extractores de cadencia diaria → data/staging/
 make build              # Compila todos los artefactos → data/normalized/
 make verify             # Integridad de artefactos (SHA-256, conteos, schema)
+make verify-readiness   # verify_pipeline.py --profile readiness
+make verify-publication # verify_pipeline.py --profile publication
+make verify-live        # verify_pipeline.py --require-live — gate del job publish de CI
 make test               # pytest — lee data/normalized/, NO corre el pipeline
+make e2e                # tests/e2e/run_all.sh — done criteria de planes archivados (no pytest)
 make verify-landing     # Playwright smoke tests de index.html
 
 # Diagnóstico del hub
@@ -883,6 +901,9 @@ protegido por un chequeo automatizado en vez de depender solo de buena voluntad.
 | `PUBLIC_DATA_BASE` de `app.js` y cache-buster `app.js?v=` | `pyproject.toml` (`[tool.chile_hub] public_site_url`, `[project] version`) | `scripts/check_landing_sync.py` |
 | Mapeo dataset ↔ extractor | `data/dataset_catalog_config.json` (campo `extractor`) | `check_companion_paths.py registry` |
 | Tabla de extractores por dominio en README | `data/dataset_catalog_config.json` vía `doc_sync.py::sync_readme_extractor_table()` | `scripts/sync_docs.py --check` |
+| Bloque Schema de cada `docs/datasets/{nombre}.md` | `contracts/datasets/{nombre}.schema.json` vía `doc_sync.py::sync_docs_schema_blocks()` | `scripts/sync_docs.py --check` |
+| Hechos contables de AGENTS.md (anclas de líneas, listas de módulos del §2, tabla de capas del §1) | código (`wc -l`, `src/`, `data/dataset_catalog_config.json`) — prosa curada, no bloque regenerado | `scripts/check_agents_sync.py` |
+| Liveness de `official_url` de fuentes | `data/source_registry.json` | `.github/workflows/source-urls.yml` + `scripts/check_source_urls.py` (semanal, no bloquea publish) |
 
 ### Mecanismo: `scripts/check_landing_sync.py`
 
@@ -957,10 +978,13 @@ regeneran el texto exacto dentro de un bloque delimitado por comentarios HTML
 §2/§3 extractores, §8 archivos de test) no se regeneran — son descripciones
 curadas editorialmente, no datos de una sola celda; automatizarlas exigiría
 mantener esa prosa duplicada dentro de un generador, sin eliminar el
-mantenimiento manual. Su protección es otra: los *conteos* que citan ("19
-capas", "9 archivos de test", "14 extractores en `make extract`") se detectan
-a ojo en revisión de PR, y su *completitud estructural* (¿falta una fila?) ya
-la cubre el gate de co-cambio de `check_companion_paths.py` de arriba.
+mantenimiento manual. Su protección es doble: los bloques `START_AGENTS_*`
+(conteo de datasets, lista de extractores, tabla de tests) SÍ se regeneran vía
+`doc_sync.py` (ver tabla de propietarios), y los hechos contables de la prosa
+que no se regeneran (anclas de líneas, listas de módulos del árbol §2, tabla de
+capas §1) los verifica `scripts/check_agents_sync.py` en `make doctor` y en el
+job `quality` — ver su docstring para la regla exacta de qué se chequea y qué
+no (solo hechos contables, nunca prosa).
 
 **Seguimiento recomendado, no implementado todavía** (mayor alcance):
 automatizar la tabla "CLI de referencia" de README.md introspeccionando

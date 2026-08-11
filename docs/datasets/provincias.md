@@ -82,3 +82,16 @@ Esta capa puede seguir en MVP, pero conviene:
 
 1. reforzar tests de unicidad sobre `codigo_region` + `codigo_provincia`
 2. documentar casos de uso concretos con datasets provinciales futuros
+
+<!-- START_DATASET_SCHEMA -->
+
+## Schema (auto-generado desde `contracts/datasets/provincias.schema.json`)
+
+| Columna | Tipo | Ejemplo | Requerida | Nota |
+|:---|:---|:---|:---:|:---|
+| `codigo_region` | `VARCHAR(2)` | `"01"` | Sí | — |
+| `nombre_region` | `VARCHAR` | `"Tarapacá"` | Sí | — |
+| `codigo_provincia` | `VARCHAR(3)` | `"011"` | Sí | PK |
+| `nombre_provincia` | `VARCHAR` | `"Iquique"` | Sí | — |
+
+<!-- END_DATASET_SCHEMA -->

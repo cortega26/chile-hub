@@ -601,5 +601,107 @@ class FromDatapackageUrlTests(unittest.TestCase):
         self.assertGreater(len(hub.summary()), 0)
 
 
+class ChileHubResolveByCoordsTests(unittest.TestCase):
+    """Tests para ChileHub.resolve_by_coords() (Plan 065, ADR-012).
+
+    Usan un fixture sintético de 3 comunas cuadradas (tests/geo_fixtures.py),
+    nunca el artefacto real de 5 MB. El umbral de >= 340 geometrías se parchea
+    en los tests de happy-path; el test estructural con < 340 lo ejercita sin
+    parche (en tests/test_chile_hub.py).
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.hub = _hub()
+
+    @staticmethod
+    def _fixture_path(comunas=None):
+        import tempfile
+
+        from geo_fixtures import write_synthetic_parquet
+
+        tmpdir = Path(tempfile.mkdtemp())
+        return write_synthetic_parquet(tmpdir / "geometria_comunal.parquet", comunas)
+
+    def test_known_point_matches_five_char_cut(self):
+        """Un punto dentro de la comuna A resuelve a su CUT de 5 caracteres."""
+        with mock.patch("chile_hub.geo.MIN_NON_EMPTY_GEOMETRIES", 3):
+            result = self.hub.resolve_by_coords(
+                [(-19.5, -70.0)], geometry_path=self._fixture_path()
+            )
+        row = result.to_dicts()[0]
+        self.assertTrue(row["matched"])
+        self.assertEqual(row["codigo_comuna"], "01101")
+        self.assertEqual(len(row["codigo_comuna"]), 5)
+        self.assertEqual(row["nombre_comuna"], "Arica")
+        self.assertEqual(result.schema["codigo_comuna"], pl.String)
+
+    def test_point_outside_chile_is_unmatched(self):
+        """Un punto fuera de todo polígono devuelve matched=False y nulos."""
+        with mock.patch("chile_hub.geo.MIN_NON_EMPTY_GEOMETRIES", 3):
+            result = self.hub.resolve_by_coords(
+                [(-21.0, -71.0)], geometry_path=self._fixture_path()
+            )
+        row = result.to_dicts()[0]
+        self.assertFalse(row["matched"])
+        self.assertIsNone(row["codigo_comuna"])
+        self.assertIsNone(row["nombre_comuna"])
+
+    def test_order_and_duplicates_preserved(self):
+        """El orden y los duplicados del input se preservan fila a fila."""
+        points = [(-19.5, -70.0), (-19.5, -70.0), (-21.0, -71.0)]
+        with mock.patch("chile_hub.geo.MIN_NON_EMPTY_GEOMETRIES", 3):
+            result = self.hub.resolve_by_coords(points, geometry_path=self._fixture_path())
+        rows = result.to_dicts()
+        self.assertEqual([r["matched"] for r in rows], [True, True, False])
+        self.assertEqual(rows[0]["codigo_comuna"], rows[1]["codigo_comuna"])
+        self.assertEqual(rows[0]["input_lat"], -19.5)
+        self.assertEqual(rows[0]["input_lon"], -70.0)
+
+    def test_invalid_coordinates_raise_value_error_naming_input(self):
+        """Latitud/longitud fuera de rango levantan ValueError nombrando el input."""
+        with self.assertRaises(ValueError) as ctx:
+            self.hub.resolve_by_coords([(-33.4, -70.6), (95.0, 0.0)])
+        self.assertIn("input 1", str(ctx.exception))
+        with self.assertRaises(ValueError):
+            self.hub.resolve_by_coords([(0.0, 181.0)])
+
+    def test_boundary_point_matches_via_covers(self):
+        """Un punto exactamente en el borde matchea (covers, no contains)."""
+        edge_point = (-19.0, -70.0)  # borde superior de A, fuera de B/C
+        with mock.patch("chile_hub.geo.MIN_NON_EMPTY_GEOMETRIES", 3):
+            result = self.hub.resolve_by_coords([edge_point], geometry_path=self._fixture_path())
+        self.assertTrue(result.to_dicts()[0]["matched"])
+        self.assertEqual(result.to_dicts()[0]["codigo_comuna"], "01101")
+
+    def test_overlap_tie_break_is_deterministic_and_warns(self):
+        """Punto cubierto por dos comunas: gana el CUT menor y se emite warning."""
+        with mock.patch("chile_hub.geo.MIN_NON_EMPTY_GEOMETRIES", 3):
+            with self.assertLogs("chile_hub.geo", level="WARNING") as logs:
+                result = self.hub.resolve_by_coords(
+                    [(-18.75, -69.2)], geometry_path=self._fixture_path()
+                )
+        row = result.to_dicts()[0]
+        self.assertTrue(row["matched"])
+        self.assertEqual(row["codigo_comuna"], "01102")  # min("01102", "01103")
+        self.assertTrue(any("tie-break" in msg for msg in logs.output))
+
+    def test_lazy_geo_extra_raises_import_error_with_hint(self):
+        """Sin geopandas/shapely: ChileHub() construye bien, resolve_by_coords
+        levanta ImportError con la instrucción exacta (patrón ChileHubSQLTests)."""
+
+        def mock_import(name, *args, **kwargs):
+            if name.startswith(("geopandas", "shapely")):
+                raise ImportError(f"No module named '{name}'")
+            return __import__(name, *args, **kwargs)
+
+        fixture = self._fixture_path()
+        with mock.patch("builtins.__import__", side_effect=mock_import):
+            hub = ChileHub(data_dir=NORMALIZED_DIR)  # construcción sin importar geo
+            with self.assertRaises(ImportError) as ctx:
+                hub.resolve_by_coords([(-19.5, -70.0)], geometry_path=fixture)
+            self.assertIn("pip install chile-hub[geo]", str(ctx.exception))
+
+
 if __name__ == "__main__":
     unittest.main()

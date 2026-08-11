@@ -35,3 +35,19 @@ El directorio se filtra para excluir establecimientos cerrados permanentemente. 
 ## Registro de cambios
 
 - 2026-06: Primera versión con RBD, nombre del establecimiento, comuna, región, dependencia administrativa y coordenadas.
+
+<!-- START_DATASET_SCHEMA -->
+
+## Schema (auto-generado desde `contracts/datasets/establecimientos_educacionales.schema.json`)
+
+| Columna | Tipo | Ejemplo | Requerida | Nota |
+|:---|:---|:---|:---:|:---|
+| `rbd` | `VARCHAR` | `"1234-5"` | Sí | PK |
+| `dv_rbd` | `VARCHAR` | `"4"` | Sí | — |
+| `nombre_establecimiento` | `VARCHAR` | `"Liceo Abate Molina"` | Sí | — |
+| `codigo_comuna` | `VARCHAR(5)` | `"01101"` | Sí | — |
+| `dependencia_administrativa` | `VARCHAR` | `"Municipal"` | No | — |
+| `latitud` / `longitud` | `DOUBLE` | `"Coordenadas geográficas"` | No | — |
+| `estado_funcionamiento` | `VARCHAR` | `"Vigente"` | Sí | — |
+
+<!-- END_DATASET_SCHEMA -->

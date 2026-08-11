@@ -89,6 +89,7 @@ doctor:
 	@$(PYTHON) scripts/check_companion_paths.py registry
 	@$(PYTHON) scripts/sync_docs.py --check
 	@$(PYTHON) scripts/check_landing_sync.py
+	@$(PYTHON) scripts/check_agents_sync.py
 
 bump-version:
 	@if [ -z "$(VERSION)" ]; then \
@@ -155,6 +156,9 @@ verify-landing:
 
 test:
 	$(PYTHON) -m pytest
+
+e2e:
+	bash tests/e2e/run_all.sh
 
 coverage:
 	$(PYTHON) -m pytest --cov=src --cov-report=term-missing --cov-report=xml

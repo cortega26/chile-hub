@@ -41,3 +41,17 @@ Esta capa es **derivada** de capas ya validadas. Su `source_mode` se calcula a
 partir de los upstreams y sólo cae a `fallback` si alguno lo es de verdad:
 `monthly` (p. ej. `finanzas_municipales`) cuenta como fuente genuina, no como
 respaldo. Con 346/346 comunas y cero warnings, su `drift_status` es `healthy`.
+
+<!-- START_DATASET_SCHEMA -->
+
+## Schema (auto-generado desde `contracts/datasets/perfil_territorial_comunal.schema.json`)
+
+| Columna | Tipo | Ejemplo | Requerida | Nota |
+|:---|:---|:---|:---:|:---|
+| `codigo_comuna` | `VARCHAR(5)` | `"01101"` | Sí | PK |
+| `poblacion_censada` | `INTEGER` | `223400` | Sí | — |
+| `establecimientos_salud_total` | `INTEGER` | `140` | Sí | — |
+| `establecimientos_educacionales_total` | `INTEGER` | `410` | Sí | — |
+| `distrito_electoral` | `VARCHAR` | `"10"` | No | — |
+
+<!-- END_DATASET_SCHEMA -->

@@ -86,3 +86,22 @@ instalación del Congreso (11 de marzo → 10 de marzo) que ya se usaba para dip
 - Dataset relacionado (cargos subnacionales, licencia mixta CC BY / CC BY-SA): `docs/datasets/autoridades_locales.md`
 - Research electoral: `docs/legal/b2-2-electoral-research.md`
 - Plan 023 — Ola A: `plans/023-autoridades-electas-partidos-politicos.md`
+
+<!-- START_DATASET_SCHEMA -->
+
+## Schema (auto-generado desde `contracts/datasets/autoridades_electas.schema.json`)
+
+| Columna | Tipo | Ejemplo | Requerida | Nota |
+|:---|:---|:---|:---:|:---|
+| `id_autoridad` | `VARCHAR` | `"diputado_1009"` | Sí | PK |
+| `nombre` | `VARCHAR` | `"Jorge Alessandri Vergara"` | Sí | — |
+| `cargo` | `VARCHAR` | `"diputado"` / `"senador"` | Sí | — |
+| `institucion` | `VARCHAR` | `"Cámara de Diputadas y Diputados"` / `"Senado"` | Sí | — |
+| `partido` | `VARCHAR` | `"Unión Demócrata Independiente"` | No | — |
+| `distrito_electoral` | `VARCHAR` | `"10"` (solo diputados)"` | No | — |
+| `circunscripcion_senatorial` | `VARCHAR` | `"3"` (solo senadores)"` | No | — |
+| `codigo_region` | `VARCHAR(2)` | `"02"` (solo senadores)"` | No | — |
+| `periodo_inicio` / `periodo_fin` | `DATE` | `"2026-03-11` / `2030-03-10"` | No | — |
+| `estado_mandato` | `VARCHAR` | `"vigente"` | No | — |
+
+<!-- END_DATASET_SCHEMA -->

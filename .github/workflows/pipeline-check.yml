@@ -14,6 +14,11 @@ on:
         required: false
         type: boolean
         default: false
+      allow_stale_backfills:
+        description: "Codigo_indicador(s) separados por coma cuyo published_backfill stale se acepta (ADR-016). Ej: ipc"
+        required: false
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -84,6 +89,13 @@ jobs:
       # autoridades_locales y 56cd9d5 con geometria_comunal).
       - name: Check landing sync (JSON-LD/app.js derivados del catálogo)
         run: python scripts/check_landing_sync.py
+
+      # AGENTS.md es prosa curada (no bloque delimitado): verifica sus hechos
+      # contables (anclas de líneas, listas de módulos, tabla de capas del §1)
+      # contra el código — el caso real que motivó este gate fue la deriva de
+      # conteos de líneas y módulos en el árbol del §2 (2026-08).
+      - name: Check AGENTS.md countable facts
+        run: python scripts/check_agents_sync.py
 
       - name: Fetch PR base commit for companion-path diff
         if: github.event_name == 'pull_request'
@@ -209,7 +221,8 @@ jobs:
             profile=readiness
           fi
           echo "profile=$profile" >> "$GITHUB_OUTPUT"
-          python scripts/verify_pipeline.py --profile "$profile"
+          python scripts/verify_pipeline.py --profile "$profile" \
+            --allow-stale-backfills "${{ inputs.allow_stale_backfills }}"
 
       - name: Explain verification profile
         run: |
