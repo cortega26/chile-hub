@@ -266,6 +266,41 @@ class BCentralExtractorTests(unittest.TestCase):
         ):
             bcentral_extractor.fetch_indicator_year("uf", 2026)
 
+    def test_fetch_indicator_year_uses_timeout_above_observed_ipc_latency(self):
+        """El timeout de mindicador.cl debe cubrir la latencia erratica de `ipc`.
+
+        Issue #43: el endpoint /api/ipc/2026 respondio en 13.7s y dio
+        TimeoutError a los 40s, contra ~1.2s del resto; el timeout=15s anterior
+        confundia "la fuente no respondio" con "serie vacia". Regresion de
+        mantener MINDICADOR_TIMEOUT_SECONDS >= 30s.
+        """
+        self.assertGreaterEqual(bcentral_extractor.MINDICADOR_TIMEOUT_SECONDS, 30)
+
+    def test_fetch_indicator_year_reports_latency_and_point_count(self):
+        """El fetch debe registrar la latencia y el conteo de puntos.
+
+        Diagnostico del issue #43: sin ese log, una serie vacia y una fuente
+        caida son indistinguibles en el log de CI. La linea imprime
+        `codigo/año: N puntos en X.Xs` con la latencia real de la llamada.
+        """
+        payload = self._payload()
+        with (
+            tempfile.TemporaryDirectory() as tmpdir,
+            patch.object(bcentral_extractor, "RAW_DIR", tmpdir),
+            patch.object(
+                bcentral_extractor,
+                "fetch_with_retry",
+                return_value=mock_response(payload),
+            ),
+            patch.object(bcentral_extractor.time, "monotonic", side_effect=[1.0, 14.7]),
+            patch("builtins.print") as mock_print,
+        ):
+            records = bcentral_extractor.fetch_indicator_year("uf", 2026)
+
+            self.assertEqual(len(records), 3)
+            latency_line = mock_print.call_args.args[0]
+            self.assertRegex(latency_line, r"^  uf/2026: 3 puntos en 13\.7s$")
+
     def test_fetch_all_history_continues_after_one_indicator_fails(self):
         current_year = datetime.date.today().year
 

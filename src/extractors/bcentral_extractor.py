@@ -57,6 +57,15 @@ INDICATOR_CODES = ["uf", "dolar", "euro", "utm", "ipc"]
 # año en curso si el dato del mes aún no fue publicado — eso es esperado, no un error.
 MONTHLY_INDICATORS = {"utm", "ipc"}
 
+# Timeout por llamada HTTP a mindicador.cl. El endpoint de `ipc` es errático:
+# respuestas observadas de 13.7s y TimeoutError a los 40s, contra ~1.2s del resto
+# de las series (diagnóstico del issue #43, 2026-07-29). Un timeout de 15s estaba
+# por debajo de esa latencia y confundía "la fuente no respondió" con "serie
+# vacía". 30s da margen a las respuestas lentas sin dejar la puerta abierta a
+# cuelgues indefinidos; la latencia se registra en el log para que el diagnóstico
+# futuro distinga ambos casos.
+MINDICADOR_TIMEOUT_SECONDS = 30
+
 # Antigüedad máxima tolerada del ÚLTIMO dato de una serie entregada por
 # `published_backfill` antes de que el gate de publicación la rechace (ADR-016).
 # El umbral depende de la cadencia: 40 días de atraso en el dólar son una
@@ -156,9 +165,12 @@ def fetch_indicator_year(codigo: str, year: int) -> list:
     Retorna una lista de dicts con claves: fecha, codigo_indicador, valor.
     """
     url = f"{MINDICADOR_BASE}/{codigo}/{year}"
-    with fetch_with_retry(url, timeout=15) as response:
+    started = time.monotonic()
+    with fetch_with_retry(url, timeout=MINDICADOR_TIMEOUT_SECONDS) as response:
         response.raise_for_status()
         payload = response.json()
+    elapsed = time.monotonic() - started
+    print(f"  {codigo}/{year}: {len(payload.get('serie', []))} puntos en {elapsed:.1f}s")
     save_raw_snapshot(payload, codigo, year)
     return parse_indicator_payload(payload, codigo)
 
