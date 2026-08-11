@@ -208,6 +208,49 @@ como decisión del mantenedor: (a) subir `--maxkb` para permitir el commit local
 específico, o (b) dejar que el artefacto se genere y commitee solo vía el pipeline de CI, igual
 que `empresas.parquet`.
 
+## Plan 065 Step 1 — contrato de distribución y caché para `resolve_by_coords()`
+
+**Decisión (2026-08-11, Plan 065)**: la resolución de coordenadas consume el artefacto
+GeoParquet candidate **directamente desde su URL pública de Pages**, nunca vía el bundle
+estable ni el data manager de release. Contrato congelado:
+
+- **Artefacto**: `https://tooltician.com/chile-hub/data/normalized/geometria_comunal.parquet`
+  (sirve el archivo commiteado por Plan 064; 5.1 MB, 345 registros, EPSG:4326, WKB).
+- **Compañero de integridad**: `https://tooltician.com/chile-hub/data/normalized/geometria_comunal.parquet.sha256`
+  — formato `sha256sum` de modo binario: `<64 hex SHA-256>  geometria_comunal.parquet`
+  (dos espacios). Regla de parseo: la digest es el primer token separado por espacios; el
+  nombre de archivo del segundo token debe coincidir con el basename esperado del artefacto
+  (cualquier discrepancia es error de contrato, no solo de checksum).
+- **Caché**: `platformdirs.user_cache_dir("chile-hub") / "geometria_comunal.parquet"` (ya es
+  dependencia base). Un caché **verificado** (digest coincide con el compañero) se reutiliza
+  sin red; `refresh_geometry=True` fuerza re-fetch.
+- **Fallos**: descarga fallida o digest no coincidente → se **preserva el caché anterior**
+  verificado y se levanta `ChileHubDataError` con causa clara. Sin caché y sin red → mismo
+  error explicando las alternativas (`refresh_geometry=True`, `geometry_path=...`, o la URL
+  directa del artefacto). Sin URL arbitraria no verificada: `geometry_path` es el único
+  camino para archivos locales y aún así pasa validación estructural GeoParquet.
+
+## Plan 065 Step 5 — decisiones finales de la API de resolución
+
+- **Match de borde vía `covers`** (no `contains`): un punto exactamente sobre un
+  límite comunal matchea a la comuna adyacente — criterio más útil para reverse
+  geocoding de coordenadas GPS y consistente con "el borde pertenece a ambos".
+- **Tie-break determinístico**: si varias geometrías cubren un punto, gana el
+  `codigo_comuna` lexicográficamente menor y se emite un warning de módulo. La
+  geometría fuente es "generalizada" y puede tener solapes o gaps diminutos
+  entre comunas; sin tie-break el resultado dependería del orden del archivo.
+- **Precisión**: `resolve_by_coords()` NO es apta para trabajo catastral o legal
+  de límites — la fuente ya es de referencia (no geodésica) y el artefacto se
+  simplifica con tolerancia ~100 m (ADR-012, "Step 3 — mecánica del artefacto").
+  Un punto cerca de un borde puede resolverse a la comuna vecina.
+- **Validación estructural antes de usar**: columna `geometry`, CRS EPSG:4326,
+  `codigo_comuna` string de 5 caracteres, sin duplicados y ≥ 340 geometrías no
+  vacías. Un artefacto local (`geometry_path=`) pasa la misma validación que el
+  descargado.
+- **Fuera del bundle estable**: la resolución consume el artefacto candidate con
+  verificación de checksum, pero `geometria_comunal` sigue fuera del catálogo,
+  de `load_polars()` y del bundle publicable (contrato Plan 065/ADR-012).
+
 ## Alternativas consideradas
 
 - **Usar la descarga estática del shapefile "División comunal" (30.6 MB) en vez del endpoint
