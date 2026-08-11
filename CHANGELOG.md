@@ -12,6 +12,112 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.23.0 - 2026-08-11
+
+### Corregido
+
+- **extractors**: Censo 2024 responde 404 al UA de requests (anti-bot INE)
+  ([`dd4a711`](https://github.com/cortega26/chile-hub/commit/dd4a7117841d991a4190cc99e0d3053f69ba1f30))
+
+- **extractors**: Sube el timeout de mindicador.cl y registra latencia por llamada
+  ([`531a16e`](https://github.com/cortega26/chile-hub/commit/531a16e2528ef8f1e6ec44c8234aecd25fa51ecb))
+
+- **hardening**: SEC-02 is_relative_to, SEC-03 escapeHtml en salud
+  ([`82717ca`](https://github.com/cortega26/chile-hub/commit/82717ca412182737bd1cf8ebec784f021482b93a))
+
+- **release**: Adjunta datos verificados al release y explica el bache de 1.22.0
+  ([`dc9f532`](https://github.com/cortega26/chile-hub/commit/dc9f532f245f8de45bdf5a2aa00394b67c966657))
+
+- **release**: Perfil 'release' en verify_pipeline — sin exigir staging en el release job
+  ([`a824a9c`](https://github.com/cortega26/chile-hub/commit/a824a9c9f717788d8c80793ab679cefdbc5a2501))
+
+- **release**: Repara la cadena de publicacion (staging, extra pipeline, replay de overrides)
+  ([`c39cce5`](https://github.com/cortega26/chile-hub/commit/c39cce51d6f8cf86bd3426420e1eb2d803c8c36d))
+
+- **review**: P1 preserve IPC months en override INE + P2 sentinel pyproject ajeno
+  ([`a2fa8c3`](https://github.com/cortega26/chile-hub/commit/a2fa8c34da34d9343fadcb12348909ae901c250f))
+
+### Mantenimiento
+
+- Trigger CI on batch branch (HEAD tenia [skip ci])
+  ([`991c4ab`](https://github.com/cortega26/chile-hub/commit/991c4ab47cddc5e8fa18508356baa78b9057c361))
+
+- **deps**: Bump actions/setup-python from 6.3.0 to 7.0.0
+  ([#49](https://github.com/cortega26/chile-hub/pull/49),
+  [`e29b6df`](https://github.com/cortega26/chile-hub/commit/e29b6df41e6a46048a3ed672ee99d37a429bc399))
+
+- **deps**: Bump astral-sh/setup-uv from 8.3.0 to 9.0.0
+  ([#48](https://github.com/cortega26/chile-hub/pull/48),
+  [`b953c6a`](https://github.com/cortega26/chile-hub/commit/b953c6a18e3f9bfd997e0396ec370b8f518a4256))
+
+- **deps**: Bump pypa/gh-action-pypi-publish from 1.14.1 to 1.14.2
+  ([#50](https://github.com/cortega26/chile-hub/pull/50),
+  [`a17761a`](https://github.com/cortega26/chile-hub/commit/a17761a429680d8d7c2f2fe2c9cf39ee6705f4c9))
+
+- **deps**: Bump the codeql-action group with 2 updates
+  ([`adbe259`](https://github.com/cortega26/chile-hub/commit/adbe2598762d9cd93eaae1415480103ff038eabc))
+
+- **deps**: Bump the codeql-action group with 2 updates
+  ([#47](https://github.com/cortega26/chile-hub/pull/47),
+  [`cbf1bde`](https://github.com/cortega26/chile-hub/commit/cbf1bded458e3cc5c96009015886bfa61562a34a))
+
+- **deps**: Sincroniza uv.lock con pyproject.toml [skip ci]
+  ([`8446b85`](https://github.com/cortega26/chile-hub/commit/8446b857c9ac8ca02babb1af0c3ebefa37180818))
+
+- **deps**: Trigger CI re-run on updated branch
+  ([`348a7e8`](https://github.com/cortega26/chile-hub/commit/348a7e846f0d46f7fbdc041a182ff0f34615a68e))
+
+- **deps-dev**: Bump the python-dev group with 3 updates
+  ([`84eda0b`](https://github.com/cortega26/chile-hub/commit/84eda0b47825b77144065ea2fab5de9e9a7416aa))
+
+- **deps-dev**: Bump the python-dev group with 3 updates
+  ([#46](https://github.com/cortega26/chile-hub/pull/46),
+  [`d649230`](https://github.com/cortega26/chile-hub/commit/d649230218f916bbcccd61e52dfb263aa4c58ab2))
+
+- **docs**: Sincroniza conteo de tests (804)
+  ([`0c5b002`](https://github.com/cortega26/chile-hub/commit/0c5b002405f6993fc13da0bb75fd6d032d01a977))
+
+- **docs**: Sincroniza conteo de tests en README (833 tras guardrails nuevos)
+  ([`bfd5123`](https://github.com/cortega26/chile-hub/commit/bfd5123afbaf2726544abbf40c82206fb75ba63b))
+
+- **plans**: Archiva el plan 053 (geometria comunal, completado)
+  ([`e6bfa6a`](https://github.com/cortega26/chile-hub/commit/e6bfa6a852de97e388a45ec4ed6668ff639c4af1))
+
+### Documentación
+
+- Sincroniza AGENTS.md y README con el refactor (lineas core/cli, 13 archivos de tests, carriles)
+  [skip ci]
+  ([`36990df`](https://github.com/cortega26/chile-hub/commit/36990df86dc90615df37e9f439e5285122203b7c))
+
+### Agregado
+
+- Notify users about data updates ([#45](https://github.com/cortega26/chile-hub/pull/45),
+  [`e62d9e7`](https://github.com/cortega26/chile-hub/commit/e62d9e7f20c03405476d0d298700aaec690e1e80))
+
+- **ci**: Expone override allow_stale_backfills en workflow_dispatch
+  ([`7126b0d`](https://github.com/cortega26/chile-hub/commit/7126b0d0aa69dc476f8f88da152d64ffb4f26758))
+
+- **extractors**: IPC desde la fuente autoritativa INE cuando mindicador no lo entrega
+  ([`61ec8e4`](https://github.com/cortega26/chile-hub/commit/61ec8e4276343391e56652bd46cf2e1b2e39322e))
+
+- **geo**: Agrega resolve_by_coords para comunas
+  ([`d9d5deb`](https://github.com/cortega26/chile-hub/commit/d9d5debcbc3745e5c029ef5b7862d045eecc7b23))
+
+- **quality**: Guardrails anti-drift de documentación y fuentes
+  ([`36f794d`](https://github.com/cortega26/chile-hub/commit/36f794d60dfbe194cffd43f632020b176e8403b2))
+
+### Refactorizado
+
+- **cli**: TECHDEBT-02 — mueve build_parser/_main/main/_print_result de core.py a cli.py
+  ([`fddcf7e`](https://github.com/cortega26/chile-hub/commit/fddcf7edcd3e12e36f63889a5bee7468e5af0ae3))
+
+- **paths**: TECHDEBT-05/06 — raiz unica _paths.find_root() y docs de carriles de extraccion
+  ([`1c6e6d4`](https://github.com/cortega26/chile-hub/commit/1c6e6d4e52d75762ec30ff811dee2e06fb41863d))
+
+- **tests**: TC-07 — extrae ChileHubDataManager y GeoCache a test_data_manager.py
+  ([`085768f`](https://github.com/cortega26/chile-hub/commit/085768f96c08ed8ea22633cc0d1263ce0b480448))
+
+
 ## 1.22.0 - 2026-07-29
 
 > 🎯 **Resumen:** El release más grande de la historia del proyecto, y no por
