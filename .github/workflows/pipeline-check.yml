@@ -82,6 +82,11 @@ jobs:
         run: python scripts/check_companion_paths.py registry
 
       - name: Check docs sync (README hardcoded facts)
+        # Gate read-only (job quality sin contents: write): el auto-heal vive
+        # en el job separado docs-autosync, que solo corre en push a main.
+        # Aqui el gate es bloqueante en todas las vias (incluido push a main:
+        # el job docs-autosync commitea el fix despues y el siguiente run ya
+        # parte consistente).
         run: python scripts/sync_docs.py --check
 
       # Adelanta a cada push/PR la deriva que "Check build-synced files" solo
@@ -106,6 +111,67 @@ jobs:
         run: |
           python scripts/check_companion_paths.py companions \
             --base "${{ github.event.pull_request.base.sha }}"
+
+  # Auto-heal de docs SOLO en push a main. Job separado con contents: write:
+  # el job quality se mantiene read-only, de modo que un PR de una rama del
+  # repo no puede ejecutar codigo controlado por el PR con un token de
+  # escritura (P1 de la review del PR #60). Este job corre el codigo de main
+  # (push ya aprobado), nunca el de una rama de PR.
+  docs-autosync:
+    name: Auto-sync docs (push a main)
+    # Corre incluso si quality falla: su proposito es arreglar el drift de docs
+    # que quality detecto (la causa habitual: carrera con un release). Si
+    # quality fallo por otra razon, el auto-sync no encontrara drift y no
+    # hara nada (el step valida con --check antes de tocar nada).
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: quality
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          enable-cache: true
+          cache-suffix: docs-autosync
+
+      - name: Install dev dependencies
+        run: uv sync --extra pipeline --extra dev
+
+      - name: Auto-sync docs if stale
+        run: |
+          if python scripts/sync_docs.py --check; then
+            echo "Docs al dia; sin cambios."
+            exit 0
+          fi
+          # Drift de docs detectado en push a main. La causa habitual es una
+          # carrera con un release: semantic-release pushea el bump de version
+          # entre la creacion de un PR y su merge, dejando el pin del README
+          # con la version anterior. El sync es determinista (regenera desde la
+          # fuente de verdad), asi que auto-corregirlo es estrictamente mejor
+          # que dejar el gate rojo para un drift operativamente inevitable.
+          echo "::warning::Bloques de docs desincronizados en push a main (probable carrera con release); auto-corrigiendo..."
+          python scripts/sync_docs.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md AGENTS.md
+          git commit -m "docs: auto-sync tras carrera con release [skip ci]" || echo "Sin cambios para commitear"
+          # El commit usa GITHUB_TOKEN, que NO dispara workflows push (ver
+          # pages-deploy.yml) -> sin loop de pipelines. El siguiente push o
+          # schedule ya parte consistente.
+          git push origin HEAD:main
 
   build-and-test:
     name: Build and verify data

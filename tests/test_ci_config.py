@@ -490,6 +490,60 @@ class LandingSyncGateGuardrailTests(unittest.TestCase):
                 self.assertIn(f"class=\"pill ' + {var}", content)
 
 
+class DocsSyncGateGuardrailTests(unittest.TestCase):
+    """El gate de sync de docs debe auto-corregirse en push a main (carrera
+    con releases) pero seguir bloqueante en PRs.
+
+    Regresion 2026-08-12 (x2): semantic-release publico 1.23.1, 1.24.0 y
+    1.24.1 en menos de una hora; el release pushea el bump de version entre
+    la creacion de un PR y su merge, dejando el pin del README con la version
+    anterior. El CI del merge fallaba con "sync_readme_version_pin_example"
+    pese a que el PR no tenia regresion — un drift operativamente inevitable.
+    """
+
+    def test_quality_job_runs_docs_sync_gate(self):
+        content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("python scripts/sync_docs.py --check", content)
+
+    def test_docs_auto_heal_lives_in_separate_main_only_job(self):
+        """El auto-heal debe vivir en un job separado (docs-autosync),
+        condicionado a push a main, NUNCA en el job quality (que debe
+        permanecer read-only).
+
+        P1 de la review del PR #60: dar contents: write al job quality
+        permitiria que un PR de una rama del repo ejecute codigo controlado
+        por el PR con un token de escritura. El job separado corre el codigo
+        de main (push aprobado), nunca el de una rama de PR.
+        """
+        content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        # El job separado existe y esta condicionado a push a main.
+        self.assertIn("  docs-autosync:", content)
+        self.assertIn("name: Auto-sync docs (push a main)", content)
+        self.assertIn(
+            "if: github.event_name == 'push' && github.ref == 'refs/heads/main' && always()",
+            content,
+        )
+        # El commit del bot usa GITHUB_TOKEN (no dispara workflows push -> sin loop).
+        self.assertIn("git push origin HEAD:main", content)
+        self.assertIn('git commit -m "docs: auto-sync tras carrera con release [skip ci]"', content)
+        # El gate del job quality es el check puro (read-only): el bloque entre
+        # el header del job quality y el comentario del job docs-autosync no
+        # debe contener un bloque de permissions propio.
+        quality_section = content.split("  quality:")[1].split("  # Auto-heal de docs")[0]
+        self.assertIn("python scripts/sync_docs.py --check", quality_section)
+        self.assertNotIn("permissions:", quality_section)
+
+    def test_docs_gate_still_blocking_on_pr(self):
+        """En PRs el gate sigue exigiendo el sync del autor (quality falla)."""
+        content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("python scripts/sync_docs.py --check", content)
+        # El auto-heal nunca corre en PRs (job condicionado a push a main).
+        self.assertIn(
+            "if: github.event_name == 'push' && github.ref == 'refs/heads/main' && always()",
+            content,
+        )
+
+
 class AgentsSyncGateGuardrailTests(unittest.TestCase):
     """AGENTS.md es prosa curada: sus hechos contables (anclas de líneas,
     listas de módulos del §2, tabla de capas del §1) no se regeneran con
