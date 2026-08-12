@@ -132,7 +132,7 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 | 070 | [Filtrar HF por publication_track (nunca candidate/deprecated)](070-hf-publication-track-filter.md) | P1 | M | MED | — | DONE (2026-08-12, commit d34462f — registry como fuente de carril; branch advisor/070 sin merge) |
 | 071 | [El catálogo del bundle ZIP solo declara capas realmente incluidas](071-bundle-catalog-consistency.md) | P1 | M | MED | coordina 070 | DONE (2026-08-12, commit e9d6041 — catálogo filtrado en el ZIP; branch advisor/071 sin merge) |
 | 072 | [Validar miembros del ZIP antes de extractall (zip-slip/symlink)](072-zip-slip-guard.md) | P2 | S | LOW | — | DONE (2026-08-12, commit a1e50d3 — guard en _extract_bundle; branch advisor/072 sin merge) |
-| 073 | [Contratos disponibles para consumidores instalados (wheel + bundle)](073-contracts-for-consumers.md) | P2 | M | MED | — | TODO |
+| 073 | [Contratos disponibles para consumidores instalados (wheel + bundle)](073-contracts-for-consumers.md) | P2 | M | MED | — | DONE (2026-08-12, commit 97f184d — contratos en el wheel + fallback; branch advisor/073 sin merge) |
 | 074 | [Anomalías temporales sobre el punto más reciente (IPC negativo)](074-anomalies-last-point-attribution.md) | P2 | S | LOW | — | TODO |
 | 075 | [Acoplar valor y período en el regex del override INE](075-ine-regex-value-period-coupling.md) | P2 | S | LOW-MED | — | TODO |
 | 076 | [RES incremental — descargar solo el año en curso](076-res-incremental-fetch.md) | P2 | M | MED | — | TODO |
