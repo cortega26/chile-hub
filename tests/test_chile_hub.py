@@ -1819,8 +1819,9 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("uv lock", self.release_workflow_text)
         self.assertIn("uv lock --locked", self.release_workflow_text)
         self.assertIn("python scripts/sync_release_artifact_version.py", self.release_workflow_text)
+        self.assertIn("python scripts/sync_docs.py", self.release_workflow_text)
         self.assertIn(
-            "git add CHANGELOG.md pyproject.toml uv.lock data/normalized/ index.html app.js",
+            "git add CHANGELOG.md pyproject.toml uv.lock data/normalized/ README.md index.html app.js",
             self.release_workflow_text,
         )
 

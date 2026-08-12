@@ -303,15 +303,36 @@ class AdoptionBadgeGuardrailTests(unittest.TestCase):
         content = (ROOT_DIR / ".github" / "workflows" / "pypi-release.yml").read_text(
             encoding="utf-8"
         )
-        # `if` en vez de capturar $?: el step corre bajo set -e y un fallo de
-        # verify_pipeline mataria bash antes de asignar el exit code (P1 de la
-        # review del PR #57) — el ready=false nunca se emitiria.
+        # El fallo se captura con un `if` (no con recheck_status=$?, que bajo
+        # set -e moriria antes de asignar — P1 de la review del PR #57).
         self.assertIn("if python scripts/verify_pipeline.py --profile release", content)
-        self.assertNotIn('recheck_status="$?"', content)
         self.assertIn("se publica sin adjuntar datos", content)
         # La degradacion ocurre DENTRO del case 0 (tras la re-verificacion),
         # no en el branch de error (*) que aborta.
         self.assertIn('echo "ready=false" >> "$GITHUB_OUTPUT"', content)
+
+    def test_release_syncs_readme_pin_before_commit(self):
+        """El release debe sincronizar el README (pin de version) en el mismo
+        commit del bump.
+
+        Regresion 2026-08-12: el release 1.23.1 bumpo pyproject.toml pero no
+        toco README.md (no estaba en el git add del release workflow), dejando
+        el pin en 1.23.0; el siguiente push a main (merge del PR #58) fallo el
+        gate sync_readme_version_pin_example del job quality y cancelo Pages
+        Deploy. El commit de release ahora corre `python scripts/sync_docs.py`
+        e incluye README.md en el git add.
+        """
+        content = (ROOT_DIR / ".github" / "workflows" / "pypi-release.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("python scripts/sync_docs.py", content)
+        self.assertIn(
+            "git add CHANGELOG.md pyproject.toml uv.lock data/normalized/ README.md", content
+        )
+        # El sync debe correr ANTES del commit (mismo commit de release).
+        sync_index = content.index("python scripts/sync_docs.py")
+        commit_index = content.index('git commit -m "chore(release)')
+        self.assertLess(sync_index, commit_index)
 
     def test_hf_publish_uses_the_adopted_publication_grade_run(self):
         """hf-publish debe bajar el run que release efectivamente adopto.

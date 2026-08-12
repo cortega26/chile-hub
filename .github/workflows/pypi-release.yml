@@ -233,10 +233,17 @@ jobs:
               uv lock
               uv lock --locked
               python scripts/sync_release_artifact_version.py
+              # Sincroniza los bloques derivados de la version en README.md
+              # (p. ej. el pin `chile-hub==X.Y.Z`). Sin esto, el commit de
+              # release bumpa pyproject.toml pero deja el README con el pin
+              # viejo, y el siguiente push a main falla el gate
+              # sync_readme_version_pin_example (regresion 2026-08-12, el
+              # release 1.23.1 dejo el pin en 1.23.0).
+              python scripts/sync_docs.py
 
               git config user.name "github-actions[bot]"
               git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-              git add CHANGELOG.md pyproject.toml uv.lock data/normalized/ index.html app.js
+              git add CHANGELOG.md pyproject.toml uv.lock data/normalized/ README.md index.html app.js
               git commit -m "chore(release): ${after} [skip ci]"
               tag="v${after}"
               git tag "$tag"
