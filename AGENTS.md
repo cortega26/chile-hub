@@ -747,7 +747,8 @@ Corre tras un `Pipeline Check` exitoso en `main` (`workflow_run`) o
 verificado, corre `python-semantic-release` (§7), publica el paquete en PyPI y
 adjunta los artefactos de datos al GitHub Release cuando son
 publication-grade. Tras cada release, el job `hf-publish` de
-`pypi-release.yml` replica las 19 capas publicables (Parquet + catálogo) a
+`pypi-release.yml` replica las 17 capas publicables (Parquet + catálogo, las
+estables por `publication_track` del registry — Plan 070) a
 Hugging Face Hub (`cortega26/chile-hub`, requiere secret `HF_TOKEN`); nunca
 incluye el carril `candidate` y no bloquea el release si falla.
 
