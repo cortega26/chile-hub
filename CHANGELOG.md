@@ -12,6 +12,79 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.25.0 - 2026-08-12
+
+### Corregido
+
+- **artifacts**: El catálogo del bundle ZIP solo declara capas incluidas
+  ([`e9d6041`](https://github.com/cortega26/chile-hub/commit/e9d6041f5ed9cd704f594be259cbd0271c6fd023))
+
+- **artifacts**: El manifest embebido describe el catálogo filtrado del ZIP
+  ([`ee99e7a`](https://github.com/cortega26/chile-hub/commit/ee99e7a6ea9cc3a35b2a57ad795a7e7c93e66f27))
+
+- **artifacts**: Tipo del catálogo filtrado (mypy) y round-trip con catálogo
+  ([`76e123a`](https://github.com/cortega26/chile-hub/commit/76e123abbaaaabdb509ed582917083819630027f))
+
+- **ci**: CodeQL tambien escucha merge_group (check requerido de la cola)
+  ([`f41143f`](https://github.com/cortega26/chile-hub/commit/f41143f9518b32a963adac7b420807eef4c67938))
+
+- **data_manager**: Validar el ZIP antes de borrar la caché verificada
+  ([`19d1608`](https://github.com/cortega26/chile-hub/commit/19d1608582526f95022e29522ea5b150e0496414))
+
+- **data_manager**: Zip-slip guard en _extract_bundle (Plan 072)
+  ([`a1e50d3`](https://github.com/cortega26/chile-hub/commit/a1e50d3aef6a3cdd5abf446fd52d33ff22fea37c))
+
+- **extractors**: El override INE es delivery visible, no backfill enmascarado
+  ([`6ef22fd`](https://github.com/cortega26/chile-hub/commit/6ef22fdd2ff96368261f94e773336fa725bdb08b))
+
+- **hf**: Delete_patterns en el mirror, e2e 059 a 17, AGENTS.md 17 capas
+  ([`cc4cc8e`](https://github.com/cortega26/chile-hub/commit/cc4cc8ebea7ad4fa450e1d82d53bbcdb60ad67c3))
+
+- **hf**: El mirror filtra por publication_track del registry (nunca candidate)
+  ([`d34462f`](https://github.com/cortega26/chile-hub/commit/d34462fdfa43945fe47dea2627db97107c59c626))
+
+- **package**: El contrato del wheel sobrevive a as_file() efímero (P2)
+  ([`84f84e3`](https://github.com/cortega26/chile-hub/commit/84f84e310a57dc6cde815e0089be6d80852c0132))
+
+- **package**: Incluir contracts en el sdist (build sdist→wheel en CI)
+  ([`df91b93`](https://github.com/cortega26/chile-hub/commit/df91b93d2eb74db9e01f654711526c830c369230))
+
+- **release**: El override INE es age-gated (no puede publicar stale indefinidamente)
+  ([`17ff5de`](https://github.com/cortega26/chile-hub/commit/17ff5debb2d6d417b5dc9801a793a54848d6fa7c))
+
+### Mantenimiento
+
+- Trigger CI en merge-queue-ready (fix CodeQL + sync docs)
+  ([`9e9e253`](https://github.com/cortega26/chile-hub/commit/9e9e2533df264c8e3040200f520e5e38eb959919))
+
+- Trigger CI on docs-gate-auto-heal branch
+  ([`8c72956`](https://github.com/cortega26/chile-hub/commit/8c72956c04967fcf8511bfeba639d6c3edd982b8))
+
+- Trigger CI tras fix P1 (job docs-autosync separado)
+  ([`fd672e7`](https://github.com/cortega26/chile-hub/commit/fd672e711615f71e78bb469ac46b394233428435))
+
+### Integración continua
+
+- **docs**: Auto-heal del gate de sync en push a main (carrera con releases)
+  ([`5e81f86`](https://github.com/cortega26/chile-hub/commit/5e81f86e29ce0709fd647b644c6c5bb04e25bc63))
+
+- **docs**: Auto-heal del gate de sync en push a main (carrera con releases)
+  ([`c067db0`](https://github.com/cortega26/chile-hub/commit/c067db010f0939bcf0f22f3468c0b9feee7ec650))
+
+### Documentación
+
+- Sincroniza conteo de tests tras guardrail de merge group [skip ci]
+  ([`b6a47b4`](https://github.com/cortega26/chile-hub/commit/b6a47b4ad326c1539862652495107101255018cb))
+
+### Agregado
+
+- **ci**: Prepara el workflow para la merge queue de GitHub (evento merge_group)
+  ([`53781e2`](https://github.com/cortega26/chile-hub/commit/53781e2c8224633d73b3021a46ce53e7e049f427))
+
+- **package**: Contratos disponibles para consumidores instalados (Plan 073)
+  ([`6691476`](https://github.com/cortega26/chile-hub/commit/66914763e2a8ed3c56a04a69110ede3ae26078eb))
+
+
 ## 1.24.1 - 2026-08-12
 
 ### Corregido
