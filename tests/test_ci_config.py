@@ -702,6 +702,42 @@ class HfPublishJobGuardrailTests(unittest.TestCase):
         self.assertIn("redistribution_ok", content)
         self.assertIn("--dry-run", content)
 
+    def test_publish_script_filters_by_publication_track_from_registry(self):
+        """El script HF debe filtrar por `publication_track` del registry, no
+        inferir el carril de `outputs` del catálogo.
+
+        Plan 070: la asunción "candidate nunca declara outputs" era falsa —
+        perfil_territorial_comunal y consumo_electrico_comunal (candidate,
+        el segundo deprecated) tienen outputs y llegaron al mirror HF como
+        si fueran publicables. El registry es la fuente de verdad del carril.
+        """
+        content = PUBLISH_HF_SCRIPT.read_text(encoding="utf-8")
+        self.assertIn("SOURCE_REGISTRY_PATH", content)
+        self.assertIn("publication_track", content)
+        self.assertIn('track != "stable_publishable"', content)
+
+    def test_publish_script_dry_run_excludes_candidate_and_deprecated(self):
+        """El dry-run debe listar 17 capas (no 19): candidate/deprecated fuera.
+
+        Regresión del Plan 070: con el catálogo real, perfil y consumo (ambos
+        candidate) no deben aparecer en la lista de parquets del mirror.
+        """
+        import subprocess
+        import sys
+
+        result = subprocess.run(
+            [sys.executable, str(PUBLISH_HF_SCRIPT), "--dry-run"],
+            capture_output=True,
+            text=True,
+            cwd=ROOT_DIR,
+            env={**__import__("os").environ, "HF_TOKEN": "x"},
+            timeout=120,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("data/regiones.parquet", result.stdout)
+        self.assertNotIn("data/perfil_territorial_comunal.parquet", result.stdout)
+        self.assertNotIn("data/consumo_electrico_comunal.parquet", result.stdout)
+
     def test_workflow_never_names_candidate_lane_datasets(self):
         """El carril candidate se excluye por construcción (ausencia de
         `outputs` en el catálogo) — nunca por una lista hardcodeada en el

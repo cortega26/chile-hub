@@ -8,7 +8,7 @@ size_categories: [100K<n<1M]
 
 # chile-hub
 
-Datos públicos de Chile curados, normalizados y validados — 19 capas
+Datos públicos de Chile curados, normalizados y validados — {{DATASET_COUNT}} capas
 (DPA, Censo 2024, indicadores económicos, salud, educación, finanzas
 municipales, electoral y más). Espejo en Hugging Face Hub del bundle oficial
 publicado en GitHub Releases: https://github.com/cortega26/chile-hub
