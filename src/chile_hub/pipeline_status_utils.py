@@ -58,6 +58,39 @@ def _load_source_registry_datasets() -> tuple:
     return all_names, public_names
 
 
+def _compute_review_status_counts():
+    """Conteos de señales de review_by del registry (Plan 083).
+
+    Build-time únicamente (igual que _load_source_registry_datasets): cuenta
+    cuántos datasets tienen `review_by` a menos de 90 días (`upcoming`,
+    mismo umbral que el default de `stalled_after_days`) y cuántos ya
+    vencidos (`due`). La decisión de carril es del mantenedor — estas
+    señales solo la agenda. Tolerante ante registry ausente (fixtures
+    sintéticos de tests).
+    """
+    try:
+        with open(SOURCE_REGISTRY_PATH, "r", encoding="utf-8") as f:
+            registry = json.load(f)
+    except FileNotFoundError:
+        return 0, 0
+    upcoming = 0
+    due = 0
+    for entry in registry:
+        review_by = entry.get("review_by")
+        if not review_by:
+            continue
+        try:
+            review_date = datetime.fromisoformat(review_by).replace(tzinfo=UTC)
+        except (ValueError, TypeError):
+            continue
+        days_until_review = (review_date - datetime.now(UTC)).days
+        if days_until_review < 0:
+            due += 1
+        elif days_until_review < 90:
+            upcoming += 1
+    return upcoming, due
+
+
 def _load_retired_datasets():
     """Nombres de datasets cuya fuente está declarada muerta en el registry.
 
@@ -356,6 +389,10 @@ def build_hub_health(metadata):
         ),
         "drifted_count": sum(1 for entry in active if entry["drift_status"] == "drifted"),
         "warning_count": sum(entry["warning_count"] for entry in active),
+        # Señal proactiva de cadencia (Plan 083): review_by a menos de 30 días
+        # (upcoming) o ya vencida (due). Aditiva — no afecta overall_status.
+        "review_approaching_count": _compute_review_status_counts()[0],
+        "review_due_count": _compute_review_status_counts()[1],
         "top_issue": top_issue,
         "top_issue_summary": format_top_issue_summary(top_issue),
         "datasets": entries,
@@ -880,6 +917,8 @@ def build_source_readiness_markdown(readiness):
         f"- `live_ready_count`: `{readiness.get('live_ready_count', 0)}`",
         f"- `fallback_only_count`: `{readiness.get('fallback_only_count', 0)}`",
         f"- `publish_blocking_count`: `{readiness.get('publish_blocking_count', 0)}`",
+        f"- `review_approaching_count`: `{readiness.get('review_approaching_count', 0)}`",
+        f"- `review_due_count`: `{readiness.get('review_due_count', 0)}`",
         "",
         "| Dataset | Madurez | Source ID | Modo | Live Ready | Fallback | Bloquea Pub | Extractor | Estancado | Próxima acción |",
         "| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |",
@@ -896,8 +935,8 @@ def build_source_readiness_markdown(readiness):
             f"`{'permitido' if entry.get('fallback_allowed') else 'no'}` | "
             f"`{'✓' if entry.get('publish_blocking') else '—'}` | "
             f"`{entry.get('live_extractor_status', 'unknown')}` | "
-            f"`{'⚠' if entry.get('stalled') else '—'}` | "
-            f"{entry.get('next_action', '—')} |"
+            f"`{'⚠' if entry.get('stalled') else '⏳' if entry.get('review_status') == 'upcoming' else '—'}` | "
+            f"{entry.get('recommended_action', '—')} |"
         )
 
     lines.append("")

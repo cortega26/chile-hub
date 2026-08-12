@@ -1174,6 +1174,13 @@ def verify_hub_health():
         if health.get(key) is None:
             fail(f"hub_health.json is missing {key}")
 
+    # Señal de cadencia de review_by (Plan 083): counts aditivos, enteros
+    # no negativos — la señal agenda decisiones de carril, nunca altera
+    # el overall_status.
+    for key in ("review_approaching_count", "review_due_count"):
+        if not isinstance(health.get(key), int) or health.get(key) < 0:
+            fail(f"hub_health.json has invalid {key}: {health.get(key)}")
+
     datasets = health.get("datasets", [])
     dataset_names = {entry.get("dataset") for entry in datasets}
     if dataset_names != REQUIRED_DATASETS:

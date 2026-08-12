@@ -128,7 +128,7 @@ chile-hub/
 │   │   ├── datasets.py            Definición de Dataset(StrEnum) y tipos
 │   │   ├── exceptions.py          Excepciones de dominio de la API
 │   │   ├── data_manager.py        Descarga de bundle, cache, verificación SHA256
-│   │   ├── pipeline_status_utils.py  Reportes Markdown de salud, catálogo y redistribución (955 líneas)
+│   │   ├── pipeline_status_utils.py  Reportes Markdown de salud, catálogo y redistribución (994 líneas)
 │   │   ├── _render.py             Helper de renderizado de tablas
 │   │   └── text.py                Utils de texto compartidas
 │   └── pipeline_status_utils.py   Shim de compatibilidad (21 líneas) — re-exporta del paquete; NO duplicar lógica aquí

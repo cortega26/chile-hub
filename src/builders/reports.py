@@ -548,10 +548,21 @@ def build_source_readiness(pipeline_metadata):
         review_by = src.get("review_by")
         stalled_after_days = src.get("stalled_after_days", 90)
         stalled = False
+        review_status = "ok"
         if review_by:
             try:
                 review_date = datetime.fromisoformat(review_by).replace(tzinfo=UTC)
-                stalled = datetime.now(UTC) > review_date
+                days_until_review = (review_date - datetime.now(UTC)).days
+                stalled = days_until_review < 0
+                # Señal proactiva de cadencia (Plan 083): al acercarse el
+                # review_by el dataset entra en "upcoming" — agenda la
+                # decisión de carril antes de que venza en silencio. El
+                # umbral es 90 días (default de stalled_after_days, la
+                # cadencia del sistema): un aviso de 30 días deja menos de
+                # un mes para reevaluar fuente/licencia, muy poco para una
+                # decisión de carril. Con 90, hoy las 4 fechas próximas
+                # (36-69 días) quedan señaladas.
+                review_status = "due" if stalled else "upcoming" if days_until_review < 90 else "ok"
             except (ValueError, TypeError):
                 pass
 
@@ -559,6 +570,10 @@ def build_source_readiness(pipeline_metadata):
         recommended_action = src.get("next_action", "—")
         if stalled:
             recommended_action = f"⚠ ESTANCADO (revisión vencida {review_by}). {recommended_action}"
+        elif review_status == "upcoming":
+            recommended_action = (
+                f"⏳ REVIEW BY {review_by} — {days_until_review} días. {recommended_action}"
+            )
 
         entries.append(
             {
@@ -580,6 +595,7 @@ def build_source_readiness(pipeline_metadata):
                 "stalled_after_days": stalled_after_days,
                 "review_by": review_by,
                 "stalled": stalled,
+                "review_status": review_status,
                 "owner": src.get("owner", "core"),
                 "next_action": src.get("next_action", "—"),
                 "recommended_action": recommended_action,
@@ -602,6 +618,8 @@ def build_source_readiness(pipeline_metadata):
             1 for e in entries if e["live_extractor_status"] == "fallback_only"
         ),
         "publish_blocking_count": sum(1 for e in entries if e["publish_blocking"]),
+        "review_approaching_count": sum(1 for e in entries if e["review_status"] == "upcoming"),
+        "review_due_count": sum(1 for e in entries if e["review_status"] == "due"),
         "datasets": entries,
     }
 
