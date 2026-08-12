@@ -521,6 +521,30 @@ class DetectSeriesAnomaliesTests(unittest.TestCase):
         anomalies = detect_series_anomalies(df, z_threshold=4.0, min_history=4)
         self.assertEqual(anomalies, [])
 
+    def test_constant_levels_with_break_at_zero_is_flagged(self):
+        """Niveles previos constantes + último valor distinto = ruptura obvia.
+
+        P2 de la review del Plan 074: con MAD=0 el z-score no tiene base,
+        pero un último valor que rompe una serie constante (p. ej. 0 tras
+        cinco 100) es claramente anómalo — se reporta con motivo de ruptura
+        de serie constante. `valor=0` es schema-válido, así que sin esta
+        señal el dato malformado pasaría al gate de publicación.
+        """
+        values = [100.0, 100.0, 100.0, 100.0, 100.0, 0.0]
+        df = self._make_series(values, code="ipc")
+        anomalies = detect_series_anomalies(df, z_threshold=4.0, min_history=4)
+        self.assertEqual(len(anomalies), 1)
+        self.assertEqual(anomalies[0]["valor"], 0.0)
+        self.assertEqual(anomalies[0]["fecha"], "2024-01-06")
+        self.assertIn("serie constante", anomalies[0]["motivo"])
+
+    def test_constant_levels_without_break_not_flagged(self):
+        """Niveles previos constantes y último valor igual: sin señal."""
+        values = [100.0, 100.0, 100.0, 100.0, 100.0, 100.0]
+        df = self._make_series(values, code="ipc")
+        anomalies = detect_series_anomalies(df, z_threshold=4.0, min_history=4)
+        self.assertEqual(anomalies, [])
+
 
 # ── validate_distritos_electorales ─────────────────────────────────────────────
 

@@ -412,21 +412,36 @@ def detect_series_anomalies(
                 continue
             median_level = statistics.median(levels)
             mad_level = statistics.median([abs(v - median_level) for v in levels])
+
             if mad_level == 0:
-                continue
-
-            z_score = 0.6745 * (last_value - median_level) / mad_level
-            if abs(z_score) <= z_threshold:
-                continue
-
-            low = median_level - z_threshold * mad_level / 0.6745
-            high = median_level + z_threshold * mad_level / 0.6745
-            motivo = (
-                f"Salto atípico en '{key}' el {dates[-1]}: valor {last_value} "
-                f"vs. mediana de niveles previos {median_level:.4f} "
-                f"(MAD={mad_level:.4f}, z={z_score:.2f}, umbral={z_threshold}). "
-                f"Rango esperado sin señal: [{round(low, 4)}, {round(high, 4)}]."
-            )
+                # Niveles previos constantes: el MAD no da base para z-score,
+                # pero un último valor distinto de la mediana ES una ruptura
+                # obvia (P2 de la review del Plan 074). Se reporta con z-score
+                # infinito y motivo de ruptura de serie constante. Ej.:
+                # [100, 100, 100, 100, 100, 0] — el 0 es claramente anómalo.
+                if last_value == median_level:
+                    continue
+                low = min(levels)
+                high = max(levels)
+                motivo = (
+                    f"Salto atípico en '{key}' el {dates[-1]}: valor {last_value} "
+                    f"vs. serie de niveles previos constante en {median_level:.4f} "
+                    f"(MAD=0, ruptura de serie constante, umbral={z_threshold}). "
+                    f"Rango esperado sin señal: [{round(low, 4)}, {round(high, 4)}]."
+                )
+                z_score = None  # MAD=0: sin base de z-score; la ruptura es obvia
+            else:
+                z_score = 0.6745 * (last_value - median_level) / mad_level
+                if abs(z_score) <= z_threshold:
+                    continue
+                low = median_level - z_threshold * mad_level / 0.6745
+                high = median_level + z_threshold * mad_level / 0.6745
+                motivo = (
+                    f"Salto atípico en '{key}' el {dates[-1]}: valor {last_value} "
+                    f"vs. mediana de niveles previos {median_level:.4f} "
+                    f"(MAD={mad_level:.4f}, z={z_score:.2f}, umbral={z_threshold}). "
+                    f"Rango esperado sin señal: [{round(low, 4)}, {round(high, 4)}]."
+                )
 
         anomalies.append(
             {
@@ -434,7 +449,7 @@ def detect_series_anomalies(
                 "fecha": dates[-1],
                 "valor": last_value,
                 "esperado_rango": [round(low, 4), round(high, 4)],
-                "z_score": round(z_score, 2),
+                "z_score": round(z_score, 2) if z_score is not None else None,
                 "motivo": motivo,
             }
         )
