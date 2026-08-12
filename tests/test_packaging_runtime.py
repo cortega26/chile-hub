@@ -1,3 +1,4 @@
+import contextlib
 import hashlib
 import json
 import sys
@@ -60,6 +61,62 @@ def _bundle_bytes() -> bytes:
 class PackagingRuntimeTests(unittest.TestCase):
     def test_public_import_exposes_chile_hub(self):
         self.assertEqual(ChileHub.__name__, "ChileHub")
+
+    def test_contract_path_falls_back_to_installed_wheel(self):
+        """El contrato se resuelve desde el wheel cuando el checkout no lo tiene.
+
+        Plan 073: los contratos viajan en el paquete instalado
+        (src/chile_hub/contracts/datasets/). Si el root_dir del hub no tiene
+        la carpeta contracts (consumidor de PyPI), _contract_path cae al
+        wheel vía importlib.resources en vez de fallar con "No existe
+        contrato de schema".
+        """
+        from unittest.mock import patch
+
+        import polars as pl
+
+        # Simular el wheel instalado: los contratos viven en un directorio
+        # externo (site-packages), no en el checkout de desarrollo. El código
+        # resuelve <raiz>/contracts/datasets, así que el fake es la raíz.
+        fake_root = Path(tempfile.mkdtemp())
+        fake_contracts = fake_root / "contracts" / "datasets"
+        fake_contracts.mkdir(parents=True, exist_ok=True)
+        contract_src = ROOT_DIR / "contracts" / "datasets" / "comunas.schema.json"
+        (fake_contracts / "comunas.schema.json").write_text(
+            contract_src.read_text(encoding="utf-8"), encoding="utf-8"
+        )
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            normalized_dir = Path(tmpdir)
+            (normalized_dir / "dataset_catalog.json").write_text(
+                json.dumps({"datasets": [{"dataset": "comunas", "outputs": {"parquet": "x"}}]}),
+                encoding="utf-8",
+            )
+            hub = ChileHub(data_dir=normalized_dir)
+            # root_dir deriva de data_dir; no tiene contracts/ → fallback al wheel.
+            with (
+                patch("chile_hub.core.importlib.resources.files", return_value=fake_root),
+                patch(
+                    "chile_hub.core.importlib.resources.as_file",
+                    side_effect=lambda p: contextlib.nullcontext(p),
+                ),
+            ):
+                contract_path = hub._contract_path("comunas")
+                self.assertIsNotNone(contract_path)
+                self.assertTrue(contract_path.is_file())
+
+                df = pl.DataFrame(
+                    {
+                        "codigo_comuna": ["01101"],
+                        "nombre_comuna": ["Iquique"],
+                        "codigo_provincia": ["011"],
+                        "codigo_region": ["01"],
+                        "nombre_comuna_clean": ["iquique"],
+                    }
+                )
+                result = hub.validate_user_data(df, "comunas")
+                self.assertEqual(result["status"], "ok")
+                self.assertIn("schema_used", result)
 
     def test_local_data_dir_mode_uses_explicit_normalized_directory(self):
         with tempfile.TemporaryDirectory() as tmpdir:
