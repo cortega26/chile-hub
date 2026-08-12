@@ -660,10 +660,21 @@ class ChileHub:
             resource = importlib.resources.files("chile_hub") / "contracts" / "datasets"
             candidate = resource / f"{dataset_name}.schema.json"
             if candidate.is_file():
-                # importlib.resources.files devuelve un Traversable, no Path;
-                # as_file materializa el recurso en un Path real.
-                with importlib.resources.as_file(candidate) as path:
-                    return Path(path)
+                # as_file() puede materializar el recurso en un temporal que
+                # se elimina al salir del with (p. ej. con zipimport); el Path
+                # retornado quedaría inválido (P2 de la review del Plan 073).
+                # Se copia a un temporal persistente del hub (borrado al
+                # cerrar el proceso) para que el llamador pueda abrirlo.
+                with importlib.resources.as_file(candidate) as materialized:
+                    import shutil
+                    import tempfile
+
+                    tmp = (
+                        Path(tempfile.mkdtemp(prefix="chile_hub_contracts_"))
+                        / f"{dataset_name}.schema.json"
+                    )
+                    shutil.copy2(materialized, tmp)
+                    return tmp
         except (ImportError, ModuleNotFoundError, FileNotFoundError):
             pass
         return None

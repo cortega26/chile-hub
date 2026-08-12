@@ -118,6 +118,68 @@ class PackagingRuntimeTests(unittest.TestCase):
                 self.assertEqual(result["status"], "ok")
                 self.assertIn("schema_used", result)
 
+    def test_contract_path_survives_ephemeral_as_file(self):
+        """El contrato debe sobrevivir a un as_file() efímero (P2 del 073).
+
+        Con un resource loader basado en zip (zipimport), as_file() materializa
+        el recurso en un temporal que se ELIMINA al salir del with. El Path
+        retornado no debe apuntar a un archivo borrado: _contract_path copia a
+        un temporal persistente.
+        """
+        # Simular as_file efímero: materializa, devuelve el path, y BORRA el
+        # archivo al salir del with (como zipimport).
+        from unittest.mock import patch
+
+        ephemeral = {}
+
+        class _EphemeralContext:
+            def __enter__(self):
+                materialized = Path(tempfile.mkdtemp()) / "comunas.schema.json"
+                materialized.write_text(
+                    (ROOT_DIR / "contracts" / "datasets" / "comunas.schema.json").read_text(
+                        encoding="utf-8"
+                    ),
+                    encoding="utf-8",
+                )
+                ephemeral["path"] = materialized
+                return materialized
+
+            def __exit__(self, *exc):
+                ephemeral["path"].unlink(missing_ok=True)
+                return False
+
+        fake_root = Path(tempfile.mkdtemp())
+        fake_contracts = fake_root / "contracts" / "datasets"
+        fake_contracts.mkdir(parents=True, exist_ok=True)
+        (fake_contracts / "comunas.schema.json").write_text("{}", encoding="utf-8")
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            normalized_dir = Path(tmpdir)
+            (normalized_dir / "dataset_catalog.json").write_text(
+                json.dumps({"datasets": [{"dataset": "comunas", "outputs": {}}]}),
+                encoding="utf-8",
+            )
+            hub = ChileHub(data_dir=normalized_dir)
+            with (
+                patch("chile_hub.core.importlib.resources.files", return_value=fake_root),
+                patch(
+                    "chile_hub.core.importlib.resources.as_file",
+                    side_effect=lambda p: _EphemeralContext(),
+                ),
+            ):
+                contract_path = hub._contract_path("comunas")
+                self.assertIsNotNone(contract_path)
+                # El path del as_file efímero ya no existe; el retornado debe ser
+                # una copia persistente válida.
+                self.assertFalse(ephemeral["path"].exists())
+                self.assertTrue(contract_path.is_file())
+                self.assertEqual(
+                    contract_path.read_text(encoding="utf-8"),
+                    (ROOT_DIR / "contracts" / "datasets" / "comunas.schema.json").read_text(
+                        encoding="utf-8"
+                    ),
+                )
+
     def test_local_data_dir_mode_uses_explicit_normalized_directory(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             normalized_dir = Path(tmpdir)
