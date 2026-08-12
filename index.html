@@ -2597,6 +2597,48 @@
             color: #3730a3;
         }
 
+        .dataset-badge.candidate {
+            background: #f5f3ff;
+            color: #5b21b6;
+            border-color: rgba(91, 33, 182, 0.2);
+        }
+
+        .candidate-card {
+            border-style: dashed;
+            border-color: rgba(91, 33, 182, 0.25);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.9));
+        }
+
+        .candidate-card .dataset-card-actions {
+            border-top-color: rgba(91, 33, 182, 0.12);
+        }
+
+        .candidate-next-action {
+            margin-top: 0.75rem;
+            font-size: 0.78rem;
+            line-height: 1.45;
+            color: var(--text-secondary);
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .candidate-chip {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: #f5f3ff;
+            color: #5b21b6;
+            border: 1px solid rgba(91, 33, 182, 0.2);
+            border-radius: 4px;
+            padding: 0.1rem 0.35rem;
+            vertical-align: middle;
+            margin-left: 0.35rem;
+        }
+
         .dataset-facts-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);

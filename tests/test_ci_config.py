@@ -780,6 +780,46 @@ class HfPublishJobGuardrailTests(unittest.TestCase):
                 in_needs_block = False
 
 
+class LandingCandidateLaneGuardrailTests(unittest.TestCase):
+    """Plan 082: la landing debe exponer el carril candidate sin contaminar
+    el catálogo estable.
+
+    Antes de este plan, hub_bundle.json producía candidate_datasets que
+    ninguna UI consumía — perfil_territorial_comunal (346/346, validation
+    ok) era invisible en la superficie principal. Si una futura refactor de
+    app.js eliminara el render candidate o el contador del buscador volviera
+    a contar candidate cards, los consumidores del sitio perderían la única
+    señal visual de qué datasets NO están en el bundle público.
+    """
+
+    def _app_js(self):
+        return (ROOT_DIR / "app.js").read_text(encoding="utf-8")
+
+    def test_app_js_renders_candidate_section_from_bundle(self):
+        content = self._app_js()
+        self.assertIn("renderCandidateSection", content)
+        self.assertIn("bundle.candidate_datasets", content)
+        self.assertIn('section.id = "cat-candidate"', content)
+        self.assertIn('class="dataset-badge candidate"', content)
+        self.assertIn("candidate-next-action", content)
+        self.assertIn('href="data/normalized/hub_bundle.json"', content)
+
+    def test_search_count_excludes_candidate_cards(self):
+        content = self._app_js()
+        self.assertIn('.dataset-card:not(.candidate-card)")', content)
+        self.assertIn("stableVisibleCount", content)
+        self.assertIn("catalogCount.textContent = `", content)
+        no_result = "if (visibleCount === 0 && cards.length > 0)"
+        self.assertIn(no_result, content)
+
+    def test_verify_landing_checks_candidate_section(self):
+        content = (ROOT_DIR / "scripts" / "verify_landing.py").read_text(encoding="utf-8")
+        self.assertIn("#cat-candidate", content)
+        self.assertIn("candidate_datasets", content)
+        self.assertIn(".candidate-card", content)
+        self.assertIn('"0 capas"', content)
+
+
 if __name__ == "__main__":
     import pytest
 
