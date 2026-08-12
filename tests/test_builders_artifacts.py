@@ -78,6 +78,32 @@ def _create_test_manifest(normalized_dir: str) -> str:
         _make_artifact_entry("data/normalized/test_metadata.json", "test_dataset", "json")
     )
 
+    # dataset_catalog.json (shared artifact): catálogo REAL con una capa
+    # candidate que tiene outputs pero SIN parquet en el manifest — el caso
+    # que el filtro del ZIP (Plan 071) debe eliminar.
+    catalog = {
+        "generated_at_utc": "2026-07-09T00:00:00+00:00",
+        "dataset_count": 2,
+        "datasets": [
+            {
+                "dataset": "test_dataset",
+                "outputs": {"parquet": "data/normalized/test_data.parquet"},
+            },
+            {
+                "dataset": "test_candidate",
+                "outputs": {"parquet": "data/normalized/test_candidate.parquet"},
+            },
+        ],
+    }
+    catalog_path = os.path.join(normalized_dir, "dataset_catalog.json")
+    with open(catalog_path, "w", encoding="utf-8") as f:
+        json.dump(catalog, f, ensure_ascii=False, indent=2)
+    artifacts.append(_make_artifact_entry("data/normalized/dataset_catalog.json", None, "shared"))
+    # El artifact_manifest.json también viaja en el ZIP real (shared artifact);
+    # el test lo incluye para verificar la consistencia size/sha256 del
+    # catálogo filtrado embebido (Plan 071).
+    artifacts.append(_make_artifact_entry("data/normalized/artifact_manifest.json", None, "shared"))
+
     manifest = {
         "generated_at_utc": "2026-07-09T00:00:00+00:00",
         "artifact_count": len(artifacts),
@@ -150,6 +176,62 @@ class TestBundleZip:
                 assert artifact["path"] in namelist, (
                     f"Ruta '{artifact['path']}' del manifiesto no encontrada en ZIP: {namelist}"
                 )
+
+    def test_bundle_zip_catalog_only_declares_included_layers(self):
+        """El dataset_catalog.json del ZIP no declara capas sin su parquet.
+
+        Plan 071: el catálogo completo declara capas candidate con `outputs`
+        (p. ej. perfil_territorial_comunal, consumo_electrico_comunal) cuyos
+        parquet NO viajan en el bundle. El catálogo interno del ZIP debe
+        filtrarse a las capas con archivos presentes, y su dataset_count debe
+        reflejar el conteo real.
+        """
+        with tempfile.TemporaryDirectory() as tmpdir:
+            normalized = os.path.join(tmpdir, "normalized")
+            os.makedirs(normalized, exist_ok=True)
+            data_dir = tmpdir
+
+            _create_test_manifest(normalized)
+
+            with (
+                patch("src.builders.artifacts.NORMALIZED_DIR", normalized),
+                patch("src.builders.artifacts.DATA_DIR", data_dir),
+            ):
+                zip_path = write_publishable_bundle_zip()
+
+            with zipfile.ZipFile(zip_path, "r") as zf:
+                names = set(zf.namelist())
+                catalog = json.loads(
+                    zf.read("data/normalized/dataset_catalog.json").decode("utf-8")
+                )
+                embedded_manifest = json.loads(
+                    zf.read("data/normalized/artifact_manifest.json").decode("utf-8")
+                )
+                cat_bytes = zf.read("data/normalized/dataset_catalog.json")
+
+            missing = [
+                entry["dataset"]
+                for entry in catalog["datasets"]
+                if entry.get("outputs")
+                and f"data/normalized/{entry['dataset']}.parquet" not in names
+                and entry.get("dataset") != "comunas_enriquecidas"
+            ]
+            assert not missing, f"Capas del catálogo del ZIP sin parquet: {missing}"
+            assert catalog["dataset_count"] == len(catalog["datasets"])
+
+            # El manifest embebido debe describir el catálogo filtrado real
+            # (size/sha256 coincidentes) — P1 de la review del Plan 071:
+            # validar el bundle contra su manifest no debe reportar el
+            # catálogo como corrupto.
+            cat_entry = next(
+                a
+                for a in embedded_manifest["artifacts"]
+                if a["path"] == "data/normalized/dataset_catalog.json"
+            )
+            import hashlib
+
+            assert cat_entry["size_bytes"] == len(cat_bytes)
+            assert cat_entry["sha256"] == hashlib.sha256(cat_bytes).hexdigest()
 
     def test_bundle_zip_missing_artifact_raises_system_exit(self):
         """SystemExit si falta un artefacto declarado en el manifiesto."""
@@ -365,7 +447,31 @@ class TestFromNormalFlow:
                     "output_type": "parquet",
                     "format": "parquet",
                 },
+                {
+                    "path": "data/normalized/dataset_catalog.json",
+                    "dataset": None,
+                    "output_type": "shared",
+                    "format": "json",
+                },
+                {
+                    "path": "data/normalized/artifact_manifest.json",
+                    "dataset": None,
+                    "output_type": "shared",
+                    "format": "json",
+                },
             ]
+            catalog = {
+                "generated_at_utc": "2026-07-09T00:00:00+00:00",
+                "dataset_count": 1,
+                "datasets": [
+                    {
+                        "dataset": "regiones",
+                        "outputs": {"parquet": "data/normalized/regiones.parquet"},
+                    }
+                ],
+            }
+            with open(os.path.join(normalized, "dataset_catalog.json"), "w", encoding="utf-8") as f:
+                json.dump(catalog, f, ensure_ascii=False, indent=2)
             manifest = {
                 "generated_at_utc": "2026-07-09T00:00:00+00:00",
                 "artifact_count": len(artifacts),

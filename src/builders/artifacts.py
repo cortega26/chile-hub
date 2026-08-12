@@ -19,7 +19,7 @@ from src.builders._shared import (
     PUBLISHABLE_BUNDLE_ZIP_NAME,
     UTC,
 )
-from src.builders.io_utils import compute_sha256, write_json_atomic
+from src.builders.io_utils import compute_sha256, compute_sha256_bytes, write_json_atomic
 from src.builders.reports import load_source_registry
 
 
@@ -370,6 +370,41 @@ def write_hub_bundle_json(pipeline_metadata, hub_health, dataset_catalog, artifa
     return output_path, bundle
 
 
+def _bundle_filtered_catalog(artifacts: list[dict]) -> str:
+    """Variante del dataset_catalog.json para DENTRO del bundle ZIP.
+
+    El catálogo completo declara capas candidate con `outputs` (p. ej.
+    perfil_territorial_comunal, consumo_electrico_comunal) cuyos parquet NO
+    viajan en el bundle (public_bundle_eligible). El catálogo del ZIP se
+    filtra a las capas cuyos archivos están en el manifest, y su
+    `dataset_count` refleja el conteo real (Plan 071). El alias
+    `comunas_enriquecidas` (sin archivo propio, apunta al parquet de
+    `comunas`) se conserva: su `outputs` se reescribe al parquet real del
+    dataset canónico para que el consumidor pueda resolverlo.
+    """
+    import json
+
+    catalog_path = os.path.join(NORMALIZED_DIR, "dataset_catalog.json")
+    with open(catalog_path, encoding="utf-8") as f:
+        catalog = json.load(f)
+
+    manifest_names = {a["path"] for a in artifacts}
+
+    def _has_parquet(dataset_name: str, entry: dict) -> bool:
+        alias_for = entry.get("alias_for")
+        target = alias_for if alias_for else dataset_name
+        return f"data/normalized/{target}.parquet" in manifest_names
+
+    filtered = [
+        entry
+        for entry in catalog.get("datasets", [])
+        if _has_parquet(entry.get("dataset", ""), entry)
+    ]
+    catalog["datasets"] = filtered
+    catalog["dataset_count"] = len(filtered)
+    return json.dumps(catalog, ensure_ascii=False, indent=2) + "\n"
+
+
 def write_publishable_bundle_zip():
     manifest_path = os.path.join(NORMALIZED_DIR, "artifact_manifest.json")
     with open(manifest_path, encoding="utf-8") as f:
@@ -391,10 +426,52 @@ def write_publishable_bundle_zip():
 
     output_path = os.path.join(NORMALIZED_DIR, PUBLISHABLE_BUNDLE_ZIP_NAME)
     tmp_path = output_path + ".tmp"
+
+    # Pre-computa el catálogo filtrado (Plan 071) y sus métricas ANTES de
+    # escribir el ZIP: el manifest embebido y el catálogo deben describirse
+    # mutuamente con los mismos bytes, sin depender del orden de los
+    # artifacts en el manifest (alfabético: artifact_manifest < dataset_catalog).
+    bundle_catalog_text: str | None = None
+    for artifact in artifacts:
+        if artifact["path"] == "data/normalized/dataset_catalog.json":
+            bundle_catalog_text = _bundle_filtered_catalog(artifacts)
+            bundle_catalog_bytes = bundle_catalog_text.encode("utf-8")
+            artifact["size_bytes"] = len(bundle_catalog_bytes)
+            artifact["sha256"] = compute_sha256_bytes(bundle_catalog_bytes)
+            break
+    if bundle_catalog_text is None:
+        raise SystemExit(
+            "Error: el manifest no declara data/normalized/dataset_catalog.json; "
+            "no se puede construir el bundle ZIP."
+        )
+
     with zipfile.ZipFile(tmp_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for artifact in artifacts:
             relative_path = artifact["path"]
             absolute_path = os.path.join(DATA_DIR, os.path.relpath(relative_path, "data"))
+            if relative_path == "data/normalized/dataset_catalog.json":
+                # Catálogo filtrado: solo capas cuyos archivos SÍ viajan en el
+                # bundle (un consumidor no debe encontrar capas sin archivo).
+                archive.writestr(relative_path, bundle_catalog_text)
+                continue
+            if relative_path == "data/normalized/artifact_manifest.json":
+                # Manifest embebido con los size/sha256 del catálogo filtrado,
+                # para que validar el bundle contra su manifest no reporte el
+                # catálogo como corrupto (P1 de la review del Plan 071).
+                archive.writestr(
+                    relative_path,
+                    json.dumps(
+                        {
+                            "generated_at_utc": manifest.get("generated_at_utc"),
+                            "artifact_count": len(artifacts),
+                            "artifacts": artifacts,
+                            "packages": manifest.get("packages", []),
+                        },
+                        ensure_ascii=False,
+                        indent=2,
+                    ),
+                )
+                continue
             archive.write(absolute_path, arcname=relative_path)
 
     with zipfile.ZipFile(tmp_path, "r") as archive:

@@ -130,7 +130,7 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 |---|------|----------|----------|--------|-----------|--------|
 | 069 | [Override INE como delivery visible (no enmascarado como backfill)](069-ine-override-delivery-visible.md) | P1 | M | MED | — | DONE (2026-08-12, commit 6ef22fd — delivery visible en extractor + gates; branch advisor/069 sin merge) |
 | 070 | [Filtrar HF por publication_track (nunca candidate/deprecated)](070-hf-publication-track-filter.md) | P1 | M | MED | — | DONE (2026-08-12, commit d34462f — registry como fuente de carril; branch advisor/070 sin merge) |
-| 071 | [El catálogo del bundle ZIP solo declara capas realmente incluidas](071-bundle-catalog-consistency.md) | P1 | M | MED | coordina 070 | TODO |
+| 071 | [El catálogo del bundle ZIP solo declara capas realmente incluidas](071-bundle-catalog-consistency.md) | P1 | M | MED | coordina 070 | DONE (2026-08-12, commit e9d6041 — catálogo filtrado en el ZIP; branch advisor/071 sin merge) |
 | 072 | [Validar miembros del ZIP antes de extractall (zip-slip/symlink)](072-zip-slip-guard.md) | P2 | S | LOW | — | TODO |
 | 073 | [Contratos disponibles para consumidores instalados (wheel + bundle)](073-contracts-for-consumers.md) | P2 | M | MED | — | TODO |
 | 074 | [Anomalías temporales sobre el punto más reciente (IPC negativo)](074-anomalies-last-point-attribution.md) | P2 | S | LOW | — | TODO |
