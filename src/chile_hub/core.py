@@ -1,4 +1,5 @@
 import functools
+import importlib.resources
 import json
 from datetime import datetime, timezone
 from difflib import get_close_matches
@@ -642,6 +643,42 @@ class ChileHub:
             },
         }
 
+    def _contract_path(self, dataset_name: str) -> Path | None:
+        """Resuelve el contrato de schema de un dataset.
+
+        Plan 073: primero busca en ``self.root_dir / "contracts" / "datasets"``
+        (checkout del repo o bundle con contratos), y si no existe, cae al
+        wheel instalado vía ``importlib.resources`` (los contratos viajan en
+        el paquete desde 073). Sin esto, ``chile-hub validate`` y
+        ``validate_user_data`` fallaban para consumidores de PyPI con
+        "No existe contrato de schema".
+        """
+        checkout_path = self.root_dir / "contracts" / "datasets" / f"{dataset_name}.schema.json"
+        if checkout_path.exists():
+            return checkout_path
+        try:
+            resource = importlib.resources.files("chile_hub") / "contracts" / "datasets"
+            candidate = resource / f"{dataset_name}.schema.json"
+            if candidate.is_file():
+                # as_file() puede materializar el recurso en un temporal que
+                # se elimina al salir del with (p. ej. con zipimport); el Path
+                # retornado quedaría inválido (P2 de la review del Plan 073).
+                # Se copia a un temporal persistente del hub (borrado al
+                # cerrar el proceso) para que el llamador pueda abrirlo.
+                with importlib.resources.as_file(candidate) as materialized:
+                    import shutil
+                    import tempfile
+
+                    tmp = (
+                        Path(tempfile.mkdtemp(prefix="chile_hub_contracts_"))
+                        / f"{dataset_name}.schema.json"
+                    )
+                    shutil.copy2(materialized, tmp)
+                    return tmp
+        except (ImportError, ModuleNotFoundError, FileNotFoundError):
+            pass
+        return None
+
     def validate_dataset(self, dataset_name: str | Dataset) -> dict:
         """Valida los datos publicados del hub contra su contrato JSON Schema.
 
@@ -665,8 +702,8 @@ class ChileHub:
         dataset_name = _resolve_dataset_name(dataset_name)
         from .contracts import verify_dataset_contract
 
-        contract_path = self.root_dir / "contracts" / "datasets" / f"{dataset_name}.schema.json"
-        if not contract_path.exists():
+        contract_path = self._contract_path(dataset_name)
+        if contract_path is None:
             raise ChileHubDatasetError(
                 f"No existe contrato de schema para '{dataset_name}'. "
                 f"Datasets disponibles: {self.list_datasets()}"
@@ -708,8 +745,8 @@ class ChileHub:
             ChileHubDatasetError: Si no existe contrato para el dataset solicitado.
         """
         dataset_name = _resolve_dataset_name(dataset_name)
-        schema_path = self.root_dir / "contracts" / "datasets" / f"{dataset_name}.schema.json"
-        if not schema_path.exists():
+        schema_path = self._contract_path(dataset_name)
+        if schema_path is None:
             raise ChileHubDatasetError(
                 f"No existe contrato de schema para '{dataset_name}'. "
                 f"Datasets disponibles: {self.list_datasets()}"

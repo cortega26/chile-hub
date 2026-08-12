@@ -117,6 +117,13 @@ Documentation = "https://tooltician.com/chile-hub/reference/"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/chile_hub"]
+# Los contratos de schema viajan en el wheel (Plan 073): sin ellos,
+# `chile-hub validate` / `validate_user_data` fallan para consumidores
+# instalados (PyPI) con "No existe contrato de schema". Se montan como
+# src/chile_hub/contracts/datasets/*.schema.json para que el fallback de
+# importlib.resources los encuentre.
+[tool.hatch.build.targets.wheel.force-include]
+"contracts/datasets" = "src/chile_hub/contracts/datasets"
 
 [tool.hatch.build.targets.sdist]
 include = [
@@ -127,6 +134,10 @@ include = [
     "/DATA_LICENSES.md",
     "/CHANGELOG.md",
     "/pyproject.toml",
+    # Los contratos viajan en el sdist para que el build sdist→wheel (el
+    # flujo de pip instalando desde el sdist) tenga el force-include de
+    # [tool.hatch.build.targets.wheel] resuelto (Plan 073).
+    "/contracts",
 ]
 
 [tool.semantic_release]
