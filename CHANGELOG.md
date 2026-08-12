@@ -12,6 +12,24 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.24.1 - 2026-08-12
+
+### Corregido
+
+- **release**: Sincroniza README (pin de version) en el commit de release
+  ([`e6848d8`](https://github.com/cortega26/chile-hub/commit/e6848d879aa68d86a210c96452767fb90d3c3a0a))
+
+### Mantenimiento
+
+- Trigger pipeline tras sync del pin 1.24.0
+  ([`b030e13`](https://github.com/cortega26/chile-hub/commit/b030e13fadd9c9d53d3b10efaa5e50dd33490634))
+
+### Documentación
+
+- Sincroniza pin de README con 1.24.0 tras release intermedio [skip ci]
+  ([`22896c0`](https://github.com/cortega26/chile-hub/commit/22896c0c6c8b78501e94a1ff9ba208f63cdabee4))
+
+
 ## 1.24.0 - 2026-08-12
 
 ### Corregido
