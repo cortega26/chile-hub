@@ -4,6 +4,11 @@ on:
   push:
     branches: [main]
   pull_request:
+  merge_group:
+    # Requerido porque CodeQL es un check requerido de la merge queue (la
+    # cola crea ramas temporales gh-readonly-queue/main/... y dispara
+    # merge_group); sin este trigger, el check requerido nunca se reporta y
+    # la cola espera para siempre.
   schedule:
     - cron: "30 11 * * 1"
   workflow_dispatch:

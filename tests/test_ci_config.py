@@ -520,6 +520,16 @@ class DocsSyncGateGuardrailTests(unittest.TestCase):
         cancel_line = [line for line in content.splitlines() if "cancel-in-progress:" in line][0]
         self.assertNotIn("merge_group", cancel_line)
 
+    def test_required_codeql_check_listens_to_merge_group(self):
+        """CodeQL es un check requerido de la rama: debe escuchar merge_group.
+
+        P1 de la review del PR #61: con CodeQL en los checks requeridos pero
+        sin el trigger merge_group en codeql.yml, cada merge en cola esperaria
+        un check que nunca se reporta y la cola se bloquearia para siempre.
+        """
+        codeql = (ROOT_DIR / ".github" / "workflows" / "codeql.yml").read_text(encoding="utf-8")
+        self.assertIn("merge_group:", codeql)
+
     def test_docs_auto_heal_lives_in_separate_main_only_job(self):
         """El auto-heal debe vivir en un job separado (docs-autosync),
         condicionado a push a main, NUNCA en el job quality (que debe
