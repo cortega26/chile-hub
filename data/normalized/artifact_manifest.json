@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-08-11T23:35:55.510868+00:00",
+  "generated_at_utc": "2026-08-12T00:13:02.836008+00:00",
   "artifact_count": 56,
   "artifacts": [
     {
@@ -90,7 +90,7 @@
       "shared_type": "datapackage",
       "format": "json",
       "size_bytes": 46018,
-      "sha256": "bd3cf16be313b9818d2be4a9793ec6a1d3cbeb8b7baf1abcabcb004253621c69"
+      "sha256": "105b1388519dc78b6dbae1161058df5c4b38b94599be1bc921130c90cff7a150"
     },
     {
       "path": "data/normalized/dataset_catalog.json",
@@ -252,7 +252,7 @@
       "shared_type": "hub_bundle",
       "format": "json",
       "size_bytes": 76548,
-      "sha256": "45cd421094ad04473110f5121dca6a855a5e6c08c9bc4b27fbcaf469c1e4cbd9"
+      "sha256": "865619daf500ee5da3c55506f4f68b46c3d2754c98de7e58becdf7066a815dfd"
     },
     {
       "path": "data/normalized/hub_health.json",
@@ -369,7 +369,7 @@
       "shared_type": "pipeline_metadata",
       "format": "json",
       "size_bytes": 58942,
-      "sha256": "6683607f49be307f3387b33d16e0a5d17afec4ed55bc2b69b7ec63633066c7b3"
+      "sha256": "d0e470f9858643cf09f7d1d5c48c8fe9e42aeeefb75320ff1c607729a7160de4"
     },
     {
       "path": "data/normalized/pipeline_status.md",
@@ -511,8 +511,8 @@
     {
       "path": "data/normalized/chile-hub-publishable-bundle.zip",
       "package_type": "zip",
-      "size_bytes": 29640942,
-      "sha256": "9b18d8d7e968762bf2e59ad0ec0c5bdbc4d9768ec554ed6d2b32abff28794ca6",
+      "size_bytes": 29640945,
+      "sha256": "f8af76b1e9b4901113fa04def9a65372099951361c50711171c23a670d38a50c",
       "checksum_algorithm": "sha256",
       "checksum_path": "data/normalized/chile-hub-publishable-bundle.zip.sha256",
       "verification_command": "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256"

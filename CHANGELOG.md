@@ -12,6 +12,32 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.24.0 - 2026-08-12
+
+### Corregido
+
+- **landing**: Copy factual preciso tras review (17 capas, match exacto, 345 geometrías)
+  ([`eabb9d2`](https://github.com/cortega26/chile-hub/commit/eabb9d209915e33374d4efe747f266280a35ace6))
+
+### Mantenimiento
+
+- Trigger pipeline tras sync de README (1.23.1)
+  ([`b416ea3`](https://github.com/cortega26/chile-hub/commit/b416ea36d434aa12de43cbbb8dae7c795456ec87))
+
+### Documentación
+
+- Sincroniza README con 1.23.1 tras release intermedio [skip ci]
+  ([`7dd1d83`](https://github.com/cortega26/chile-hub/commit/7dd1d839ff101529783bf2298ceb30a6a015a97b))
+
+### Agregado
+
+- **landing**: Hero rediseñado, sección Capacidades y footer estructurado
+  ([`75f7010`](https://github.com/cortega26/chile-hub/commit/75f7010a4e2c6ded2f121d8ea7fcea14e6a974a7))
+
+- **landing**: Reveal al scroll y scrollspy del nav
+  ([`9ef56c9`](https://github.com/cortega26/chile-hub/commit/9ef56c9ebc357c94f1f269bb1aea5b94738073f8))
+
+
 ## 1.23.1 - 2026-08-11
 
 ### Corregido
