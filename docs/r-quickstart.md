@@ -44,13 +44,12 @@ Reemplaza `comunas.parquet` por el nombre del dataset que necesitas (ver la
 
 El bundle publicable no incluye `chile_data.duckdb` (no viaja en el ZIP;
 solo se publican Parquet + JSON). Para cruces SQL con DuckDB, lee los
-Parquet directamente desde el bundle descargado:
+Parquet directamente desde el bundle descargado (rutas locales, sin
+extensiones):
 
 ```r
 library(duckdb)
 con <- dbConnect(duckdb())
-
-dbExecute(con, "INSTALL httpfs; LOAD httpfs;")
 
 dbGetQuery(con,
   "SELECT c.nombre_comuna, c.nombre_region, cc.poblacion_censada
@@ -64,9 +63,10 @@ dbGetQuery(con,
 dbDisconnect(con, shutdown = TRUE)
 ```
 
-> **Nota:** también puedes consultar los Parquet remotos directamente con
-> DuckDB + httpfs (sin descargar el bundle), apuntando a las URLs de la
-> Opción B.
+> **Nota:** las rutas locales no requieren la extensión `httpfs`. Si prefieres
+> consultar los Parquet **remotos** directamente (sin descargar el bundle),
+> ejecuta primero `dbExecute(con, "INSTALL httpfs; LOAD httpfs;")` y usa las
+> URLs de la Opción B.
 
 ## Notas importantes
 
