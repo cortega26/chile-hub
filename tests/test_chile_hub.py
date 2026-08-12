@@ -1734,9 +1734,16 @@ class WorkflowContractTests(unittest.TestCase):
         )
 
     def test_pipeline_check_workflow_uses_split_bounded_jobs(self):
-        for job in ("quality:", "build-and-test:", "package-quality:", "landing:", "publish:"):
+        for job in (
+            "quality:",
+            "docs-autosync:",
+            "build-and-test:",
+            "package-quality:",
+            "landing:",
+            "publish:",
+        ):
             self.assertIn(job, self.workflow_text)
-        self.assertEqual(self.workflow_text.count("timeout-minutes:"), 5)
+        self.assertEqual(self.workflow_text.count("timeout-minutes:"), 6)
         self.assertIn("concurrency:", self.workflow_text)
 
     def test_pipeline_check_workflow_uses_one_generated_output_artifact(self):
