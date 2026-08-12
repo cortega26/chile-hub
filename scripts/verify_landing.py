@@ -295,7 +295,10 @@ def verify_landing():
 
         # Candidate lane section (Plan 082): the carril candidate must be
         # visible in its own section, filtered by search but excluded from
-        # the stable catalog count.
+        # the stable catalog count. The candidate name searched below is
+        # derived from the bundle (the registry is the source of truth for
+        # lane membership), so promoting a candidate to stable (Plan 084)
+        # does not break this check.
         expected_candidate_count = len(bundle.get("candidate_datasets", []))
         candidate_section = page.locator("#cat-candidate")
         if expected_candidate_count > 0:
@@ -316,10 +319,11 @@ def verify_landing():
                 next_action = card.locator(".candidate-next-action").inner_text()
                 if not next_action.strip():
                     fail(f"Expected non-empty next_action on candidate card {index}")
-            page.fill("#catalog-search-input", "perfil_territorial")
+            first_candidate_name = bundle["candidate_datasets"][0]["dataset"]
+            page.fill("#catalog-search-input", first_candidate_name)
             page.wait_for_timeout(200)
-            if not page.locator("#candidate-perfil_territorial_comunal").is_visible():
-                fail("Expected candidate card to be found by search")
+            if not page.locator(f"#candidate-{first_candidate_name}").is_visible():
+                fail(f"Expected candidate card to be found by search: {first_candidate_name}")
             stable_count_text = page.locator("#catalog-count").inner_text()
             if stable_count_text != "0 capas":
                 fail(
