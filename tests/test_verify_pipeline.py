@@ -129,6 +129,30 @@ class VerifyGoldenCopyTests(unittest.TestCase):
     def test_dataset_catalog_passes(self) -> None:
         vp.verify_dataset_catalog()
 
+    def test_catalog_accepts_ine_override_delivery(self) -> None:
+        """El delivery `ine_override` debe ser aceptado por el catálogo.
+
+        Plan 069: el override INE (issue #43) scrapea la variación mensual
+        del IPC desde la fuente autoritativa; el delivery debe ser visible
+        para que el gate evalúe el dato real. Sin esta entrada en el
+        allowlist, el build con override fallaría.
+        """
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            norm = base / "data" / "normalized"
+            norm.mkdir(parents=True)
+            dst = norm / "dataset_catalog.json"
+            shutil.copy2(self._golden_dir / "data" / "normalized" / "dataset_catalog.json", dst)
+
+            catalog = _read_json(dst)
+            indicadores = next(e for e in catalog["datasets"] if e["dataset"] == "indicadores")
+            indicadores["indicator_delivery"]["ipc"] = "ine_override"
+            _write_json(dst, catalog)
+
+            self._patch_paths(base)
+            self.addCleanup(self.tearDown)
+            vp.verify_dataset_catalog()  # no debe lanzar SystemExit
+
     def test_pipeline_metadata_passes(self) -> None:
         vp.verify_pipeline_metadata()
 
@@ -468,6 +492,28 @@ class VerifySyntheticTests(unittest.TestCase):
         self._run_policy(self._indicadores_with_backfill(code="dolar", age_days=8))
         with patch("builtins.print"), self.assertRaises(SystemExit):
             self._run_policy(self._indicadores_with_backfill(code="dolar", age_days=12))
+
+    def test_ine_override_delivery_is_not_unsafe_and_is_age_gated(self) -> None:
+        """El delivery `ine_override` no es unsafe pero SÍ dispara el gate de
+        edad.
+
+        Plan 069 + P1 de la review: el override INE entrega el valor del IPC
+        desde la fuente autoritativa; etiquetarlo como `published_backfill`
+        enmascaraba el dato scrapeado. Con el delivery visible, el gate debe
+        aceptarlo (no unsafe) PERO aplicar el umbral de edad igual que al
+        backfill: si la página del INE sirve el mismo valor mes tras mes, el
+        dato entregado es stale y el build debe rechazarse (ADR-016 mide la
+        edad del dato entregado, no la fuente).
+        """
+        # Override fresco (60 dias < umbral mensual de 70): aceptado.
+        self._run_policy(
+            self._indicadores_with_backfill(code="ipc", age_days=60, status="ine_override")
+        )
+        # Override stale (240 dias > umbral): rechazado, igual que el backfill.
+        with patch("builtins.print"), self.assertRaises(SystemExit):
+            self._run_policy(
+                self._indicadores_with_backfill(code="ipc", age_days=240, status="ine_override")
+            )
 
     def test_live_delivery_is_never_flagged_by_the_backfill_gate(self) -> None:
         """Una serie vieja pero entregada en vivo es problema de frescura,

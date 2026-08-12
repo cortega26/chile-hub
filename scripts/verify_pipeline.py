@@ -541,20 +541,22 @@ def verify_publication_policy(
         unsafe_delivery = {
             code: status
             for code, status in indicadores.get("indicator_delivery", {}).items()
-            if status not in {"live", "published_backfill"}
+            if status not in {"live", "published_backfill", "ine_override"}
         }
         if unsafe_delivery:
             violations.append(f"indicadores: unsafe delivery={unsafe_delivery}")
 
-        # Backfill consciente de la edad (ADR-016): `published_backfill` es una
-        # degradación con gracia legítima ante un hueco transitorio, pero repetida
-        # build tras build esconde una serie muerta. Se mide la edad del dato
-        # ENTREGADO, con umbral por cadencia.
+        # Backfill consciente de la edad (ADR-016): `published_backfill` y
+        # `ine_override` son entregas que pueden quedarse stale si la fuente
+        # (agregador O INE) deja de actualizar: la edad se mide sobre el dato
+        # ENTREGADO, con umbral por cadencia. Un override INE con el mismo
+        # valor mes tras mes es tan stale como un backfill repetido — el gate
+        # debe rechazarlo igual (P1 de la review del Plan 069).
         delivery = indicadores.get("indicator_delivery", {})
         ages = indicadores.get("indicator_age_days", {})
         stale_backfills = {}
         for code, status in delivery.items():
-            if status != "published_backfill":
+            if status not in {"published_backfill", "ine_override"}:
                 continue
             age = ages.get(code)
             if age is None:
@@ -906,6 +908,11 @@ def verify_dataset_catalog():
                 "raw_recovery",
                 "preserved_existing",
                 "published_backfill",
+                # Override de último recurso desde la fuente autoritativa INE
+                # (issue #43): el valor scrapeado es NUEVO, no una reutilización
+                # del artefacto publicado. Plan 069 — delivery visible para que
+                # el gate evalúe el dato real.
+                "ine_override",
             }
             invalid_statuses = {
                 code: status

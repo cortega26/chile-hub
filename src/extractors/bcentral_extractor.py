@@ -457,10 +457,14 @@ def process_indicators() -> str:
         indicator_delivery[pair.split("/", 1)[0]] = "raw_recovery"
     for pair in diagnostics.get("preserved_existing_pairs", []):
         indicator_delivery[pair.split("/", 1)[0]] = "preserved_existing"
-    for pair in diagnostics.get("ine_override_pairs", []):
-        indicator_delivery[pair.split("/", 1)[0]] = "ine_override"
     for code in diagnostics.get("published_backfills", []):
         indicator_delivery[code] = "published_backfill"
+    # El override (último recurso, fuente autoritativa) gana sobre el backfill:
+    # el bucle anterior etiqueta la serie como "reutilización del artefacto
+    # publicado" (falso cuando el valor viene del INE). El delivery debe ser
+    # visible para que el gate de publicación evalúe el dato real. Plan 069.
+    for pair in diagnostics.get("ine_override_pairs", []):
+        indicator_delivery[pair.split("/", 1)[0]] = "ine_override"
 
     df.write_csv(STAGING_CSV_PATH)
 
