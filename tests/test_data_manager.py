@@ -252,6 +252,33 @@ class ChileHubDataManagerUnitTests(unittest.TestCase):
             self.assertFalse((Path(tmpdir).parent / "evil.txt").exists())
             self.assertFalse((Path(tmpdir) / "evil.txt").exists())
 
+    def test_extract_rejected_bundle_preserves_existing_cache(self):
+        """Un bundle rechazado NO debe destruir la caché verificada previa.
+
+        P2 de la review del Plan 072: la validación de miembros ocurría
+        DESPUÉS del rmtree del cache — un bundle checksum-válido pero
+        rechazado dejaba al usuario sin sus datos verificados. Ahora la
+        validación es previa: la caché existente se preserva ante rechazo.
+        """
+        import zipfile
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            manager = self._make_extract_manager(tmpdir)
+            manager.normalized_dir.mkdir(parents=True, exist_ok=True)
+            marker = manager.normalized_dir / "verified.txt"
+            marker.write_text("verified-data")
+
+            bundle_path = manager.version_cache_dir / "evil.zip"
+            with zipfile.ZipFile(bundle_path, "w") as zf:
+                zf.writestr("../evil.txt", "pwned")
+
+            with self.assertRaises(ChileHubDataError):
+                manager._extract_bundle(bundle_path)
+
+            # La caché verificada previa sigue intacta.
+            self.assertTrue(marker.exists())
+            self.assertEqual(marker.read_text(), "verified-data")
+
     def test_extract_rejects_out_of_tree_member(self):
         """_extract_bundle() rechaza un miembro fuera de data/normalized/."""
         import zipfile
