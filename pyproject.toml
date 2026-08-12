@@ -134,6 +134,10 @@ include = [
     "/DATA_LICENSES.md",
     "/CHANGELOG.md",
     "/pyproject.toml",
+    # Los contratos viajan en el sdist para que el build sdist→wheel (el
+    # flujo de pip instalando desde el sdist) tenga el force-include de
+    # [tool.hatch.build.targets.wheel] resuelto (Plan 073).
+    "/contracts",
 ]
 
 [tool.semantic_release]
