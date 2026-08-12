@@ -396,6 +396,62 @@ function wireDatasetExampleInteractions() {
     });
 }
 
+function renderCandidateSection(bundle, grid, artifactManifestByPath) {
+    const candidates = bundle.candidate_datasets || [];
+    if (candidates.length === 0) return;
+
+    const cardsHtml = candidates.map(candidate => {
+        const searchable = [candidate.dataset, candidate.maturity_status, candidate.source_detail, candidate.next_action]
+            .filter(Boolean)
+            .join(" ");
+        return `
+            <article class="dataset-card candidate-card" id="candidate-${escapeHtml(candidate.dataset)}" data-search="${escapeHtml(searchable)}">
+                <div class="dataset-card-top">
+                    <div>
+                        <h4 class="dataset-name">${escapeHtml(candidate.dataset)}</h4>
+                        <div class="dataset-desc">Evaluado, no incluido en el bundle público.</div>
+                    </div>
+                    <span class="dataset-badge candidate">candidate</span>
+                </div>
+
+                <div class="dataset-facts-grid">
+                    <div class="dataset-fact-mini">
+                        <span class="dataset-fact-mini-label">Estado</span>
+                        <span class="dataset-fact-mini-value">${escapeHtml(candidate.maturity_status || "unknown")}</span>
+                    </div>
+                    <div class="dataset-fact-mini">
+                        <span class="dataset-fact-mini-label">Fuente</span>
+                        <span class="dataset-fact-mini-value" title="${escapeHtml(candidate.source_detail || "")}">${escapeHtml(candidate.source_detail || "N/D")}</span>
+                    </div>
+                </div>
+
+                <div class="candidate-next-action">${escapeHtml(candidate.next_action || "Sin acción registrada.")}</div>
+
+                <div class="dataset-card-actions">
+                    <a class="btn-card-action muted" href="data/normalized/hub_bundle.json" target="_blank" rel="noopener noreferrer">Ver metadata en Bundle JSON</a>
+                </div>
+            </article>
+        `;
+    }).join("");
+
+    const section = document.createElement("section");
+    section.className = "catalog-category candidate-category";
+    section.id = "cat-candidate";
+    section.innerHTML = `
+        <div class="catalog-category-header">
+            <h3 class="catalog-category-title">
+                En evaluación
+                <span class="candidate-chip">candidate</span>
+                <span class="catalog-category-count">${candidates.length}</span>
+            </h3>
+        </div>
+        <div class="catalog-grid-sub">
+            ${cardsHtml}
+        </div>
+    `;
+    grid.appendChild(section);
+}
+
 function filterCatalog() {
     if (!catalogGrid || !catalogCount) return;
     const query = (catalogSearchInput?.value || "")
@@ -421,7 +477,11 @@ function filterCatalog() {
         cat.hidden = !hasVisibleCards;
     });
 
-    catalogCount.textContent = `${visibleCount} ${visibleCount === 1 ? "capa" : "capas"}`;
+    // El contador refleja solo el catálogo estable: las cards candidate
+    // (carril candidate, fuera del bundle público) filtran pero no cuentan.
+    const stableVisibleCount = [...catalogGrid.querySelectorAll(".dataset-card:not(.candidate-card)")]
+        .filter(card => !card.hidden).length;
+    catalogCount.textContent = `${stableVisibleCount} ${stableVisibleCount === 1 ? "capa" : "capas"}`;
 
     const existingNoResults = catalogGrid.querySelector(".no-results-message");
     if (existingNoResults) existingNoResults.remove();
@@ -981,6 +1041,10 @@ function renderCatalog(bundle) {
         directorios: {
             title: "Directorios Oficiales y Economía",
             datasets: ["establecimientos_salud", "establecimientos_educacionales", "empresas", "indicadores"]
+        },
+        gobierno: {
+            title: "Gobierno y Política",
+            datasets: ["partidos_politicos", "autoridades_electas"]
         }
     };
 
@@ -1059,6 +1123,8 @@ function renderCatalog(bundle) {
     }).join("");
 
     catalogGrid.innerHTML = categoriesHtml;
+
+    renderCandidateSection(bundle, catalogGrid, artifactManifestByPath);
 
     filterCatalog();
 

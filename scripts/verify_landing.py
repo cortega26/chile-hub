@@ -293,6 +293,49 @@ def verify_landing():
         page.fill("#catalog-search-input", "")
         page.wait_for_timeout(200)
 
+        # Candidate lane section (Plan 082): the carril candidate must be
+        # visible in its own section, filtered by search but excluded from
+        # the stable catalog count. The candidate name searched below is
+        # derived from the bundle (the registry is the source of truth for
+        # lane membership), so promoting a candidate to stable (Plan 084)
+        # does not break this check.
+        expected_candidate_count = len(bundle.get("candidate_datasets", []))
+        candidate_section = page.locator("#cat-candidate")
+        if expected_candidate_count > 0:
+            if not candidate_section.is_visible():
+                fail(
+                    "Expected #cat-candidate section to be visible with candidate datasets in the bundle"
+                )
+            candidate_cards = page.locator(".candidate-card")
+            if candidate_cards.count() != expected_candidate_count:
+                fail(
+                    f"Expected {expected_candidate_count} candidate cards, got {candidate_cards.count()}"
+                )
+            for index in range(candidate_cards.count()):
+                card = candidate_cards.nth(index)
+                badge = card.locator(".dataset-badge.candidate")
+                if badge.count() != 1 or badge.inner_text().strip().lower() != "candidate":
+                    fail(f"Expected candidate badge on candidate card {index}")
+                next_action = card.locator(".candidate-next-action").inner_text()
+                if not next_action.strip():
+                    fail(f"Expected non-empty next_action on candidate card {index}")
+            first_candidate_name = bundle["candidate_datasets"][0]["dataset"]
+            page.fill("#catalog-search-input", first_candidate_name)
+            page.wait_for_timeout(200)
+            if not page.locator(f"#candidate-{first_candidate_name}").is_visible():
+                fail(f"Expected candidate card to be found by search: {first_candidate_name}")
+            stable_count_text = page.locator("#catalog-count").inner_text()
+            if stable_count_text != "0 capas":
+                fail(
+                    f"Expected candidate search to keep stable count at 0, got '{stable_count_text}'"
+                )
+            page.fill("#catalog-search-input", "")
+            page.wait_for_timeout(200)
+            stable_count_text = page.locator("#catalog-count").inner_text()
+            expected_stable = str(len(bundle.get("datasets", [])))
+            if stable_count_text.split(" ")[0] != expected_stable:
+                fail(f"Expected stable catalog count {expected_stable}, got '{stable_count_text}'")
+
         repo_href = page.get_by_role("link", name="GitHub Repo").get_attribute("href")
         if repo_href != "https://github.com/cortega26/chile-hub":
             fail(f"Unexpected repo href: {repo_href}")
