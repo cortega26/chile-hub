@@ -211,6 +211,11 @@ def main(argv: list[str] | None = None) -> None:
             repo_id=args.repo_id,
             repo_type="dataset",
             commit_message=f"chore(data): publish chile-hub {version}",
+            # upload_folder NO sincroniza borrados remotos: sin delete_patterns,
+            # un parquet candidate subido en releases anteriores (Plan 070) se
+            # quedaria en el mirror para siempre. Se borran explicitamente los
+            # parquets que ya no pertenecen al set publicable.
+            delete_patterns=["data/*.parquet"],
         )
         print(f"Publicado {args.repo_id} (chile-hub {version}).")
 

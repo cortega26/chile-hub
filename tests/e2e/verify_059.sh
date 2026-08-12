@@ -3,14 +3,14 @@
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/../.."
 
-echo "-- make build && publish_hf_dataset.py --dry-run lista 19 parquet --"
+echo "-- make build && publish_hf_dataset.py --dry-run lista 17 parquet --"
 make build >/dev/null
 DRY_RUN_OUTPUT="$(.venv/bin/python scripts/publish_hf_dataset.py --dry-run)"
 echo "$DRY_RUN_OUTPUT"
-test "$(echo "$DRY_RUN_OUTPUT" | grep -c 'data/.*\.parquet')" = "19"
+test "$(echo "$DRY_RUN_OUTPUT" | grep -c 'data/.*\.parquet')" = "17"
 
 echo "-- el dry-run NO lista datasets del carril candidate --"
-test "$(echo "$DRY_RUN_OUTPUT" | grep -c 'delincuencia_comunal\|autoridades_locales\|geometria_comunal')" = "0"
+test "$(echo "$DRY_RUN_OUTPUT" | grep -c 'delincuencia_comunal\|autoridades_locales\|geometria_comunal\|perfil_territorial_comunal\|consumo_electrico_comunal')" = "0"
 git checkout -- data/normalized/ README.md index.html 2>/dev/null || true
 make sync-docs >/dev/null
 
