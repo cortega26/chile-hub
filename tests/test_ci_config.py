@@ -490,6 +490,42 @@ class LandingSyncGateGuardrailTests(unittest.TestCase):
                 self.assertIn(f"class=\"pill ' + {var}", content)
 
 
+class DocsSyncGateGuardrailTests(unittest.TestCase):
+    """El gate de sync de docs debe auto-corregirse en push a main (carrera
+    con releases) pero seguir bloqueante en PRs.
+
+    Regresion 2026-08-12 (x2): semantic-release publico 1.23.1, 1.24.0 y
+    1.24.1 en menos de una hora; el release pushea el bump de version entre
+    la creacion de un PR y su merge, dejando el pin del README con la version
+    anterior. El CI del merge fallaba con "sync_readme_version_pin_example"
+    pese a que el PR no tenia regresion — un drift operativamente inevitable.
+    """
+
+    def test_quality_job_runs_docs_sync_gate(self):
+        content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("python scripts/sync_docs.py --check", content)
+
+    def test_docs_auto_heal_only_on_push_to_main(self):
+        """El auto-heal debe estar condicionado a push a main; nunca escribir
+        en la rama de un PR ni en otras vias (schedule/dispatch)."""
+        content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn(
+            'if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]]',
+            content,
+        )
+        # El commit del bot usa GITHUB_TOKEN (no dispara workflows push -> sin loop).
+        self.assertIn("git push origin HEAD:main", content)
+        self.assertIn('git commit -m "docs: auto-sync tras carrera con release [skip ci]"', content)
+
+    def test_docs_gate_still_blocking_on_pr(self):
+        """En PRs el gate sigue exigiendo el sync del autor (exit 1)."""
+        content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn(
+            "echo \"::error::Bloques de docs desincronizados. Corre 'make sync-docs'", content
+        )
+        self.assertIn("exit 1", content)
+
+
 class AgentsSyncGateGuardrailTests(unittest.TestCase):
     """AGENTS.md es prosa curada: sus hechos contables (anclas de líneas,
     listas de módulos del §2, tabla de capas del §1) no se regeneran con

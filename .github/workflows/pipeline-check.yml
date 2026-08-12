@@ -37,6 +37,10 @@ jobs:
     if: github.event_name != 'push' || !contains(github.event.head_commit.message, '[skip ci]')
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    # contents: write solo se usa en el paso de auto-heal de docs, que está
+    # condicionado a push a main (nunca escribe en PRs ni en otras vías).
+    permissions:
+      contents: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -82,7 +86,34 @@ jobs:
         run: python scripts/check_companion_paths.py registry
 
       - name: Check docs sync (README hardcoded facts)
-        run: python scripts/sync_docs.py --check
+        run: |
+          if python scripts/sync_docs.py --check; then
+            exit 0
+          fi
+          # Drift de docs detectado. En push a main, la causa habitual es una
+          # carrera con un release: semantic-release pushea el bump de version
+          # entre la creacion de un PR y su merge, dejando el pin del README
+          # con la version anterior. El sync es determinista (regenera desde la
+          # fuente de verdad), asi que auto-corregirlo en main es estrictamente
+          # mejor que fallar: el pipeline actual sigue pasando y el siguiente
+          # push/schedule ya parte consistente. El commit usa GITHUB_TOKEN
+          # (que NO dispara workflows push — ver pages-deploy.yml), evitando
+          # un loop de pipelines.
+          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "::warning::Bloques de docs desincronizados en push a main (probable carrera con release); auto-corrigiendo..."
+            python scripts/sync_docs.py
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add README.md AGENTS.md
+            git commit -m "docs: auto-sync tras carrera con release [skip ci]" || echo "Sin cambios para commitear"
+            git push origin HEAD:main
+            echo "Auto-sync commiteado; el pipeline continua con el estado corregido."
+            exit 0
+          fi
+          # En PRs y demas vias el gate sigue siendo bloqueante: el autor debe
+          # traer el sync (nunca escribimos en la rama del autor).
+          echo "::error::Bloques de docs desincronizados. Corre 'make sync-docs' y commitea el resultado."
+          exit 1
 
       # Adelanta a cada push/PR la deriva que "Check build-synced files" solo
       # detecta en la vía schedule, tras un build completo (ver #270 con
