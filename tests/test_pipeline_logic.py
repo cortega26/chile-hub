@@ -1,5 +1,6 @@
 import datetime
 import json
+import os
 import re
 import sys
 import tempfile
@@ -3085,6 +3086,29 @@ class DocSyncTests(unittest.TestCase):
     """Tests para src/builders/doc_sync.py: sincroniza hechos hardcodeados de
     README.md (conteo de tests/ADRs/contratos, badge, pin de versión, salud,
     calidad, redistribución) con su fuente de verdad. Ver AGENTS.md §12."""
+
+    def test_extractor_inventory_includes_ine_ipc(self):
+        """El inventario de extractores de AGENTS.md debe incluir ine_ipc.py.
+
+        Plan 081: ine_ipc.py no sigue la convención *_extractor (es un
+        override de último recurso, no un extractor por dataset), pero es
+        parte del carril diario de indicadores. Sin incluirlo en
+        _SHARED_MODULES, el gate anti-drift decía 19 extractores cuando hay
+        20 módulos de extracción — un punto ciego del §12.
+        """
+        from src.builders import doc_sync
+
+        self.assertIn("ine_ipc.py", doc_sync._SHARED_MODULES)
+        self.assertIn("ine_ipc.py", doc_sync._AGENTS_EXTRACTOR_DESCRIPTIONS)
+        all_extractor_files = {
+            f
+            for f in os.listdir(doc_sync.EXTRACTORS_DIR)
+            if f.endswith(".py") and f != "__init__.py"
+        }
+        listed = set(doc_sync._SHARED_MODULES) | {
+            f for f in all_extractor_files if f.endswith("_extractor.py")
+        }
+        self.assertEqual(all_extractor_files, listed)
 
     def _readme(self, tmpdir, *blocks):
         lines = ["# README de prueba", ""]

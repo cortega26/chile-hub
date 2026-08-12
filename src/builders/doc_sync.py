@@ -250,6 +250,7 @@ _AGENTS_EXTRACTOR_DESCRIPTIONS = {
     "http_utils.py": "Reintentos/backoff HTTP compartidos",
     "region_utils.py": "Normalización de nombres de región compartida",
     "source_adapter.py": "Adaptador de fuente compartido",
+    "ine_ipc.py": "Override de IPC desde el INE (fuente autoritativa; Plan 069)",
     "subdere_extractor.py": (
         "DPA: regiones/provincias/comunas/comunas_enriquecidas (BCN ArcGIS) → data/staging/"
     ),
@@ -293,7 +294,17 @@ _AGENTS_EXTRACTOR_DESCRIPTIONS = {
 
 EXTRACTORS_DIR = os.path.join(ROOT_DIR, "src", "extractors")
 
-_SHARED_MODULES = {"base.py", "http_utils.py", "region_utils.py", "source_adapter.py"}
+_SHARED_MODULES = {
+    "base.py",
+    "http_utils.py",
+    "region_utils.py",
+    "source_adapter.py",
+    # ine_ipc.py no sigue la convención *_extractor (es un override de
+    # último recurso, no un extractor por dataset) pero es parte del carril
+    # diario de indicadores — sin esto, el inventario decía 19 extractores
+    # cuando hay 20 módulos de extracción (Plan 081).
+    "ine_ipc.py",
+}
 
 
 def sync_agents_extractor_list(check_only=False):
