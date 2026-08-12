@@ -12,6 +12,27 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.25.1 - 2026-08-12
+
+### Corregido
+
+- **validation**: El punto más reciente ≤0 se evalúa con detector de nivel (Plan 074)
+  ([`efa42a2`](https://github.com/cortega26/chile-hub/commit/efa42a2ddbcbccd057ff425269fb7dc161a8b614))
+
+- **validation**: Ruptura de serie constante con MAD=0 se reporta (P2 del 074)
+  ([`aef3e3f`](https://github.com/cortega26/chile-hub/commit/aef3e3fd077406c3c2ffa667ed0bfe556d32c271))
+
+### Mantenimiento
+
+- Ignora codegraph.lock (artefacto local del indexador)
+  ([`b12bf72`](https://github.com/cortega26/chile-hub/commit/b12bf72acbbd51dbf22c27edb58b97bd999357c2))
+
+### Documentación
+
+- Sincroniza conteo de validation.py (1505)
+  ([`631443e`](https://github.com/cortega26/chile-hub/commit/631443eac5977691b79fb8d43061b68b1ff3469e))
+
+
 ## 1.25.0 - 2026-08-12
 
 ### Corregido
