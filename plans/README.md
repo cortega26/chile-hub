@@ -117,7 +117,73 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 
 ## Planes activos
 
-_No hay planes activos — la cola está vacía (2026-08-11)._
+> **Auditoría `/improve deep` 2026-08-12 (commit `53781e2`)**: planes **069–085**
+> (17 hallazgos net-positivos + 4 de dirección). Re-auditoría tras 3 días de
+> cambios densos (release chain, IPC INE, CLI refactor, landing, merge queue).
+> Cuatro subagentes por categoría (correctness/security, perf/deps, tests/DX,
+> docs/direction); todos los hallazgos vetados por el advisor contra el código
+> y los artefactos reales. **Los 3 primeros (069–071) están confirmados en
+> producción** (metadata real, mirror HF real, ZIP real) — son bugs que
+> violan la política declarada, no opiniones.
+
+| # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
+|---|------|----------|----------|--------|-----------|--------|
+| 069 | [Override INE como delivery visible (no enmascarado como backfill)](069-ine-override-delivery-visible.md) | P1 | M | MED | — | TODO |
+| 070 | [Filtrar HF por publication_track (nunca candidate/deprecated)](070-hf-publication-track-filter.md) | P1 | M | MED | — | TODO |
+| 071 | [El catálogo del bundle ZIP solo declara capas realmente incluidas](071-bundle-catalog-consistency.md) | P1 | M | MED | coordina 070 | TODO |
+| 072 | [Validar miembros del ZIP antes de extractall (zip-slip/symlink)](072-zip-slip-guard.md) | P2 | S | LOW | — | TODO |
+| 073 | [Contratos disponibles para consumidores instalados (wheel + bundle)](073-contracts-for-consumers.md) | P2 | M | MED | — | TODO |
+| 074 | [Anomalías temporales sobre el punto más reciente (IPC negativo)](074-anomalies-last-point-attribution.md) | P2 | S | LOW | — | TODO |
+| 075 | [Acoplar valor y período en el regex del override INE](075-ine-regex-value-period-coupling.md) | P2 | S | LOW-MED | — | TODO |
+| 076 | [RES incremental — descargar solo el año en curso](076-res-incremental-fetch.md) | P2 | M | MED | — | TODO |
+| 077 | [Caracterizar build_dev_db.py (cobertura 21% → ≥60%)](077-characterize-build-dev-db.md) | P2 | L | MED | — | TODO |
+| 078 | [Paralelizar CEAD y geometría (scrapes secuenciales)](078-parallelize-cead-geometria.md) | P2 | M | MED | — | TODO |
+| 079 | [Cobertura de writers y extractores sin test (geo, CEAD, reports)](079-cover-geo-cead-reports.md) | P2 | M | LOW | 077 (helper) | TODO |
+| 080 | [Higiene de tests (red real, sleeps, staleness, e2e, Makefile)](080-test-hygiene-batch.md) | P3 | M | LOW-MED | — | TODO |
+| 081 | [Docs — quickstart R, marcas de carril, inventario de extractores](081-docs-quickstart-lanes-inventory.md) | P3 | S | LOW | — | TODO |
+| 082 | [Mostrar el carril candidate en la landing](082-landing-candidate-lane.md) | P3 | M | MED | 070, 071 | TODO |
+| 083 | [Señal proactiva de review_by inminente](083-review-approaching-signal.md) | P3 | S-M | LOW | — | TODO |
+| 084 | [Promover perfil_territorial_comunal al bundle estable](084-promote-perfil-territorial.md) | P3 (decisión) | S-M | MED | 070, 071 | TODO |
+| 085 | [ADR multi-fuente para el override de IPC](085-adr-multi-source-ipc-override.md) | P3 | M | LOW | 069, 075 | TODO |
+
+## Dependencias y orden recomendado
+
+**Lote 1 (bugs confirmados en producción — P1):**
+069 → 070 → 071. 069 (delivery INE visible) debe preceder a 070 (ambos tocan
+el flujo de indicadores); 071 coordina con 070 en la noción de "publicable".
+
+**Lote 2 (seguridad/consumidor):**
+072, 073 (independientes).
+
+**Lote 3 (correctness del override + perf diaria):**
+074, 075 (el guard del valor INE), 076 (RES incremental, mayor ahorro diario).
+
+**Lote 4 (tests):**
+077 (caracterización build_dev_db, base para 079) → 079 (helper compartido),
+078 (paralelización), 080 (higiene).
+
+**Lote 5 (docs + dirección):**
+081 (docs), 082/083/084/085 (dirección — los 4 requieren decisión o
+ratificación del mantenedor; 084 es decisión de producto).
+
+## Hallazgos considerados y rechazados (2026-08-12)
+
+- **PERF-01 (builds incrementales)**: confirmado correctamente diferido — sin
+  telemetría de duración y con timeout real de CI de 30 min < umbral de 45;
+  el accionable es medir (dentro del lote de perf), no implementar deltas hoy.
+- **PERF-6 (re-lectura de parquet en verify)**: coste aceptado — el guard
+  post-build independiente tiene valor anti-regresión.
+- **PERF-7 (fallback por-comuna de geometría)**: solo aplica en degradación;
+  absorbido por 078 (paralelización).
+- **SECURITY-03 (temp paths fijos)**: race teórico sin ejecución concurrente
+  (CI serializa); registrado, no planificado.
+- **CORRECTNESS-05 (caché de DataFrames no invalidada)**: real pero requiere
+  decisión de API; documentado como follow-up, no plan.
+- **SECURITY-02 (SQL interpolado en sql())**: riesgo limitado al trust domain
+  del catálogo; fragilidad de comillas real pero de bajo impacto; no plan.
+- **DX-05 (cache de staging ~2 GB)**: beneficio incierto; requiere
+  re-verificación en runner; no plan.
+- **TC-04/05 (caracterización restante de tests)**: cubiertos por 077/079/080.
 
 ## Orden de ejecución actualizado (2026-07-26)
 
@@ -128,9 +194,10 @@ _No hay planes activos — la cola está vacía (2026-08-11)._
 > dependen del operador. La secuencia vigente se reduce a los pasos 1–3 de abajo.
 >
 > **Cierre final (2026-08-11)**: con el 064 DONE (2026-07-29) y el 065 DONE y
-> mergeado (PR #54), la secuencia se agotó — **no quedan planes activos**. El 053
-> (plan maestro de geometría) se archivó el mismo día; ver su fila en "Planes
-> archivados (2026-07-24)".
+> mergeado (PR #54), la secuencia se agotó. El 053 (plan maestro de geometría)
+> se archivó el mismo día; ver su fila en "Planes archivados (2026-07-24)".
+> La cola se reabrió con la auditoría 2026-08-12 (planes 069–085, ver
+> "Planes activos").
 
 1. **065** — DONE (2026-08-11): `resolve_by_coords()` implementado y verificado end-to-end contra el artefacto de Pages (ver fila archivada). La cola de planes está vacía.
 
