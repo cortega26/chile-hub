@@ -59,10 +59,10 @@ Actualmente publica veintidós (<!-- START_AGENTS_DATASET_COUNT -->22<!-- END_AG
 | **Finanzas Municipales** | SINIM / SUBDERE | Indicadores financieros municipales anuales por comuna |
 | **Resultados Educacionales** | MINEDUC | Métricas educacionales agregadas por comuna y año, sin registros personales |
 | **Indicadores Urbanos SIEDU** | INE / SIEDU | Indicadores urbanos en formato largo con cobertura parcial esperada |
-| **Perfil Territorial Comunal** | chile-hub derivado | Una fila por comuna con métricas territoriales consolidadas |
+| **Perfil Territorial Comunal** | chile-hub derivado | Una fila por comuna con métricas territoriales consolidadas (carril `candidate`, `review_by` 2026-09-18) |
 | **Empresas (RES)** | Ministerio de Economía / datos.gob.cl | Registro de constituciones de empresas bajo Ley 20.659 con RUT, razón social, tipo societario y comuna |
 | **Pobreza Comunal (SAE)** | MDS / Observatorio Social | Estimaciones de pobreza por ingresos y multidimensional por comuna |
-| **Consumo Eléctrico Comunal** | CNE / Energía Abierta | Consumo eléctrico anual por comuna y tipo de cliente |
+| **Consumo Eléctrico Comunal** | CNE / Energía Abierta | Consumo eléctrico anual por comuna y tipo de cliente (carril `candidate` — fuente CNE descontinuada, `maturity_status: deprecated`) |
 | **Partidos Políticos** | Cámara de Diputados / SERVEL | Roster de partidos políticos vigentes e históricos con estado legal |
 | **Autoridades Electas** | Cámara de Diputados + Senado | Diputados y senadores en ejercicio, con partido y distrito o circunscripción |
 | **Delincuencia Comunal** | CEAD / Subsecretaría de Prevención del Delito | Casos policiales DMCS y otras categorías por comuna y mes (carril `candidate`, ver nota abajo) |
@@ -91,9 +91,10 @@ chile-hub/
 │
 ├── src/
 <!-- START_AGENTS_EXTRACTOR_LIST -->
-│   ├── extractors/                 19 extractores por dataset + 4 módulos compartidos (ver nota abajo)
+│   ├── extractors/                 19 extractores por dataset + 5 módulos compartidos (ver nota abajo)
 │   │   ├── base.py                                       BaseExtractor ABC (contrato para todos los extractores)
 │   │   ├── http_utils.py                                 Reintentos/backoff HTTP compartidos
+│   │   ├── ine_ipc.py                                    Override de IPC desde el INE (fuente autoritativa; Plan 069)
 │   │   ├── region_utils.py                               Normalización de nombres de región compartida
 │   │   ├── source_adapter.py                             Adaptador de fuente compartido
 │   │   ├── autoridades_electas_extractor.py              Diputados y senadores en ejercicio → data/staging/

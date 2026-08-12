@@ -1,5 +1,8 @@
 # Perfil Territorial Comunal
 
+> **Carril:** `candidate` — NO incluido en el bundle público. Revisión de
+> carril programada (`review_by` 2026-09-18, ver `data/source_registry.json`).
+
 ## Descripción
 
 Tabla derivada con una fila por comuna que consolida la DPA, Censo 2024, hogares y viviendas, salud, educación, distritos electorales, finanzas municipales, resultados educacionales y resumen SIEDU.

@@ -14,7 +14,7 @@ download.file(url, tmp, mode = "wb")
 unzip(tmp, exdir = "chile-hub-data")
 
 library(arrow)
-comunas <- read_parquet("chile-hub-data/comunas.parquet")
+comunas <- read_parquet("chile-hub-data/data/normalized/comunas.parquet")
 head(comunas)
 ```
 
@@ -23,7 +23,9 @@ Para verificar la integridad del ZIP descargado, compara su hash con el archivo
 (usa el paquete `digest` o `openssl dgst -sha256` en terminal).
 
 > **Nota:** la URL `releases/latest/download/` es estable entre versiones;
-> apunta siempre al release publicado más reciente.
+> apunta siempre al release publicado más reciente. El bundle contiene los
+> artefactos bajo el prefijo `data/normalized/` (ver la Opción B para leer
+> sin descargar).
 
 ## Opción B — Parquet individual por URL directa
 
@@ -40,22 +42,31 @@ Reemplaza `comunas.parquet` por el nombre del dataset que necesitas (ver la
 
 ## Opción C — DuckDB (cruces SQL)
 
-Conecta directamente al archivo DuckDB del bundle para hacer cruces SQL:
+El bundle publicable no incluye `chile_data.duckdb` (no viaja en el ZIP;
+solo se publican Parquet + JSON). Para cruces SQL con DuckDB, lee los
+Parquet directamente desde el bundle descargado (rutas locales, sin
+extensiones):
 
 ```r
 library(duckdb)
-con <- dbConnect(duckdb(), "chile-hub-data/chile_data.duckdb", read_only = TRUE)
+con <- dbConnect(duckdb())
 
 dbGetQuery(con,
   "SELECT c.nombre_comuna, c.nombre_region, cc.poblacion_censada
-   FROM comunas c
-   JOIN censo_comunal cc USING (codigo_comuna)
+   FROM read_parquet('chile-hub-data/data/normalized/comunas.parquet') c
+   JOIN read_parquet('chile-hub-data/data/normalized/censo_comunal.parquet') cc
+     USING (codigo_comuna)
    ORDER BY cc.poblacion_censada DESC
    LIMIT 10"
 )
 
 dbDisconnect(con, shutdown = TRUE)
 ```
+
+> **Nota:** las rutas locales no requieren la extensión `httpfs`. Si prefieres
+> consultar los Parquet **remotos** directamente (sin descargar el bundle),
+> ejecuta primero `dbExecute(con, "INSTALL httpfs; LOAD httpfs;")` y usa las
+> URLs de la Opción B.
 
 ## Notas importantes
 
