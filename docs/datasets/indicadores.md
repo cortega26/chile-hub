@@ -144,8 +144,11 @@ cadencia — 70 días para mensuales (UTM, IPC), 10 para diarias (UF, dólar, eu
 estado contra la fuente y use `--allow-stale-backfills`.
 
 El delivery `ine_override` (serie tomada del INE, la fuente autoritativa del
-IPC) **no** es un backfill: no dispara el gate de edad ni se marca como unsafe
-— es la provenance honesta de un dato nuevo, visible en el build (Plan 069).
+IPC) **no es un backfill** (es un dato nuevo, no una reutilización del
+artefacto publicado) y no se marca como unsafe — pero **sí dispara el gate de
+edad** (ADR-016): si la página del INE sirve el mismo valor mes tras mes, el
+dato entregado es stale y el build se rechaza, igual que un backfill repetido
+(Plan 069).
 
 
 **Estado conocido**: la serie `ipc` no recibe datos nuevos desde 2025-12-01. El

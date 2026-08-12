@@ -546,15 +546,17 @@ def verify_publication_policy(
         if unsafe_delivery:
             violations.append(f"indicadores: unsafe delivery={unsafe_delivery}")
 
-        # Backfill consciente de la edad (ADR-016): `published_backfill` es una
-        # degradación con gracia legítima ante un hueco transitorio, pero repetida
-        # build tras build esconde una serie muerta. Se mide la edad del dato
-        # ENTREGADO, con umbral por cadencia.
+        # Backfill consciente de la edad (ADR-016): `published_backfill` y
+        # `ine_override` son entregas que pueden quedarse stale si la fuente
+        # (agregador O INE) deja de actualizar: la edad se mide sobre el dato
+        # ENTREGADO, con umbral por cadencia. Un override INE con el mismo
+        # valor mes tras mes es tan stale como un backfill repetido — el gate
+        # debe rechazarlo igual (P1 de la review del Plan 069).
         delivery = indicadores.get("indicator_delivery", {})
         ages = indicadores.get("indicator_age_days", {})
         stale_backfills = {}
         for code, status in delivery.items():
-            if status != "published_backfill":
+            if status not in {"published_backfill", "ine_override"}:
                 continue
             age = ages.get(code)
             if age is None:

@@ -493,18 +493,27 @@ class VerifySyntheticTests(unittest.TestCase):
         with patch("builtins.print"), self.assertRaises(SystemExit):
             self._run_policy(self._indicadores_with_backfill(code="dolar", age_days=12))
 
-    def test_ine_override_delivery_is_not_unsafe_and_skips_stale_gate(self) -> None:
-        """El delivery `ine_override` no es unsafe y no dispara el gate de
-        backfill stale.
+    def test_ine_override_delivery_is_not_unsafe_and_is_age_gated(self) -> None:
+        """El delivery `ine_override` no es unsafe pero SÍ dispara el gate de
+        edad.
 
-        Plan 069: el override INE entrega el valor fresco del IPC desde la
-        fuente autoritativa; etiquetarlo como `published_backfill` enmascaraba
-        el dato scrapeado y dejaba inerte el gate. Con el delivery visible,
-        el gate debe aceptarlo (no unsafe) y no aplicarle el umbral de
-        backfill (su edad es la del dato INE, no un backfill repetido).
+        Plan 069 + P1 de la review: el override INE entrega el valor del IPC
+        desde la fuente autoritativa; etiquetarlo como `published_backfill`
+        enmascaraba el dato scrapeado. Con el delivery visible, el gate debe
+        aceptarlo (no unsafe) PERO aplicar el umbral de edad igual que al
+        backfill: si la página del INE sirve el mismo valor mes tras mes, el
+        dato entregado es stale y el build debe rechazarse (ADR-016 mide la
+        edad del dato entregado, no la fuente).
         """
-        entry = self._indicadores_with_backfill(code="ipc", age_days=240, status="ine_override")
-        self._run_policy(entry)  # no debe lanzar SystemExit
+        # Override fresco (60 dias < umbral mensual de 70): aceptado.
+        self._run_policy(
+            self._indicadores_with_backfill(code="ipc", age_days=60, status="ine_override")
+        )
+        # Override stale (240 dias > umbral): rechazado, igual que el backfill.
+        with patch("builtins.print"), self.assertRaises(SystemExit):
+            self._run_policy(
+                self._indicadores_with_backfill(code="ipc", age_days=240, status="ine_override")
+            )
 
     def test_live_delivery_is_never_flagged_by_the_backfill_gate(self) -> None:
         """Una serie vieja pero entregada en vivo es problema de frescura,
