@@ -4,6 +4,11 @@ on:
   push:
     branches: [main]
   pull_request:
+  merge_group:
+    # Requerido por la merge queue (branch protection "Require merge queue"):
+    # la cola crea ramas temporales gh-readonly-queue/main/... y dispara el
+    # evento merge_group; sin este trigger los checks requeridos nunca se
+    # reportan y la cola falla todos los merges.
   schedule:
     # GitHub cron is UTC: 06:00 CLT or 07:00 CLST.
     - cron: "0 10 * * *"
@@ -29,6 +34,9 @@ env:
 
 concurrency:
   group: pipeline-${{ github.workflow }}-${{ github.ref }}
+  # En merge_group NO se cancela: la cola prueba varios PRs en paralelo en
+  # ramas temporales distintas (cada una con su propio ref/grupo), y cancelar
+  # los builds en curso romperia la formacion de grupos de la cola.
   cancel-in-progress: ${{ github.event_name == 'pull_request' || github.event_name == 'push' }}
 
 jobs:

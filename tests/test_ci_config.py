@@ -505,6 +505,21 @@ class DocsSyncGateGuardrailTests(unittest.TestCase):
         content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
         self.assertIn("python scripts/sync_docs.py --check", content)
 
+    def test_pipeline_workflow_listens_to_merge_group(self):
+        """El workflow de Pipeline Check debe escuchar el evento merge_group.
+
+        Requisito de la merge queue de GitHub: la cola crea ramas temporales
+        gh-readonly-queue/main/... y dispara el evento merge_group; sin este
+        trigger, los checks requeridos nunca se reportan y la cola falla todos
+        los merges. Sin esto, habilitar "Require merge queue" en la branch
+        protection romperia todos los merges futuros.
+        """
+        content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("merge_group:", content)
+        # La cola no debe cancelar builds en curso (prueba varios PRs en paralelo).
+        cancel_line = [line for line in content.splitlines() if "cancel-in-progress:" in line][0]
+        self.assertNotIn("merge_group", cancel_line)
+
     def test_docs_auto_heal_lives_in_separate_main_only_job(self):
         """El auto-heal debe vivir en un job separado (docs-autosync),
         condicionado a push a main, NUNCA en el job quality (que debe
