@@ -12,6 +12,35 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.26.0 - 2026-08-12
+
+### Documentación
+
+- Quickstart R, marcas de carril, inventario de extractores (Plan 081)
+  ([#68](https://github.com/cortega26/chile-hub/pull/68),
+  [`a20ceeb`](https://github.com/cortega26/chile-hub/commit/a20ceeb3a32e819d2c9d3ef3cb3aeeb5e5cccda4))
+
+- **r-quickstart**: Opcion C sin INSTALL httpfs (rutas locales, offline-safe)
+  ([#68](https://github.com/cortega26/chile-hub/pull/68),
+  [`a20ceeb`](https://github.com/cortega26/chile-hub/commit/a20ceeb3a32e819d2c9d3ef3cb3aeeb5e5cccda4))
+
+### Agregado
+
+- **landing**: Carril candidate visible en la landing (Plan 082)
+  ([#69](https://github.com/cortega26/chile-hub/pull/69),
+  [`afaa96b`](https://github.com/cortega26/chile-hub/commit/afaa96bd88663bff04b38d8dbf4581a24aedb3cb))
+
+- **landing**: Seccion candidate visible + fix grid estables (Plan 082)
+  ([#69](https://github.com/cortega26/chile-hub/pull/69),
+  [`afaa96b`](https://github.com/cortega26/chile-hub/commit/afaa96bd88663bff04b38d8dbf4581a24aedb3cb))
+
+### Tests
+
+- **landing**: Deriva el nombre candidate del bundle en el smoke test
+  ([#69](https://github.com/cortega26/chile-hub/pull/69),
+  [`afaa96b`](https://github.com/cortega26/chile-hub/commit/afaa96bd88663bff04b38d8dbf4581a24aedb3cb))
+
+
 ## 1.25.1 - 2026-08-12
 
 ### Corregido
