@@ -1380,4 +1380,42 @@ window.addEventListener("DOMContentLoaded", () => {
 
     // Check hash on load
     handleHashChange();
+
+    // Reveal on scroll: aplica .is-visible a los elementos .reveal al entrar
+    // al viewport. El CSS ya desactiva la transición bajo prefers-reduced-motion.
+    const revealObserver = new IntersectionObserver(
+        (entries, observer) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("is-visible");
+                    observer.unobserve(entry.target);
+                }
+            });
+        },
+        { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
+    );
+    document.querySelectorAll(".reveal").forEach((el) => revealObserver.observe(el));
+
+    // Scrollspy del nav: marca el link activo según la sección visible.
+    // Solo afecta a links de ancla interna (#seccion); Documentación/GitHub
+    // nunca se marcan.
+    const navAnchors = Array.from(document.querySelectorAll('.site-nav a[href^="#"]'));
+    if (navAnchors.length > 0) {
+        const spySections = navAnchors
+            .map((a) => document.querySelector(a.getAttribute("href")))
+            .filter(Boolean);
+        const spyObserver = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (!entry.isIntersecting) return;
+                    const id = entry.target.id;
+                    navAnchors.forEach((a) =>
+                        a.classList.toggle("is-active", a.getAttribute("href") === `#${id}`)
+                    );
+                });
+            },
+            { rootMargin: "-30% 0px -60% 0px", threshold: 0 }
+        );
+        spySections.forEach((s) => spyObserver.observe(s));
+    }
 });
