@@ -99,6 +99,10 @@ def _create_test_manifest(normalized_dir: str) -> str:
     with open(catalog_path, "w", encoding="utf-8") as f:
         json.dump(catalog, f, ensure_ascii=False, indent=2)
     artifacts.append(_make_artifact_entry("data/normalized/dataset_catalog.json", None, "shared"))
+    # El artifact_manifest.json también viaja en el ZIP real (shared artifact);
+    # el test lo incluye para verificar la consistencia size/sha256 del
+    # catálogo filtrado embebido (Plan 071).
+    artifacts.append(_make_artifact_entry("data/normalized/artifact_manifest.json", None, "shared"))
 
     manifest = {
         "generated_at_utc": "2026-07-09T00:00:00+00:00",
@@ -200,6 +204,10 @@ class TestBundleZip:
                 catalog = json.loads(
                     zf.read("data/normalized/dataset_catalog.json").decode("utf-8")
                 )
+                embedded_manifest = json.loads(
+                    zf.read("data/normalized/artifact_manifest.json").decode("utf-8")
+                )
+                cat_bytes = zf.read("data/normalized/dataset_catalog.json")
 
             missing = [
                 entry["dataset"]
@@ -210,6 +218,20 @@ class TestBundleZip:
             ]
             assert not missing, f"Capas del catálogo del ZIP sin parquet: {missing}"
             assert catalog["dataset_count"] == len(catalog["datasets"])
+
+            # El manifest embebido debe describir el catálogo filtrado real
+            # (size/sha256 coincidentes) — P1 de la review del Plan 071:
+            # validar el bundle contra su manifest no debe reportar el
+            # catálogo como corrupto.
+            cat_entry = next(
+                a
+                for a in embedded_manifest["artifacts"]
+                if a["path"] == "data/normalized/dataset_catalog.json"
+            )
+            import hashlib
+
+            assert cat_entry["size_bytes"] == len(cat_bytes)
+            assert cat_entry["sha256"] == hashlib.sha256(cat_bytes).hexdigest()
 
     def test_bundle_zip_missing_artifact_raises_system_exit(self):
         """SystemExit si falta un artefacto declarado en el manifiesto."""

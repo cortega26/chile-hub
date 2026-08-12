@@ -40,6 +40,16 @@ def compute_sha256(path):
     return hasher.hexdigest()
 
 
+def compute_sha256_bytes(data: bytes) -> str:
+    """SHA-256 de un buffer en memoria (sin tocar disco).
+
+    Usado por el builder del bundle ZIP para describir el catálogo filtrado
+    embebido (Plan 071): sus bytes difieren del archivo en disco, así que el
+    manifest embebido debe declarar el hash del contenido real.
+    """
+    return hashlib.sha256(data).hexdigest()
+
+
 def read_json_if_exists(path):
     if not os.path.exists(path):
         return None
