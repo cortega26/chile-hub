@@ -370,6 +370,41 @@ def write_hub_bundle_json(pipeline_metadata, hub_health, dataset_catalog, artifa
     return output_path, bundle
 
 
+def _bundle_filtered_catalog(artifacts: list[dict]) -> str:
+    """Variante del dataset_catalog.json para DENTRO del bundle ZIP.
+
+    El catálogo completo declara capas candidate con `outputs` (p. ej.
+    perfil_territorial_comunal, consumo_electrico_comunal) cuyos parquet NO
+    viajan en el bundle (public_bundle_eligible). El catálogo del ZIP se
+    filtra a las capas cuyos archivos están en el manifest, y su
+    `dataset_count` refleja el conteo real (Plan 071). El alias
+    `comunas_enriquecidas` (sin archivo propio, apunta al parquet de
+    `comunas`) se conserva: su `outputs` se reescribe al parquet real del
+    dataset canónico para que el consumidor pueda resolverlo.
+    """
+    import json
+
+    catalog_path = os.path.join(NORMALIZED_DIR, "dataset_catalog.json")
+    with open(catalog_path, encoding="utf-8") as f:
+        catalog = json.load(f)
+
+    manifest_names = {a["path"] for a in artifacts}
+
+    def _has_parquet(dataset_name: str, entry: dict) -> bool:
+        alias_for = entry.get("alias_for")
+        target = alias_for if alias_for else dataset_name
+        return f"data/normalized/{target}.parquet" in manifest_names
+
+    filtered = [
+        entry
+        for entry in catalog.get("datasets", [])
+        if _has_parquet(entry.get("dataset", ""), entry)
+    ]
+    catalog["datasets"] = filtered
+    catalog["dataset_count"] = len(filtered)
+    return json.dumps(catalog, ensure_ascii=False, indent=2) + "\n"
+
+
 def write_publishable_bundle_zip():
     manifest_path = os.path.join(NORMALIZED_DIR, "artifact_manifest.json")
     with open(manifest_path, encoding="utf-8") as f:
@@ -395,6 +430,14 @@ def write_publishable_bundle_zip():
         for artifact in artifacts:
             relative_path = artifact["path"]
             absolute_path = os.path.join(DATA_DIR, os.path.relpath(relative_path, "data"))
+            # El dataset_catalog.json completo declara capas candidate con
+            # outputs que NO viajan en el bundle (Plan 071): dentro del ZIP,
+            # el catálogo se filtra a las capas cuyos archivos SÍ están en el
+            # manifest, para que un consumidor no encuentre capas sin archivo.
+            if relative_path == "data/normalized/dataset_catalog.json":
+                catalog_text = _bundle_filtered_catalog(artifacts)
+                archive.writestr(relative_path, catalog_text)
+                continue
             archive.write(absolute_path, arcname=relative_path)
 
     with zipfile.ZipFile(tmp_path, "r") as archive:
