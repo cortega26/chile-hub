@@ -223,6 +223,123 @@ class ChileHubDataManagerUnitTests(unittest.TestCase):
             if cache_root.exists():
                 shutil.rmtree(str(cache_root))
 
+    def _make_extract_manager(self, tmpdir):
+        """Manager de prueba con rutas bajo un tmpdir (sin tocar cache real)."""
+        manager = ChileHubDataManager(cache_dir=tmpdir, data_version="v0.0.0-test")
+        manager.version_cache_dir.mkdir(parents=True, exist_ok=True)
+        return manager
+
+    def test_extract_rejects_zip_slip_member(self):
+        """_extract_bundle() rechaza un miembro con `../` (zip-slip, Plan 072).
+
+        El checksum SHA-256 verifica el bundle contra un .sha256 de la MISMA
+        release de GitHub — no añade un dominio de confianza distinto. Un
+        miembro con path traversal escribiría fuera del directorio de caché
+        si la release se viera comprometida.
+        """
+        import zipfile
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            manager = self._make_extract_manager(tmpdir)
+            bundle_path = manager.version_cache_dir / "evil.zip"
+            with zipfile.ZipFile(bundle_path, "w") as zf:
+                zf.writestr("data/normalized/ok.txt", "ok")
+                zf.writestr("../evil.txt", "pwned")
+
+            with self.assertRaises(ChileHubDataError) as ctx:
+                manager._extract_bundle(bundle_path)
+            self.assertIn("path traversal", str(ctx.exception))
+            self.assertFalse((Path(tmpdir).parent / "evil.txt").exists())
+            self.assertFalse((Path(tmpdir) / "evil.txt").exists())
+
+    def test_extract_rejected_bundle_preserves_existing_cache(self):
+        """Un bundle rechazado NO debe destruir la caché verificada previa.
+
+        P2 de la review del Plan 072: la validación de miembros ocurría
+        DESPUÉS del rmtree del cache — un bundle checksum-válido pero
+        rechazado dejaba al usuario sin sus datos verificados. Ahora la
+        validación es previa: la caché existente se preserva ante rechazo.
+        """
+        import zipfile
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            manager = self._make_extract_manager(tmpdir)
+            manager.normalized_dir.mkdir(parents=True, exist_ok=True)
+            marker = manager.normalized_dir / "verified.txt"
+            marker.write_text("verified-data")
+
+            bundle_path = manager.version_cache_dir / "evil.zip"
+            with zipfile.ZipFile(bundle_path, "w") as zf:
+                zf.writestr("../evil.txt", "pwned")
+
+            with self.assertRaises(ChileHubDataError):
+                manager._extract_bundle(bundle_path)
+
+            # La caché verificada previa sigue intacta.
+            self.assertTrue(marker.exists())
+            self.assertEqual(marker.read_text(), "verified-data")
+
+    def test_extract_rejects_out_of_tree_member(self):
+        """_extract_bundle() rechaza un miembro fuera de data/normalized/."""
+        import zipfile
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            manager = self._make_extract_manager(tmpdir)
+            bundle_path = manager.version_cache_dir / "oob.zip"
+            with zipfile.ZipFile(bundle_path, "w") as zf:
+                zf.writestr("data/other/evil.txt", "pwned")
+
+            with self.assertRaises(ChileHubDataError) as ctx:
+                manager._extract_bundle(bundle_path)
+            self.assertIn("fuera de data/normalized/", str(ctx.exception))
+
+    def test_extract_rejects_absolute_path_member(self):
+        """_extract_bundle() rechaza un miembro con path absoluto."""
+        import zipfile
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            manager = self._make_extract_manager(tmpdir)
+            bundle_path = manager.version_cache_dir / "abs.zip"
+            with zipfile.ZipFile(bundle_path, "w") as zf:
+                zf.writestr("/tmp/evil.txt", "pwned")
+
+            with self.assertRaises(ChileHubDataError) as ctx:
+                manager._extract_bundle(bundle_path)
+            self.assertIn("path traversal", str(ctx.exception))
+
+    def test_extract_accepts_legitimate_bundle(self):
+        """_extract_bundle() acepta un bundle con entradas bajo data/normalized/."""
+        import zipfile
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            manager = self._make_extract_manager(tmpdir)
+            bundle_path = manager.version_cache_dir / "ok.zip"
+            with zipfile.ZipFile(bundle_path, "w") as zf:
+                zf.writestr("data/normalized/comunas.parquet", b"fake-parquet")
+                zf.writestr("data/normalized/dataset_catalog.json", "{}")
+
+            manager._extract_bundle(bundle_path)
+            self.assertTrue((manager.normalized_dir / "comunas.parquet").exists())
+            self.assertTrue((manager.normalized_dir / "dataset_catalog.json").exists())
+
+    def test_extract_rejects_symlink_member(self):
+        """_extract_bundle() rechaza un miembro symlink (zip-slip, Plan 072)."""
+        import stat
+        import zipfile
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            manager = self._make_extract_manager(tmpdir)
+            bundle_path = manager.version_cache_dir / "symlink.zip"
+            with zipfile.ZipFile(bundle_path, "w") as zf:
+                info = zipfile.ZipInfo("data/normalized/evil-link")
+                info.create_system = 3  # unix
+                info.external_attr = stat.S_IFLNK << 16 | 0o777
+                zf.writestr(info, "/etc/passwd")
+
+            with self.assertRaises(ChileHubDataError) as ctx:
+                manager._extract_bundle(bundle_path)
+            self.assertIn("symlink", str(ctx.exception))
+
 
 class GeoCacheIntegrityTests(unittest.TestCase):
     """Contrato de distribución/caché de la geometría (Plan 065, ADR-012).
