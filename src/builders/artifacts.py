@@ -431,8 +431,7 @@ def write_publishable_bundle_zip():
     # escribir el ZIP: el manifest embebido y el catálogo deben describirse
     # mutuamente con los mismos bytes, sin depender del orden de los
     # artifacts en el manifest (alfabético: artifact_manifest < dataset_catalog).
-    bundle_catalog_text = None
-    bundle_catalog_bytes = None
+    bundle_catalog_text: str | None = None
     for artifact in artifacts:
         if artifact["path"] == "data/normalized/dataset_catalog.json":
             bundle_catalog_text = _bundle_filtered_catalog(artifacts)
@@ -440,6 +439,11 @@ def write_publishable_bundle_zip():
             artifact["size_bytes"] = len(bundle_catalog_bytes)
             artifact["sha256"] = compute_sha256_bytes(bundle_catalog_bytes)
             break
+    if bundle_catalog_text is None:
+        raise SystemExit(
+            "Error: el manifest no declara data/normalized/dataset_catalog.json; "
+            "no se puede construir el bundle ZIP."
+        )
 
     with zipfile.ZipFile(tmp_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for artifact in artifacts:

@@ -447,7 +447,31 @@ class TestFromNormalFlow:
                     "output_type": "parquet",
                     "format": "parquet",
                 },
+                {
+                    "path": "data/normalized/dataset_catalog.json",
+                    "dataset": None,
+                    "output_type": "shared",
+                    "format": "json",
+                },
+                {
+                    "path": "data/normalized/artifact_manifest.json",
+                    "dataset": None,
+                    "output_type": "shared",
+                    "format": "json",
+                },
             ]
+            catalog = {
+                "generated_at_utc": "2026-07-09T00:00:00+00:00",
+                "dataset_count": 1,
+                "datasets": [
+                    {
+                        "dataset": "regiones",
+                        "outputs": {"parquet": "data/normalized/regiones.parquet"},
+                    }
+                ],
+            }
+            with open(os.path.join(normalized, "dataset_catalog.json"), "w", encoding="utf-8") as f:
+                json.dump(catalog, f, ensure_ascii=False, indent=2)
             manifest = {
                 "generated_at_utc": "2026-07-09T00:00:00+00:00",
                 "artifact_count": len(artifacts),
