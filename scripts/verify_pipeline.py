@@ -541,7 +541,7 @@ def verify_publication_policy(
         unsafe_delivery = {
             code: status
             for code, status in indicadores.get("indicator_delivery", {}).items()
-            if status not in {"live", "published_backfill"}
+            if status not in {"live", "published_backfill", "ine_override"}
         }
         if unsafe_delivery:
             violations.append(f"indicadores: unsafe delivery={unsafe_delivery}")
@@ -906,6 +906,11 @@ def verify_dataset_catalog():
                 "raw_recovery",
                 "preserved_existing",
                 "published_backfill",
+                # Override de último recurso desde la fuente autoritativa INE
+                # (issue #43): el valor scrapeado es NUEVO, no una reutilización
+                # del artefacto publicado. Plan 069 — delivery visible para que
+                # el gate evalúe el dato real.
+                "ine_override",
             }
             invalid_statuses = {
                 code: status

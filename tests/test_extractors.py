@@ -631,6 +631,68 @@ class IneIpcOverrideIntegrationTests(unittest.TestCase):
         ine_mock.assert_called_once()
         self.assertEqual(len(diagnostics["ine_override_pairs"]), 1)
 
+    def test_override_coexists_with_published_backfill_delivery_visible(self):
+        """El delivery `ine_override` debe ganar cuando co-ocurre con un
+        published_backfill del staging previo (el caso de producción).
+
+        Plan 069: en producción, `load_existing_staging` devuelve
+        `published_backfills=['ipc']` (staging previo con la serie muerta).
+        El bucle de `published_backfills` en `process_indicators` corre
+        DESPUÉS del de `ine_override_pairs` y sobrescribe el delivery a
+        `published_backfill` — enmascarando el valor scrapeado del INE como
+        "reutilización del último artefacto publicado" (falso) y dejando
+        inerte el gate de publicación ADR-016.
+        """
+        current_year = datetime.date.today().year
+
+        def fetch(codigo, year):
+            if codigo == "ipc" and year == current_year:
+                return []
+            return [{"fecha": f"{year}-01-01", "codigo_indicador": codigo, "valor": 1.0}]
+
+        existing = pl.DataFrame(
+            {
+                "fecha": [f"{current_year - 1}-12-01", f"{current_year}-01-01"],
+                "codigo_indicador": ["ipc", "uf"],
+                "valor": [-0.2, 1.0],
+            }
+        ).with_columns(pl.col("fecha").str.to_date("%Y-%m-%d"))
+
+        with (
+            tempfile.TemporaryDirectory() as tmpdir,
+            patch.object(bcentral_extractor, "RAW_DIR", tmpdir),
+            patch.object(bcentral_extractor, "STAGING_DIR", tmpdir),
+            patch.object(
+                bcentral_extractor,
+                "METADATA_PATH",
+                str(Path(tmpdir) / "indicadores.metadata.json"),
+            ),
+            patch.object(
+                bcentral_extractor,
+                "STAGING_CSV_PATH",
+                str(Path(tmpdir) / "indicadores.csv"),
+            ),
+            patch.object(
+                bcentral_extractor,
+                "load_existing_staging",
+                return_value=(existing, current_year, ["ipc"]),
+            ),
+            patch.object(bcentral_extractor, "HISTORY_START_YEAR", current_year),
+            patch.object(bcentral_extractor, "fetch_indicator_year", side_effect=fetch),
+            patch.object(
+                bcentral_extractor,
+                "fetch_ine_ipc",
+                return_value=IneIpcReading(value=0.1, date_iso=f"{current_year}-07-01"),
+            ),
+        ):
+            bcentral_extractor.process_indicators()
+            metadata = json.loads(
+                (Path(tmpdir) / "indicadores.metadata.json").read_text(encoding="utf-8")
+            )
+
+        self.assertEqual(metadata["indicator_delivery"]["ipc"], "ine_override")
+        self.assertTrue(any("ine_override_used_for_pairs" in n for n in metadata.get("notes", [])))
+
     def test_process_indicators_records_ine_override_in_metadata(self):
         """El metadata debe registrar `ine_override` en indicator_delivery y
         el note correspondiente (provenance honesta: la serie llegó del INE,

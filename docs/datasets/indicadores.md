@@ -53,8 +53,11 @@ Ejemplo real del estado actual:
 
 - `source_mode`: `live`
 - `source_detail`: `public_api_with_published_backfill`
-- `indicator_delivery`: `ipc` quedó como `published_backfill`, mientras `dolar`, `euro`, `uf` y `utm` siguieron `live`
-- `warnings`: la API devolvió serie vacía para `ipc/2026` y el hub reutilizó el último artifact publicado para ese código
+- `indicator_delivery`: `ipc` quedó como `ine_override` (serie tomada de la
+  fuente autoritativa INE cuando mindicador.cl no la entrega — Plan 069),
+  mientras `dolar`, `euro`, `uf` y `utm` siguieron `live`
+- `warnings`: la API devolvió serie vacía para `ipc/2026` y el hub usó el
+  override del INE para ese código
 
 ## Por qué existe esta capa
 
@@ -139,6 +142,11 @@ publicado ante un hueco de la fuente) y su último dato supera el umbral de su
 cadencia — 70 días para mensuales (UTM, IPC), 10 para diarias (UF, dólar, euro)
 —, el gate de publicación **rechaza el build** hasta que alguien confirme el
 estado contra la fuente y use `--allow-stale-backfills`.
+
+El delivery `ine_override` (serie tomada del INE, la fuente autoritativa del
+IPC) **no** es un backfill: no dispara el gate de edad ni se marca como unsafe
+— es la provenance honesta de un dato nuevo, visible en el build (Plan 069).
+
 
 **Estado conocido**: la serie `ipc` no recibe datos nuevos desde 2025-12-01. El
 diagnóstico upstream está abierto en el issue #43.
