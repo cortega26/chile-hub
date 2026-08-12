@@ -487,6 +487,64 @@ class DetectSeriesAnomaliesTests(unittest.TestCase):
         anomalies = detect_series_anomalies(df)
         self.assertEqual(anomalies, [], f"falsos positivos inesperados: {anomalies}")
 
+    def test_last_point_negative_value_attributed_to_correct_date(self):
+        """El último punto negativo se evalúa con su propia fecha (Plan 074).
+
+        Antes: cuando el último valor era ≤ 0 (común en la variación mensual
+        del IPC), el par log-retorno se saltaba y se evaluaba un par VIEJO
+        pero se reportaba con la fecha/valor del punto nuevo — señal mal
+        atribuida, justo el guard del valor scrapeado del INE. Ahora el punto
+        negativo se evalúa con el detector de nivel y su fecha real.
+        """
+        # Serie con salto final a negativo: el último par no es log-evaluable.
+        values = [0.3, 0.2, 0.4, 0.3, 0.5, -2.0]
+        df = self._make_series(values, code="ipc")
+        anomalies = detect_series_anomalies(df, z_threshold=4.0, min_history=4)
+        self.assertEqual(len(anomalies), 1, f"esperada 1 anomalía, got: {anomalies}")
+        self.assertEqual(anomalies[0]["fecha"], "2024-01-06")
+        self.assertEqual(anomalies[0]["valor"], -2.0)
+        self.assertEqual(anomalies[0]["codigo_indicador"], "ipc")
+        self.assertIn("niveles previos", anomalies[0]["motivo"])
+
+    def test_negative_values_without_real_jump_not_flagged(self):
+        """Valores negativos sin salto real no deben disparar señal (Plan 074)."""
+        # Variación mensual del IPC realista: valores pequeños, algunos negativos.
+        values = [0.3, -0.2, 0.1, 0.4, -0.1, 0.2, -0.3, 0.1]
+        df = self._make_series(values, code="ipc")
+        anomalies = detect_series_anomalies(df, z_threshold=4.0, min_history=4)
+        self.assertEqual(anomalies, [])
+
+    def test_negative_last_point_without_history_not_flagged(self):
+        """Con poco histórico previo, un punto negativo no dispara señal."""
+        values = [0.3, 0.2, -2.0]
+        df = self._make_series(values, code="ipc")
+        anomalies = detect_series_anomalies(df, z_threshold=4.0, min_history=4)
+        self.assertEqual(anomalies, [])
+
+    def test_constant_levels_with_break_at_zero_is_flagged(self):
+        """Niveles previos constantes + último valor distinto = ruptura obvia.
+
+        P2 de la review del Plan 074: con MAD=0 el z-score no tiene base,
+        pero un último valor que rompe una serie constante (p. ej. 0 tras
+        cinco 100) es claramente anómalo — se reporta con motivo de ruptura
+        de serie constante. `valor=0` es schema-válido, así que sin esta
+        señal el dato malformado pasaría al gate de publicación.
+        """
+        values = [100.0, 100.0, 100.0, 100.0, 100.0, 0.0]
+        df = self._make_series(values, code="ipc")
+        anomalies = detect_series_anomalies(df, z_threshold=4.0, min_history=4)
+        self.assertEqual(len(anomalies), 1)
+        self.assertEqual(anomalies[0]["valor"], 0.0)
+        self.assertEqual(anomalies[0]["fecha"], "2024-01-06")
+        self.assertIn("serie constante", anomalies[0]["motivo"])
+
+    def test_constant_levels_without_break_not_flagged(self):
+        """Niveles previos constantes y último valor igual: sin señal."""
+        values = [100.0, 100.0, 100.0, 100.0, 100.0, 100.0]
+        df = self._make_series(values, code="ipc")
+        anomalies = detect_series_anomalies(df, z_threshold=4.0, min_history=4)
+        self.assertEqual(anomalies, [])
+
 
 # ── validate_distritos_electorales ─────────────────────────────────────────────
 

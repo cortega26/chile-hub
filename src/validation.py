@@ -362,37 +362,95 @@ def detect_series_anomalies(
                 continue
             log_returns.append(math.log(curr_value / prev_value))
 
-        if len(log_returns) < min_history + 1:
-            continue  # no hay suficiente histórico de referencia + el punto a evaluar
+        last_value = values[-1]
+        if len(values) < 2:
+            continue  # una sola observación no permite evaluar un par
+        penultimate_value = values[-2]
 
-        reference = log_returns[:-1]
-        last_return = log_returns[-1]
-        median_ref = statistics.median(reference)
-        mad = statistics.median([abs(r - median_ref) for r in reference])
-        if mad == 0:
-            continue  # serie perfectamente constante en el histórico de referencia; sin base para z-score
+        if (
+            penultimate_value is not None
+            and last_value is not None
+            and penultimate_value > 0
+            and last_value > 0
+        ):
+            # Último par cronológico log-evaluable: flujo actual. log_returns[-1]
+            # ES ese par (se procesa en orden), así que la calibración del
+            # Plan 054 (z_threshold=4.0, cero falsos positivos en 506 registros)
+            # queda intacta.
+            if len(log_returns) < min_history + 1:
+                continue  # no hay suficiente histórico de referencia + el punto a evaluar
 
-        z_score = 0.6745 * (last_return - median_ref) / mad
-        if abs(z_score) <= z_threshold:
-            continue
+            reference = log_returns[:-1]
+            last_return = log_returns[-1]
+            median_ref = statistics.median(reference)
+            mad = statistics.median([abs(r - median_ref) for r in reference])
+            if mad == 0:
+                continue  # serie perfectamente constante; sin base para z-score
 
-        prev_value = values[-2]
-        low = prev_value * math.exp(median_ref - z_threshold * mad / 0.6745)
-        high = prev_value * math.exp(median_ref + z_threshold * mad / 0.6745)
+            z_score = 0.6745 * (last_return - median_ref) / mad
+            if abs(z_score) <= z_threshold:
+                continue
+
+            prev_value = penultimate_value
+            low = prev_value * math.exp(median_ref - z_threshold * mad / 0.6745)
+            high = prev_value * math.exp(median_ref + z_threshold * mad / 0.6745)
+            motivo = (
+                f"Salto atípico en '{key}' el {dates[-1]}: valor {last_value} "
+                f"implica un log-retorno diario de {last_return:.4f} vs. mediana "
+                f"histórica de referencia {median_ref:.4f} (MAD={mad:.4f}, "
+                f"z={z_score:.2f}, umbral={z_threshold}). Rango esperado sin "
+                f"señal: [{round(low, 4)}, {round(high, 4)}]."
+            )
+        else:
+            # Último par NO log-evaluable (valor ≤ 0, común en la variación
+            # mensual del IPC): detector de nivel sobre los valores previos.
+            # Plan 074: antes se evaluaba el último par ADMITIDO (viejo) pero
+            # se reportaba con la fecha/valor del punto nuevo — señal mal
+            # atribuida, justo el guard del valor scrapeado del INE.
+            levels = [v for v in values[:-1] if v is not None]
+            if len(levels) < min_history + 1:
+                continue
+            median_level = statistics.median(levels)
+            mad_level = statistics.median([abs(v - median_level) for v in levels])
+
+            if mad_level == 0:
+                # Niveles previos constantes: el MAD no da base para z-score,
+                # pero un último valor distinto de la mediana ES una ruptura
+                # obvia (P2 de la review del Plan 074). Se reporta con z-score
+                # infinito y motivo de ruptura de serie constante. Ej.:
+                # [100, 100, 100, 100, 100, 0] — el 0 es claramente anómalo.
+                if last_value == median_level:
+                    continue
+                low = min(levels)
+                high = max(levels)
+                motivo = (
+                    f"Salto atípico en '{key}' el {dates[-1]}: valor {last_value} "
+                    f"vs. serie de niveles previos constante en {median_level:.4f} "
+                    f"(MAD=0, ruptura de serie constante, umbral={z_threshold}). "
+                    f"Rango esperado sin señal: [{round(low, 4)}, {round(high, 4)}]."
+                )
+                z_score = None  # MAD=0: sin base de z-score; la ruptura es obvia
+            else:
+                z_score = 0.6745 * (last_value - median_level) / mad_level
+                if abs(z_score) <= z_threshold:
+                    continue
+                low = median_level - z_threshold * mad_level / 0.6745
+                high = median_level + z_threshold * mad_level / 0.6745
+                motivo = (
+                    f"Salto atípico en '{key}' el {dates[-1]}: valor {last_value} "
+                    f"vs. mediana de niveles previos {median_level:.4f} "
+                    f"(MAD={mad_level:.4f}, z={z_score:.2f}, umbral={z_threshold}). "
+                    f"Rango esperado sin señal: [{round(low, 4)}, {round(high, 4)}]."
+                )
+
         anomalies.append(
             {
                 "codigo_indicador": key,
                 "fecha": dates[-1],
-                "valor": values[-1],
+                "valor": last_value,
                 "esperado_rango": [round(low, 4), round(high, 4)],
-                "z_score": round(z_score, 2),
-                "motivo": (
-                    f"Salto atípico en '{key}' el {dates[-1]}: valor {values[-1]} "
-                    f"implica un log-retorno diario de {last_return:.4f} vs. mediana "
-                    f"histórica de referencia {median_ref:.4f} (MAD={mad:.4f}, "
-                    f"z={z_score:.2f}, umbral={z_threshold}). Rango esperado sin "
-                    f"señal: [{round(low, 4)}, {round(high, 4)}]."
-                ),
+                "z_score": round(z_score, 2) if z_score is not None else None,
+                "motivo": motivo,
             }
         )
     return anomalies
