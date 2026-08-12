@@ -372,6 +372,30 @@ class ChileHubDataManager:
         if self.normalized_dir.exists():
             shutil.rmtree(self.normalized_dir)
         with zipfile.ZipFile(bundle_path) as archive:
+            # Zip-slip guard (Plan 072): el checksum SHA-256 verifica el bundle
+            # contra un .sha256 de la MISMA release de GitHub — no añade un
+            # dominio de confianza distinto. Un miembro con `../` o un symlink
+            # permitiría escritura arbitraria fuera del directorio de caché si
+            # la release se viera comprometida. Se validan TODOS los miembros
+            # antes de extraer: solo se aceptan rutas bajo `data/normalized/`.
+            for member in archive.infolist():
+                filename = member.filename
+                if not filename or filename == ".":
+                    raise ChileHubDataError("Bundle ZIP inválido: miembro con nombre vacío o '.'.")
+                if filename.startswith("/") or "\\" in filename or ".." in filename:
+                    raise ChileHubDataError(
+                        f"Bundle ZIP inválido: miembro con path traversal: {filename!r}"
+                    )
+                if not filename.startswith("data/normalized/"):
+                    raise ChileHubDataError(
+                        f"Bundle ZIP inválido: miembro fuera de data/normalized/: {filename!r}"
+                    )
+                # Detección de symlink: el modo unix (S_IFLNK = 0o120000) se
+                # codifica en los bits altos de external_attr de ZipInfo.
+                if member.external_attr >> 16 & 0o170000 == 0o120000:
+                    raise ChileHubDataError(
+                        f"Bundle ZIP inválido: miembro symlink no permitido: {filename!r}"
+                    )
             archive.extractall(self.version_cache_dir)
 
     @staticmethod
