@@ -106,3 +106,26 @@ narrativo escrito por un humano en `CHANGELOG.md`. El bloque usa el formato:
 - Los resúmenes narrativos van en **español neutral**, como el resto de la documentación
   del proyecto. Las categorías auto-generadas por PSR heredan el idioma de los mensajes
   de commit (inglés o español, según como se escribieron).
+
+## Merge queue (GitHub)
+
+Los PRs a `main` se mergean con merge queue: GitHub crea ramas temporales
+`gh-readonly-queue/main/...`, re-corre los checks requeridos contra el estado
+final (main + PR + PRs en cola) y mergea en FIFO solo si pasan. Esto elimina
+la carrera release-vs-merge (un release que pushea el bump de versión entre la
+creación del PR y su merge ya no deja el CI del merge con el pin viejo).
+
+**Cómo mergear un PR:** `gh pr merge <n> --auto --delete-branch` — agrega el PR
+a la cola; GitHub lo mergea cuando los checks requeridos pasan en el merge
+group. El PR debe tener los checks del pipeline verdes primero.
+
+**Configuración (UI, no hay API):** Settings → Branches → regla de `main` →
+"Require merge queue". Requiere que el workflow escuche el evento `merge_group`
+(ya configurado en `pipeline-check.yml` — sin ese trigger la cola fallaría
+todos los merges).
+
+**Limitaciones:** la cola espera a los checks requeridos (Python quality, Build
+and verify data, Landing smoke test, CodeQL) en el merge group; los jobs
+condicionados a `push` a main (p. ej. `docs-autosync`) no corren en la cola —
+correcto, la cola no debe escribir. Los commits de bot (`[skip ci]`) siguen
+pusheando directo a main sin pasar por la cola.

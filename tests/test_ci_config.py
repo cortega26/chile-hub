@@ -505,6 +505,31 @@ class DocsSyncGateGuardrailTests(unittest.TestCase):
         content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
         self.assertIn("python scripts/sync_docs.py --check", content)
 
+    def test_pipeline_workflow_listens_to_merge_group(self):
+        """El workflow de Pipeline Check debe escuchar el evento merge_group.
+
+        Requisito de la merge queue de GitHub: la cola crea ramas temporales
+        gh-readonly-queue/main/... y dispara el evento merge_group; sin este
+        trigger, los checks requeridos nunca se reportan y la cola falla todos
+        los merges. Sin esto, habilitar "Require merge queue" en la branch
+        protection romperia todos los merges futuros.
+        """
+        content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("merge_group:", content)
+        # La cola no debe cancelar builds en curso (prueba varios PRs en paralelo).
+        cancel_line = [line for line in content.splitlines() if "cancel-in-progress:" in line][0]
+        self.assertNotIn("merge_group", cancel_line)
+
+    def test_required_codeql_check_listens_to_merge_group(self):
+        """CodeQL es un check requerido de la rama: debe escuchar merge_group.
+
+        P1 de la review del PR #61: con CodeQL en los checks requeridos pero
+        sin el trigger merge_group en codeql.yml, cada merge en cola esperaria
+        un check que nunca se reporta y la cola se bloquearia para siempre.
+        """
+        codeql = (ROOT_DIR / ".github" / "workflows" / "codeql.yml").read_text(encoding="utf-8")
+        self.assertIn("merge_group:", codeql)
+
     def test_docs_auto_heal_lives_in_separate_main_only_job(self):
         """El auto-heal debe vivir en un job separado (docs-autosync),
         condicionado a push a main, NUNCA en el job quality (que debe
