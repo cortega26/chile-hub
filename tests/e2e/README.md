@@ -15,7 +15,6 @@ archivado). Requiere correrse desde la raíz del repo con `.venv` ya creado
 Uso:
 
 ```bash
-tests/e2e/verify_058.sh     # un plan puntual (solo planes activos)
 tests/e2e/run_all.sh        # todos los planes activos ya marcados DONE, en orden de la cola
 make e2e                    # equivalente a run_all.sh desde la raíz
 ```
