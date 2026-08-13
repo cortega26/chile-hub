@@ -430,7 +430,10 @@ class VerifyGoldenCopyTests(unittest.TestCase):
             meta = _read_json(norm / "pipeline_metadata.json")
             current = meta["version"]
             major, minor, patch_num = (int(x) for x in current.split("."))
-            meta["version"] = f"{major}.{minor}.{patch_num + 1}"
+            # +5: el golden puede estar UNA version atras respecto al codigo
+            # (ventana release->publish) — +1 coincidiria con expected y el
+            # test no probaria el caso futuro.
+            meta["version"] = f"{major}.{minor}.{patch_num + 5}"
             _write_json(norm / "pipeline_metadata.json", meta)
 
             self._patch_paths(base)
