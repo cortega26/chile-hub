@@ -135,7 +135,7 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 | 073 | [Contratos disponibles para consumidores instalados (wheel + bundle)](073-contracts-for-consumers.md) | P2 | M | MED | — | DONE (2026-08-12, commit 97f184d — contratos en el wheel + fallback; branch advisor/073 sin merge) |
 | 074 | [Anomalías temporales sobre el punto más reciente (IPC negativo)](074-anomalies-last-point-attribution.md) | P2 | S | LOW | — | DONE (2026-08-12, commit 1b95c1c — detector de nivel para punto ≤0; branch advisor/074 sin merge) |
 | 075 | [Acoplar valor y período en el regex del override INE](075-ine-regex-value-period-coupling.md) | P2 | S | LOW-MED | — | DONE (2026-08-12) |
-| 076 | [RES incremental — descargar solo el año en curso](076-res-incremental-fetch.md) | P2 | M | MED | — | TODO |
+| 076 | [RES incremental — descargar solo el año en curso](076-res-incremental-fetch.md) | P2 | M | MED | — | DONE (2026-08-12) |
 | 077 | [Caracterizar build_dev_db.py (cobertura 21% → ≥60%)](077-characterize-build-dev-db.md) | P2 | L | MED | — | TODO |
 | 078 | [Paralelizar CEAD y geometría (scrapes secuenciales)](078-parallelize-cead-geometria.md) | P2 | M | MED | — | TODO |
 | 079 | [Cobertura de writers y extractores sin test (geo, CEAD, reports)](079-cover-geo-cead-reports.md) | P2 | M | LOW | 077 (helper) | TODO |

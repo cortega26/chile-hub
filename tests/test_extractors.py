@@ -1103,6 +1103,156 @@ class ResExtractorTests(unittest.TestCase):
         self.assertTrue(policy["redistribution_ok"])
         self.assertIn("CC-BY", policy["license"])
 
+    # ── Plan 076: fetch incremental (solo el año en curso) ────────────────
+
+    @staticmethod
+    def _resource(name: str, year: int) -> dict:
+        return {
+            "name": f"Constituciones del año {year}",
+            "format": "csv",
+            "url": f"https://datos.gob.cl/resource/{name}.csv",
+        }
+
+    @staticmethod
+    def _response_mock(content: bytes = b"a;b\n1;2\n"):
+        resp = MagicMock()
+        resp.raise_for_status = lambda: None
+        resp.content = content
+        resp.__enter__.return_value = resp
+        return resp
+
+    @staticmethod
+    def _package_mock(resources: list[dict]):
+        pkg = MagicMock()
+        pkg.raise_for_status = lambda: None
+        pkg.json.return_value = {"result": {"resources": resources}}
+        pkg.__enter__.return_value = pkg
+        return pkg
+
+    def _write_staging(self, tmpdir: str, years: list[int]) -> None:
+        """Escribe un staging consolidado sintético (columnas normalizadas,
+        como las escribe write_csv del extractor) con filas de los años dados."""
+        rows = []
+        for year in years:
+            rows.append(
+                f"76286049-K,Test EIRL,EIRL,CONSTITUCION,1000000,"
+                f"{year}-05-02,{year}-05-02,{year}-05-02,"
+                f"{year},Mayo,Santiago,13,Santiago,13"
+            )
+        header = (
+            "rut,razon_social,codigo_sociedad,tipo_actuacion,capital,"
+            "fecha_actuacion,fecha_registro,fecha_aprobacion_sii,"
+            "anio,mes,comuna_tributaria,region_tributaria,comuna_social,region_social"
+        )
+        content = header + "\n" + "\n".join(rows) + "\n"
+        staging_path = Path(tmpdir) / "empresas.csv"
+        staging_path.write_text(content, encoding="utf-8")
+        return staging_path
+
+    def test_incremental_only_fetches_current_year(self):
+        """Plan 076: con staging previo presente, el fetch solo pide recursos
+        del año en curso (+ el año anterior si falta del staging)."""
+        current_year = datetime.date.today().year
+        resources = [self._resource(f"y{year}", year) for year in range(2013, current_year + 2)]
+        package_mock = self._package_mock([r | {"name": r["name"]} for r in resources])
+        response_mock = self._response_mock()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            self._write_staging(tmpdir, list(range(2013, current_year)))
+            with (
+                patch.object(res_extractor, "RAW_DIR", tmpdir),
+                patch.object(res_extractor, "STAGING_CSV_PATH", str(Path(tmpdir) / "empresas.csv")),
+                patch.object(
+                    res_extractor, "fetch_with_retry", side_effect=[package_mock, response_mock]
+                ),
+            ):
+                contents, mode, _ = res_extractor.fetch_resources()
+
+        # El año anterior ya está en el staging → solo se descarga el actual
+        self.assertEqual(mode, "live")
+        self.assertEqual(len(contents), 1)
+        self.assertEqual(res_extractor._LAST_FETCH_MODE, "incremental")
+
+    def test_incremental_fetches_previous_year_when_missing(self):
+        """Plan 076: si el año anterior falta del staging (la fuente puede
+        publicarlo con retraso), se descarga junto con el año en curso."""
+        current_year = datetime.date.today().year
+        resources = [self._resource(f"y{year}", year) for year in (current_year - 1, current_year)]
+        package_mock = self._package_mock([r | {"name": r["name"]} for r in resources])
+        response_mock = self._response_mock()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            # staging solo con años viejos (falta current_year - 1)
+            self._write_staging(tmpdir, list(range(2013, current_year - 1)))
+            with (
+                patch.object(res_extractor, "RAW_DIR", tmpdir),
+                patch.object(res_extractor, "STAGING_CSV_PATH", str(Path(tmpdir) / "empresas.csv")),
+                patch.object(
+                    res_extractor,
+                    "fetch_with_retry",
+                    side_effect=[package_mock, response_mock, response_mock],
+                ),
+            ):
+                contents, _, _ = res_extractor.fetch_resources()
+
+        self.assertEqual(len(contents), 2)
+        self.assertEqual(res_extractor._LAST_FETCH_MODE, "incremental")
+
+    def test_full_fetch_when_no_staging(self):
+        """Plan 076: sin staging previo, el fetch descarga el histórico
+        completo (todos los recursos)."""
+        current_year = datetime.date.today().year
+        resources = [self._resource(f"y{year}", year) for year in range(2013, current_year + 1)]
+        package_mock = self._package_mock([r | {"name": r["name"]} for r in resources])
+        response_mock = self._response_mock()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with (
+                patch.object(res_extractor, "RAW_DIR", tmpdir),
+                patch.object(res_extractor, "STAGING_CSV_PATH", str(Path(tmpdir) / "empresas.csv")),
+                patch.object(
+                    res_extractor,
+                    "fetch_with_retry",
+                    side_effect=[package_mock] + [response_mock] * len(resources),
+                ),
+            ):
+                contents, _, _ = res_extractor.fetch_resources()
+
+        self.assertEqual(len(contents), len(resources))
+        self.assertEqual(res_extractor._LAST_FETCH_MODE, "full")
+
+    def test_incremental_merge_preserves_history_and_dedups(self):
+        """Plan 076: el merge incremental conserva las filas históricas y
+        deduplica el solapamiento del año en curso."""
+        current_year = datetime.date.today().year
+        prev_year = current_year - 1
+        csv_content = (
+            "ID;RUT;Razon Social;Fecha de actuacion (1era firma);"
+            "Fecha de registro (ultima firma);Fecha de aprobacion x SII;"
+            "Anio;Mes;Comuna Tributaria;Region Tributaria;"
+            "Codigo de sociedad;Tipo de actuacion;Capital;Comuna Social;Region Social\n"
+            # fila del año anterior que YA está en staging (solapamiento)
+            f"9;12345678-5;Antigua SA;01-01-{prev_year};01-01-{prev_year};01-01-{prev_year};"
+            f"{prev_year};Enero;Santiago;13;SA;CONSTITUCION;9000000;Santiago;13\n"
+            # fila nueva del año en curso
+            f"10;87654321-4;Nueva SpA;02-06-{current_year};02-06-{current_year};02-06-{current_year};"
+            f"{current_year};Junio;Providencia;13;SPA;CONSTITUCION;8000000;Providencia;13\n"
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            staging_path = self._write_staging(tmpdir, [2013, prev_year])
+            df_nuevo = res_extractor.parse_resources([csv_content.encode("utf-8")])
+            with patch.object(res_extractor, "STAGING_CSV_PATH", str(staging_path)):
+                merged = res_extractor._merge_incremental(df_nuevo)
+
+        # Historial preservado (fila 2013 + la previa) + la nueva del año actual
+        merged_ruts = merged["rut"].to_list()
+        self.assertIn("12345678-5", merged_ruts)  # fila previa solapada dedup/keep
+        self.assertIn("87654321-4", merged_ruts)  # fila nueva
+        self.assertIn("76286049-K", merged_ruts)  # histórico 2013
+        # Orden final: fecha_registro descendente
+        dates = merged["fecha_registro"].to_list()
+        self.assertEqual(dates, sorted(dates, reverse=True))
+
 
 class SourceAdapterTests(unittest.TestCase):
     """Tests para los helpers reutilizables de extractores (source_adapter.py)."""
