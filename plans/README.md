@@ -144,7 +144,7 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 | 082 | [Mostrar el carril candidate en la landing](082-landing-candidate-lane.md) | P3 | M | MED | 070, 071 | DONE (2026-08-12) |
 | 083 | [Señal proactiva de review_by inminente](083-review-approaching-signal.md) | P3 | S-M | LOW | — | DONE (2026-08-12) |
 | 084 | [Promover perfil_territorial_comunal al bundle estable](084-promote-perfil-territorial.md) | P3 (decisión) | S-M | MED | 070, 071 | DONE (2026-08-12) |
-| 085 | [ADR multi-fuente para el override de IPC](085-adr-multi-source-ipc-override.md) | P3 | M | LOW | 069, 075 | TODO |
+| 085 | [ADR multi-fuente para el override de IPC](085-adr-multi-source-ipc-override.md) | P3 | M | LOW | 069, 075 | DONE (2026-08-12) |
 
 ## Dependencias y orden recomendado
 
