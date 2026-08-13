@@ -4,7 +4,7 @@
   "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/tematico/Comunas_Generalizadas/MapServer/0/query",
   "source_mode": "live",
   "source_detail": "bcn_arcgis_geometria_generalizada",
-  "refreshed_at_utc": "2026-07-29T21:05:00.773344+00:00",
+  "refreshed_at_utc": "2026-08-13T19:06:25.741920+00:00",
   "record_count": 345,
   "fields": [
     "codigo_region",
@@ -32,7 +32,7 @@
     "región 14: 12 comunas",
     "región 15: 4 comunas",
     "región 16: 21 comunas",
-    "snapshot crudo: bcn_geometria_comunal_20260729T210456Z.json"
+    "snapshot crudo: bcn_geometria_comunal_20260813T190621Z.json"
   ],
   "reuse_policy": {
     "status": "open-attribution",
