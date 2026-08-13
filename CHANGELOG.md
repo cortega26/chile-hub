@@ -12,6 +12,23 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.28.4 - 2026-08-13
+
+### Corregido
+
+- **ci**: Eliminar carreras de escritura sobre main (release no escribe datos)
+  ([#77](https://github.com/cortega26/chile-hub/pull/77),
+  [`c2d1455`](https://github.com/cortega26/chile-hub/commit/c2d145529d878973da8b0476903265b2528c1fb3))
+
+- **ci**: Eliminar carreras de escritura sobre main — release no escribe datos (write-races)
+  ([#77](https://github.com/cortega26/chile-hub/pull/77),
+  [`c2d1455`](https://github.com/cortega26/chile-hub/commit/c2d145529d878973da8b0476903265b2528c1fb3))
+
+- **ci**: P1x2 + P2 de la review del PR #77 — artifact lleva derivados, release commitea index/app
+  ([#77](https://github.com/cortega26/chile-hub/pull/77),
+  [`c2d1455`](https://github.com/cortega26/chile-hub/commit/c2d145529d878973da8b0476903265b2528c1fb3))
+
+
 ## 1.28.3 - 2026-08-13
 
 ### Corregido
