@@ -40,13 +40,24 @@ SPANISH_MONTHS = {
 
 _MONTH_PATTERN = "|".join(SPANISH_MONTHS)
 
+# Acotación del par cifra/periodo (Plan 075): el span entre el h1 del IPC,
+# su cifra y su período no puede cruzar el cierre de un contenedor
+# (`</div>`), de modo que el valor de una tarjeta nunca se case con el
+# período de otra si el INE reordena el layout. Permite tags internos
+# (`<p>`, `<br>` — el fixture real tiene `</p><p>` entre cifra y período,
+# así que `[^<]` rompería el parseo) y admite hasta 500 chars de holgura:
+# la tarjeta real ocupa ~57. Si el INE separa cifra y período en bloques
+# distintos, este patrón deja de matchear y el override degrada — es la
+# primera alerta del rediseño, no un valor erróneo silencioso.
+_ACOTADO = r"(?:(?!</div>)[\s\S]){0,500}"
+
 # Anclado al <h1> del IPC; el par cifraV3/periodoCifraV3 siguiente es el del
-# propio IPC (lazy match), no el de una tarjeta hermana. Tolerante a tildes y
-# a clases adicionales (p. ej. `class="cifraV3 highlight"`).
+# propio IPC (mismo contenedor, span acotado), no el de una tarjeta hermana.
+# Tolerante a tildes y a clases adicionales (p. ej. `class="cifraV3 highlight"`).
 _PATTERN = re.compile(
     rf"<h1[^>]*>[^<]*[ÍI]ndice\s+de\s+Precios\s+al\s+Consumidor[^<]*</h1>"
-    rf"[\s\S]*?<p[^>]*class=\"[^\"]*\bcifraV3\b[^\"]*\"[^>]*>\s*(-?\d+(?:[,.]\d+)?)\s*%\s*</p>"
-    rf"[\s\S]*?<p[^>]*class=\"[^\"]*\bperiodoCifraV3\b[^\"]*\"[^>]*>\s*Variaci[oó]n\s+mensual\s+"
+    rf"{_ACOTADO}<p[^>]*class=\"[^\"]*\bcifraV3\b[^\"]*\"[^>]*>\s*(-?\d+(?:[,.]\d+)?)\s*%\s*</p>"
+    rf"{_ACOTADO}<p[^>]*class=\"[^\"]*\bperiodoCifraV3\b[^\"]*\"[^>]*>\s*Variaci[oó]n\s+mensual\s+"
     rf"({_MONTH_PATTERN})\s+(\d{{4}})",
     re.IGNORECASE,
 )

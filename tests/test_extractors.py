@@ -451,6 +451,67 @@ class IneIpcExtractorTests(unittest.TestCase):
         self.assertIsNotNone(reading)
         self.assertAlmostEqual(reading.value, 0.1, places=6)
 
+    def test_parse_rejects_mismatched_sibling_card(self):
+        """Plan 075: si una tarjeta hermana se intercala entre el h1 del IPC y
+        su cifra, el parser no puede casar el valor ajeno con el período del
+        IPC — el span acotado no cruza el cierre del contenedor de la tarjeta
+        hermana, así que devuelve None (degradación) antes que un valor
+        erróneo silencioso."""
+        from src.extractors.ine_ipc import parse_ine_ipc
+
+        html = """
+        <div class="cuadroIndV3">
+          <h1>Índice de Precios al Consumidor - IPC</h1>
+        </div>
+        <div class="cuadroIndV3">
+          <p class="cifraV3">-2,9%</p>
+          <p class="periodoCifraV3">Variación mensual julio 2026</p>
+        </div>
+        """
+        self.assertIsNone(parse_ine_ipc(html))
+
+    def test_parse_sibling_card_between_h1_and_value(self):
+        """Plan 075: una tarjeta hermana (ICT) completa intercalada entre el
+        h1 del IPC y su cifra NO puede contaminar el valor: el h1 y su cifra
+        deben compartir contenedor."""
+        from src.extractors.ine_ipc import parse_ine_ipc
+
+        html = """
+        <div class="cuadroIndV3">
+          <h1>Índice de Precios al Consumidor - IPC</h1>
+        </div>
+        <div class="cuadroIndV3">
+          <p class="cifraV3">-2,9%</p>
+          <p class="periodoCifraV3">Variación mensual junio 2026</p>
+        </div>
+        <div class="cuadroIndV3">
+          <p class="cifraV3">0,1%</p>
+          <p class="periodoCifraV3">Variación mensual julio 2026</p>
+        </div>
+        """
+        reading = parse_ine_ipc(html)
+        # La tarjeta hermana cierra su contenedor antes de la cifra del IPC:
+        # sin cruce de </div>, el parser no llega a la cifra posterior.
+        self.assertIsNone(reading)
+
+    def test_parse_same_card_value_and_period_ok(self):
+        """Plan 075 (contra-test): cuando cifra y período están en el MISMO
+        contenedor que el h1, el parseo funciona — el acotado no rompe el
+        layout actual."""
+        from src.extractors.ine_ipc import parse_ine_ipc
+
+        html = """
+        <div class="cuadroIndV3">
+          <h1>Índice de Precios al Consumidor - IPC</h1>
+          <p class="cifraV3">0,1%</p>
+          <p class="periodoCifraV3">Variación mensual julio 2026</p>
+        </div>
+        """
+        reading = parse_ine_ipc(html)
+        self.assertIsNotNone(reading)
+        self.assertEqual(reading.date_iso, "2026-07-01")
+        self.assertAlmostEqual(reading.value, 0.1, places=6)
+
     def test_parse_negative_variation(self):
         from src.extractors.ine_ipc import parse_ine_ipc
 
