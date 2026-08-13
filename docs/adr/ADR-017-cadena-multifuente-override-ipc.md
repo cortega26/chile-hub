@@ -57,6 +57,19 @@ entrega con su última versión y el gate de edad (ADR-016) empieza a contar.
 El mantenedor ve `published_backfill` + la señal de edad, y el issue se
 reabre con evidencia — no se insiste en el scrape roto.
 
+**Alcance exacto del escape hatch** (matiz operativo — P2 de la review del
+PR #72): la degradación graciosa solo ocurre cuando el delivery llega como
+`published_backfill`, es decir en dos escenarios: (a) la request live a
+mindicador.cl **tiene éxito** pero devuelve la serie IPC vacía, o (b)
+**todas** las requests del refresh fallan y entra la rama all-backfill. En
+el escenario mixto — la request de IPC lanza excepción mientras el resto
+de los indicadores refresca bien, y el scrape INE además falla — el
+extractor registra `preserved_existing_pairs`, que la política de
+publicación **rechaza a propósito** (los recovery diagnostics no son
+`published_backfill`): no hay publicación graciosa. Ese caso queda
+bloqueado por diseño y requiere intervención humana, no sorprende a un
+operador que confíe en el escape hatch.
+
 ## Consecuencias
 
 - El publish diario de `indicadores` depende de un parseo HTML del INE;
