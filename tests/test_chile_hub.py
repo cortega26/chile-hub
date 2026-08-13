@@ -45,6 +45,9 @@ INDICADORES_NON_SYNTHETIC_DELIVERY = {
     "published_backfill",
     "raw_recovery",
     "preserved_existing",
+    # Override de último recurso desde el INE (Plan 069, ADR-017): delivery
+    # visible para que el gate de publicación evalúe el dato real scrapeado.
+    "ine_override",
 }
 EXPECTED_DATASET_COUNT = 19
 # Datasets candidate (p. ej. consumo_electrico_comunal) no tienen tarjeta en
