@@ -15,6 +15,7 @@ No contiene dirección postal (solo comuna y región), ni actividad económica.
 import datetime
 import io
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -94,6 +95,11 @@ RUT_SENTINELS = ["0"]
 # la firma de parse_resources(), que es parte del contrato del extractor.
 _LAST_SENTINEL_DROP_COUNT = 0
 
+# Modo del último fetch (Plan 076): "incremental" (solo el año en curso porque
+# el staging ya tiene el histórico) o "full" (primera carga o staging ilegible).
+# Mismo patrón de estado de módulo que _LAST_SENTINEL_DROP_COUNT.
+_LAST_FETCH_MODE = "full"
+
 # Tipos de sociedad que mapean a abreviaturas canónicas
 SOCIEDAD_MAP = {
     "SRL": "SRL",
@@ -111,8 +117,57 @@ SOCIEDAD_MAP = {
 }
 
 
+def _staging_years_present() -> set[int] | None:
+    """Años presentes en el staging consolidado (columna `anio`).
+
+    Retorna ``None`` si no hay staging o no se puede leer (primera carga o
+    staging de una generación distinta) — en ese caso el fetch es completo.
+    Solo lee la columna ``anio`` (lazy scan): el consolidado tiene ~1.57M
+    filas, pero proyectar una sola columna es barato.
+    """
+    if not os.path.exists(STAGING_CSV_PATH):
+        return None
+    try:
+        years = (
+            pl.scan_csv(STAGING_CSV_PATH, infer_schema_length=0)
+            .select("anio")
+            .unique()
+            .collect()["anio"]
+            .cast(pl.Int32, strict=False)
+            .to_list()
+        )
+    except Exception:
+        return None
+    return {y for y in years if y is not None}
+
+
+_RESOURCE_YEAR_RE = re.compile(r"[Aa]ño\s+(\d{4})")
+
+
+def _resource_year(resource: dict) -> int | None:
+    """Año del archivo anual, extraído del nombre del recurso.
+
+    Los recursos siguen el patrón "Constituciones del año 2026, con fecha de
+    corte al 30 de junio del 2026" — el año en curso cambia de nombre en cada
+    republicación (corte), los históricos son estables.
+    """
+    name = resource.get("name", "")
+    match = _RESOURCE_YEAR_RE.search(name)
+    if not match:
+        return None
+    try:
+        return int(match.group(1))
+    except ValueError:
+        return None
+
+
 def fetch_resources() -> tuple[list[bytes], str, str]:
-    """Obtiene todos los CSVs del dataset RES desde datos.gob.cl.
+    """Obtiene los CSVs del dataset RES desde datos.gob.cl.
+
+    Incremental (Plan 076): si el staging consolidado ya existe, solo se
+    descargan los archivos del año en curso (+ el año anterior si falta —
+    la fuente puede publicarlo con retraso). Sin staging, se descarga el
+    histórico completo. El merge con el staging previo lo hace process().
 
     Retorna:
         Tupla con (lista_de_contenidos_csv_bytes, source_mode, source_detail).
@@ -128,10 +183,30 @@ def fetch_resources() -> tuple[list[bytes], str, str]:
     if not csv_resources:
         raise SystemExit("No se encontraron recursos CSV en el dataset RES.")
 
+    global _LAST_FETCH_MODE
+    present_years = _staging_years_present()
+    current_year = datetime.date.today().year
+
+    if present_years is None:
+        selected_resources = csv_resources
+        _LAST_FETCH_MODE = "full"
+    else:
+        years_to_fetch = {current_year}
+        if current_year - 1 not in present_years:
+            years_to_fetch.add(current_year - 1)
+        selected_resources = [r for r in csv_resources if _resource_year(r) in years_to_fetch]
+        # Si la fuente cambió el naming y ningún recurso matchea los años
+        # buscados, degradar a fetch completo en vez de quedarse sin datos.
+        if not selected_resources:
+            selected_resources = csv_resources
+            _LAST_FETCH_MODE = "full"
+        else:
+            _LAST_FETCH_MODE = "incremental"
+
     contents = []
     stamp = datetime.datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
 
-    for resource in csv_resources:
+    for resource in selected_resources:
         resource_name = resource.get("name", "unknown").replace(" ", "_")
         raw_path = Path(RAW_DIR) / f"res_{resource_name}_{stamp}.csv"
 
@@ -311,10 +386,29 @@ class ResExtractor(BaseExtractor):
         return output
 
 
+def _merge_incremental(df_new: pl.DataFrame) -> pl.DataFrame:
+    """Concatena el staging consolidado previo con el año recién parseado.
+
+    Plan 076: el fetch incremental solo trae el año en curso; el histórico
+    vive en `data/staging/empresas.csv` (que la dedup de parse_resources ya
+    dejó sin duplicados). El merge aplica la MISMA dedup de hoy (`unique()`)
+    sobre la concatenación — si el archivo anual del año en curso solapa con
+    lo ya publicado (fecha de corte distinta), las filas repetidas se
+    eliminan y las nuevas entran. Conserva el sort final del contrato.
+    """
+    existing = pl.read_csv(STAGING_CSV_PATH)
+    merged = pl.concat([existing, df_new], how="diagonal_relaxed")
+    merged = merged.unique()
+    merged = merged.sort(["fecha_registro", "rut"], descending=[True, False])
+    return merged
+
+
 def process() -> str:
     """Ejecuta el pipeline completo del extractor RES."""
     contents, source_mode, source_detail = fetch_resources()
     df = parse_resources(contents)
+    if _LAST_FETCH_MODE == "incremental":
+        df = _merge_incremental(df)
 
     extractor = ResExtractor()
     validation = extractor.validate(df, {"source_mode": source_mode})
