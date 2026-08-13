@@ -12,6 +12,33 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.28.1 - 2026-08-13
+
+### Corregido
+
+- **ine**: Acoplar valor y periodo en el regex del override (Plan 075)
+  ([#73](https://github.com/cortega26/chile-hub/pull/73),
+  [`3181254`](https://github.com/cortega26/chile-hub/commit/318125410ce60b7952f1689aea166ab9971fed40))
+
+- **ine**: Acoplar valor y período en el regex del override (Plan 075)
+  ([#73](https://github.com/cortega26/chile-hub/pull/73),
+  [`3181254`](https://github.com/cortega26/chile-hub/commit/318125410ce60b7952f1689aea166ab9971fed40))
+
+- **ine**: Rechazar apertura de contenedor anidado en el span (Plan 075)
+  ([#73](https://github.com/cortega26/chile-hub/pull/73),
+  [`3181254`](https://github.com/cortega26/chile-hub/commit/318125410ce60b7952f1689aea166ab9971fed40))
+
+### Documentación
+
+- **adr**: ADR-017 — cadena multi-fuente para el override de IPC (Plan 085)
+  ([#72](https://github.com/cortega26/chile-hub/pull/72),
+  [`37a9b4d`](https://github.com/cortega26/chile-hub/commit/37a9b4dc5f988710b6f47ba64f2ccffdd3accdfc))
+
+- **adr**: Alcance exacto del escape hatch del ADR-017
+  ([#72](https://github.com/cortega26/chile-hub/pull/72),
+  [`37a9b4d`](https://github.com/cortega26/chile-hub/commit/37a9b4dc5f988710b6f47ba64f2ccffdd3accdfc))
+
+
 ## 1.28.0 - 2026-08-13
 
 ### Agregado
