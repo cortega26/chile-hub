@@ -512,6 +512,24 @@ class IneIpcExtractorTests(unittest.TestCase):
         self.assertEqual(reading.date_iso, "2026-07-01")
         self.assertAlmostEqual(reading.value, 0.1, places=6)
 
+    def test_parse_rejects_nested_sibling_card_after_h1(self):
+        """Plan 075 (P2 de la review del PR #73): una tarjeta hermana
+        ANIDADA como <div> hijo tras el h1 del IPC no puede entregar su
+        valor como si fuera el IPC — el span acotado rechaza también la
+        apertura de un nuevo contenedor, no solo su cierre."""
+        from src.extractors.ine_ipc import parse_ine_ipc
+
+        html = """
+        <div class="cuadroIndV3">
+          <h1>Índice de Precios al Consumidor - IPC</h1>
+          <div class="cuadroIndV3">
+            <p class="cifraV3">-2,9%</p>
+            <p class="periodoCifraV3">Variación mensual julio 2026</p>
+          </div>
+        </div>
+        """
+        self.assertIsNone(parse_ine_ipc(html))
+
     def test_parse_negative_variation(self):
         from src.extractors.ine_ipc import parse_ine_ipc
 

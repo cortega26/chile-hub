@@ -41,15 +41,16 @@ SPANISH_MONTHS = {
 _MONTH_PATTERN = "|".join(SPANISH_MONTHS)
 
 # Acotación del par cifra/periodo (Plan 075): el span entre el h1 del IPC,
-# su cifra y su período no puede cruzar el cierre de un contenedor
-# (`</div>`), de modo que el valor de una tarjeta nunca se case con el
-# período de otra si el INE reordena el layout. Permite tags internos
-# (`<p>`, `<br>` — el fixture real tiene `</p><p>` entre cifra y período,
-# así que `[^<]` rompería el parseo) y admite hasta 500 chars de holgura:
-# la tarjeta real ocupa ~57. Si el INE separa cifra y período en bloques
-# distintos, este patrón deja de matchear y el override degrada — es la
-# primera alerta del rediseño, no un valor erróneo silencioso.
-_ACOTADO = r"(?:(?!</div>)[\s\S]){0,500}"
+# su cifra y su período no puede cruzar ni la apertura ni el cierre de un
+# contenedor (`<div` / `</div>`), de modo que el valor de una tarjeta nunca
+# se case con el período de otra si el INE reordena el layout — tampoco si
+# una tarjeta hermana entra ANIDADA tras el h1 (P2 de la review del PR #73).
+# Permite tags internos (`<p>`, `<br>` — el fixture real tiene `</p><p>`
+# entre cifra y período, así que `[^<]` rompería el parseo) y admite hasta
+# 500 chars de holgura: la tarjeta real ocupa ~57. Si el INE separa cifra y
+# período en bloques distintos, este patrón deja de matchear y el override
+# degrada — es la primera alerta del rediseño, no un valor erróneo silencioso.
+_ACOTADO = r"(?:(?!</div>|<div\b)[\s\S]){0,500}"
 
 # Anclado al <h1> del IPC; el par cifraV3/periodoCifraV3 siguiente es el del
 # propio IPC (mismo contenedor, span acotado), no el de una tarjeta hermana.
