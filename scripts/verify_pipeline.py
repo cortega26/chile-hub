@@ -296,7 +296,27 @@ def verify_source_registry(registry=None, catalog=None):
                 fail(f"{dataset_name} stable_publishable must have public_bundle_eligible=true")
             if entry.get("maturity_status") != "stable":
                 fail(f"{dataset_name} stable_publishable requires maturity_status=stable")
-            if entry.get("live_ready") is not True:
+            # Exención estrecha para capas derivadas (Plan 084): un dataset
+            # con live_extractor_status=derived no tiene fetch propio — su
+            # cadencia es la del pipeline (se regenera desde upstreams en
+            # cada build). La regla live_ready existe para impedir que un
+            # "estable" nunca se actualice; un derivado cubre esa garantía
+            # por construcción SOLO si declara upstreams: exige una lista
+            # no vacía cuyas entradas existan en el registry (P2 de la
+            # review del PR #71) — un "derived" sin upstreams no es
+            # verificable y no obtiene la exención.
+            is_derived = entry.get("live_extractor_status") == "derived"
+            if is_derived:
+                upstream = entry.get("upstream_datasets") or []
+                if not upstream:
+                    fail(f"{dataset_name} derived stable_publishable requires upstream_datasets")
+                missing_upstream = [u for u in upstream if u not in registry_by_name]
+                if missing_upstream:
+                    fail(
+                        f"{dataset_name} derived stable_publishable has unknown upstream "
+                        f"datasets ({', '.join(missing_upstream)})"
+                    )
+            if not is_derived and entry.get("live_ready") is not True:
                 fail(f"{dataset_name} stable_publishable requires live_ready=true")
             if entry.get("live_extractor_status") == "fallback_only":
                 fail(f"{dataset_name} stable_publishable cannot have fallback_only extractor")

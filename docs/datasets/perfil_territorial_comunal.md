@@ -1,7 +1,8 @@
 # Perfil Territorial Comunal
 
-> **Carril:** `candidate` — NO incluido en el bundle público. Revisión de
-> carril programada (`review_by` 2026-09-18, ver `data/source_registry.json`).
+> **Carril:** `stable_publishable` — incluido en el bundle público (Plan
+> 084). Capa derivada en `build_dev_db.py` de 9 datasets upstream; su
+> `freshness_policy` es `derivada`, no una fuente viva.
 
 ## Descripción
 

@@ -49,10 +49,11 @@ def _read_source_registry() -> dict:
     """Carril por dataset: fuente única en `data/source_registry.json`.
 
     El catálogo construido (`dataset_catalog_config.json`) declara `outputs`
-    también para candidate (perfil_territorial_comunal, consumo_electrico —
-    Plan 070): inferir el carril de `outputs` era falso y dejó que el mirror
-    de HF publicara 2 capas candidate como publicables. El registry es la
-    fuente de verdad del carril (AGENTS.md §1).
+    también para candidate (consumo_electrico — Plan 070; perfil fue
+    candidate hasta su promoción en el Plan 084): inferir el carril de
+    `outputs` era falso y dejó que el mirror de HF publicara 2 capas
+    candidate como publicables. El registry es la fuente de verdad del
+    carril (AGENTS.md §1).
     """
     data = _read_json(SOURCE_REGISTRY_PATH)
     entries = data if isinstance(data, list) else list(data.values())

@@ -724,20 +724,25 @@ class ChileHubTests(unittest.TestCase):
         bundle = self.bundle
         self.assertEqual(bundle["overall_status"], self.health["overall_status"])
         self.assertEqual(bundle["dataset_count"], EXPECTED_DATASET_COUNT)
-        self.assertEqual(bundle["public_dataset_count"], 17)
-        self.assertEqual(bundle["candidate_dataset_count"], 2)
+        # Coherencia estructural (contrato del bundle, independiente de la
+        # generación de datos): ambas listas son disjuntas y cada conteo
+        # coincide con su lista. El conteo absoluto (18/1 tras el Plan 084,
+        # perfil promovido a stable) lo garantiza verify publication en el
+        # publish diario con datos frescos — en el job de PR este bundle es
+        # el del último publish (generación anterior, aún 17/2) y fijar 18
+        # aquí rompería el PR hasta el próximo daily refresh (mismo patrón
+        # de tolerancia documentada que el gate del Plan 083).
         self.assertEqual(len(bundle["datasets"]), bundle["public_dataset_count"])
         self.assertEqual(len(bundle["candidate_datasets"]), bundle["candidate_dataset_count"])
-        # Verify candidate names (only candidates with real catalog outputs;
-        # delincuencia_comunal/autoridades_locales are "próximamente" with no
-        # outputs yet, so they never appear in dataset_catalog.json)
+        stable_names = {e["dataset"] for e in bundle["datasets"]}
         candidate_names = {e["dataset"] for e in bundle["candidate_datasets"]}
+        self.assertTrue(stable_names.isdisjoint(candidate_names))
+        # perfil_territorial_comunal vive en una de las dos listas según la
+        # generación del bundle (candidate hasta el Plan 084, estable desde
+        # entonces) — pero nunca en ambas.
         self.assertEqual(
-            candidate_names,
-            {
-                "perfil_territorial_comunal",
-                "consumo_electrico_comunal",
-            },
+            "perfil_territorial_comunal" in stable_names,
+            "perfil_territorial_comunal" not in candidate_names,
         )
         self.assertEqual(
             bundle["reports"]["health_json"]["path"], "data/normalized/hub_health.json"
