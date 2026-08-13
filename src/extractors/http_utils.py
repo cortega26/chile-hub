@@ -6,6 +6,7 @@ from typing import Any, Callable
 
 import requests
 from tenacity import (
+    nap,
     retry,
     retry_if_exception,
     stop_after_attempt,
@@ -36,6 +37,7 @@ def fetch_with_retry(
     *,
     get_fn: Callable[..., Any] = requests.get,
     max_attempts: int = 3,
+    sleep: Callable[[float], Any] = nap.sleep,
     **kwargs: Any,
 ) -> Any:
     """HTTP GET con reintentos exponenciales para errores transitorios.
@@ -49,6 +51,9 @@ def fetch_with_retry(
         url: URL a descargar.
         get_fn: Función GET a invocar (requests.get por defecto; acepta curl_cffi.requests.get).
         max_attempts: Número máximo de intentos, incluyendo el primero.
+        sleep: Función de espera entre reintentos (inyectable en tests — ver
+            Plan 080: tenacity captura nap.sleep en import-time, así que el
+            patch directo no surte efecto).
         **kwargs: Parámetros adicionales para get_fn (timeout, headers, params, etc.).
     """
 
@@ -57,6 +62,7 @@ def fetch_with_retry(
         wait=wait_exponential(multiplier=1, min=2, max=8),
         retry=retry_if_exception(_is_retryable),
         reraise=True,
+        sleep=sleep,
     )
     def _attempt() -> Any:
         resp = get_fn(url, **kwargs)

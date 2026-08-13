@@ -7,6 +7,7 @@ artefactos existentes en data/normalized/.
 No cubren el CLI (argparse + _main) — eso corresponde a tests de integración.
 """
 
+import datetime
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -22,6 +23,12 @@ NORMALIZED_DIR = ROOT_DIR / "data" / "normalized"
 
 def _hub():
     """Factory reutilizable: ChileHub apuntando a data/normalized/ local."""
+    # Staleness guard (Plan 080): antes, test_core.py (73 tests) corría
+    # contra artefactos stale — el guard solo se llamaba en 3 de 9 clases
+    # de test_chile_hub.py. Se reutiliza la función compartida.
+    from test_chile_hub import _assert_normalized_not_stale
+
+    _assert_normalized_not_stale()
     return ChileHub(data_dir=NORMALIZED_DIR)
 
 
@@ -365,12 +372,18 @@ class ChileHubEdgeCaseTests(unittest.TestCase):
 
     def test_check_sources_returns_list(self):
         hub = _hub()
-        results = hub.check_sources(timeout=3)
+        # Sin red real (Plan 080): la señal de liveness la cubre
+        # source-urls.yml semanalmente — aquí solo se prueba el formato.
+        fake_resp = mock.MagicMock(status_code=200, elapsed=datetime.timedelta(milliseconds=5))
+        fake_resp.close = lambda: None
+        with mock.patch("chile_hub.core.requests.head", return_value=fake_resp):
+            results = hub.check_sources(timeout=3)
         self.assertIsInstance(results, list)
         self.assertGreater(len(results), 0)
         for r in results:
             self.assertIn("dataset", r)
             self.assertIn("status", r)
+            self.assertEqual(r["status"], "online")
 
 
 class ChileHubInternalHelpersTests(unittest.TestCase):

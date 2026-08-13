@@ -1,7 +1,7 @@
 PYTHON ?= $(if $(wildcard .venv/bin/python),.venv/bin/python,python3)
 VENV_DIR ?= .venv
 
-.PHONY: help bootstrap install-browsers doctor bump-version release extract build verify verify-dev verify-readiness verify-publication verify-live verify-landing test coverage lint lint-fix format format-check docs-coverage package package-check package-smoke check refresh sync-docs status catalog hub-list hub-summary hub-summary-table hub-example hub-artifacts hub-shared-artifacts hub-shared-artifacts-table hub-reports hub-reports-table hub-report hub-inventory hub-inventory-table hub-snapshot hub-snapshot-table hub-overview hub-overview-table hub-status hub-status-table hub-health hub-health-table hub-bundle hub-freshness-audit hub-freshness-audit-table hub-runtime-status hub-runtime-status-table hub-top-issue hub-top-issue-text hub-top-issue-table hub-packages hub-packages-table hub-package hub-package-verify hub-redistribution hub-redistribution-table hub-provenance hub-provenance-table hub-drift hub-drift-table hub-source-readiness hub-dataset-quality package-bundle clean-publishable docs-build docs-serve
+.PHONY: help bootstrap install-browsers doctor bump-version release extract build verify verify-readiness verify-publication verify-landing test coverage lint lint-fix format format-check docs-coverage package package-check package-smoke check refresh sync-docs status catalog hub-list hub-summary hub-summary-table hub-example hub-artifacts hub-shared-artifacts hub-shared-artifacts-table hub-reports hub-reports-table hub-report hub-inventory hub-inventory-table hub-snapshot hub-snapshot-table hub-overview hub-overview-table hub-status hub-status-table hub-health hub-health-table hub-bundle hub-freshness-audit hub-freshness-audit-table hub-runtime-status hub-runtime-status-table hub-top-issue hub-top-issue-text hub-top-issue-table hub-packages hub-packages-table hub-package hub-package-verify hub-redistribution hub-redistribution-table hub-provenance hub-provenance-table hub-drift hub-drift-table hub-source-readiness hub-dataset-quality package-bundle clean-publishable docs-build docs-serve
 
 help:
 	@printf "Targets disponibles:\n"
@@ -13,12 +13,10 @@ help:
 	@printf "  make extract          Ejecuta extractores\n"
 	@printf "  make build            Compila outputs del hub\n"
 	@printf "  make verify           Verifica artefactos generados (perfil dev)\n"
-	@printf "  make verify-dev       Igual que verify (perfil dev explícito)\n"
 	@printf "  make verify-readiness Valida registry, contratos, source_readiness y dataset_quality\n"
 	@printf "  make verify-publication Exige datos live y frescos aptos para publicación\n"
-	@printf "  make verify-live      [obsoleto] Usa verify-publication en su lugar\n"
 	@printf "  make verify-landing   Corre smoke check de la landing en navegador\n"
-	@printf "  make test             Corre smoke tests\n"
+	@printf "  make test             Corre la suite pytest completa (requiere `make build` previo)\n"
 	@printf "  make coverage         Corre tests con reporte de cobertura\n"
 	@printf "  make freshness-badge  Genera el badge de frescura de datos\n"
 	@printf "  make coverage-badge   Genera el badge de cobertura desde coverage.xml\n"
@@ -139,23 +137,19 @@ build:
 verify:
 	$(PYTHON) scripts/verify_pipeline.py --profile dev
 
-verify-dev:
-	$(PYTHON) scripts/verify_pipeline.py --profile dev
-
 verify-readiness:
 	$(PYTHON) scripts/verify_pipeline.py --profile readiness
 
 verify-publication:
 	$(PYTHON) scripts/verify_pipeline.py --profile publication
 
-verify-live:
-	$(PYTHON) scripts/verify_pipeline.py --require-live
-
 verify-landing:
 	$(PYTHON) scripts/verify_landing.py
 
+# xdist fijado en el Plan 080: -n auto baja la suite de ~66s a ~18s y
+# pasa la suite completa sin romper fixtures compartidos (verificado).
 test:
-	$(PYTHON) -m pytest
+	$(PYTHON) -m pytest -n auto
 
 e2e:
 	bash tests/e2e/run_all.sh

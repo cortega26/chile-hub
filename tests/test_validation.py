@@ -1046,17 +1046,34 @@ class RUTCheckDigitTests(unittest.TestCase):
         result = _expected_dv_vectorized(bases)
         self.assertEqual(result.to_list(), expected.to_list())
 
-    def test_equivalencia_con_rutificador(self):
-        """Compara _expected_dv_vectorized vs calcular_digito_verificador.
+    @staticmethod
+    def _dv_modulo11(base: str) -> str:
+        """Dígito verificador Módulo 11 (oráculo inline para tests, Plan 080).
 
-        Se salta si rutificador no está instalado (self-skip tras la migración).
-        Verifica un rango fijo de bases de 7 y 8 dígitos.
+        Algoritmo oficial del SII: dígitos de la base en orden inverso
+        multiplicados por 2,3,4,5,6,7 (ciclo); DV = 11 - (suma % 11), con
+        11→"0" y 10→"k". Sustituye a la dependencia rutificador (que no está
+        en el venv y dejaba el test con equivalencia en skip permanente).
         """
-        import pytest
+        suma = 0
+        factor = 2
+        for digito in reversed(base):
+            suma += int(digito) * factor
+            factor = 2 if factor == 7 else factor + 1
+        resto = suma % 11
+        dv = 11 - resto
+        if dv == 11:
+            return "0"
+        if dv == 10:
+            return "k"
+        return str(dv)
 
-        pytest.importorskip("rutificador")
-        from rutificador import calcular_digito_verificador
+    def test_equivalencia_con_rutificador(self):
+        """Compara _expected_dv_vectorized vs un oráculo Módulo 11 inline.
 
+        Plan 080: el test se saltaba permanentemente (rutificador no está en
+        el venv). El oráculo inline implementa el mismo algoritmo del SII —
+        verifica un rango fijo de bases de 7 y 8 dígitos."""
         from src.validation import _expected_dv_vectorized
 
         # Rango fijo pequeño: 0..999 con 7 y 8 dígitos
@@ -1066,7 +1083,7 @@ class RUTCheckDigitTests(unittest.TestCase):
         bases_series = pl.Series(bases)
 
         vectorized = _expected_dv_vectorized(bases_series)
-        expected = bases_series.map_elements(calcular_digito_verificador, return_dtype=pl.String)
+        expected = [self._dv_modulo11(b) for b in bases]
 
         mismatches = []
         for i, (v, e) in enumerate(zip(vectorized, expected)):
