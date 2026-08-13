@@ -1796,7 +1796,11 @@ class WorkflowContractTests(unittest.TestCase):
 
     def test_pipeline_check_workflow_uses_one_generated_output_artifact(self):
         self.assertIn("PIPELINE_ARTIFACT: pipeline-output-${{ github.run_id }}", self.workflow_text)
-        self.assertIn("path: data/normalized/", self.workflow_text)
+        # El artifact incluye data/normalized + los derivados del build
+        # (README/index/app) para que el publish los adopte frescos (P1 de la
+        # review del PR #77).
+        self.assertIn("data/normalized/", self.workflow_text)
+        self.assertIn("README.md\n            index.html\n            app.js", self.workflow_text)
         self.assertEqual(self.workflow_text.count("name: ${{ env.PIPELINE_ARTIFACT }}"), 3)
         self.assertNotIn("data/normalized/hub_status.json\n", self.workflow_text)
 
@@ -1874,11 +1878,13 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("uv lock", self.release_workflow_text)
         self.assertIn("uv lock --locked", self.release_workflow_text)
         self.assertIn("python scripts/sync_release_artifact_version.py", self.release_workflow_text)
-        self.assertIn("python scripts/sync_docs.py", self.release_workflow_text)
+        self.assertIn("python scripts/sync_docs.py --version-only", self.release_workflow_text)
+        # Fix/write-races: el commit del release ya NO incluye data/normalized
+        # ni index/app — la data de main la escribe solo el publish diario.
         self.assertIn(
-            "git add CHANGELOG.md pyproject.toml uv.lock data/normalized/ README.md index.html app.js",
-            self.release_workflow_text,
+            "git add CHANGELOG.md pyproject.toml uv.lock README.md", self.release_workflow_text
         )
+        self.assertNotIn("data/normalized/ README.md index.html app.js", self.release_workflow_text)
 
     def test_monthly_scrape_uses_project_extras_not_dependency_groups(self):
         self.assertNotIn("uv sync --group dev", self.monthly_workflow_text)

@@ -12,7 +12,20 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pypi-release-${{ github.ref }}
+  # Serializacion de los bots que escriben main (fix/write-races, Opcion D):
+  # grupo unico compartido por todos los workflows que commitean a main
+  # (publish, docs-autosync, release, monthly-scrape, geometria, adoption).
+  # cancel-in-progress: false -> el nuevo espera; nunca se cancelan escrituras
+  # a medio hacer. Sin esto, dos bots con pull --rebase podian colisionar y
+  # un push fallaba sin retry.
+  #
+  # Limitacion conocida (P2 de la review del PR #77): GitHub Actions retiene
+  # a lo sumo 1 running + 1 pending por grupo; un tercer miembro CANCELA el
+  # pending aunque cancel-in-progress sea false. Es aceptable porque TODOS los
+  # bots son idempotentes (el publish regenera todo desde staging; el scrape
+  # mensual recalcula; adoption recalcula estadisticas): el trabajo del bot
+  # cancelado lo rehace su siguiente corrida programada sin perdida de datos.
+  group: bot-writes-main
   cancel-in-progress: false
 
 jobs:
@@ -146,6 +159,19 @@ jobs:
             echo "assets_run_id=$found" >> "$GITHUB_OUTPUT"
           fi
 
+          # Guarda de frescura (fix/write-races, Opcion B): si el artifact
+          # proviene de un commit anterior al HEAD de main, los datos que se
+          # adjuntaran al release NO son los del codigo actual. El release ya
+          # no los commitea a main (la data la escribe solo el publish), pero
+          # se avisa para que el mantenedor no trate los adjuntos como la
+          # version oficial de datos.
+          source_run="${found:-$run_id}"
+          artifact_sha="$(gh run view "$source_run" --json headSha --jq .headSha 2>/dev/null || echo unknown)"
+          main_sha="$(git rev-parse HEAD)"
+          if [[ "$artifact_sha" != "unknown" && "$artifact_sha" != "$main_sha" ]]; then
+            echo "::warning::Artifact del run $source_run proviene de $artifact_sha, distinto del HEAD de main ($main_sha). Los datos adjuntos al release pueden no reflejar el ultimo codigo; la data oficial de main la actualiza el publish diario."
+          fi
+
           set +e
           python - <<'PY'
           import json
@@ -233,17 +259,25 @@ jobs:
               uv lock
               uv lock --locked
               python scripts/sync_release_artifact_version.py
-              # Sincroniza los bloques derivados de la version en README.md
-              # (p. ej. el pin `chile-hub==X.Y.Z`). Sin esto, el commit de
-              # release bumpa pyproject.toml pero deja el README con el pin
-              # viejo, y el siguiente push a main falla el gate
-              # sync_readme_version_pin_example (regresion 2026-08-12, el
-              # release 1.23.1 dejo el pin en 1.23.0).
-              python scripts/sync_docs.py
+              # Sincroniza SOLO el pin de version del README (`chile-hub==X.Y.Z`,
+              # --version-only). El release NO regenera bloques derivados de
+              # data/normalized (health, quality, layers): ese artifact puede
+              # provenir de un commit anterior al de main (carrera
+              # release↔publish, fix/write-races) y escribirlos pisaria datos
+              # frescos. Los datos de main los escribe unicamente el publish
+              # diario; el release adjunta el artifact al GitHub Release sin
+              # commitearlo.
+              python scripts/sync_docs.py --version-only
 
               git config user.name "github-actions[bot]"
               git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-              git add CHANGELOG.md pyproject.toml uv.lock data/normalized/ README.md index.html app.js
+              # index.html/app.js SÍ se commitean (P1 de la review del PR #77):
+              # sync_release_artifact_version.py regenero el cache-buster
+              # app.js?v= con la version nueva; dejarlo fuera dejaria main con
+              # pyproject 1.28.4 e index.html con v1.28.3. Lo que el release
+              # NO toca es data/normalized (bloques de datos) — eso es del
+              # publish diario.
+              git add CHANGELOG.md pyproject.toml uv.lock README.md index.html app.js
               git commit -m "chore(release): ${after} [skip ci]"
               tag="v${after}"
               git tag "$tag"
