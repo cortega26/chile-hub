@@ -139,7 +139,7 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 | 077 | [Caracterizar build_dev_db.py (cobertura 21% → ≥60%)](077-characterize-build-dev-db.md) | P2 | L | MED | — | TODO |
 | 078 | [Paralelizar CEAD y geometría (scrapes secuenciales)](078-parallelize-cead-geometria.md) | P2 | M | MED | — | TODO |
 | 079 | [Cobertura de writers y extractores sin test (geo, CEAD, reports)](079-cover-geo-cead-reports.md) | P2 | M | LOW | 077 (helper) | TODO |
-| 080 | [Higiene de tests (red real, sleeps, staleness, e2e, Makefile)](080-test-hygiene-batch.md) | P3 | M | LOW-MED | — | TODO |
+| 080 | [Higiene de tests (red real, sleeps, staleness, e2e, Makefile)](080-test-hygiene-batch.md) | P3 | M | LOW-MED | — | DONE (2026-08-12) |
 | 081 | [Docs — quickstart R, marcas de carril, inventario de extractores](081-docs-quickstart-lanes-inventory.md) | P3 | S | LOW | — | DONE (2026-08-12, commit 6f4c8b2 — quickstart R corregido, carriles marcados, ine_ipc en inventario; branch advisor/081 sin merge) |
 | 082 | [Mostrar el carril candidate en la landing](082-landing-candidate-lane.md) | P3 | M | MED | 070, 071 | DONE (2026-08-12) |
 | 083 | [Señal proactiva de review_by inminente](083-review-approaching-signal.md) | P3 | S-M | LOW | — | DONE (2026-08-12) |

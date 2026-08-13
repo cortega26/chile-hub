@@ -1845,9 +1845,13 @@ class HttpUtilsRetryTests(unittest.TestCase):
         self.assertEqual(result.status_code, 200)
         mock_get.assert_called_once_with("https://example.com", timeout=5)
 
-    @patch("tenacity.nap.sleep")
-    def test_retries_on_connection_error_and_succeeds(self, _sleep):
-        """Reintenta en ConnectionError transitorio y retorna respuesta al tercer intento."""
+    def test_retries_on_connection_error_and_succeeds(self):
+        """Reintenta en ConnectionError transitorio y retorna respuesta al tercer intento.
+
+        El sleep se inyecta (Plan 080): tenacity captura nap.sleep en
+        import-time, así que @patch("tenacity.nap.sleep") no surte efecto y
+        los tests dormían 2+4=6s reales. Con sleep=mock, se verifica el
+        backoff sin esperar."""
         import requests as _req
 
         from src.extractors.http_utils import fetch_with_retry
@@ -1860,21 +1864,36 @@ class HttpUtilsRetryTests(unittest.TestCase):
                 ok_resp,
             ]
         )
-        result = fetch_with_retry("https://example.com", get_fn=mock_get, max_attempts=3, timeout=5)
+        mock_sleep = MagicMock()
+        result = fetch_with_retry(
+            "https://example.com",
+            get_fn=mock_get,
+            max_attempts=3,
+            sleep=mock_sleep,
+            timeout=5,
+        )
         self.assertEqual(mock_get.call_count, 3)
         self.assertEqual(result.status_code, 200)
+        self.assertEqual(mock_sleep.call_count, 2)
 
-    @patch("tenacity.nap.sleep")
-    def test_raises_after_max_attempts_exhausted(self, _sleep):
+    def test_raises_after_max_attempts_exhausted(self):
         """Propaga ConnectionError tras agotar todos los reintentos (reraise=True)."""
         import requests as _req
 
         from src.extractors.http_utils import fetch_with_retry
 
         mock_get = MagicMock(side_effect=_req.exceptions.ConnectionError("sin red"))
+        mock_sleep = MagicMock()
         with self.assertRaises(_req.exceptions.ConnectionError):
-            fetch_with_retry("https://example.com", get_fn=mock_get, max_attempts=2, timeout=5)
+            fetch_with_retry(
+                "https://example.com",
+                get_fn=mock_get,
+                max_attempts=2,
+                sleep=mock_sleep,
+                timeout=5,
+            )
         self.assertEqual(mock_get.call_count, 2)
+        self.assertEqual(mock_sleep.call_count, 1)
 
     def test_does_not_retry_4xx(self):
         """No reintenta errores del cliente (4xx) — los retorna tal cual."""
@@ -1882,12 +1901,15 @@ class HttpUtilsRetryTests(unittest.TestCase):
 
         not_found = mock_response(None, status_code=404)
         mock_get = MagicMock(return_value=not_found)
-        result = fetch_with_retry("https://example.com", get_fn=mock_get, timeout=5)
+        mock_sleep = MagicMock()
+        result = fetch_with_retry(
+            "https://example.com", get_fn=mock_get, sleep=mock_sleep, timeout=5
+        )
         self.assertEqual(result.status_code, 404)
         mock_get.assert_called_once()
+        mock_sleep.assert_not_called()
 
-    @patch("tenacity.nap.sleep")
-    def test_retries_on_5xx_and_succeeds(self, _sleep):
+    def test_retries_on_5xx_and_succeeds(self):
         """Reintenta respuestas 5xx hasta recuperarse en el segundo intento."""
         import requests as _req
 
@@ -1900,9 +1922,17 @@ class HttpUtilsRetryTests(unittest.TestCase):
         )
         ok_resp = mock_response({"ok": True})
         mock_get = MagicMock(side_effect=[err_resp, ok_resp])
-        result = fetch_with_retry("https://example.com", get_fn=mock_get, max_attempts=3, timeout=5)
+        mock_sleep = MagicMock()
+        result = fetch_with_retry(
+            "https://example.com",
+            get_fn=mock_get,
+            max_attempts=3,
+            sleep=mock_sleep,
+            timeout=5,
+        )
         self.assertEqual(mock_get.call_count, 2)
         self.assertEqual(result.status_code, 200)
+        self.assertEqual(mock_sleep.call_count, 1)
 
     def test_is_retryable_connection_error(self):
         """_is_retryable: True para requests.exceptions.ConnectionError."""
@@ -2583,14 +2613,24 @@ class AutoridadesLocalesExtractorTests(unittest.TestCase):
         self.assertFalse(personales & {c.lower() for c in df.columns})
 
     def test_fetch_alcalde_bcn_extrae_nombre(self):
-        """Prueba unitaria con HTML real de BCN SIIT (Melipilla)."""
-        f = autoridades_locales_extractor.fetch_alcalde_bcn
-        # Esto requiere red; si no hay, es un test de integracion, no unitario.
-        # Para CI sin red, usar mock:
-        try:
-            nombre = f("13501")
-        except Exception:
-            self.skipTest("Sin acceso a BCN SIIT en este entorno")
+        """Parseo del HTML de BCN SIIT con HTML sintético (sin red, Plan 080).
+
+        La liveness de la fuente la cubre source-urls.yml semanalmente; aquí
+        solo se prueba que fetch_alcalde_bcn extrae el nombre del campo
+        Alcalde y lo limpia."""
+        html = (
+            '<table class="table table-striped">'
+            "<tr><td>Superficie</td><td>1345.0 km2</td></tr>"
+            "<tr><td>Alcalde</td><td>Olavarría&nbsp;Bravo&nbsp;Carolina</td></tr>"
+            "<tr><td>N de concejales</td><td>8</td></tr>"
+            "</table>"
+        )
+        fake_resp = MagicMock(text=html)
+        fake_resp.raise_for_status = lambda: None
+        with patch.object(
+            autoridades_locales_extractor, "fetch_with_retry", return_value=fake_resp
+        ):
+            nombre = autoridades_locales_extractor.fetch_alcalde_bcn("13501")
         self.assertIsNotNone(nombre)
         self.assertIn("Olavarría", nombre)
         self.assertNotIn("&nbsp;", nombre)
@@ -2645,17 +2685,29 @@ class AutoridadesLocalesExtractorTests(unittest.TestCase):
         self.assertEqual(nombre, "Nombre Con Espacios")
 
     def test_fetch_alcaldes_bcn_cobertura_total(self):
-        """BCN SIIT debe cubrir al menos 340 de las 345 comunas."""
+        """El flujo completo (lookup → fetch → filas) cubre todas las comunas.
+
+        Sin red real (Plan 080): fetch_alcalde_bcn se parchea con un fake —
+        la señal de liveness de BCN la cubre source-urls.yml. Lo que se
+        prueba aquí es el orquestador: construye una tarea por comuna,
+        recolecta los resultados y no pierde ninguna."""
         lookup = autoridades_locales_extractor._load_comunas_lookup()
         if not lookup:
             self.skipTest("comunas.csv no disponible")
-        try:
+        reales = {
+            (nombre, codigo)
+            for nombre, (codigo, region) in lookup.items()
+            if codigo and len(codigo) == 5 and codigo != "00000"
+        }
+        with patch.object(
+            autoridades_locales_extractor,
+            "fetch_alcalde_bcn",
+            side_effect=lambda codigo: f"Alcalde Test {codigo}",
+        ):
             filas = autoridades_locales_extractor.fetch_alcaldes_bcn(lookup, max_workers=5)
-        except Exception:
-            self.skipTest("Sin acceso a BCN SIIT en este entorno")
         self.assertGreaterEqual(len(filas), 340)
         con_nombre = sum(1 for f in filas if f["nombre"])
-        self.assertGreaterEqual(con_nombre, 300, f"Solo {con_nombre} alcaldes con nombre")
+        self.assertEqual(con_nombre, len(reales), f"Solo {con_nombre} alcaldes con nombre")
 
     def test_normalize_alcaldes_fuente_bcn(self):
         """Las filas de alcalde usan BCN SIIT como fuente (no Wikipedia)."""

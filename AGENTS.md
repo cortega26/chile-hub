@@ -834,9 +834,8 @@ make build              # Compila todos los artefactos → data/normalized/
 make verify             # Integridad de artefactos (SHA-256, conteos, schema)
 make verify-readiness   # verify_pipeline.py --profile readiness
 make verify-publication # verify_pipeline.py --profile publication
-make verify-live        # verify_pipeline.py --require-live — gate del job publish de CI
 make test               # pytest — lee data/normalized/, NO corre el pipeline
-make e2e                # tests/e2e/run_all.sh — done criteria de planes archivados (no pytest)
+make e2e                # tests/e2e/run_all.sh — scripts de planes activos (no pytest)
 make verify-landing     # Playwright smoke tests de index.html
 
 # Diagnóstico del hub

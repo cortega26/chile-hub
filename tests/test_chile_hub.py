@@ -1223,6 +1223,9 @@ class ArtifactContractTests(unittest.TestCase):
 class ChileHubCliTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        # Staleness guard (Plan 080): sin él, esta clase pasaba contra
+        # artefactos stale — el guard solo se llamaba en 3 de 9 clases.
+        _assert_normalized_not_stale()
         cls.health = ChileHub().health()
 
     def run_cli(self, *args):
@@ -1617,7 +1620,44 @@ class ChileHubCliTests(unittest.TestCase):
             self.assertIn("codigo_region", content)
 
     def test_cli_check_sources(self):
-        result = self.run_cli("check-sources", "--timeout", "2", "--format", "table")
+        # Sin red real (Plan 080): el subprocess carga un sitecustomize que
+        # parchea requests.head antes de que chile_hub lo importe — el CLI
+        # solo prueba el formato de salida, la liveness la cubre
+        # source-urls.yml semanalmente.
+        import subprocess as _subprocess
+        import sys as _sys
+
+        sitecustomize = (
+            "import datetime\n"
+            "from unittest.mock import MagicMock\n"
+            "import requests\n"
+            "def _fake(url, **kwargs):\n"
+            "    r = MagicMock(status_code=200, elapsed=datetime.timedelta(milliseconds=5))\n"
+            "    r.close = lambda: None\n"
+            "    return r\n"
+            "requests.head = _fake\n"
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            (Path(tmpdir) / "sitecustomize.py").write_text(sitecustomize, encoding="utf-8")
+            env = os.environ.copy()
+            env["PYTHONPATH"] = f"{tmpdir}{os.pathsep}{SRC_DIR}"
+            result = _subprocess.run(
+                [
+                    _sys.executable,
+                    "-m",
+                    "chile_hub",
+                    "check-sources",
+                    "--timeout",
+                    "2",
+                    "--format",
+                    "table",
+                ],
+                cwd=ROOT_DIR,
+                env=env,
+                capture_output=True,
+                text=True,
+                check=True,
+            )
         self.assertIn("chile-hub check-sources", result.stdout)
         self.assertIn("dataset", result.stdout)
         self.assertIn("status", result.stdout)
