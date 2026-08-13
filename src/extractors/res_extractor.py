@@ -395,7 +395,10 @@ def _merge_incremental(df_new: pl.DataFrame) -> pl.DataFrame:
     - `infer_schema_length=0` al leer el staging: las columnas de región son
       numéricas con padding ("01") y el inferir como int les quita el cero —
       validate_empresas las exige en formato de 2 dígitos (P1 de la review
-      del PR #74).
+      del PR #74). El costo es que `anio` y las fechas llegan como string:
+      se castean a su tipo canónico DESPUÉS del concat (anio → Int32;
+      fecha_* → Date), o validate_empresas compara string contra 2013 y
+      explota (regresión 2026-08-13, dispatch de validación de write-races).
     - Dedup por clave natural `(rut, razon_social, fecha_registro)` con
       `keep="last"`: la fuente republica el año en curso con correcciones;
       un `unique()` de fila completa conservaría el registro stale y el
@@ -405,6 +408,13 @@ def _merge_incremental(df_new: pl.DataFrame) -> pl.DataFrame:
     """
     existing = pl.read_csv(STAGING_CSV_PATH, infer_schema_length=0)
     merged = pl.concat([existing, df_new], how="diagonal_relaxed")
+    if "anio" in merged.columns:
+        merged = merged.with_columns(pl.col("anio").cast(pl.Int32, strict=False))
+    if "capital" in merged.columns:
+        merged = merged.with_columns(pl.col("capital").cast(pl.Int64, strict=False))
+    for col in ("fecha_actuacion", "fecha_registro", "fecha_aprobacion_sii"):
+        if col in merged.columns:
+            merged = merged.with_columns(pl.col(col).str.to_date("%Y-%m-%d", strict=False))
     merged = merged.unique(subset=["rut", "razon_social", "fecha_registro"], keep="last")
     merged = merged.sort(["fecha_registro", "rut"], descending=[True, False])
     return merged
