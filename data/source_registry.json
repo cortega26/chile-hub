@@ -79,6 +79,7 @@
     "stalled_after_days": 90,
     "owner": "core",
     "next_action": "Keep derived schema aligned with comunas.",
+    "upstream_datasets": ["comunas", "censo_comunal"],
     "publication_track": "stable_publishable",
     "public_bundle_eligible": true,
     "cadencia": "bajo_demanda"

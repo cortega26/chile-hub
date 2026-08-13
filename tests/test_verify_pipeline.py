@@ -458,11 +458,59 @@ class VerifySyntheticTests(unittest.TestCase):
                 "license_status": "open-attribution",
                 "publication_track": "stable_publishable",
                 "public_bundle_eligible": True,
-            }
+                "upstream_datasets": ["comunas"],
+            },
+            {
+                "dataset": "comunas",
+                "access_method": "landing_snapshot",
+                "live_extractor_status": "implemented",
+                "fallback_policy": "none",
+                "maturity_status": "stable",
+                "live_ready": True,
+                "publish_blocking": False,
+                "license_status": "open-attribution",
+                "publication_track": "stable_publishable",
+                "public_bundle_eligible": True,
+            },
         ]
         vp.verify_source_registry(
-            registry=registry, catalog={"datasets": [{"dataset": registry[0]["dataset"]}]}
+            registry=registry,
+            catalog={
+                "datasets": [
+                    {"dataset": registry[0]["dataset"]},
+                    {"dataset": "comunas"},
+                ]
+            },
         )
+
+    def test_publication_policy_rejects_derived_stable_without_upstreams(self) -> None:
+        """P2 de la review del PR #71: un stable_publishable derived SIN
+        upstream_datasets no obtiene la exención de live_ready — sin la
+        lista, la garantía "se regenera desde upstreams" no es verificable
+        y cualquier entrada podría esquivar el gate marcando derived."""
+        registry = [
+            {
+                "dataset": "perfil_territorial_comunal",
+                "access_method": "derived",
+                "live_extractor_status": "derived",
+                "fallback_policy": "none",
+                "maturity_status": "stable",
+                "live_ready": False,
+                "publish_blocking": False,
+                "license_status": "open-attribution",
+                "publication_track": "stable_publishable",
+                "public_bundle_eligible": True,
+            }
+        ]
+        with (
+            patch("builtins.print") as print_mock,
+            self.assertRaises(SystemExit),
+        ):
+            vp.verify_source_registry(
+                registry=registry, catalog={"datasets": [{"dataset": registry[0]["dataset"]}]}
+            )
+        printed = print_mock.call_args.args[0]
+        self.assertIn("requires upstream_datasets", printed)
 
     def test_publication_policy_rejects_derived_extractor_without_access_method(self) -> None:
         """Anti-drift del Plan 084: live_extractor_status=derived exige

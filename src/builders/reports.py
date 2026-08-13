@@ -670,6 +670,12 @@ def build_dataset_quality(pipeline_metadata, hub_health, source_readiness):
     def _score_source_readiness(readiness):
         if readiness.get("live_ready") and readiness.get("live_extractor_status") == "implemented":
             return 100
+        # Capas derivadas (Plan 084): se regeneran desde upstreams validados
+        # en cada build — su readiness es equivalente a una fuente live, no
+        # a un fallback. La exención del gate de publicación ya exige
+        # upstream_datasets no vacíos con entradas reales del registry.
+        if readiness.get("live_extractor_status") == "derived":
+            return 100
         if readiness.get("fallback_allowed"):
             return 50
         return 0
