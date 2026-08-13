@@ -1796,7 +1796,11 @@ class WorkflowContractTests(unittest.TestCase):
 
     def test_pipeline_check_workflow_uses_one_generated_output_artifact(self):
         self.assertIn("PIPELINE_ARTIFACT: pipeline-output-${{ github.run_id }}", self.workflow_text)
-        self.assertIn("path: data/normalized/", self.workflow_text)
+        # El artifact incluye data/normalized + los derivados del build
+        # (README/index/app) para que el publish los adopte frescos (P1 de la
+        # review del PR #77).
+        self.assertIn("data/normalized/", self.workflow_text)
+        self.assertIn("README.md\n            index.html\n            app.js", self.workflow_text)
         self.assertEqual(self.workflow_text.count("name: ${{ env.PIPELINE_ARTIFACT }}"), 3)
         self.assertNotIn("data/normalized/hub_status.json\n", self.workflow_text)
 

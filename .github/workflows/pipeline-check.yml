@@ -390,7 +390,16 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ${{ env.PIPELINE_ARTIFACT }}
-          path: data/normalized/
+          # P1 de la review del PR #77 (write-races): README/index/app viajan
+          # en el artifact porque el build los regenera con la version y los
+          # datos CORRECTOS del run — el publish los adopta. Antes solo subia
+          # data/normalized/ y el publish commitaba index/app del checkout de
+          # main (stale) y un README sin cambios.
+          path: |
+            data/normalized/
+            README.md
+            index.html
+            app.js
           if-no-files-found: error
           retention-days: 7
           compression-level: 0
@@ -472,7 +481,11 @@ jobs:
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: ${{ env.PIPELINE_ARTIFACT }}
-          path: data/normalized/
+          path: .pipeline-output/
+
+      - name: Adopt pipeline data for landing verification
+        run: |
+          cp -a .pipeline-output/data/normalized/. data/normalized/
 
       - name: Verify landing page
         run: python scripts/verify_landing.py
@@ -499,10 +512,16 @@ jobs:
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: ${{ env.PIPELINE_ARTIFACT }}
-          path: data/normalized/
+          path: .pipeline-output/
 
       - name: Commit refreshed artifacts
         run: |
+          # Adopta los archivos regenerados por el build del run (P1 de la
+          # review del PR #77): el artifact ahora incluye README/index/app
+          # junto con data/normalized/. Sin esta copia, el publish commitaba
+          # el README del checkout de main (stale) y el cache-buster viejo.
+          cp -a .pipeline-output/data/normalized/. data/normalized/
+          cp .pipeline-output/README.md .pipeline-output/index.html .pipeline-output/app.js .
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           # README.md incluido (fix/write-races): el build regenera los bloques

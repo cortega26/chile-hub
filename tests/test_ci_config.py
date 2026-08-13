@@ -328,10 +328,14 @@ class AdoptionBadgeGuardrailTests(unittest.TestCase):
             encoding="utf-8"
         )
         self.assertIn("python scripts/sync_docs.py --version-only", content)
-        self.assertIn("git add CHANGELOG.md pyproject.toml uv.lock README.md", content)
-        # El commit del release ya NO incluye data/normalized ni index/app
-        # (fix/write-races): la data de main la escribe solo el publish diario.
+        self.assertIn(
+            "git add CHANGELOG.md pyproject.toml uv.lock README.md index.html app.js", content
+        )
+        # El commit del release ya NO incluye data/normalized (fix/write-races):
+        # la data de main la escribe solo el publish diario. index/app sí van
+        # (cache-buster de version).
         self.assertNotIn("data/normalized/ README.md index.html app.js", content)
+        self.assertNotIn("uv.lock data/normalized/", content)
         # El sync debe correr ANTES del commit (mismo commit de release).
         sync_index = content.index("python scripts/sync_docs.py")
         commit_index = content.index('git commit -m "chore(release)')
@@ -848,19 +852,17 @@ class BotWriteRaceGuardrailTests(unittest.TestCase):
 
     def test_release_never_commits_data_or_derived_assets(self):
         content = PYPI_RELEASE_WORKFLOW.read_text(encoding="utf-8")
-        # El commit del release NO debe incluir data/normalized ni los
-        # derivados del build (index.html/app.js): los datos de main los
-        # escribe solo el publish diario. El release SÍ usa data/normalized
-        # para adjuntar assets al GitHub Release y para hf-publish — eso no
-        # es commitear a main, y el guard no debe confundirlo.
-        self.assertNotIn("git add CHANGELOG.md pyproject.toml uv.lock data/normalized/", content)
-        self.assertNotIn(
-            "git add CHANGELOG.md pyproject.toml uv.lock README.md index.html", content
-        )
+        # El commit del release NO debe incluir data/normalized: los datos
+        # de main los escribe solo el publish diario. El release SÍ usa
+        # data/normalized para adjuntar assets al GitHub Release y para
+        # hf-publish — eso no es commitear a main, y el guard no debe
+        # confundirlo. index.html/app.js SÍ van en el commit (cache-buster
+        # de version regenerado por sync_release_artifact_version.py, P1 de
+        # la review del PR #77).
         commit_block = content.split("git commit -m")[0].split("git add")[-1]
         self.assertNotIn("data/normalized", commit_block)
-        self.assertNotIn("index.html", commit_block)
-        self.assertNotIn("app.js", commit_block)
+        self.assertIn("index.html", commit_block)
+        self.assertIn("app.js", commit_block)
 
     def test_release_uses_version_only_sync_docs(self):
         content = PYPI_RELEASE_WORKFLOW.read_text(encoding="utf-8")
