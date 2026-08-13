@@ -12,6 +12,37 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.28.5 - 2026-08-13
+
+### Corregido
+
+- **landing**: Tolerancia direccional de version en el badge (misma ventana release->publish)
+  ([#78](https://github.com/cortega26/chile-hub/pull/78),
+  [`8a246b6`](https://github.com/cortega26/chile-hub/commit/8a246b6fff8ffc701ede86178b25b14d37ab1686))
+
+- **res**: Tipos canonicos en el merge incremental — anio/capital/fechas
+  ([#78](https://github.com/cortega26/chile-hub/pull/78),
+  [`8a246b6`](https://github.com/cortega26/chile-hub/commit/8a246b6fff8ffc701ede86178b25b14d37ab1686))
+
+- **res**: Tipos canónicos en el merge incremental (bug del dispatch)
+  ([#78](https://github.com/cortega26/chile-hub/pull/78),
+  [`8a246b6`](https://github.com/cortega26/chile-hub/commit/8a246b6fff8ffc701ede86178b25b14d37ab1686))
+
+- **verify**: Tolerancia direccional de version en hub_bundle (mismo patron que pipeline_metadata)
+  ([#78](https://github.com/cortega26/chile-hub/pull/78),
+  [`8a246b6`](https://github.com/cortega26/chile-hub/commit/8a246b6fff8ffc701ede86178b25b14d37ab1686))
+
+- **verify**: Tolerancia direccional de version en pipeline_metadata
+  ([#78](https://github.com/cortega26/chile-hub/pull/78),
+  [`8a246b6`](https://github.com/cortega26/chile-hub/commit/8a246b6fff8ffc701ede86178b25b14d37ab1686))
+
+### Tests
+
+- Version futura con +5 (robusto a la ventana release->publish)
+  ([#78](https://github.com/cortega26/chile-hub/pull/78),
+  [`8a246b6`](https://github.com/cortega26/chile-hub/commit/8a246b6fff8ffc701ede86178b25b14d37ab1686))
+
+
 ## 1.28.4 - 2026-08-13
 
 ### Corregido
