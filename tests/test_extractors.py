@@ -1221,6 +1221,47 @@ class ResExtractorTests(unittest.TestCase):
         self.assertEqual(len(contents), len(resources))
         self.assertEqual(res_extractor._LAST_FETCH_MODE, "full")
 
+    def test_incremental_merge_keeps_canonical_types_for_validation(self):
+        """Regresión 2026-08-13 (dispatch de validación de write-races): el
+        merge lee el staging con infer_schema_length=0 (para preservar el
+        padding de regiones, P1 del PR #74) y eso deja anio/capital/fechas
+        como string — validate_empresas compara contra números y explota
+        ("cannot compare string with numeric type"). El merge debe restaurar
+        los tipos canónicos (Int32/Int64/Date) y el resultado debe pasar
+        validate_empresas."""
+        import polars as pl
+
+        from src.extractors import res_extractor
+
+        current_year = datetime.date.today().year
+        prev_year = current_year - 1
+        csv_content = (
+            "ID;RUT;Razon Social;Fecha de actuacion (1era firma);"
+            "Fecha de registro (ultima firma);Fecha de aprobacion x SII;"
+            "Anio;Mes;Comuna Tributaria;Region Tributaria;"
+            "Codigo de sociedad;Tipo de actuacion;Capital;Comuna Social;Region Social\n"
+            f"9;12345678-5;Antigua SA;01-01-{prev_year};01-01-{prev_year};01-01-{prev_year};"
+            f"{prev_year};Enero;Santiago;01;SA;CONSTITUCION;9000000;Santiago;01\n"
+            f"10;87654321-4;Nueva SpA;02-06-{current_year};02-06-{current_year};02-06-{current_year};"
+            f"{current_year};Junio;Providencia;13;SPA;CONSTITUCION;8000000;Providencia;13\n"
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            staging_path = self._write_staging(tmpdir, [2013, prev_year])
+            # El staging con padding "01" en regiones (el caso que motivó
+            # infer_schema_length=0 en el merge).
+            df_nuevo = res_extractor.parse_resources([csv_content.encode("utf-8")])
+            with patch.object(res_extractor, "STAGING_CSV_PATH", str(staging_path)):
+                merged = res_extractor._merge_incremental(df_nuevo)
+
+        self.assertEqual(merged.schema["anio"], pl.Int32)
+        self.assertEqual(merged.schema["capital"], pl.Int64)
+        self.assertEqual(merged.schema["fecha_registro"], pl.Date)
+        self.assertEqual(merged["region_tributaria"].str.len_chars().min(), 2)
+        from src.validation import validate_empresas
+
+        result = validate_empresas(merged, {"notes": []})
+        self.assertEqual(result["status"], "ok", result.get("errors", [])[:3])
+
     def test_incremental_merge_preserves_history_and_dedups(self):
         """Plan 076: el merge incremental conserva las filas históricas y
         deduplica el solapamiento del año en curso."""

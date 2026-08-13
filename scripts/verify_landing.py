@@ -203,9 +203,25 @@ def verify_landing():
             fail("hub_bundle.json is missing version field")
         project_version = project_metadata.get("version")
         if expected_version != project_version:
-            fail(
-                f"hub_bundle.json version is stale: expected {project_version}, "
-                f"got {expected_version}"
+            # Misma tolerancia direccional que verify_pipeline (write-races):
+            # entre release y publish, la data de main (y el badge) puede ser
+            # una version anterior — el smoke de PR no debe fallar. Version
+            # futura o no parseable sigue siendo error duro.
+            def _vt(version: str) -> tuple:
+                try:
+                    return tuple(int(part) for part in version.split("."))
+                except ValueError:
+                    return ()
+
+            if not _vt(expected_version) or _vt(expected_version) > _vt(project_version):
+                fail(
+                    f"hub_bundle.json version is stale: expected {project_version}, "
+                    f"got {expected_version}"
+                )
+            print(
+                "WARNING [verify_landing]: hub_bundle.json version "
+                f"{expected_version} es anterior a la del codigo ({project_version}); "
+                "la data se regenerara en el proximo publish diario."
             )
         navbar_badge = page.locator(".badge-alpha")
         if navbar_badge.count() != 1:
