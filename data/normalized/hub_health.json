@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-08-12T10:56:29.988761+00:00",
+  "generated_at_utc": "2026-08-13T16:44:23.749517+00:00",
   "overall_status": "warn",
   "dataset_count": 19,
   "retired_count": 1,
@@ -19,6 +19,8 @@
   "unknown_coverage_count": 0,
   "drifted_count": 1,
   "warning_count": 5,
+  "review_approaching_count": 6,
+  "review_due_count": 0,
   "top_issue": {
     "dataset": "empresas",
     "attention_priority": 0,
