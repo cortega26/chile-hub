@@ -2711,16 +2711,6 @@
   },
   {
     "fecha": "2026-08-13",
-    "codigo_indicador": "dolar",
-    "valor": 912.0
-  },
-  {
-    "fecha": "2026-08-13",
-    "codigo_indicador": "euro",
-    "valor": 1050.93
-  },
-  {
-    "fecha": "2026-08-13",
     "codigo_indicador": "uf",
     "valor": 40850.06
   },

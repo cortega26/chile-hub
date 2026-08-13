@@ -12,6 +12,43 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.28.3 - 2026-08-13
+
+### Corregido
+
+- **test**: INDICADORES_NON_SYNTHETIC_DELIVERY incluye ine_override
+  ([#76](https://github.com/cortega26/chile-hub/pull/76),
+  [`1f37e2d`](https://github.com/cortega26/chile-hub/commit/1f37e2d9bbb2376da3672bf9733905f616b4f47d))
+
+### Documentación
+
+- Auto-sync tras carrera con release [skip ci]
+  ([`ff8dd74`](https://github.com/cortega26/chile-hub/commit/ff8dd740780971d63f162192853bbcb668291e26))
+
+- Auto-sync tras carrera con release [skip ci]
+  ([`aa8274e`](https://github.com/cortega26/chile-hub/commit/aa8274ec64aefecab25fadcd8c4874f953ada2ec))
+
+- Quality summary 95.2 — destraba Check build-synced files del publish
+  ([`89276e4`](https://github.com/cortega26/chile-hub/commit/89276e43002e3af5dabdcd31a4878cf1f3b41ed9))
+
+- README quality summary 94.2 -> 95.2 (Plan 084)
+  ([`3cfb158`](https://github.com/cortega26/chile-hub/commit/3cfb158ce0e54e1475d224c756fe3dae63777791))
+
+- **e2e**: Quita el ejemplo de script individual archivado
+  ([#75](https://github.com/cortega26/chile-hub/pull/75),
+  [`d18088e`](https://github.com/cortega26/chile-hub/commit/d18088e9abcf039512cd017050172d2e21a285e7))
+
+### Tests
+
+- Higiene — sin red real, sleeps inyectados, guards, e2e congelados (Plan 080)
+  ([#75](https://github.com/cortega26/chile-hub/pull/75),
+  [`d18088e`](https://github.com/cortega26/chile-hub/commit/d18088e9abcf039512cd017050172d2e21a285e7))
+
+- Higiene — sin red real, sleeps, guards, e2e congelados (Plan 080)
+  ([#75](https://github.com/cortega26/chile-hub/pull/75),
+  [`d18088e`](https://github.com/cortega26/chile-hub/commit/d18088e9abcf039512cd017050172d2e21a285e7))
+
+
 ## 1.28.2 - 2026-08-13
 
 ### Corregido

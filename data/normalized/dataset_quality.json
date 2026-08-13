@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-08-13T16:44:23.749517+00:00",
+  "generated_at_utc": "2026-08-12T10:56:29.988761+00:00",
   "dataset_count": 19,
   "grade_distribution": {
     "A": 18,
@@ -8,7 +8,7 @@
     "D": 0,
     "F": 0
   },
-  "average_score": 95.2,
+  "average_score": 94.2,
   "weights": {
     "validation": 25,
     "schema_contract": 20,
@@ -117,12 +117,12 @@
     {
       "dataset": "comunas_enriquecidas",
       "maturity_status": "stable",
-      "overall_score": 100.0,
+      "overall_score": 90.0,
       "grade": "A",
       "dimensions": {
         "validation": 100,
         "schema_contract": 100,
-        "source_readiness": 100,
+        "source_readiness": 50,
         "freshness": 100,
         "coverage": 100,
         "reuse_policy": 100
@@ -135,8 +135,10 @@
         "coverage": 10,
         "reuse_policy": 10
       },
-      "blocking_reasons": [],
-      "recommended_action": "Mantener monitoreo operativo y actualizaciones periódicas."
+      "blocking_reasons": [
+        "Madurez de fuente incompleta"
+      ],
+      "recommended_action": "Keep derived schema aligned with comunas."
     },
     {
       "dataset": "consumo_electrico_comunal",
@@ -372,13 +374,13 @@
     },
     {
       "dataset": "perfil_territorial_comunal",
-      "maturity_status": "stable",
-      "overall_score": 100.0,
+      "maturity_status": "candidate",
+      "overall_score": 90.0,
       "grade": "A",
       "dimensions": {
         "validation": 100,
         "schema_contract": 100,
-        "source_readiness": 100,
+        "source_readiness": 50,
         "freshness": 100,
         "coverage": 100,
         "reuse_policy": 100
@@ -391,8 +393,11 @@
         "coverage": 10,
         "reuse_policy": 10
       },
-      "blocking_reasons": [],
-      "recommended_action": "Mantener monitoreo operativo y actualizaciones periódicas."
+      "blocking_reasons": [
+        "Fuente no lista para live",
+        "Capa derivada — depende de datasets upstream no publicables"
+      ],
+      "recommended_action": "Track readiness inherited from upstream component datasets."
     },
     {
       "dataset": "pobreza_comunal",
