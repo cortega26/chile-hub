@@ -296,7 +296,17 @@ def verify_source_registry(registry=None, catalog=None):
                 fail(f"{dataset_name} stable_publishable must have public_bundle_eligible=true")
             if entry.get("maturity_status") != "stable":
                 fail(f"{dataset_name} stable_publishable requires maturity_status=stable")
-            if entry.get("live_ready") is not True:
+            # Exención estrecha para capas derivadas (Plan 084): un dataset
+            # con live_extractor_status=derived no tiene fetch propio — su
+            # cadencia es la del pipeline (se regenera desde upstreams en
+            # cada build). La regla live_ready existe para impedir que un
+            # "estable" nunca se actualice; un derivado cubre esa garantía
+            # por construcción (sus upstreams pasan los gates de publicación).
+            # La coherencia derived/access_method=derived ya la exige el gate
+            # de registry entries (arriba), así que la exención no es
+            # esquivable.
+            is_derived = entry.get("live_extractor_status") == "derived"
+            if not is_derived and entry.get("live_ready") is not True:
                 fail(f"{dataset_name} stable_publishable requires live_ready=true")
             if entry.get("live_extractor_status") == "fallback_only":
                 fail(f"{dataset_name} stable_publishable cannot have fallback_only extractor")

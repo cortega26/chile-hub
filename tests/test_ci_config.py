@@ -717,10 +717,12 @@ class HfPublishJobGuardrailTests(unittest.TestCase):
         self.assertIn('track != "stable_publishable"', content)
 
     def test_publish_script_dry_run_excludes_candidate_and_deprecated(self):
-        """El dry-run debe listar 17 capas (no 19): candidate/deprecated fuera.
+        """El dry-run debe listar 18 capas (no 19): candidate/deprecated fuera.
 
-        Regresión del Plan 070: con el catálogo real, perfil y consumo (ambos
-        candidate) no deben aparecer en la lista de parquets del mirror.
+        Regresión del Plan 070: con el catálogo real, consumo (candidate/
+        deprecated) no debe aparecer en la lista de parquets del mirror.
+        perfil_territorial_comunal SÍ debe aparecer desde el Plan 084
+        (promovido a stable_publishable 2026-08-12).
         """
         import subprocess
         import sys
@@ -735,7 +737,7 @@ class HfPublishJobGuardrailTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("data/regiones.parquet", result.stdout)
-        self.assertNotIn("data/perfil_territorial_comunal.parquet", result.stdout)
+        self.assertIn("data/perfil_territorial_comunal.parquet", result.stdout)
         self.assertNotIn("data/consumo_electrico_comunal.parquet", result.stdout)
 
     def test_workflow_never_names_candidate_lane_datasets(self):

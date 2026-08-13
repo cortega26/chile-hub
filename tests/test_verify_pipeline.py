@@ -440,6 +440,87 @@ class VerifySyntheticTests(unittest.TestCase):
         ):
             vp.verify_publication_policy({"datasets": datasets}, registry=registry)
 
+    def test_publication_policy_accepts_derived_stable_without_live_ready(self) -> None:
+        """Plan 084: un stable_publishable con live_extractor_status=derived
+        (capa regenerada desde upstreams en cada build, sin fetch propio —
+        p. ej. perfil_territorial_comunal) no requiere live_ready=true. La
+        regla live_ready existe para impedir que un "estable" nunca se
+        actualice; un derivado cubre esa garantía por construcción."""
+        registry = [
+            {
+                "dataset": "perfil_territorial_comunal",
+                "access_method": "derived",
+                "live_extractor_status": "derived",
+                "fallback_policy": "none",
+                "maturity_status": "stable",
+                "live_ready": False,
+                "publish_blocking": False,
+                "license_status": "open-attribution",
+                "publication_track": "stable_publishable",
+                "public_bundle_eligible": True,
+            }
+        ]
+        vp.verify_source_registry(
+            registry=registry, catalog={"datasets": [{"dataset": registry[0]["dataset"]}]}
+        )
+
+    def test_publication_policy_rejects_derived_extractor_without_access_method(self) -> None:
+        """Anti-drift del Plan 084: live_extractor_status=derived exige
+        access_method=derived (gate de coherencia de registry entries) —
+        nadie puede esquivar el requisito de live_ready marcando algo como
+        derivado por accidente."""
+        registry = [
+            {
+                "dataset": "perfil_territorial_comunal",
+                "access_method": "landing_snapshot",
+                "live_extractor_status": "derived",
+                "fallback_policy": "none",
+                "maturity_status": "stable",
+                "live_ready": False,
+                "publish_blocking": False,
+                "license_status": "open-attribution",
+                "publication_track": "stable_publishable",
+                "public_bundle_eligible": True,
+            }
+        ]
+        with (
+            patch("builtins.print") as print_mock,
+            self.assertRaises(SystemExit),
+        ):
+            vp.verify_source_registry(
+                registry=registry, catalog={"datasets": [{"dataset": registry[0]["dataset"]}]}
+            )
+        printed = print_mock.call_args.args[0]
+        self.assertIn("derived registry entry must set access_method=derived", printed)
+
+    def test_publication_policy_still_rejects_non_derived_without_live_ready(self) -> None:
+        """Regresión del Plan 084: la exención es ESTRECHA — un stable
+        implemented sin live_ready=true sigue fallando (la regla original
+        no debe relajarse para el caso general)."""
+        registry = [
+            {
+                "dataset": "comunas",
+                "access_method": "landing_snapshot",
+                "live_extractor_status": "implemented",
+                "fallback_policy": "none",
+                "maturity_status": "stable",
+                "live_ready": False,
+                "publish_blocking": False,
+                "license_status": "open-attribution",
+                "publication_track": "stable_publishable",
+                "public_bundle_eligible": True,
+            }
+        ]
+        with (
+            patch("builtins.print") as print_mock,
+            self.assertRaises(SystemExit),
+        ):
+            vp.verify_source_registry(
+                registry=registry, catalog={"datasets": [{"dataset": registry[0]["dataset"]}]}
+            )
+        printed = print_mock.call_args.args[0]
+        self.assertIn("requires live_ready=true", printed)
+
     # -- temporal anomaly gate (Plan 054, ADR-013) -------------------------
 
     @staticmethod
