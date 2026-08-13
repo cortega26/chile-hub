@@ -12,6 +12,25 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.28.0 - 2026-08-13
+
+### Agregado
+
+- **registry**: 4 fixes de la review del PR #71 (Plan 084)
+  ([#71](https://github.com/cortega26/chile-hub/pull/71),
+  [`384376d`](https://github.com/cortega26/chile-hub/commit/384376dd65ca3194e0fdbbaf46f258e3d8bb2ab5))
+
+- **registry**: Promover perfil_territorial_comunal al bundle estable (Plan 084)
+  ([#71](https://github.com/cortega26/chile-hub/pull/71),
+  [`384376d`](https://github.com/cortega26/chile-hub/commit/384376dd65ca3194e0fdbbaf46f258e3d8bb2ab5))
+
+### Tests
+
+- **chile_hub**: Bundle_summary agnostico a la generacion de datos
+  ([#71](https://github.com/cortega26/chile-hub/pull/71),
+  [`384376d`](https://github.com/cortega26/chile-hub/commit/384376dd65ca3194e0fdbbaf46f258e3d8bb2ab5))
+
+
 ## 1.27.0 - 2026-08-13
 
 ### Corregido
