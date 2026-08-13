@@ -766,15 +766,38 @@ def verify_required_files(required_files=None):
         fail(f"Missing required files: {', '.join(missing)}")
 
 
+def _version_tuple(version: str) -> tuple:
+    try:
+        return tuple(int(part) for part in version.split("."))
+    except ValueError:
+        return ()
+
+
 def verify_pipeline_metadata():
     metadata_path = NORMALIZED_DIR / "pipeline_metadata.json"
     metadata = load_json(metadata_path)
     expected_version = load_project_version()
-    if metadata.get("version") != expected_version:
-        fail(
-            "pipeline_metadata.json version is stale: "
-            f"expected {expected_version}, got {metadata.get('version')}. "
-            "Run 'python src/build_dev_db.py' (or 'make build') after bumping pyproject.toml."
+    metadata_version = metadata.get("version")
+    if metadata_version != expected_version:
+        # Tolerancia direccional (fix/write-races): desde que el release NO
+        # commitea data (los datos de main los escribe solo el publish diario),
+        # entre un bump de version y el siguiente publish la data de main es
+        # legítimamente UNA version anterior — el verify de PR (contra la data
+        # commiteada) no debe fallar en esa ventana. Data FUTURA (version mayor
+        # que el codigo) o no parseable sigue siendo error duro: solo puede
+        # venir de un cache o artifact mal restaurado.
+        meta_tuple = _version_tuple(metadata_version or "")
+        if not meta_tuple or meta_tuple > _version_tuple(expected_version):
+            fail(
+                "pipeline_metadata.json version is stale: "
+                f"expected {expected_version}, got {metadata_version}. "
+                "Run 'python src/build_dev_db.py' (or 'make build') after bumping pyproject.toml."
+            )
+        print(
+            "WARNING [verify_pipeline_metadata]: "
+            f"pipeline_metadata.json version {metadata_version} es anterior a la "
+            f"del codigo ({expected_version}); la data se regenerara en el proximo "
+            "publish diario (ventana release->publish)."
         )
 
     datasets = metadata.get("datasets", {})

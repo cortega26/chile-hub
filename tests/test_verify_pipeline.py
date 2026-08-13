@@ -389,6 +389,55 @@ class VerifyGoldenCopyTests(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 vp.verify_pipeline_metadata()
 
+    def test_pipeline_metadata_accepts_older_version_with_warning(self) -> None:
+        """Ventana release->publish (fix/write-races): la data de main puede
+        ser UNA version anterior a la del codigo hasta el proximo publish —
+        el verify de PR no debe fallar (solo warning)."""
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            norm = base / "data" / "normalized"
+            norm.mkdir(parents=True)
+            shutil.copy2(
+                self._golden_dir / "data" / "normalized" / "pipeline_metadata.json",
+                norm / "pipeline_metadata.json",
+            )
+            shutil.copy2(ROOT_DIR / "pyproject.toml", base / "pyproject.toml")
+
+            meta = _read_json(norm / "pipeline_metadata.json")
+            current = meta["version"]
+            major, minor, patch_num = (int(x) for x in current.split("."))
+            meta["version"] = f"{major}.{minor}.{max(0, patch_num - 1)}"
+            _write_json(norm / "pipeline_metadata.json", meta)
+
+            self._patch_paths(base)
+            self.addCleanup(self.tearDown)
+            with patch("builtins.print"):
+                vp.verify_pipeline_metadata()  # no debe lanzar SystemExit
+
+    def test_pipeline_metadata_rejects_future_version(self) -> None:
+        """Data FUTURA (version mayor que el codigo) es error duro: solo puede
+        venir de un cache o artifact mal restaurado."""
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            norm = base / "data" / "normalized"
+            norm.mkdir(parents=True)
+            shutil.copy2(
+                self._golden_dir / "data" / "normalized" / "pipeline_metadata.json",
+                norm / "pipeline_metadata.json",
+            )
+            shutil.copy2(ROOT_DIR / "pyproject.toml", base / "pyproject.toml")
+
+            meta = _read_json(norm / "pipeline_metadata.json")
+            current = meta["version"]
+            major, minor, patch_num = (int(x) for x in current.split("."))
+            meta["version"] = f"{major}.{minor}.{patch_num + 1}"
+            _write_json(norm / "pipeline_metadata.json", meta)
+
+            self._patch_paths(base)
+            self.addCleanup(self.tearDown)
+            with self.assertRaises(SystemExit):
+                vp.verify_pipeline_metadata()
+
 
 # ═══════════════════════════════════════════════════════════════════════════
 #  Synthetic-fixture tests  (parameterized gates)
