@@ -1332,11 +1332,25 @@ def verify_hub_bundle():
     bundle_path = NORMALIZED_DIR / "hub_bundle.json"
     bundle = load_json(bundle_path)
     expected_version = load_project_version()
-    if bundle.get("version") != expected_version:
-        fail(
-            "hub_bundle.json version is stale: "
-            f"expected {expected_version}, got {bundle.get('version')}. "
-            "Run 'python src/build_dev_db.py' (or sync release artifacts) after bumping pyproject.toml."
+    bundle_version = bundle.get("version")
+    if bundle_version != expected_version:
+        # Misma tolerancia direccional que verify_pipeline_metadata
+        # (fix/write-races): la data de main puede ser una version anterior
+        # a la del codigo entre release y publish; version futura o no
+        # parseable sigue siendo error duro.
+        bundle_tuple = _version_tuple(bundle_version or "")
+        if not bundle_tuple or bundle_tuple > _version_tuple(expected_version):
+            fail(
+                "hub_bundle.json version is stale: "
+                f"expected {expected_version}, got {bundle_version}. "
+                "Run 'python src/build_dev_db.py' (or sync release artifacts) "
+                "after bumping pyproject.toml."
+            )
+        print(
+            "WARNING [verify_hub_bundle]: "
+            f"hub_bundle.json version {bundle_version} es anterior a la del "
+            f"codigo ({expected_version}); la data se regenerara en el proximo "
+            "publish diario (ventana release->publish)."
         )
 
     if bundle.get("dataset_count") != len(REQUIRED_DATASETS):
