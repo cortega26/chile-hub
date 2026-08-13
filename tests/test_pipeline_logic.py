@@ -2314,6 +2314,64 @@ class RemainingValidatorTests(unittest.TestCase):
 class PipelineStatusUtilsTests(unittest.TestCase):
     """Tests para funciones puras de pipeline_status_utils."""
 
+    def test_source_readiness_markdown_signals_review_upcoming(self):
+        """Plan 083: la columna 'Estancado' del markdown muestra ⏳ para
+        review_status upcoming y el texto 'REVIEW BY' en la acción — la
+        señal de cadencia debe ser visible en source_readiness.md, no solo
+        en el JSON."""
+        from src.chile_hub import pipeline_status_utils as psu
+
+        today = datetime.datetime.now(UTC)
+        readiness = {
+            "generated_at_utc": today.isoformat(),
+            "stable_count": 0,
+            "candidate_count": 2,
+            "experimental_count": 0,
+            "deprecated_count": 0,
+            "live_ready_count": 1,
+            "fallback_only_count": 0,
+            "publish_blocking_count": 0,
+            "review_approaching_count": 1,
+            "review_due_count": 0,
+            "datasets": [
+                {
+                    "dataset": "near_candidate",
+                    "maturity_status": "candidate",
+                    "source_id": "src_x",
+                    "source_mode": "live",
+                    "live_ready": True,
+                    "fallback_allowed": False,
+                    "publish_blocking": False,
+                    "live_extractor_status": "implemented",
+                    "stalled": False,
+                    "review_status": "upcoming",
+                    "review_by": (today + datetime.timedelta(days=10)).date().isoformat(),
+                    "recommended_action": "⏳ REVIEW BY — acción agendada.",
+                },
+                {
+                    "dataset": "far_candidate",
+                    "maturity_status": "candidate",
+                    "source_id": "src_y",
+                    "source_mode": "live",
+                    "live_ready": True,
+                    "fallback_allowed": False,
+                    "publish_blocking": False,
+                    "live_extractor_status": "implemented",
+                    "stalled": False,
+                    "review_status": "ok",
+                    "review_by": None,
+                    "recommended_action": "Sin señal.",
+                },
+            ],
+        }
+
+        markdown = psu.build_source_readiness_markdown(readiness)
+
+        self.assertIn("`⏳`", markdown)
+        self.assertIn("REVIEW BY", markdown)
+        self.assertIn("`review_approaching_count`: `1`", markdown)
+        self.assertIn("near_candidate", markdown)
+
     def test_root_resolution_is_unified_in_paths_module(self):
         """TECHDEBT-05: todos los módulos del paquete resuelven la raíz desde
         `_paths`, no con `parents[N]` propios.
@@ -2586,6 +2644,96 @@ class ReportsBuilderTests(unittest.TestCase):
         self.assertEqual(status["overall_status"], "warn")
         self.assertEqual(status["live_count"], 2)
         self.assertEqual(status["top_issue"]["dataset"], "c_fallback")
+
+    def test_build_source_readiness_review_status_thresholds(self):
+        """Plan 083: review_status clasifica upcoming (< 90 días), due
+        (vencida) y ok — con el umbral de cadencia de stalled_after_days
+        (90), no los 30 del borrador del plan (las 4 fechas reales del
+        registry están a 36-69 días; con 30 no habría señal)."""
+        from src.builders.reports import build_source_readiness
+
+        today = datetime.datetime.now(UTC)
+        registry = [
+            {
+                "dataset": "near_candidate",
+                "maturity_status": "candidate",
+                "review_by": (today + datetime.timedelta(days=10)).date().isoformat(),
+                "stalled_after_days": 90,
+            },
+            {
+                "dataset": "mid_candidate",
+                "maturity_status": "candidate",
+                "review_by": (today + datetime.timedelta(days=40)).date().isoformat(),
+                "stalled_after_days": 90,
+            },
+            {
+                "dataset": "far_candidate",
+                "maturity_status": "candidate",
+                "review_by": (today + datetime.timedelta(days=120)).date().isoformat(),
+                "stalled_after_days": 90,
+            },
+            {
+                "dataset": "overdue_candidate",
+                "maturity_status": "candidate",
+                "review_by": (today - datetime.timedelta(days=5)).date().isoformat(),
+                "stalled_after_days": 90,
+            },
+        ]
+        metadata = {
+            "datasets": {entry["dataset"]: {"source_mode": "live"} for entry in registry},
+            "generated_at_utc": today.isoformat(),
+        }
+        with patch("src.builders.reports.load_source_registry", return_value=registry):
+            readiness = build_source_readiness(metadata)
+
+        by_name = {entry["dataset"]: entry for entry in readiness["datasets"]}
+        self.assertEqual(by_name["near_candidate"]["review_status"], "upcoming")
+        self.assertEqual(by_name["mid_candidate"]["review_status"], "upcoming")
+        self.assertEqual(by_name["far_candidate"]["review_status"], "ok")
+        self.assertEqual(by_name["overdue_candidate"]["review_status"], "due")
+        self.assertTrue(by_name["overdue_candidate"]["stalled"])
+        self.assertIn("REVIEW BY", by_name["near_candidate"]["recommended_action"])
+        self.assertIn("ESTANCADO", by_name["overdue_candidate"]["recommended_action"])
+        self.assertEqual(readiness["review_approaching_count"], 2)
+        self.assertEqual(readiness["review_due_count"], 1)
+
+    def test_build_hub_health_exposes_review_counts(self):
+        """Plan 083: hub_health.json expone review_approaching_count y
+        review_due_count de forma aditiva — sin alterar overall_status."""
+        import tempfile
+
+        today = datetime.datetime.now(UTC)
+        registry = [
+            {
+                "dataset": "ds_a",
+                "review_by": (today + datetime.timedelta(days=10)).date().isoformat(),
+            },
+            {
+                "dataset": "ds_b",
+                "review_by": (today - datetime.timedelta(days=3)).date().isoformat(),
+            },
+        ]
+        metadata = {
+            "generated_at_utc": "2026-07-08T00:00:00+00:00",
+            "datasets": {
+                "ds_a": self._catalog_entry("ds_a", "live"),
+                "ds_b": self._catalog_entry("ds_b", "live"),
+            },
+            "validations": {
+                "ds_a": {"status": "ok", "warnings": [], "expected_warnings": []},
+                "ds_b": {"status": "ok", "warnings": [], "expected_warnings": []},
+            },
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            registry_path = Path(tmpdir) / "source_registry.json"
+            registry_path.write_text(json.dumps(registry), encoding="utf-8")
+            with patch.object(_pipeline_canonical, "SOURCE_REGISTRY_PATH", registry_path):
+                health = build_hub_health(metadata)
+
+        self.assertEqual(health["review_approaching_count"], 1)
+        self.assertEqual(health["review_due_count"], 1)
+        self.assertEqual(health["overall_status"], "ok")
 
 
 class HubHealthHistoryTests(unittest.TestCase):

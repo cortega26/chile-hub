@@ -1174,6 +1174,21 @@ def verify_hub_health():
         if health.get(key) is None:
             fail(f"hub_health.json is missing {key}")
 
+    # Señal de cadencia de review_by (Plan 083): counts aditivos, enteros
+    # no negativos — la señal agenda decisiones de carril, nunca altera
+    # el overall_status.
+    #
+    # Tolerancia a ausencia: son campos de contrato NUEVO. En el job de PR
+    # este verify corre contra data/normalized commiteado del último
+    # publish (sin build), donde legítimamente aún no existen (regresión
+    # 2026-08-12, PR #70). La presencia del campo la garantiza
+    # test_build_hub_health_exposes_review_counts; este gate valida tipo y
+    # rango cuando el build lo produce (schedule/publish, datos frescos).
+    for key in ("review_approaching_count", "review_due_count"):
+        value = health.get(key)
+        if value is not None and (not isinstance(value, int) or value < 0):
+            fail(f"hub_health.json has invalid {key}: {value}")
+
     datasets = health.get("datasets", [])
     dataset_names = {entry.get("dataset") for entry in datasets}
     if dataset_names != REQUIRED_DATASETS:
