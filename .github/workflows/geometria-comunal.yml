@@ -9,8 +9,17 @@ permissions:
 env:
   PYTHON_VERSION: "3.13"
 
+
+
+
 concurrency:
-  group: geometria-comunal
+  # Serializacion de los bots que escriben main (fix/write-races, Opcion D):
+  # grupo unico compartido por todos los workflows que commitean a main
+  # (publish, docs-autosync, release, monthly-scrape, geometria, adoption).
+  # cancel-in-progress: false -> el nuevo espera; nunca se cancelan escrituras
+  # a medio hacer. Sin esto, dos bots con pull --rebase podian colisionar y
+  # un push fallaba sin retry.
+  group: bot-writes-main
   cancel-in-progress: false
 
 jobs:

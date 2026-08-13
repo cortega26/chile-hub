@@ -1874,11 +1874,13 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("uv lock", self.release_workflow_text)
         self.assertIn("uv lock --locked", self.release_workflow_text)
         self.assertIn("python scripts/sync_release_artifact_version.py", self.release_workflow_text)
-        self.assertIn("python scripts/sync_docs.py", self.release_workflow_text)
+        self.assertIn("python scripts/sync_docs.py --version-only", self.release_workflow_text)
+        # Fix/write-races: el commit del release ya NO incluye data/normalized
+        # ni index/app — la data de main la escribe solo el publish diario.
         self.assertIn(
-            "git add CHANGELOG.md pyproject.toml uv.lock data/normalized/ README.md index.html app.js",
-            self.release_workflow_text,
+            "git add CHANGELOG.md pyproject.toml uv.lock README.md", self.release_workflow_text
         )
+        self.assertNotIn("data/normalized/ README.md index.html app.js", self.release_workflow_text)
 
     def test_monthly_scrape_uses_project_extras_not_dependency_groups(self):
         self.assertNotIn("uv sync --group dev", self.monthly_workflow_text)

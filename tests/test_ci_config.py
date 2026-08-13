@@ -319,16 +319,19 @@ class AdoptionBadgeGuardrailTests(unittest.TestCase):
         toco README.md (no estaba en el git add del release workflow), dejando
         el pin en 1.23.0; el siguiente push a main (merge del PR #58) fallo el
         gate sync_readme_version_pin_example del job quality y cancelo Pages
-        Deploy. El commit de release ahora corre `python scripts/sync_docs.py`
-        e incluye README.md en el git add.
+        Deploy. El commit de release ahora corre `python scripts/sync_docs.py
+        --version-only` (fix/write-races: el sync COMPLETO regeneraria bloques
+        de datos desde un artifact potencialmente viejo) e incluye README.md
+        en el git add — sin data/normalized ni index/app.
         """
         content = (ROOT_DIR / ".github" / "workflows" / "pypi-release.yml").read_text(
             encoding="utf-8"
         )
-        self.assertIn("python scripts/sync_docs.py", content)
-        self.assertIn(
-            "git add CHANGELOG.md pyproject.toml uv.lock data/normalized/ README.md", content
-        )
+        self.assertIn("python scripts/sync_docs.py --version-only", content)
+        self.assertIn("git add CHANGELOG.md pyproject.toml uv.lock README.md", content)
+        # El commit del release ya NO incluye data/normalized ni index/app
+        # (fix/write-races): la data de main la escribe solo el publish diario.
+        self.assertNotIn("data/normalized/ README.md index.html app.js", content)
         # El sync debe correr ANTES del commit (mismo commit de release).
         sync_index = content.index("python scripts/sync_docs.py")
         commit_index = content.index('git commit -m "chore(release)')
@@ -820,6 +823,74 @@ class LandingCandidateLaneGuardrailTests(unittest.TestCase):
         self.assertIn("candidate_datasets", content)
         self.assertIn(".candidate-card", content)
         self.assertIn('"0 capas"', content)
+
+
+class BotWriteRaceGuardrailTests(unittest.TestCase):
+    """Regresión 2026-08-13 (fix/write-races): tres carreras encadenadas
+    sobre main por escritores de bot:
+
+    R1. El release 1.28.2/1.28.3 bajaba el artifact del pipeline MÁS
+        RECIENTE EXITOSO (posiblemente de un commit anterior al último
+        merge) y lo commitaba a main junto con README/index.html/app.js
+        regenerados desde esa data vieja — pisando data fresca y el README
+        del Plan 084 (94.2 vs 95.2), rompiendo los gates de todos los PRs
+        siguientes.
+    R2. El publish diario NO commitaba README.md, así que el bloque de
+        health/quality regenerado quedaba desincronizado en main hasta el
+        siguiente push (gap que dejó el README en 94.2 tras el release).
+    R3. Los bots escribían main sin serialización: dos pull --rebase
+        concurrentes podían colisionar sin retry.
+
+    Solución: el release solo versiona (nunca data), el publish commitea
+    README, y todos los bots comparten el grupo de concurrency
+    `bot-writes-main`.
+    """
+
+    def test_release_never_commits_data_or_derived_assets(self):
+        content = PYPI_RELEASE_WORKFLOW.read_text(encoding="utf-8")
+        # El commit del release NO debe incluir data/normalized ni los
+        # derivados del build (index.html/app.js): los datos de main los
+        # escribe solo el publish diario. El release SÍ usa data/normalized
+        # para adjuntar assets al GitHub Release y para hf-publish — eso no
+        # es commitear a main, y el guard no debe confundirlo.
+        self.assertNotIn("git add CHANGELOG.md pyproject.toml uv.lock data/normalized/", content)
+        self.assertNotIn(
+            "git add CHANGELOG.md pyproject.toml uv.lock README.md index.html", content
+        )
+        commit_block = content.split("git commit -m")[0].split("git add")[-1]
+        self.assertNotIn("data/normalized", commit_block)
+        self.assertNotIn("index.html", commit_block)
+        self.assertNotIn("app.js", commit_block)
+
+    def test_release_uses_version_only_sync_docs(self):
+        content = PYPI_RELEASE_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("sync_docs.py --version-only", content)
+        # No debe correr el sync completo (regeneraría bloques de data desde
+        # el artifact potencialmente viejo).
+        self.assertNotIn("python scripts/sync_docs.py\n", content)
+
+    def test_publish_commits_readme(self):
+        content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("git add --all data/normalized/ index.html app.js README.md", content)
+
+    def test_all_bot_writers_share_concurrency_group(self):
+        for path in (
+            PIPELINE_CHECK_WORKFLOW,
+            PYPI_RELEASE_WORKFLOW,
+            MONTHLY_SCRAPE_WORKFLOW,
+            GEOMETRIA_COMUNAL_WORKFLOW,
+            ADOPTION_STATS_WORKFLOW,
+        ):
+            content = path.read_text(encoding="utf-8")
+            self.assertIn(
+                "group: bot-writes-main", content, f"{path.name} sin grupo de concurrency"
+            )
+            self.assertIn("cancel-in-progress: false", content, f"{path.name} con cancel permitido")
+
+    def test_sync_docs_version_only_flag_exists(self):
+        content = (ROOT_DIR / "scripts" / "sync_docs.py").read_text(encoding="utf-8")
+        self.assertIn("--version-only", content)
+        self.assertIn("sync_readme_version_pin_example", content)
 
 
 if __name__ == "__main__":
