@@ -12,6 +12,25 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.28.2 - 2026-08-13
+
+### Corregido
+
+- **res**: Contrato del merge incremental — padding de regiones y dedup por clave
+  ([#74](https://github.com/cortega26/chile-hub/pull/74),
+  [`7988f98`](https://github.com/cortega26/chile-hub/commit/7988f985fa3208901765aeab4e5e388fffae6866))
+
+### Mejorado
+
+- **res**: Fetch incremental — solo el anio en curso (Plan 076)
+  ([#74](https://github.com/cortega26/chile-hub/pull/74),
+  [`7988f98`](https://github.com/cortega26/chile-hub/commit/7988f985fa3208901765aeab4e5e388fffae6866))
+
+- **res**: Fetch incremental — solo el año en curso (Plan 076)
+  ([#74](https://github.com/cortega26/chile-hub/pull/74),
+  [`7988f98`](https://github.com/cortega26/chile-hub/commit/7988f985fa3208901765aeab4e5e388fffae6866))
+
+
 ## 1.28.1 - 2026-08-13
 
 ### Corregido
