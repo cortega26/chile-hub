@@ -12,6 +12,25 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.27.0 - 2026-08-13
+
+### Corregido
+
+- **verify**: Gate de review counts tolerante a datos del ultimo publish
+  ([#70](https://github.com/cortega26/chile-hub/pull/70),
+  [`b723048`](https://github.com/cortega26/chile-hub/commit/b723048924eb9f3edcfdbca79b810ffadc58a05b))
+
+### Agregado
+
+- **health**: Senal proactiva de review_by upcoming/due (Plan 083)
+  ([#70](https://github.com/cortega26/chile-hub/pull/70),
+  [`b723048`](https://github.com/cortega26/chile-hub/commit/b723048924eb9f3edcfdbca79b810ffadc58a05b))
+
+- **health**: Señal proactiva de review_by upcoming/due (Plan 083)
+  ([#70](https://github.com/cortega26/chile-hub/pull/70),
+  [`b723048`](https://github.com/cortega26/chile-hub/commit/b723048924eb9f3edcfdbca79b810ffadc58a05b))
+
+
 ## 1.26.0 - 2026-08-12
 
 ### Documentación
