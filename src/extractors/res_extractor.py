@@ -390,15 +390,22 @@ def _merge_incremental(df_new: pl.DataFrame) -> pl.DataFrame:
     """Concatena el staging consolidado previo con el año recién parseado.
 
     Plan 076: el fetch incremental solo trae el año en curso; el histórico
-    vive en `data/staging/empresas.csv` (que la dedup de parse_resources ya
-    dejó sin duplicados). El merge aplica la MISMA dedup de hoy (`unique()`)
-    sobre la concatenación — si el archivo anual del año en curso solapa con
-    lo ya publicado (fecha de corte distinta), las filas repetidas se
-    eliminan y las nuevas entran. Conserva el sort final del contrato.
+    vive en `data/staging/empresas.csv`. Detalles de contrato:
+
+    - `infer_schema_length=0` al leer el staging: las columnas de región son
+      numéricas con padding ("01") y el inferir como int les quita el cero —
+      validate_empresas las exige en formato de 2 dígitos (P1 de la review
+      del PR #74).
+    - Dedup por clave natural `(rut, razon_social, fecha_registro)` con
+      `keep="last"`: la fuente republica el año en curso con correcciones;
+      un `unique()` de fila completa conservaría el registro stale y el
+      corregido como dos filas (P2 de la review del PR #74). Con
+      `concat([existing, new])`, keep="last" hace ganar la versión nueva.
+      Conserva el sort final del contrato.
     """
-    existing = pl.read_csv(STAGING_CSV_PATH)
+    existing = pl.read_csv(STAGING_CSV_PATH, infer_schema_length=0)
     merged = pl.concat([existing, df_new], how="diagonal_relaxed")
-    merged = merged.unique()
+    merged = merged.unique(subset=["rut", "razon_social", "fecha_registro"], keep="last")
     merged = merged.sort(["fecha_registro", "rut"], descending=[True, False])
     return merged
 
