@@ -20,9 +20,10 @@ operativa son los workflows, esta página es la vista de referencia.
    Nunca mezclar un extractor en dos carriles.
 2. **El override INE es parte del carril diario de `indicadores`.** Cuando
    mindicador.cl no entrega el IPC del año en curso, `ine_ipc.py` scrapea la
-   variación mensual de la página pública del INE (fuente autoritativa, Plan
-   069) ANTES de recurrir al backfill — el publish diario depende de ese
-   parseo HTML, y su edad está gateada (ADR-016).
+   variación mensual de la página pública del INE (fuente autoritativa) ANTES
+   de recurrir al backfill — el publish diario depende de ese parseo HTML, y
+   su edad está gateada (ADR-016). La cadena multi-fuente completa (agregador
+   → override → backfill) y su escape hatch están decididos en ADR-017.
 3. **El stub SINIM nunca corre en un job programado.** `sinim_finanzas_extractor.py`
    siempre escribe 3 filas de muestra; el snapshot real mensual vive versionado en
    git y lo restaura `pipeline-check.yml` tras un restore de caché obsoleto.

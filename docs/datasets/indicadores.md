@@ -130,6 +130,12 @@ Esta capa puede seguir en MVP, pero todavía conviene mejorar en:
 2. una política explícita para distinguir backfill desde raw local versus backfill desde artifact publicado
 3. una estrategia histórica más clara para IPC y UTM frente a snapshots parciales del agregador
 
+> **Entregada (ADR-017):** la estrategia del punto 3 para el IPC está decidida
+> y documentada en [`ADR-017`](../adr/ADR-017-cadena-multifuente-override-ipc.md)
+> — cadena multi-fuente (agregador → override INE → backfill) con delivery
+> visible y escape hatch; pendiente el análogo para UTM (pregunta abierta del
+> mismo ADR).
+
 ## Vigencia de las series (ADR-016)
 
 `pipeline_metadata.json` expone `indicator_max_date` e `indicator_age_days` por
