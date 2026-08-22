@@ -206,7 +206,7 @@ chile-hub health       # severidad, frescura, drift y cobertura
 ### Respaldo adicional
 
 <!-- START_TEST_COUNT -->
-- **908 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
+- **909 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
 <!-- END_TEST_COUNT -->
 <!-- START_ADR_COUNT -->
 - **17 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
@@ -534,7 +534,7 @@ print(df.head())
 > **Versionado:** Para entornos productivos, fija la versión exacta en `requirements.txt`
 > (revisa el badge de PyPI al inicio de este README para la versión más reciente):
 > ```
-> chile-hub==1.28.4
+> chile-hub==1.28.5
 > ```
 > El bundle de datos se publica con cada release. La API del módulo `ChileHub` sigue
 > versionado semántico: cambios de interfaz pública solo en _major releases_.

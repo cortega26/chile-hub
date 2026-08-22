@@ -118,7 +118,7 @@ chile-hub/
 │   │   └── subdere_extractor.py                          DPA: regiones/provincias/comunas/comunas_enriquecidas (BCN ArcGIS) → data/staging/
 <!-- END_AGENTS_EXTRACTOR_LIST -->
 │   ├── validation.py              Todas las funciones validate_*() — módulo independiente (1 505 líneas)
-│   ├── build_dev_db.py            Orquestador (883 líneas): main() + fases (_load_inputs, _compute_validations, _write_data_artifacts, _generate_reports)
+│   ├── build_dev_db.py            Orquestador (805 líneas): main() + fases (_load_inputs, _compute_validations, _write_data_artifacts, _generate_reports)
 │   ├── builders/                  Módulos del pipeline extraídos de build_dev_db.py (formats, metadata, reports, artifacts, datasets, catalog, landing, io_utils, _shared, dcat_catalog, data_package, doc_sync, geo, _logging)
 │   ├── chile_hub.py               Compatibility shim (21 líneas) — delega al paquete
 │   ├── chile_hub/                 Paquete Python instalable (ChileHub API + CLI + data manager)
@@ -191,7 +191,7 @@ codegraph impact validate_comunas                   # Qué se rompe si cambio es
 **Reglas para acotar lecturas y ahorrar tokens:**
 - Usar `Read` con `offset`/`limit` — nunca leer archivos grandes enteros de golpe.
 - `base.py` (76 líneas) es seguro de leer completo. `validation.py` (1 505 líneas) — leer por validador individual.
-- `build_dev_db.py` (883 líneas) y `src/chile_hub/core.py` (1 987 líneas) — usar estas áncoras:
+- `build_dev_db.py` (805 líneas) y `src/chile_hub/core.py` (1 987 líneas) — usar estas áncoras:
 
 | Archivo | Líneas de interés |
 |---|---|

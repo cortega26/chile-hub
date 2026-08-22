@@ -110,6 +110,7 @@ from src.builders.reports import (  # noqa: E402
     write_redistribution_report_json,
     write_source_readiness_json,
 )
+from src.builders.staging_schema import STAGING_SCHEMAS, apply_date_casts  # noqa: E402
 from src.pipeline_status_utils import (
     build_hub_health,
     write_dataset_catalog_markdown_file,
@@ -293,94 +294,36 @@ def _load_inputs():
 
     # Cargar datos desde staging
     # Especificamos explícitamente el tipo de dato de los códigos a String para no perder ceros
-    df_comunas = pl.read_csv(
-        comunas_csv,
-        schema_overrides={
-            "codigo_region": pl.String,
-            "codigo_provincia": pl.String,
-            "codigo_comuna": pl.String,
-        },
-    )
+    df_comunas = pl.read_csv(comunas_csv, schema_overrides=STAGING_SCHEMAS["comunas"])
 
     df_indicadores = pl.read_csv(
-        indicadores_csv,
-        schema_overrides={"codigo_indicador": pl.String, "valor": pl.Float64},
+        indicadores_csv, schema_overrides=STAGING_SCHEMAS["indicadores"]
     ).with_columns(pl.col("fecha").str.to_date("%Y-%m-%d"))
-    df_censo = pl.read_csv(
-        censo_csv,
-        schema_overrides={
-            "codigo_region": pl.String,
-            "codigo_provincia": pl.String,
-            "codigo_comuna": pl.String,
-        },
-    )
-    df_salud = pl.read_csv(
-        salud_csv,
-        schema_overrides={
-            "codigo_establecimiento": pl.String,
-            "codigo_region": pl.String,
-            "codigo_comuna": pl.String,
-        },
-    )
+    df_censo = pl.read_csv(censo_csv, schema_overrides=STAGING_SCHEMAS["censo_comunal"])
+    df_salud = pl.read_csv(salud_csv, schema_overrides=STAGING_SCHEMAS["establecimientos_salud"])
     df_censo_hogares = pl.read_csv(
-        censo_hogares_csv,
-        schema_overrides={
-            "codigo_region": pl.String,
-            "codigo_provincia": pl.String,
-            "codigo_comuna": pl.String,
-        },
+        censo_hogares_csv, schema_overrides=STAGING_SCHEMAS["censo_hogares_viviendas"]
     )
     df_electoral = pl.read_csv(
-        electoral_csv,
-        schema_overrides={
-            "codigo_comuna": pl.String,
-            "distrito_electoral": pl.String,
-            "circunscripcion_senatorial": pl.String,
-        },
+        electoral_csv, schema_overrides=STAGING_SCHEMAS["distritos_electorales"]
     )
     df_educacionales = pl.read_csv(
-        educacionales_csv,
-        schema_overrides={
-            "rbd": pl.String,
-            "dv_rbd": pl.String,
-            "codigo_region": pl.String,
-            "codigo_comuna": pl.String,
-        },
+        educacionales_csv, schema_overrides=STAGING_SCHEMAS["establecimientos_educacionales"]
     )
     df_finanzas = pl.read_csv(
-        finanzas_csv,
-        schema_overrides={"anio": pl.Int32, "codigo_comuna": pl.String},
+        finanzas_csv, schema_overrides=STAGING_SCHEMAS["finanzas_municipales"]
     )
     df_resultados_educacionales = pl.read_csv(
         resultados_educacionales_csv,
-        schema_overrides={"anio": pl.Int32, "codigo_comuna": pl.String},
+        schema_overrides=STAGING_SCHEMAS["resultados_educacionales"],
     )
-    df_siedu = pl.read_csv(
-        siedu_csv,
-        schema_overrides={
-            "anio": pl.Int32,
-            "codigo_comuna": pl.String,
-            "codigo_indicador": pl.String,
-            "valor": pl.Float64,
-        },
-    )
+    df_siedu = pl.read_csv(siedu_csv, schema_overrides=STAGING_SCHEMAS["indicadores_urbanos_siedu"])
 
     # Empresas: dataset opcional (nuevo, puede no existir en builds anteriores)
     df_empresas = None
     if os.path.exists(empresas_csv) and empresas_metadata is not None:
-        df_empresas = pl.read_csv(
-            empresas_csv,
-            schema_overrides={
-                "rut": pl.String,
-                "razon_social": pl.String,
-                "codigo_sociedad": pl.String,
-                "capital": pl.Int64,
-                "anio": pl.Int32,
-                "comuna_tributaria": pl.String,
-                "region_tributaria": pl.String,
-                "comuna_social": pl.String,
-                "region_social": pl.String,
-            },
+        df_empresas = apply_date_casts(
+            pl.read_csv(empresas_csv, schema_overrides=STAGING_SCHEMAS["empresas"]), "empresas"
         )
         log.info("dataset_loaded", dataset="empresas", records=df_empresas.height)
     else:
@@ -390,15 +333,7 @@ def _load_inputs():
     df_pobreza_comunal = None
     if os.path.exists(pobreza_comunal_csv) and pobreza_comunal_metadata is not None:
         df_pobreza_comunal = pl.read_csv(
-            pobreza_comunal_csv,
-            schema_overrides={
-                "codigo_region": pl.String,
-                "codigo_comuna": pl.String,
-                "anio": pl.Int64,
-                "tasa": pl.Float64,
-                "limite_inferior": pl.Float64,
-                "limite_superior": pl.Float64,
-            },
+            pobreza_comunal_csv, schema_overrides=STAGING_SCHEMAS["pobreza_comunal"]
         )
         log.info("dataset_loaded", dataset="pobreza_comunal", records=df_pobreza_comunal.height)
     else:
@@ -408,14 +343,7 @@ def _load_inputs():
     df_consumo_electrico = None
     if os.path.exists(consumo_electrico_csv) and consumo_electrico_metadata is not None:
         df_consumo_electrico = pl.read_csv(
-            consumo_electrico_csv,
-            schema_overrides={
-                "codigo_region": pl.String,
-                "codigo_comuna": pl.String,
-                "anio": pl.Int64,
-                "consumo_kwh": pl.Float64,
-                "numero_clientes": pl.Int64,
-            },
+            consumo_electrico_csv, schema_overrides=STAGING_SCHEMAS["consumo_electrico_comunal"]
         )
         log.info(
             "dataset_loaded",
@@ -445,13 +373,7 @@ def _load_inputs():
     df_autoridades_electas = None
     if os.path.exists(autoridades_electas_csv) and autoridades_electas_metadata is not None:
         df_autoridades_electas = pl.read_csv(
-            autoridades_electas_csv,
-            schema_overrides={
-                "distrito_electoral": pl.String,
-                "circunscripcion_senatorial": pl.String,
-                "codigo_comuna": pl.String,
-                "codigo_region": pl.String,
-            },
+            autoridades_electas_csv, schema_overrides=STAGING_SCHEMAS["autoridades_electas"]
         )
         log.info(
             "dataset_loaded",

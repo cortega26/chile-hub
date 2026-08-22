@@ -45,6 +45,8 @@ except ModuleNotFoundError:
     from base import BaseExtractor, ensure_staging_directories, write_staging_metadata
     from source_adapter import build_standard_metadata
 
+from src.builders.staging_schema import STAGING_SCHEMAS
+
 DATA_DIR = Path(__file__).resolve().parents[2] / "data"
 RAW_DIR = DATA_DIR / "raw"
 STAGING_DIR = DATA_DIR / "staging"
@@ -139,7 +141,7 @@ def _load_comuna_codes() -> list[tuple[str, str]]:
     if comunas_path.suffix == ".parquet":
         df = pl.read_parquet(comunas_path)
     else:
-        df = pl.read_csv(comunas_path)
+        df = pl.read_csv(comunas_path, schema_overrides=STAGING_SCHEMAS["comunas"])
 
     # Seleccionar columnas de código y nombre
     codigo_col = "codigo_comuna" if "codigo_comuna" in df.columns else "codigo_comuna_clean"

@@ -76,8 +76,9 @@ src/
 │   ├── core.py                    Clase ChileHub + API publica completa — 2 302 lineas
 │   ├── cli.py                     Puntos de entrada de CLI (5 lineas)
 │   ├── data_manager.py            Descarga de bundles, cache, SHA256 — ~200 lineas
-│   └── pipeline_status_utils.py   Constructores de reportes (health, catalog, redistribution) — 888 lineas
-├── pipeline_status_utils.py       Copia del anterior para importaciones de build_dev_db.py — 888 lineas
+│   └── pipeline_status_utils.py   Constructores de reportes (health, catalog, redistribution) — 994 lineas
+├── pipeline_status_utils.py       Shim de reexport (21 lineas) — para scripts con PYTHONPATH=src.
+│   No dupliques logica aqui: la implementacion real es chile_hub/pipeline_status_utils.py (arriba)
 
 data/
 ├── raw/        Snapshots de auditoria — solo append, nunca editar
