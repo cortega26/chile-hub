@@ -12,6 +12,14 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.28.8 - 2026-08-22
+
+### Corregido
+
+- **landing**: Polish mobile layout
+  ([`e00caa9`](https://github.com/cortega26/chile-hub/commit/e00caa9933bff72ccf852e729e046f8a4278c67c))
+
+
 ## 1.28.7 - 2026-08-22
 
 ### Corregido
