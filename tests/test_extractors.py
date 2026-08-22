@@ -2871,6 +2871,35 @@ class SinimFinanzasLiveExtractorTests(unittest.TestCase):
             _parse_xml_spreadsheet(xml)
 
 
+class CeadDelincuenciaLiveExtractorTests(unittest.TestCase):
+    """Tests para _load_comuna_codes (src/extractors/cead_delincuencia_live_extractor.py).
+
+    Cubre la rama de fallback (sin comunas.parquet cacheado, lee comunas.csv
+    de staging) que hasta ahora no tenía ningún test — un pl.read_csv() sin
+    schema_overrides ahí perdería el cero inicial de codigo_comuna."""
+
+    def test_load_comuna_codes_falls_back_to_staging_csv_preserving_zero_padding(self):
+        from src.extractors import cead_delincuencia_live_extractor
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            data_dir = Path(tmpdir) / "data"
+            staging_dir = data_dir / "staging"
+            staging_dir.mkdir(parents=True)
+            (staging_dir / "comunas.csv").write_text(
+                "codigo_comuna,nombre_comuna\n01101,Iquique\n13101,Santiago\n",
+                encoding="utf-8",
+            )
+            # No se crea data/normalized/comunas.parquet: fuerza la rama fallback.
+            with (
+                patch.object(cead_delincuencia_live_extractor, "DATA_DIR", data_dir),
+                patch.object(cead_delincuencia_live_extractor, "STAGING_DIR", staging_dir),
+            ):
+                codes = cead_delincuencia_live_extractor._load_comuna_codes()
+
+        self.assertIn(("01101", "Iquique"), codes)
+        self.assertIn(("13101", "Santiago"), codes)
+
+
 class GeometriaComunalExtractorTests(unittest.TestCase):
     """Tests unitarios para el extractor de geometría comunal (BCN ArcGIS)."""
 

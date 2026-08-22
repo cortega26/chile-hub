@@ -41,7 +41,7 @@ try:
 except ModuleNotFoundError:
     from http_utils import fetch_with_retry
 
-from src.builders.staging_schema import STAGING_SCHEMAS
+from src.builders.staging_schema import STAGING_SCHEMAS, apply_date_casts
 
 DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data"))
 RAW_DIR = os.path.join(DATA_DIR, "raw")
@@ -415,9 +415,7 @@ def _merge_incremental(df_new: pl.DataFrame) -> pl.DataFrame:
         merged = merged.with_columns(pl.col("anio").cast(schema["anio"], strict=False))
     if "capital" in merged.columns:
         merged = merged.with_columns(pl.col("capital").cast(schema["capital"], strict=False))
-    for col in ("fecha_actuacion", "fecha_registro", "fecha_aprobacion_sii"):
-        if col in merged.columns:
-            merged = merged.with_columns(pl.col(col).str.to_date("%Y-%m-%d", strict=False))
+    merged = apply_date_casts(merged, "empresas")
     merged = merged.unique(subset=["rut", "razon_social", "fecha_registro"], keep="last")
     merged = merged.sort(["fecha_registro", "rut"], descending=[True, False])
     return merged

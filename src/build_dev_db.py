@@ -110,7 +110,7 @@ from src.builders.reports import (  # noqa: E402
     write_redistribution_report_json,
     write_source_readiness_json,
 )
-from src.builders.staging_schema import STAGING_SCHEMAS  # noqa: E402
+from src.builders.staging_schema import STAGING_SCHEMAS, apply_date_casts  # noqa: E402
 from src.pipeline_status_utils import (
     build_hub_health,
     write_dataset_catalog_markdown_file,
@@ -322,7 +322,9 @@ def _load_inputs():
     # Empresas: dataset opcional (nuevo, puede no existir en builds anteriores)
     df_empresas = None
     if os.path.exists(empresas_csv) and empresas_metadata is not None:
-        df_empresas = pl.read_csv(empresas_csv, schema_overrides=STAGING_SCHEMAS["empresas"])
+        df_empresas = apply_date_casts(
+            pl.read_csv(empresas_csv, schema_overrides=STAGING_SCHEMAS["empresas"]), "empresas"
+        )
         log.info("dataset_loaded", dataset="empresas", records=df_empresas.height)
     else:
         log.info("dataset_skipped", dataset="empresas", reason="not_found_in_staging")

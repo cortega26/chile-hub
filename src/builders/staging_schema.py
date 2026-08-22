@@ -98,7 +98,13 @@ STAGING_SCHEMAS: dict[str, dict[str, type[pl.DataType] | pl.DataType]] = {
     },
 }
 
-STAGING_DATE_COLUMNS: dict[str, dict[str, str]] = {}
+STAGING_DATE_COLUMNS: dict[str, dict[str, str]] = {
+    "empresas": {
+        "fecha_actuacion": "%Y-%m-%d",
+        "fecha_registro": "%Y-%m-%d",
+        "fecha_aprobacion_sii": "%Y-%m-%d",
+    },
+}
 
 
 def apply_date_casts(df: pl.DataFrame, dataset: str) -> pl.DataFrame:
