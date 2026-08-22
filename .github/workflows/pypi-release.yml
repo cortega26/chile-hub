@@ -259,6 +259,7 @@ jobs:
               uv lock
               uv lock --locked
               python scripts/sync_release_artifact_version.py
+              python scripts/check_landing_sync.py
               # Sincroniza SOLO el pin de version del README (`chile-hub==X.Y.Z`,
               # --version-only). El release NO regenera bloques derivados de
               # data/normalized (health, quality, layers): ese artifact puede

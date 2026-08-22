@@ -328,6 +328,7 @@ class AdoptionBadgeGuardrailTests(unittest.TestCase):
             encoding="utf-8"
         )
         self.assertIn("python scripts/sync_docs.py --version-only", content)
+        self.assertIn("python scripts/check_landing_sync.py", content)
         self.assertIn(
             "git add CHANGELOG.md pyproject.toml uv.lock README.md index.html app.js", content
         )
@@ -337,8 +338,10 @@ class AdoptionBadgeGuardrailTests(unittest.TestCase):
         self.assertNotIn("data/normalized/ README.md index.html app.js", content)
         self.assertNotIn("uv.lock data/normalized/", content)
         # El sync debe correr ANTES del commit (mismo commit de release).
+        landing_sync_index = content.index("python scripts/check_landing_sync.py")
         sync_index = content.index("python scripts/sync_docs.py")
         commit_index = content.index('git commit -m "chore(release)')
+        self.assertLess(landing_sync_index, commit_index)
         self.assertLess(sync_index, commit_index)
 
     def test_hf_publish_uses_the_adopted_publication_grade_run(self):
