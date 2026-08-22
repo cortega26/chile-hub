@@ -41,6 +41,8 @@ try:
 except ModuleNotFoundError:
     from http_utils import fetch_with_retry
 
+from src.builders.staging_schema import STAGING_SCHEMAS
+
 DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data"))
 RAW_DIR = os.path.join(DATA_DIR, "raw")
 STAGING_DIR = os.path.join(DATA_DIR, "staging")
@@ -406,12 +408,13 @@ def _merge_incremental(df_new: pl.DataFrame) -> pl.DataFrame:
       `concat([existing, new])`, keep="last" hace ganar la versión nueva.
       Conserva el sort final del contrato.
     """
+    schema = STAGING_SCHEMAS["empresas"]
     existing = pl.read_csv(STAGING_CSV_PATH, infer_schema_length=0)
     merged = pl.concat([existing, df_new], how="diagonal_relaxed")
     if "anio" in merged.columns:
-        merged = merged.with_columns(pl.col("anio").cast(pl.Int32, strict=False))
+        merged = merged.with_columns(pl.col("anio").cast(schema["anio"], strict=False))
     if "capital" in merged.columns:
-        merged = merged.with_columns(pl.col("capital").cast(pl.Int64, strict=False))
+        merged = merged.with_columns(pl.col("capital").cast(schema["capital"], strict=False))
     for col in ("fecha_actuacion", "fecha_registro", "fecha_aprobacion_sii"):
         if col in merged.columns:
             merged = merged.with_columns(pl.col(col).str.to_date("%Y-%m-%d", strict=False))
