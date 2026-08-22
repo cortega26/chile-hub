@@ -15,12 +15,17 @@ Estrategia de actualización:
 import datetime
 import json
 import os
+import sys
 import time
 from pathlib import Path
 
 import polars as pl
 
 UTC = datetime.timezone.utc
+
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
 
 try:
     from src.extractors.base import (
