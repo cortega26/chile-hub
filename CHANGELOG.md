@@ -12,6 +12,28 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.28.7 - 2026-08-22
+
+### Corregido
+
+- **release**: Verify landing metadata before commit
+  ([`11ad400`](https://github.com/cortega26/chile-hub/commit/11ad4003f904c0fd1f66b8e82b0ede7ac873feca))
+
+### Mantenimiento
+
+- **deps**: Bump astral-sh/setup-uv from 9.0.0 to 10.0.1
+  ([#81](https://github.com/cortega26/chile-hub/pull/81),
+  [`bd01786`](https://github.com/cortega26/chile-hub/commit/bd01786b48264515a9a2c1142d04f5b84ab09d17))
+
+- **deps**: Bump the codeql-action group with 2 updates
+  ([#80](https://github.com/cortega26/chile-hub/pull/80),
+  [`efb3d10`](https://github.com/cortega26/chile-hub/commit/efb3d1068003988b0d7828fc010cbf17ff3fe05d))
+
+- **deps-dev**: Bump the python-dev group across 1 directory with 4 updates
+  ([#82](https://github.com/cortega26/chile-hub/pull/82),
+  [`3bb923c`](https://github.com/cortega26/chile-hub/commit/3bb923ca1bd9017088c74ef17cdb221749d4d7a8))
+
+
 ## 1.28.6 - 2026-08-22
 
 ### Corregido
