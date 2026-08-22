@@ -193,19 +193,19 @@ def verify_landing():
             fail(f"Browser errors while rendering landing: {browser_errors}")
 
         # Version and public URL verification.
-        # La versión se lee de hub_bundle.json (fuente única de verdad) y app.js
-        # la inyecta dinámicamente en el badge. Así no hay riesgo de desincronización
-        # entre pyproject.toml e index.html.
+        # The versioned app.js URL is generated from pyproject.toml on every
+        # package release. hub_bundle.json is a data artifact that can validly
+        # lag behind, so it must not control the package version in the navbar.
         project_metadata, public_site_url = load_project_metadata()
         public_data_base = public_site_url + "data/normalized"
-        expected_version = bundle.get("version")
-        if not expected_version:
+        bundle_version = bundle.get("version")
+        if not bundle_version:
             fail("hub_bundle.json is missing version field")
         project_version = project_metadata.get("version")
-        if expected_version != project_version:
+        if bundle_version != project_version:
             # Misma tolerancia direccional que verify_pipeline (write-races):
-            # entre release y publish, la data de main (y el badge) puede ser
-            # una version anterior — el smoke de PR no debe fallar. Version
+            # entre release y publish, la data de main puede ser una versión
+            # anterior — el smoke de PR no debe fallar. Version
             # futura o no parseable sigue siendo error duro.
             def _vt(version: str) -> tuple:
                 try:
@@ -213,20 +213,22 @@ def verify_landing():
                 except ValueError:
                     return ()
 
-            if not _vt(expected_version) or _vt(expected_version) > _vt(project_version):
+            if not _vt(bundle_version) or _vt(bundle_version) > _vt(project_version):
                 fail(
                     f"hub_bundle.json version is stale: expected {project_version}, "
-                    f"got {expected_version}"
+                    f"got {bundle_version}"
                 )
             print(
                 "WARNING [verify_landing]: hub_bundle.json version "
-                f"{expected_version} es anterior a la del codigo ({project_version}); "
+                f"{bundle_version} es anterior a la del codigo ({project_version}); "
                 "la data se regenerara en el proximo publish diario."
             )
+        expected_version = project_version
         navbar_badge = page.locator(".badge-alpha")
         if navbar_badge.count() != 1:
             fail("Expected exactly one .badge-alpha version badge in the navbar")
-        # Espera a que app.js haya poblado el badge desde hub_bundle.json.
+        # Espera a que app.js haya poblado el badge desde el cache-buster de
+        # release, independiente de la cadencia del bundle de datos.
         try:
             page.wait_for_function(
                 "document.querySelector('.badge-alpha')?.textContent?.startsWith('v')",

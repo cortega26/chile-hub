@@ -59,6 +59,15 @@ let packageManifestByPath = {};
 const CHILE_HUB_ASSET_VERSION = new URL(
     document.currentScript?.src || window.location.href
 ).searchParams.get("v") || "dev";
+const packageVersionBadge = document.querySelector(".badge-alpha");
+
+// The versioned app URL is regenerated from pyproject.toml on every package
+// release. Dataset artifacts may be refreshed on a different cadence, so their
+// bundle version must not make the navbar advertise an older package release.
+if (packageVersionBadge && CHILE_HUB_ASSET_VERSION !== "dev") {
+    packageVersionBadge.textContent = `v${CHILE_HUB_ASSET_VERSION}`;
+}
+
 const PUBLIC_DATA_BASE = "https://tooltician.com/chile-hub/data/normalized";
 const PREVIEW_ROW_LIMIT = 5;
 const SUPPORT_LINKS = [
@@ -863,12 +872,6 @@ function loadCatalog() {
             .catch(() => null)
     ])
         .then(([bundle, manifest]) => {
-            // Sincroniza la versión del badge con el bundle (fuente única de verdad).
-            var versionBadge = document.querySelector(".badge-alpha");
-            if (versionBadge && bundle.version) {
-                versionBadge.textContent = "v" + bundle.version;
-            }
-
             artifactManifestByPath = Object.fromEntries(
                 (manifest?.artifacts || []).map(entry => [entry.path, entry])
             );

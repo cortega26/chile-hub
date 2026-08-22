@@ -29,6 +29,8 @@ MAKEFILE = ROOT_DIR / "Makefile"
 MKDOCS_CONFIG = ROOT_DIR / "mkdocs.yml"
 DOCS_DIR = ROOT_DIR / "docs"
 PUBLISH_HF_SCRIPT = ROOT_DIR / "scripts" / "publish_hf_dataset.py"
+LANDING_APP = ROOT_DIR / "app.js"
+VERIFY_LANDING_SCRIPT = ROOT_DIR / "scripts" / "verify_landing.py"
 
 
 class SinimDailyJobGuardrailTests(unittest.TestCase):
@@ -474,6 +476,24 @@ class LandingSyncGateGuardrailTests(unittest.TestCase):
             body,
             "`make doctor` debe correr el gate de landing antes de commit.",
         )
+
+    def test_package_version_badge_uses_the_versioned_app_asset(self):
+        """El bundle de datos puede llegar después que una release de paquete.
+
+        En 1.28.7, ``hub_bundle.json`` seguía en 1.28.4 y app.js sobrescribió
+        el badge de la navbar con ese valor. El cache-buster de app.js se
+        sincroniza desde pyproject.toml en cada release, por lo que es la fuente
+        correcta para la versión del paquete que el sitio anuncia.
+        """
+        app_content = LANDING_APP.read_text(encoding="utf-8")
+        verification_content = VERIFY_LANDING_SCRIPT.read_text(encoding="utf-8")
+
+        self.assertIn(
+            "packageVersionBadge.textContent = `v${CHILE_HUB_ASSET_VERSION}`;",
+            app_content,
+        )
+        self.assertNotIn('versionBadge.textContent = "v" + bundle.version;', app_content)
+        self.assertIn("expected_version = project_version", verification_content)
 
     def test_health_table_escapes_status_values_in_class_attributes(self):
         """SEC-03: los valores de estado del dashboard de salud deben escaparse
