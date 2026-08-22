@@ -12,6 +12,35 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.28.6 - 2026-08-22
+
+### Corregido
+
+- **deps**: Upgrade pip to resolve audit finding
+  ([`57b06f9`](https://github.com/cortega26/chile-hub/commit/57b06f942cd90c2c0c8f35ec3064e3fae1516e33))
+
+- **landing**: Sync app cache version
+  ([`0cabffc`](https://github.com/cortega26/chile-hub/commit/0cabffc45a81452d89d58f88be41723168233a9a))
+
+- **res**: Tipos Date en fecha_* de empresas; codigo_comuna en fallback de cead
+  ([`2de14af`](https://github.com/cortega26/chile-hub/commit/2de14af67898db6612d8be069e2f5a1701ede75b))
+
+### Mantenimiento
+
+- **codegraph**: Ignora todo .codegraph/ salvo .gitignore
+  ([`80da68f`](https://github.com/cortega26/chile-hub/commit/80da68f8951ac969e788972bcf7e45767abce38e))
+
+### Documentación
+
+- Auto-sync tras carrera con release [skip ci]
+  ([`273abbe`](https://github.com/cortega26/chile-hub/commit/273abbe3c269afa88930ddfdd44354ad7ec279b6))
+
+### Refactorizado
+
+- **build**: Registro central de tipos de staging (schema_overrides)
+  ([`5e60466`](https://github.com/cortega26/chile-hub/commit/5e6046695a6d79bd97691ea02ca3f39b84c48f7a))
+
+
 ## 1.28.5 - 2026-08-13
 
 ### Corregido
