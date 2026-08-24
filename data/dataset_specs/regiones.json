@@ -1,0 +1,62 @@
+{
+  "spec_version": "1.0",
+  "dataset": "regiones",
+  "kind": "direct",
+  "publication_track": "stable_publishable",
+  "public_bundle_eligible": true,
+  "maturity_status": "stable",
+  "confidence_tier": "Tier B",
+  "extraction_lane": "bajo_demanda",
+  "extractor": "src/extractors/subdere_extractor.py",
+  "contract_path": "contracts/datasets/regiones.schema.json",
+  "validator": "validate_regiones",
+  "alias_for": null,
+  "dependencies": [],
+  "source": {
+    "source_id": "bcn_regiones",
+    "source_name": "BCN ArcGIS",
+    "official_url": "https://www.bcn.cl/siit/mapas_vectoriales",
+    "access_method": "api",
+    "license_status": "open-attribution",
+    "live_extractor_status": "implemented",
+    "fallback_policy": "allowed_for_dev",
+    "live_ready": true,
+    "fallback_allowed": true,
+    "publish_blocking": true,
+    "review_by": "2026-12-31",
+    "stalled_after_days": 90,
+    "owner": "core",
+    "next_action": "Maintain DPA cardinality and CUT format checks."
+  },
+  "reuse_policy": {
+    "status": "open-attribution",
+    "license": "CC BY",
+    "license_url": "https://datos.bcn.cl/es/informacion/lo-que-esta-haciendo-bcn",
+    "attribution_required": true,
+    "redistribution_ok": true,
+    "summary": "Derivada de datos abiertos BCN reutilizables con atribucion."
+  },
+  "freshness_policy": {
+    "max_age_hours": 2160,
+    "label": "estable"
+  },
+  "documentation": {
+    "description": "Capa derivada de regiones para filtros, joins y referencias administrativas de alto nivel.",
+    "path": "docs/datasets/regiones.md",
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('regiones')",
+      "duckdb": "SELECT *\nFROM 'data/normalized/regiones.parquet'\nORDER BY codigo_region;",
+      "cli": "chile-hub show regiones"
+    }
+  },
+  "outputs": {
+    "parquet": "data/normalized/regiones.parquet",
+    "json": "data/normalized/regiones.json",
+    "duckdb_table": "regiones",
+    "sqlite_table": "regiones",
+    "excel_sheet": "Regiones"
+  },
+  "join_keys": [
+    "codigo_region"
+  ]
+}

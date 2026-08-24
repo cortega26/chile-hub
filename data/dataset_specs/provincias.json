@@ -1,0 +1,63 @@
+{
+  "spec_version": "1.0",
+  "dataset": "provincias",
+  "kind": "direct",
+  "publication_track": "stable_publishable",
+  "public_bundle_eligible": true,
+  "maturity_status": "stable",
+  "confidence_tier": "Tier B",
+  "extraction_lane": "bajo_demanda",
+  "extractor": "src/extractors/subdere_extractor.py",
+  "contract_path": "contracts/datasets/provincias.schema.json",
+  "validator": "validate_provincias",
+  "alias_for": null,
+  "dependencies": [],
+  "source": {
+    "source_id": "bcn_provincias",
+    "source_name": "BCN ArcGIS",
+    "official_url": "https://www.bcn.cl/siit/mapas_vectoriales",
+    "access_method": "api",
+    "license_status": "open-attribution",
+    "live_extractor_status": "implemented",
+    "fallback_policy": "allowed_for_dev",
+    "live_ready": true,
+    "fallback_allowed": true,
+    "publish_blocking": true,
+    "review_by": "2026-12-31",
+    "stalled_after_days": 90,
+    "owner": "core",
+    "next_action": "Maintain DPA cardinality and CUT format checks."
+  },
+  "reuse_policy": {
+    "status": "open-attribution",
+    "license": "CC BY",
+    "license_url": "https://datos.bcn.cl/es/informacion/lo-que-esta-haciendo-bcn",
+    "attribution_required": true,
+    "redistribution_ok": true,
+    "summary": "Derivada de datos abiertos BCN reutilizables con atribucion."
+  },
+  "freshness_policy": {
+    "max_age_hours": 2160,
+    "label": "estable"
+  },
+  "documentation": {
+    "description": "Capa derivada de provincias para cruces intermedios entre region y comuna.",
+    "path": "docs/datasets/provincias.md",
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('provincias')",
+      "duckdb": "SELECT *\nFROM 'data/normalized/provincias.parquet'\nWHERE codigo_region = '13';",
+      "cli": "chile-hub show provincias"
+    }
+  },
+  "outputs": {
+    "parquet": "data/normalized/provincias.parquet",
+    "json": "data/normalized/provincias.json",
+    "duckdb_table": "provincias",
+    "sqlite_table": "provincias",
+    "excel_sheet": "Provincias"
+  },
+  "join_keys": [
+    "codigo_provincia",
+    "codigo_region"
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "spec_version": "1.0",
+  "dataset": "comunas",
+  "kind": "direct",
+  "publication_track": "stable_publishable",
+  "public_bundle_eligible": true,
+  "maturity_status": "stable",
+  "confidence_tier": "Tier B",
+  "extraction_lane": "bajo_demanda",
+  "extractor": "src/extractors/subdere_extractor.py",
+  "contract_path": "contracts/datasets/comunas.schema.json",
+  "validator": "validate_comunas",
+  "alias_for": null,
+  "dependencies": [],
+  "source": {
+    "source_id": "bcn_comunas",
+    "source_name": "BCN ArcGIS + INE reference files",
+    "official_url": "https://www.bcn.cl/siit/mapas_vectoriales",
+    "access_method": "api",
+    "license_status": "open-attribution",
+    "live_extractor_status": "implemented",
+    "fallback_policy": "allowed_for_dev",
+    "live_ready": true,
+    "fallback_allowed": true,
+    "publish_blocking": true,
+    "review_by": "2026-12-31",
+    "stalled_after_days": 90,
+    "owner": "core",
+    "next_action": "Maintain 346-comuna invariant and enrichment references."
+  },
+  "reuse_policy": {
+    "status": "open-attribution",
+    "license": "CC BY",
+    "license_url": "https://datos.bcn.cl/es/informacion/lo-que-esta-haciendo-bcn",
+    "attribution_required": true,
+    "redistribution_ok": true,
+    "summary": "Fuente operativa BCN dentro de su superficie de datos abiertos; atribucion requerida."
+  },
+  "freshness_policy": {
+    "max_age_hours": 2160,
+    "label": "estable"
+  },
+  "documentation": {
+    "description": "Base territorial normalizada para cruces por region, provincia y comuna.",
+    "path": "docs/datasets/comunas.md",
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('comunas')",
+      "duckdb": "SELECT codigo_comuna, nombre_comuna, nombre_region\nFROM 'data/normalized/comunas.parquet'\nLIMIT 10;",
+      "cli": "chile-hub path comunas --output parquet"
+    }
+  },
+  "outputs": {
+    "parquet": "data/normalized/comunas.parquet",
+    "json": "data/normalized/comunas.json",
+    "duckdb_table": "comunas",
+    "sqlite_table": "comunas",
+    "excel_sheet": "Comunas y Regiones"
+  },
+  "join_keys": [
+    "codigo_comuna",
+    "codigo_region"
+  ]
+}

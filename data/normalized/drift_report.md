@@ -1,6 +1,6 @@
 # chile-hub drift report
 
-- `generated_at_utc`: `2026-08-24T01:19:53.829890+00:00`
+- `generated_at_utc`: `2026-08-24T01:32:02.954179+00:00`
 - `dataset_count`: `19`
 - `drifted_count`: `2`
 - `healthy_count`: `17`
@@ -75,7 +75,7 @@
 - `drift_status`: `drifted`
 - `source_mode`: `live`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
-- `degradation`: indicadores live refresh reused last published artifact for missing codes: ipc; indicadores freshness is stale: 248.96h since refresh, policy max is 72h
+- `degradation`: indicadores live refresh reused last published artifact for missing codes: ipc; indicadores freshness is stale: 249.17h since refresh, policy max is 72h
 - `warning_count`: `2`
 - `diagnostic_summary`: indicadores live refresh reused last published artifact for missing codes: ipc
 - `recommended_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.
