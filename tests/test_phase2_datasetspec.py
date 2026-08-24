@@ -81,13 +81,29 @@ class TestPilotSpecModel:
         assert (ROOT_DIR / spec.contract_path).is_file()
 
     def test_only_one_spec_exists(self) -> None:
-        assert list(iter_specs()) == [_spec()]
+        # Phase 2: solo pilot; Phase 3A: 10 specs (pilot + 9 direct stable)
+        specs = list(iter_specs())
+        assert _spec() in specs
+        assert len(specs) == 10
+        assert {s.dataset for s in specs} == {
+            "partidos_politicos",
+            "censo_comunal",
+            "censo_hogares_viviendas",
+            "distritos_electorales",
+            "empresas",
+            "establecimientos_educacionales",
+            "establecimientos_salud",
+            "indicadores_urbanos_siedu",
+            "pobreza_comunal",
+            "resultados_educacionales",
+        }
 
     def test_spec_declares_no_structural_schema_facts(self) -> None:
-        payload = json.loads(
-            (ROOT_DIR / "data" / "dataset_specs" / f"{PILOT}.json").read_text(encoding="utf-8")
-        )
-        assert not (CONTRACT_OWNED_KEYS & set(payload))
+        for spec_path in (ROOT_DIR / "data" / "dataset_specs").glob("*.json"):
+            payload = json.loads(spec_path.read_text(encoding="utf-8"))
+            assert not (CONTRACT_OWNED_KEYS & set(payload)), (
+                f"{spec_path.name} redacta hechos del contrato"
+            )
 
 
 class TestCatalogProjection:
@@ -95,6 +111,12 @@ class TestCatalogProjection:
         """Garantía B04: la proyección del spec replica exactamente la entrada
         legacy del catálogo para el piloto."""
         assert _spec().to_catalog_entry() == _legacy_catalog()[PILOT]
+
+    def test_all_specs_catalog_entries_equal_legacy(self) -> None:
+        """Phase 3A: cada spec del cohort proyecta exactamente su entrada legacy."""
+        cat = _legacy_catalog()
+        for spec in iter_specs():
+            assert spec.to_catalog_entry() == cat[spec.dataset], f"mismatch {spec.dataset}"
 
     def test_expected_record_count_is_projected_from_contract(self) -> None:
         """P0-D2: expected_record_count es hecho del contrato; el spec no lo
@@ -106,9 +128,9 @@ class TestCatalogProjection:
         assert entry["expected_record_count"] == _legacy_catalog()[PILOT]["expected_record_count"]
 
     def test_contract_reference_is_stable_and_resolvable(self) -> None:
-        spec = _spec()
-        assert spec.contract_reference() == {"path": spec.contract_path}
-        assert (ROOT_DIR / spec.contract_path).is_file()
+        for spec in iter_specs():
+            assert spec.contract_reference() == {"path": spec.contract_path}
+            assert (ROOT_DIR / spec.contract_path).is_file()
 
     def test_documentation_metadata_equals_legacy(self) -> None:
         legacy = _legacy_catalog()[PILOT]
@@ -118,7 +140,9 @@ class TestCatalogProjection:
         assert projected["path"] == legacy["documentation"]
 
     def test_artifact_declarations_equal_legacy_outputs(self) -> None:
-        assert _spec().artifact_declarations() == _legacy_catalog()[PILOT]["outputs"]
+        cat = _legacy_catalog()
+        for spec in iter_specs():
+            assert spec.artifact_declarations() == cat[spec.dataset]["outputs"]
 
 
 class TestSourceRegistryProjection:
@@ -126,6 +150,11 @@ class TestSourceRegistryProjection:
         """Garantía B12: la proyección del spec replica exactamente la entrada
         legacy del registry de fuentes para el piloto."""
         assert _spec().to_source_registry_entry() == _legacy_registry_entry()
+
+    def test_all_specs_source_registry_entries_equal_legacy(self) -> None:
+        reg = {e["dataset"]: e for e in _legacy_registry()}
+        for spec in iter_specs():
+            assert spec.to_source_registry_entry() == reg[spec.dataset], f"mismatch {spec.dataset}"
 
 
 class TestPublicInventoryPolicy:
@@ -167,9 +196,10 @@ class TestOverlayAdapters:
         legacy = _legacy_catalog()
         overlaid = catalog_config_with_spec_overlay(legacy)
         assert set(overlaid) == set(legacy)
+        specs = {s.dataset: s for s in iter_specs()}
         for dataset_id, entry in legacy.items():
-            if dataset_id == PILOT:
-                assert overlaid[dataset_id] == _spec().to_catalog_entry()
+            if dataset_id in specs:
+                assert overlaid[dataset_id] == specs[dataset_id].to_catalog_entry()
             else:
                 assert overlaid[dataset_id] == entry
 
@@ -177,9 +207,11 @@ class TestOverlayAdapters:
         legacy = _legacy_registry()
         overlaid = source_registry_with_spec_overlay(legacy)
         assert len(overlaid) == len(legacy)
+        specs = {s.dataset: s for s in iter_specs()}
         for legacy_entry, overlaid_entry in zip(legacy, overlaid):
-            if legacy_entry["dataset"] == PILOT:
-                assert overlaid_entry == _spec().to_source_registry_entry()
+            ds = legacy_entry["dataset"]
+            if ds in specs:
+                assert overlaid_entry == specs[ds].to_source_registry_entry()
             else:
                 assert overlaid_entry == legacy_entry
 
@@ -193,7 +225,9 @@ class TestOverlayAdapters:
     def test_runtime_catalog_config_flows_through_spec_projection(self) -> None:
         """El módulo cargado por el build (import-time) ya trae el overlay:
         su entrada del piloto debe coincidir con la proyección del spec."""
-        assert DATASET_CATALOG_CONFIG[PILOT] == _spec().to_catalog_entry()
+        specs = {s.dataset: s for s in iter_specs()}
+        for ds, spec in specs.items():
+            assert DATASET_CATALOG_CONFIG[ds] == spec.to_catalog_entry()
 
 
 class TestFailClosed:

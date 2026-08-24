@@ -1,0 +1,61 @@
+{
+  "spec_version": "1.0",
+  "dataset": "empresas",
+  "kind": "direct",
+  "publication_track": "stable_publishable",
+  "public_bundle_eligible": true,
+  "maturity_status": "stable",
+  "confidence_tier": "Tier B",
+  "extraction_lane": "diaria",
+  "extractor": "src/extractors/res_extractor.py",
+  "contract_path": "contracts/datasets/empresas.schema.json",
+  "validator": "validate_empresas",
+  "alias_for": null,
+  "dependencies": [],
+  "source": {
+    "source_id": "ministerio_economia_res",
+    "source_name": "Ministerio de Economia / datos.gob.cl",
+    "official_url": "https://datos.gob.cl/",
+    "access_method": "direct_file",
+    "license_status": "open-attribution",
+    "live_extractor_status": "implemented",
+    "fallback_policy": "none",
+    "live_ready": true,
+    "fallback_allowed": false,
+    "publish_blocking": true,
+    "review_by": "2026-12-31",
+    "stalled_after_days": 90,
+    "owner": "core",
+    "next_action": "Keep large-output behavior documented and verify Parquet-first consumption."
+  },
+  "reuse_policy": {
+    "status": "open-attribution",
+    "license": "CC-BY",
+    "license_url": "https://creativecommons.org/licenses/by/3.0/cl/",
+    "attribution_required": true,
+    "redistribution_ok": true,
+    "summary": "Registro de Empresas y Sociedades (RES) del Ministerio de Economia, publicado en datos.gob.cl bajo CC-BY. Solo incluye constituciones bajo Ley 20.659 (regimen simplificado) desde 2013."
+  },
+  "freshness_policy": {
+    "max_age_hours": 1080,
+    "label": "mensual"
+  },
+  "documentation": {
+    "description": "Registro de Empresas y Sociedades (RES) con RUT, razon social, tipo societario, capital, fecha de constitucion y comuna de domicilio.",
+    "path": "docs/datasets/empresas.md",
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('empresas')\n# Empresas por comuna\ndf.group_by('comuna_tributaria').len().sort('len', descending=True)",
+      "duckdb": "SELECT comuna_tributaria, count(*) AS n\nFROM 'data/normalized/empresas.parquet'\nGROUP BY 1 ORDER BY n DESC LIMIT 10;",
+      "cli": "chile-hub show empresas"
+    }
+  },
+  "outputs": {
+    "parquet": "data/normalized/empresas.parquet",
+    "duckdb_table": "empresas",
+    "excel_sheet": "Empresas RES"
+  },
+  "join_keys": [
+    "rut"
+  ],
+  "catalog_notes": "JSON y SQLite omitidos: >1.5M registros. Usa Parquet o DuckDB."
+}

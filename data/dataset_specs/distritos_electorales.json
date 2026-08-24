@@ -1,0 +1,59 @@
+{
+  "spec_version": "1.0",
+  "dataset": "distritos_electorales",
+  "kind": "direct",
+  "publication_track": "stable_publishable",
+  "public_bundle_eligible": true,
+  "maturity_status": "stable",
+  "confidence_tier": "Tier A",
+  "extraction_lane": "bajo_demanda",
+  "extractor": "src/extractors/electoral_extractor.py",
+  "contract_path": "contracts/datasets/distritos_electorales.schema.json",
+  "validator": "validate_distritos_electorales",
+  "alias_for": null,
+  "dependencies": [],
+  "source": {
+    "source_id": "bcn_servel_distritos",
+    "source_name": "BCN / Ley 20.840",
+    "official_url": "https://www.bcn.cl/",
+    "access_method": "direct_file",
+    "license_status": "open-attribution",
+    "live_extractor_status": "implemented",
+    "fallback_policy": "none",
+    "live_ready": true,
+    "fallback_allowed": false,
+    "publish_blocking": true,
+    "review_by": "2026-12-31",
+    "stalled_after_days": 90,
+    "owner": "core",
+    "next_action": "Update only when electoral district law changes."
+  },
+  "reuse_policy": {
+    "status": "open-attribution",
+    "license": "CC0",
+    "license_url": "http://www.opendefinition.org/licenses/cc-zero",
+    "attribution_required": false,
+    "redistribution_ok": true,
+    "summary": "Asociación comunal a distritos y circunscripciones electorales basada en Ley N° 20.840."
+  },
+  "freshness_policy": {
+    "max_age_hours": 87600,
+    "label": "estable"
+  },
+  "documentation": {
+    "description": "Asociación de comunas a distritos electorales (diputados) y circunscripciones senatoriales.",
+    "path": "docs/datasets/distritos_electorales.md",
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\nhub = ChileHub()\ndf = hub.load_polars('distritos_electorales')",
+      "duckdb": "SELECT * FROM 'data/normalized/distritos_electorales.parquet';",
+      "cli": "chile-hub show distritos_electorales"
+    }
+  },
+  "outputs": {
+    "parquet": "data/normalized/distritos_electorales.parquet",
+    "json": "data/normalized/distritos_electorales.json"
+  },
+  "join_keys": [
+    "codigo_comuna"
+  ]
+}

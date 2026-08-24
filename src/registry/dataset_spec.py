@@ -134,6 +134,7 @@ class SourcePolicy:
     stalled_after_days: int
     owner: str
     next_action: str
+    source_notes: str | None = None
 
 
 @dataclass(frozen=True)
@@ -192,6 +193,7 @@ class DatasetSpec:
     documentation: DocumentationMetadata
     outputs: dict[str, str]
     join_keys: tuple[str, ...]
+    catalog_notes: str | None = None
 
     # -- Proyecciones de compatibilidad (mecánicas, no fuentes duplicadas) --
 
@@ -241,9 +243,8 @@ class DatasetSpec:
             "confidence_tier": self.confidence_tier,
             "extractor": self.extractor,
         }
-        expected = payload.get("expected_record_count") if payload else None
-        if expected is not None:
-            entry["expected_record_count"] = expected
+        if payload is not None and "expected_record_count" in payload:
+            entry["expected_record_count"] = payload["expected_record_count"]
         entry.update(
             {
                 "reuse_policy": asdict(self.reuse_policy),
@@ -253,13 +254,15 @@ class DatasetSpec:
                 "documentation": self.documentation.path,
             }
         )
+        if self.catalog_notes is not None:
+            entry["_notes"] = self.catalog_notes
         if self.kind == "alias":
             entry["alias_for"] = self.alias_for
         return entry
 
     def to_source_registry_entry(self) -> dict[str, Any]:
         """Proyección del spec a la forma exacta de la entrada legacy del registry."""
-        return {
+        entry: dict[str, Any] = {
             "source_id": self.source.source_id,
             "dataset": self.dataset,
             "source_name": self.source.source_name,
@@ -280,6 +283,9 @@ class DatasetSpec:
             "public_bundle_eligible": self.public_bundle_eligible,
             "cadencia": self.extraction_lane,
         }
+        if self.source.source_notes is not None:
+            entry["source_notes"] = self.source.source_notes
+        return entry
 
 
 # ---------------------------------------------------------------------------
@@ -335,6 +341,9 @@ def _parse_source(payload: Mapping[str, Any], where: str) -> SourcePolicy:
     if not isinstance(source, dict):
         raise DatasetSpecError(f"DatasetSpec {where}: 'source' debe ser objeto")
     _require_keys(source, _SOURCE_REQUIRED_KEYS, f"{where}.source")
+    source_notes = source.get("source_notes")
+    if source_notes is not None and not isinstance(source_notes, str):
+        raise DatasetSpecError(f"DatasetSpec {where}: 'source.source_notes' debe ser string")
     return SourcePolicy(
         source_id=_require_str(source, "source_id", where),
         source_name=_require_str(source, "source_name", where),
@@ -350,6 +359,7 @@ def _parse_source(payload: Mapping[str, Any], where: str) -> SourcePolicy:
         stalled_after_days=_require_int(source, "stalled_after_days", where),
         owner=_require_str(source, "owner", where),
         next_action=_require_str(source, "next_action", where),
+        source_notes=source_notes,
     )
 
 
@@ -461,6 +471,12 @@ def parse_dataset_spec(payload: Mapping[str, Any], *, source_path: str = "<memor
 
     validator = _require_str(payload, "validator", where)
 
+    catalog_notes = payload.get("catalog_notes")
+    if catalog_notes is None:
+        catalog_notes = payload.get("_notes")
+    if catalog_notes is not None and not isinstance(catalog_notes, str):
+        raise DatasetSpecError(f"DatasetSpec {where}: 'catalog_notes' debe ser string")
+
     return DatasetSpec(
         spec_version=spec_version,
         dataset=dataset,
@@ -481,6 +497,7 @@ def parse_dataset_spec(payload: Mapping[str, Any], *, source_path: str = "<memor
         documentation=_parse_documentation(payload, where),
         outputs=_require_str_dict(payload, "outputs", where),
         join_keys=_require_str_list(payload, "join_keys", where),
+        catalog_notes=catalog_notes,
     )
 
 

@@ -1,0 +1,63 @@
+{
+  "spec_version": "1.0",
+  "dataset": "censo_comunal",
+  "kind": "direct",
+  "publication_track": "stable_publishable",
+  "public_bundle_eligible": true,
+  "maturity_status": "stable",
+  "confidence_tier": "Tier A",
+  "extraction_lane": "bajo_demanda",
+  "extractor": "src/extractors/censo_extractor.py",
+  "contract_path": "contracts/datasets/censo_comunal.schema.json",
+  "validator": "validate_censo_comunal",
+  "alias_for": null,
+  "dependencies": [],
+  "source": {
+    "source_id": "ine_censo_comunal_2024",
+    "source_name": "INE Censo 2024",
+    "official_url": "https://www.ine.gob.cl/",
+    "access_method": "direct_file",
+    "license_status": "open-attribution",
+    "live_extractor_status": "implemented",
+    "fallback_policy": "allowed_for_dev",
+    "live_ready": true,
+    "fallback_allowed": true,
+    "publish_blocking": true,
+    "review_by": "2026-12-31",
+    "stalled_after_days": 90,
+    "owner": "core",
+    "next_action": "Keep decennial source and schema documentation current."
+  },
+  "reuse_policy": {
+    "status": "open-attribution",
+    "license": "CC BY 4.0",
+    "license_url": "https://www.ine.gob.cl/terminos-de-uso",
+    "attribution_required": true,
+    "redistribution_ok": true,
+    "summary": "Resultados oficiales del Censo 2024 publicados por el INE."
+  },
+  "freshness_policy": {
+    "max_age_hours": 87600,
+    "label": "decenal"
+  },
+  "documentation": {
+    "description": "Perfil demografico comunal del Censo 2024 con sexo y grandes grupos de edad.",
+    "path": "docs/datasets/censo_comunal.md",
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('censo_comunal')",
+      "duckdb": "SELECT * FROM 'data/normalized/censo_comunal.parquet' ORDER BY poblacion_censada DESC;",
+      "cli": "chile-hub show censo_comunal"
+    }
+  },
+  "outputs": {
+    "parquet": "data/normalized/censo_comunal.parquet",
+    "json": "data/normalized/censo_comunal.json",
+    "duckdb_table": "censo_comunal",
+    "sqlite_table": "censo_comunal",
+    "excel_sheet": "Censo Comunal"
+  },
+  "join_keys": [
+    "codigo_comuna",
+    "codigo_region"
+  ]
+}

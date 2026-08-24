@@ -1,0 +1,60 @@
+{
+  "spec_version": "1.0",
+  "dataset": "pobreza_comunal",
+  "kind": "direct",
+  "publication_track": "stable_publishable",
+  "public_bundle_eligible": true,
+  "maturity_status": "stable",
+  "confidence_tier": "Tier A",
+  "extraction_lane": "bajo_demanda",
+  "extractor": "src/extractors/pobreza_extractor.py",
+  "contract_path": "contracts/datasets/pobreza_comunal.schema.json",
+  "validator": "validate_pobreza_comunal",
+  "alias_for": null,
+  "dependencies": [],
+  "source": {
+    "source_id": "mds_pobreza_comunal",
+    "source_name": "Observatorio Social — MDS",
+    "official_url": "https://observatorio.ministeriodesarrollosocial.gob.cl/pobreza-comunal-2022",
+    "access_method": "xlsx",
+    "license_status": "open-attribution",
+    "live_extractor_status": "implemented",
+    "fallback_policy": "allowed_for_dev",
+    "live_ready": true,
+    "fallback_allowed": true,
+    "publish_blocking": false,
+    "review_by": "2027-06-30",
+    "stalled_after_days": 180,
+    "owner": "core",
+    "next_action": "Monitorear publicación de próxima ronda CASEN (2024-2025)."
+  },
+  "reuse_policy": {
+    "status": "open-attribution",
+    "license": "Datos abiertos MDS",
+    "license_url": "https://observatorio.ministeriodesarrollosocial.gob.cl/",
+    "attribution_required": true,
+    "redistribution_ok": true,
+    "summary": "Estimaciones de pobreza comunal publicadas por el Observatorio Social del MDS. Atribución requerida."
+  },
+  "freshness_policy": {
+    "max_age_hours": 175200,
+    "label": "bienal/trienal"
+  },
+  "documentation": {
+    "description": "Estimaciones de pobreza comunal por ingresos y multidimensional derivadas de la encuesta CASEN mediante metodología SAE (Estimación de Áreas Pequeñas). Incluye tasa, límite inferior y superior del intervalo de confianza por comuna, año y dimensión.",
+    "path": "docs/datasets/pobreza_comunal.md",
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('pobreza_comunal')\n# Filtrar pobreza por ingresos 2022\npobreza_2022 = df.filter(pl.col('anio') == 2022, pl.col('dimension') == 'ingresos')",
+      "duckdb": "SELECT codigo_comuna, nombre_comuna, tasa, limite_inferior, limite_superior\nFROM 'data/normalized/pobreza_comunal.parquet'\nWHERE anio = 2022 AND dimension = 'ingresos'\nORDER BY tasa DESC;",
+      "cli": "chile-hub show pobreza_comunal"
+    }
+  },
+  "outputs": {
+    "parquet": "data/normalized/pobreza_comunal.parquet",
+    "json": "data/normalized/pobreza_comunal.json"
+  },
+  "join_keys": [
+    "codigo_comuna",
+    "codigo_region"
+  ]
+}

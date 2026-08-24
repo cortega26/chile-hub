@@ -1,0 +1,63 @@
+{
+  "spec_version": "1.0",
+  "dataset": "establecimientos_salud",
+  "kind": "direct",
+  "publication_track": "stable_publishable",
+  "public_bundle_eligible": true,
+  "maturity_status": "stable",
+  "confidence_tier": "Tier A",
+  "extraction_lane": "diaria",
+  "extractor": "src/extractors/salud_extractor.py",
+  "contract_path": "contracts/datasets/establecimientos_salud.schema.json",
+  "validator": "validate_establecimientos_salud",
+  "alias_for": null,
+  "dependencies": [],
+  "source": {
+    "source_id": "minsal_establecimientos_salud",
+    "source_name": "MINSAL / datos.gob.cl",
+    "official_url": "https://datos.gob.cl/",
+    "access_method": "direct_file",
+    "license_status": "open-attribution",
+    "live_extractor_status": "implemented",
+    "fallback_policy": "allowed_for_dev_blocked_for_publication",
+    "live_ready": true,
+    "fallback_allowed": true,
+    "publish_blocking": true,
+    "review_by": "2026-12-31",
+    "stalled_after_days": 90,
+    "owner": "core",
+    "next_action": "Monitor monthly source freshness and geocoding coverage."
+  },
+  "reuse_policy": {
+    "status": "open-attribution",
+    "license": "CC0",
+    "license_url": "http://www.opendefinition.org/licenses/cc-zero",
+    "attribution_required": false,
+    "redistribution_ok": true,
+    "summary": "Directorio oficial MINSAL publicado en datos.gob.cl bajo CC0."
+  },
+  "freshness_policy": {
+    "max_age_hours": 1080,
+    "label": "mensual"
+  },
+  "documentation": {
+    "description": "Directorio vigente de establecimientos de salud con tipo, dependencia, urgencia y ubicacion.",
+    "path": "docs/datasets/establecimientos_salud.md",
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('establecimientos_salud')",
+      "duckdb": "SELECT codigo_comuna, count(*) FROM 'data/normalized/establecimientos_salud.parquet' GROUP BY 1;",
+      "cli": "chile-hub show establecimientos_salud"
+    }
+  },
+  "outputs": {
+    "parquet": "data/normalized/establecimientos_salud.parquet",
+    "json": "data/normalized/establecimientos_salud.json",
+    "duckdb_table": "establecimientos_salud",
+    "sqlite_table": "establecimientos_salud",
+    "excel_sheet": "Establecimientos Salud"
+  },
+  "join_keys": [
+    "codigo_establecimiento",
+    "codigo_comuna"
+  ]
+}

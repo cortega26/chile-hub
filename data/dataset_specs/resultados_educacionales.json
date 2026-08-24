@@ -1,0 +1,64 @@
+{
+  "spec_version": "1.0",
+  "dataset": "resultados_educacionales",
+  "kind": "direct",
+  "publication_track": "stable_publishable",
+  "public_bundle_eligible": true,
+  "maturity_status": "stable",
+  "confidence_tier": "Tier B",
+  "extraction_lane": "anual",
+  "extractor": "src/extractors/mineduc_resultados_extractor.py",
+  "contract_path": "contracts/datasets/resultados_educacionales.schema.json",
+  "validator": "validate_resultados_educacionales",
+  "alias_for": null,
+  "dependencies": [],
+  "source": {
+    "source_id": "mineduc_resultados_educacionales",
+    "source_name": "MINEDUC - Centro de Estudios",
+    "official_url": "https://datosabiertos.mineduc.cl/wp-content/uploads/2025/04/Rendimiento_2024.rar",
+    "access_method": "direct_file",
+    "license_status": "open-attribution",
+    "live_extractor_status": "implemented",
+    "fallback_policy": "allowed_for_dev_blocked_for_publication",
+    "live_ready": true,
+    "fallback_allowed": true,
+    "publish_blocking": true,
+    "review_by": "2026-12-31",
+    "stalled_after_days": 90,
+    "owner": "core",
+    "next_action": "Actualizar URL anualmente (año en nombre de archivo). Verificar columnas SIT_FIN_R si MINEDUC cambia metodología.",
+    "source_notes": "RAR con CSV student-level (~3.5M filas). Agregado a nivel (anio, codigo_comuna). SIT_FIN_R: P=Promovido, R=Reprobado, T=Trasladado, Y=Retirado."
+  },
+  "reuse_policy": {
+    "status": "open-attribution",
+    "license": "CC-BY-3.0",
+    "license_url": "https://creativecommons.org/licenses/by/3.0/cl/",
+    "attribution_required": true,
+    "redistribution_ok": true,
+    "summary": "Datos agregados desde publicaciones del Centro de Estudios MINEDUC; citar fuente oficial."
+  },
+  "freshness_policy": {
+    "max_age_hours": 8760,
+    "label": "anual"
+  },
+  "documentation": {
+    "description": "Resultados educacionales agregados por comuna y año, sin registros personales.",
+    "path": "docs/datasets/resultados_educacionales.md",
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\nhub = ChileHub()\ndf = hub.load_polars('resultados_educacionales')",
+      "duckdb": "SELECT anio, codigo_comuna, matricula_total FROM 'data/normalized/resultados_educacionales.parquet';",
+      "cli": "chile-hub show resultados_educacionales"
+    }
+  },
+  "outputs": {
+    "parquet": "data/normalized/resultados_educacionales.parquet",
+    "json": "data/normalized/resultados_educacionales.json",
+    "duckdb_table": "resultados_educacionales",
+    "sqlite_table": "resultados_educacionales",
+    "excel_sheet": "Resultados Educacionales"
+  },
+  "join_keys": [
+    "anio",
+    "codigo_comuna"
+  ]
+}

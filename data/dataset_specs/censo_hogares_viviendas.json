@@ -1,0 +1,60 @@
+{
+  "spec_version": "1.0",
+  "dataset": "censo_hogares_viviendas",
+  "kind": "direct",
+  "publication_track": "stable_publishable",
+  "public_bundle_eligible": true,
+  "maturity_status": "stable",
+  "confidence_tier": "Tier A",
+  "extraction_lane": "bajo_demanda",
+  "extractor": "src/extractors/censo_hogares_viviendas_extractor.py",
+  "contract_path": "contracts/datasets/censo_hogares_viviendas.schema.json",
+  "validator": "validate_censo_hogares_viviendas",
+  "alias_for": null,
+  "dependencies": [],
+  "source": {
+    "source_id": "ine_censo_hogares_viviendas_2024",
+    "source_name": "INE Censo 2024",
+    "official_url": "https://www.ine.gob.cl/",
+    "access_method": "direct_file",
+    "license_status": "open-attribution",
+    "live_extractor_status": "implemented",
+    "fallback_policy": "allowed_for_dev",
+    "live_ready": true,
+    "fallback_allowed": true,
+    "publish_blocking": true,
+    "review_by": "2026-12-31",
+    "stalled_after_days": 90,
+    "owner": "core",
+    "next_action": "Keep decennial source and schema documentation current."
+  },
+  "reuse_policy": {
+    "status": "open-attribution",
+    "license": "CC BY 4.0",
+    "license_url": "https://www.ine.gob.cl/terminos-de-uso",
+    "attribution_required": true,
+    "redistribution_ok": true,
+    "summary": "Resultados oficiales del Censo 2024 publicados por el INE."
+  },
+  "freshness_policy": {
+    "max_age_hours": 87600,
+    "label": "decenal"
+  },
+  "documentation": {
+    "description": "Viviendas y hogares censados por comuna, ocupacion y tamano medio del hogar.",
+    "path": "docs/datasets/censo_hogares_viviendas.md",
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\nhub = ChileHub()\ndf = hub.load_polars('censo_hogares_viviendas')",
+      "duckdb": "SELECT * FROM 'data/normalized/censo_hogares_viviendas.parquet';",
+      "cli": "chile-hub show censo_hogares_viviendas"
+    }
+  },
+  "outputs": {
+    "parquet": "data/normalized/censo_hogares_viviendas.parquet",
+    "json": "data/normalized/censo_hogares_viviendas.json"
+  },
+  "join_keys": [
+    "codigo_comuna",
+    "codigo_region"
+  ]
+}

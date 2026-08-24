@@ -1,0 +1,62 @@
+{
+  "spec_version": "1.0",
+  "dataset": "establecimientos_educacionales",
+  "kind": "direct",
+  "publication_track": "stable_publishable",
+  "public_bundle_eligible": true,
+  "maturity_status": "stable",
+  "confidence_tier": "Tier A",
+  "extraction_lane": "diaria",
+  "extractor": "src/extractors/mineduc_establecimientos_extractor.py",
+  "contract_path": "contracts/datasets/establecimientos_educacionales.schema.json",
+  "validator": "validate_establecimientos_educacionales",
+  "alias_for": null,
+  "dependencies": [],
+  "source": {
+    "source_id": "mineduc_establecimientos",
+    "source_name": "MINEDUC",
+    "official_url": "https://datosabiertos.mineduc.cl/",
+    "access_method": "direct_file",
+    "license_status": "open-attribution",
+    "live_extractor_status": "implemented",
+    "fallback_policy": "allowed_for_dev_blocked_for_publication",
+    "live_ready": true,
+    "fallback_allowed": true,
+    "publish_blocking": true,
+    "review_by": "2026-12-31",
+    "stalled_after_days": 90,
+    "owner": "core",
+    "next_action": "Monitor annual source package and RAR extraction dependency."
+  },
+  "reuse_policy": {
+    "status": "open-attribution",
+    "license": "CC-BY-3.0",
+    "license_url": "https://creativecommons.org/licenses/by/3.0/cl/",
+    "attribution_required": true,
+    "redistribution_ok": true,
+    "summary": "Directorio oficial MINEDUC publicado por el Centro de Estudios del Ministerio de Educación de Chile bajo licencia CC BY."
+  },
+  "freshness_policy": {
+    "max_age_hours": 8760,
+    "label": "anual"
+  },
+  "documentation": {
+    "description": "Directorio oficial del Ministerio de Educación (MINEDUC) con Rol Base de Datos (RBD), ubicación y dependencia administrativa.",
+    "path": "docs/datasets/establecimientos_educacionales.md",
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('establecimientos_educacionales')",
+      "duckdb": "SELECT nombre_establecimiento, dependencia_administrativa FROM 'data/normalized/establecimientos_educacionales.parquet' LIMIT 10;",
+      "cli": "chile-hub show establecimientos_educacionales"
+    }
+  },
+  "outputs": {
+    "parquet": "data/normalized/establecimientos_educacionales.parquet",
+    "json": "data/normalized/establecimientos_educacionales.json",
+    "duckdb_table": "establecimientos_educacionales",
+    "sqlite_table": "establecimientos_educacionales",
+    "excel_sheet": "Establecimientos Educacionales"
+  },
+  "join_keys": [
+    "codigo_comuna"
+  ]
+}

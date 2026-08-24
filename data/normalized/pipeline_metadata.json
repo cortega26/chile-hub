@@ -1,7 +1,7 @@
 {
   "version": "1.28.8",
   "public_site_url": "https://tooltician.com/chile-hub/",
-  "generated_at_utc": "2026-08-24T01:05:41.337847+00:00",
+  "generated_at_utc": "2026-08-24T01:19:53.829890+00:00",
   "datasets": {
     "regiones": {
       "dataset": "regiones",
@@ -30,9 +30,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 293.39,
+        "age_hours": 293.63,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-08-24T01:05:41.329523+00:00"
+        "checked_at_utc": "2026-08-24T01:19:53.827082+00:00"
       },
       "degradation": {
         "status": "none",
@@ -95,9 +95,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 293.39,
+        "age_hours": 293.63,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-08-24T01:05:41.329621+00:00"
+        "checked_at_utc": "2026-08-24T01:19:53.827112+00:00"
       },
       "degradation": {
         "status": "none",
@@ -169,9 +169,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 293.39,
+        "age_hours": 293.63,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-08-24T01:05:41.329655+00:00"
+        "checked_at_utc": "2026-08-24T01:19:53.827126+00:00"
       },
       "degradation": {
         "status": "none",
@@ -247,9 +247,9 @@
       "alias_for": "comunas",
       "freshness": {
         "status": "fresh",
-        "age_hours": 293.39,
+        "age_hours": 293.63,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-08-24T01:05:41.329675+00:00"
+        "checked_at_utc": "2026-08-24T01:19:53.827134+00:00"
       },
       "degradation": {
         "status": "none",
@@ -343,28 +343,28 @@
         "summary": "Datos del Banco Central de Chile (BCCh) e INE. Libre reproducción con citación. Acceso vía mindicador.cl (API pública de la comunidad)."
       },
       "indicator_max_date": {
-        "utm": "2026-09-01",
         "dolar": "2026-08-13",
         "euro": "2026-08-13",
+        "utm": "2026-09-01",
         "ipc": "2026-07-01",
         "uf": "2026-09-09"
       },
       "indicator_age_days": {
-        "utm": -8,
         "dolar": 11,
         "euro": 11,
+        "utm": -8,
         "ipc": 54,
         "uf": -16
       },
       "freshness": {
         "status": "stale",
-        "age_hours": 248.73,
+        "age_hours": 248.96,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-08-24T01:05:41.330212+00:00"
+        "checked_at_utc": "2026-08-24T01:19:53.827332+00:00"
       },
       "degradation": {
         "status": "warning",
-        "impact": "indicadores live refresh reused last published artifact for missing codes: ipc; indicadores freshness is stale: 248.73h since refresh, policy max is 72h",
+        "impact": "indicadores live refresh reused last published artifact for missing codes: ipc; indicadores freshness is stale: 248.96h since refresh, policy max is 72h",
         "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
       },
       "coverage": {
@@ -435,9 +435,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 293.38,
+        "age_hours": 293.62,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-08-24T01:05:41.330268+00:00"
+        "checked_at_utc": "2026-08-24T01:19:53.827354+00:00"
       },
       "degradation": {
         "status": "none",
@@ -513,9 +513,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 293.38,
+        "age_hours": 293.62,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-08-24T01:05:41.330294+00:00"
+        "checked_at_utc": "2026-08-24T01:19:53.827365+00:00"
       },
       "degradation": {
         "status": "none",
@@ -583,9 +583,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 293.38,
+        "age_hours": 293.62,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-08-24T01:05:41.330315+00:00"
+        "checked_at_utc": "2026-08-24T01:19:53.827373+00:00"
       },
       "degradation": {
         "status": "none",
@@ -657,9 +657,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 39.62,
+        "age_hours": 39.85,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-08-24T01:05:41.330338+00:00"
+        "checked_at_utc": "2026-08-24T01:19:53.827381+00:00"
       },
       "degradation": {
         "status": "none",
@@ -724,9 +724,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 293.38,
+        "age_hours": 293.62,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-08-24T01:05:41.330358+00:00"
+        "checked_at_utc": "2026-08-24T01:19:53.827387+00:00"
       },
       "degradation": {
         "status": "none",
@@ -797,9 +797,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 246.13,
+        "age_hours": 246.36,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-08-24T01:05:41.330377+00:00"
+        "checked_at_utc": "2026-08-24T01:19:53.827395+00:00"
       },
       "degradation": {
         "status": "none",
@@ -872,9 +872,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 293.38,
+        "age_hours": 293.62,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-08-24T01:05:41.330396+00:00"
+        "checked_at_utc": "2026-08-24T01:19:53.827402+00:00"
       },
       "degradation": {
         "status": "none",
@@ -957,9 +957,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 293.38,
+        "age_hours": 293.62,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-08-24T01:05:41.330421+00:00"
+        "checked_at_utc": "2026-08-24T01:19:53.827410+00:00"
       },
       "degradation": {
         "status": "none",
@@ -999,7 +999,7 @@
       "source_url": "https://github.com/cortega26/chile-hub",
       "source_mode": "live",
       "source_detail": "derived_from_validated_chile_hub_layers",
-      "refreshed_at_utc": "2026-08-24T01:05:41.330447+00:00",
+      "refreshed_at_utc": "2026-08-24T01:19:53.827420+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -1061,7 +1061,7 @@
         "status": "fresh",
         "age_hours": 0.0,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-08-24T01:05:41.330492+00:00"
+        "checked_at_utc": "2026-08-24T01:19:53.827432+00:00"
       },
       "degradation": {
         "status": "none",
@@ -1144,9 +1144,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 293.28,
+        "age_hours": 293.51,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-08-24T01:05:41.330520+00:00"
+        "checked_at_utc": "2026-08-24T01:19:53.827448+00:00"
       },
       "degradation": {
         "status": "none",
@@ -1222,9 +1222,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 293.28,
+        "age_hours": 293.51,
         "max_age_hours": 175200,
-        "checked_at_utc": "2026-08-24T01:05:41.330543+00:00"
+        "checked_at_utc": "2026-08-24T01:19:53.827459+00:00"
       },
       "degradation": {
         "status": "none",
@@ -1317,9 +1317,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 293.28,
+        "age_hours": 293.51,
         "max_age_hours": 17520,
-        "checked_at_utc": "2026-08-24T01:05:41.330562+00:00"
+        "checked_at_utc": "2026-08-24T01:19:53.827465+00:00"
       },
       "degradation": {
         "status": "warning",
@@ -1407,9 +1407,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 293.28,
+        "age_hours": 293.51,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-08-24T01:05:41.330581+00:00"
+        "checked_at_utc": "2026-08-24T01:19:53.827470+00:00"
       },
       "degradation": {
         "status": "none",
@@ -1494,9 +1494,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 293.26,
+        "age_hours": 293.49,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-08-24T01:05:41.330603+00:00"
+        "checked_at_utc": "2026-08-24T01:19:53.827476+00:00"
       },
       "degradation": {
         "status": "none",
@@ -1556,7 +1556,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 293.39
+      "freshness_age_hours": 293.63
     },
     "provincias": {
       "dataset": "provincias",
@@ -1565,7 +1565,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 293.39
+      "freshness_age_hours": 293.63
     },
     "comunas": {
       "dataset": "comunas",
@@ -1574,7 +1574,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 293.39
+      "freshness_age_hours": 293.63
     },
     "comunas_enriquecidas": {
       "dataset": "comunas_enriquecidas",
@@ -1583,7 +1583,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 293.39
+      "freshness_age_hours": 293.63
     },
     "indicadores": {
       "dataset": "indicadores",
@@ -1592,7 +1592,7 @@
       "errors": [],
       "warnings": [
         "indicadores live refresh reused last published artifact for missing codes: ipc",
-        "indicadores freshness is stale: 248.73h since refresh, policy max is 72h"
+        "indicadores freshness is stale: 248.96h since refresh, policy max is 72h"
       ],
       "indicator_codes": [
         "dolar",
@@ -1603,7 +1603,7 @@
       ],
       "anomalies": [],
       "freshness_status": "stale",
-      "freshness_age_hours": 248.73
+      "freshness_age_hours": 248.96
     },
     "censo_comunal": {
       "dataset": "censo_comunal",
@@ -1612,7 +1612,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 293.38
+      "freshness_age_hours": 293.62
     },
     "establecimientos_salud": {
       "dataset": "establecimientos_salud",
@@ -1621,7 +1621,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 293.38
+      "freshness_age_hours": 293.62
     },
     "censo_hogares_viviendas": {
       "dataset": "censo_hogares_viviendas",
@@ -1630,7 +1630,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 39.62
+      "freshness_age_hours": 39.85
     },
     "distritos_electorales": {
       "dataset": "distritos_electorales",
@@ -1639,7 +1639,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 293.38
+      "freshness_age_hours": 293.62
     },
     "establecimientos_educacionales": {
       "dataset": "establecimientos_educacionales",
@@ -1648,7 +1648,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 293.38
+      "freshness_age_hours": 293.62
     },
     "finanzas_municipales": {
       "dataset": "finanzas_municipales",
@@ -1657,7 +1657,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 246.13
+      "freshness_age_hours": 246.36
     },
     "resultados_educacionales": {
       "dataset": "resultados_educacionales",
@@ -1666,7 +1666,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 293.38
+      "freshness_age_hours": 293.62
     },
     "indicadores_urbanos_siedu": {
       "dataset": "indicadores_urbanos_siedu",
@@ -1680,7 +1680,7 @@
         "indicadores_urbanos_siedu has intentionally partial urban coverage"
       ],
       "freshness_status": "fresh",
-      "freshness_age_hours": 293.38
+      "freshness_age_hours": 293.62
     },
     "empresas": {
       "dataset": "empresas",
@@ -1694,7 +1694,7 @@
         "RES solo cubre constituciones bajo Ley 20.659 (regimen simplificado). No incluye empresas del regimen tradicional (Diario Oficial) ni empresas anteriores a mayo 2013."
       ],
       "freshness_status": "fresh",
-      "freshness_age_hours": 293.28
+      "freshness_age_hours": 293.51
     },
     "pobreza_comunal": {
       "dataset": "pobreza_comunal",
@@ -1708,7 +1708,7 @@
         "cobertura SAE: 345/346 comunas (99.7%) — parcial por diseño; comunas sin muestra no tienen estimación"
       ],
       "freshness_status": "fresh",
-      "freshness_age_hours": 293.28
+      "freshness_age_hours": 293.51
     },
     "consumo_electrico_comunal": {
       "dataset": "consumo_electrico_comunal",
@@ -1721,7 +1721,7 @@
         "consumo_electrico_comunal source_mode is fallback; usando datos de muestra mínima."
       ],
       "freshness_status": "fresh",
-      "freshness_age_hours": 293.28
+      "freshness_age_hours": 293.51
     },
     "partidos_politicos": {
       "dataset": "partidos_politicos",
@@ -1735,7 +1735,7 @@
         "estado_legal poblado (vía SERVEL) en 15/36 partidos"
       ],
       "freshness_status": "fresh",
-      "freshness_age_hours": 293.28
+      "freshness_age_hours": 293.51
     },
     "autoridades_electas": {
       "dataset": "autoridades_electas",
@@ -1744,7 +1744,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 293.26
+      "freshness_age_hours": 293.49
     },
     "perfil_territorial_comunal": {
       "dataset": "perfil_territorial_comunal",

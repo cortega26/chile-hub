@@ -271,7 +271,8 @@
       "sqlite_table": "establecimientos_salud",
       "excel_sheet": "Establecimientos Salud"
     },
-    "documentation": "docs/datasets/establecimientos_salud.md"
+    "documentation": "docs/datasets/establecimientos_salud.md",
+    "expected_record_count": null
   },
   "distritos_electorales": {
     "description": "Asociación de comunas a distritos electorales (diputados) y circunscripciones senatoriales.",
@@ -335,7 +336,8 @@
       "sqlite_table": "establecimientos_educacionales",
       "excel_sheet": "Establecimientos Educacionales"
     },
-    "documentation": "docs/datasets/establecimientos_educacionales.md"
+    "documentation": "docs/datasets/establecimientos_educacionales.md",
+    "expected_record_count": null
   },
   "finanzas_municipales": {
     "description": "Indicadores financieros municipales anuales desde SINIM/SUBDERE. CAPA PARCIAL/CANDIDATO: 3 de 346 comunas (0.9%). Usar con precaución; no representa cobertura nacional.",
@@ -409,7 +411,8 @@
       "sqlite_table": "resultados_educacionales",
       "excel_sheet": "Resultados Educacionales"
     },
-    "documentation": "docs/datasets/resultados_educacionales.md"
+    "documentation": "docs/datasets/resultados_educacionales.md",
+    "expected_record_count": null
   },
   "indicadores_urbanos_siedu": {
     "description": "Indicadores urbanos SIEDU en formato largo con cobertura comunal parcial esperada.",
@@ -444,7 +447,8 @@
       "sqlite_table": "indicadores_urbanos_siedu",
       "excel_sheet": "SIEDU"
     },
-    "documentation": "docs/datasets/indicadores_urbanos_siedu.md"
+    "documentation": "docs/datasets/indicadores_urbanos_siedu.md",
+    "expected_record_count": null
   },
   "perfil_territorial_comunal": {
     "description": "Perfil comunal curado que consolida DPA, censo, salud, educación, finanzas, SIEDU y distritos.",
@@ -510,7 +514,8 @@
       "excel_sheet": "Empresas RES"
     },
     "documentation": "docs/datasets/empresas.md",
-    "_notes": "JSON y SQLite omitidos: >1.5M registros. Usa Parquet o DuckDB."
+    "_notes": "JSON y SQLite omitidos: >1.5M registros. Usa Parquet o DuckDB.",
+    "expected_record_count": null
   },
   "pobreza_comunal": {
     "description": "Estimaciones de pobreza comunal por ingresos y multidimensional derivadas de la encuesta CASEN mediante metodología SAE (Estimación de Áreas Pequeñas). Incluye tasa, límite inferior y superior del intervalo de confianza por comuna, año y dimensión.",

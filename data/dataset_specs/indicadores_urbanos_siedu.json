@@ -1,0 +1,65 @@
+{
+  "spec_version": "1.0",
+  "dataset": "indicadores_urbanos_siedu",
+  "kind": "direct",
+  "publication_track": "stable_publishable",
+  "public_bundle_eligible": true,
+  "maturity_status": "stable",
+  "confidence_tier": "Tier B",
+  "extraction_lane": "bajo_demanda",
+  "extractor": "src/extractors/siedu_extractor.py",
+  "contract_path": "contracts/datasets/indicadores_urbanos_siedu.schema.json",
+  "validator": "validate_indicadores_urbanos_siedu",
+  "alias_for": null,
+  "dependencies": [],
+  "source": {
+    "source_id": "ine_siedu_indicadores",
+    "source_name": "INE - Sistema de Indicadores y Estándares de Desarrollo Urbano",
+    "official_url": "https://www.ine.gob.cl/docs/default-source/sistema-de-indicadores-y-estandares-de-desarrollo-urbano/indicadores/actualizaci%C3%B3n-2019/matriz-siedu-publicacion.xlsm",
+    "access_method": "direct_file",
+    "license_status": "open-attribution",
+    "live_extractor_status": "implemented",
+    "fallback_policy": "allowed_for_dev_blocked_for_publication",
+    "live_ready": true,
+    "fallback_allowed": true,
+    "publish_blocking": true,
+    "review_by": "2026-12-31",
+    "stalled_after_days": 90,
+    "owner": "core",
+    "next_action": "Monitorear si INE publica una 6ta medición (post-2022) y actualizar URL y SHEET_YEARS.",
+    "source_notes": "XLSM con 5 hojas de medición (2018-2022). Formato wide → long. Deduplicación: año más reciente por (codigo_comuna, codigo_indicador). Cobertura parcial: ~117 comunas urbanas seleccionadas por SIEDU."
+  },
+  "reuse_policy": {
+    "status": "open-attribution",
+    "license": "Licencia de Datos Abiertos INE",
+    "license_url": "https://www.ine.gob.cl/terminos-de-uso",
+    "attribution_required": true,
+    "redistribution_ok": true,
+    "summary": "Indicadores urbanos SIEDU publicados por INE para comunas urbanas seleccionadas."
+  },
+  "freshness_policy": {
+    "max_age_hours": 8760,
+    "label": "anual"
+  },
+  "documentation": {
+    "description": "Indicadores urbanos SIEDU en formato largo con cobertura comunal parcial esperada.",
+    "path": "docs/datasets/indicadores_urbanos_siedu.md",
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\nhub = ChileHub()\ndf = hub.load_polars('indicadores_urbanos_siedu')",
+      "duckdb": "SELECT * FROM 'data/normalized/indicadores_urbanos_siedu.parquet' WHERE codigo_indicador = 'siedu_acceso_areas_verdes';",
+      "cli": "chile-hub show indicadores_urbanos_siedu"
+    }
+  },
+  "outputs": {
+    "parquet": "data/normalized/indicadores_urbanos_siedu.parquet",
+    "json": "data/normalized/indicadores_urbanos_siedu.json",
+    "duckdb_table": "indicadores_urbanos_siedu",
+    "sqlite_table": "indicadores_urbanos_siedu",
+    "excel_sheet": "SIEDU"
+  },
+  "join_keys": [
+    "anio",
+    "codigo_comuna",
+    "codigo_indicador"
+  ]
+}
