@@ -12,6 +12,17 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.30.0 - 2026-08-24
+
+### Agregado
+
+- **registry**: Phase 3A direct stable cohort (9 datasets)
+  ([`b2b4a96`](https://github.com/cortega26/chile-hub/commit/b2b4a9673d64efe59656c052f124cbccda18b133))
+
+- **registry**: Phase 3B shared-source cohort (regiones, provincias, comunas)
+  ([`3f024e3`](https://github.com/cortega26/chile-hub/commit/3f024e3a238082ae0533d9240021643761fcb12e))
+
+
 ## 1.29.0 - 2026-08-24
 
 ### Corregido
