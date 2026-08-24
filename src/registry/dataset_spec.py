@@ -135,6 +135,7 @@ class SourcePolicy:
     owner: str
     next_action: str
     source_notes: str | None = None
+    upstream_datasets: tuple[str, ...] | None = None
 
 
 @dataclass(frozen=True)
@@ -285,6 +286,8 @@ class DatasetSpec:
         }
         if self.source.source_notes is not None:
             entry["source_notes"] = self.source.source_notes
+        if self.source.upstream_datasets is not None:
+            entry["upstream_datasets"] = list(self.source.upstream_datasets)
         return entry
 
 
@@ -344,6 +347,15 @@ def _parse_source(payload: Mapping[str, Any], where: str) -> SourcePolicy:
     source_notes = source.get("source_notes")
     if source_notes is not None and not isinstance(source_notes, str):
         raise DatasetSpecError(f"DatasetSpec {where}: 'source.source_notes' debe ser string")
+    upstream = source.get("upstream_datasets")
+    if upstream is not None:
+        if not isinstance(upstream, list) or not all(isinstance(x, str) for x in upstream):
+            raise DatasetSpecError(
+                f"DatasetSpec {where}: 'source.upstream_datasets' debe ser lista de strings"
+            )
+        upstream_t: tuple[str, ...] | None = tuple(upstream)
+    else:
+        upstream_t = None
     return SourcePolicy(
         source_id=_require_str(source, "source_id", where),
         source_name=_require_str(source, "source_name", where),
@@ -360,6 +372,7 @@ def _parse_source(payload: Mapping[str, Any], where: str) -> SourcePolicy:
         owner=_require_str(source, "owner", where),
         next_action=_require_str(source, "next_action", where),
         source_notes=source_notes,
+        upstream_datasets=upstream_t,
     )
 
 

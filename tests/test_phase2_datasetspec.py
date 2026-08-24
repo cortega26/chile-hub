@@ -81,10 +81,10 @@ class TestPilotSpecModel:
         assert (ROOT_DIR / spec.contract_path).is_file()
 
     def test_only_one_spec_exists(self) -> None:
-        # Phase 2: solo pilot; Phase 3A: 10 specs; Phase 3B: 13 specs
+        # Phase 2: solo pilot; Phase 3A: 10 specs; Phase 3B: 13 specs; Phase 3C: 15 specs
         specs = list(iter_specs())
         assert _spec() in specs
-        assert len(specs) == 13
+        assert len(specs) == 15
         assert {s.dataset for s in specs} == {
             "partidos_politicos",
             "censo_comunal",
@@ -99,6 +99,8 @@ class TestPilotSpecModel:
             "regiones",
             "provincias",
             "comunas",
+            "comunas_enriquecidas",
+            "perfil_territorial_comunal",
         }
 
     def test_spec_declares_no_structural_schema_facts(self) -> None:

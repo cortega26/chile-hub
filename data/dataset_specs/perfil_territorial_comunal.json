@@ -1,0 +1,83 @@
+{
+  "spec_version": "1.0",
+  "dataset": "perfil_territorial_comunal",
+  "kind": "derived",
+  "publication_track": "stable_publishable",
+  "public_bundle_eligible": true,
+  "maturity_status": "stable",
+  "confidence_tier": "Tier B",
+  "extraction_lane": "bajo_demanda",
+  "extractor": null,
+  "contract_path": "contracts/datasets/perfil_territorial_comunal.schema.json",
+  "validator": "validate_perfil_territorial_comunal",
+  "alias_for": null,
+  "dependencies": [
+    "comunas",
+    "censo_comunal",
+    "censo_hogares_viviendas",
+    "establecimientos_salud",
+    "establecimientos_educacionales",
+    "distritos_electorales",
+    "finanzas_municipales",
+    "resultados_educacionales",
+    "indicadores_urbanos_siedu"
+  ],
+  "source": {
+    "source_id": "chile_hub_perfil_territorial",
+    "source_name": "chile-hub derived layer",
+    "official_url": "https://github.com/cortega26/chile-hub",
+    "access_method": "derived",
+    "license_status": "open-attribution",
+    "live_extractor_status": "derived",
+    "fallback_policy": "allowed_for_dev_blocked_for_publication",
+    "live_ready": false,
+    "fallback_allowed": true,
+    "publish_blocking": false,
+    "review_by": "2026-09-18",
+    "stalled_after_days": 90,
+    "owner": "core",
+    "next_action": "Track readiness inherited from upstream component datasets.",
+    "upstream_datasets": [
+      "comunas",
+      "censo_comunal",
+      "censo_hogares_viviendas",
+      "establecimientos_salud",
+      "establecimientos_educacionales",
+      "distritos_electorales",
+      "finanzas_municipales",
+      "resultados_educacionales",
+      "indicadores_urbanos_siedu"
+    ]
+  },
+  "reuse_policy": {
+    "status": "open-attribution",
+    "license": "Derivada de fuentes abiertas con atribución",
+    "license_url": "https://github.com/cortega26/chile-hub",
+    "attribution_required": true,
+    "redistribution_ok": true,
+    "summary": "Capa derivada a partir de datasets validados de chile-hub."
+  },
+  "freshness_policy": {
+    "max_age_hours": 1080,
+    "label": "derivada"
+  },
+  "documentation": {
+    "description": "Perfil comunal curado que consolida DPA, censo, salud, educación, finanzas, SIEDU y distritos.",
+    "path": "docs/datasets/perfil_territorial_comunal.md",
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\nhub = ChileHub()\ndf = hub.load_polars('perfil_territorial_comunal')",
+      "duckdb": "SELECT codigo_comuna, nombre_comuna, establecimientos_salud_total FROM 'data/normalized/perfil_territorial_comunal.parquet';",
+      "cli": "chile-hub show perfil_territorial_comunal"
+    }
+  },
+  "outputs": {
+    "parquet": "data/normalized/perfil_territorial_comunal.parquet",
+    "json": "data/normalized/perfil_territorial_comunal.json",
+    "duckdb_table": "perfil_territorial_comunal",
+    "sqlite_table": "perfil_territorial_comunal",
+    "excel_sheet": "Perfil Territorial"
+  },
+  "join_keys": [
+    "codigo_comuna"
+  ]
+}
