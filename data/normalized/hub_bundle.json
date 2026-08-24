@@ -1,6 +1,6 @@
 {
-  "version": "1.28.4",
-  "generated_at_utc": "2026-08-13T18:40:16.236945+00:00",
+  "version": "1.28.8",
+  "generated_at_utc": "2026-08-24T01:05:41.337847+00:00",
   "overall_status": "warn",
   "dataset_count": 19,
   "public_dataset_count": 18,
@@ -11,7 +11,7 @@
     "error_count": 0,
     "live_count": 18,
     "fallback_count": 0,
-    "stale_count": 0,
+    "stale_count": 1,
     "publishable_count": 18,
     "review_terms_count": 0,
     "unknown_reuse_count": 0,
@@ -20,7 +20,7 @@
     "partial_coverage_count": 2,
     "unknown_coverage_count": 0,
     "drifted_count": 1,
-    "warning_count": 5,
+    "warning_count": 6,
     "top_issue": {
       "dataset": "empresas",
       "attention_priority": 0,
@@ -54,7 +54,7 @@
       "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
       "source_mode": "live",
       "source_detail": "bcn_arcgis",
-      "refreshed_at_utc": "2026-08-13T18:39:12.793492+00:00",
+      "refreshed_at_utc": "2026-08-11T19:42:23.780877+00:00",
       "record_count": 16,
       "indicator_codes": [],
       "indicator_delivery": {},
@@ -73,9 +73,9 @@
       "validation_status": "ok",
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.02,
+        "age_hours": 293.39,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-08-13T18:40:16.233916+00:00"
+        "checked_at_utc": "2026-08-24T01:05:41.329523+00:00"
       },
       "coverage": {
         "status": "full",
@@ -139,7 +139,7 @@
       "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
       "source_mode": "live",
       "source_detail": "bcn_arcgis",
-      "refreshed_at_utc": "2026-08-13T18:39:12.793492+00:00",
+      "refreshed_at_utc": "2026-08-11T19:42:23.780877+00:00",
       "record_count": 56,
       "indicator_codes": [],
       "indicator_delivery": {},
@@ -159,9 +159,9 @@
       "validation_status": "ok",
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.02,
+        "age_hours": 293.39,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-08-13T18:40:16.233940+00:00"
+        "checked_at_utc": "2026-08-24T01:05:41.329621+00:00"
       },
       "coverage": {
         "status": "full",
@@ -225,7 +225,7 @@
       "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
       "source_mode": "live",
       "source_detail": "bcn_arcgis",
-      "refreshed_at_utc": "2026-08-13T18:39:12.793492+00:00",
+      "refreshed_at_utc": "2026-08-11T19:42:23.780877+00:00",
       "record_count": 346,
       "indicator_codes": [],
       "indicator_delivery": {},
@@ -245,9 +245,9 @@
       "validation_status": "ok",
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.02,
+        "age_hours": 293.39,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-08-13T18:40:16.233951+00:00"
+        "checked_at_utc": "2026-08-24T01:05:41.329655+00:00"
       },
       "coverage": {
         "status": "full",
@@ -291,7 +291,7 @@
           "shared_type": null,
           "format": null,
           "size_bytes": 132226,
-          "sha256": "d01c3b76f6eb5d347e3ea9bfe4e5d3acd1e7b5761798596152a03042a79e9a13"
+          "sha256": "1e44ae73ea283c2016875ad4faf967dc98ee2db1784b57d9bb2c46f54c7ce0f9"
         },
         {
           "path": "data/normalized/comunas.parquet",
@@ -299,8 +299,8 @@
           "output_type": "parquet",
           "shared_type": null,
           "format": null,
-          "size_bytes": 15263,
-          "sha256": "ba6c7ac9741ffb2847194167f0a23b2f7e9986b3f8432864b1f9ff24eb3afd1e"
+          "size_bytes": 15253,
+          "sha256": "90e76f63642a967523f1c6faba7781d469cc8853075898706386c77aca749442"
         }
       ]
     },
@@ -311,7 +311,7 @@
       "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
       "source_mode": "live",
       "source_detail": "bcn_arcgis",
-      "refreshed_at_utc": "2026-08-13T18:39:12.793492+00:00",
+      "refreshed_at_utc": "2026-08-11T19:42:23.780877+00:00",
       "record_count": 346,
       "indicator_codes": [],
       "indicator_delivery": {},
@@ -330,9 +330,9 @@
       "validation_status": "ok",
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.02,
+        "age_hours": 293.39,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-08-13T18:40:16.233957+00:00"
+        "checked_at_utc": "2026-08-24T01:05:41.329675+00:00"
       },
       "coverage": {
         "status": "full",
@@ -376,7 +376,7 @@
           "shared_type": null,
           "format": null,
           "size_bytes": 132226,
-          "sha256": "d01c3b76f6eb5d347e3ea9bfe4e5d3acd1e7b5761798596152a03042a79e9a13"
+          "sha256": "1e44ae73ea283c2016875ad4faf967dc98ee2db1784b57d9bb2c46f54c7ce0f9"
         },
         {
           "path": "data/normalized/comunas.parquet",
@@ -384,8 +384,8 @@
           "output_type": "parquet",
           "shared_type": null,
           "format": null,
-          "size_bytes": 15263,
-          "sha256": "ba6c7ac9741ffb2847194167f0a23b2f7e9986b3f8432864b1f9ff24eb3afd1e"
+          "size_bytes": 15253,
+          "sha256": "90e76f63642a967523f1c6faba7781d469cc8853075898706386c77aca749442"
         }
       ]
     },
@@ -396,7 +396,7 @@
       "source_url": "https://mindicador.cl/api",
       "source_mode": "live",
       "source_detail": "public_api_with_published_backfill",
-      "refreshed_at_utc": "2026-08-13T18:39:27.490763+00:00",
+      "refreshed_at_utc": "2026-08-13T16:22:04.519950+00:00",
       "record_count": 573,
       "indicator_codes": [
         "dolar",
@@ -427,10 +427,10 @@
       },
       "validation_status": "ok",
       "freshness": {
-        "status": "fresh",
-        "age_hours": 0.01,
+        "status": "stale",
+        "age_hours": 248.73,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-08-13T18:40:16.234095+00:00"
+        "checked_at_utc": "2026-08-24T01:05:41.330212+00:00"
       },
       "coverage": {
         "status": "not_applicable",
@@ -440,12 +440,12 @@
         "summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
         "expected": false
       },
-      "warning_count": 1,
+      "warning_count": 2,
       "severity": "warn",
       "publishability_status": "ready",
       "degradation": {
         "status": "warning",
-        "impact": "indicadores live refresh reused last published artifact for missing codes: ipc",
+        "impact": "indicadores live refresh reused last published artifact for missing codes: ipc; indicadores freshness is stale: 248.73h since refresh, policy max is 72h",
         "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
       },
       "drift": {
@@ -494,7 +494,7 @@
       "source_url": "https://censo2024.ine.gob.cl/wp-content/uploads/2025/03/D1_Poblacion-censada-por-sexo-y-edad-en-grupos-quinquenales.xlsx",
       "source_mode": "live",
       "source_detail": "official_xlsx",
-      "refreshed_at_utc": "2026-08-13T18:39:29.032712+00:00",
+      "refreshed_at_utc": "2026-08-11T19:42:36.653758+00:00",
       "record_count": 346,
       "indicator_codes": [],
       "indicator_delivery": {},
@@ -514,9 +514,9 @@
       "validation_status": "ok",
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.01,
+        "age_hours": 293.38,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-08-13T18:40:16.234108+00:00"
+        "checked_at_utc": "2026-08-24T01:05:41.330268+00:00"
       },
       "coverage": {
         "status": "full",
@@ -577,10 +577,10 @@
       "dataset": "establecimientos_salud",
       "description": "Directorio vigente de establecimientos de salud con tipo, dependencia, urgencia y ubicacion.",
       "source_name": "Ministerio de Salud - Establecimientos de Salud",
-      "source_url": "https://datos.gob.cl/dataset/3bf4cf7c-f638-4735-9a01-f65faae4beca/resource/2c44d782-3365-44e3-aefb-2c8b8363a1bc/download/establecimientos_20260811.csv",
+      "source_url": "https://datos.gob.cl/dataset/3bf4cf7c-f638-4735-9a01-f65faae4beca/resource/2c44d782-3365-44e3-aefb-2c8b8363a1bc/download/establecimientos_20260804.csv",
       "source_mode": "live",
       "source_detail": "datos_gob_csv",
-      "refreshed_at_utc": "2026-08-13T18:39:31.072936+00:00",
+      "refreshed_at_utc": "2026-08-11T19:42:40.802326+00:00",
       "record_count": 5717,
       "indicator_codes": [],
       "indicator_delivery": {},
@@ -600,9 +600,9 @@
       "validation_status": "ok",
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.01,
+        "age_hours": 293.38,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-08-13T18:40:16.234115+00:00"
+        "checked_at_utc": "2026-08-24T01:05:41.330294+00:00"
       },
       "coverage": {
         "status": "not_applicable",
@@ -666,7 +666,7 @@
       "source_url": "https://datosabiertos.mineduc.cl/wp-content/uploads/2025/11/Directorio-Oficial-EE-2025.rar",
       "source_mode": "live",
       "source_detail": "mineduc_datos_abiertos_rar",
-      "refreshed_at_utc": "2026-08-13T18:39:33.260448+00:00",
+      "refreshed_at_utc": "2026-08-11T19:42:41.413175+00:00",
       "record_count": 12898,
       "indicator_codes": [],
       "indicator_delivery": {},
@@ -685,9 +685,9 @@
       "validation_status": "ok",
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.01,
+        "age_hours": 293.38,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-08-13T18:40:16.234120+00:00"
+        "checked_at_utc": "2026-08-24T01:05:41.330315+00:00"
       },
       "coverage": {
         "status": "not_applicable",
@@ -751,7 +751,7 @@
       "source_url": "https://censo2024.ine.gob.cl/wp-content/uploads/2025/03/V1_Viviendas-y-hogares-censados.xlsx",
       "source_mode": "live",
       "source_detail": "official_xlsx",
-      "refreshed_at_utc": "2026-08-13T18:39:29.860672+00:00",
+      "refreshed_at_utc": "2026-08-22T09:28:35.974071+00:00",
       "record_count": 346,
       "indicator_codes": [],
       "indicator_delivery": {},
@@ -771,9 +771,9 @@
       "validation_status": "ok",
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.01,
+        "age_hours": 39.62,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-08-13T18:40:16.234126+00:00"
+        "checked_at_utc": "2026-08-24T01:05:41.330338+00:00"
       },
       "coverage": {
         "status": "full",
@@ -834,7 +834,7 @@
       "source_url": "https://www.bcn.cl/siit/observatorio/ley20840",
       "source_mode": "live",
       "source_detail": "bcn_electoral_mapping_generated",
-      "refreshed_at_utc": "2026-08-13T18:39:31.216239+00:00",
+      "refreshed_at_utc": "2026-08-11T19:42:40.945699+00:00",
       "record_count": 346,
       "indicator_codes": [],
       "indicator_delivery": {},
@@ -853,9 +853,9 @@
       "validation_status": "ok",
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.01,
+        "age_hours": 293.38,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-08-13T18:40:16.234130+00:00"
+        "checked_at_utc": "2026-08-24T01:05:41.330358+00:00"
       },
       "coverage": {
         "status": "full",
@@ -916,7 +916,7 @@
       "source_url": "https://datos.sinim.gov.cl/datos_municipales.php",
       "source_mode": "monthly",
       "source_detail": "curated_fallback_pending_direct_export",
-      "refreshed_at_utc": "2026-08-01T04:07:59.333799+00:00",
+      "refreshed_at_utc": "2026-08-13T18:58:06.679811+00:00",
       "record_count": 345,
       "indicator_codes": [],
       "indicator_delivery": {},
@@ -936,9 +936,9 @@
       "validation_status": "ok",
       "freshness": {
         "status": "fresh",
-        "age_hours": 302.54,
+        "age_hours": 246.13,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-08-13T18:40:16.234137+00:00"
+        "checked_at_utc": "2026-08-24T01:05:41.330377+00:00"
       },
       "coverage": {
         "status": "partial",
@@ -1003,7 +1003,7 @@
       "source_url": "https://datosabiertos.mineduc.cl/wp-content/uploads/2025/04/Rendimiento_2024.rar",
       "source_mode": "live",
       "source_detail": "mineduc_rendimiento_2024_rar_agregado_por_comuna",
-      "refreshed_at_utc": "2026-08-13T18:39:39.781052+00:00",
+      "refreshed_at_utc": "2026-08-11T19:42:44.201011+00:00",
       "record_count": 345,
       "indicator_codes": [],
       "indicator_delivery": {},
@@ -1023,9 +1023,9 @@
       "validation_status": "ok",
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.01,
+        "age_hours": 293.38,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-08-13T18:40:16.234144+00:00"
+        "checked_at_utc": "2026-08-24T01:05:41.330396+00:00"
       },
       "coverage": {
         "status": "not_applicable",
@@ -1089,7 +1089,7 @@
       "source_url": "https://www.ine.gob.cl/docs/default-source/sistema-de-indicadores-y-estandares-de-desarrollo-urbano/indicadores/actualizaci%C3%B3n-2019/matriz-siedu-publicacion.xlsm",
       "source_mode": "live",
       "source_detail": "ine_siedu_xlsm_cinco_mediciones_2018_2022",
-      "refreshed_at_utc": "2026-08-13T18:39:42.581166+00:00",
+      "refreshed_at_utc": "2026-08-11T19:42:46.514973+00:00",
       "record_count": 6701,
       "indicator_codes": [],
       "indicator_delivery": {},
@@ -1110,9 +1110,9 @@
       "validation_status": "ok",
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.01,
+        "age_hours": 293.38,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-08-13T18:40:16.234150+00:00"
+        "checked_at_utc": "2026-08-24T01:05:41.330421+00:00"
       },
       "coverage": {
         "status": "partial",
@@ -1177,7 +1177,7 @@
       "source_url": "https://github.com/cortega26/chile-hub",
       "source_mode": "live",
       "source_detail": "derived_from_validated_chile_hub_layers",
-      "refreshed_at_utc": "2026-08-13T18:40:16.234175+00:00",
+      "refreshed_at_utc": "2026-08-24T01:05:41.330447+00:00",
       "record_count": 346,
       "indicator_codes": [],
       "indicator_delivery": {},
@@ -1198,7 +1198,7 @@
         "status": "fresh",
         "age_hours": 0.0,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-08-13T18:40:16.234203+00:00"
+        "checked_at_utc": "2026-08-24T01:05:41.330492+00:00"
       },
       "coverage": {
         "status": "full",
@@ -1262,7 +1262,7 @@
       "source_url": "https://datos.gob.cl/dataset/registro-de-empresas-y-sociedades",
       "source_mode": "live",
       "source_detail": "datos_gob_cl_ckan_api",
-      "refreshed_at_utc": "2026-08-13T18:39:47.703674+00:00",
+      "refreshed_at_utc": "2026-08-11T19:49:00.139637+00:00",
       "record_count": 1590979,
       "indicator_codes": [],
       "indicator_delivery": {},
@@ -1281,9 +1281,9 @@
       "validation_status": "ok",
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.01,
+        "age_hours": 293.28,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-08-13T18:40:16.234211+00:00"
+        "checked_at_utc": "2026-08-24T01:05:41.330520+00:00"
       },
       "coverage": {
         "status": "not_applicable",
@@ -1324,8 +1324,8 @@
           "output_type": "parquet",
           "shared_type": null,
           "format": null,
-          "size_bytes": 28821120,
-          "sha256": "d561993761fddd4b6edc8c3fab0fb0f948037062437c5a12cff1d89d42b9f9a8"
+          "size_bytes": 28826825,
+          "sha256": "fbaa79027891d92c05504af6bf2c3a19abba7dabd568c0bc9b48e1b3970c75b1"
         }
       ]
     },
@@ -1336,7 +1336,7 @@
       "source_url": "https://observatorio.ministeriodesarrollosocial.gob.cl/storage/docs/pobreza-comunal/2022/Estimaciones_Tasa_Pobreza_Ingresos_Comunas_2022.xlsx",
       "source_mode": "live",
       "source_detail": "Estimaciones de Pobreza Comunal vía SAE desde encuesta CASEN",
-      "refreshed_at_utc": "2026-08-13T18:39:52.082483+00:00",
+      "refreshed_at_utc": "2026-08-11T19:49:01.701838+00:00",
       "record_count": 690,
       "indicator_codes": [],
       "indicator_delivery": {},
@@ -1356,9 +1356,9 @@
       "validation_status": "ok",
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.01,
+        "age_hours": 293.28,
         "max_age_hours": 175200,
-        "checked_at_utc": "2026-08-13T18:40:16.234217+00:00"
+        "checked_at_utc": "2026-08-24T01:05:41.330543+00:00"
       },
       "coverage": {
         "status": "not_applicable",
@@ -1399,7 +1399,7 @@
           "shared_type": null,
           "format": null,
           "size_bytes": 397419,
-          "sha256": "e4296cb7cdfcfba616748ec43efafd025f1bf507855d88df5fbd981a8852894a"
+          "sha256": "101e4f7eb53e22a2440d92067adeff252285daf8c0ed061489b6e7cd5ac86759"
         },
         {
           "path": "data/normalized/pobreza_comunal.parquet",
@@ -1408,7 +1408,7 @@
           "shared_type": null,
           "format": null,
           "size_bytes": 25689,
-          "sha256": "c80fb6d0c2f3d13828618c7d2761477e82e53173cff8aa209436bf1b8a091aa0"
+          "sha256": "944f331712dc0d0f0e96b666679c6cc87956f4a226a6f1e592f2fc30ed163a19"
         }
       ]
     },
@@ -1419,7 +1419,7 @@
       "source_url": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
       "source_mode": "live",
       "source_detail": "WSComun.asmx/retornarPartidosPoliticos + servel.cl/partidos-politicos (estado legal)",
-      "refreshed_at_utc": "2026-08-13T18:39:58.934776+00:00",
+      "refreshed_at_utc": "2026-08-11T19:49:08.719490+00:00",
       "record_count": 36,
       "indicator_codes": [],
       "indicator_delivery": {},
@@ -1438,9 +1438,9 @@
       "validation_status": "ok",
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.0,
+        "age_hours": 293.28,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-08-13T18:40:16.234229+00:00"
+        "checked_at_utc": "2026-08-24T01:05:41.330581+00:00"
       },
       "coverage": {
         "status": "full",
@@ -1481,7 +1481,7 @@
           "shared_type": null,
           "format": null,
           "size_bytes": 14264,
-          "sha256": "66c20d95920dd18c72fe7a624e0b8dc3bf1f91b38179f1a547f19628dd94f6c1"
+          "sha256": "a1aa8e257643f2490e18555602b68e0b076eb2375638264268a2dee88f37c53b"
         },
         {
           "path": "data/normalized/partidos_politicos.parquet",
@@ -1490,7 +1490,7 @@
           "shared_type": null,
           "format": null,
           "size_bytes": 5184,
-          "sha256": "55962570dbc23bdb3ece0188cec8d0647a0d510c6e329eea3f428ac32b7e60b6"
+          "sha256": "d72b9094d8bfbceceea51a8eb7315c2cb1091c8c963ca23e35c6444bc93f5ca5"
         }
       ]
     },
@@ -1501,7 +1501,7 @@
       "source_url": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
       "source_mode": "live",
       "source_detail": "WSDiputado.asmx/retornarDiputadosPeriodoActual + camara.cl + senado.cl (Scrapling)",
-      "refreshed_at_utc": "2026-08-13T18:40:06.315527+00:00",
+      "refreshed_at_utc": "2026-08-11T19:50:16.685023+00:00",
       "record_count": 205,
       "indicator_codes": [],
       "indicator_delivery": {},
@@ -1522,9 +1522,9 @@
       "validation_status": "ok",
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.0,
+        "age_hours": 293.26,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-08-13T18:40:16.234237+00:00"
+        "checked_at_utc": "2026-08-24T01:05:41.330603+00:00"
       },
       "coverage": {
         "status": "full",
@@ -1564,8 +1564,8 @@
           "output_type": "json",
           "shared_type": null,
           "format": null,
-          "size_bytes": 133756,
-          "sha256": "6535ec00bc08385a102f1b21ed21c7639650192d585c64d1d5284dc99b7700e8"
+          "size_bytes": 133702,
+          "sha256": "e648e3f4fc27bb5a1120c98d69e2042237a2ed778d05ef216f5851d3e2eaa3a4"
         },
         {
           "path": "data/normalized/autoridades_electas.parquet",
@@ -1573,8 +1573,8 @@
           "output_type": "parquet",
           "shared_type": null,
           "format": null,
-          "size_bytes": 10810,
-          "sha256": "9c6adc7e2d0707024c2c6810530190c6ae2c17a631169dcdc09552f087da8e41"
+          "size_bytes": 11045,
+          "sha256": "0ed3cde7345a73df4a6e71d90c165e1cc8a00447d3b96245fe2f5282c0f52bf1"
         }
       ]
     }
@@ -1589,9 +1589,9 @@
       "source_detail": "Consumo eléctrico anual por comuna y tipo de cliente",
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.01,
+        "age_hours": 293.28,
         "max_age_hours": 17520,
-        "checked_at_utc": "2026-08-13T18:40:16.234223+00:00"
+        "checked_at_utc": "2026-08-24T01:05:41.330562+00:00"
       },
       "next_action": "Fuente confirmada caída de forma permanente (investigado 2026-07-07): CNE decomisionó el catálogo Junar de energiaabierta.cl; la página del dataset no ofrece archivo ni API de reemplazo (el enlace API del sitio apunta a /visualizaciones/en-mantencion/). El dataset nunca tuvo un fetch en vivo exitoso — solo publica FALLBACK_ROWS de muestra. Degradado a deprecated/candidate por AGENTS.md §6 (protocolo de fuente permanentemente caída); reevaluar solo si CNE publica un reemplazo oficial."
     }
@@ -1603,8 +1603,8 @@
       "output_type": null,
       "shared_type": "pipeline_status",
       "format": "markdown",
-      "size_bytes": 16493,
-      "sha256": "2ad380d7623f7cddeef33f9190e7bd9e7e5bfd746c5fcb3c20c05ae8e7fbadc4"
+      "size_bytes": 16713,
+      "sha256": "619fa055bae5225e6d742d5f74b933a782cb9aac45a107f9c2e57c124bb119ca"
     },
     "health_json": {
       "path": "data/normalized/hub_health.json",
@@ -1613,7 +1613,7 @@
       "shared_type": "hub_health",
       "format": "json",
       "size_bytes": 15578,
-      "sha256": "b82fef1f2e5cc5839811c8729b413109143049525c2108cd6291652af24326f7"
+      "sha256": "ed17313a1addd07401a007d3ad76accd6a800f857fb22169b2de2b56732c6189"
     },
     "health_markdown": {
       "path": "data/normalized/hub_health.md",
@@ -1622,7 +1622,7 @@
       "shared_type": "hub_health",
       "format": "markdown",
       "size_bytes": 3329,
-      "sha256": "9fac24ba1fe626c3f0b3d1773ca4060d0e55c97d7eba3bfeabc9d57d61a4221d"
+      "sha256": "b70aa06f44a80a92ed2f1d1f590f90689a36d856ba143ab421a0a7549127b8a9"
     },
     "status_json": {
       "path": "data/normalized/hub_status.json",
@@ -1631,7 +1631,7 @@
       "shared_type": "hub_status",
       "format": "json",
       "size_bytes": 1029,
-      "sha256": "145b41f454ff92a450aaa796b054f4094cf84c922320b6cd2ac167dfe064f9bf"
+      "sha256": "883dca5184e1eb201d30ddca52ca53723107dbcfc18f1ffb4960e63ebe4efd7c"
     },
     "dataset_status_json": {
       "path": "data/normalized/dataset_status.json",
@@ -1639,8 +1639,8 @@
       "output_type": null,
       "shared_type": "dataset_status",
       "format": "json",
-      "size_bytes": 12928,
-      "sha256": "a4b63194e85826d7d5605ee5cf8ee83c556777ab4c0fecc70f9a31dd5e983c93"
+      "size_bytes": 13047,
+      "sha256": "15bb40080d85e22f5a84751555f964d4f6e9a3cdb432d5e2dd0a49405624a02f"
     },
     "dataset_changelog_json": {
       "path": "data/normalized/dataset_changelog.json",
@@ -1649,7 +1649,7 @@
       "shared_type": "dataset_changelog",
       "format": "json",
       "size_bytes": 12316,
-      "sha256": "3a05430b76ce072ac0b21cc8ec0709603a5be9f4cae260df2b9f3c669e820243"
+      "sha256": "9dd9bb2a693f8e64091823a224b1259958926ba71b5f160d0e01a4b4ee7b6dc1"
     },
     "bundle_json": {
       "path": "data/normalized/hub_bundle.json",
@@ -1657,8 +1657,8 @@
       "output_type": null,
       "shared_type": "hub_bundle",
       "format": "json",
-      "size_bytes": 79057,
-      "sha256": "1bb27eb2fb9094cf466872df573f6bc658232ca7f24f832822078810a29aeb84"
+      "size_bytes": 79138,
+      "sha256": "c910b8367e9e88cc65568d62b51bc6582ea329117b038375f294963a48ed9505"
     },
     "redistribution_json": {
       "path": "data/normalized/redistribution_report.json",
@@ -1667,7 +1667,7 @@
       "shared_type": "redistribution_report",
       "format": "json",
       "size_bytes": 11135,
-      "sha256": "64264d4b243a22bd41c81000659ea165f057f08ebc6e455d2f3d39c8f1b7034b"
+      "sha256": "5f8631dfa10a7b6b47ea623bd5762e68ee860e745ed975c908e5812d00ff656a"
     },
     "redistribution_markdown": {
       "path": "data/normalized/redistribution_report.md",
@@ -1676,7 +1676,7 @@
       "shared_type": "redistribution_report",
       "format": "markdown",
       "size_bytes": 10364,
-      "sha256": "10290e4abcf84b3240b23b8184065b1a5816651b32a0765145cacc44e6a313d8"
+      "sha256": "731d64f937764e64f21d1e4ebe664a32cfdf3cf62c7858c9fdbf1f8f2ae8cfde"
     },
     "provenance_json": {
       "path": "data/normalized/provenance_report.json",
@@ -1684,8 +1684,8 @@
       "output_type": null,
       "shared_type": "provenance_report",
       "format": "json",
-      "size_bytes": 13127,
-      "sha256": "188369d1424503a123d1bd4ef0b9344782cae1de5b950834f45c73d6b03f80ba"
+      "size_bytes": 13162,
+      "sha256": "53334ff020f02b27e3f6ce714dda4238e9babd274c6c36634105ee3d58db3285"
     },
     "provenance_markdown": {
       "path": "data/normalized/provenance_report.md",
@@ -1693,8 +1693,8 @@
       "output_type": null,
       "shared_type": "provenance_report",
       "format": "markdown",
-      "size_bytes": 14834,
-      "sha256": "72b40f2aa6d655337b019e7c9a027a29a79ba8b29091504f59f5121d56fc447f"
+      "size_bytes": 14904,
+      "sha256": "de7461ed99e9f5c784b5ca3ceb8fde6594fefe518b41104c69a2250f1679f2fa"
     },
     "drift_json": {
       "path": "data/normalized/drift_report.json",
@@ -1702,8 +1702,8 @@
       "output_type": null,
       "shared_type": "drift_report",
       "format": "json",
-      "size_bytes": 13817,
-      "sha256": "b282856180316b1e53de4eda1ef2ad3ccfe3a36f6ba9e14ec7748c39f1bbec69"
+      "size_bytes": 13891,
+      "sha256": "436deae1d0b0e6b994c553cdf5e79c7e0a21b02ea042acc99455f8799799ebd8"
     },
     "drift_markdown": {
       "path": "data/normalized/drift_report.md",
@@ -1711,8 +1711,8 @@
       "output_type": null,
       "shared_type": "drift_report",
       "format": "markdown",
-      "size_bytes": 9649,
-      "sha256": "badbcb449ccb1570be362309c16e06d15e9dae83f5b08a70d01b0d3236f6bcb4"
+      "size_bytes": 9723,
+      "sha256": "ec9c9b95416de8c7a9fc46b7693cc9ef08bd5e21e9d11c14074db39a161243c8"
     },
     "overview_json": {
       "path": "data/normalized/overview.json",
@@ -1721,7 +1721,7 @@
       "shared_type": "overview",
       "format": "json",
       "size_bytes": 6215,
-      "sha256": "9e8e8b288ace76a12d815e790fbd354d24650a3ecbebcedd473a8119ffbe3d6c"
+      "sha256": "70adaed596776ca7b84463f9ccb6f4b6e9499f64b1abd5eee871a48464e6a1b4"
     },
     "overview_markdown": {
       "path": "data/normalized/overview.md",
@@ -1730,7 +1730,7 @@
       "shared_type": "overview",
       "format": "markdown",
       "size_bytes": 3252,
-      "sha256": "32f6a747602c77d01abbdc0a4c672616784a8be224c32555ce49e7ba41665dd0"
+      "sha256": "12b55481c5fe5726a6de9d35f68b50c75e085bff2b81d39592363147d6e4aae0"
     },
     "catalog_json": {
       "path": "data/normalized/dataset_catalog.json",
@@ -1738,8 +1738,8 @@
       "output_type": null,
       "shared_type": "dataset_catalog",
       "format": "json",
-      "size_bytes": 64971,
-      "sha256": "91e9a391bb08ac96f65ec3714347db011eafcd85da7aa034ed534db55085adda"
+      "size_bytes": 65250,
+      "sha256": "8f46bfd548a64428b07005068931e2a8dbf246f240da14dcaf10adef0b582603"
     },
     "catalog_markdown": {
       "path": "data/normalized/dataset_catalog.md",
@@ -1747,8 +1747,8 @@
       "output_type": null,
       "shared_type": "dataset_catalog",
       "format": "markdown",
-      "size_bytes": 35690,
-      "sha256": "df1ab51145bbb5cf1c7ed5657b19a918dfe8e8f2ce99d124480025d02955d58b"
+      "size_bytes": 35836,
+      "sha256": "893e12cb0d5c08f53670367f6c091727c025ebe8e7d7d011d8d3e6b928c276f4"
     },
     "manifest_json": {
       "path": "data/normalized/artifact_manifest.json",
@@ -1757,7 +1757,7 @@
       "shared_type": "artifact_manifest",
       "format": "json",
       "size_bytes": 17739,
-      "sha256": "14b67a701a5fd107276b046e5b3797c2c81b3c183e96029dc8ec6987471f7f54"
+      "sha256": "572ec49b332b2658d67d6213613cde13411049c29cabe7632274f30caf51b23a"
     },
     "source_readiness_json": {
       "path": "data/normalized/source_readiness.json",
@@ -1766,7 +1766,7 @@
       "shared_type": "source_readiness",
       "format": "json",
       "size_bytes": 26403,
-      "sha256": "ed4ea12ad683ee19ce2a9a532d4c0570134772bd27758bfbb079c58b17305476"
+      "sha256": "fc9eb4acdc6b510fbded3f7c418cd7bc3a31ce8f0985c6eac4feabb581334475"
     },
     "source_readiness_markdown": {
       "path": "data/normalized/source_readiness.md",
@@ -1775,7 +1775,7 @@
       "shared_type": "source_readiness",
       "format": "markdown",
       "size_bytes": 6410,
-      "sha256": "be08733afda960dc3f003e06bb6dd19d18b8205c186433b5f126d7dba687eea7"
+      "sha256": "e0ddf7671f8bef22aff4d7608d37eb22fea6733b91ee79b30c98d8007f3dbb79"
     },
     "dataset_quality_json": {
       "path": "data/normalized/dataset_quality.json",
@@ -1783,8 +1783,8 @@
       "output_type": null,
       "shared_type": "dataset_quality",
       "format": "json",
-      "size_bytes": 14372,
-      "sha256": "95377fc973c1fa625a287937ee0bd86c1ddb49708b0bd76cb19ea00d885e8dfe"
+      "size_bytes": 14394,
+      "sha256": "ca682c4d5126dab319b84fa2bc54805638f966b66bcd3c056cd9801e44888b13"
     },
     "dataset_quality_markdown": {
       "path": "data/normalized/dataset_quality.md",
@@ -1792,8 +1792,8 @@
       "output_type": null,
       "shared_type": "dataset_quality",
       "format": "markdown",
-      "size_bytes": 2646,
-      "sha256": "aed2cd9e9a3f6b01991941a43c8be4a38e06828eeebca8d700d3337b1e8e28f9"
+      "size_bytes": 2658,
+      "sha256": "9f0146b7e8a9743ceea49a45aca03d94008a91b6fe4d819435e5127dd0f4a45a"
     }
   },
   "shared_artifacts": [
@@ -1804,7 +1804,7 @@
       "shared_type": "artifact_manifest",
       "format": "json",
       "size_bytes": 17739,
-      "sha256": "14b67a701a5fd107276b046e5b3797c2c81b3c183e96029dc8ec6987471f7f54"
+      "sha256": "572ec49b332b2658d67d6213613cde13411049c29cabe7632274f30caf51b23a"
     },
     {
       "path": "data/normalized/datapackage.json",
@@ -1813,7 +1813,7 @@
       "shared_type": "datapackage",
       "format": "json",
       "size_bytes": 46018,
-      "sha256": "4be45ca22c94929a0dd5ef47f4a5e6270864a2be3f16d47a4c8a283522637ca2"
+      "sha256": "05b49b5c6988c8c46293c8630ab709fcc319b23a2c21651b3456edcdd4cab922"
     },
     {
       "path": "data/normalized/dataset_catalog.json",
@@ -1821,8 +1821,8 @@
       "output_type": null,
       "shared_type": "dataset_catalog",
       "format": "json",
-      "size_bytes": 64971,
-      "sha256": "91e9a391bb08ac96f65ec3714347db011eafcd85da7aa034ed534db55085adda"
+      "size_bytes": 65250,
+      "sha256": "8f46bfd548a64428b07005068931e2a8dbf246f240da14dcaf10adef0b582603"
     },
     {
       "path": "data/normalized/dataset_catalog.md",
@@ -1830,8 +1830,8 @@
       "output_type": null,
       "shared_type": "dataset_catalog",
       "format": "markdown",
-      "size_bytes": 35690,
-      "sha256": "df1ab51145bbb5cf1c7ed5657b19a918dfe8e8f2ce99d124480025d02955d58b"
+      "size_bytes": 35836,
+      "sha256": "893e12cb0d5c08f53670367f6c091727c025ebe8e7d7d011d8d3e6b928c276f4"
     },
     {
       "path": "data/normalized/dataset_changelog.json",
@@ -1840,7 +1840,7 @@
       "shared_type": "dataset_changelog",
       "format": "json",
       "size_bytes": 12316,
-      "sha256": "3a05430b76ce072ac0b21cc8ec0709603a5be9f4cae260df2b9f3c669e820243"
+      "sha256": "9dd9bb2a693f8e64091823a224b1259958926ba71b5f160d0e01a4b4ee7b6dc1"
     },
     {
       "path": "data/normalized/dataset_quality.json",
@@ -1848,8 +1848,8 @@
       "output_type": null,
       "shared_type": "dataset_quality",
       "format": "json",
-      "size_bytes": 14372,
-      "sha256": "95377fc973c1fa625a287937ee0bd86c1ddb49708b0bd76cb19ea00d885e8dfe"
+      "size_bytes": 14394,
+      "sha256": "ca682c4d5126dab319b84fa2bc54805638f966b66bcd3c056cd9801e44888b13"
     },
     {
       "path": "data/normalized/dataset_quality.md",
@@ -1857,8 +1857,8 @@
       "output_type": null,
       "shared_type": "dataset_quality",
       "format": "markdown",
-      "size_bytes": 2646,
-      "sha256": "aed2cd9e9a3f6b01991941a43c8be4a38e06828eeebca8d700d3337b1e8e28f9"
+      "size_bytes": 2658,
+      "sha256": "9f0146b7e8a9743ceea49a45aca03d94008a91b6fe4d819435e5127dd0f4a45a"
     },
     {
       "path": "data/normalized/dataset_status.json",
@@ -1866,8 +1866,8 @@
       "output_type": null,
       "shared_type": "dataset_status",
       "format": "json",
-      "size_bytes": 12928,
-      "sha256": "a4b63194e85826d7d5605ee5cf8ee83c556777ab4c0fecc70f9a31dd5e983c93"
+      "size_bytes": 13047,
+      "sha256": "15bb40080d85e22f5a84751555f964d4f6e9a3cdb432d5e2dd0a49405624a02f"
     },
     {
       "path": "data/normalized/drift_report.json",
@@ -1875,8 +1875,8 @@
       "output_type": null,
       "shared_type": "drift_report",
       "format": "json",
-      "size_bytes": 13817,
-      "sha256": "b282856180316b1e53de4eda1ef2ad3ccfe3a36f6ba9e14ec7748c39f1bbec69"
+      "size_bytes": 13891,
+      "sha256": "436deae1d0b0e6b994c553cdf5e79c7e0a21b02ea042acc99455f8799799ebd8"
     },
     {
       "path": "data/normalized/drift_report.md",
@@ -1884,8 +1884,8 @@
       "output_type": null,
       "shared_type": "drift_report",
       "format": "markdown",
-      "size_bytes": 9649,
-      "sha256": "badbcb449ccb1570be362309c16e06d15e9dae83f5b08a70d01b0d3236f6bcb4"
+      "size_bytes": 9723,
+      "sha256": "ec9c9b95416de8c7a9fc46b7693cc9ef08bd5e21e9d11c14074db39a161243c8"
     },
     {
       "path": "data/normalized/hub_bundle.json",
@@ -1893,8 +1893,8 @@
       "output_type": null,
       "shared_type": "hub_bundle",
       "format": "json",
-      "size_bytes": 79057,
-      "sha256": "1bb27eb2fb9094cf466872df573f6bc658232ca7f24f832822078810a29aeb84"
+      "size_bytes": 79138,
+      "sha256": "c910b8367e9e88cc65568d62b51bc6582ea329117b038375f294963a48ed9505"
     },
     {
       "path": "data/normalized/hub_health.json",
@@ -1903,7 +1903,7 @@
       "shared_type": "hub_health",
       "format": "json",
       "size_bytes": 15578,
-      "sha256": "b82fef1f2e5cc5839811c8729b413109143049525c2108cd6291652af24326f7"
+      "sha256": "ed17313a1addd07401a007d3ad76accd6a800f857fb22169b2de2b56732c6189"
     },
     {
       "path": "data/normalized/hub_health.md",
@@ -1912,7 +1912,7 @@
       "shared_type": "hub_health",
       "format": "markdown",
       "size_bytes": 3329,
-      "sha256": "9fac24ba1fe626c3f0b3d1773ca4060d0e55c97d7eba3bfeabc9d57d61a4221d"
+      "sha256": "b70aa06f44a80a92ed2f1d1f590f90689a36d856ba143ab421a0a7549127b8a9"
     },
     {
       "path": "data/normalized/hub_health_history.jsonl",
@@ -1920,8 +1920,8 @@
       "output_type": null,
       "shared_type": "hub_health_history",
       "format": "jsonl",
-      "size_bytes": 4920,
-      "sha256": "ce85d65c2ef1699128dc065ce99f91923a726e17fc4348154123068d00bc9723"
+      "size_bytes": 5622,
+      "sha256": "c87da43f7827f43a2d01307affe0f6cdafb76b8a30579d26c773b48390ad0af8"
     },
     {
       "path": "data/normalized/hub_status.json",
@@ -1930,7 +1930,7 @@
       "shared_type": "hub_status",
       "format": "json",
       "size_bytes": 1029,
-      "sha256": "145b41f454ff92a450aaa796b054f4094cf84c922320b6cd2ac167dfe064f9bf"
+      "sha256": "883dca5184e1eb201d30ddca52ca53723107dbcfc18f1ffb4960e63ebe4efd7c"
     },
     {
       "path": "data/normalized/overview.json",
@@ -1939,7 +1939,7 @@
       "shared_type": "overview",
       "format": "json",
       "size_bytes": 6215,
-      "sha256": "9e8e8b288ace76a12d815e790fbd354d24650a3ecbebcedd473a8119ffbe3d6c"
+      "sha256": "70adaed596776ca7b84463f9ccb6f4b6e9499f64b1abd5eee871a48464e6a1b4"
     },
     {
       "path": "data/normalized/overview.md",
@@ -1948,7 +1948,7 @@
       "shared_type": "overview",
       "format": "markdown",
       "size_bytes": 3252,
-      "sha256": "32f6a747602c77d01abbdc0a4c672616784a8be224c32555ce49e7ba41665dd0"
+      "sha256": "12b55481c5fe5726a6de9d35f68b50c75e085bff2b81d39592363147d6e4aae0"
     },
     {
       "path": "data/normalized/pipeline_metadata.json",
@@ -1956,8 +1956,8 @@
       "output_type": null,
       "shared_type": "pipeline_metadata",
       "format": "json",
-      "size_bytes": 58934,
-      "sha256": "e58697bb49f56ef4d983f42812c60e9c5052adb2f93899927cba1b3e9dc13e9c"
+      "size_bytes": 59165,
+      "sha256": "2913a85a8f9a7d35fed5f2fa5d321cf90ff4954f4597d58dd7584b5889bbe757"
     },
     {
       "path": "data/normalized/pipeline_status.md",
@@ -1965,8 +1965,8 @@
       "output_type": null,
       "shared_type": "pipeline_status",
       "format": "markdown",
-      "size_bytes": 16493,
-      "sha256": "2ad380d7623f7cddeef33f9190e7bd9e7e5bfd746c5fcb3c20c05ae8e7fbadc4"
+      "size_bytes": 16713,
+      "sha256": "619fa055bae5225e6d742d5f74b933a782cb9aac45a107f9c2e57c124bb119ca"
     },
     {
       "path": "data/normalized/provenance_report.json",
@@ -1974,8 +1974,8 @@
       "output_type": null,
       "shared_type": "provenance_report",
       "format": "json",
-      "size_bytes": 13127,
-      "sha256": "188369d1424503a123d1bd4ef0b9344782cae1de5b950834f45c73d6b03f80ba"
+      "size_bytes": 13162,
+      "sha256": "53334ff020f02b27e3f6ce714dda4238e9babd274c6c36634105ee3d58db3285"
     },
     {
       "path": "data/normalized/provenance_report.md",
@@ -1983,8 +1983,8 @@
       "output_type": null,
       "shared_type": "provenance_report",
       "format": "markdown",
-      "size_bytes": 14834,
-      "sha256": "72b40f2aa6d655337b019e7c9a027a29a79ba8b29091504f59f5121d56fc447f"
+      "size_bytes": 14904,
+      "sha256": "de7461ed99e9f5c784b5ca3ceb8fde6594fefe518b41104c69a2250f1679f2fa"
     },
     {
       "path": "data/normalized/redistribution_report.json",
@@ -1993,7 +1993,7 @@
       "shared_type": "redistribution_report",
       "format": "json",
       "size_bytes": 11135,
-      "sha256": "64264d4b243a22bd41c81000659ea165f057f08ebc6e455d2f3d39c8f1b7034b"
+      "sha256": "5f8631dfa10a7b6b47ea623bd5762e68ee860e745ed975c908e5812d00ff656a"
     },
     {
       "path": "data/normalized/redistribution_report.md",
@@ -2002,7 +2002,7 @@
       "shared_type": "redistribution_report",
       "format": "markdown",
       "size_bytes": 10364,
-      "sha256": "10290e4abcf84b3240b23b8184065b1a5816651b32a0765145cacc44e6a313d8"
+      "sha256": "731d64f937764e64f21d1e4ebe664a32cfdf3cf62c7858c9fdbf1f8f2ae8cfde"
     },
     {
       "path": "data/normalized/source_readiness.json",
@@ -2011,7 +2011,7 @@
       "shared_type": "source_readiness",
       "format": "json",
       "size_bytes": 26403,
-      "sha256": "ed4ea12ad683ee19ce2a9a532d4c0570134772bd27758bfbb079c58b17305476"
+      "sha256": "fc9eb4acdc6b510fbded3f7c418cd7bc3a31ce8f0985c6eac4feabb581334475"
     },
     {
       "path": "data/normalized/source_readiness.md",
@@ -2020,15 +2020,15 @@
       "shared_type": "source_readiness",
       "format": "markdown",
       "size_bytes": 6410,
-      "sha256": "be08733afda960dc3f003e06bb6dd19d18b8205c186433b5f126d7dba687eea7"
+      "sha256": "e0ddf7671f8bef22aff4d7608d37eb22fea6733b91ee79b30c98d8007f3dbb79"
     }
   ],
   "packages": [
     {
       "path": "data/normalized/chile-hub-publishable-bundle.zip",
       "package_type": "zip",
-      "size_bytes": 29760656,
-      "sha256": "322776f9e5c758c38577019f9d9ba4da35b169b2d3f565a11ff127c935051161",
+      "size_bytes": 29765005,
+      "sha256": "cf6ea38358c89953378cfaecbc16b704e57be8e59b93725a83da02554cf11a4d",
       "checksum_algorithm": "sha256",
       "checksum_path": "data/normalized/chile-hub-publishable-bundle.zip.sha256",
       "verification_command": "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256"

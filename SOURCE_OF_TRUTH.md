@@ -79,8 +79,10 @@ src/
 │   └── pipeline_status_utils.py   Constructores de reportes (health, catalog, redistribution) — 994 lineas
 ├── pipeline_status_utils.py       Shim de reexport (21 lineas) — para scripts con PYTHONPATH=src.
 │   No dupliques logica aqui: la implementacion real es chile_hub/pipeline_status_utils.py (arriba)
+├── registry/                      DatasetSpec piloto Phase 2 (ADR-018 — ver docs/architecture-migration-phase-2-pilot.md)
 
 data/
+├── dataset_specs/  DatasetSpec del piloto (partidos_politicos.json)
 ├── raw/        Snapshots de auditoria — solo append, nunca editar
 ├── staging/    {dataset}.csv + {dataset}.metadata.json — entradas del pipeline
 └── normalized/ Artefactos generados — NUNCA editar manualmente; siempre regenerar

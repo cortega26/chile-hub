@@ -8,6 +8,7 @@ y por `build_dev_db.py` sin riesgo de imports circulares.
 import json
 import os
 from datetime import timezone
+from typing import Any
 
 UTC = timezone.utc
 
@@ -67,7 +68,14 @@ def _load_catalog_config() -> dict:
             "Si acabas de clonar, verifica que el archivo no esté en .gitignore."
         )
     with open(path, "r", encoding="utf-8") as f:
-        return json.load(f)  # type: ignore[no-any-return]  # json.load → dict en runtime
+        loaded: dict[str, Any] = json.load(f)
+        config = loaded
+    # Piloto Phase 2 (ADR-018): el dataset con DatasetSpec se lee a través de
+    # su proyección tipada; todo dataset sin spec conserva su entrada legacy.
+    # Import local: el módulo registry es stdlib-only y no importa builders.
+    from src.registry.dataset_spec import catalog_config_with_spec_overlay
+
+    return catalog_config_with_spec_overlay(config)
 
 
 DATASET_CATALOG_CONFIG = _load_catalog_config()

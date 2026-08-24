@@ -49,6 +49,9 @@ COMPANION_RULES: dict[str, list[str]] = {
     # Cambiar el generador de bloques delimitados sin regenerar los documentos
     # que escribe (README/AGENTS/docs de datasets) deja deriva latente.
     "src/builders/doc_sync.py": ["AGENTS.md", "README.md", "docs/datasets/"],
+    # Un DatasetSpec (Phase 2) co-evoluciona con la documentación del dataset
+    # y con el registro de tests que prueban su equivalencia de proyección.
+    "data/dataset_specs/": ["docs/datasets/", "AGENTS.md", "tests/"],
 }
 
 # Módulos compartidos de src/extractors/ que no representan un dataset propio;

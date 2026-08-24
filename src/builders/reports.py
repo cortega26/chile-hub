@@ -521,10 +521,17 @@ def write_overview_json(overview):
 
 
 def load_source_registry():
-    """Carga el registry de fuentes desde data/source_registry.json."""
+    """Carga el registry de fuentes desde data/source_registry.json.
+
+    Piloto Phase 2 (ADR-018): la entrada del dataset con DatasetSpec se
+    proyecta desde su spec; todo dataset sin spec conserva su entrada legacy.
+    """
     registry_path = os.path.join(DATA_DIR, "source_registry.json")
     with open(registry_path, "r", encoding="utf-8") as f:
-        return json.load(f)
+        registry = json.load(f)
+    from src.registry.dataset_spec import source_registry_with_spec_overlay
+
+    return source_registry_with_spec_overlay(registry)
 
 
 def build_source_readiness(pipeline_metadata):

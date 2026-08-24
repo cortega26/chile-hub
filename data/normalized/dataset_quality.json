@@ -1,14 +1,14 @@
 {
-  "generated_at_utc": "2026-08-13T18:40:16.236945+00:00",
+  "generated_at_utc": "2026-08-24T01:05:41.337847+00:00",
   "dataset_count": 19,
   "grade_distribution": {
-    "A": 18,
-    "B": 1,
+    "A": 17,
+    "B": 2,
     "C": 0,
     "D": 0,
     "F": 0
   },
-  "average_score": 95.2,
+  "average_score": 94.8,
   "weights": {
     "validation": 25,
     "schema_contract": 20,
@@ -297,13 +297,13 @@
     {
       "dataset": "indicadores",
       "maturity_status": "stable",
-      "overall_score": 90.0,
-      "grade": "A",
+      "overall_score": 82.5,
+      "grade": "B",
       "dimensions": {
         "validation": 100,
         "schema_contract": 100,
         "source_readiness": 100,
-        "freshness": 100,
+        "freshness": 50,
         "coverage": 0,
         "reuse_policy": 100
       },
@@ -316,6 +316,7 @@
         "reuse_policy": 10
       },
       "blocking_reasons": [
+        "Datos stale",
         "Cobertura not_applicable"
       ],
       "recommended_action": "Monitor empty monthly IPC responses and published backfill behavior."

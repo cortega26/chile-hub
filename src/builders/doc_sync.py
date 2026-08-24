@@ -195,11 +195,29 @@ _AGENTS_TEST_DESCRIPTIONS = {
         "Unit tests de `ChileHubDataManager` y contrato de caché de geometría — sin "
         "`data/normalized/` (TC-07: extraídos de `test_chile_hub.py`)"
     ),
+    "test_phase1_characterization.py": (
+        "Arnés de caracterización Phase 1: staging sintético offline, equivalencia "
+        "de build completo, alias y políticas de publicación"
+    ),
+    "test_phase2_datasetspec.py": (
+        "DatasetSpec piloto Phase 2: modelo tipado, proyecciones de compatibilidad "
+        "contra catálogo/registry/contrato legacy, overlay y fallos cerrados"
+    ),
+}
+
+# Estas pruebas crean todo ``data/normalized/`` bajo un directorio temporal;
+# la heurística textual siguiente vería la ruta y las marcaría erróneamente
+# como dependientes de los artefactos del repositorio.
+_TEST_FILES_WITHOUT_REPOSITORY_NORMALIZED = {
+    "test_phase1_characterization.py",
+    "test_phase2_datasetspec.py",
 }
 
 
 def _test_file_requires_normalized(filepath):
     """Heurística: ¿el archivo de test lee de data/normalized/?"""
+    if os.path.basename(filepath) in _TEST_FILES_WITHOUT_REPOSITORY_NORMALIZED:
+        return False
     with open(filepath, "r", encoding="utf-8") as f:
         return "data/normalized" in f.read(4096)
 

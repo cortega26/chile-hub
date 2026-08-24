@@ -9,6 +9,8 @@ data/normalized/*
 !data/normalized/*.json
 !data/normalized/*.jsonl
 !data/normalized/*.md
+!data/dataset_specs/
+!data/dataset_specs/*.json
 !data/normalized/*.parquet
 !data/normalized/*.zip
 !data/normalized/*.sha256

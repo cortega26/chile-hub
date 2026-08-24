@@ -1,0 +1,59 @@
+{
+  "spec_version": "1.0",
+  "dataset": "partidos_politicos",
+  "kind": "direct",
+  "publication_track": "stable_publishable",
+  "public_bundle_eligible": true,
+  "maturity_status": "stable",
+  "confidence_tier": "Tier B",
+  "extraction_lane": "bajo_demanda",
+  "extractor": "src/extractors/partidos_politicos_extractor.py",
+  "contract_path": "contracts/datasets/partidos_politicos.schema.json",
+  "validator": "validate_partidos_politicos",
+  "alias_for": null,
+  "dependencies": [],
+  "source": {
+    "source_id": "camara_partidos_politicos",
+    "source_name": "Cámara de Diputadas y Diputados — Datos Abiertos",
+    "official_url": "https://opendata.camara.cl/",
+    "access_method": "api",
+    "license_status": "open-attribution",
+    "live_extractor_status": "implemented",
+    "fallback_policy": "fallback_to_last_snapshot",
+    "live_ready": true,
+    "fallback_allowed": true,
+    "publish_blocking": true,
+    "review_by": "2026-10-05",
+    "stalled_after_days": 90,
+    "owner": "core",
+    "next_action": "estado_legal/fecha_constitucion completados desde SERVEL (15/36 partidos matcheados por nombre; el resto son históricos no listados en SERVEL). ambito (nacional/regional) queda nullable: no se encontró esa señal en ninguna fuente institucional disponible."
+  },
+  "reuse_policy": {
+    "status": "open-attribution",
+    "license": "CC-BY",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "attribution_required": true,
+    "redistribution_ok": true,
+    "summary": "Roster institucional de partidos políticos (Cámara de Diputadas y Diputados), enriquecido con estado legal y fecha de constitución desde SERVEL. ambito (nacional/regional) queda nullable: no se encontró esa señal en ninguna fuente."
+  },
+  "freshness_policy": {
+    "max_age_hours": 87600,
+    "label": "bajo_demanda"
+  },
+  "documentation": {
+    "description": "Roster de partidos políticos de Chile (Cámara de Diputadas y Diputados), con estado_legal y fecha_constitucion completados por join de nombre contra el registro público de SERVEL.",
+    "path": "docs/datasets/partidos_politicos.md",
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars(\"partidos_politicos\")\n# Partidos con estado legal constituido\nconstituidos = df.filter(pl.col(\"estado_legal\") == \"constituido\")",
+      "duckdb": "SELECT nombre, sigla, estado_legal, fecha_constitucion\nFROM 'data/normalized/partidos_politicos.parquet'\nWHERE estado_legal = 'constituido'\nORDER BY fecha_constitucion;",
+      "cli": "chile-hub show partidos_politicos"
+    }
+  },
+  "outputs": {
+    "parquet": "data/normalized/partidos_politicos.parquet",
+    "json": "data/normalized/partidos_politicos.json"
+  },
+  "join_keys": [
+    "id_partido"
+  ]
+}

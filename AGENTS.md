@@ -131,16 +131,18 @@ chile-hub/
 │   │   ├── pipeline_status_utils.py  Reportes Markdown de salud, catálogo y redistribución (994 líneas)
 │   │   ├── _render.py             Helper de renderizado de tablas
 │   │   └── text.py                Utils de texto compartidas
+│   ├── registry/                  DatasetSpec piloto Phase 2 (ADR-018): modelo tipado + proyecciones de compatibilidad (dataset_spec.py, 568 líneas)
 │   └── pipeline_status_utils.py   Shim de compatibilidad (21 líneas) — re-exporta del paquete; NO duplicar lógica aquí
 │
 ├── data/
 │   ├── dataset_catalog_config.json  Fuente de verdad de qué datasets existen (cargado por _shared.py)
 │   ├── source_registry.json         Registro de fuentes: maturity_status, confidence_tier, review_by
+│   ├── dataset_specs/               DatasetSpec del piloto Phase 2 (partidos_politicos.json) — proyección shadow en _shared.py/reports.py
 │   ├── raw/          Snapshots crudos de cada respuesta de API (JSON). Solo lectura una vez guardados.
 │   ├── staging/      Datos parseados y cercanos a la fuente (CSV + metadata.json por dataset).
 │   └── normalized/   Artefactos finales publicables (Parquet, JSON, DuckDB, Excel, ZIP, reportes).
 │
-├── tests/                        13 archivos pytest — ver tabla completa en §8, no la dupliques aquí
+├── tests/                        15 archivos pytest — ver tabla completa en §8, no la dupliques aquí
 │   ├── test_chile_hub.py         API/CLI de ChileHub, contratos de artefactos, workflow, Makefile
 │   ├── test_extractors.py        Un test class por extractor + contrato de BaseExtractor
 │   ├── test_pipeline_logic.py    Lógica interna de build_dev_db.py, invariantes CUT, changelog
@@ -622,7 +624,7 @@ pytest tests/test_chile_hub.py::ChileHubTests::test_load_polars -v
 
 <!-- START_AGENTS_TEST_TABLE -->
 
-**13 archivos** en `tests/`. Esta tabla es de **navegación por archivo**, no un
+**15 archivos** en `tests/`. Esta tabla es de **navegación por archivo**, no un
 inventario de clases — las clases cambian con frecuencia y una lista exhaustiva
 aquí quedaría stale de inmediato. Para el inventario vivo de clases:
 ```bash
@@ -640,6 +642,8 @@ grep -n "^class " tests/*.py
 | `test_data_package.py` | Sí (`make build` antes) | Builder de Frictionless Data Package |
 | `test_extractors.py` | No | Un test class por extractor (fetch, normalización, staging) + contrato ABC de `BaseExtractor` + reintentos HTTP |
 | `test_packaging_runtime.py` | Sí (`make build` antes) | Empaquetado del bundle publicable (ZIP, SHA256) en runtime |
+| `test_phase1_characterization.py` | No | Arnés de caracterización Phase 1: staging sintético offline, equivalencia de build completo, alias y políticas de publicación |
+| `test_phase2_datasetspec.py` | No | DatasetSpec piloto Phase 2: modelo tipado, proyecciones de compatibilidad contra catálogo/registry/contrato legacy, overlay y fallos cerrados |
 | `test_pipeline_logic.py` | No | Lógica interna de `build_dev_db.py`, invariantes CUT, fallback de indicadores, severidad de `dataset_changelog.json`, builders (`reports`, `pipeline_status_utils`) |
 | `test_render.py` | No | Helper de renderizado de tablas (`_render.py`) |
 | `test_validation.py` | No | Funciones `validate_*()` de `src/validation.py`: bordes vacíos, claves duplicadas, casos límite |
@@ -909,6 +913,7 @@ protegido por un chequeo automatizado en vez de depender solo de buena voluntad.
 | Mapeo dataset ↔ extractor | `data/dataset_catalog_config.json` (campo `extractor`) | `check_companion_paths.py registry` |
 | Tabla de extractores por dominio en README | `data/dataset_catalog_config.json` vía `doc_sync.py::sync_readme_extractor_table()` | `scripts/sync_docs.py --check` |
 | Bloque Schema de cada `docs/datasets/{nombre}.md` | `contracts/datasets/{nombre}.schema.json` vía `doc_sync.py::sync_docs_schema_blocks()` | `scripts/sync_docs.py --check` |
+| Hechos operacionales del piloto DatasetSpec (Phase 2) | `data/dataset_specs/partidos_politicos.json` — proyección shadow en `_shared.py`/`reports.py` | `tests/test_phase2_datasetspec.py` (equivalencia vs. catálogo/registry/contrato legacy) |
 | Hechos contables de AGENTS.md (anclas de líneas, listas de módulos del §2, tabla de capas del §1) | código (`wc -l`, `src/`, `data/dataset_catalog_config.json`) — prosa curada, no bloque regenerado | `scripts/check_agents_sync.py` |
 | Liveness de `official_url` de fuentes | `data/source_registry.json` | `.github/workflows/source-urls.yml` + `scripts/check_source_urls.py` (semanal, no bloquea publish) |
 
