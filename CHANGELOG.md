@@ -12,6 +12,17 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.31.0 - 2026-08-24
+
+### Agregado
+
+- **registry**: Phase 3C alias and derived cohort (2 datasets)
+  ([`936494b`](https://github.com/cortega26/chile-hub/commit/936494b3910449861b825e85a46fddfaa79f9549))
+
+- **registry**: Phase 3D exceptional cohort (7 datasets) — complete 22-spec migration
+  ([`5c4c1a9`](https://github.com/cortega26/chile-hub/commit/5c4c1a9f6e10e73ab86bc50df98f388254983773))
+
+
 ## 1.30.0 - 2026-08-24
 
 ### Agregado
