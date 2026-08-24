@@ -1,6 +1,6 @@
 # chile-hub health summary
 
-- `generated_at_utc`: `2026-08-24T01:38:46.362579+00:00`
+- `generated_at_utc`: `2026-08-24T01:44:50.510705+00:00`
 - `overall_status`: `warn`
 - `dataset_count`: `19`
 - `ok_count`: `17`
@@ -14,7 +14,7 @@
 - `unknown_reuse_count`: `0`
 - `degraded_count`: `0`
 - `degradation_warning_count`: `1`
-- `partial_coverage_count`: `2`
+- `partial_coverage_count`: `1`
 - `unknown_coverage_count`: `0`
 - `drifted_count`: `1`
 - `warning_count`: `6`
@@ -35,7 +35,7 @@
 | `empresas` | `ok` | `live` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 1 |
 | `establecimientos_educacionales` | `ok` | `live` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `establecimientos_salud` | `ok` | `live` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 0 |
-| `finanzas_municipales` | `ok` | `monthly` | `fresh` | `partial` | `healthy` | `ready` | `none` | `ok` | 0 |
+| `finanzas_municipales` | `ok` | `monthly` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `indicadores` | `warn` | `live` | `stale` | `not_applicable` | `drifted` | `ready` | `warning` | `ok` | 2 |
 | `indicadores_urbanos_siedu` | `ok` | `live` | `fresh` | `partial` | `healthy` | `ready` | `none` | `ok` | 1 |
 | `partidos_politicos` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 1 |

@@ -1,0 +1,71 @@
+{
+  "spec_version": "1.0",
+  "dataset": "finanzas_municipales",
+  "kind": "direct",
+  "publication_track": "stable_publishable",
+  "public_bundle_eligible": true,
+  "maturity_status": "stable",
+  "confidence_tier": "Tier B",
+  "extraction_lane": "mensual",
+  "extractor": [
+    "src/extractors/sinim_finanzas_extractor.py",
+    "src/extractors/sinim_finanzas_live_extractor.py"
+  ],
+  "contract_path": "contracts/datasets/finanzas_municipales.schema.json",
+  "validator": "validate_finanzas_municipales",
+  "alias_for": null,
+  "dependencies": [],
+  "source": {
+    "source_id": "sinim_finanzas_municipales",
+    "source_name": "SINIM / SUBDERE",
+    "official_url": "https://datos.sinim.gov.cl/",
+    "access_method": "scraping_playwright_xml",
+    "license_status": "public-api-review-terms",
+    "live_extractor_status": "implemented",
+    "fallback_policy": "allowed_for_dev_blocked_for_publication",
+    "live_ready": true,
+    "fallback_allowed": true,
+    "publish_blocking": false,
+    "review_by": "2026-12-31",
+    "stalled_after_days": 90,
+    "owner": "core",
+    "next_action": "Fase 3.2 PoC exitoso: extractor live implementado (sinim_finanzas_live_extractor.py). Cobertura 345/346 municipios (2024). Pendiente: workflow mensual (3.3) y metadata de cadencia (3.4).",
+    "degradation_reason": "resolved_2026-06-30_live_extractor_implemented",
+    "legal_note": "El sitio declara sin fines comerciales junto a badge CC BY 2.0 CL. Chile-hub es no comercial. Restricción NC debe declararse en reuse_policy.",
+    "source_mode": "mensual"
+  },
+  "reuse_policy": {
+    "status": "public-api-review-terms",
+    "license": "Datos públicos municipales; términos de reutilización sujetos a revisión",
+    "license_url": "https://datos.sinim.gov.cl/",
+    "attribution_required": true,
+    "redistribution_ok": true,
+    "summary": "Información municipal pública publicada por SINIM/SUBDERE; citar fuente oficial."
+  },
+  "freshness_policy": {
+    "max_age_hours": 8760,
+    "label": "anual"
+  },
+  "documentation": {
+    "description": "Indicadores financieros municipales anuales desde SINIM/SUBDERE. CAPA PARCIAL/CANDIDATO: 3 de 346 comunas (0.9%). Usar con precaución; no representa cobertura nacional.",
+    "path": "docs/datasets/finanzas_municipales.md",
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\nhub = ChileHub()\ndf = hub.load_polars('finanzas_municipales')",
+      "duckdb": "SELECT * FROM 'data/normalized/finanzas_municipales.parquet' WHERE codigo_comuna = '13101';",
+      "cli": "chile-hub show finanzas_municipales"
+    }
+  },
+  "outputs": {
+    "parquet": "data/normalized/finanzas_municipales.parquet",
+    "json": "data/normalized/finanzas_municipales.json",
+    "duckdb_table": "finanzas_municipales",
+    "sqlite_table": "finanzas_municipales",
+    "excel_sheet": "Finanzas Municipales"
+  },
+  "join_keys": [
+    "anio",
+    "codigo_comuna"
+  ],
+  "coverage_note": "parcial_candidato_3_de_346_comunas",
+  "coverage_pct": 0.9
+}

@@ -131,13 +131,13 @@ chile-hub/
 │   │   ├── pipeline_status_utils.py  Reportes Markdown de salud, catálogo y redistribución (994 líneas)
 │   │   ├── _render.py             Helper de renderizado de tablas
 │   │   └── text.py                Utils de texto compartidas
-│   ├── registry/                  DatasetSpec cohort Phase 2–3C (ADR-018): modelo tipado + proyecciones de compatibilidad (dataset_spec.py, 598 líneas)
+│   ├── registry/                  DatasetSpec cohort Phase 2–3D (ADR-018): modelo tipado + proyecciones de compatibilidad (dataset_spec.py, 657 líneas)
 │   └── pipeline_status_utils.py   Shim de compatibilidad (21 líneas) — re-exporta del paquete; NO duplicar lógica aquí
 │
 ├── data/
 │   ├── dataset_catalog_config.json  Fuente de verdad de qué datasets existen (cargado por _shared.py)
 │   ├── source_registry.json         Registro de fuentes: maturity_status, confidence_tier, review_by
-│   ├── dataset_specs/               DatasetSpec cohort Phase 3A–3C (15 specs: piloto + 12 direct stable + 2 alias/derived) — proyección shadow en _shared.py/reports.py
+│   ├── dataset_specs/               DatasetSpec cohort Phase 3A–3D (22 specs: complete) — proyección shadow en _shared.py/reports.py
 │   ├── raw/          Snapshots crudos de cada respuesta de API (JSON). Solo lectura una vez guardados.
 │   ├── staging/      Datos parseados y cercanos a la fuente (CSV + metadata.json por dataset).
 │   └── normalized/   Artefactos finales publicables (Parquet, JSON, DuckDB, Excel, ZIP, reportes).
@@ -643,7 +643,7 @@ grep -n "^class " tests/*.py
 | `test_extractors.py` | No | Un test class por extractor (fetch, normalización, staging) + contrato ABC de `BaseExtractor` + reintentos HTTP |
 | `test_packaging_runtime.py` | Sí (`make build` antes) | Empaquetado del bundle publicable (ZIP, SHA256) en runtime |
 | `test_phase1_characterization.py` | No | Arnés de caracterización Phase 1: staging sintético offline, equivalencia de build completo, alias y políticas de publicación |
-| `test_phase2_datasetspec.py` | No | DatasetSpec piloto Phase 2–3C: modelo tipado, proyecciones de compatibilidad contra catálogo/registry/contrato legacy, overlay y fallos cerrados (15 specs) |
+| `test_phase2_datasetspec.py` | No | DatasetSpec piloto Phase 2–3D: modelo tipado, proyecciones de compatibilidad contra catálogo/registry/contrato legacy, overlay y fallos cerrados (22 specs: complete) |
 | `test_pipeline_logic.py` | No | Lógica interna de `build_dev_db.py`, invariantes CUT, fallback de indicadores, severidad de `dataset_changelog.json`, builders (`reports`, `pipeline_status_utils`) |
 | `test_render.py` | No | Helper de renderizado de tablas (`_render.py`) |
 | `test_validation.py` | No | Funciones `validate_*()` de `src/validation.py`: bordes vacíos, claves duplicadas, casos límite |
@@ -913,7 +913,7 @@ protegido por un chequeo automatizado en vez de depender solo de buena voluntad.
 | Mapeo dataset ↔ extractor | `data/dataset_catalog_config.json` (campo `extractor`) | `check_companion_paths.py registry` |
 | Tabla de extractores por dominio en README | `data/dataset_catalog_config.json` vía `doc_sync.py::sync_readme_extractor_table()` | `scripts/sync_docs.py --check` |
 | Bloque Schema de cada `docs/datasets/{nombre}.md` | `contracts/datasets/{nombre}.schema.json` vía `doc_sync.py::sync_docs_schema_blocks()` | `scripts/sync_docs.py --check` |
-| Hechos operacionales del piloto DatasetSpec (Phase 2–3C cohort) | `data/dataset_specs/` (15 specs) — proyección shadow en `_shared.py`/`reports.py` | `tests/test_phase2_datasetspec.py` (equivalencia vs. catálogo/registry/contrato legacy, 24 tests) |
+| Hechos operacionales del piloto DatasetSpec (Phase 2–3D cohort) | `data/dataset_specs/` (22 specs: complete) — proyección shadow en `_shared.py`/`reports.py` | `tests/test_phase2_datasetspec.py` (equivalencia vs. catálogo/registry/contrato legacy, 24 tests) |
 | Hechos contables de AGENTS.md (anclas de líneas, listas de módulos del §2, tabla de capas del §1) | código (`wc -l`, `src/`, `data/dataset_catalog_config.json`) — prosa curada, no bloque regenerado | `scripts/check_agents_sync.py` |
 | Liveness de `official_url` de fuentes | `data/source_registry.json` | `.github/workflows/source-urls.yml` + `scripts/check_source_urls.py` (semanal, no bloquea publish) |
 

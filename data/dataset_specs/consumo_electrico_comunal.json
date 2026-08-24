@@ -1,0 +1,60 @@
+{
+  "spec_version": "1.0",
+  "dataset": "consumo_electrico_comunal",
+  "kind": "direct",
+  "publication_track": "candidate",
+  "public_bundle_eligible": false,
+  "maturity_status": "deprecated",
+  "confidence_tier": "Tier C",
+  "extraction_lane": "bajo_demanda",
+  "extractor": "src/extractors/consumo_electrico_extractor.py",
+  "contract_path": "contracts/datasets/consumo_electrico_comunal.schema.json",
+  "validator": "validate_consumo_electrico_comunal",
+  "alias_for": null,
+  "dependencies": [],
+  "source": {
+    "source_id": "cne_consumo_electrico_comunal",
+    "source_name": "CNE — Energía Abierta",
+    "official_url": "http://energiaabierta.cl/datasets-estadistica/consumo-electrico-anual-por-comuna-y-tipo-de-cliente/",
+    "access_method": "xlsx",
+    "license_status": "open-attribution",
+    "live_extractor_status": "fallback_only",
+    "fallback_policy": "allowed_for_dev",
+    "live_ready": false,
+    "fallback_allowed": true,
+    "publish_blocking": true,
+    "review_by": "2027-06-30",
+    "stalled_after_days": 180,
+    "owner": "core",
+    "next_action": "Fuente confirmada caída de forma permanente (investigado 2026-07-07): CNE decomisionó el catálogo Junar de energiaabierta.cl; la página del dataset no ofrece archivo ni API de reemplazo (el enlace API del sitio apunta a /visualizaciones/en-mantencion/). El dataset nunca tuvo un fetch en vivo exitoso — solo publica FALLBACK_ROWS de muestra. Degradado a deprecated/candidate por AGENTS.md §6 (protocolo de fuente permanentemente caída); reevaluar solo si CNE publica un reemplazo oficial."
+  },
+  "reuse_policy": {
+    "status": "open-attribution",
+    "license": "CC BY",
+    "license_url": "http://energiaabierta.cl/",
+    "attribution_required": true,
+    "redistribution_ok": true,
+    "summary": "Consumo eléctrico anual por comuna publicado por la CNE en Energía Abierta. Atribución requerida."
+  },
+  "freshness_policy": {
+    "max_age_hours": 17520,
+    "label": "anual"
+  },
+  "documentation": {
+    "description": "Consumo eléctrico anual por comuna y tipo de cliente (Residencial, Comercial, Industrial, Agrícola, Alumbrado Público, Otros), publicado por la Comisión Nacional de Energía (CNE) en el portal Energía Abierta. DEPRECATED: la fuente Junar de energiaabierta.cl fue decomisionada (investigado 2026-07-07); el dataset solo publica datos de muestra (FALLBACK_ROWS), no está en el bundle público. Ver data/source_registry.json.",
+    "path": "docs/datasets/consumo_electrico_comunal.md",
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('consumo_electrico_comunal')\n# Consumo residencial por comuna\nresidencial = df.filter(pl.col('tipo_cliente') == 'Residencial')",
+      "duckdb": "SELECT codigo_comuna, nombre_comuna, tipo_cliente, consumo_kwh\nFROM 'data/normalized/consumo_electrico_comunal.parquet'\nWHERE tipo_cliente = 'Residencial'\nORDER BY consumo_kwh DESC;",
+      "cli": "chile-hub show consumo_electrico_comunal"
+    }
+  },
+  "outputs": {
+    "parquet": "data/normalized/consumo_electrico_comunal.parquet",
+    "json": "data/normalized/consumo_electrico_comunal.json"
+  },
+  "join_keys": [
+    "codigo_comuna",
+    "codigo_region"
+  ]
+}

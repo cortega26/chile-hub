@@ -136,6 +136,9 @@ class SourcePolicy:
     next_action: str
     source_notes: str | None = None
     upstream_datasets: tuple[str, ...] | None = None
+    degradation_reason: str | None = None
+    legal_note: str | None = None
+    source_mode: str | None = None
 
 
 @dataclass(frozen=True)
@@ -183,9 +186,9 @@ class DatasetSpec:
     maturity_status: str
     confidence_tier: str
     extraction_lane: str
-    extractor: str | None
+    extractor: str | list[str] | None
     contract_path: str
-    validator: str
+    validator: str | None
     alias_for: str | None
     dependencies: tuple[str, ...]
     source: SourcePolicy
@@ -195,6 +198,8 @@ class DatasetSpec:
     outputs: dict[str, str]
     join_keys: tuple[str, ...]
     catalog_notes: str | None = None
+    coverage_note: str | None = None
+    coverage_pct: float | None = None
 
     # -- Proyecciones de compatibilidad (mecánicas, no fuentes duplicadas) --
 
@@ -246,15 +251,21 @@ class DatasetSpec:
         }
         if payload is not None and "expected_record_count" in payload:
             entry["expected_record_count"] = payload["expected_record_count"]
-        entry.update(
-            {
-                "reuse_policy": asdict(self.reuse_policy),
-                "freshness_policy": asdict(self.freshness_policy),
-                "usage_examples": dict(self.documentation.usage_examples),
-                "outputs": dict(self.outputs),
-                "documentation": self.documentation.path,
-            }
-        )
+        # outputs: include only if non-empty to match legacy candidate entries
+        # that intentionally omit the key (no public outputs).
+        outputs_update: dict[str, Any] = {
+            "reuse_policy": asdict(self.reuse_policy),
+            "freshness_policy": asdict(self.freshness_policy),
+            "usage_examples": dict(self.documentation.usage_examples),
+            "documentation": self.documentation.path,
+        }
+        if self.outputs:
+            outputs_update["outputs"] = dict(self.outputs)
+        entry.update(outputs_update)
+        if self.coverage_note is not None:
+            entry["coverage_note"] = self.coverage_note
+        if self.coverage_pct is not None:
+            entry["coverage_pct"] = self.coverage_pct
         if self.catalog_notes is not None:
             entry["_notes"] = self.catalog_notes
         if self.kind == "alias":
@@ -288,6 +299,12 @@ class DatasetSpec:
             entry["source_notes"] = self.source.source_notes
         if self.source.upstream_datasets is not None:
             entry["upstream_datasets"] = list(self.source.upstream_datasets)
+        if self.source.degradation_reason is not None:
+            entry["degradation_reason"] = self.source.degradation_reason
+        if self.source.legal_note is not None:
+            entry["legal_note"] = self.source.legal_note
+        if self.source.source_mode is not None:
+            entry["source_mode"] = self.source.source_mode
         return entry
 
 
@@ -356,6 +373,15 @@ def _parse_source(payload: Mapping[str, Any], where: str) -> SourcePolicy:
         upstream_t: tuple[str, ...] | None = tuple(upstream)
     else:
         upstream_t = None
+    degradation_reason = source.get("degradation_reason")
+    if degradation_reason is not None and not isinstance(degradation_reason, str):
+        raise DatasetSpecError(f"DatasetSpec {where}: 'source.degradation_reason' debe ser string")
+    legal_note = source.get("legal_note")
+    if legal_note is not None and not isinstance(legal_note, str):
+        raise DatasetSpecError(f"DatasetSpec {where}: 'source.legal_note' debe ser string")
+    source_mode = source.get("source_mode")
+    if source_mode is not None and not isinstance(source_mode, str):
+        raise DatasetSpecError(f"DatasetSpec {where}: 'source.source_mode' debe ser string")
     return SourcePolicy(
         source_id=_require_str(source, "source_id", where),
         source_name=_require_str(source, "source_name", where),
@@ -373,6 +399,9 @@ def _parse_source(payload: Mapping[str, Any], where: str) -> SourcePolicy:
         next_action=_require_str(source, "next_action", where),
         source_notes=source_notes,
         upstream_datasets=upstream_t,
+        degradation_reason=degradation_reason,
+        legal_note=legal_note,
+        source_mode=source_mode,
     )
 
 
@@ -468,8 +497,14 @@ def parse_dataset_spec(payload: Mapping[str, Any], *, source_path: str = "<memor
             raise DatasetSpecError(f"DatasetSpec {where}: 'derived' requiere dependencies")
 
     extractor = payload.get("extractor")
-    if extractor is not None and not isinstance(extractor, str):
-        raise DatasetSpecError(f"DatasetSpec {where}: 'extractor' debe ser string o null")
+    if (
+        extractor is not None
+        and not isinstance(extractor, str)
+        and not (isinstance(extractor, list) and all(isinstance(x, str) for x in extractor))
+    ):
+        raise DatasetSpecError(
+            f"DatasetSpec {where}: 'extractor' debe ser string, lista de strings o null"
+        )
     if kind != "derived" and not extractor:
         raise DatasetSpecError(
             f"DatasetSpec {where}: 'extractor' es obligatorio para kind '{kind}'"
@@ -482,13 +517,35 @@ def parse_dataset_spec(payload: Mapping[str, Any], *, source_path: str = "<memor
             f"DatasetSpec {where}: el contrato referenciado no existe: {contract_path}"
         )
 
-    validator = _require_str(payload, "validator", where)
+    validator_raw = payload.get("validator")
+    if validator_raw is not None and not isinstance(validator_raw, str):
+        raise DatasetSpecError(f"DatasetSpec {where}: 'validator' debe ser string o null")
+    validator = validator_raw
 
     catalog_notes = payload.get("catalog_notes")
     if catalog_notes is None:
         catalog_notes = payload.get("_notes")
     if catalog_notes is not None and not isinstance(catalog_notes, str):
         raise DatasetSpecError(f"DatasetSpec {where}: 'catalog_notes' debe ser string")
+
+    coverage_note = payload.get("coverage_note")
+    if coverage_note is not None and not isinstance(coverage_note, str):
+        raise DatasetSpecError(f"DatasetSpec {where}: 'coverage_note' debe ser string")
+    coverage_pct = payload.get("coverage_pct")
+    if coverage_pct is not None and not isinstance(coverage_pct, (int, float)):
+        raise DatasetSpecError(f"DatasetSpec {where}: 'coverage_pct' debe ser número")
+    if isinstance(coverage_pct, int) and not isinstance(coverage_pct, bool):
+        coverage_pct = float(coverage_pct)
+    elif coverage_pct is not None:
+        coverage_pct = float(coverage_pct)
+
+    # outputs: may be {} for candidate datasets without public outputs
+    outputs_raw = payload.get("outputs", {})
+    if not isinstance(outputs_raw, dict) or not all(
+        isinstance(k, str) and isinstance(v, str) for k, v in outputs_raw.items()
+    ):
+        raise DatasetSpecError(f"DatasetSpec {where}: 'outputs' debe ser dict de strings")
+    outputs: dict[str, str] = dict(outputs_raw)
 
     return DatasetSpec(
         spec_version=spec_version,
@@ -508,9 +565,11 @@ def parse_dataset_spec(payload: Mapping[str, Any], *, source_path: str = "<memor
         reuse_policy=_parse_reuse(payload, where),
         freshness_policy=_parse_freshness(payload, where),
         documentation=_parse_documentation(payload, where),
-        outputs=_require_str_dict(payload, "outputs", where),
+        outputs=outputs,
         join_keys=_require_str_list(payload, "join_keys", where),
         catalog_notes=catalog_notes,
+        coverage_note=coverage_note,
+        coverage_pct=coverage_pct,
     )
 
 

@@ -1,0 +1,56 @@
+{
+  "spec_version": "1.0",
+  "dataset": "geometria_comunal",
+  "kind": "direct",
+  "publication_track": "candidate",
+  "public_bundle_eligible": false,
+  "maturity_status": "candidate",
+  "confidence_tier": "Tier B",
+  "extraction_lane": "bajo_demanda",
+  "extractor": "src/extractors/geometria_comunal_extractor.py",
+  "contract_path": "contracts/datasets/geometria_comunal.schema.json",
+  "validator": "validate_geometria_comunal",
+  "alias_for": null,
+  "dependencies": [],
+  "source": {
+    "source_id": "bcn_arcgis_geometria_comunal",
+    "source_name": "BCN ArcGIS — tematico/Comunas_Generalizadas",
+    "official_url": "https://www.bcn.cl/siit/mapas_vectoriales/index_html",
+    "access_method": "api",
+    "license_status": "open-attribution",
+    "live_extractor_status": "implemented",
+    "fallback_policy": "fallback_to_last_snapshot",
+    "live_ready": false,
+    "fallback_allowed": true,
+    "publish_blocking": true,
+    "review_by": "2026-10-21",
+    "stalled_after_days": 90,
+    "owner": "core",
+    "next_action": "Cobertura 345/346 (falta codigo_comuna=12202/Antártica, hueco conocido de la fuente BCN — ver ADR-012). Evaluar promoción a stable_publishable una vez confirmada cadencia de refresco y estabilidad del endpoint ArcGIS (region 12/Magallanes requiere fallback comuna-por-comuna por payload combinado grande)."
+  },
+  "reuse_policy": {
+    "status": "open-attribution",
+    "license": "Uso libre con atribución a la Biblioteca del Congreso Nacional de Chile (bcn.cl/siit/mapas_vectoriales). Geometría generalizada, no apta para precisión geodésica.",
+    "license_url": "https://www.bcn.cl/siit/mapas_vectoriales/index_html",
+    "attribution_required": true,
+    "redistribution_ok": true,
+    "summary": "Límites comunales (geometría generalizada) desde BCN ArcGIS. Carril CANDIDATE mientras madura la cobertura (345/346 comunas — falta codigo_comuna=12202/Antártica, ver ADR-012). Ver ADR-012 para el gate de licencia completo."
+  },
+  "freshness_policy": {
+    "max_age_hours": 87600,
+    "label": "bajo_demanda"
+  },
+  "documentation": {
+    "description": "Límites poligonales de las 346 comunas de Chile (GeoParquet, geometría 'generalizada' — simplificada para cartografía a escala nacional, no apta para trabajo de precisión geodésica ni catastral). Fuente: BCN ArcGIS (tematico/Comunas_Generalizadas). Artefacto separado de `comunas`, unido por `codigo_comuna`.",
+    "path": "docs/datasets/geometria_comunal.md",
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars(\"geometria_comunal\")\n# geometry llega como WKB; usa geopandas para trabajar con la columna geometrica\nimport geopandas as gpd\ngdf = gpd.read_parquet(\"data/normalized/geometria_comunal.parquet\")",
+      "duckdb": "-- DuckDB con la extension spatial puede leer GeoParquet directamente\nINSTALL spatial; LOAD spatial;\nSELECT codigo_comuna, nombre_comuna, ST_Area(geometry) AS area\nFROM 'data/normalized/geometria_comunal.parquet'\nORDER BY area DESC;",
+      "cli": "chile-hub show geometria_comunal"
+    }
+  },
+  "outputs": {},
+  "join_keys": [
+    "codigo_comuna"
+  ]
+}

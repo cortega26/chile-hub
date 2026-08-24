@@ -1,0 +1,56 @@
+{
+  "spec_version": "1.0",
+  "dataset": "delincuencia_comunal",
+  "kind": "direct",
+  "publication_track": "candidate",
+  "public_bundle_eligible": false,
+  "maturity_status": "candidate",
+  "confidence_tier": "Tier C",
+  "extraction_lane": "monthly",
+  "extractor": "src/extractors/cead_delincuencia_live_extractor.py",
+  "contract_path": "contracts/datasets/delincuencia_comunal.schema.json",
+  "validator": null,
+  "alias_for": null,
+  "dependencies": [],
+  "source": {
+    "source_id": "cead_delincuencia_comunal",
+    "source_name": "CEAD — Subsecretaría de Prevención del Delito",
+    "official_url": "https://cead.minsegpublica.gob.cl/estadisticas-delictuales/",
+    "access_method": "scraping_html_post",
+    "license_status": "public-api-review-terms",
+    "live_extractor_status": "implemented",
+    "fallback_policy": "fallback_to_last_snapshot",
+    "live_ready": false,
+    "fallback_allowed": true,
+    "publish_blocking": true,
+    "review_by": "2026-09-21",
+    "stalled_after_days": 90,
+    "owner": "core",
+    "next_action": "Monitorear estabilidad del scraping; buscar fuente estructurada oficial (datos.gob.cl, export CEAD). Degradar a rejected si no madura para review_by."
+  },
+  "reuse_policy": {
+    "status": "public-api-review-terms",
+    "license": "Sin licencia explícita. Datos públicos agregados de la SPD.",
+    "license_url": "https://cead.minsegpublica.gob.cl/estadisticas-delictuales/",
+    "attribution_required": true,
+    "redistribution_ok": false,
+    "summary": "Casos policiales por comuna desde CEAD. Carril CANDIDATE — NO redistribuible en el bundle público."
+  },
+  "freshness_policy": {
+    "max_age_hours": 2160,
+    "label": "mensual"
+  },
+  "documentation": {
+    "description": "Casos policiales de Delitos de Mayor Connotación Social (DMCS) y otras categorías por comuna y mes, reportados por Carabineros y PDI al Ministerio del Interior. Fuente: CEAD (Centro de Estudios y Análisis del Delito), Subsecretaría de Prevención del Delito.",
+    "path": "docs/datasets/delincuencia_comunal.md",
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars(\"delincuencia_comunal\")\n# Casos de robos violentos por comuna en 2024\nrobos = df.filter(pl.col(\"familia_delito\") == \"robos_violentos\")",
+      "duckdb": "SELECT codigo_comuna, nombre_comuna, mes, casos\nFROM 'data/normalized/delincuencia_comunal.parquet'\nWHERE familia_delito = 'robos_violentos' AND anio = 2024\nORDER BY casos DESC;",
+      "cli": "chile-hub show delincuencia_comunal"
+    }
+  },
+  "outputs": {},
+  "join_keys": [
+    "codigo_comuna"
+  ]
+}

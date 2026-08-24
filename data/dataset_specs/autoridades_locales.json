@@ -1,0 +1,57 @@
+{
+  "spec_version": "1.0",
+  "dataset": "autoridades_locales",
+  "kind": "direct",
+  "publication_track": "candidate",
+  "public_bundle_eligible": false,
+  "maturity_status": "candidate",
+  "confidence_tier": "Tier B",
+  "extraction_lane": "bajo_demanda",
+  "extractor": "src/extractors/autoridades_locales_extractor.py",
+  "contract_path": "contracts/datasets/autoridades_locales.schema.json",
+  "validator": null,
+  "alias_for": null,
+  "dependencies": [],
+  "source": {
+    "source_id": "wikipedia_autoridades_locales",
+    "source_name": "Wikipedia (CC-BY-SA)",
+    "official_url": "https://es.wikipedia.org/wiki/Gobernador_regional_de_Chile",
+    "access_method": "scraping_html",
+    "license_status": "open-attribution",
+    "live_extractor_status": "implemented",
+    "fallback_policy": "fallback_to_last_snapshot",
+    "live_ready": false,
+    "fallback_allowed": true,
+    "publish_blocking": true,
+    "review_by": "2026-10-05",
+    "stalled_after_days": 90,
+    "owner": "core",
+    "next_action": "Ampliar cobertura de alcaldes (~165/345 identificados; ~121 sin página en Wikipedia, ~59 sin marca de vigencia clara); buscar fuente redistribuible no-share-alike para promover a stable_publishable."
+  },
+  "reuse_policy": {
+    "status": "open-attribution",
+    "license": "CC BY / CC BY-SA",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "attribution_required": true,
+    "redistribution_ok": false,
+    "summary": "Autoridades locales: alcaldes desde BCN SIIT (dato público gubernamental, 346/346 comunas, 100% cobertura) y gobernadores regionales desde Wikipedia (CC-BY-SA, 16 regiones). Carril CANDIDATE — NO redistribuible en el bundle público mientras los gobernadores dependan de fuente share-alike."
+  },
+  "freshness_policy": {
+    "max_age_hours": 87600,
+    "label": "bajo_demanda"
+  },
+  "documentation": {
+    "description": "Autoridades locales/subnacionales de Chile: gobernadores regionales (Wikipedia, CC-BY-SA) y alcaldes (BCN SIIT, dato público gubernamental). Wikipedia se mantiene como fuente de gobernadores y enriquecimiento opcional de periodo_inicio para alcaldes. Dataset segregado de autoridades_electas por licencia mixta.",
+    "path": "docs/datasets/autoridades_locales.md",
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars(\"autoridades_locales\")\n# Alcaldes con titular identificado\nalcaldes = df.filter((pl.col(\"cargo\") == \"alcalde\") & pl.col(\"nombre\").is_not_null())",
+      "duckdb": "SELECT nombre, cargo, codigo_comuna, codigo_region\nFROM 'data/normalized/autoridades_locales.parquet'\nWHERE cargo = 'alcalde';",
+      "cli": "chile-hub show autoridades_locales"
+    }
+  },
+  "outputs": {},
+  "join_keys": [
+    "codigo_region",
+    "codigo_comuna"
+  ]
+}

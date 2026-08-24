@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-08-24T01:38:46.362579+00:00",
+  "generated_at_utc": "2026-08-24T01:44:50.510705+00:00",
   "dataset_count": 19,
   "datasets": [
     {
@@ -32,9 +32,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 293.94,
+        "age_hours": 294.04,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-08-24T01:38:46.359712+00:00"
+        "checked_at_utc": "2026-08-24T01:44:50.508095+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -112,9 +112,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 293.94,
+        "age_hours": 294.04,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-08-24T01:38:46.359746+00:00"
+        "checked_at_utc": "2026-08-24T01:44:50.508120+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -199,9 +199,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 293.94,
+        "age_hours": 294.04,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-08-24T01:38:46.359756+00:00"
+        "checked_at_utc": "2026-08-24T01:44:50.508129+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -285,9 +285,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 293.94,
+        "age_hours": 294.04,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-08-24T01:38:46.359762+00:00"
+        "checked_at_utc": "2026-08-24T01:44:50.508134+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -376,9 +376,9 @@
       },
       "freshness": {
         "status": "stale",
-        "age_hours": 249.28,
+        "age_hours": 249.38,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-08-24T01:38:46.359922+00:00"
+        "checked_at_utc": "2026-08-24T01:44:50.508268+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 72,
@@ -413,15 +413,15 @@
       "validation_status": "ok",
       "warnings": [
         "indicadores live refresh reused last published artifact for missing codes: ipc",
-        "indicadores freshness is stale: 249.28h since refresh, policy max is 72h"
+        "indicadores freshness is stale: 249.38h since refresh, policy max is 72h"
       ],
       "actionable_warnings": [
         "indicadores live refresh reused last published artifact for missing codes: ipc",
-        "indicadores freshness is stale: 249.28h since refresh, policy max is 72h"
+        "indicadores freshness is stale: 249.38h since refresh, policy max is 72h"
       ],
       "degradation": {
         "status": "warning",
-        "impact": "indicadores live refresh reused last published artifact for missing codes: ipc; indicadores freshness is stale: 249.28h since refresh, policy max is 72h",
+        "impact": "indicadores live refresh reused last published artifact for missing codes: ipc; indicadores freshness is stale: 249.38h since refresh, policy max is 72h",
         "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
       },
       "notes": [
@@ -473,9 +473,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 293.94,
+        "age_hours": 294.04,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-08-24T01:38:46.359936+00:00"
+        "checked_at_utc": "2026-08-24T01:44:50.508280+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -562,9 +562,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 293.93,
+        "age_hours": 294.04,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-08-24T01:38:46.359942+00:00"
+        "checked_at_utc": "2026-08-24T01:44:50.508287+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 1080,
@@ -643,9 +643,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 293.93,
+        "age_hours": 294.04,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-08-24T01:38:46.359949+00:00"
+        "checked_at_utc": "2026-08-24T01:44:50.508293+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -728,9 +728,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 40.17,
+        "age_hours": 40.27,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-08-24T01:38:46.359955+00:00"
+        "checked_at_utc": "2026-08-24T01:44:50.508298+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -801,9 +801,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 293.93,
+        "age_hours": 294.04,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-08-24T01:38:46.359959+00:00"
+        "checked_at_utc": "2026-08-24T01:44:50.508302+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -880,22 +880,21 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 246.68,
+        "age_hours": 246.78,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-08-24T01:38:46.359965+00:00"
+        "checked_at_utc": "2026-08-24T01:44:50.508308+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
         "label": "anual"
       },
       "coverage": {
-        "status": "partial",
-        "expected_record_count": 346,
+        "status": "not_applicable",
+        "expected_record_count": null,
         "actual_record_count": 345,
-        "coverage_ratio": 0.9971,
-        "summary": "Cobertura parcial: 345/346 filas respecto del baseline esperado.",
-        "expected": true,
-        "expected_reason": "El contrato declara coverage_policy='partial_expected': la fuente no cubre el universo completo por diseño."
+        "coverage_ratio": null,
+        "summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
+        "expected": false
       },
       "drift": {
         "status": "healthy",
@@ -967,9 +966,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 293.93,
+        "age_hours": 294.04,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-08-24T01:38:46.359971+00:00"
+        "checked_at_utc": "2026-08-24T01:44:50.508315+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -1054,9 +1053,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 293.93,
+        "age_hours": 294.03,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-08-24T01:38:46.359977+00:00"
+        "checked_at_utc": "2026-08-24T01:44:50.508320+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -1114,7 +1113,7 @@
       "source_url": "https://github.com/cortega26/chile-hub",
       "source_mode": "live",
       "source_detail": "derived_from_validated_chile_hub_layers",
-      "refreshed_at_utc": "2026-08-24T01:38:46.359985+00:00",
+      "refreshed_at_utc": "2026-08-24T01:44:50.508328+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -1178,7 +1177,7 @@
         "status": "fresh",
         "age_hours": 0.0,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-08-24T01:38:46.359996+00:00"
+        "checked_at_utc": "2026-08-24T01:44:50.508337+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 1080,
@@ -1265,9 +1264,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 293.83,
+        "age_hours": 293.93,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-08-24T01:38:46.360004+00:00"
+        "checked_at_utc": "2026-08-24T01:44:50.508345+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 1080,
@@ -1357,9 +1356,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 293.83,
+        "age_hours": 293.93,
         "max_age_hours": 175200,
-        "checked_at_utc": "2026-08-24T01:38:46.360010+00:00"
+        "checked_at_utc": "2026-08-24T01:44:50.508351+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 175200,
@@ -1442,9 +1441,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 293.83,
+        "age_hours": 293.93,
         "max_age_hours": 17520,
-        "checked_at_utc": "2026-08-24T01:38:46.360015+00:00"
+        "checked_at_utc": "2026-08-24T01:44:50.508356+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 17520,
@@ -1530,9 +1529,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 293.83,
+        "age_hours": 293.93,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-08-24T01:38:46.360022+00:00"
+        "checked_at_utc": "2026-08-24T01:44:50.508361+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -1623,9 +1622,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 293.81,
+        "age_hours": 293.91,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-08-24T01:38:46.360028+00:00"
+        "checked_at_utc": "2026-08-24T01:44:50.508367+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,

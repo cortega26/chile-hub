@@ -1,11 +1,11 @@
 # chile-hub drift report
 
-- `generated_at_utc`: `2026-08-24T01:38:46.362579+00:00`
+- `generated_at_utc`: `2026-08-24T01:44:50.510705+00:00`
 - `dataset_count`: `19`
 - `drifted_count`: `2`
 - `healthy_count`: `17`
 - `fallback_count`: `1`
-- `partial_coverage_count`: `2`
+- `partial_coverage_count`: `1`
 - `degraded_count`: `0`
 
 | Dataset | Drift | Mode | Coverage | Degradation | Warnings | Action |
@@ -20,7 +20,7 @@
 | `establecimientos_educacionales` | `healthy` | `live` | `not_applicable` | `none` | 0 | Ninguna. |
 | `censo_hogares_viviendas` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
 | `distritos_electorales` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
-| `finanzas_municipales` | `healthy` | `monthly` | `partial` | `none` | 0 | Ninguna. |
+| `finanzas_municipales` | `healthy` | `monthly` | `not_applicable` | `none` | 0 | Ninguna. |
 | `resultados_educacionales` | `healthy` | `live` | `not_applicable` | `none` | 0 | Ninguna. |
 | `indicadores_urbanos_siedu` | `healthy` | `live` | `partial` | `none` | 1 | Ninguna. |
 | `perfil_territorial_comunal` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
@@ -75,7 +75,7 @@
 - `drift_status`: `drifted`
 - `source_mode`: `live`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
-- `degradation`: indicadores live refresh reused last published artifact for missing codes: ipc; indicadores freshness is stale: 249.28h since refresh, policy max is 72h
+- `degradation`: indicadores live refresh reused last published artifact for missing codes: ipc; indicadores freshness is stale: 249.38h since refresh, policy max is 72h
 - `warning_count`: `2`
 - `diagnostic_summary`: indicadores live refresh reused last published artifact for missing codes: ipc
 - `recommended_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.
@@ -134,7 +134,7 @@
 
 - `drift_status`: `healthy`
 - `source_mode`: `monthly`
-- `coverage`: `Cobertura parcial: 345/346 filas respecto del baseline esperado.`
+- `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
 - `degradation`: Sin degradación operativa detectada en este build.
 - `warning_count`: `0`
 - `diagnostic_summary`: Sin degradación operativa detectada en este build.

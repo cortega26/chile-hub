@@ -1,14 +1,14 @@
 {
-  "generated_at_utc": "2026-08-24T01:38:46.362579+00:00",
+  "generated_at_utc": "2026-08-24T01:44:50.510705+00:00",
   "dataset_count": 19,
   "grade_distribution": {
-    "A": 17,
-    "B": 2,
+    "A": 16,
+    "B": 3,
     "C": 0,
     "D": 0,
     "F": 0
   },
-  "average_score": 94.8,
+  "average_score": 94.4,
   "weights": {
     "validation": 25,
     "schema_contract": 20,
@@ -270,14 +270,14 @@
     {
       "dataset": "finanzas_municipales",
       "maturity_status": "stable",
-      "overall_score": 92.0,
-      "grade": "A",
+      "overall_score": 85.0,
+      "grade": "B",
       "dimensions": {
         "validation": 100,
         "schema_contract": 100,
         "source_readiness": 100,
         "freshness": 100,
-        "coverage": 70,
+        "coverage": 0,
         "reuse_policy": 50
       },
       "weights": {
@@ -289,7 +289,7 @@
         "reuse_policy": 10
       },
       "blocking_reasons": [
-        "Cobertura partial",
+        "Cobertura not_applicable",
         "Reutilización: public-api-review-terms"
       ],
       "recommended_action": "Fase 3.2 PoC exitoso: extractor live implementado (sinim_finanzas_live_extractor.py). Cobertura 345/346 municipios (2024). Pendiente: workflow mensual (3.3) y metadata de cadencia (3.4)."

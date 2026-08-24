@@ -1,0 +1,63 @@
+{
+  "spec_version": "1.0",
+  "dataset": "indicadores",
+  "kind": "direct",
+  "publication_track": "stable_publishable",
+  "public_bundle_eligible": true,
+  "maturity_status": "stable",
+  "confidence_tier": "Tier A/B",
+  "extraction_lane": "diaria",
+  "extractor": "src/extractors/bcentral_extractor.py",
+  "contract_path": "contracts/datasets/indicadores.schema.json",
+  "validator": "validate_indicadores",
+  "alias_for": null,
+  "dependencies": [],
+  "source": {
+    "source_id": "mindicador_indicadores",
+    "source_name": "mindicador.cl / BCCh / INE",
+    "official_url": "https://mindicador.cl/",
+    "access_method": "api",
+    "license_status": "open-attribution",
+    "live_extractor_status": "implemented",
+    "fallback_policy": "allowed_for_dev_blocked_for_publication",
+    "live_ready": true,
+    "fallback_allowed": true,
+    "publish_blocking": true,
+    "review_by": "2026-12-31",
+    "stalled_after_days": 90,
+    "owner": "core",
+    "next_action": "Monitor empty monthly IPC responses and published backfill behavior."
+  },
+  "reuse_policy": {
+    "status": "open-attribution",
+    "license": "Reproducción libre con citación (BCCh / INE)",
+    "license_url": "https://www.bcentral.cl/web/banco-central/terminos-y-condiciones",
+    "attribution_required": true,
+    "redistribution_ok": true,
+    "summary": "Datos del Banco Central de Chile (BCCh) e INE. Libre reproducción con citación. Acceso vía mindicador.cl (API pública de la comunidad)."
+  },
+  "freshness_policy": {
+    "max_age_hours": 72,
+    "label": "diaria"
+  },
+  "documentation": {
+    "description": "Serie de indicadores economicos diarios de referencia para analisis y software.",
+    "path": "docs/datasets/indicadores.md",
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars('indicadores')",
+      "duckdb": "SELECT *\nFROM 'data/normalized/indicadores.parquet'\nORDER BY fecha DESC, codigo_indicador;",
+      "cli": "chile-hub show indicadores"
+    }
+  },
+  "outputs": {
+    "parquet": "data/normalized/indicadores.parquet",
+    "json": "data/normalized/indicadores_hoy.json",
+    "duckdb_table": "indicadores",
+    "sqlite_table": "indicadores",
+    "excel_sheet": "Indicadores Diarios"
+  },
+  "join_keys": [
+    "fecha",
+    "codigo_indicador"
+  ]
+}

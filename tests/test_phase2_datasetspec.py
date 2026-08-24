@@ -81,10 +81,10 @@ class TestPilotSpecModel:
         assert (ROOT_DIR / spec.contract_path).is_file()
 
     def test_only_one_spec_exists(self) -> None:
-        # Phase 2: solo pilot; Phase 3A: 10 specs; Phase 3B: 13 specs; Phase 3C: 15 specs
+        # Phase 2: solo pilot; Phase 3A: 10 specs; Phase 3B: 13 specs; Phase 3C: 15 specs; Phase 3D: 22 specs
         specs = list(iter_specs())
         assert _spec() in specs
-        assert len(specs) == 15
+        assert len(specs) == 22
         assert {s.dataset for s in specs} == {
             "partidos_politicos",
             "censo_comunal",
@@ -101,6 +101,13 @@ class TestPilotSpecModel:
             "comunas",
             "comunas_enriquecidas",
             "perfil_territorial_comunal",
+            "consumo_electrico_comunal",
+            "delincuencia_comunal",
+            "geometria_comunal",
+            "autoridades_locales",
+            "autoridades_electas",
+            "indicadores",
+            "finanzas_municipales",
         }
 
     def test_spec_declares_no_structural_schema_facts(self) -> None:
@@ -147,7 +154,7 @@ class TestCatalogProjection:
     def test_artifact_declarations_equal_legacy_outputs(self) -> None:
         cat = _legacy_catalog()
         for spec in iter_specs():
-            assert spec.artifact_declarations() == cat[spec.dataset]["outputs"]
+            assert spec.artifact_declarations() == cat[spec.dataset].get("outputs", {})
 
 
 class TestSourceRegistryProjection:

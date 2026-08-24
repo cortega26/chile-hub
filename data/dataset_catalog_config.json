@@ -170,7 +170,8 @@
       "sqlite_table": "indicadores",
       "excel_sheet": "Indicadores Diarios"
     },
-    "documentation": "docs/datasets/indicadores.md"
+    "documentation": "docs/datasets/indicadores.md",
+    "expected_record_count": null
   },
   "censo_comunal": {
     "description": "Perfil demografico comunal del Censo 2024 con sexo y grandes grupos de edad.",
@@ -352,7 +353,7 @@
     ],
     "coverage_note": "parcial_candidato_3_de_346_comunas",
     "coverage_pct": 0.9,
-    "expected_record_count": 346,
+    "expected_record_count": null,
     "reuse_policy": {
       "status": "public-api-review-terms",
       "license": "Datos públicos municipales; términos de reutilización sujetos a revisión",
@@ -632,7 +633,8 @@
       "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars(\"delincuencia_comunal\")\n# Casos de robos violentos por comuna en 2024\nrobos = df.filter(pl.col(\"familia_delito\") == \"robos_violentos\")",
       "duckdb": "SELECT codigo_comuna, nombre_comuna, mes, casos\nFROM 'data/normalized/delincuencia_comunal.parquet'\nWHERE familia_delito = 'robos_violentos' AND anio = 2024\nORDER BY casos DESC;",
       "cli": "chile-hub show delincuencia_comunal"
-    }
+    },
+    "documentation": "docs/datasets/delincuencia_comunal.md"
   },
   "partidos_politicos": {
     "description": "Roster de partidos políticos de Chile (Cámara de Diputadas y Diputados), con estado_legal y fecha_constitucion completados por join de nombre contra el registro público de SERVEL.",
@@ -723,6 +725,7 @@
       "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars(\"autoridades_locales\")\n# Alcaldes con titular identificado\nalcaldes = df.filter((pl.col(\"cargo\") == \"alcalde\") & pl.col(\"nombre\").is_not_null())",
       "duckdb": "SELECT nombre, cargo, codigo_comuna, codigo_region\nFROM 'data/normalized/autoridades_locales.parquet'\nWHERE cargo = 'alcalde';",
       "cli": "chile-hub show autoridades_locales"
-    }
+    },
+    "documentation": "docs/datasets/autoridades_locales.md"
   }
 }

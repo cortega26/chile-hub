@@ -1,0 +1,61 @@
+{
+  "spec_version": "1.0",
+  "dataset": "autoridades_electas",
+  "kind": "direct",
+  "publication_track": "stable_publishable",
+  "public_bundle_eligible": true,
+  "maturity_status": "stable",
+  "confidence_tier": "Tier B",
+  "extraction_lane": "bajo_demanda",
+  "extractor": "src/extractors/autoridades_electas_extractor.py",
+  "contract_path": "contracts/datasets/autoridades_electas.schema.json",
+  "validator": "validate_autoridades_electas",
+  "alias_for": null,
+  "dependencies": [],
+  "source": {
+    "source_id": "camara_senado_autoridades_electas",
+    "source_name": "Cámara de Diputadas y Diputados + Senado de Chile",
+    "official_url": "https://www.camara.cl/diputados/diputados.aspx",
+    "access_method": "scraping_html",
+    "license_status": "open-attribution",
+    "live_extractor_status": "implemented",
+    "fallback_policy": "fallback_to_last_snapshot",
+    "live_ready": true,
+    "fallback_allowed": true,
+    "publish_blocking": true,
+    "review_by": "2026-10-05",
+    "stalled_after_days": 90,
+    "owner": "core",
+    "next_action": "codigo_region/periodo de senadores completados desde senado.cl (REGION/PERIODOS). gobernador_regional y alcalde viven en el dataset segregado autoridades_locales (CC-BY-SA, candidate) por decisión de licencia."
+  },
+  "reuse_policy": {
+    "status": "open-attribution",
+    "license": "CC-BY",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "attribution_required": true,
+    "redistribution_ok": true,
+    "summary": "Autoridades electas en ejercicio (diputados y senadores) desde la Cámara de Diputadas y Diputados y el Senado de Chile. Gobernador_regional y alcalde viven en el dataset segregado autoridades_locales (CC-BY-SA)."
+  },
+  "freshness_policy": {
+    "max_age_hours": 87600,
+    "label": "bajo_demanda"
+  },
+  "documentation": {
+    "description": "Autoridades electas en ejercicio de Chile (diputados y senadores): partido, distrito electoral/circunscripción senatorial, región y período de mandato.",
+    "path": "docs/datasets/autoridades_electas.md",
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars(\"autoridades_electas\")\n# Senadores por región\nsenadores = df.filter(pl.col(\"cargo\") == \"senador\")",
+      "duckdb": "SELECT nombre, cargo, partido, codigo_region\nFROM 'data/normalized/autoridades_electas.parquet'\nWHERE cargo = 'senador'\nORDER BY codigo_region;",
+      "cli": "chile-hub show autoridades_electas"
+    }
+  },
+  "outputs": {
+    "parquet": "data/normalized/autoridades_electas.parquet",
+    "json": "data/normalized/autoridades_electas.json"
+  },
+  "join_keys": [
+    "distrito_electoral",
+    "circunscripcion_senatorial",
+    "codigo_region"
+  ]
+}
