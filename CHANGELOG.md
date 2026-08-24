@@ -12,6 +12,24 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.29.0 - 2026-08-24
+
+### Corregido
+
+- **landing**: Show current package version
+  ([`6658c30`](https://github.com/cortega26/chile-hub/commit/6658c300961456a480a12381ef89b6e1c137b0c1))
+
+### Documentación
+
+- Auto-sync tras carrera con release [skip ci]
+  ([`52aa686`](https://github.com/cortega26/chile-hub/commit/52aa6867c2830bb31fb30175f4a683f4a72e80f6))
+
+### Agregado
+
+- **registry**: Phase 2 DatasetSpec pilot for partidos_politicos
+  ([`10ebf71`](https://github.com/cortega26/chile-hub/commit/10ebf711ef8ecf55c9b1c51d6b7d3feed0e8a950))
+
+
 ## 1.28.8 - 2026-08-22
 
 ### Corregido
