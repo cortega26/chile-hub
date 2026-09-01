@@ -4,7 +4,7 @@
   "source_url": "https://datos.sinim.gov.cl/datos_municipales.php",
   "source_mode": "monthly",
   "source_detail": "curated_fallback_pending_direct_export",
-  "refreshed_at_utc": "2026-08-13T18:58:06.679811+00:00",
+  "refreshed_at_utc": "2026-09-01T03:04:24.987281+00:00",
   "record_count": 345,
   "fields": [
     "anio",
@@ -21,7 +21,7 @@
     "live: Playwright configurando filtros SINIM",
     "live: descargando XML Spreadsheet",
     "live: parseando XML Spreadsheet",
-    "live: 345 municipios extraídos (snapshot: sinim_finanzas_municipales_20260813T185601Z.xlsx)"
+    "live: 345 municipios extraídos (snapshot: sinim_finanzas_municipales_20260901T030218Z.xlsx)"
   ],
   "reuse_policy": {
     "status": "public-api-review-terms",
