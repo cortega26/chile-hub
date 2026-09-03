@@ -12,6 +12,27 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.31.1 - 2026-09-03
+
+### Corregido
+
+- **ci**: Prevent stale normalized + lock drift
+  ([`f19b34e`](https://github.com/cortega26/chile-hub/commit/f19b34e1053ab2634f9ddadd85d6337a99735ce1))
+
+### Mantenimiento
+
+- **deps**: Bump the codeql-action group with 2 updates
+  ([#87](https://github.com/cortega26/chile-hub/pull/87),
+  [`cee5f63`](https://github.com/cortega26/chile-hub/commit/cee5f6331b611c93dd73f6cdec8bc020a201186c))
+
+- **deps**: Sync uv.lock after dependabot bumps [skip ci]
+  ([`c581a93`](https://github.com/cortega26/chile-hub/commit/c581a9372aebd77fa3c42999234b500ee6f9ca20))
+
+- **deps-dev**: Bump the python-dev group with 3 updates
+  ([#86](https://github.com/cortega26/chile-hub/pull/86),
+  [`e1120cf`](https://github.com/cortega26/chile-hub/commit/e1120cf9073fb617def08e5f5af707194cf35b41))
+
+
 ## 1.31.0 - 2026-08-24
 
 ### Agregado
