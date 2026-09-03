@@ -454,18 +454,54 @@ def verify_staging_not_newer_than_normalized():
             "Run 'python src/build_dev_db.py' (or 'make build') before verifying."
         )
     sentinel_mtime = sentinel.stat().st_mtime
-    stale = [
+    # 1) Gate mtime: 10s grace (no 1s) — git checkout escribe archivos en
+    # orden arbitrario y en /tmp/test dio 0.5-2.4s de skew; en worktrees
+    # sucios llegó a 100s. 10s cubre el caso CI sin ocultar un extractor
+    # real (un extractor deja horas de diferencia vía refreshed_at_utc).
+    # 2) Si el gate mtime dispara, confirmar con contenido (refreshed_at_utc
+    # vs generated_at_utc) antes de fallar — elimina falsos positivos de
+    # checkout sin debilitar la detección de staging realmente nuevo.
+    stale_by_mtime = [
         p
         for p in STAGING_DIR.glob("*.metadata.json")
-        if p.name not in OUT_OF_BAND_STAGING_METADATA
-        and p.stat().st_mtime > sentinel_mtime + 1  # 1-second grace
+        if p.name not in OUT_OF_BAND_STAGING_METADATA and p.stat().st_mtime > sentinel_mtime + 10
     ]
-    if stale:
-        names = ", ".join(sorted(p.name for p in stale))
-        fail(
-            f"Staging metadata is newer than normalized artifacts: [{names}]. "
-            "Run 'python src/build_dev_db.py' (or 'make build') to rebuild before verifying."
-        )
+    if not stale_by_mtime:
+        return
+    # Confirmación por contenido: si ningún staging tiene refreshed_at más
+    # nuevo que el sentinel generado, fue solo skew de checkout.
+    try:
+        sentinel_generated = load_json(sentinel).get("generated_at_utc")
+        sentinel_dt = datetime.fromisoformat(sentinel_generated) if sentinel_generated else None
+        if sentinel_dt and sentinel_dt.tzinfo is None:
+            sentinel_dt = sentinel_dt.replace(tzinfo=UTC)
+    except Exception:
+        sentinel_dt = None
+    if sentinel_dt is not None:
+        truly_stale = []
+        for p in stale_by_mtime:
+            try:
+                refreshed = load_json(p).get("refreshed_at_utc")
+                if not refreshed:
+                    truly_stale.append(p)
+                    continue
+                ref_dt = datetime.fromisoformat(refreshed)
+                if ref_dt.tzinfo is None:
+                    ref_dt = ref_dt.replace(tzinfo=UTC)
+                if ref_dt > sentinel_dt:
+                    truly_stale.append(p)
+            except Exception:
+                truly_stale.append(p)
+        if not truly_stale:
+            return
+        stale = truly_stale
+    else:
+        stale = stale_by_mtime
+    names = ", ".join(sorted(p.name for p in stale))
+    fail(
+        f"Staging metadata is newer than normalized artifacts: [{names}]. "
+        "Run 'python src/build_dev_db.py' (or 'make build') to rebuild before verifying."
+    )
 
 
 def stable_publishable_dataset_names(registry):

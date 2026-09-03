@@ -1,0 +1,66 @@
+name: Dependabot Lock Sync
+
+on:
+  pull_request:
+    paths:
+      - pyproject.toml
+      - uv.lock
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: dependabot-lock-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sync-lock:
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # El token del PR necesita push; checkout del head del PR
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          enable-cache: true
+
+      - name: Check if lock is stale
+        id: check
+        run: |
+          if uv lock --check; then
+            echo "stale=false" >> "$GITHUB_OUTPUT"
+            echo "uv.lock al día"
+          else
+            echo "stale=true" >> "$GITHUB_OUTPUT"
+            echo "uv.lock desactualizado — regenerando"
+          fi
+
+      - name: Regenerate lock
+        if: steps.check.outputs.stale == 'true'
+        run: uv lock
+
+      - name: Commit updated lock
+        if: steps.check.outputs.stale == 'true'
+        run: |
+          if git diff --quiet -- uv.lock; then
+            echo "Sin cambios en uv.lock tras uv lock"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add uv.lock
+          git commit -m "chore(deps): sync uv.lock [skip ci]"
+          git push origin HEAD:${{ github.head_ref }}

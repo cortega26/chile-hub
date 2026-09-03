@@ -77,6 +77,11 @@ jobs:
           test -f data/staging/finanzas_municipales.csv
           test -f data/staging/finanzas_municipales.metadata.json
 
+      - name: Rebuild normalized artifacts
+        if: steps.scrape.outcome == 'success'
+        run: |
+          python src/build_dev_db.py
+
       - name: Commit updated data (if changed)
         if: steps.scrape.outcome == 'success'
         run: |
@@ -91,10 +96,15 @@ jobs:
             # estos artefactos puntuales son la excepcion intencional (snapshot mensual versionado).
             [ -e "$path" ] && git add -f "$path"
           done
+          # Artefactos derivados del build — sin esto main queda con staging
+          # más nuevo que normalized y todo PR/push falla el gate
+          # verify_staging_not_newer_than_normalized (a01a9c5).
+          git add --all data/normalized/ index.html app.js README.md || true
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
             git commit -m "chore(data): monthly SINIM scrape refresh [skip ci]"
+            git pull --rebase --autostash origin main || true
             git push
           fi
 

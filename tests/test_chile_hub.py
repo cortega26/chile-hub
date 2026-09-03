@@ -74,8 +74,9 @@ def _assert_normalized_not_stale():
     pipeline_metadata.json sentinel.  This catches the common mistake of
     running an extractor and then running tests without rebuilding first.
 
-    The check is intentionally lenient (1-second grace) to tolerate
-    sub-second filesystem timestamp rounding on some platforms.
+    10s grace + confirmación por contenido (refreshed_at_utc vs
+    generated_at_utc) igual que scripts/verify_pipeline.py — evita falsos
+    positivos por orden de checkout (0.5-2.4s, hasta 100s en worktrees sucios).
     """
     if not _NORMALIZED_SENTINEL.exists():
         raise AssertionError(
@@ -89,19 +90,48 @@ def _assert_normalized_not_stale():
     # listas capaces de divergir.
     from scripts.verify_pipeline import OUT_OF_BAND_STAGING_METADATA
 
-    stale_files = [
+    stale_by_mtime = [
         p
         for p in _STAGING_DIR.glob("*.metadata.json")
-        if p.name not in OUT_OF_BAND_STAGING_METADATA
-        and p.stat().st_mtime > sentinel_mtime + 1  # 1-second grace
+        if p.name not in OUT_OF_BAND_STAGING_METADATA and p.stat().st_mtime > sentinel_mtime + 10
     ]
-    if stale_files:
-        names = ", ".join(sorted(p.name for p in stale_files))
-        raise AssertionError(
-            f"Normalized artifacts are older than staging metadata: [{names}]. "
-            "Run 'make build' (or 'python src/build_dev_db.py') to rebuild, "
-            "then re-run pytest."
-        )
+    if not stale_by_mtime:
+        return
+    # Confirmar con contenido para no fallar por simple skew de checkout
+    try:
+        sentinel_data = json.loads(_NORMALIZED_SENTINEL.read_text(encoding="utf-8"))
+        gen = sentinel_data.get("generated_at_utc")
+        sentinel_dt = datetime.fromisoformat(gen) if gen else None
+        if sentinel_dt and sentinel_dt.tzinfo is None:
+            sentinel_dt = sentinel_dt.replace(tzinfo=UTC)
+    except Exception:
+        sentinel_dt = None
+    if sentinel_dt is not None:
+        truly_stale = []
+        for p in stale_by_mtime:
+            try:
+                refreshed = json.loads(p.read_text(encoding="utf-8")).get("refreshed_at_utc")
+                if not refreshed:
+                    truly_stale.append(p)
+                    continue
+                ref_dt = datetime.fromisoformat(refreshed)
+                if ref_dt.tzinfo is None:
+                    ref_dt = ref_dt.replace(tzinfo=UTC)
+                if ref_dt > sentinel_dt:
+                    truly_stale.append(p)
+            except Exception:
+                truly_stale.append(p)
+        if not truly_stale:
+            return
+        stale_files = truly_stale
+    else:
+        stale_files = stale_by_mtime
+    names = ", ".join(sorted(p.name for p in stale_files))
+    raise AssertionError(
+        f"Normalized artifacts are older than staging metadata: [{names}]. "
+        "Run 'make build' (or 'python src/build_dev_db.py') to rebuild, "
+        "then re-run pytest."
+    )
 
 
 class ChileHubTests(unittest.TestCase):
