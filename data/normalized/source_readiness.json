@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-08-24T01:44:50.510705+00:00",
+  "generated_at_utc": "2026-09-03T18:21:20.116335+00:00",
   "dataset_count": 22,
   "stable_count": 18,
   "candidate_count": 3,
@@ -345,7 +345,7 @@
       "review_status": "upcoming",
       "owner": "core",
       "next_action": "Track readiness inherited from upstream component datasets.",
-      "recommended_action": "⏳ REVIEW BY 2026-09-18 — 24 días. Track readiness inherited from upstream component datasets."
+      "recommended_action": "⏳ REVIEW BY 2026-09-18 — 14 días. Track readiness inherited from upstream component datasets."
     },
     {
       "dataset": "empresas",
@@ -441,7 +441,7 @@
       "review_status": "upcoming",
       "owner": "core",
       "next_action": "Cobertura 345/346 (falta codigo_comuna=12202/Antártica, hueco conocido de la fuente BCN — ver ADR-012). Evaluar promoción a stable_publishable una vez confirmada cadencia de refresco y estabilidad del endpoint ArcGIS (region 12/Magallanes requiere fallback comuna-por-comuna por payload combinado grande).",
-      "recommended_action": "⏳ REVIEW BY 2026-10-21 — 57 días. Cobertura 345/346 (falta codigo_comuna=12202/Antártica, hueco conocido de la fuente BCN — ver ADR-012). Evaluar promoción a stable_publishable una vez confirmada cadencia de refresco y estabilidad del endpoint ArcGIS (region 12/Magallanes requiere fallback comuna-por-comuna por payload combinado grande)."
+      "recommended_action": "⏳ REVIEW BY 2026-10-21 — 47 días. Cobertura 345/346 (falta codigo_comuna=12202/Antártica, hueco conocido de la fuente BCN — ver ADR-012). Evaluar promoción a stable_publishable una vez confirmada cadencia de refresco y estabilidad del endpoint ArcGIS (region 12/Magallanes requiere fallback comuna-por-comuna por payload combinado grande)."
     },
     {
       "dataset": "delincuencia_comunal",
@@ -465,7 +465,7 @@
       "review_status": "upcoming",
       "owner": "core",
       "next_action": "Monitorear estabilidad del scraping; buscar fuente estructurada oficial (datos.gob.cl, export CEAD). Degradar a rejected si no madura para review_by.",
-      "recommended_action": "⏳ REVIEW BY 2026-09-21 — 27 días. Monitorear estabilidad del scraping; buscar fuente estructurada oficial (datos.gob.cl, export CEAD). Degradar a rejected si no madura para review_by."
+      "recommended_action": "⏳ REVIEW BY 2026-09-21 — 17 días. Monitorear estabilidad del scraping; buscar fuente estructurada oficial (datos.gob.cl, export CEAD). Degradar a rejected si no madura para review_by."
     },
     {
       "dataset": "partidos_politicos",
@@ -489,7 +489,7 @@
       "review_status": "upcoming",
       "owner": "core",
       "next_action": "estado_legal/fecha_constitucion completados desde SERVEL (15/36 partidos matcheados por nombre; el resto son históricos no listados en SERVEL). ambito (nacional/regional) queda nullable: no se encontró esa señal en ninguna fuente institucional disponible.",
-      "recommended_action": "⏳ REVIEW BY 2026-10-05 — 41 días. estado_legal/fecha_constitucion completados desde SERVEL (15/36 partidos matcheados por nombre; el resto son históricos no listados en SERVEL). ambito (nacional/regional) queda nullable: no se encontró esa señal en ninguna fuente institucional disponible."
+      "recommended_action": "⏳ REVIEW BY 2026-10-05 — 31 días. estado_legal/fecha_constitucion completados desde SERVEL (15/36 partidos matcheados por nombre; el resto son históricos no listados en SERVEL). ambito (nacional/regional) queda nullable: no se encontró esa señal en ninguna fuente institucional disponible."
     },
     {
       "dataset": "autoridades_electas",
@@ -513,7 +513,7 @@
       "review_status": "upcoming",
       "owner": "core",
       "next_action": "codigo_region/periodo de senadores completados desde senado.cl (REGION/PERIODOS). gobernador_regional y alcalde viven en el dataset segregado autoridades_locales (CC-BY-SA, candidate) por decisión de licencia.",
-      "recommended_action": "⏳ REVIEW BY 2026-10-05 — 41 días. codigo_region/periodo de senadores completados desde senado.cl (REGION/PERIODOS). gobernador_regional y alcalde viven en el dataset segregado autoridades_locales (CC-BY-SA, candidate) por decisión de licencia."
+      "recommended_action": "⏳ REVIEW BY 2026-10-05 — 31 días. codigo_region/periodo de senadores completados desde senado.cl (REGION/PERIODOS). gobernador_regional y alcalde viven en el dataset segregado autoridades_locales (CC-BY-SA, candidate) por decisión de licencia."
     },
     {
       "dataset": "autoridades_locales",
@@ -537,7 +537,7 @@
       "review_status": "upcoming",
       "owner": "core",
       "next_action": "Ampliar cobertura de alcaldes (~165/345 identificados; ~121 sin página en Wikipedia, ~59 sin marca de vigencia clara); buscar fuente redistribuible no-share-alike para promover a stable_publishable.",
-      "recommended_action": "⏳ REVIEW BY 2026-10-05 — 41 días. Ampliar cobertura de alcaldes (~165/345 identificados; ~121 sin página en Wikipedia, ~59 sin marca de vigencia clara); buscar fuente redistribuible no-share-alike para promover a stable_publishable."
+      "recommended_action": "⏳ REVIEW BY 2026-10-05 — 31 días. Ampliar cobertura de alcaldes (~165/345 identificados; ~121 sin página en Wikipedia, ~59 sin marca de vigencia clara); buscar fuente redistribuible no-share-alike para promover a stable_publishable."
     }
   ]
 }
