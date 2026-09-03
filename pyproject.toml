@@ -48,7 +48,7 @@ pipeline = [
     "pyarrow>=24.0.0",
     "pandas==3.0.3; python_version >= '3.11'",
     "xlsxwriter==3.2.9",
-    "curl_cffi==0.16.0",
+    "curl_cffi==0.16.2",
     "openpyxl==3.1.5",
     "structlog==26.1.0",
     "tenacity==9.1.4",
@@ -71,11 +71,11 @@ validation = [
     "frictionless>=5.18,<6",
 ]
 dev = [
-    "build==1.5.0",
+    "build==1.6.0",
     "twine==7.0.0",
     "python-semantic-release==10.6.1",
     "playwright==1.62.0",
-    "ruff==0.16.3",
+    "ruff==0.16.5",
     "pytest==9.1.1",
     "pytest-cov==7.1.0",
     "pre-commit==4.6.2",
