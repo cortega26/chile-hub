@@ -1039,7 +1039,7 @@ function renderCatalog(bundle) {
         },
         demografia: {
             title: "Demografía y Estadísticas",
-            datasets: ["censo_comunal", "censo_hogares_viviendas", "finanzas_municipales", "resultados_educacionales", "indicadores_urbanos_siedu", "consumo_electrico_comunal", "pobreza_comunal"]
+            datasets: ["censo_comunal", "censo_hogares_viviendas", "finanzas_municipales", "resultados_educacionales", "indicadores_urbanos_siedu", "consumo_electrico_comunal", "pobreza_comunal", "estadisticas_vitales"]
         },
         directorios: {
             title: "Directorios Oficiales y Economía",

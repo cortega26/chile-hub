@@ -96,6 +96,12 @@ STAGING_SCHEMAS: dict[str, dict[str, type[pl.DataType] | pl.DataType]] = {
         "codigo_comuna": pl.String,
         "codigo_region": pl.String,
     },
+    "estadisticas_vitales": {
+        "anio": pl.Int64,
+        "codigo_region": pl.String,
+        "codigo_comuna": pl.String,
+        "cantidad": pl.Int64,
+    },
 }
 
 STAGING_DATE_COLUMNS: dict[str, dict[str, str]] = {

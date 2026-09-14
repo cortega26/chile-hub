@@ -2,9 +2,9 @@
   "name": "chile-hub",
   "title": "chile-hub -- Datos publicos de Chile curados",
   "description": "Capa de datos reproducible y curada sobre datasets publicos oficiales de Chile: geografia, demografia, salud, educacion, finanzas municipales e indicadores.",
-  "version": "1.31.0",
+  "version": "1.31.1",
   "homepage": "https://tooltician.com/chile-hub/",
-  "created": "2026-09-03T18:21:20.127627+00:00",
+  "created": "2026-09-14T23:35:14.848726+00:00",
   "resources": [
     {
       "name": "regiones",
@@ -1774,6 +1774,116 @@
         {
           "title": "CC-BY",
           "path": "https://creativecommons.org/licenses/by/4.0/"
+        }
+      ]
+    },
+    {
+      "name": "estadisticas_vitales",
+      "path": "estadisticas_vitales.parquet",
+      "format": "parquet",
+      "mediatype": "application/vnd.apache.parquet",
+      "title": "estadisticas_vitales",
+      "description": "Nacimientos y defunciones por comuna de residencia y sexo, desde los Anuarios de Estadísticas Vitales del INE (definitivos, 2010 en adelante).",
+      "schema": {
+        "fields": [
+          {
+            "name": "anio",
+            "type": "integer",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "codigo_region",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "codigo_comuna",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_comuna",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "evento",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "sexo",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "cantidad",
+            "type": "integer",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "estado_dato",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "fuente",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "url_fuente",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "fecha_fuente",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          }
+        ],
+        "missingValues": [
+          ""
+        ],
+        "primaryKey": [
+          "anio",
+          "codigo_comuna",
+          "evento",
+          "sexo"
+        ]
+      },
+      "sources": [
+        {
+          "title": "Instituto Nacional de Estadísticas (INE) — Estadísticas Vitales",
+          "path": "https://www.ine.gob.cl/estadisticas-por-tema/demografia-y-poblacion/estadisticas-vitales"
+        }
+      ],
+      "licenses": [
+        {
+          "title": "CC BY 4.0",
+          "path": "https://www.ine.gob.cl/terminos-de-uso"
         }
       ]
     }

@@ -193,6 +193,7 @@ class TestPublicInventoryPolicy:
             "distritos_electorales",
             "partidos_politicos",
             "autoridades_electas",
+            "estadisticas_vitales",
             "finanzas_municipales",
             "resultados_educacionales",
             "indicadores_urbanos_siedu",

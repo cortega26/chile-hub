@@ -1,6 +1,6 @@
 {
-  "generated_at_utc": "2026-09-03T18:21:20.160347+00:00",
-  "artifact_count": 58,
+  "generated_at_utc": "2026-09-14T23:35:14.885439+00:00",
+  "artifact_count": 60,
   "artifacts": [
     {
       "path": "data/normalized/artifact_manifest.json",
@@ -9,7 +9,7 @@
       "shared_type": "artifact_manifest",
       "format": "json",
       "size_bytes": 17739,
-      "sha256": "2b24510149fb43a1d88d5fd3f4162abe58a879724e5f10abe3c68970282d68d7"
+      "sha256": "9ed6ae9eb7e6bbebb0bd60733ed5b2f3cb1635a1b72d55c765fd441c26b642e6"
     },
     {
       "path": "data/normalized/autoridades_electas.json",
@@ -17,8 +17,8 @@
       "output_type": "json",
       "shared_type": null,
       "format": null,
-      "size_bytes": 133702,
-      "sha256": "e648e3f4fc27bb5a1120c98d69e2042237a2ed778d05ef216f5851d3e2eaa3a4"
+      "size_bytes": 119350,
+      "sha256": "6e1bbbbf00ab72038880b578aa30c2b39fdce9faa4caef248df26200138a78e4"
     },
     {
       "path": "data/normalized/autoridades_electas.parquet",
@@ -35,8 +35,8 @@
       "output_type": "json",
       "shared_type": null,
       "format": null,
-      "size_bytes": 159162,
-      "sha256": "2861033189b1cd154a2eb0206ea231ebb6e55b3dd74ac358d15f966f179aaa30"
+      "size_bytes": 136324,
+      "sha256": "479c851264c12fd811e31638a35725471fe2ae8afc27846a1698f5782a4088a4"
     },
     {
       "path": "data/normalized/censo_comunal.parquet",
@@ -53,8 +53,8 @@
       "output_type": "json",
       "shared_type": null,
       "format": null,
-      "size_bytes": 148976,
-      "sha256": "7615d84e01a9bcfebaa068c7cfe8ce8520da5edbf1bfa4ab95bec11f0e26fa3c"
+      "size_bytes": 130290,
+      "sha256": "1b4d004360d644d9f9be11b2cb1b6af9b28e6078b91cb61d8b2a1b2e10feca98"
     },
     {
       "path": "data/normalized/censo_hogares_viviendas.parquet",
@@ -71,8 +71,8 @@
       "output_type": "json",
       "shared_type": null,
       "format": null,
-      "size_bytes": 132226,
-      "sha256": "1e44ae73ea283c2016875ad4faf967dc98ee2db1784b57d9bb2c46f54c7ce0f9"
+      "size_bytes": 114924,
+      "sha256": "3be6bf4b4e7384ce7fce57953556ff16986535f9e5acce528f3abb75c94fba5d"
     },
     {
       "path": "data/normalized/comunas.parquet",
@@ -89,8 +89,8 @@
       "output_type": null,
       "shared_type": "datapackage",
       "format": "json",
-      "size_bytes": 46018,
-      "sha256": "55cdd34b3b602cb35dbfe02eb82ae800054321589ea4638d81bc0820bcffcb61"
+      "size_bytes": 48797,
+      "sha256": "426b441e82a7009dd5a11bf8c232640127ac9207d4dc2e2fb3e472f6309ce286"
     },
     {
       "path": "data/normalized/dataset_catalog.json",
@@ -98,8 +98,8 @@
       "output_type": null,
       "shared_type": "dataset_catalog",
       "format": "json",
-      "size_bytes": 65112,
-      "sha256": "d9dabca618a069c5d5a52062ca2ef944ef244888b82b1a5d4f503b228c8394ce"
+      "size_bytes": 70824,
+      "sha256": "cc077af42498f39345e6af0e8e96d160618aa9f9015aed0641542beda3b388bf"
     },
     {
       "path": "data/normalized/dataset_catalog.md",
@@ -107,8 +107,8 @@
       "output_type": null,
       "shared_type": "dataset_catalog",
       "format": "markdown",
-      "size_bytes": 35836,
-      "sha256": "b362c0286804d7c288e14c64deeae15f1edecdfa459769ee494f3e6453381644"
+      "size_bytes": 39764,
+      "sha256": "d06b7c6989482fd1173f1d2073a921346d2a081feebbf1829be356f9444a6776"
     },
     {
       "path": "data/normalized/dataset_changelog.json",
@@ -116,8 +116,8 @@
       "output_type": null,
       "shared_type": "dataset_changelog",
       "format": "json",
-      "size_bytes": 12316,
-      "sha256": "65b1448a1bb408faf5874b85c1e3ad0ccc30f79d45259d9241f258172406b448"
+      "size_bytes": 13196,
+      "sha256": "5bc303d1fa4e669065ae3c147de250e51dc814722ce520e196d950c4a3dc0948"
     },
     {
       "path": "data/normalized/dataset_quality.json",
@@ -125,8 +125,8 @@
       "output_type": null,
       "shared_type": "dataset_quality",
       "format": "json",
-      "size_bytes": 14400,
-      "sha256": "07f9fd4df49742c7c6401ee141745dd42ff0f5cf7f37b3d18247407b180d8f25"
+      "size_bytes": 15108,
+      "sha256": "79f2b5017d9d9dc1329e89af688fd459dc198c5ea20c18f554d7d8c7bbf82a6d"
     },
     {
       "path": "data/normalized/dataset_quality.md",
@@ -134,8 +134,8 @@
       "output_type": null,
       "shared_type": "dataset_quality",
       "format": "markdown",
-      "size_bytes": 2664,
-      "sha256": "21336dcd162f319a5209155aaef5f114c61d017368e48bb5632fa490e02a565d"
+      "size_bytes": 2767,
+      "sha256": "7af602337c35c91b80c5e0a45b0bd62ae2de9e880c81b9a2bb085b1d36bfbb11"
     },
     {
       "path": "data/normalized/dataset_status.json",
@@ -143,8 +143,8 @@
       "output_type": null,
       "shared_type": "dataset_status",
       "format": "json",
-      "size_bytes": 13053,
-      "sha256": "83e8be4e5907ce870a1184862e21657a5d6403004e49466a991a37c47c26d7cc"
+      "size_bytes": 13691,
+      "sha256": "f84a3a3da75746cd44064019a842eda0a6ea46eddf14e0bb7e8ca1cb2f1fce68"
     },
     {
       "path": "data/normalized/distritos_electorales.json",
@@ -152,8 +152,8 @@
       "output_type": "json",
       "shared_type": null,
       "format": null,
-      "size_bytes": 49503,
-      "sha256": "3b9dae3382c5871668ad168a017059060243d9281d6538e30360da3381aeaef7"
+      "size_bytes": 41889,
+      "sha256": "8f39c7650678974f814bb9f870c2b463aa30e2963930fcf6d59d6de97c0a0583"
     },
     {
       "path": "data/normalized/distritos_electorales.parquet",
@@ -170,8 +170,8 @@
       "output_type": null,
       "shared_type": "drift_report",
       "format": "json",
-      "size_bytes": 13890,
-      "sha256": "cbc7eb8d76879eedd885d341465046dffbb64c8651e6a9ced4134c2627bec71b"
+      "size_bytes": 14569,
+      "sha256": "b7219b59f0fdd709fd9e02211bf558e7c840638892004fe236ea25c023211f0c"
     },
     {
       "path": "data/normalized/drift_report.md",
@@ -179,8 +179,8 @@
       "output_type": null,
       "shared_type": "drift_report",
       "format": "markdown",
-      "size_bytes": 9724,
-      "sha256": "b09e83df7388fc23cd2bc73f529cb21d6166aa4bef1b8027dd42e24b4f7758cf"
+      "size_bytes": 10169,
+      "sha256": "55a8decb9a5b7182860ce6941fa6a491901f24e10ebbf0f86c4552fdc3229d77"
     },
     {
       "path": "data/normalized/empresas.parquet",
@@ -197,8 +197,8 @@
       "output_type": "json",
       "shared_type": null,
       "format": null,
-      "size_bytes": 4137625,
-      "sha256": "5d893d1476eab40a7daf1120aac576190e2597e58fc3db04cabbdb9126ec99a3"
+      "size_bytes": 3595907,
+      "sha256": "43b94b5085772b4d3336a4a1ba87273aee7314e5cbcea620b76527765f84bbee"
     },
     {
       "path": "data/normalized/establecimientos_educacionales.parquet",
@@ -215,8 +215,8 @@
       "output_type": "json",
       "shared_type": null,
       "format": null,
-      "size_bytes": 3300553,
-      "sha256": "c7cd107f0c712f609ee6760db4297649a2756d7f6d7fbcc33c1478e152fe6b83"
+      "size_bytes": 2946097,
+      "sha256": "b9bc651730c777f2290848f42b16e312334d18730fccb363432c2a0171868870"
     },
     {
       "path": "data/normalized/establecimientos_salud.parquet",
@@ -228,13 +228,31 @@
       "sha256": "f661436bd21b420a50f97179af3f93e001cd86b565312da00c715ecb083070b4"
     },
     {
+      "path": "data/normalized/estadisticas_vitales.json",
+      "dataset": "estadisticas_vitales",
+      "output_type": "json",
+      "shared_type": null,
+      "format": null,
+      "size_bytes": 6726460,
+      "sha256": "0c544de8fc94234e9ad3a92129337dd01d8cbbdfb7e530cdef83ae0e89811787"
+    },
+    {
+      "path": "data/normalized/estadisticas_vitales.parquet",
+      "dataset": "estadisticas_vitales",
+      "output_type": "parquet",
+      "shared_type": null,
+      "format": null,
+      "size_bytes": 37652,
+      "sha256": "ea418d0e8e2f4a9a3a80933d11349b8c607647eaa457ee48f15d6728e55bcac5"
+    },
+    {
       "path": "data/normalized/finanzas_municipales.json",
       "dataset": "finanzas_municipales",
       "output_type": "json",
       "shared_type": null,
       "format": null,
-      "size_bytes": 114162,
-      "sha256": "9c5c2ea02b8c1c1e55b71e7fd22ace32c0a2a661d598b53397b19066b5ea08d5"
+      "size_bytes": 99670,
+      "sha256": "7418002e06c6ae76af581151b94b1ab09cfaaf86199466beea7d0405f1922b7f"
     },
     {
       "path": "data/normalized/finanzas_municipales.parquet",
@@ -252,7 +270,7 @@
       "shared_type": "hub_bundle",
       "format": "json",
       "size_bytes": 79010,
-      "sha256": "6fd7918fd1390a4ecce269f69d4ea6e0c0043b2714ba4fcd94d814ab98a59009"
+      "sha256": "1aeef4947e6e6a0775dfdbccac5f57c781f265257916931dad3793bcc95a3d39"
     },
     {
       "path": "data/normalized/hub_health.json",
@@ -260,8 +278,8 @@
       "output_type": null,
       "shared_type": "hub_health",
       "format": "json",
-      "size_bytes": 15584,
-      "sha256": "8d4317467abf39c9d35ff4ffb44d9a9d8cae71282c9e18b44a7335f193290286"
+      "size_bytes": 16462,
+      "sha256": "633adc64b35d13ef289340d4bc62dc11a03db754cbc33872fc24298d84a70c8e"
     },
     {
       "path": "data/normalized/hub_health.md",
@@ -269,8 +287,8 @@
       "output_type": null,
       "shared_type": "hub_health",
       "format": "markdown",
-      "size_bytes": 3336,
-      "sha256": "8de06418c8e5be144e5ad93bfc4bbc7ea2b17c74e957f9a10e438c00140d2aa1"
+      "size_bytes": 3450,
+      "sha256": "971740ad8eaea1542f5a2aeae1d3dec434564e17acbaca0dadda31a0875b96b2"
     },
     {
       "path": "data/normalized/hub_health_history.jsonl",
@@ -278,8 +296,8 @@
       "output_type": null,
       "shared_type": "hub_health_history",
       "format": "jsonl",
-      "size_bytes": 6792,
-      "sha256": "1fcd12dba6068ba6c357cd159b844f57a19beb2c7ec21abef3f4a909e9f484dc"
+      "size_bytes": 7026,
+      "sha256": "555065627b3a55a13cc53441bb6e7635b36baada77992b8cceef7f82f5d96eea"
     },
     {
       "path": "data/normalized/hub_status.json",
@@ -288,7 +306,7 @@
       "shared_type": "hub_status",
       "format": "json",
       "size_bytes": 1029,
-      "sha256": "945efc9d8a5e25425494dbfbcca0ce982fdcdc73eab6620404de2538b00be4ce"
+      "sha256": "2e6a42360afea4ac7943738ab7cddfb013718fe4d89e1d818ca5795607c2ae99"
     },
     {
       "path": "data/normalized/indicadores.parquet",
@@ -305,8 +323,8 @@
       "output_type": "json",
       "shared_type": null,
       "format": null,
-      "size_bytes": 50695,
-      "sha256": "87695c1533348149101d9a3dddbab6f0e34450ccc730733e36dfe88056eb6586"
+      "size_bytes": 40379,
+      "sha256": "f86cd0369bcb615c5f3a490cee0e43b2db3493af2f656eb26c28765e2425d06e"
     },
     {
       "path": "data/normalized/indicadores_urbanos_siedu.json",
@@ -314,8 +332,8 @@
       "output_type": "json",
       "shared_type": null,
       "format": null,
-      "size_bytes": 2421957,
-      "sha256": "b7378e90c309ed276699f60a9d5a9a66b163345832e7b43ea5731f2c4327746a"
+      "size_bytes": 2140513,
+      "sha256": "61d4f66f68a3ee94a50fc089c2da5cd79a0e284ed21a6015b8cd20c097a119d7"
     },
     {
       "path": "data/normalized/indicadores_urbanos_siedu.parquet",
@@ -333,7 +351,7 @@
       "shared_type": "overview",
       "format": "json",
       "size_bytes": 6222,
-      "sha256": "28a797ea272f6cef6ff5ece881336c4995b9f3e99b2a80be5be1d0b66df712c5"
+      "sha256": "de670c0146e39aef35ea22fb005369bdc802e52efb5b98c631555130631e6172"
     },
     {
       "path": "data/normalized/overview.md",
@@ -342,7 +360,7 @@
       "shared_type": "overview",
       "format": "markdown",
       "size_bytes": 3259,
-      "sha256": "6843a4233b19b6ff9dce18349c86e0d32fc3782263e9767bc2016ec24bd9e606"
+      "sha256": "a0962739ca17f9f472a797865b8b156ec735bf567a2cb5b59648dcb85ee72a98"
     },
     {
       "path": "data/normalized/partidos_politicos.json",
@@ -350,8 +368,8 @@
       "output_type": "json",
       "shared_type": null,
       "format": null,
-      "size_bytes": 14264,
-      "sha256": "a1aa8e257643f2490e18555602b68e0b076eb2375638264268a2dee88f37c53b"
+      "size_bytes": 12750,
+      "sha256": "ae538a262f498c490b80daa8aa9741610db6dd6b1f5ad3195f240033c58fc715"
     },
     {
       "path": "data/normalized/partidos_politicos.parquet",
@@ -368,8 +386,8 @@
       "output_type": "json",
       "shared_type": null,
       "format": null,
-      "size_bytes": 520396,
-      "sha256": "5b2a56361dd83061cbe98300ef39b3c230ca1661fd9bf28396078e0dd8fd3fc1"
+      "size_bytes": 460190,
+      "sha256": "371fb4927b8ccbf0f83affc10399f52efedd0246b3690125bcf8da8111478f5a"
     },
     {
       "path": "data/normalized/perfil_territorial_comunal.parquet",
@@ -386,8 +404,8 @@
       "output_type": null,
       "shared_type": "pipeline_metadata",
       "format": "json",
-      "size_bytes": 59025,
-      "sha256": "60d55f6555ded9f7098b618420d0b1f666b9e5918628b27d8eacf0cfc3de7365"
+      "size_bytes": 64425,
+      "sha256": "597c724a84d2fb66ea53643e0c20ef6b88fbfa17f99a050ea6432378012f0c33"
     },
     {
       "path": "data/normalized/pipeline_status.md",
@@ -395,8 +413,8 @@
       "output_type": null,
       "shared_type": "pipeline_status",
       "format": "markdown",
-      "size_bytes": 16714,
-      "sha256": "7b2355d0c555cec05d0eb72f1664539693bc496772f9f9034de47f47c0ef2574"
+      "size_bytes": 19507,
+      "sha256": "791adf2b7c2a8aecdd3faec640fbb168a31243dab49f4bd30498f3c95f56fc6a"
     },
     {
       "path": "data/normalized/pobreza_comunal.json",
@@ -404,8 +422,8 @@
       "output_type": "json",
       "shared_type": null,
       "format": null,
-      "size_bytes": 397419,
-      "sha256": "101e4f7eb53e22a2440d92067adeff252285daf8c0ed061489b6e7cd5ac86759"
+      "size_bytes": 360157,
+      "sha256": "945b774a2711eb4ffd5f1e4890023409d1f99a35b5898ccd469541e73eb3b7a2"
     },
     {
       "path": "data/normalized/pobreza_comunal.parquet",
@@ -422,8 +440,8 @@
       "output_type": null,
       "shared_type": "provenance_report",
       "format": "json",
-      "size_bytes": 13162,
-      "sha256": "878bd325114762853a9dac12d5e71c18df6baebb5c549aa08e3630e9e3ede35a"
+      "size_bytes": 14089,
+      "sha256": "c47fbe0d69e0c13630587f003b76bcb700ecf610332114c50e07605c486698f2"
     },
     {
       "path": "data/normalized/provenance_report.md",
@@ -431,8 +449,8 @@
       "output_type": null,
       "shared_type": "provenance_report",
       "format": "markdown",
-      "size_bytes": 14904,
-      "sha256": "e6161dac00b8beae7bc2df8e5f0d295680fb50f2948f3710eaf7766f86b0b864"
+      "size_bytes": 16084,
+      "sha256": "f103fb5386479866688faec6dd900d3d538341615ecacde84fe85bfdcd1c543c"
     },
     {
       "path": "data/normalized/provincias.json",
@@ -440,8 +458,8 @@
       "output_type": "json",
       "shared_type": null,
       "format": null,
-      "size_bytes": 8623,
-      "sha256": "065dcf4f5697f7fe4247cc90500c33dae54b2a350db63168fe303d28d8420f70"
+      "size_bytes": 7389,
+      "sha256": "36ff3de771846aba08dc1bd83b223d570ae627c596de5573d6661f2e602fa85c"
     },
     {
       "path": "data/normalized/provincias.parquet",
@@ -458,8 +476,8 @@
       "output_type": null,
       "shared_type": "redistribution_report",
       "format": "json",
-      "size_bytes": 11135,
-      "sha256": "cfaf380f2c8cc9b513b4d3e8e35fa057a5f09bbfe7f2fc7c1272916f18f16bf7"
+      "size_bytes": 11721,
+      "sha256": "3eb723a520ff23660524bc8c1e1af6ad930b581282ef54eb011cc39c465b328e"
     },
     {
       "path": "data/normalized/redistribution_report.md",
@@ -467,8 +485,8 @@
       "output_type": null,
       "shared_type": "redistribution_report",
       "format": "markdown",
-      "size_bytes": 10364,
-      "sha256": "0fbbe93108c58a0240592f4f0ead361194b491dd3ac74ea829a45c399149c799"
+      "size_bytes": 10896,
+      "sha256": "939cb453a0297644de64225ec3d1023b31539ad1f5d7d5e164597db48265c583"
     },
     {
       "path": "data/normalized/regiones.json",
@@ -476,8 +494,8 @@
       "output_type": "json",
       "shared_type": null,
       "format": null,
-      "size_bytes": 1372,
-      "sha256": "4b2feff927ea904ce3e26f4e6050b25d560b1c7c700d068d7670faacf03cefed"
+      "size_bytes": 1146,
+      "sha256": "12c669c020fde8196dff2db15b4fedc86d3d0eeef1e6ebf4b95f612b1ac8b3a6"
     },
     {
       "path": "data/normalized/regiones.parquet",
@@ -494,8 +512,8 @@
       "output_type": "json",
       "shared_type": null,
       "format": null,
-      "size_bytes": 100936,
-      "sha256": "6dcd3d8bd3cc2c082830b1577c8d3a00441b760239f83ca82a916badb4a0ce6c"
+      "size_bytes": 87824,
+      "sha256": "8299fcc575e00a7a6ff3005dfc866f5bf52c0f4b061bd28163ce989b8bc40318"
     },
     {
       "path": "data/normalized/resultados_educacionales.parquet",
@@ -512,8 +530,8 @@
       "output_type": null,
       "shared_type": "source_readiness",
       "format": "json",
-      "size_bytes": 26403,
-      "sha256": "3936cd8d677eff7d3042dae50b5e2744d1fb3587330dbd13c5367c094a04d1c5"
+      "size_bytes": 27673,
+      "sha256": "f0901b1db00aa8c5b3039538791781124f4da8de2463512df52a02018cf59cb5"
     },
     {
       "path": "data/normalized/source_readiness.md",
@@ -521,16 +539,16 @@
       "output_type": null,
       "shared_type": "source_readiness",
       "format": "markdown",
-      "size_bytes": 6410,
-      "sha256": "c04c4639bc051e14aa66dee1f3053c2dc6f51de3cf0e117941c38c3a9d106dbf"
+      "size_bytes": 6615,
+      "sha256": "cd80ed13cfd5fbc1198f9e11bdf9c19f14c69a128c55fb8fc272b79d6c5584e8"
     }
   ],
   "packages": [
     {
       "path": "data/normalized/chile-hub-publishable-bundle.zip",
       "package_type": "zip",
-      "size_bytes": 29764817,
-      "sha256": "81cee6b4d02c710bc0952eeed02d0431306ec77c29c705299f7aededd963ee23",
+      "size_bytes": 29915729,
+      "sha256": "876dc9d1b6e5b500d2209b0125b69f1e1497f43ef1923814e61c3093a8582e7d",
       "checksum_algorithm": "sha256",
       "checksum_path": "data/normalized/chile-hub-publishable-bundle.zip.sha256",
       "verification_command": "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256"

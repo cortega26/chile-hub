@@ -1,3 +1,4 @@
+import datetime
 import math
 import statistics
 from typing import Any
@@ -1498,6 +1499,143 @@ def validate_geometria_comunal(
 
     return {
         "dataset": "geometria_comunal",
+        "status": "error" if errors else "ok",
+        "record_count": row_count,
+        "errors": errors,
+        "warnings": warnings,
+    }
+
+
+def validate_estadisticas_vitales(
+    df: pl.DataFrame,
+    metadata: dict[str, Any] | None = None,
+    valid_commune_codes: list[str] | None = None,
+) -> dict[str, Any]:
+    """Valida el dataset de estadísticas vitales comunales (INE).
+
+    Chequeos:
+    - Columnas requeridas
+    - Duplicados de clave primaria (anio, codigo_comuna, evento, sexo)
+    - Dominios cerrados: evento, sexo, estado_dato
+    - cantidad entera no negativa y sin nulos
+    - Formato de códigos CUT
+    - Integridad referencial con la DPA (error: cobertura total esperada)
+    - Cobertura: cada (anio, evento) debe traer las 346 comunas. Un faltante
+      significa que el layout del anuario cambió o el parseo falló — el
+      pipeline debe abortar, no publicar una serie incompleta.
+    """
+    errors: list[str] = []
+    warnings: list[str] = []
+    row_count = df.height
+
+    required = [
+        "anio",
+        "codigo_region",
+        "codigo_comuna",
+        "nombre_comuna",
+        "evento",
+        "sexo",
+        "cantidad",
+        "estado_dato",
+        "fuente",
+        "url_fuente",
+        "fecha_fuente",
+    ]
+    missing = _missing_columns(df, required)
+    if missing:
+        errors.append(f"missing required columns: {missing}")
+        return {
+            "dataset": "estadisticas_vitales",
+            "status": "error",
+            "record_count": row_count,
+            "errors": errors,
+            "warnings": warnings,
+        }
+
+    if row_count == 0:
+        errors.append("estadisticas_vitales dataset is empty")
+        return {
+            "dataset": "estadisticas_vitales",
+            "status": "error",
+            "record_count": row_count,
+            "errors": errors,
+            "warnings": warnings,
+        }
+
+    # Duplicados de clave primaria
+    dup_count = _duplicate_count(df, ["anio", "codigo_comuna", "evento", "sexo"])
+    if dup_count > 0:
+        errors.append(
+            "found {0} duplicate rows by primary key (anio, codigo_comuna, evento, sexo)".format(
+                dup_count
+            )
+        )
+
+    # Formato de códigos CUT
+    invalid_region = _invalid_fixed_length_count(df, "codigo_region", 2)
+    if invalid_region > 0:
+        errors.append(f"found {invalid_region} codigo_region with invalid length (expected 2)")
+
+    invalid_cut = _invalid_fixed_length_count(df, "codigo_comuna", 5)
+    if invalid_cut > 0:
+        errors.append(f"found {invalid_cut} codigo_comuna with invalid length (expected 5)")
+
+    # Dominios cerrados
+    valid_eventos = {"nacimiento", "defuncion"}
+    unexpected_eventos = set(df["evento"].drop_nulls().unique().to_list()) - valid_eventos
+    if unexpected_eventos:
+        errors.append(f"unexpected evento values: {sorted(unexpected_eventos)}")
+
+    valid_sexos = {"hombre", "mujer", "indeterminado", "total"}
+    unexpected_sexos = set(df["sexo"].drop_nulls().unique().to_list()) - valid_sexos
+    if unexpected_sexos:
+        errors.append(f"unexpected sexo values: {sorted(unexpected_sexos)}")
+
+    valid_estados = {"definitivo", "provisional"}
+    unexpected_estados = set(df["estado_dato"].drop_nulls().unique().to_list()) - valid_estados
+    if unexpected_estados:
+        errors.append(f"unexpected estado_dato values: {sorted(unexpected_estados)}")
+
+    # cantidad: entera, sin nulos, no negativa
+    null_cantidad = df.filter(pl.col("cantidad").is_null()).height
+    if null_cantidad > 0:
+        errors.append(f"found {null_cantidad} rows with null cantidad")
+    negative_cantidad = df.filter(pl.col("cantidad") < 0).height
+    if negative_cantidad > 0:
+        errors.append(f"found {negative_cantidad} rows with negative cantidad")
+
+    # Integridad referencial con la DPA
+    unknown = _unknown_codes(df, "codigo_comuna", valid_commune_codes)
+    if unknown:
+        errors.append(f"estadisticas_vitales references unknown communes: {unknown}")
+
+    # Cobertura total por (anio, evento): 346 comunas, sin excepción.
+    if valid_commune_codes:
+        expected = len(valid_commune_codes)
+        coverage = df.group_by(["anio", "evento"]).agg(
+            pl.col("codigo_comuna").n_unique().alias("comunas")
+        )
+        incomplete = coverage.filter(pl.col("comunas") != expected)
+        for row in incomplete.iter_rows(named=True):
+            errors.append(
+                f"cobertura incompleta: anio={row['anio']} evento={row['evento']} "
+                f"trae {row['comunas']}/{expected} comunas"
+            )
+
+    # Años razonables (serie de anuarios definitivos 2010 en adelante)
+    current_year = datetime.datetime.now(datetime.timezone.utc).year
+    years = df["anio"].drop_nulls().unique().to_list()
+    odd_years = sorted(y for y in years if y < 2010 or y > current_year)
+    if odd_years:
+        warnings.append(f"años fuera del rango esperado [2010, {current_year}]: {odd_years}")
+
+    if metadata and metadata.get("source_mode") == "fallback":
+        warnings.append(
+            "estadisticas_vitales source_mode is fallback; usando datos de muestra mínima."
+        )
+
+    return {
+        "dataset": "estadisticas_vitales",
         "status": "error" if errors else "ok",
         "record_count": row_count,
         "errors": errors,

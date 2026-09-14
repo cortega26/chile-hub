@@ -727,5 +727,40 @@
       "cli": "chile-hub show autoridades_locales"
     },
     "documentation": "docs/datasets/autoridades_locales.md"
+  },
+  "estadisticas_vitales": {
+    "description": "Nacimientos y defunciones por comuna de residencia y sexo, desde los Anuarios de Estadísticas Vitales del INE (definitivos, 2010 en adelante).",
+    "join_keys": [
+      "anio",
+      "codigo_comuna"
+    ],
+    "confidence_tier": "Tier A",
+    "extractor": "src/extractors/estadisticas_vitales_extractor.py",
+    "expected_record_count": null,
+    "reuse_policy": {
+      "status": "open-attribution",
+      "license": "CC BY 4.0",
+      "license_url": "https://www.ine.gob.cl/terminos-de-uso",
+      "attribution_required": true,
+      "redistribution_ok": true,
+      "summary": "Anuarios de Estadísticas Vitales del INE (nacimientos y defunciones por comuna). Datos abiertos con atribución requerida."
+    },
+    "freshness_policy": {
+      "max_age_hours": 8760,
+      "label": "anual"
+    },
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars(\"estadisticas_vitales\")\n# Nacimientos por comuna 2023\nnac_2023 = df.filter((pl.col(\"anio\") == 2023) & (pl.col(\"evento\") == \"nacimiento\"))",
+      "duckdb": "SELECT anio, codigo_comuna, sum(cantidad) AS hechos\nFROM 'data/normalized/estadisticas_vitales.parquet'\nWHERE evento = 'nacimiento'\nGROUP BY 1, 2 ORDER BY 1, 3 DESC;",
+      "cli": "chile-hub show estadisticas_vitales"
+    },
+    "outputs": {
+      "parquet": "data/normalized/estadisticas_vitales.parquet",
+      "json": "data/normalized/estadisticas_vitales.json",
+      "duckdb_table": "estadisticas_vitales",
+      "sqlite_table": "estadisticas_vitales",
+      "excel_sheet": "Estadísticas Vitales"
+    },
+    "documentation": "docs/datasets/estadisticas_vitales.md"
   }
 }

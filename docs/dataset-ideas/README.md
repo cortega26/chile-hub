@@ -28,3 +28,4 @@ decision.
 | [Plus Codes y puntos de referencia vial](plus-codes-road-reference-layer.md) | needs-research | Requiere validar fuente vial redistribuible y volumen nacional. |
 | [Apoyos formales para emprendedores](entrepreneurship-support-programs.md) | needs-research | Requiere evaluar si Chile Emprende u otra fuente expone datos estructurados. |
 | [Resultados electorales, autoridades electas y partidos](electoral-results-authorities-parties.md) | needs-research | Requiere separar datos agregados publicables de datos personales electorales excluidos. |
+| [Estadísticas vitales comunales (nacimientos/defunciones)](estadisticas-vitales-comunal.md) | accepted | Implementado como `estadisticas_vitales` (anuarios INE 2010→, cobertura 346/346). |

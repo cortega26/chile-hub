@@ -35,6 +35,7 @@ class Dataset(str, enum.Enum):
     DISTRITOS_ELECTORALES = "distritos_electorales"
     PARTIDOS_POLITICOS = "partidos_politicos"
     AUTORIDADES_ELECTAS = "autoridades_electas"
+    ESTADISTICAS_VITALES = "estadisticas_vitales"
     FINANZAS_MUNICIPALES = "finanzas_municipales"
     RESULTADOS_EDUCACIONALES = "resultados_educacionales"
     INDICADORES_URBANOS_SIEDU = "indicadores_urbanos_siedu"

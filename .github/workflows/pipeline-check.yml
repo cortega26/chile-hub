@@ -258,6 +258,7 @@ jobs:
             python src/extractors/pobreza_extractor.py
             python src/extractors/consumo_electrico_extractor.py
             python src/extractors/partidos_politicos_extractor.py
+            python src/extractors/estadisticas_vitales_extractor.py
             # autoridades_electas necesita scrapling (anti-403 en camara.cl/senado.cl),
             # que no puede coexistir con el extra dev en el venv del job (conflicto
             # de click via python-semantic-release — ver pyproject.toml). Se ejecuta

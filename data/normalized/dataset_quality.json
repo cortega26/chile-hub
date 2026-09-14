@@ -1,14 +1,14 @@
 {
-  "generated_at_utc": "2026-09-03T18:21:20.116335+00:00",
-  "dataset_count": 19,
+  "generated_at_utc": "2026-09-14T23:35:14.841893+00:00",
+  "dataset_count": 20,
   "grade_distribution": {
-    "A": 16,
+    "A": 17,
     "B": 3,
     "C": 0,
     "D": 0,
     "F": 0
   },
-  "average_score": 94.4,
+  "average_score": 94.2,
   "weights": {
     "validation": 25,
     "schema_contract": 20,
@@ -266,6 +266,32 @@
         "Cobertura not_applicable"
       ],
       "recommended_action": "Monitor monthly source freshness and geocoding coverage."
+    },
+    {
+      "dataset": "estadisticas_vitales",
+      "maturity_status": "stable",
+      "overall_score": 90.0,
+      "grade": "A",
+      "dimensions": {
+        "validation": 100,
+        "schema_contract": 100,
+        "source_readiness": 100,
+        "freshness": 100,
+        "coverage": 0,
+        "reuse_policy": 100
+      },
+      "weights": {
+        "validation": 25,
+        "schema_contract": 20,
+        "source_readiness": 20,
+        "freshness": 15,
+        "coverage": 10,
+        "reuse_policy": 10
+      },
+      "blocking_reasons": [
+        "Cobertura not_applicable"
+      ],
+      "recommended_action": "Monitorear publicación del anuario 2024 (el extractor lo incorpora solo)."
     },
     {
       "dataset": "finanzas_municipales",
