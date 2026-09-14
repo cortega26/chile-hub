@@ -71,11 +71,11 @@ validation = [
     "frictionless>=5.18,<6",
 ]
 dev = [
-    "build==1.6.0",
+    "build==1.6.1",
     "twine==7.0.0",
     "python-semantic-release==10.6.2",
     "playwright==1.62.0",
-    "ruff==0.16.6",
+    "ruff==0.16.7",
     "pytest==9.1.1",
     "pytest-cov==7.1.0",
     "pre-commit==4.6.2",
@@ -83,7 +83,7 @@ dev = [
     "pip-audit==2.10.1",
     "interrogate==1.7.0",
     "pytest-xdist==3.8.0",
-    "hypothesis==6.167.1",
+    "hypothesis==6.168.0",
     "bandit==1.9.4",
     "structlog==26.1.0",
     "frictionless>=5.18,<6",
