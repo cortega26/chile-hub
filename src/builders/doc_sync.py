@@ -310,7 +310,7 @@ _AGENTS_EXTRACTOR_DESCRIPTIONS = {
         "Finanzas municipales — scraper real; corre en `monthly-scrape.yml`"
     ),
     "cead_delincuencia_live_extractor.py": (
-        "Delincuencia comunal (CEAD); corre en `monthly-scrape.yml`"
+        "Delincuencia comunal (CEAD) — NEUTRALIZADO (deprecated 2026-09-15); fuera de `monthly-scrape.yml`"
     ),
     "autoridades_locales_extractor.py": (
         "Autoridades locales (BCN SIIT + Wikipedia); carril `candidate`, sin cadencia automática"

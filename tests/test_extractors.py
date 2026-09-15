@@ -2875,32 +2875,30 @@ class SinimFinanzasLiveExtractorTests(unittest.TestCase):
 
 
 class CeadDelincuenciaLiveExtractorTests(unittest.TestCase):
-    """Tests para _load_comuna_codes (src/extractors/cead_delincuencia_live_extractor.py).
+    """El extractor CEAD está neutralizado (deprecated 2026-09-15, AGENTS.md
+    §5 paso 4): toda invocación levanta NotImplementedError con el motivo."""
 
-    Cubre la rama de fallback (sin comunas.parquet cacheado, lee comunas.csv
-    de staging) que hasta ahora no tenía ningún test — un pl.read_csv() sin
-    schema_overrides ahí perdería el cero inicial de codigo_comuna."""
-
-    def test_load_comuna_codes_falls_back_to_staging_csv_preserving_zero_padding(self):
+    def test_fetch_raises_not_implemented(self):
         from src.extractors import cead_delincuencia_live_extractor
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            data_dir = Path(tmpdir) / "data"
-            staging_dir = data_dir / "staging"
-            staging_dir.mkdir(parents=True)
-            (staging_dir / "comunas.csv").write_text(
-                "codigo_comuna,nombre_comuna\n01101,Iquique\n13101,Santiago\n",
-                encoding="utf-8",
-            )
-            # No se crea data/normalized/comunas.parquet: fuerza la rama fallback.
-            with (
-                patch.object(cead_delincuencia_live_extractor, "DATA_DIR", data_dir),
-                patch.object(cead_delincuencia_live_extractor, "STAGING_DIR", staging_dir),
-            ):
-                codes = cead_delincuencia_live_extractor._load_comuna_codes()
+        with self.assertRaises(NotImplementedError):
+            cead_delincuencia_live_extractor.fetch_data()
 
-        self.assertIn(("01101", "Iquique"), codes)
-        self.assertIn(("13101", "Santiago"), codes)
+    def test_process_raises_not_implemented(self):
+        from src.extractors import cead_delincuencia_live_extractor
+
+        with self.assertRaises(NotImplementedError):
+            cead_delincuencia_live_extractor.process_cead_delincuencia()
+
+    def test_extractor_methods_raise_not_implemented(self):
+        from src.extractors import cead_delincuencia_live_extractor
+
+        extractor = cead_delincuencia_live_extractor.CeaddelincuenciaLiveExtractor()
+        self.assertEqual(extractor.dataset_name, "delincuencia_comunal")
+        with self.assertRaises(NotImplementedError):
+            extractor.fetch()
+        with self.assertRaises(NotImplementedError):
+            extractor.validate(None, {})
 
 
 class GeometriaComunalExtractorTests(unittest.TestCase):

@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-09-15T02:05:46.688089+00:00",
+  "generated_at_utc": "2026-09-15T11:57:40.284582+00:00",
   "dataset_count": 25,
   "stable_count": 21,
   "candidate_count": 3,
@@ -8,7 +8,7 @@
   "live_ready_count": 20,
   "fallback_only_count": 1,
   "publish_blocking_count": 22,
-  "review_approaching_count": 6,
+  "review_approaching_count": 4,
   "review_due_count": 0,
   "datasets": [
     {
@@ -340,12 +340,12 @@
       "fallback_policy": "allowed_for_dev_blocked_for_publication",
       "source_contract_url": "github:chile-hub/chile-hub/contracts/datasets/perfil_territorial_comunal.schema.json",
       "stalled_after_days": 90,
-      "review_by": "2026-09-18",
+      "review_by": "2026-12-31",
       "stalled": false,
-      "review_status": "upcoming",
+      "review_status": "ok",
       "owner": "core",
-      "next_action": "Track readiness inherited from upstream component datasets.",
-      "recommended_action": "⏳ REVIEW BY 2026-09-18 — 2 días. Track readiness inherited from upstream component datasets."
+      "next_action": "Track readiness inherited from upstream component datasets (12 upstreams desde 2026-09: +estadisticas_vitales, +permisos_edificacion, +calidad_aire).",
+      "recommended_action": "Track readiness inherited from upstream component datasets (12 upstreams desde 2026-09: +estadisticas_vitales, +permisos_edificacion, +calidad_aire)."
     },
     {
       "dataset": "empresas",
@@ -460,12 +460,12 @@
       "fallback_policy": "fallback_to_last_snapshot",
       "source_contract_url": "github:chile-hub/chile-hub/contracts/datasets/delincuencia_comunal.schema.json",
       "stalled_after_days": 90,
-      "review_by": "2026-09-21",
+      "review_by": "2027-09-15",
       "stalled": false,
-      "review_status": "upcoming",
+      "review_status": "ok",
       "owner": "core",
-      "next_action": "Monitorear estabilidad del scraping; buscar fuente estructurada oficial (datos.gob.cl, export CEAD). Degradar a rejected si no madura para review_by.",
-      "recommended_action": "⏳ REVIEW BY 2026-09-21 — 5 días. Monitorear estabilidad del scraping; buscar fuente estructurada oficial (datos.gob.cl, export CEAD). Degradar a rejected si no madura para review_by."
+      "next_action": "DEGRADADO a rejected 2026-09-15 (review anticipada): en 90+ días no apareció descarga estructurada oficial (datos.gob.cl solo tiene bulk 2015 con links muertos; portal CEAD con protección anti-bots y solo PDF/presentaciones) y el dataset nunca fue redistribuible. Extractor neutralizado (NotImplementedError) y removido del scrape mensual. Reevaluar solo si el CEAD publica descarga oficial.",
+      "recommended_action": "DEGRADADO a rejected 2026-09-15 (review anticipada): en 90+ días no apareció descarga estructurada oficial (datos.gob.cl solo tiene bulk 2015 con links muertos; portal CEAD con protección anti-bots y solo PDF/presentaciones) y el dataset nunca fue redistribuible. Extractor neutralizado (NotImplementedError) y removido del scrape mensual. Reevaluar solo si el CEAD publica descarga oficial."
     },
     {
       "dataset": "partidos_politicos",

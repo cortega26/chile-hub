@@ -1,5 +1,10 @@
 # Delincuencia comunal — CEAD
 
+> **DEPRECATED 2026-09-15** — dataset degradado a rechazado: sin fuente
+> estructurada oficial (verificación 2026-09-15 en la ficha de la idea) y no
+> redistribuible. Extractor neutralizado y fuera del scrape mensual. Esta
+> documentación se conserva como referencia histórica.
+>
 > **Carril:** `candidate` — NO incluido en el bundle público.
 > **Fuente:** Centro de Estudios y Análisis del Delito (CEAD), Subsecretaría de Prevención del Delito, Ministerio del Interior.
 > **review_by:** 2026-09-21 · **stalled_after_days:** 90

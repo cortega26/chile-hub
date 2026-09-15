@@ -410,10 +410,10 @@
     "live_ready": false,
     "fallback_allowed": true,
     "publish_blocking": true,
-    "review_by": "2026-09-21",
+    "review_by": "2027-09-15",
     "stalled_after_days": 90,
     "owner": "core",
-    "next_action": "Monitorear estabilidad del scraping; buscar fuente estructurada oficial (datos.gob.cl, export CEAD). Degradar a rejected si no madura para review_by.",
+    "next_action": "DEGRADADO a rejected 2026-09-15 (review anticipada): en 90+ días no apareció descarga estructurada oficial (datos.gob.cl solo tiene bulk 2015 con links muertos; portal CEAD con protección anti-bots y solo PDF/presentaciones) y el dataset nunca fue redistribuible. Extractor neutralizado (NotImplementedError) y removido del scrape mensual. Reevaluar solo si el CEAD publica descarga oficial.",
     "publication_track": "candidate",
     "public_bundle_eligible": false,
     "cadencia": "monthly"
