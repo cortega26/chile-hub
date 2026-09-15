@@ -171,8 +171,8 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 | 096 | [`duckdb` acotado + pip-audit expiry + bandit a extractors](096-deps-alignment-bandit.md) | P1 | S-M | LOW-MED | — | DONE (2026-09-15, commit 7beda93 — duckdb query acotado, pip-audit expiry 2026-12-31/PSR-bump, bandit a extractors + fix B314 real con defusedxml 0.7.1 y asserts→raise; branch advisor/wave-3) |
 | 097 | [Docs quirúrgicos: counts, badge, §5 como puntero](097-docs-surgical-fixes.md) | P1 | S | LOW | — | DONE (2026-09-15, commit de12198 — CLAUDE counts+lanes, convención 22/21/20/25/28 documentada, criterios como fuente única; branch advisor/wave-4) |
 | 098 | [Arquitectura docs + anti-drift extendido](098-docs-architecture.md) | P2 | M | MED | 097 | DONE (2026-09-15, commit 4fdc4ce — glosario estado↔carril, CLAUDE ~35 líneas, conteos solo en AGENTS, gate --docs ×3 + regex fix + tests; branch advisor/wave-4) |
-| 099 | [Deuda media: sinim-shared + salud canónica + `_paths`](099-shared-debt.md) | P2 | M | MED | 091 | TODO |
-| 100 | [Spike Polars `2.0rc1` en rama (sin prod)](100-polars2-spike.md) | P2 | M | MED | 092 | TODO |
+| 099 | [Deuda media: sinim-shared + salud canónica + `_paths`](099-shared-debt.md) | P2 | M | MED | 091 | DONE (2026-09-15, commits 8c5123c+6763d00+261374b — `_sinim_shared` con test de equivalencia; salud: mapeo muestra que no hay dualidad real (sin churn); sys.path congelado con gate; branch advisor/wave-5) |
+| 100 | [Spike Polars `2.0rc1` en rama (sin prod)](100-polars2-spike.md) | P2 | M | MED | 092 | DONE (2026-09-15 — evidencia: 22/22 parquet + JSONs idénticos salvo wall-clock; suite 403 verde bajo RC; sin cambios a prod; ver commit; branch advisor/wave-5) |
 
 ## Dependencias 086–100 (ver `ROADMAP.md` para el grafo completo)
 
