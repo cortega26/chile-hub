@@ -797,5 +797,41 @@
       "excel_sheet": "Permisos Edificación"
     },
     "documentation": "docs/datasets/permisos_edificacion.md"
+  },
+  "calidad_aire": {
+    "description": "Promedios diarios de contaminantes atmosféricos (MP2.5, MP10, SO2, NO2, CO, O3) por estación de monitoreo, desde el SINCA (MMA). Cobertura parcial: ~65 comunas con estación.",
+    "join_keys": [
+      "fecha",
+      "codigo_comuna",
+      "codigo_contaminante"
+    ],
+    "confidence_tier": "Tier B",
+    "extractor": "src/extractors/calidad_aire_extractor.py",
+    "expected_record_count": null,
+    "reuse_policy": {
+      "status": "public-api-review-terms",
+      "license": "Datos públicos MMA; sin licencia explícita, citar fuente oficial",
+      "license_url": "https://sinca.mma.gob.cl/",
+      "attribution_required": true,
+      "redistribution_ok": true,
+      "summary": "Mediciones de calidad del aire del SINCA (MMA), API JSON pública. Organismo público chileno sin restricción explícita de reúso; citar fuente oficial."
+    },
+    "freshness_policy": {
+      "max_age_hours": 72,
+      "label": "diaria"
+    },
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars(\"calidad_aire\")\n# Promedio diario de MP2.5 por comuna\ndf.filter(pl.col(\"codigo_contaminante\") == \"mp25\").sort(\"valor_promedio_diario\", descending=True)",
+      "duckdb": "SELECT fecha, codigo_comuna, avg(valor_promedio_diario) AS mp25\nFROM 'data/normalized/calidad_aire.parquet'\nWHERE codigo_contaminante = 'mp25'\nGROUP BY 1, 2 ORDER BY 1 DESC, 3 DESC;",
+      "cli": "chile-hub show calidad_aire"
+    },
+    "outputs": {
+      "parquet": "data/normalized/calidad_aire.parquet",
+      "json": "data/normalized/calidad_aire.json",
+      "duckdb_table": "calidad_aire",
+      "sqlite_table": "calidad_aire",
+      "excel_sheet": "Calidad Aire"
+    },
+    "documentation": "docs/datasets/calidad_aire.md"
   }
 }

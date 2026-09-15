@@ -211,11 +211,17 @@ def compute_top_issue(entries, freshness_field="freshness_status"):
         return None
 
     def attention_priority(entry):
-        warning_count = entry.get("warning_count", 0) or 0
+        # Los warnings esperados (diseño confirmado, ADR-014) no son trabajo
+        # accionable: un dataset sano con cobertura parcial declarada no debe
+        # desplazar al problema realmente accionable del primer lugar. Sin la
+        # clave (fixtures unitarios) se usa warning_count como antes.
+        actionable = entry.get("actionable_warning_count")
+        if actionable is None:
+            actionable = entry.get("warning_count", 0) or 0
         freshness_status = entry.get(freshness_field)
         drift_status = entry.get("drift_status")
         degradation_status = entry.get("degradation_status")
-        if warning_count > 0 or freshness_status in {"stale", "unknown"}:
+        if actionable > 0 or freshness_status in {"stale", "unknown"}:
             return 0
         if drift_status == "drifted" or degradation_status in {"warning", "degraded"}:
             return 1

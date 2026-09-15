@@ -21,6 +21,7 @@ if str(SRC_DIR) not in sys.path:
 from src.validation import (
     detect_series_anomalies,
     validate_autoridades_electas,
+    validate_calidad_aire,
     validate_censo_comunal,
     validate_censo_hogares_viviendas,
     validate_comunas,
@@ -2295,6 +2296,97 @@ class PermisosEdificacionValidatorTests(unittest.TestCase):
         )
         self.assertEqual(result["status"], "ok")
         self.assertTrue(any("parcial esperada" in w for w in result["warnings"]))
+
+
+class CalidadAireValidatorTests(unittest.TestCase):
+    """Tests unitarios para validate_calidad_aire."""
+
+    def _row(self, **overrides):
+        base = {
+            "fecha": "2026-09-14",
+            "id_estacion": "271",
+            "nombre_estacion": "Quilicura",
+            "codigo_region": "00",
+            "codigo_comuna": "00001",
+            "nombre_comuna": "Comuna 1",
+            "codigo_contaminante": "mp25",
+            "nombre_contaminante": "MP 2,5",
+            "unidad": "ug/m3",
+            "valor_promedio_diario": 18.4,
+            "valor_max_horario": 42.0,
+            "horas_validas": 24,
+            "estado_dato": "definitivo",
+            "fuente": "SINCA",
+            "url_fuente": "https://example.com",
+            "fecha_fuente": "2026-09-15",
+        }
+        base.update(overrides)
+        return base
+
+    def _make_df(self, rows):
+        return pl.DataFrame(
+            rows,
+            schema={
+                "fecha": pl.String,
+                "id_estacion": pl.String,
+                "nombre_estacion": pl.String,
+                "codigo_region": pl.String,
+                "codigo_comuna": pl.String,
+                "nombre_comuna": pl.String,
+                "codigo_contaminante": pl.String,
+                "nombre_contaminante": pl.String,
+                "unidad": pl.String,
+                "valor_promedio_diario": pl.Float64,
+                "valor_max_horario": pl.Float64,
+                "horas_validas": pl.Int64,
+                "estado_dato": pl.String,
+                "fuente": pl.String,
+                "url_fuente": pl.String,
+                "fecha_fuente": pl.String,
+            },
+        )
+
+    def test_valid_data_returns_ok_with_expected_partial_warning(self):
+        """Cobertura parcial SINCA: warning declarado esperado, no error."""
+        df = self._make_df([self._row()])
+        result = validate_calidad_aire(df, valid_commune_codes=VALID_COMMUNE_CODES)
+        self.assertEqual(result["status"], "ok")
+        self.assertEqual(result["errors"], [])
+        self.assertTrue(any("parcial por diseño" in w for w in result["warnings"]))
+
+    def test_empty_dataframe_returns_error(self):
+        result = validate_calidad_aire(self._make_df([]))
+        self.assertEqual(result["status"], "error")
+
+    def test_duplicate_primary_key_returns_error(self):
+        df = self._make_df([self._row(), self._row()])
+        result = validate_calidad_aire(df)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("duplicate" in e for e in result["errors"]))
+
+    def test_unexpected_contaminante_returns_error(self):
+        df = self._make_df([self._row(codigo_contaminante="pm99")])
+        result = validate_calidad_aire(df)
+        self.assertEqual(result["status"], "error")
+
+    def test_negative_value_returns_error(self):
+        df = self._make_df([self._row(valor_promedio_diario=-1.0)])
+        result = validate_calidad_aire(df)
+        self.assertEqual(result["status"], "error")
+
+    def test_unknown_commune_returns_error(self):
+        df = self._make_df([self._row(codigo_comuna="99999")])
+        result = validate_calidad_aire(df, valid_commune_codes=VALID_COMMUNE_CODES)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("unknown communes" in e for e in result["errors"]))
+
+    def test_fallback_source_mode_warns_but_passes(self):
+        from src.extractors.calidad_aire_extractor import FALLBACK_ROWS
+
+        df = pl.DataFrame(FALLBACK_ROWS)
+        result = validate_calidad_aire(df, {"source_mode": "fallback"})
+        self.assertEqual(result["status"], "ok")
+        self.assertTrue(any("fallback" in w for w in result["warnings"]))
 
 
 if __name__ == "__main__":

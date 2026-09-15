@@ -1,9 +1,9 @@
 # chile-hub drift report
 
-- `generated_at_utc`: `2026-09-15T00:04:41.910173+00:00`
-- `dataset_count`: `21`
+- `generated_at_utc`: `2026-09-15T01:20:22.166676+00:00`
+- `dataset_count`: `22`
 - `drifted_count`: `2`
-- `healthy_count`: `19`
+- `healthy_count`: `20`
 - `fallback_count`: `1`
 - `partial_coverage_count`: `1`
 - `degraded_count`: `0`
@@ -31,6 +31,7 @@
 | `autoridades_electas` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
 | `estadisticas_vitales` | `healthy` | `live` | `not_applicable` | `none` | 0 | Ninguna. |
 | `permisos_edificacion` | `healthy` | `live` | `not_applicable` | `none` | 0 | Ninguna. |
+| `calidad_aire` | `healthy` | `live` | `not_applicable` | `none` | 1 | Ninguna. |
 
 ## regiones
 
@@ -77,7 +78,7 @@
 - `drift_status`: `drifted`
 - `source_mode`: `live`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
-- `degradation`: indicadores live refresh reused last published artifact for missing codes: ipc; indicadores freshness is stale: 775.71h since refresh, policy max is 72h
+- `degradation`: indicadores live refresh reused last published artifact for missing codes: ipc; indicadores freshness is stale: 776.97h since refresh, policy max is 72h
 - `warning_count`: `2`
 - `diagnostic_summary`: indicadores live refresh reused last published artifact for missing codes: ipc
 - `recommended_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.
@@ -240,4 +241,14 @@
 - `degradation`: Sin degradación operativa detectada en este build.
 - `warning_count`: `0`
 - `diagnostic_summary`: Sin degradación operativa detectada en este build.
+- `recommended_action`: Ninguna.
+
+## calidad_aire
+
+- `drift_status`: `healthy`
+- `source_mode`: `live`
+- `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
+- `degradation`: 1 observación(es) esperada(s): cobertura SINCA: 65/346 comunas (18.8%) — parcial por diseño; solo comunas con estación
+- `warning_count`: `1`
+- `diagnostic_summary`: cobertura SINCA: 65/346 comunas (18.8%) — parcial por diseño; solo comunas con estación
 - `recommended_action`: Ninguna.

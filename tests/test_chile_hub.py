@@ -49,7 +49,7 @@ INDICADORES_NON_SYNTHETIC_DELIVERY = {
     # visible para que el gate de publicación evalúe el dato real scrapeado.
     "ine_override",
 }
-EXPECTED_DATASET_COUNT = 21
+EXPECTED_DATASET_COUNT = 22
 # Datasets candidate (p. ej. consumo_electrico_comunal) no tienen tarjeta en
 # la landing page, así que build_hub_health filtra el top_issue de los
 # artefactos estáticos (hub_health.json/hub_bundle.json/overview.json y
@@ -57,7 +57,11 @@ EXPECTED_DATASET_COUNT = 21
 # ChileHub.top_issue()/overview()/runtime_status()/snapshot_text() (y sus
 # equivalentes CLI) recalculan en vivo sin ese filtro — a propósito, ya que
 # no están atados a ningún enlace HTML — así que legítimamente difieren.
-EXPECTED_BUILD_TOP_ISSUE = "empresas"
+# Historial del top de BUILD: fue "empresas" hasta que issue #42 eliminó su
+# único warning accionable (quedó solo la nota RES informativa); desde
+# entonces el top real es "indicadores" (stale crónico, issue #43). Cambiar
+# este valor solo si la salud de las fuentes lo justifica.
+EXPECTED_BUILD_TOP_ISSUE = "indicadores"
 EXPECTED_LIVE_TOP_ISSUE = "consumo_electrico_comunal"
 
 
@@ -172,6 +176,7 @@ class ChileHubTests(unittest.TestCase):
                 "autoridades_electas",
                 "estadisticas_vitales",
                 "permisos_edificacion",
+                "calidad_aire",
             ],
         )
 
@@ -262,6 +267,20 @@ class ChileHubTests(unittest.TestCase):
         self.assertTrue(
             (df["unidades_total"] == df["unidades_casas"] + df["unidades_departamentos"]).all()
         )
+
+    def test_load_polars_calidad_aire(self):
+        """Serie diaria de calidad del aire por estación (SINCA, incremental)."""
+        df = self.hub.load_polars("calidad_aire")
+        self.assertEqual(df.height, self.catalog_by_dataset["calidad_aire"]["record_count"])
+        self.assertGreater(df.height, 0)
+        self.assertIn("codigo_comuna", df.columns)
+        self.assertEqual(df["codigo_comuna"].str.len_chars().min(), 5)
+        # Clave primaria única y métricas no negativas
+        self.assertEqual(
+            df.group_by(["fecha", "id_estacion", "codigo_contaminante"]).len().height,
+            df.height,
+        )
+        self.assertTrue((df["valor_promedio_diario"] >= 0).all())
 
     def test_load_polars_missing_dataset(self):
         """load_polars con dataset inexistente lanza ChileHubDatasetError."""
@@ -366,6 +385,7 @@ class ChileHubTests(unittest.TestCase):
                 "autoridades_electas": "ok",
                 "estadisticas_vitales": "ok",
                 "permisos_edificacion": "ok",
+                "calidad_aire": "ok",
             },
         )
         warning_counts = {item["dataset"]: item["warning_count"] for item in summary}
@@ -1361,6 +1381,7 @@ class ChileHubCliTests(unittest.TestCase):
                 "autoridades_electas",
                 "estadisticas_vitales",
                 "permisos_edificacion",
+                "calidad_aire",
             ],
         )
 

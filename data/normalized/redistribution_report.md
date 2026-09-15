@@ -1,8 +1,8 @@
 # chile-hub redistribution report
 
-- `generated_at_utc`: `2026-09-15T00:04:41.910173+00:00`
-- `dataset_count`: `21`
-- `ready_count`: `21`
+- `generated_at_utc`: `2026-09-15T01:20:22.166676+00:00`
+- `dataset_count`: `22`
+- `ready_count`: `22`
 - `review_terms_count`: `0`
 - `unknown_count`: `0`
 
@@ -29,6 +29,7 @@
 | `autoridades_electas` | `ready` | CC-BY | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
 | `estadisticas_vitales` | `ready` | CC BY 4.0 | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
 | `permisos_edificacion` | `ready` | Uso autorizado con cita (MINVU CEDOC) | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
+| `calidad_aire` | `ready` | Datos públicos MMA; sin licencia explícita, citar fuente oficial | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
 
 ## regiones
 
@@ -239,3 +240,13 @@
 - `redistribution_ok`: `True`
 - `recommended_action`: Publicable con atribucion y referencia de fuente.
 - `summary`: Estadísticas de permisos de edificación del CEDOC (MINVU). El Centro autoriza el uso de la información citando la fuente.
+
+## calidad_aire
+
+- `publishability_status`: `ready`
+- `license`: `Datos públicos MMA; sin licencia explícita, citar fuente oficial`
+- `license_url`: https://sinca.mma.gob.cl/
+- `attribution_required`: `True`
+- `redistribution_ok`: `True`
+- `recommended_action`: Publicable con atribucion y referencia de fuente.
+- `summary`: Mediciones de calidad del aire del SINCA (MMA), API JSON pública. Organismo público chileno sin restricción explícita de reúso; citar fuente oficial.

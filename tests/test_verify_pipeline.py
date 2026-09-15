@@ -428,11 +428,12 @@ class VerifyGoldenCopyTests(unittest.TestCase):
             shutil.copy2(ROOT_DIR / "pyproject.toml", base / "pyproject.toml")
 
             meta = _read_json(norm / "pipeline_metadata.json")
-            current = meta["version"]
-            major, minor, patch_num = (int(x) for x in current.split("."))
-            # +5: el golden puede estar UNA version atras respecto al codigo
-            # (ventana release->publish) — +1 coincidiria con expected y el
-            # test no probaria el caso futuro.
+            # Futuro respecto al CODIGO (no a la data): en la ventana
+            # release->publish la data commiteada va una version atras y
+            # derivar el futuro desde ella (+5 parches) puede caer por debajo
+            # del codigo y dejar de probar el caso futuro.
+            code_version = vp.load_project_version()
+            major, minor, patch_num = (int(x) for x in code_version.split("."))
             meta["version"] = f"{major}.{minor}.{patch_num + 5}"
             _write_json(norm / "pipeline_metadata.json", meta)
 
