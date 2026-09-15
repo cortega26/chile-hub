@@ -643,6 +643,12 @@ def _compute_validations(dfs, meta):
     permisos_edificacion_metadata = meta["permisos_edificacion"]
     calidad_aire_metadata = meta["calidad_aire"]
 
+    # Una sola copia de la allowlist DPA (Plan 093): antes se copiaba la
+    # columna codigo_comuna (~15 veces, una por validador). Los validadores
+    # solo hacen set()/len() sobre ella, así que compartir el objeto es
+    # seguro — futuros validadores deben recibir este mismo objeto.
+    valid_comunas = df_comunas["codigo_comuna"].to_list()
+
     validations = {
         "regiones": validate_regiones(df_regiones),
         "provincias": validate_provincias(df_provincias),
@@ -654,34 +660,30 @@ def _compute_validations(dfs, meta):
         "indicadores": validate_indicadores(df_indicadores, indicadores_metadata),
         "censo_comunal": validate_censo_comunal(df_censo, censo_metadata),
         "establecimientos_salud": validate_establecimientos_salud(
-            df_salud, salud_metadata, df_comunas["codigo_comuna"].to_list()
+            df_salud, salud_metadata, valid_comunas
         ),
         "censo_hogares_viviendas": validate_censo_hogares_viviendas(
-            df_censo_hogares, censo_hogares_metadata, df_comunas["codigo_comuna"].to_list()
+            df_censo_hogares, censo_hogares_metadata, valid_comunas
         ),
         "distritos_electorales": validate_distritos_electorales(
-            df_electoral, electoral_metadata, df_comunas["codigo_comuna"].to_list()
+            df_electoral, electoral_metadata, valid_comunas
         ),
         "establecimientos_educacionales": validate_establecimientos_educacionales(
-            df_educacionales, educacionales_metadata, df_comunas["codigo_comuna"].to_list()
+            df_educacionales, educacionales_metadata, valid_comunas
         ),
         "finanzas_municipales": validate_finanzas_municipales(
-            df_finanzas, finanzas_metadata, df_comunas["codigo_comuna"].to_list()
+            df_finanzas, finanzas_metadata, valid_comunas
         ),
         "resultados_educacionales": validate_resultados_educacionales(
             df_resultados_educacionales,
             resultados_educacionales_metadata,
-            df_comunas["codigo_comuna"].to_list(),
+            valid_comunas,
         ),
         "indicadores_urbanos_siedu": validate_indicadores_urbanos_siedu(
-            df_siedu, siedu_metadata, df_comunas["codigo_comuna"].to_list()
+            df_siedu, siedu_metadata, valid_comunas
         ),
         **(
-            {
-                "empresas": validate_empresas(
-                    df_empresas, empresas_metadata, df_comunas["codigo_comuna"].to_list()
-                )
-            }
+            {"empresas": validate_empresas(df_empresas, empresas_metadata, valid_comunas)}
             if df_empresas is not None
             else {}
         ),
@@ -690,7 +692,7 @@ def _compute_validations(dfs, meta):
                 "pobreza_comunal": validate_pobreza_comunal(
                     df_pobreza_comunal,
                     pobreza_comunal_metadata,
-                    df_comunas["codigo_comuna"].to_list(),
+                    valid_comunas,
                 )
             }
             if df_pobreza_comunal is not None
@@ -701,7 +703,7 @@ def _compute_validations(dfs, meta):
                 "consumo_electrico_comunal": validate_consumo_electrico_comunal(
                     df_consumo_electrico,
                     consumo_electrico_metadata,
-                    df_comunas["codigo_comuna"].to_list(),
+                    valid_comunas,
                 )
             }
             if df_consumo_electrico is not None
@@ -721,7 +723,7 @@ def _compute_validations(dfs, meta):
                 "autoridades_electas": validate_autoridades_electas(
                     df_autoridades_electas,
                     autoridades_electas_metadata,
-                    df_comunas["codigo_comuna"].to_list(),
+                    valid_comunas,
                 )
             }
             if df_autoridades_electas is not None
@@ -732,7 +734,7 @@ def _compute_validations(dfs, meta):
                 "estadisticas_vitales": validate_estadisticas_vitales(
                     df_estadisticas_vitales,
                     estadisticas_vitales_metadata,
-                    df_comunas["codigo_comuna"].to_list(),
+                    valid_comunas,
                 )
             }
             if df_estadisticas_vitales is not None
@@ -743,7 +745,7 @@ def _compute_validations(dfs, meta):
                 "permisos_edificacion": validate_permisos_edificacion(
                     df_permisos_edificacion,
                     permisos_edificacion_metadata,
-                    df_comunas["codigo_comuna"].to_list(),
+                    valid_comunas,
                 )
             }
             if df_permisos_edificacion is not None
@@ -754,7 +756,7 @@ def _compute_validations(dfs, meta):
                 "calidad_aire": validate_calidad_aire(
                     df_calidad_aire,
                     calidad_aire_metadata,
-                    df_comunas["codigo_comuna"].to_list(),
+                    valid_comunas,
                 )
             }
             if df_calidad_aire is not None
@@ -766,7 +768,7 @@ def _compute_validations(dfs, meta):
                 "dataset": "perfil_territorial_comunal",
                 "notes": [],
             },
-            df_comunas["codigo_comuna"].to_list(),
+            valid_comunas,
         ),
     }
 

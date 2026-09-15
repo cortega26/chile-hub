@@ -352,6 +352,28 @@ class ChileHubCatalogQueriesTests(unittest.TestCase):
 
         self.assertIs(df1, df2)
 
+    def test_load_polars_cache_is_bounded_lru(self):
+        """Plan 093: el cache no crece sin cota — al superar
+        _DF_CACHE_MAXSIZE se expulsa el menos recientemente usado y el
+        dato expulsado se relee correcto de disco."""
+        from chile_hub.core import _DF_CACHE_MAXSIZE
+
+        hub = _hub()
+        names = [d["dataset"] for d in hub.catalog["datasets"] if not d.get("alias_for")]
+        self.assertGreater(len(names), _DF_CACHE_MAXSIZE, "se necesitan más datasets que el tope")
+        for name in names:
+            hub.load_polars(name)
+        self.assertLessEqual(len(hub._df_cache), _DF_CACHE_MAXSIZE)
+        # El primero cargado fue expulsado; releerlo da datos correctos.
+        evicted = names[0]
+        self.assertNotIn(evicted, hub._df_cache)
+        df = hub.load_polars(evicted)
+        self.assertGreater(df.height, 0)
+        self.assertIn(evicted, hub._df_cache)
+        # clear_cache vacía por completo.
+        hub.clear_cache()
+        self.assertEqual(hub._df_cache, {})
+
     def test_example_usage_returns_string(self):
         example = self.hub.example_usage("comunas", "python")
         self.assertIsInstance(example, str)

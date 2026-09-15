@@ -349,8 +349,12 @@ def detect_series_anomalies(
         ``motivo`` (texto legible).
     """
     anomalies: list[dict[str, Any]] = []
-    for key in df[key_col].unique().sort().to_list():
-        series = df.filter(pl.col(key_col) == key).sort(date_col)
+    # Una pasada O(N) en vez de un scan completo por clave O(K·N) (Plan 093).
+    # sort + partition_by(maintain_order=True) replica el orden anterior
+    # (claves ordenadas, cada serie ordenada por fecha): salida idéntica.
+    for series in df.sort(key_col).partition_by(key_col, maintain_order=True):
+        key = series[key_col][0]
+        series = series.sort(date_col)
         values = series[value_col].to_list()
         dates = series[date_col].to_list()
 

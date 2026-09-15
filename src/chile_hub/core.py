@@ -32,6 +32,13 @@ from ._paths import NORMALIZED_DIR, ROOT_DIR  # noqa: F401  (re-export: ROOT_DIR
 
 DATASET_CATALOG_PATH = NORMALIZED_DIR / "dataset_catalog.json"
 
+# Tope del cache LRU de DataFrames en memoria (Plan 093). 22 datasets
+# publicables; 8 retiene los de uso frecuente (DPA + consultas típicas) sin
+# dejar que empresas (~1.6M filas) + cross_view crezcan sin cota en procesos
+# longevos. No es configurable por instancia a propósito: es un guardarraíl,
+# no un tuning.
+_DF_CACHE_MAXSIZE = 8
+
 
 def _resolve_dataset_name(dataset_name: str | Dataset) -> str:
     """Convierte un dataset_name a string, validando contra el enum ``Dataset``.
@@ -85,6 +92,11 @@ class ChileHub:
         self.normalized_dir = self.catalog_path.resolve().parent
         self.root_dir = self.normalized_dir.parents[1]
         self.catalog = self._load_catalog()
+        # Cache LRU acotado (Plan 093): un proceso longevo que tocaba muchos
+        # datasets (p. ej. empresas ~1.6M filas + cross_view) crecía sin cota
+        # hasta OOM. Política: al superar _DF_CACHE_MAXSIZE se expulsa el
+        # menos recientemente usado; la entrada expulsada se relee de Parquet
+        # (correcto, solo más lento). Ver load_polars() y clear_cache().
         self._df_cache: dict[str, pl.DataFrame] = {}
 
     def _load_catalog(self) -> dict[str, Any]:
@@ -259,14 +271,19 @@ class ChileHub:
                 Lanza ``ChileHubDataError`` si la validación falla.
 
         Returns:
-            DataFrame de Polars con los datos del dataset.
+            DataFrame de Polars con los datos del dataset. La instancia
+            cachea hasta ``_DF_CACHE_MAXSIZE`` frames con política LRU
+            (el excedente se expulsa y se relee de disco si se pide de nuevo).
 
         Raises:
             ChileHubDatasetError: Si el dataset no existe o el archivo es ilegible.
             ChileHubDataError: Si ``validate=True`` y la validación encuentra errores.
         """
         dataset_name = _resolve_dataset_name(dataset_name)
-        if dataset_name not in self._df_cache:
+        if dataset_name in self._df_cache:
+            # Re-inserta para marcar uso reciente (dict conserva orden).
+            self._df_cache[dataset_name] = self._df_cache.pop(dataset_name)
+        else:
             path = self.get_output_path(dataset_name, "parquet")
             try:
                 df = pl.read_parquet(path)
@@ -277,6 +294,8 @@ class ChileHub:
             except Exception as exc:
                 raise ChileHubDatasetError(f"Error al leer Parquet para '{dataset_name}': {exc}")
             self._df_cache[dataset_name] = df
+            while len(self._df_cache) > _DF_CACHE_MAXSIZE:
+                self._df_cache.pop(next(iter(self._df_cache)))
 
         if validate:
             result = self.validate_dataset(dataset_name)
@@ -286,6 +305,10 @@ class ChileHub:
                 )
 
         return self._df_cache[dataset_name]
+
+    def clear_cache(self) -> None:
+        """Vacía el cache de DataFrames (útil en procesos longevos o tests)."""
+        self._df_cache.clear()
 
     def cross_view(
         self,
