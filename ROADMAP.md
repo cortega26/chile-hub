@@ -21,7 +21,7 @@
 | Wave | Planes | Done | Estado |
 |------|--------|------|--------|
 | 0 Baseline | — | 1/1 | DONE (2026-09-15) |
-| 1 Correctness S | 086–090 | 0/5 | TODO |
+| 1 Correctness S | 086–090 | 5/5 | DONE (2026-09-15, branch advisor/wave-1; suite 1027 passed) |
 | 2 Correctness/Perf M | 091–093 | 0/3 | TODO |
 | 3 Deps/Tooling/Sec | 094–096 | 0/3 | TODO |
 | 4 Docs agentes | 097–098 | 0/2 | TODO |
@@ -31,11 +31,11 @@
 ## Backlog (orden de ejecución)
 
 - [x] Wave 0: SHA + `make doctor` en lectura + confirmar 077/078/079 TODO
-- [ ] 086 Snapshot SINCA viejo etiquetado `live` → `stale_snapshot` (P1/S, —)
-- [ ] 087 `sync_landing_metadata` falla ruidoso en vez de `print` (P1/S, —)
-- [ ] 088 Cobertura catálogo→validación: gate + exenciones explícitas (P1/S, —)
-- [ ] 089 bcentral: TZ a UTC + throttle real (P1/S, —)
-- [ ] 090 Una sola conversión `to_pandas()` + descarte pre-conversión (P1/S, —)
+- [x] 086 Snapshot SINCA viejo → `fallback` + nota con snapshot (P1/S, 2522d7d)
+- [x] 087 `sync_landing_metadata` con raise tras print (P1/S, b751717)
+- [x] 088 Cobertura catálogo→validación + 3 exenciones explícitas (P1/S, 48a60be)
+- [x] 089 bcentral UTC×3 + submits espaciados (P1/S, fbddeaa)
+- [x] 090 Frames pandas compartidos + skip pre-conversión (P1/S, 62143ac)
 - [ ] 091 Opcionales ausentes ruidosos + fallback sintético strict (P1/M, —)
 - [ ] 092 Paralelizar formatos + `indicadores_hoy` = última fecha (P2/M, tras 090)
 - [ ] 093 Scans O(K·N)→`partition_by` + allowlist única + cache acotado (P2/M, —)
