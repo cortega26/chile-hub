@@ -2128,6 +2128,53 @@ class EstadisticasVitalesValidatorTests(unittest.TestCase):
         self.assertEqual(result["status"], "ok")
         self.assertTrue(any("fallback" in w for w in result["warnings"]))
 
+    def test_fallback_partial_coverage_passes_with_warning(self):
+        """P1 review: la muestra mínima de fallback (2 comunas) no debe
+        abortar el build en desarrollo; el publish la rechaza por otra vía."""
+        df = self._make_df(
+            [
+                self._row(codigo_comuna="00001", nombre_comuna="Comuna 1"),
+                self._row(codigo_comuna="00002", nombre_comuna="Comuna 2"),
+            ]
+        )
+        result = validate_estadisticas_vitales(
+            df, {"source_mode": "fallback"}, valid_commune_codes=VALID_COMMUNE_CODES
+        )
+        self.assertEqual(result["status"], "ok")
+        self.assertTrue(any("parcial esperada" in w for w in result["warnings"]))
+
+    def test_gap_year_returns_error(self):
+        """P1 review: un año ausente por completo no genera grupo
+        incompleto, así que la continuidad se verifica explícitamente."""
+        rows = []
+        for anio in (2022, 2024):
+            for i in range(1, 347):
+                for evento in ("nacimiento", "defuncion"):
+                    rows.append(
+                        self._row(
+                            anio=anio,
+                            codigo_region=f"{i:05d}"[:2],
+                            codigo_comuna=f"{i:05d}",
+                            nombre_comuna=f"Comuna {i}",
+                            evento=evento,
+                            sexo="total",
+                        )
+                    )
+        result = validate_estadisticas_vitales(
+            self._make_df(rows), valid_commune_codes=VALID_COMMUNE_CODES
+        )
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("faltantes" in e for e in result["errors"]))
+
+    def test_missing_evento_in_year_returns_error(self):
+        rows = [
+            self._row(codigo_comuna=f"{i:05d}", nombre_comuna=f"Comuna {i}") for i in range(1, 347)
+        ]
+        df = self._make_df(rows)
+        result = validate_estadisticas_vitales(df, valid_commune_codes=VALID_COMMUNE_CODES)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("sin eventos" in e for e in result["errors"]))
+
 
 class PermisosEdificacionValidatorTests(unittest.TestCase):
     """Tests unitarios para validate_permisos_edificacion."""
@@ -2234,6 +2281,20 @@ class PermisosEdificacionValidatorTests(unittest.TestCase):
         )
         self.assertEqual(result["status"], "ok")
         self.assertTrue(any("fallback" in w for w in result["warnings"]))
+
+    def test_fallback_partial_coverage_passes_with_warning(self):
+        """La muestra mínima de fallback no debe abortar el build en desarrollo."""
+        df = self._make_df(
+            [
+                self._row(codigo_comuna="00001"),
+                self._row(codigo_comuna="00002"),
+            ]
+        )
+        result = validate_permisos_edificacion(
+            df, {"source_mode": "fallback"}, valid_commune_codes=VALID_COMMUNE_CODES
+        )
+        self.assertEqual(result["status"], "ok")
+        self.assertTrue(any("parcial esperada" in w for w in result["warnings"]))
 
 
 if __name__ == "__main__":

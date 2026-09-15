@@ -351,6 +351,33 @@ def _parse_sheet(
     return valores, totales, provisionales
 
 
+def _gate_reconciliacion_anual(
+    rows: list[dict[str, Any]], totals: dict[tuple[str, int], int]
+) -> tuple[list[dict[str, Any]], list[str]]:
+    """Descarta años completos que no reconcilian con la fila Total País.
+
+    El validador exige cobertura total por año y aborta ruidosamente, en vez
+    de publicar métricas corruptas por un cambio de layout.
+    Retorna (filas_conservadas, mensajes_error).
+    """
+    anios = sorted({r["anio"] for r in rows})
+    malos: set[int] = set()
+    errores: list[str] = []
+    for target in METRIC_COLUMNS:
+        for year in anios:
+            esperado = totals.get((target, year))
+            obtenido = sum(r[target] for r in rows if r["anio"] == year)
+            if esperado is not None and esperado != obtenido:
+                if year not in malos:
+                    malos.add(year)
+                errores.append(
+                    f"ERROR reconciliación {target} {year}: suma comunas={obtenido} "
+                    f"vs Total País={esperado}; año omitido"
+                )
+    kept = [r for r in rows if r["anio"] not in malos]
+    return kept, errores
+
+
 def fetch_data() -> tuple[list[dict], str, str, list[str]]:
     """Obtiene permisos de edificación por comuna desde MINVU CEDOC.
 
@@ -447,17 +474,12 @@ def fetch_data() -> tuple[list[dict], str, str, list[str]]:
             row[col] = metrics.get(col, 0)
         rows.append(row)
 
-    # Reconciliación contra filas "Total País" del archivo.
-    anios_serie: list[int] = sorted({anio for _, anio in series})
-    for target in METRIC_COLUMNS:
-        for year in anios_serie:
-            esperado = totals.get((target, year))
-            obtenido = sum(r[target] for r in rows if r["anio"] == year)
-            if esperado is not None and esperado != obtenido:
-                notes.append(
-                    f"reconciliación {target} {year}: suma comunas={obtenido} "
-                    f"vs Total País={esperado}"
-                )
+    # Reconciliación contra filas "Total País" del archivo. Un año que no
+    # cuadra se descarta completo (el validador exige cobertura total por
+    # año y aborta ruidosamente) en vez de publicar métricas corruptas por
+    # un cambio de layout.
+    rows, gate_errors = _gate_reconciliacion_anual(rows, totals)
+    notes.extend(gate_errors)
     notes.append(
         f"{len(rows)} filas desde '{path.name}' "
         f"(hojas: {', '.join(hojas_ok)}; años provisionales: {sorted(provisionales) or 'ninguno'})"

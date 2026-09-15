@@ -121,7 +121,7 @@ chile-hub/
 │   │   ├── sinim_finanzas_live_extractor.py              Finanzas municipales — scraper real; corre en `monthly-scrape.yml`
 │   │   └── subdere_extractor.py                          DPA: regiones/provincias/comunas/comunas_enriquecidas (BCN ArcGIS) → data/staging/
 <!-- END_AGENTS_EXTRACTOR_LIST -->
-│   ├── validation.py              Todas las funciones validate_*() — módulo independiente (1 782 líneas)
+│   ├── validation.py              Todas las funciones validate_*() — módulo independiente (1 809 líneas)
 │   ├── build_dev_db.py            Orquestador (884 líneas): main() + fases (_load_inputs, _compute_validations, _write_data_artifacts, _generate_reports)
 │   ├── builders/                  Módulos del pipeline extraídos de build_dev_db.py (formats, metadata, reports, artifacts, datasets, catalog, landing, io_utils, _shared, dcat_catalog, data_package, doc_sync, geo, _logging)
 │   ├── chile_hub.py               Compatibility shim (21 líneas) — delega al paquete
@@ -196,7 +196,7 @@ codegraph impact validate_comunas                   # Qué se rompe si cambio es
 
 **Reglas para acotar lecturas y ahorrar tokens:**
 - Usar `Read` con `offset`/`limit` — nunca leer archivos grandes enteros de golpe.
-- `base.py` (76 líneas) es seguro de leer completo. `validation.py` (1 782 líneas) — leer por validador individual.
+- `base.py` (76 líneas) es seguro de leer completo. `validation.py` (1 809 líneas) — leer por validador individual.
 - `build_dev_db.py` (884 líneas) y `src/chile_hub/core.py` (1 987 líneas) — usar estas áncoras:
 
 | Archivo | Líneas de interés |

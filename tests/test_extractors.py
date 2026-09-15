@@ -3222,6 +3222,80 @@ class EstadisticasVitalesExtractorTests(unittest.TestCase):
         # http://n normalizado a https://n por el extractor
         self.assertEqual(found[0][2], "https://n")
 
+    def test_gate_reconciliacion_drops_mismatched_event(self):
+        """P2 review: el grupo que no cuadra con la fila TOTAL se omite (el
+        validador detecta el evento faltante y aborta ruidosamente)."""
+        from src.extractors.estadisticas_vitales_extractor import _gate_reconciliacion
+
+        rows = [
+            {"evento": "nacimiento", "sexo": "total", "cantidad": 60},
+            {"evento": "defuncion", "sexo": "total", "cantidad": 40},
+        ]
+        totals = {"nacimiento_total": 999, "defuncion_total": 40}
+        kept, errors = _gate_reconciliacion(rows, totals)
+        self.assertEqual(len(kept), 1)
+        self.assertEqual(kept[0]["evento"], "defuncion")
+        self.assertTrue(any("ERROR" in e for e in errors))
+
+    def test_gate_reconciliacion_keeps_matching_rows(self):
+        from src.extractors.estadisticas_vitales_extractor import _gate_reconciliacion
+
+        rows = [
+            {"evento": "nacimiento", "sexo": "total", "cantidad": 60},
+            {"evento": "defuncion", "sexo": "total", "cantidad": 40},
+        ]
+        totals = {"nacimiento_total": 60, "defuncion_total": 40}
+        kept, errors = _gate_reconciliacion(rows, totals)
+        self.assertEqual(len(kept), 2)
+        self.assertEqual(errors, [])
+
+    def test_gate_reconciliacion_without_totals_keeps_rows(self):
+        from src.extractors.estadisticas_vitales_extractor import _gate_reconciliacion
+
+        rows = [{"evento": "nacimiento", "sexo": "total", "cantidad": 60}]
+        kept, errors = _gate_reconciliacion(rows, {})
+        self.assertEqual(len(kept), 1)
+        self.assertEqual(errors, [])
+
+    def test_fetch_recovers_from_snapshots_when_discovery_fails(self):
+        """Si el sitio INE no responde, el extractor reconstruye desde
+        snapshots crudos locales en vez de caer a fallback."""
+        from requests import RequestException
+
+        from src.extractors import estadisticas_vitales_extractor as ev
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            wb = openpyxl.Workbook()
+            ws = wb.active
+            ws.append(["volver"])
+            ws.append(["1.2.2-04: NACIDOS VIVOS"])
+            ws.append([])
+            ws.append(
+                [
+                    "REGIÓN, PROVINCIA Y COMUNA DE RESIDENCIA",
+                    "Nacidos vivos",
+                    "Matrimonios",
+                    "DEFUNCIONES",
+                ]
+            )
+            ws.append([None, None, None, "Generales"])
+            ws.append(["TOTAL", 60, 30, 40])
+            ws.append(["METROPOLITANA", 60, 30, 40])
+            ws.append(["Provincia Santiago", 60, 30, 40])
+            ws.append(["Santiago", 60, 30, 40])
+            snap = Path(tmpdir) / "ine_estadisticas_vitales_2015_20200101T000000Z.xlsx"
+            wb.save(snap)
+            fake_lookup = {"santiago": ("13101", "13", "Santiago")}
+            with (
+                patch.object(ev, "_discover_anuario_docs", side_effect=RequestException("down")),
+                patch.object(ev, "RAW_DIR", tmpdir),
+                patch.object(ev, "_load_comunas_lookup", return_value=(fake_lookup, set())),
+            ):
+                rows, mode, _url, notes = ev.fetch_data()
+        self.assertEqual(mode, "live")
+        self.assertTrue(any(r["codigo_comuna"] == "13101" for r in rows))
+        self.assertTrue(any("snapshots locales" in n for n in notes))
+
     def test_run_dry_run_returns_validation_without_writing(self):
         """Dry run ejecuta fetch + normalize + validate sin persistir."""
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -3371,6 +3445,43 @@ class PermisosEdificacionExtractorTests(unittest.TestCase):
             url, metodo = pe._discover_xlsx_url()
         self.assertEqual(url, pe.HARDCODED_XLSX_URL)
         self.assertTrue(metodo.startswith("directa-conocida"))
+
+    def _wide_row(self, anio, unidades_total, codigo_comuna="13101"):
+        return {
+            "anio": anio,
+            "codigo_comuna": codigo_comuna,
+            "unidades_total": unidades_total,
+            "superficie_m2_total": unidades_total * 80,
+            "unidades_casas": unidades_total,
+            "superficie_m2_casas": unidades_total * 80,
+            "unidades_departamentos": 0,
+            "superficie_m2_departamentos": 0,
+        }
+
+    def test_gate_reconciliacion_anual_drops_mismatched_year(self):
+        """El año que no cuadra con Total País se descarta completo (el
+        validador exige cobertura total por año y aborta ruidosamente)."""
+        from src.extractors.permisos_edificacion_extractor import _gate_reconciliacion_anual
+
+        rows = [self._wide_row(2022, 100), self._wide_row(2023, 50)]
+        totals = {
+            ("unidades_total", 2022): 100,
+            ("superficie_m2_total", 2022): 8000,
+            ("unidades_total", 2023): 999,
+            ("superficie_m2_total", 2023): 4000,
+        }
+        kept, errors = _gate_reconciliacion_anual(rows, totals)
+        self.assertEqual([r["anio"] for r in kept], [2022])
+        self.assertTrue(any("ERROR" in e and "2023" in e for e in errors))
+
+    def test_gate_reconciliacion_anual_keeps_matching_years(self):
+        from src.extractors.permisos_edificacion_extractor import _gate_reconciliacion_anual
+
+        rows = [self._wide_row(2022, 100)]
+        totals = {("unidades_total", 2022): 100, ("superficie_m2_total", 2022): 8000}
+        kept, errors = _gate_reconciliacion_anual(rows, totals)
+        self.assertEqual(len(kept), 1)
+        self.assertEqual(errors, [])
 
     def test_run_dry_run_returns_validation_without_writing(self):
         with tempfile.TemporaryDirectory() as tmpdir:

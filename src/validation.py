@@ -1520,13 +1520,16 @@ def validate_estadisticas_vitales(
     - cantidad entera no negativa y sin nulos
     - Formato de códigos CUT
     - Integridad referencial con la DPA (error: cobertura total esperada)
-    - Cobertura: cada (anio, evento) debe traer las 346 comunas. Un faltante
-      significa que el layout del anuario cambió o el parseo falló — el
-      pipeline debe abortar, no publicar una serie incompleta.
+    - Cobertura: cada (anio, evento) debe traer las 346 comunas (solo en
+      modo live; en fallback la cobertura parcial es esperada por diseño).
+    - Continuidad: sin años faltantes en la serie y ambos eventos por año
+      (un año o evento ausente por completo no genera grupo incompleto y
+      debe fallar igual).
     """
     errors: list[str] = []
     warnings: list[str] = []
     row_count = df.height
+    is_live = not metadata or metadata.get("source_mode") != "fallback"
 
     required = [
         "anio",
@@ -1610,7 +1613,9 @@ def validate_estadisticas_vitales(
         errors.append(f"estadisticas_vitales references unknown communes: {unknown}")
 
     # Cobertura total por (anio, evento): 346 comunas, sin excepción.
-    if valid_commune_codes:
+    # Solo en modo live: en fallback la muestra mínima (2 comunas) es
+    # esperada por diseño y el publish la rechaza por otra vía.
+    if valid_commune_codes and is_live:
         expected = len(valid_commune_codes)
         coverage = df.group_by(["anio", "evento"]).agg(
             pl.col("codigo_comuna").n_unique().alias("comunas")
@@ -1621,6 +1626,22 @@ def validate_estadisticas_vitales(
                 f"cobertura incompleta: anio={row['anio']} evento={row['evento']} "
                 f"trae {row['comunas']}/{expected} comunas"
             )
+
+    # Continuidad de la serie: un año o evento ausente por completo no
+    # genera grupo incompleto, así que se verifica explícitamente. Un hueco
+    # significa que un anuario no se parseó y la serie quedaría parcial.
+    if is_live:
+        years = sorted(df["anio"].drop_nulls().unique().to_list())
+        if years and years != list(range(min(years), max(years) + 1)):
+            errors.append(f"serie con años faltantes: {years}")
+        eventos_por_anio = df.group_by(["anio"]).agg(pl.col("evento").unique().alias("eventos"))
+        for row in eventos_por_anio.iter_rows(named=True):
+            faltantes = valid_eventos - set(row["eventos"])
+            if faltantes:
+                errors.append(f"anio={row['anio']} sin eventos: {sorted(faltantes)}")
+
+    if not is_live:
+        warnings.append("estadisticas_vitales source_mode no es live; cobertura parcial esperada.")
 
     # Años razonables (serie de anuarios definitivos 2010 en adelante)
     current_year = datetime.datetime.now(datetime.timezone.utc).year
@@ -1658,11 +1679,13 @@ def validate_permisos_edificacion(
       La fuente publica el total como suma exacta de ambas tipologías.
     - Formato de códigos CUT
     - Integridad referencial con la DPA (error: cobertura total esperada)
-    - Cobertura: cada anio debe traer las 346 comunas.
+    - Cobertura: cada anio debe traer las 346 comunas (solo en modo
+      live; en fallback la muestra mínima es esperada por diseño).
     """
     errors: list[str] = []
     warnings: list[str] = []
     row_count = df.height
+    is_live = not metadata or metadata.get("source_mode") != "fallback"
 
     metric_columns = [
         "unidades_total",
@@ -1751,8 +1774,9 @@ def validate_permisos_edificacion(
     if unknown:
         errors.append(f"permisos_edificacion references unknown communes: {unknown}")
 
-    # Cobertura total por año: 346 comunas, sin excepción.
-    if valid_commune_codes:
+    # Cobertura total por año: 346 comunas, sin excepción (solo en live:
+    # en fallback la muestra mínima es esperada por diseño).
+    if valid_commune_codes and is_live:
         expected = len(valid_commune_codes)
         coverage = df.group_by(["anio"]).agg(pl.col("codigo_comuna").n_unique().alias("comunas"))
         incomplete = coverage.filter(pl.col("comunas") != expected)
@@ -1760,6 +1784,9 @@ def validate_permisos_edificacion(
             errors.append(
                 f"cobertura incompleta: anio={row['anio']} trae {row['comunas']}/{expected} comunas"
             )
+
+    if not is_live:
+        warnings.append("permisos_edificacion source_mode no es live; cobertura parcial esperada.")
 
     # Años razonables (serie desde 2002)
     current_year = datetime.datetime.now(datetime.timezone.utc).year

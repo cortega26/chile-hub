@@ -525,6 +525,35 @@ def _parse_comuna_sheet(
     return out, totals, notas
 
 
+def _gate_reconciliacion(rows: list[dict], totals: dict[str, int]) -> tuple[list[dict], list[str]]:
+    """Filtra grupos (evento, sexo) que no reconcilian con la fila TOTAL.
+
+    Lo que no cuadra se omite (el validador detecta el año/evento faltante
+    y aborta el build ruidosamente) en vez de publicar conteos corruptos
+    por un cambio de layout. Sin fila TOTAL no hay gate posible.
+    Retorna (filas_conservadas, mensajes_error).
+    """
+    if not totals:
+        return rows, []
+    sumas: dict[tuple[str, str], int] = {}
+    for r in rows:
+        key = (r["evento"], r["sexo"])
+        sumas[key] = sumas.get(key, 0) + r["cantidad"]
+    malas = {
+        key
+        for key, v in sumas.items()
+        if f"{key[0]}_{key[1]}" in totals and totals[f"{key[0]}_{key[1]}"] != v
+    }
+    if not malas:
+        return rows, []
+    detalle = "; ".join(
+        f"{ev}/{sx} (emitido={sumas[(ev, sx)]}, TOTAL={totals[f'{ev}_{sx}']})"
+        for (ev, sx) in sorted(malas)
+    )
+    kept = [r for r in rows if (r["evento"], r["sexo"]) not in malas]
+    return kept, [f"ERROR de reconciliación ({detalle}); filas omitidas"]
+
+
 def fetch_data() -> tuple[list[dict], str, str, list[str]]:
     """Obtiene estadísticas vitales comunales desde el INE.
 
@@ -542,26 +571,51 @@ def fetch_data() -> tuple[list[dict], str, str, list[str]]:
 
     try:
         anuarios = _discover_anuario_docs()
+        # (anio, titulo, url, path_prefijado). path None = descargar.
+        jobs: list[tuple[int, str, str, Path | None]] = [
+            (year, title, url, None) for (year, title, url) in anuarios
+        ]
     except (requests.RequestException, ValueError, KeyError) as exc:
-        notes.append(f"descubrimiento de anuarios falló ({exc}); sin snapshots previos, fallback")
-        anuarios = []
+        notes.append(f"descubrimiento de anuarios falló ({exc})")
+        jobs = []
 
-    if not anuarios:
-        notes.append("sin anuarios definitivos disponibles")
-        return FALLBACK_ROWS, "fallback", EEVV_PAGE, notes
+    if not jobs:
+        # Sitio no disponible: reconstruir desde snapshots crudos locales
+        # (un job por archivo; años con varios archivos se fusionan igual
+        # que en descubrimiento, p. ej. nacimientos + suplementos de 2016).
+        por_archivo: list[tuple[int, str, str, Path | None]] = []
+        for snap in sorted(Path(RAW_DIR).glob("ine_estadisticas_vitales_*.xlsx")):
+            m = re.fullmatch(r"ine_estadisticas_vitales_(\d{4})_.*\.xlsx", snap.name)
+            if m:
+                por_archivo.append(
+                    (int(m.group(1)), f"snapshot {snap.name}", f"snapshot:{snap.name}", snap)
+                )
+        if not por_archivo:
+            notes.append("sin anuarios definitivos ni snapshots previos disponibles")
+            return FALLBACK_ROWS, "fallback", EEVV_PAGE, notes
+        notes.append(
+            f"descubrimiento no disponible; reconstruyendo desde {len(por_archivo)} "
+            "snapshots locales"
+        )
+        jobs = por_archivo
 
     any_live = False
     errores: dict[int, list[str]] = {}
-    for year, title, url in anuarios:
+    for year, title, url, preset_path in jobs:
         try:
-            try:
-                path = _download_xlsx(url, year)
-            except (requests.RequestException, OSError) as exc:
-                snapshots = sorted(Path(RAW_DIR).glob(f"ine_estadisticas_vitales_{year}_*.xlsx"))
-                if not snapshots:
-                    raise
-                path = snapshots[-1]
-                notes.append(f"{year}: descarga falló, usando snapshot {path.name} ({exc})")
+            if preset_path is not None:
+                path = preset_path
+            else:
+                try:
+                    path = _download_xlsx(url, year)
+                except (requests.RequestException, OSError) as exc:
+                    snapshots = sorted(
+                        Path(RAW_DIR).glob(f"ine_estadisticas_vitales_{year}_*.xlsx")
+                    )
+                    if not snapshots:
+                        raise
+                    path = snapshots[-1]
+                    notes.append(f"{year}: descarga falló, usando snapshot {path.name} ({exc})")
             wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
             try:
                 sheet_name, sheet_rows = _find_comuna_sheet(wb)
@@ -573,6 +627,14 @@ def fetch_data() -> tuple[list[dict], str, str, list[str]]:
             notes.extend(sheet_notes)
             if not rows:
                 errores.setdefault(year, []).append(f"'{title}': tabla comunal sin filas")
+                continue
+            # Gate de reconciliación contra la fila TOTAL del anuario.
+            if not totals:
+                notes.append(f"{year}: sin fila TOTAL para reconciliar '{title}'")
+            rows, gate_errors = _gate_reconciliacion(rows, totals)
+            for err in gate_errors:
+                errores.setdefault(year, []).append(f"'{title}': {err}")
+            if not rows:
                 continue
             all_rows.extend(rows)
             any_live = True
@@ -587,11 +649,16 @@ def fetch_data() -> tuple[list[dict], str, str, list[str]]:
             continue
     # Solo reportar años omitidos si NINGÚN archivo del año aportó filas
     # (p. ej. el suplemento neonatal 2016 no trae tabla comunal general, pero
-    # el archivo de nacimientos del mismo año sí).
+    # el archivo de nacimientos del mismo año sí). Las notas ERROR siempre
+    # se reportan: indican datos descartados por no reconciliar.
     anios_con_filas = {r["anio"] for r in all_rows}
     for year in sorted(errores):
-        if year not in anios_con_filas:
-            notes.append(f"{year}: año omitido ({'; '.join(errores[year])})")
+        msgs = errores[year]
+        urgentes = [m for m in msgs if "ERROR" in m]
+        resto = [m for m in msgs if "ERROR" not in m]
+        notes.extend(f"{year}: {m}" for m in urgentes)
+        if year not in anios_con_filas and resto:
+            notes.append(f"{year}: año omitido ({'; '.join(resto)})")
 
     if not all_rows:
         return FALLBACK_ROWS, "fallback", EEVV_PAGE, notes
