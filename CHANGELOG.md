@@ -12,6 +12,32 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.33.0 - 2026-09-15
+
+### Mantenimiento
+
+- **deps**: Bump astral-sh/setup-uv from 10.0.1 to 10.1.0
+  ([#92](https://github.com/cortega26/chile-hub/pull/92),
+  [`2d81233`](https://github.com/cortega26/chile-hub/commit/2d81233dc76a5cb68a18b0cc5843e7b6a00a7913))
+
+- **deps**: Bump the codeql-action group across 1 directory with 2 updates
+  ([#91](https://github.com/cortega26/chile-hub/pull/91),
+  [`536ba17`](https://github.com/cortega26/chile-hub/commit/536ba170583f8ed4bd232255466205c9e2bb8297))
+
+- **deps**: Sync uv.lock [skip ci] ([#90](https://github.com/cortega26/chile-hub/pull/90),
+  [`0762ff1`](https://github.com/cortega26/chile-hub/commit/0762ff1d2e032d33494275fc7243649be6db3ec3))
+
+- **deps-dev**: Bump the python-dev group with 3 updates
+  ([#90](https://github.com/cortega26/chile-hub/pull/90),
+  [`0762ff1`](https://github.com/cortega26/chile-hub/commit/0762ff1d2e032d33494275fc7243649be6db3ec3))
+
+### Agregado
+
+- **datasets**: Add calidad_aire (SINCA, serie diaria incremental)
+  ([#94](https://github.com/cortega26/chile-hub/pull/94),
+  [`12061c4`](https://github.com/cortega26/chile-hub/commit/12061c4ad6758b30c4361205827a8e0876307693))
+
+
 ## 1.32.0 - 2026-09-15
 
 ### Corregido
