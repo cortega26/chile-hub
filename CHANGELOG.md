@@ -12,6 +12,27 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.36.1 - 2026-09-15
+
+### Corregido
+
+- **sec**: XML de red via defusedxml (B314) + duckdb query acotado + pip-audit expiry
+  ([`7beda93`](https://github.com/cortega26/chile-hub/commit/7beda9300b9077f648740fb3e08562b83640eece))
+
+### Code Style
+
+- **isort**: Orden canonico de ruff 0.16.7 (tomllib)
+  ([`238bc10`](https://github.com/cortega26/chile-hub/commit/238bc10564eacd8528889e73df467ca41d12fd6d))
+
+### Documentación
+
+- **wave-3**: Marca 094-096 DONE con commits y scoreboard
+  ([`896a380`](https://github.com/cortega26/chile-hub/commit/896a380c350c429b9aeeb397e381778c6fe21dcb))
+
+- **wave-3**: SHAs de tracking tras rebase sobre 1.36.0
+  ([`40a33a7`](https://github.com/cortega26/chile-hub/commit/40a33a73afb40c4c971b7bf3af22548bd5f32000))
+
+
 ## 1.36.0 - 2026-09-15
 
 ### Documentación
