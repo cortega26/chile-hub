@@ -12,6 +12,30 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.36.4 - 2026-09-15
+
+### Corregido
+
+- **adopcion**: User-Agent + reintentos + exit 1 si todo falla
+  ([`700b432`](https://github.com/cortega26/chile-hub/commit/700b432ccd4415cdcaee1000a3290b071804fb4c))
+
+### Documentación
+
+- Auto-sync tras carrera con release [skip ci]
+  ([`c8a0f07`](https://github.com/cortega26/chile-hub/commit/c8a0f072ea7007d7ec0f7632fe470135b3b780b7))
+
+- **wave-6**: Marca 077-079 DONE/verificado con evidencia
+  ([`f7f0727`](https://github.com/cortega26/chile-hub/commit/f7f0727437a9b34a9b45d412983e72bbc53ddff9))
+
+- **wave-6**: SHAs de tracking tras rebase sobre 1.36.3
+  ([`dff699a`](https://github.com/cortega26/chile-hub/commit/dff699ad3ef322f7296dd737d916425ea8441ff3))
+
+### Tests
+
+- **geo**: Round-trip GeoParquet 1.0/WKB del writer (079)
+  ([`5d9b0a8`](https://github.com/cortega26/chile-hub/commit/5d9b0a86287b0f72f0587a1dd939304ccd250690))
+
+
 ## 1.36.3 - 2026-09-15
 
 ### Corregido
