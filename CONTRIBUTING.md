@@ -63,11 +63,12 @@ Los datasets nuevos entran por el carril `candidate`, se evalúan contra
 template [Dataset request](.github/ISSUE_TEMPLATE/dataset_request.yml) —
 un PR de extractor sin issue previo aprobado probablemente se cierre.
 
-Una vez que el mantenedor responde positivamente a las 3 preguntas bloqueantes
-(licencia, formato, estabilidad), sigue este checklist:
+Una vez que el mantenedor responde positivamente a los criterios bloqueantes
+de `docs/dataset-inclusion-criteria.md` (la única fuente normativa; `AGENTS.md
+§5`, Paso 1 solo enlaza, no redefine), sigue este checklist:
 
-1. **Issue aprobado** — respuesta positiva del mantenedor a licencia, formato
-   y estabilidad (ver `AGENTS.md §5`, Paso 1).
+1. **Issue aprobado** — respuesta positiva del mantenedor a los criterios
+   bloqueantes (ver `docs/dataset-inclusion-criteria.md`).
 2. **Extractor** en `src/extractors/{nombre}_extractor.py` siguiendo el
    contrato de `src/extractors/base.py`. Como modelo, usa un extractor simple
    existente (p. ej. `pobreza_extractor.py`).

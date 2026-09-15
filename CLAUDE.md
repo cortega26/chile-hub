@@ -39,7 +39,7 @@ make doctor             # Verifica Python, dependencias críticas, gates anti-dr
 make refresh            # extract → build → verify → test → verify-landing → lint
 
 # Pasos individuales
-make extract            # 14 extractores → data/staging/
+make extract            # 17 extractores diarios → data/staging/ (22 ficheros; resto: carril `candidate`/stub/live — ver `docs/extraction-lanes.md`)
 make build              # Artefactos → data/normalized/
 make verify             # Integridad (SHA-256, conteos, schema)
 make test               # pytest — lee data/normalized/, NO corre el pipeline
@@ -61,10 +61,10 @@ make format-check       # Ruff format check
 
 | Archivo | Cuándo leerlo |
 |---|---|
-| `src/extractors/base.py` (73 líneas) | Entender contrato de extractores |
-| `src/validation.py` (1 194 líneas) | Agregar funciones `validate_*()` — leer por validador |
-| `src/build_dev_db.py` (867 líneas) | Depurar el pipeline — `_compute_validations()` contiene el bloque `validations = {…}` |
-| `src/chile_hub/core.py` (2 302 líneas) | API pública de `ChileHub` |
+| `src/extractors/base.py` (99 líneas) | Entender contrato de extractores |
+| `src/validation.py` (1 960 líneas) | Agregar funciones `validate_*()` — leer por validador |
+| `src/build_dev_db.py` (948 líneas) | Depurar el pipeline — `_compute_validations()` contiene el bloque `validations = {…}` |
+| `src/chile_hub/core.py` (2 018 líneas) | API pública de `ChileHub` |
 | `data/dataset_catalog_config.json` | Fuente de verdad de qué datasets existen |
 | `data/source_registry.json` | Carril, maturity_status, confidence_tier, review_by |
 

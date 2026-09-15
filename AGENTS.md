@@ -43,7 +43,7 @@ entender la arquitectura, las reglas no negociables y las convenciones del proye
 ## 1. Propósito del proyecto
 
 `chile-hub` es una capa de datos pública, curada y reproducible sobre **datos oficiales de Chile**.
-Actualmente publica veinticinco (<!-- START_AGENTS_DATASET_COUNT -->25<!-- END_AGENTS_DATASET_COUNT -->) capas:
+Actualmente registra veinticinco (<!-- START_AGENTS_DATASET_COUNT -->25<!-- END_AGENTS_DATASET_COUNT -->) capas, de las cuales 21 viajan en el bundle público (ver convención de conteos junto al badge de README.md):
 
 | Capa | Fuente | Descripción |
 |:---|:---|:---|
@@ -344,22 +344,13 @@ Sigue estos pasos en orden. No saltear ninguno.
 
 ### Paso 1 — Evaluar la fuente
 
-Antes de escribir código, responder:
-
-**Preguntas bloqueantes** (una respuesta negativa descarta el dataset para el MVP):
-
-- [ ] **1. Licencia:** ¿Tiene licencia explícita o amparo claro en la Ley 20.285?
-- [ ] **2. Formato:** ¿Está disponible como API JSON o dump estático descargable? (no scraping HTML frágil)
-- [ ] **3. Estabilidad:** ¿El formato de origen es estable? ¿Ha cambiado en los últimos 12 meses?
-
-**Preguntas orientativas** (una respuesta negativa no descarta, pero reduce prioridad):
-
-- [ ] **4. Cruce DPA:** ¿El dataset cruza con la DPA por `codigo_comuna` o `codigo_region`?
-- [ ] **5. Costo-beneficio:** ¿El dolor que resuelve justifica el costo de mantenimiento?
-
-Si la respuesta a cualquiera de las preguntas bloqueantes (1–3) es negativa,
-**no agregar al MVP**. Las preguntas orientativas (4–5) informan la prioridad
-relativa frente a otros candidatos, pero no son excluyentes.
+**Fuente normativa única: `docs/dataset-inclusion-criteria.md`** (criterios
+bloqueantes, prioridades y estados `accepted`/`under-review`/`needs-research`/
+`deferred`/`rejected`). Esta sección no redefine compuertas — solo el flujo:
+los datasets nuevos entran por el carril `candidate` (incluso con fuente
+frágil, como `under-review`) y el mantenedor decide la promoción a
+`stable_publishable`. Ante cualquier discrepancia entre este checklist y ese
+documento, manda el documento.
 
 ### Paso 2 — Crear el extractor
 

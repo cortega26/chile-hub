@@ -22,6 +22,7 @@
 [![License: MIT](https://img.shields.io/badge/Code%20License-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-3776AB.svg?style=flat&logo=python&logoColor=white)]()
 [![Formats](https://img.shields.io/badge/Formats-Parquet%20%7C%20DuckDB%20%7C%20SQLite%20%7C%20JSON%20%7C%20Excel-orange.svg)]()
+<!-- Convención de conteos (Plan 097): badge = 22 CONSTRUIBLES (claves del catálogo con `outputs`, lo que `make build` genera localmente, incl. consumo_electrico en carril candidate) · 21 PUBLICABLES (registry `publication_track: stable_publishable` + elegibles al ZIP) · 20 en el manifest (alias comunas_enriquecidas sin artefacto físico) · 25 REGISTRADAS (claves del catálogo) · 28 DOCS (con archivados). Fórmula del badge: sync_readme_dataset_badge() en src/builders/doc_sync.py. -->
 <!-- START_DATASET_BADGE -->
 [![Datasets](https://img.shields.io/badge/Datasets-22%20capas-16a34a.svg)]()
 <!-- END_DATASET_BADGE -->
@@ -143,6 +144,8 @@ Pipeline determinista en GitHub Actions: extracción → build → verificación
 ---
 
 ## Las 22 capas de datos
+
+> **Cómo leer los conteos:** 22 construibles (`make build` local, incl. 1 en carril `candidate`) · 21 publicables (bundle ZIP) · 25 registradas en el catálogo (3 filas de abajo son placeholders sin datos: geometría, delincuencia, autoridades locales). Ver convención completa junto al badge superior.
 
 <!-- START_DATASET_TABLE -->
 
