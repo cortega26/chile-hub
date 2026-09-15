@@ -171,13 +171,14 @@ Pipeline determinista en GitHub Actions: extracción → build → verificación
 | 21 | **Permisos de Edificación** | 8 650 | 🟢 live | MINVU / CEDOC | Uso c/cita | Mensual |
 | 22 | **Calidad del Aire** | 756 | 🟢 live | MMA / SINCA | Revisión términos | Diaria |
 | 23 | **geometria_comunal** 🆕 | — | 🔜 próximamente | — | — | — |
-| 24 | **Delincuencia Comunal** 🆕 | — | 🔜 próximamente | CEAD / SPD | Revisión términos | — |
+| 24 | **Delincuencia Comunal** 🚫 | — | 🚫 deprecated | CEAD / SPD | Revisión términos | — |
 | 25 | **Autoridades Locales** 🆕 | — | 🔜 próximamente | BCN SIIT + Wikipedia | CC BY / CC BY-SA | — |
 
 > **🟢 live**: datos extraídos directamente desde la fuente oficial en cada ejecución del pipeline.
 > **🟡 fallback**: datos servidos desde un respaldo curado mientras se completa la extracción en vivo.
 > **🔶 parcial**: cobertura inferior al 50% del universo esperado. Capa candidata, no completa.
 > **🔜 próximamente**: capa en carril candidate — extractor implementado, datos no incluidos en el bundle público.
+> **🚫 deprecated**: capa degradada a rechazada — sin mantención ni bundle; su doc queda como referencia histórica.
 > Para auditar el estado exacto de cada capa: `chile-hub provenance` y `chile-hub health`.
 
 <!-- END_DATASET_TABLE -->
