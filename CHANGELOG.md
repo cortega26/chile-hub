@@ -12,6 +12,36 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.36.0 - 2026-09-15
+
+### Documentación
+
+- Sync conteos tras wave-2 (tests 1030, anclas de lineas)
+  ([`a9cdebc`](https://github.com/cortega26/chile-hub/commit/a9cdebc0b8436668f9adbfe536b0025616d0d10d))
+
+- **roadmap**: Rastrea fix regex checker hallado en wave-2
+  ([`24853a1`](https://github.com/cortega26/chile-hub/commit/24853a1dde1a628781e72e5a7d0c7c55cd73133b))
+
+- **wave-2**: 092+093 DONE, 091 revertida con razon
+  ([`8e49383`](https://github.com/cortega26/chile-hub/commit/8e493833855604449f2efbfa06fc0d1d30a90083))
+
+- **wave-2**: Completa tracking DONE de 092 y 093
+  ([`af6af5c`](https://github.com/cortega26/chile-hub/commit/af6af5cdf09e1ec4739c7799af84401a36ec3cda))
+
+### Agregado
+
+- **build**: Ausencia stable_publishable sin staging aborta ruidoso
+  ([`bc3e02f`](https://github.com/cortega26/chile-hub/commit/bc3e02ff9bf5d3622bbdbecaee1b82814333069a))
+
+### Mejorado
+
+- **build**: Indicadores_hoy solo ultima fecha por codigo; sin paralelizar
+  ([`c9d8c2a`](https://github.com/cortega26/chile-hub/commit/c9d8c2a716a38bb8ac70440e70f841c19b6aedf3))
+
+- **validacion**: Partition_by, allowlist unica y cache LRU acotado
+  ([`3a155bd`](https://github.com/cortega26/chile-hub/commit/3a155bd111546a2dfa997f5afe590b679f9304a3))
+
+
 ## 1.35.0 - 2026-09-15
 
 ### Corregido
