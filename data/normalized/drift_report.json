@@ -1,8 +1,8 @@
 {
-  "generated_at_utc": "2026-09-14T23:35:14.841893+00:00",
-  "dataset_count": 20,
+  "generated_at_utc": "2026-09-15T00:04:41.910173+00:00",
+  "dataset_count": 21,
   "drifted_count": 2,
-  "healthy_count": 18,
+  "healthy_count": 19,
   "fallback_count": 1,
   "partial_coverage_count": 1,
   "degraded_count": 0,
@@ -75,7 +75,7 @@
       "coverage_ratio": null,
       "coverage_summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
       "degradation_status": "warning",
-      "degradation_impact": "indicadores live refresh reused last published artifact for missing codes: ipc; indicadores freshness is stale: 775.22h since refresh, policy max is 72h",
+      "degradation_impact": "indicadores live refresh reused last published artifact for missing codes: ipc; indicadores freshness is stale: 775.71h since refresh, policy max is 72h",
       "drift_summary": "Drift detectado: degradation=warning.",
       "warning_count": 2,
       "diagnostic_summary": "indicadores live refresh reused last published artifact for missing codes: ipc",
@@ -306,6 +306,21 @@
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
       "recommended_action": "Ninguna.",
       "documentation": "docs/datasets/estadisticas_vitales.md"
+    },
+    {
+      "dataset": "permisos_edificacion",
+      "drift_status": "healthy",
+      "source_mode": "live",
+      "coverage_status": "not_applicable",
+      "coverage_ratio": null,
+      "coverage_summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
+      "degradation_status": "none",
+      "degradation_impact": "Sin degradación operativa detectada en este build.",
+      "drift_summary": "Sin drift operativo detectado en este build.",
+      "warning_count": 0,
+      "diagnostic_summary": "Sin degradación operativa detectada en este build.",
+      "recommended_action": "Ninguna.",
+      "documentation": "docs/datasets/permisos_edificacion.md"
     }
   ]
 }

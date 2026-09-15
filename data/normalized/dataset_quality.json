@@ -1,14 +1,14 @@
 {
-  "generated_at_utc": "2026-09-14T23:35:14.841893+00:00",
-  "dataset_count": 20,
+  "generated_at_utc": "2026-09-15T00:04:41.910173+00:00",
+  "dataset_count": 21,
   "grade_distribution": {
-    "A": 17,
+    "A": 18,
     "B": 3,
     "C": 0,
     "D": 0,
     "F": 0
   },
-  "average_score": 94.2,
+  "average_score": 94.0,
   "weights": {
     "validation": 25,
     "schema_contract": 20,
@@ -420,6 +420,32 @@
       },
       "blocking_reasons": [],
       "recommended_action": "Mantener monitoreo operativo y actualizaciones periódicas."
+    },
+    {
+      "dataset": "permisos_edificacion",
+      "maturity_status": "stable",
+      "overall_score": 90.0,
+      "grade": "A",
+      "dimensions": {
+        "validation": 100,
+        "schema_contract": 100,
+        "source_readiness": 100,
+        "freshness": 100,
+        "coverage": 0,
+        "reuse_policy": 100
+      },
+      "weights": {
+        "validation": 25,
+        "schema_contract": 20,
+        "source_readiness": 20,
+        "freshness": 15,
+        "coverage": 10,
+        "reuse_policy": 10
+      },
+      "blocking_reasons": [
+        "Cobertura not_applicable"
+      ],
+      "recommended_action": "Monitorear que el biblionumber 25583 siga resolviendo al XLSX anual vigente."
     },
     {
       "dataset": "pobreza_comunal",

@@ -37,6 +37,7 @@ from src.builders._shared import (  # noqa: E402, F401
     INDICADORES_METADATA_PATH,
     NORMALIZED_DIR,
     PARTIDOS_POLITICOS_METADATA_PATH,
+    PERMISOS_EDIFICACION_METADATA_PATH,
     POBREZA_COMUNAL_METADATA_PATH,
     RESULTADOS_EDUCACIONALES_METADATA_PATH,
     SALUD_METADATA_PATH,
@@ -140,6 +141,7 @@ from src.validation import (
     validate_indicadores_urbanos_siedu,
     validate_partidos_politicos,
     validate_perfil_territorial_comunal,
+    validate_permisos_edificacion,
     validate_pobreza_comunal,
     validate_provincias,
     validate_regiones,
@@ -175,6 +177,7 @@ def _load_inputs():
     partidos_politicos_csv = os.path.join(STAGING_DIR, "partidos_politicos.csv")
     autoridades_electas_csv = os.path.join(STAGING_DIR, "autoridades_electas.csv")
     estadisticas_vitales_csv = os.path.join(STAGING_DIR, "estadisticas_vitales.csv")
+    permisos_edificacion_csv = os.path.join(STAGING_DIR, "permisos_edificacion.csv")
 
     required_staging = (
         comunas_csv,
@@ -266,6 +269,11 @@ def _load_inputs():
     estadisticas_vitales_metadata = (
         load_metadata(ESTADISTICAS_VITALES_METADATA_PATH)
         if os.path.exists(ESTADISTICAS_VITALES_METADATA_PATH)
+        else None
+    )
+    permisos_edificacion_metadata = (
+        load_metadata(PERMISOS_EDIFICACION_METADATA_PATH)
+        if os.path.exists(PERMISOS_EDIFICACION_METADATA_PATH)
         else None
     )
 
@@ -405,6 +413,20 @@ def _load_inputs():
     else:
         log.info("dataset_skipped", dataset="estadisticas_vitales", reason="not_found_in_staging")
 
+    # Permisos de edificación: dataset opcional (nuevo)
+    df_permisos_edificacion = None
+    if os.path.exists(permisos_edificacion_csv) and permisos_edificacion_metadata is not None:
+        df_permisos_edificacion = pl.read_csv(
+            permisos_edificacion_csv, schema_overrides=STAGING_SCHEMAS["permisos_edificacion"]
+        )
+        log.info(
+            "dataset_loaded",
+            dataset="permisos_edificacion",
+            records=df_permisos_edificacion.height,
+        )
+    else:
+        log.info("dataset_skipped", dataset="permisos_edificacion", reason="not_found_in_staging")
+
     df_regiones, df_provincias = derive_geography_layers(df_comunas)
     df_perfil_territorial = build_perfil_territorial_comunal(
         df_comunas,
@@ -435,6 +457,7 @@ def _load_inputs():
         "partidos_politicos": df_partidos_politicos,
         "autoridades_electas": df_autoridades_electas,
         "estadisticas_vitales": df_estadisticas_vitales,
+        "permisos_edificacion": df_permisos_edificacion,
         "regiones": df_regiones,
         "provincias": df_provincias,
         "perfil_territorial": df_perfil_territorial,
@@ -456,6 +479,7 @@ def _load_inputs():
         "partidos_politicos": partidos_politicos_metadata,
         "autoridades_electas": autoridades_electas_metadata,
         "estadisticas_vitales": estadisticas_vitales_metadata,
+        "permisos_edificacion": permisos_edificacion_metadata,
     }
     return dfs, meta, previous_pipeline_metadata
 
@@ -478,6 +502,7 @@ def _compute_validations(dfs, meta):
     df_partidos_politicos = dfs["partidos_politicos"]
     df_autoridades_electas = dfs["autoridades_electas"]
     df_estadisticas_vitales = dfs["estadisticas_vitales"]
+    df_permisos_edificacion = dfs["permisos_edificacion"]
     df_regiones = dfs["regiones"]
     df_provincias = dfs["provincias"]
     df_perfil_territorial = dfs["perfil_territorial"]
@@ -497,6 +522,7 @@ def _compute_validations(dfs, meta):
     partidos_politicos_metadata = meta["partidos_politicos"]
     autoridades_electas_metadata = meta["autoridades_electas"]
     estadisticas_vitales_metadata = meta["estadisticas_vitales"]
+    permisos_edificacion_metadata = meta["permisos_edificacion"]
 
     validations = {
         "regiones": validate_regiones(df_regiones),
@@ -593,6 +619,17 @@ def _compute_validations(dfs, meta):
             if df_estadisticas_vitales is not None
             else {}
         ),
+        **(
+            {
+                "permisos_edificacion": validate_permisos_edificacion(
+                    df_permisos_edificacion,
+                    permisos_edificacion_metadata,
+                    df_comunas["codigo_comuna"].to_list(),
+                )
+            }
+            if df_permisos_edificacion is not None
+            else {}
+        ),
         "perfil_territorial_comunal": validate_perfil_territorial_comunal(
             df_perfil_territorial,
             {
@@ -633,6 +670,7 @@ def _write_data_artifacts(dfs):
     df_partidos_politicos = dfs["partidos_politicos"]
     df_autoridades_electas = dfs["autoridades_electas"]
     df_estadisticas_vitales = dfs["estadisticas_vitales"]
+    df_permisos_edificacion = dfs["permisos_edificacion"]
     df_regiones = dfs["regiones"]
     df_provincias = dfs["provincias"]
     df_perfil_territorial = dfs["perfil_territorial"]
@@ -655,6 +693,8 @@ def _write_data_artifacts(dfs):
         extra_tables["autoridades_electas"] = df_autoridades_electas
     if df_estadisticas_vitales is not None:
         extra_tables["estadisticas_vitales"] = df_estadisticas_vitales
+    if df_permisos_edificacion is not None:
+        extra_tables["permisos_edificacion"] = df_permisos_edificacion
 
     # Convertir tablas extra a pandas UNA sola vez para SQLite y Excel.
     # Empresas tiene ~1.57M filas: la conversión es costosa y no debe duplicarse.

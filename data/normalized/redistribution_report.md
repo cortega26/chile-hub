@@ -1,8 +1,8 @@
 # chile-hub redistribution report
 
-- `generated_at_utc`: `2026-09-14T23:35:14.841893+00:00`
-- `dataset_count`: `20`
-- `ready_count`: `20`
+- `generated_at_utc`: `2026-09-15T00:04:41.910173+00:00`
+- `dataset_count`: `21`
+- `ready_count`: `21`
 - `review_terms_count`: `0`
 - `unknown_count`: `0`
 
@@ -28,6 +28,7 @@
 | `partidos_politicos` | `ready` | CC-BY | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
 | `autoridades_electas` | `ready` | CC-BY | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
 | `estadisticas_vitales` | `ready` | CC BY 4.0 | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
+| `permisos_edificacion` | `ready` | Uso autorizado con cita (MINVU CEDOC) | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
 
 ## regiones
 
@@ -228,3 +229,13 @@
 - `redistribution_ok`: `True`
 - `recommended_action`: Publicable con atribucion y referencia de fuente.
 - `summary`: Anuarios de Estadísticas Vitales del INE (nacimientos y defunciones por comuna). Datos abiertos con atribución requerida.
+
+## permisos_edificacion
+
+- `publishability_status`: `ready`
+- `license`: `Uso autorizado con cita (MINVU CEDOC)`
+- `license_url`: https://centrodeestudios.minvu.gob.cl/repositorio/categoria/permisos-de-edificacion
+- `attribution_required`: `True`
+- `redistribution_ok`: `True`
+- `recommended_action`: Publicable con atribucion y referencia de fuente.
+- `summary`: Estadísticas de permisos de edificación del CEDOC (MINVU). El Centro autoriza el uso de la información citando la fuente.

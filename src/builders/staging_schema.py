@@ -102,6 +102,17 @@ STAGING_SCHEMAS: dict[str, dict[str, type[pl.DataType] | pl.DataType]] = {
         "codigo_comuna": pl.String,
         "cantidad": pl.Int64,
     },
+    "permisos_edificacion": {
+        "anio": pl.Int64,
+        "codigo_region": pl.String,
+        "codigo_comuna": pl.String,
+        "unidades_total": pl.Int64,
+        "superficie_m2_total": pl.Int64,
+        "unidades_casas": pl.Int64,
+        "superficie_m2_casas": pl.Int64,
+        "unidades_departamentos": pl.Int64,
+        "superficie_m2_departamentos": pl.Int64,
+    },
 }
 
 STAGING_DATE_COLUMNS: dict[str, dict[str, str]] = {

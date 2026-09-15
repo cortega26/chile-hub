@@ -499,5 +499,27 @@
     "public_bundle_eligible": true,
     "source_notes": "Un XLSX de anuario definitivo por año (2010 en adelante), tabla 1.2.2-04 por comuna de residencia. Descubrimiento vía endpoints JSON propios del sitio INE (hijosCarpeta/getArchivos). Layouts heterogéneos por año (totales 2010-2020, split por sexo desde 2021; 2016 en archivos separados). Los boletines provisionales no traen grano comunal: solo definitivos.",
     "cadencia": "anual"
+  },
+  {
+    "source_id": "minvu_permisos_edificacion",
+    "dataset": "permisos_edificacion",
+    "source_name": "MINVU — Centro de Estudios de Ciudad y Territorio (CEDOC)",
+    "official_url": "https://centrodeestudios.minvu.gob.cl/repositorio/categoria/permisos-de-edificacion",
+    "access_method": "direct_file",
+    "license_status": "open-attribution",
+    "live_extractor_status": "implemented",
+    "fallback_policy": "allowed_for_dev_blocked_for_publication",
+    "maturity_status": "stable",
+    "live_ready": true,
+    "fallback_allowed": true,
+    "publish_blocking": true,
+    "review_by": "2026-12-31",
+    "stalled_after_days": 90,
+    "owner": "core",
+    "next_action": "Monitorear que el biblionumber 25583 siga resolviendo al XLSX anual vigente.",
+    "publication_track": "stable_publishable",
+    "public_bundle_eligible": true,
+    "source_notes": "XLSX 'Viviendas unidades y superficie según año y comuna' (serie 2002 en adelante, 6 hojas: número/m2 × total/casas/departamentos). Descubrimiento vía biblionumber Koha 25583 en la página del repositorio CEDOC. Ñuble se lista bajo 'Biobío' y 'Ñuble (ex-Biobío)' con series complementarias: el extractor las fusiona. Años marcados (*) y el último de la serie van como provisionales.",
+    "cadencia": "mensual"
   }
 ]

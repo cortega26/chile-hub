@@ -762,5 +762,40 @@
       "excel_sheet": "Estadísticas Vitales"
     },
     "documentation": "docs/datasets/estadisticas_vitales.md"
+  },
+  "permisos_edificacion": {
+    "description": "Viviendas en unidades y superficie (m2) por comuna y año —casas y departamentos— desde las estadísticas de permisos de edificación del CEDOC (MINVU), serie desde 2002.",
+    "join_keys": [
+      "anio",
+      "codigo_comuna"
+    ],
+    "confidence_tier": "Tier A",
+    "extractor": "src/extractors/permisos_edificacion_extractor.py",
+    "expected_record_count": null,
+    "reuse_policy": {
+      "status": "open-attribution",
+      "license": "Uso autorizado con cita (MINVU CEDOC)",
+      "license_url": "https://centrodeestudios.minvu.gob.cl/repositorio/categoria/permisos-de-edificacion",
+      "attribution_required": true,
+      "redistribution_ok": true,
+      "summary": "Estadísticas de permisos de edificación del CEDOC (MINVU). El Centro autoriza el uso de la información citando la fuente."
+    },
+    "freshness_policy": {
+      "max_age_hours": 1080,
+      "label": "mensual"
+    },
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars(\"permisos_edificacion\")\n# Unidades autorizadas por comuna 2023\nunid_2023 = df.filter(pl.col(\"anio\") == 2023).sort(\"unidades_total\", descending=True)",
+      "duckdb": "SELECT anio, codigo_comuna, unidades_total, superficie_m2_total\nFROM 'data/normalized/permisos_edificacion.parquet'\nWHERE anio = 2023 ORDER BY unidades_total DESC LIMIT 10;",
+      "cli": "chile-hub show permisos_edificacion"
+    },
+    "outputs": {
+      "parquet": "data/normalized/permisos_edificacion.parquet",
+      "json": "data/normalized/permisos_edificacion.json",
+      "duckdb_table": "permisos_edificacion",
+      "sqlite_table": "permisos_edificacion",
+      "excel_sheet": "Permisos Edificación"
+    },
+    "documentation": "docs/datasets/permisos_edificacion.md"
   }
 }

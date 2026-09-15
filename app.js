@@ -1043,7 +1043,7 @@ function renderCatalog(bundle) {
         },
         directorios: {
             title: "Directorios Oficiales y Economía",
-            datasets: ["establecimientos_salud", "establecimientos_educacionales", "empresas", "indicadores"]
+            datasets: ["establecimientos_salud", "establecimientos_educacionales", "empresas", "indicadores", "permisos_edificacion"]
         },
         gobierno: {
             title: "Gobierno y Política",

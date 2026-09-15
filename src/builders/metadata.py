@@ -416,6 +416,7 @@ def build_dataset_metadata(dfs, meta):
     df_partidos_politicos = dfs["partidos_politicos"]
     df_autoridades_electas = dfs["autoridades_electas"]
     df_estadisticas_vitales = dfs["estadisticas_vitales"]
+    df_permisos_edificacion = dfs["permisos_edificacion"]
     df_regiones = dfs["regiones"]
     df_provincias = dfs["provincias"]
     df_perfil_territorial = dfs["perfil_territorial"]
@@ -435,6 +436,7 @@ def build_dataset_metadata(dfs, meta):
     partidos_politicos_metadata = meta["partidos_politicos"]
     autoridades_electas_metadata = meta["autoridades_electas"]
     estadisticas_vitales_metadata = meta["estadisticas_vitales"]
+    permisos_edificacion_metadata = meta["permisos_edificacion"]
 
     dataset_metadata = {
         "regiones": {
@@ -786,6 +788,30 @@ def build_dataset_metadata(dfs, meta):
                 }
             }
             if df_estadisticas_vitales is not None and estadisticas_vitales_metadata is not None
+            else {}
+        ),
+        **(
+            {
+                "permisos_edificacion": {
+                    "dataset": "permisos_edificacion",
+                    "source_name": permisos_edificacion_metadata.get("source_name", ""),
+                    "source_url": permisos_edificacion_metadata.get("source_url", ""),
+                    "source_mode": permisos_edificacion_metadata.get("source_mode", "fallback"),
+                    "source_detail": permisos_edificacion_metadata.get("source_detail", ""),
+                    "refreshed_at_utc": permisos_edificacion_metadata.get("refreshed_at_utc", ""),
+                    "record_count": df_permisos_edificacion.height,
+                    "fields": df_permisos_edificacion.columns,
+                    "notes": permisos_edificacion_metadata.get("notes", []),
+                    "reuse_policy": DATASET_CATALOG_CONFIG["permisos_edificacion"]["reuse_policy"],
+                    "freshness": build_freshness(
+                        permisos_edificacion_metadata.get("refreshed_at_utc", ""),
+                        DATASET_CATALOG_CONFIG["permisos_edificacion"]["freshness_policy"][
+                            "max_age_hours"
+                        ],
+                    ),
+                }
+            }
+            if df_permisos_edificacion is not None and permisos_edificacion_metadata is not None
             else {}
         ),
     }

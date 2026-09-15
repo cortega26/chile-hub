@@ -28,6 +28,7 @@ from src.extractors import (
     mineduc_establecimientos_extractor,
     mineduc_resultados_extractor,
     partidos_politicos_extractor,
+    permisos_edificacion_extractor,
     res_extractor,
     salud_extractor,
     siedu_extractor,
@@ -3243,6 +3244,155 @@ class EstadisticasVitalesExtractorTests(unittest.TestCase):
                 ),
             ):
                 result = estadisticas_vitales_extractor.EstadisticasVitalesExtractor().run(
+                    dry_run=True
+                )
+                self.assertEqual(result["status"], "ok")
+                self.assertFalse(staging_csv.exists())
+
+
+class PermisosEdificacionExtractorTests(unittest.TestCase):
+    """Tests unitarios para el extractor de permisos de edificación (MINVU CEDOC)."""
+
+    FAKE_LOOKUP = {
+        "santiago": ("13101", "13", "Santiago"),
+        "puente alto": ("13201", "13", "Puente Alto"),
+        "chillan": ("16101", "16", "Chillán"),
+    }
+
+    def _sheet_rows(self):
+        return [
+            [None, None, None, None],
+            [None, None, None, None],
+            ["Región", "Comuna", 2022, "2023 (*)"],
+            [None, None, None, None],
+            ["Total País ", None, 1000, 900],
+            [None, None, None, None],
+            ["Metropolitana", None, 600, 500],
+            ["Metropolitana", "Santiago", 590, 490],
+            ["Metropolitana", "Puente Alto", 10, 10],
+            ["Biobío", None, 0, 0],
+            ["Ñuble (ex-Biobío)", "Chillán", 50, 0],
+            ["Ñuble", "Chillán", 0, 40],
+            [None, "Notas: (*)", None, None],
+        ]
+
+    def test_dataset_name(self):
+        extractor = permisos_edificacion_extractor.PermisosEdificacionExtractor()
+        self.assertEqual(extractor.dataset_name, "permisos_edificacion")
+
+    def test_normalize_rows_writes_required_schema(self):
+        from src.extractors.permisos_edificacion_extractor import FALLBACK_ROWS, normalize_rows
+
+        df = normalize_rows(FALLBACK_ROWS)
+        required = {
+            "anio",
+            "codigo_region",
+            "codigo_comuna",
+            "nombre_comuna",
+            "unidades_total",
+            "superficie_m2_total",
+            "unidades_casas",
+            "superficie_m2_casas",
+            "unidades_departamentos",
+            "superficie_m2_departamentos",
+            "estado_dato",
+            "fuente",
+        }
+        self.assertTrue(required.issubset(set(df.columns)))
+        self.assertEqual(df["codigo_comuna"].dtype, pl.String)
+        self.assertEqual(df["anio"].dtype, pl.Int64)
+        self.assertEqual(df["unidades_total"].dtype, pl.Int64)
+        self.assertGreater(df.height, 0)
+
+    def test_normalize_empty_rows(self):
+        from src.extractors.permisos_edificacion_extractor import normalize_rows
+
+        df = normalize_rows([])
+        self.assertEqual(df.height, 0)
+        self.assertIn("unidades_total", df.columns)
+
+    def test_sheet_target_mapping(self):
+        from src.extractors.permisos_edificacion_extractor import _sheet_target
+
+        self.assertEqual(_sheet_target("número_total"), "unidades_total")
+        self.assertEqual(_sheet_target("m2_total"), "superficie_m2_total")
+        self.assertEqual(_sheet_target("número_casas"), "unidades_casas")
+        self.assertEqual(_sheet_target("m2_casas"), "superficie_m2_casas")
+        self.assertEqual(_sheet_target("número_departamentos"), "unidades_departamentos")
+        self.assertEqual(_sheet_target("m2_departamentos"), "superficie_m2_departamentos")
+        self.assertIsNone(_sheet_target("Serie Nacimientos"))
+
+    def test_year_from_header_marks_star_provisional(self):
+        from src.extractors.permisos_edificacion_extractor import _year_from_header
+
+        self.assertEqual(_year_from_header(2022), (2022, False))
+        self.assertEqual(_year_from_header("2024 (*)"), (2024, True))
+        # (***) es nota metodológica, no provisionalidad
+        self.assertEqual(_year_from_header("2018 (***)"), (2018, False))
+        self.assertEqual(_year_from_header(None), (None, False))
+
+    def test_parse_sheet_merges_nuble_split_sections(self):
+        """Las secciones 'Ñuble (ex-Biobío)' y 'Ñuble' traen series
+        complementarias (corte 2018): se fusionan sumando por comuna."""
+        from src.extractors.permisos_edificacion_extractor import _parse_sheet
+
+        valores, totales, provisionales = _parse_sheet(self._sheet_rows(), "unidades_total")
+        self.assertEqual(totales, {2022: 1000, 2023: 900})
+        self.assertEqual(provisionales, [2023])
+        # Chillán fusionado: 50 (ex-Biobío, 2022) + 40 (Ñuble, 2023)
+        self.assertEqual(valores["chillan"], {2022: 50, 2023: 40})
+        self.assertEqual(valores["santiago"], {2022: 590, 2023: 490})
+        # Regiones y notas no entran a valores
+        self.assertNotIn("metropolitana", valores)
+        self.assertNotIn("notas: (*)", valores)
+
+    def test_discover_resolves_biblionumber_link(self):
+        """El descubrimiento extrae el `uri` del link con biblionumber=25583."""
+        from src.extractors import permisos_edificacion_extractor as pe
+
+        html = (
+            '<a href="https://catalogo.minvu.cl/cgi-bin/koha/tracklinks.pl'
+            '?uri=https%3A%2F%2Fcatalogo.minvu.cl%2Ff.xlsx&amp;biblionumber=25583">DL</a>'
+        )
+        fake_response = MagicMock()
+        fake_response.text = html
+        fake_response.__enter__.return_value = fake_response
+        with patch.object(pe, "fetch_with_retry", return_value=fake_response):
+            url, metodo = pe._discover_xlsx_url()
+        self.assertEqual(url, "https://catalogo.minvu.cl/f.xlsx")
+        self.assertEqual(metodo, "repositorio-biblionumber")
+
+    def test_discover_falls_back_to_hardcoded_url(self):
+        """Si el repositorio no responde, se usa la URL directa conocida."""
+        from requests import RequestException
+
+        pe = permisos_edificacion_extractor
+        with patch.object(pe, "fetch_with_retry", side_effect=RequestException("down")):
+            url, metodo = pe._discover_xlsx_url()
+        self.assertEqual(url, pe.HARDCODED_XLSX_URL)
+        self.assertTrue(metodo.startswith("directa-conocida"))
+
+    def test_run_dry_run_returns_validation_without_writing(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            staging_csv = Path(tmpdir) / "permisos_edificacion.csv"
+            metadata_path = Path(tmpdir) / "permisos_edificacion.metadata.json"
+            with (
+                patch.object(permisos_edificacion_extractor, "STAGING_CSV_PATH", str(staging_csv)),
+                patch.object(permisos_edificacion_extractor, "METADATA_PATH", str(metadata_path)),
+                patch.object(permisos_edificacion_extractor, "RAW_DIR", tmpdir),
+                patch.object(permisos_edificacion_extractor, "STAGING_DIR", tmpdir),
+                patch.object(
+                    permisos_edificacion_extractor,
+                    "fetch_data",
+                    return_value=(
+                        permisos_edificacion_extractor.FALLBACK_ROWS,
+                        "fallback",
+                        permisos_edificacion_extractor.REPOSITORIO_URL,
+                        ["test"],
+                    ),
+                ),
+            ):
+                result = permisos_edificacion_extractor.PermisosEdificacionExtractor().run(
                     dry_run=True
                 )
                 self.assertEqual(result["status"], "ok")

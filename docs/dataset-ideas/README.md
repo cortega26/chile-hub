@@ -29,3 +29,4 @@ decision.
 | [Apoyos formales para emprendedores](entrepreneurship-support-programs.md) | needs-research | Requiere evaluar si Chile Emprende u otra fuente expone datos estructurados. |
 | [Resultados electorales, autoridades electas y partidos](electoral-results-authorities-parties.md) | needs-research | Requiere separar datos agregados publicables de datos personales electorales excluidos. |
 | [Estadísticas vitales comunales (nacimientos/defunciones)](estadisticas-vitales-comunal.md) | accepted | Implementado como `estadisticas_vitales` (anuarios INE 2010→, cobertura 346/346). |
+| [Permisos de edificación por comuna (MINVU CEDOC)](permisos-edificacion-minvu.md) | accepted | Implementado como `permisos_edificacion` (serie 2002→, cobertura 346/346). |
