@@ -43,7 +43,7 @@
 - [ ] 095 Floor Python `>=3.11` + despineo pandas + matriz CI (P1/M, —)
 - [ ] 096 `duckdb` query acotado + pip-audit expiry + bandit a extractors (P1/S-M, —)
 - [ ] 097 Docs quirúrgicos: CLAUDE counts, badge capas, §5 como puntero (P1/S, —)
-- [ ] 098 Docs arquitectura: SOURCE índice, CLAUDE→30 líneas, anti-drift extendido (P2/M, tras 097)
+- [ ] 098 Docs arquitectura: SOURCE índice, CLAUDE→30 líneas, anti-drift extendido (P2/M, tras 097) + fix regex `check_agents_sync.py:54` (aceptar `\d{4}` sin espacio; hoy `1034` pelado no matchea y atribuye el número vecino — hallado en Wave 2, workaround: formato `1 034`)
 - [ ] 099 Deuda media: sinim-shared + salud canónica + `sys.path`→`_paths` (P2/M, tras 091)
 - [ ] 100 Spike Polars `2.0rc1` en rama + golden-diff (P2/M, tras 092; sin prod)
 - [ ] Wave 6: terminar 077→079 y luego split god objects por dominio (L, tras Wave 2)
