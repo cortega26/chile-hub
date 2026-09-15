@@ -6,19 +6,26 @@ plataforma, en CI. Este script NUNCA corre en la máquina del usuario ni se
 empaqueta con la librería instalada — cero telemetría en el artefacto
 distribuido.
 
-Cada fuente degrada con gracia: si PyPI o GitHub fallan (red, rate-limit, 404
-porque el paquete aún no tiene descargas), el script no aborta — usa None/0
-para esa fuente y sigue. La señal es informativa, no un gate.
+Parcialmente tolerante a fallos: si UNA fuente falla (red, rate-limit, 404
+porque el paquete aún no tiene descargas), usa None/0 para esa fuente y sigue.
+Pero si AMBAS fallan, sale con código 1 SIN escribir archivos — commitear
+nulls sobre datos reales sería perder la señal en silencio (el workflow
+semanal salta el commit cuando el step falla). La señal es informativa,
+no un gate; el silencio, en cambio, sí se reporta.
 
 Uso:
   python scripts/fetch_adoption_stats.py                             # modo online
   python scripts/fetch_adoption_stats.py --offline PATH_A_FIXTURE.json  # modo offline
+
+Códigos de salida: 0 con al menos una fuente viva (archivos escritos),
+1 si ambas fallan (nada escrito), 2 en error de uso/args.
 """
 
 import argparse
 import json
 import os
 import sys
+import time
 import urllib.error
 import urllib.request
 from datetime import UTC, datetime
@@ -31,22 +38,38 @@ BADGE_PATH = ROOT_DIR / "data" / "normalized" / "adoption_badge.json"
 PYPI_STATS_URL = "https://pypistats.org/api/packages/chile-hub/recent"
 GITHUB_RELEASES_URL = "https://api.github.com/repos/cortega26/chile-hub/releases"
 REQUEST_TIMEOUT_SECONDS = 10
+REQUEST_MAX_ATTEMPTS = 3
+# User-Agent identificable con contacto: varios WAFs (incluido el de
+# pypistats.org) bloquean el default "Python-urllib/3.x", sobre todo desde
+# IPs de CI compartidas. Sin esto, el job semanal de Actions recibía 403 y
+# commiteaba nulls semana tras semana sin que nadie lo notara.
+USER_AGENT = "chile-hub-adoption-stats/1.0 (+https://github.com/cortega26/chile-hub)"
 
 
 def _http_get_json(url: str, headers: dict | None = None) -> dict | list | None:
     """Hace GET a `url` y parsea el JSON de respuesta.
 
-    Degrada con gracia: cualquier error de red, HTTP o de parseo devuelve
-    `None` en vez de propagar la excepción (invariante de este script: una
-    fuente caída no debe abortar la corrida).
+    Reintenta transitorios (hasta REQUEST_MAX_ATTEMPTS con backoff) y degrada
+    con gracia: si todo falla devuelve `None` en vez de propagar la excepción.
     """
-    request = urllib.request.Request(url, headers=headers or {})
-    try:
-        with urllib.request.urlopen(request, timeout=REQUEST_TIMEOUT_SECONDS) as response:
-            return json.loads(response.read().decode("utf-8"))
-    except (urllib.error.URLError, OSError, ValueError) as exc:
-        print(f"WARN: fallo al leer {url}: {exc}", file=sys.stderr)
-        return None
+    merged = {"User-Agent": USER_AGENT, "Accept": "application/json"}
+    merged.update(headers or {})
+    request = urllib.request.Request(url, headers=merged)
+    last_error: Exception | None = None
+    for attempt in range(1, REQUEST_MAX_ATTEMPTS + 1):
+        try:
+            with urllib.request.urlopen(request, timeout=REQUEST_TIMEOUT_SECONDS) as response:
+                return json.loads(response.read().decode("utf-8"))
+        except (urllib.error.URLError, OSError, ValueError) as exc:
+            last_error = exc
+            print(
+                f"WARN: intento {attempt}/{REQUEST_MAX_ATTEMPTS} falló para {url}: {exc}",
+                file=sys.stderr,
+            )
+            if attempt < REQUEST_MAX_ATTEMPTS:
+                time.sleep(2 ** (attempt - 1))
+    print(f"WARN: agotados los reintentos para {url}: {last_error}", file=sys.stderr)
+    return None
 
 
 def fetch_pypi_recent() -> dict | None:
@@ -118,7 +141,7 @@ def load_offline_fixture(path: Path) -> tuple[dict | None, list | None]:
     return fixture.get("pypi_recent"), fixture.get("github_releases")
 
 
-def main() -> None:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--offline",
@@ -128,13 +151,21 @@ def main() -> None:
             "(modo reproducible, sin red, para tests y CI)."
         ),
     )
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     if args.offline:
         pypi_recent, github_releases = load_offline_fixture(Path(args.offline))
     else:
         pypi_recent = fetch_pypi_recent()
         github_releases = fetch_github_releases()
+
+    if pypi_recent is None and github_releases is None:
+        print(
+            "ERROR: ambas fuentes de adopción fallaron; no se escribe nada "
+            "(ver WARNs arriba). El workflow semanal salta el commit en este caso.",
+            file=sys.stderr,
+        )
+        return 1
 
     pypi_stats = parse_pypi_stats(pypi_recent)
     github_total = sum_github_downloads(github_releases)
@@ -149,7 +180,8 @@ def main() -> None:
         f"Señal de adopción generada: {ADOPTION_PATH} y {BADGE_PATH} "
         f"→ {badge['message']} instalaciones/mes"
     )
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

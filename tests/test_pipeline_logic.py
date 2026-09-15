@@ -4094,6 +4094,75 @@ class AdoptionStatsTests(unittest.TestCase):
         )
         self.assertEqual(github_total, 567)
 
+    def test_adoption_main_fails_closed_without_writing_when_both_sources_fail(self):
+        """Si ambas fuentes fallan no se escribe nada (exit 1): commitear
+        nulls sobre datos reales pierde la señal en silencio — el modo en que
+        el job semanal produjo nulls semana tras semana."""
+        import scripts.fetch_adoption_stats as adoption_mod
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            adoption_path = Path(tmpdir) / "adoption.json"
+            badge_path = Path(tmpdir) / "adoption_badge.json"
+            with (
+                patch.object(adoption_mod, "ADOPTION_PATH", adoption_path),
+                patch.object(adoption_mod, "BADGE_PATH", badge_path),
+                patch.object(adoption_mod, "fetch_pypi_recent", return_value=None),
+                patch.object(adoption_mod, "fetch_github_releases", return_value=None),
+            ):
+                self.assertEqual(adoption_mod.main([]), 1)
+            self.assertFalse(adoption_path.exists())
+            self.assertFalse(badge_path.exists())
+
+    def test_adoption_main_writes_partial_signal_when_one_source_fails(self):
+        """Con una fuente viva se escribe igual (exit 0): la degradación
+        parcial sigue siendo informativa."""
+        import scripts.fetch_adoption_stats as adoption_mod
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            adoption_path = Path(tmpdir) / "adoption.json"
+            badge_path = Path(tmpdir) / "adoption_badge.json"
+            with (
+                patch.object(adoption_mod, "ADOPTION_PATH", adoption_path),
+                patch.object(adoption_mod, "BADGE_PATH", badge_path),
+                patch.object(adoption_mod, "fetch_pypi_recent", return_value=None),
+                patch.object(
+                    adoption_mod,
+                    "fetch_github_releases",
+                    return_value=[{"assets": [{"download_count": 7}]}],
+                ),
+            ):
+                self.assertEqual(adoption_mod.main([]), 0)
+            payload = json.loads(adoption_path.read_text(encoding="utf-8"))
+            self.assertIsNone(payload["pypi"]["last_month"])
+            self.assertEqual(payload["github_releases"], {"total_downloads": 7})
+
+    def test_adoption_http_sends_identifiable_user_agent(self):
+        """Varios WAFs bloquean el default 'Python-urllib/3.x' (causa raíz de
+        los nulls semanales desde IPs de CI): el script debe identificarse."""
+        import urllib.request
+
+        import scripts.fetch_adoption_stats as adoption_mod
+
+        seen = {}
+
+        class FakeResponse:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                return False
+
+            def read(self):
+                return b'{"ok": true}'
+
+        def fake_urlopen(request, timeout=None):
+            seen["ua"] = request.get_header("User-agent")
+            return FakeResponse()
+
+        with patch.object(urllib.request, "urlopen", side_effect=fake_urlopen):
+            self.assertEqual(adoption_mod._http_get_json("https://example.invalid/x"), {"ok": True})
+        self.assertIn("chile-hub", seen["ua"])
+
 
 class ExcelGuardTests(unittest.TestCase):
     """Tests para el guardia de omisión de tablas masivas en Excel."""
