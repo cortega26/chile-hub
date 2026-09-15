@@ -146,6 +146,42 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 | 084 | [Promover perfil_territorial_comunal al bundle estable](084-promote-perfil-territorial.md) | P3 (decisión) | S-M | MED | 070, 071 | DONE (2026-08-12) |
 | 085 | [ADR multi-fuente para el override de IPC](085-adr-multi-source-ipc-override.md) | P3 | M | LOW | 069, 075 | DONE (2026-08-12) |
 
+> **Auditoría 2026-09-15 (commit `3315eb6`)**: planes **086–100**. Cuatro
+> subagentes read-only por categoría (correctness+perf, deuda+tests,
+> deps+tooling+security, docs+direction) + vet del advisor contra el código
+> (líneas medidas con `wc -l`/`grep`, checker corrido en vivo) + web (Polars
+> 2.0 RC1 02-sep-2026, Python 3.10 EOL 31-oct-2026, DuckDB 1.5.6/2.0).
+> Decisiones del mantenedor: alcance todos los net-positive; dropear 3.10;
+> spike Polars 2.0 solo en rama; consolidación agresiva de docs. Tracking
+> vivo en `ROADMAP.md` (waves + scoreboard + backlog + goto). Veteados y
+> rechazados en `ROADMAP.md` ("Rechazados": click-dev-vs-scraping,
+> shapely/geo duplicado, lock drift, puntos_interes exenta, sin APIs
+> deprecadas en uso, `build_freshness` ya delega).
+
+| 086 | [Snapshot SINCA viejo deja de etiquetarse `live`](086-sinca-snapshot-mode.md) | P1 | S | LOW | — | TODO |
+| 087 | [`sync_landing_metadata` falla ruidoso en vez de `print`](087-landing-fails-loud.md) | P1 | S | LOW | — | TODO |
+| 088 | [Cobertura catálogo→validación: gate + exenciones explícitas](088-catalog-validation-coverage.md) | P1 | S | LOW | — | TODO |
+| 089 | [bcentral: fechas a UTC y throttle real](089-bcentral-tz-throttle.md) | P1 | S | LOW | — | TODO |
+| 090 | [Una sola conversión `to_pandas()` + descarte pre-conversión](090-single-pandas-conversion.md) | P1 | S | LOW | — | TODO |
+| 091 | [Opcionales ruidosos + fallback sintético strict](091-optional-datasets-strict.md) | P1 | M | MED | — | TODO |
+| 092 | [Paralelizar formatos + `indicadores_hoy` = última fecha](092-parallel-formats-hoy-payload.md) | P2 | M | MED | 090 | TODO |
+| 093 | [Scans O(K·N)→`partition_by` + allowlist única + cache acotado](093-validation-scans-cache.md) | P2 | M | LOW | — | TODO |
+| 094 | [Toolchain única + targets locales](094-dx-single-toolchain.md) | P1 | S | LOW | — | TODO |
+| 095 | [Floor Python `>=3.11` + despineo pandas](095-python-311-floor.md) | P1 | M | LOW | — | TODO |
+| 096 | [`duckdb` acotado + pip-audit expiry + bandit a extractors](096-deps-alignment-bandit.md) | P1 | S-M | LOW-MED | — | TODO |
+| 097 | [Docs quirúrgicos: counts, badge, §5 como puntero](097-docs-surgical-fixes.md) | P1 | S | LOW | — | TODO |
+| 098 | [Arquitectura docs + anti-drift extendido](098-docs-architecture.md) | P2 | M | MED | 097 | TODO |
+| 099 | [Deuda media: sinim-shared + salud canónica + `_paths`](099-shared-debt.md) | P2 | M | MED | 091 | TODO |
+| 100 | [Spike Polars `2.0rc1` en rama (sin prod)](100-polars2-spike.md) | P2 | M | MED | 092 | TODO |
+
+## Dependencias 086–100 (ver `ROADMAP.md` para el grafo completo)
+
+**Wave 1 (P1/S, paralelo):** 086, 087, 088, 089, 090.
+**Wave 2 (P1-P2/M):** 091, 093 (paralelas); 092 tras 090.
+**Wave 3 (deps/tooling):** 094, 095, 096 (paralelas; 094 coordina targets con 096).
+**Wave 4 (docs):** 097 → 098. **Wave 5:** 099 tras 091; 100 tras 092, rama evidencia-only.
+**Wave 6 (L):** terminar 077→079 primero; split god objects solo después.
+
 ## Dependencias y orden recomendado
 
 **Lote 1 (bugs confirmados en producción — P1):**
