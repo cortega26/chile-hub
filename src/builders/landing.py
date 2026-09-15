@@ -188,4 +188,9 @@ def sync_landing_metadata(public_site_url, version=None):
                     f.write(new_content)
                 print(f"Sincronización Landing: app.js actualizado a {public_data_base}")
     except Exception as e:
+        # Falla ruidoso (Plan 087, AGENTS.md §4.2): un build verde con la
+        # landing a medio sincronizar abortaba el publish 24h después en el
+        # gate schedule. El caller (catalog.write_pipeline_metadata) no
+        # captura, así que esto aborta el build.
         print(f"Advertencia: No se pudo actualizar la landing: {e}")
+        raise

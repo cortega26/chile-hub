@@ -3437,6 +3437,21 @@ class SyncLandingMetadataTests(unittest.TestCase):
             with patch.object(landing, "ROOT_DIR", tmpdir):
                 landing.sync_landing_metadata("https://example.cl/chile-hub/")
 
+    def test_sync_landing_metadata_io_failure_raises_loud(self):
+        """Plan 087 (AGENTS.md §4.2): un fallo de E/S durante el sync debe
+        abortar con raise, no quedarse en un print — un build verde con la
+        landing a medias abortaba el publish diario 24h después."""
+        from src.builders import landing
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            self._write_fixtures(tmpdir)
+            with (
+                patch.object(landing, "ROOT_DIR", tmpdir),
+                patch("builtins.open", side_effect=OSError("disco de solo lectura")),
+            ):
+                with self.assertRaises(OSError):
+                    landing.sync_landing_metadata("https://example.cl/chile-hub/")
+
 
 class CheckLandingSyncTests(unittest.TestCase):
     """Tests para scripts/check_landing_sync.py, el gate que corre en cada
