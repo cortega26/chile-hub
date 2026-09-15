@@ -7,7 +7,7 @@ name = "chile-hub"
 version = "1.36.0"
 description = "Datos públicos de Chile curados, normalizados y validados: geografía, demografía, economía, salud, educación, finanzas municipales, indicadores urbanos y distritos electorales. Listos para consumir en una línea de código con Polars, DuckDB, SQLite y Excel."
 readme = "README.md"
-requires-python = ">=3.10,<3.15"
+requires-python = ">=3.11,<3.15"
 license = "MIT"
 authors = [
     { name = "Carlos Ortega" },
@@ -26,7 +26,6 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -46,7 +45,7 @@ dependencies = [
 pipeline = [
     "duckdb==1.5.5",
     "pyarrow>=24.0.0",
-    "pandas==3.0.3; python_version >= '3.11'",
+    "pandas==3.0.3",
     "xlsxwriter==3.2.9",
     "curl_cffi==0.16.3",
     "openpyxl==3.1.5",
@@ -169,7 +168,7 @@ public_site_url = "https://tooltician.com/chile-hub/"
 
 [tool.ruff]
 line-length = 100
-target-version = "py310"
+target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "W", "F", "I"]
@@ -212,7 +211,7 @@ exclude_also = [
 ]
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.11"
 files = [
     "src/chile_hub",
     "src/extractors",
