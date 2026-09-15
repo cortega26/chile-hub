@@ -12,6 +12,35 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.35.0 - 2026-09-15
+
+### Corregido
+
+- **bcentral**: Fechas UTC y throttle por submits espaciados
+  ([`fbddeaa`](https://github.com/cortega26/chile-hub/commit/fbddeaad70c183aefb260a8b5cbca60dbb54e230))
+
+- **calidad-aire**: Snapshot SINCA se reporta fallback, no live
+  ([`2522d7d`](https://github.com/cortega26/chile-hub/commit/2522d7d79c076cbea11fb2b22f60460f176d744d))
+
+- **landing**: Sync_landing_metadata falla ruidoso en vez de print
+  ([`b751717`](https://github.com/cortega26/chile-hub/commit/b751717b62bfce4aa31a7c717fb92a0119ff844c))
+
+### Documentación
+
+- **wave-1**: Marca 086-090 DONE con commits y scoreboard
+  ([`d9f0e95`](https://github.com/cortega26/chile-hub/commit/d9f0e9534a561ddfaf93fffb14543c8bbdf79c27))
+
+### Agregado
+
+- **gates**: Cobertura catalogo-validacion con exenciones explicitas
+  ([`48a60be`](https://github.com/cortega26/chile-hub/commit/48a60be51de7a95fca6e2721f9363f2299f47cb7))
+
+### Mejorado
+
+- **build**: Una sola conversion to_pandas y skip pre-conversion
+  ([`62143ac`](https://github.com/cortega26/chile-hub/commit/62143ac23f11aa6cf937311e8b7dcda5dd31d0d9))
+
+
 ## 1.34.2 - 2026-09-15
 
 ### Corregido
