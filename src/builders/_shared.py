@@ -38,6 +38,7 @@ PARTIDOS_POLITICOS_METADATA_PATH = os.path.join(STAGING_DIR, "partidos_politicos
 AUTORIDADES_ELECTAS_METADATA_PATH = os.path.join(STAGING_DIR, "autoridades_electas.metadata.json")
 ESTADISTICAS_VITALES_METADATA_PATH = os.path.join(STAGING_DIR, "estadisticas_vitales.metadata.json")
 PERMISOS_EDIFICACION_METADATA_PATH = os.path.join(STAGING_DIR, "permisos_edificacion.metadata.json")
+CALIDAD_AIRE_METADATA_PATH = os.path.join(STAGING_DIR, "calidad_aire.metadata.json")
 # Valores estructuralmente válidos de source_mode en cualquier reporte generado.
 # "monthly" cubre datasets de cadencia mensual con extractor live real (p. ej.
 # finanzas_municipales vía sinim_finanzas_live_extractor.py + Monthly Scrape

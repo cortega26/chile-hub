@@ -20,6 +20,7 @@ from src.extractors import (
     autoridades_electas_extractor,
     autoridades_locales_extractor,
     bcentral_extractor,
+    calidad_aire_extractor,
     censo_extractor,
     censo_hogares_viviendas_extractor,
     electoral_extractor,
@@ -3506,6 +3507,135 @@ class PermisosEdificacionExtractorTests(unittest.TestCase):
                 result = permisos_edificacion_extractor.PermisosEdificacionExtractor().run(
                     dry_run=True
                 )
+                self.assertEqual(result["status"], "ok")
+                self.assertFalse(staging_csv.exists())
+
+
+class CalidadAireExtractorTests(unittest.TestCase):
+    """Tests unitarios para el extractor de calidad del aire (SINCA)."""
+
+    FAKE_LOOKUP = {
+        "quilicura": ("13144", "13", "Quilicura"),
+        "santiago": ("13101", "13", "Santiago"),
+    }
+
+    def _serie(self, code, puntos):
+        return {
+            "code": code,
+            "name": "MP-2,5" if code == "PM25" else code,
+            "info": {"rows": [{"c": [{"v": hora}, {"v": valor}]} for hora, valor in puntos]},
+        }
+
+    def _payload(self):
+        return [
+            {
+                "key": "271",
+                "nombre": "Quilicura",
+                "comuna": "Quilicura",
+                "region": "Región Metropolitana",
+                "latitud": -33.36,
+                "longitud": -70.73,
+                "realtime": [
+                    self._serie(
+                        "PM25",
+                        [("2026-09-14 22:00", 10.0), ("2026-09-14 23:00", 20.0)],
+                    ),
+                    self._serie("XXXX", [("2026-09-14 22:00", 1.0)]),
+                ],
+            },
+            {
+                "key": "999",
+                "nombre": "Sin Comuna",
+                "comuna": "Comuna Inexistente",
+                "region": "Región Metropolitana",
+                "latitud": None,
+                "longitud": None,
+                "realtime": [self._serie("PM25", [("2026-09-14 22:00", 5.0)])],
+            },
+        ]
+
+    def test_dataset_name(self):
+        extractor = calidad_aire_extractor.CalidadAireExtractor()
+        self.assertEqual(extractor.dataset_name, "calidad_aire")
+
+    def test_normalize_rows_writes_required_schema(self):
+        from src.extractors.calidad_aire_extractor import FALLBACK_ROWS, normalize_rows
+
+        df = normalize_rows(FALLBACK_ROWS)
+        required = {
+            "fecha",
+            "id_estacion",
+            "codigo_comuna",
+            "codigo_contaminante",
+            "valor_promedio_diario",
+            "valor_max_horario",
+            "horas_validas",
+            "estado_dato",
+        }
+        self.assertTrue(required.issubset(set(df.columns)))
+        self.assertEqual(df["codigo_comuna"].dtype, pl.String)
+        self.assertEqual(df["valor_promedio_diario"].dtype, pl.Float64)
+        self.assertEqual(df["horas_validas"].dtype, pl.Int64)
+        self.assertGreater(df.height, 0)
+
+    def test_normalize_empty_rows(self):
+        from src.extractors.calidad_aire_extractor import normalize_rows
+
+        df = normalize_rows([])
+        self.assertEqual(df.height, 0)
+        self.assertIn("valor_promedio_diario", df.columns)
+
+    def test_parse_listado_aggregates_daily_and_maps_comuna(self):
+        """Agrega 24h a promedio+máximo, mapea comuna a CUT, omite códigos
+        desconocidos y estaciones sin match (con nota)."""
+        from src.extractors.calidad_aire_extractor import _parse_listado
+
+        rows, notas, _ = _parse_listado(
+            self._payload(), self.FAKE_LOOKUP, "http://ejemplo", "2026-09-15", "2026-09-15"
+        )
+        # Solo Quilicura/PM25 aporta (código XXXX se omite, Sin Comuna sin match)
+        self.assertEqual(len(rows), 1)
+        row = rows[0]
+        self.assertEqual(row["codigo_comuna"], "13144")
+        self.assertEqual(row["codigo_contaminante"], "mp25")
+        self.assertEqual(row["valor_promedio_diario"], 15.0)
+        self.assertEqual(row["valor_max_horario"], 20.0)
+        self.assertEqual(row["horas_validas"], 2)
+        self.assertEqual(row["estado_dato"], "definitivo")
+        self.assertTrue(any("Sin Comuna" in n for n in notas))
+
+    def test_parse_realtime_series_skips_empty_values(self):
+        from src.extractors.calidad_aire_extractor import _parse_realtime_series
+
+        canon, puntos = _parse_realtime_series(
+            self._serie("PM25", [("2026-09-14 22:00", None), ("2026-09-14 23:00", 7.5)])
+        )
+        self.assertEqual(canon, "mp25")
+        self.assertEqual(puntos, [("2026-09-14 23:00", 7.5)])
+        canon, puntos = _parse_realtime_series(self._serie("ZZZZ", []))
+        self.assertEqual((canon, puntos), ("", []))
+
+    def test_run_dry_run_returns_validation_without_writing(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            staging_csv = Path(tmpdir) / "calidad_aire.csv"
+            metadata_path = Path(tmpdir) / "calidad_aire.metadata.json"
+            with (
+                patch.object(calidad_aire_extractor, "STAGING_CSV_PATH", str(staging_csv)),
+                patch.object(calidad_aire_extractor, "METADATA_PATH", str(metadata_path)),
+                patch.object(calidad_aire_extractor, "RAW_DIR", tmpdir),
+                patch.object(calidad_aire_extractor, "STAGING_DIR", tmpdir),
+                patch.object(
+                    calidad_aire_extractor,
+                    "fetch_data",
+                    return_value=(
+                        calidad_aire_extractor.FALLBACK_ROWS,
+                        "fallback",
+                        calidad_aire_extractor.LISTADO_URL,
+                        ["test"],
+                    ),
+                ),
+            ):
+                result = calidad_aire_extractor.CalidadAireExtractor().run(dry_run=True)
                 self.assertEqual(result["status"], "ok")
                 self.assertFalse(staging_csv.exists())
 

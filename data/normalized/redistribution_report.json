@@ -1,7 +1,7 @@
 {
-  "generated_at_utc": "2026-09-15T00:04:41.910173+00:00",
-  "dataset_count": 21,
-  "ready_count": 21,
+  "generated_at_utc": "2026-09-15T01:20:22.166676+00:00",
+  "dataset_count": 22,
+  "ready_count": 22,
   "review_terms_count": 0,
   "unknown_count": 0,
   "datasets": [
@@ -256,6 +256,18 @@
       "summary": "Estadísticas de permisos de edificación del CEDOC (MINVU). El Centro autoriza el uso de la información citando la fuente.",
       "recommended_action": "Publicable con atribucion y referencia de fuente.",
       "documentation": "docs/datasets/permisos_edificacion.md"
+    },
+    {
+      "dataset": "calidad_aire",
+      "publishability_status": "ready",
+      "license": "Datos públicos MMA; sin licencia explícita, citar fuente oficial",
+      "license_url": "https://sinca.mma.gob.cl/",
+      "reuse_status": "public-api-review-terms",
+      "attribution_required": true,
+      "redistribution_ok": true,
+      "summary": "Mediciones de calidad del aire del SINCA (MMA), API JSON pública. Organismo público chileno sin restricción explícita de reúso; citar fuente oficial.",
+      "recommended_action": "Publicable con atribucion y referencia de fuente.",
+      "documentation": "docs/datasets/calidad_aire.md"
     }
   ]
 }

@@ -1,13 +1,14 @@
 # chile-hub — Calidad de datasets
 
-- `generated_at_utc`: `2026-09-15T00:04:41.910173+00:00`
-- `dataset_count`: `21`
-- `average_score`: `94.0`
-- `grade_distribution`: A=18, B=3, C=0, D=0, F=0
+- `generated_at_utc`: `2026-09-15T01:20:22.166676+00:00`
+- `dataset_count`: `22`
+- `average_score`: `93.6`
+- `grade_distribution`: A=18, B=4, C=0, D=0, F=0
 
 | Dataset | Nota | Valid | Contrato | Madurez | Frescura | Cobert | Reúso | Bloqueadores |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | :--- |
 | `autoridades_electas` | **A** (100.0) | 100 | 100 | 100 | 100 | 100 | 100 | — |
+| `calidad_aire` | **B** (85.0) | 100 | 100 | 100 | 100 | 0 | 50 | Cobertura not_applicable; Reutilización: public-api-review-terms |
 | `censo_comunal` | **A** (100.0) | 100 | 100 | 100 | 100 | 100 | 100 | — |
 | `censo_hogares_viviendas` | **A** (100.0) | 100 | 100 | 100 | 100 | 100 | 100 | — |
 | `comunas` | **A** (100.0) | 100 | 100 | 100 | 100 | 100 | 100 | — |

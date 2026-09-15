@@ -65,6 +65,7 @@ from src.validation import (
     _negative_numeric_count,
     _percentage_out_of_bounds_count,
     _unknown_codes,
+    validate_calidad_aire,
     validate_censo_comunal,
     validate_censo_hogares_viviendas,
     validate_comunas,
@@ -1480,6 +1481,57 @@ class ValidatorTests(unittest.TestCase):
         self.assertEqual(df["codigo_region"].dtype, pl.String)
         self.assertTrue((df["codigo_region"].str.len_chars() == 2).all())
 
+    def test_validate_calidad_aire_rejects_empty_and_duplicate_keys(self):
+        cols = {
+            "fecha": pl.String,
+            "id_estacion": pl.String,
+            "nombre_estacion": pl.String,
+            "codigo_region": pl.String,
+            "codigo_comuna": pl.String,
+            "nombre_comuna": pl.String,
+            "codigo_contaminante": pl.String,
+            "nombre_contaminante": pl.String,
+            "unidad": pl.String,
+            "valor_promedio_diario": pl.Float64,
+            "valor_max_horario": pl.Float64,
+            "horas_validas": pl.Int64,
+            "estado_dato": pl.String,
+            "fuente": pl.String,
+            "url_fuente": pl.String,
+            "fecha_fuente": pl.String,
+        }
+        empty = pl.DataFrame(schema=cols)
+        row = {
+            "fecha": "2026-09-14",
+            "id_estacion": "271",
+            "nombre_estacion": "Quilicura",
+            "codigo_region": "13",
+            "codigo_comuna": "13144",
+            "nombre_comuna": "Quilicura",
+            "codigo_contaminante": "mp25",
+            "nombre_contaminante": "MP 2,5",
+            "unidad": "ug/m3",
+            "valor_promedio_diario": 18.4,
+            "valor_max_horario": 42.0,
+            "horas_validas": 24,
+            "estado_dato": "definitivo",
+            "fuente": "SINCA",
+            "url_fuente": "https://example.com",
+            "fecha_fuente": "2026-09-15",
+        }
+        duplicate = pl.DataFrame([row, row], schema=cols)
+        self.assertEqual(validate_calidad_aire(empty)["status"], "error")
+        result = validate_calidad_aire(duplicate)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("duplicate" in e for e in result["errors"]))
+
+    def test_calidad_aire_cut_codes_are_fixed_width_strings(self):
+        df = self._load_parquet("calidad_aire")
+        self.assertEqual(df["codigo_comuna"].dtype, pl.String)
+        self.assertTrue((df["codigo_comuna"].str.len_chars() == 5).all())
+        self.assertEqual(df["codigo_region"].dtype, pl.String)
+        self.assertTrue((df["codigo_region"].str.len_chars() == 2).all())
+
     @classmethod
     def setUpClass(cls):
         cls.normalized_dir = ROOT_DIR / "data" / "normalized"
@@ -2555,6 +2607,31 @@ class PipelineStatusUtilsTests(unittest.TestCase):
             {
                 "dataset": "b",
                 "warning_count": 2,
+                "freshness_status": "fresh",
+                "drift_status": "healthy",
+            },
+        ]
+        top = compute_top_issue(entries)
+        self.assertEqual(top["dataset"], "b")
+
+    def test_compute_top_issue_prefers_actionable_over_expected_warnings(self):
+        """ADR-014: un dataset sano con solo warnings esperados (p. ej.
+        cobertura parcial declarada) no debe desplazar al problema
+        realmente accionable del primer lugar."""
+        from src.pipeline_status_utils import compute_top_issue
+
+        entries = [
+            {
+                "dataset": "a",
+                "warning_count": 1,
+                "actionable_warning_count": 0,
+                "freshness_status": "fresh",
+                "drift_status": "healthy",
+            },
+            {
+                "dataset": "b",
+                "warning_count": 1,
+                "actionable_warning_count": 1,
                 "freshness_status": "fresh",
                 "drift_status": "healthy",
             },
@@ -4074,15 +4151,17 @@ class DriftTaxonomyTests(unittest.TestCase):
         self.assertTrue(coverage["expected"])
         self.assertEqual(coverage["expected_reason"], "sólo comunas urbanas")
 
-    def test_all_four_partial_expected_contracts_are_covered(self):
-        """Los 4 contratos con coverage_policy=partial_expected.
+    def test_all_five_partial_expected_contracts_are_covered(self):
+        """Los 5 contratos con coverage_policy=partial_expected.
 
         Hoy sólo finanzas_municipales e indicadores_urbanos_siedu alcanzan
-        coverage_status=partial; en resultados_educacionales y
-        delincuencia_comunal el flag queda INERTE (su cobertura no es partial:
-        no tienen expected_record_count o su actual >= esperado). Se cubren
-        igual para que, si mañana pasan a partial, no drifteen sin que ningún
-        test lo haya ejercitado.
+        coverage_status=partial; en resultados_educacionales,
+        delincuencia_comunal y calidad_aire el flag queda INERTE (su
+        cobertura no es partial: no tienen expected_record_count, su actual
+        >= esperado, o —calidad_aire— la parcialidad va por conteo de
+        comunas con estación y no por cardinalidad). Se cubren igual para
+        que, si mañana pasan a partial, no drifteen sin que ningún test lo
+        haya ejercitado.
         """
         contracts_dir = Path(__file__).resolve().parents[1] / "contracts" / "datasets"
         declared = sorted(
@@ -4094,6 +4173,7 @@ class DriftTaxonomyTests(unittest.TestCase):
         self.assertEqual(
             declared,
             [
+                "calidad_aire",
                 "delincuencia_comunal",
                 "finanzas_municipales",
                 "indicadores_urbanos_siedu",
@@ -4175,6 +4255,7 @@ class DriftTaxonomyTests(unittest.TestCase):
             {
                 "validate_indicadores_urbanos_siedu",  # cobertura urbana intencional
                 "validate_pobreza_comunal",  # cobertura SAE parcial por diseño
+                "validate_calidad_aire",  # cobertura SINCA parcial por diseño
                 "validate_partidos_politicos",  # estado_legal segun SERVEL
                 "validate_empresas",  # RES solo cubre Ley 20.659 (issue #42)
             },
@@ -4293,6 +4374,9 @@ class DriftTaxonomyTests(unittest.TestCase):
         - dataset_count 20 → 21: nuevo dataset `permisos_edificacion`
           (MINVU CEDOC 2002→, cobertura total, sin warnings). No altera los
           contadores de drift/warn/retired.
+        - dataset_count 21 → 22: nuevo dataset `calidad_aire`
+          (SINCA, cobertura parcial declarada esperada, sin warnings
+          accionables). No altera los contadores de drift/warn/retired.
 
         Queda `indicadores`, que es un problema real y abierto (issue #43).
         """
@@ -4300,7 +4384,7 @@ class DriftTaxonomyTests(unittest.TestCase):
         self.assertEqual(health["drifted_count"], 1)
         self.assertEqual(health["warn_count"], 1)
         self.assertEqual(health["retired_count"], 1)
-        self.assertEqual(health["dataset_count"], 21)
+        self.assertEqual(health["dataset_count"], 22)
         self.assertEqual(health["overall_status"], "warn")
         report = json.loads((NORMALIZED_DIR / "drift_report.json").read_text(encoding="utf-8"))
         drifted = sorted(e["dataset"] for e in report["datasets"] if e["drift_status"] == "drifted")

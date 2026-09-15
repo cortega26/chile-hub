@@ -25,6 +25,7 @@ UTC = timezone.utc
 # DATASET_CATALOG_CONFIG se consume vía build_dev_db en verify_pipeline.py y tests).
 from src.builders._shared import (  # noqa: E402, F401
     AUTORIDADES_ELECTAS_METADATA_PATH,
+    CALIDAD_AIRE_METADATA_PATH,
     CENSO_HOGARES_METADATA_PATH,
     CENSO_METADATA_PATH,
     COMUNAS_METADATA_PATH,
@@ -127,6 +128,7 @@ from src.pipeline_status_utils import (
 )
 from src.validation import (
     validate_autoridades_electas,
+    validate_calidad_aire,
     validate_censo_comunal,
     validate_censo_hogares_viviendas,
     validate_comunas,
@@ -178,6 +180,7 @@ def _load_inputs():
     autoridades_electas_csv = os.path.join(STAGING_DIR, "autoridades_electas.csv")
     estadisticas_vitales_csv = os.path.join(STAGING_DIR, "estadisticas_vitales.csv")
     permisos_edificacion_csv = os.path.join(STAGING_DIR, "permisos_edificacion.csv")
+    calidad_aire_csv = os.path.join(STAGING_DIR, "calidad_aire.csv")
 
     required_staging = (
         comunas_csv,
@@ -274,6 +277,11 @@ def _load_inputs():
     permisos_edificacion_metadata = (
         load_metadata(PERMISOS_EDIFICACION_METADATA_PATH)
         if os.path.exists(PERMISOS_EDIFICACION_METADATA_PATH)
+        else None
+    )
+    calidad_aire_metadata = (
+        load_metadata(CALIDAD_AIRE_METADATA_PATH)
+        if os.path.exists(CALIDAD_AIRE_METADATA_PATH)
         else None
     )
 
@@ -427,6 +435,20 @@ def _load_inputs():
     else:
         log.info("dataset_skipped", dataset="permisos_edificacion", reason="not_found_in_staging")
 
+    # Calidad del aire: dataset opcional (nuevo)
+    df_calidad_aire = None
+    if os.path.exists(calidad_aire_csv) and calidad_aire_metadata is not None:
+        df_calidad_aire = pl.read_csv(
+            calidad_aire_csv, schema_overrides=STAGING_SCHEMAS["calidad_aire"]
+        )
+        log.info(
+            "dataset_loaded",
+            dataset="calidad_aire",
+            records=df_calidad_aire.height,
+        )
+    else:
+        log.info("dataset_skipped", dataset="calidad_aire", reason="not_found_in_staging")
+
     df_regiones, df_provincias = derive_geography_layers(df_comunas)
     df_perfil_territorial = build_perfil_territorial_comunal(
         df_comunas,
@@ -458,6 +480,7 @@ def _load_inputs():
         "autoridades_electas": df_autoridades_electas,
         "estadisticas_vitales": df_estadisticas_vitales,
         "permisos_edificacion": df_permisos_edificacion,
+        "calidad_aire": df_calidad_aire,
         "regiones": df_regiones,
         "provincias": df_provincias,
         "perfil_territorial": df_perfil_territorial,
@@ -480,6 +503,7 @@ def _load_inputs():
         "autoridades_electas": autoridades_electas_metadata,
         "estadisticas_vitales": estadisticas_vitales_metadata,
         "permisos_edificacion": permisos_edificacion_metadata,
+        "calidad_aire": calidad_aire_metadata,
     }
     return dfs, meta, previous_pipeline_metadata
 
@@ -503,6 +527,7 @@ def _compute_validations(dfs, meta):
     df_autoridades_electas = dfs["autoridades_electas"]
     df_estadisticas_vitales = dfs["estadisticas_vitales"]
     df_permisos_edificacion = dfs["permisos_edificacion"]
+    df_calidad_aire = dfs["calidad_aire"]
     df_regiones = dfs["regiones"]
     df_provincias = dfs["provincias"]
     df_perfil_territorial = dfs["perfil_territorial"]
@@ -523,6 +548,7 @@ def _compute_validations(dfs, meta):
     autoridades_electas_metadata = meta["autoridades_electas"]
     estadisticas_vitales_metadata = meta["estadisticas_vitales"]
     permisos_edificacion_metadata = meta["permisos_edificacion"]
+    calidad_aire_metadata = meta["calidad_aire"]
 
     validations = {
         "regiones": validate_regiones(df_regiones),
@@ -630,6 +656,17 @@ def _compute_validations(dfs, meta):
             if df_permisos_edificacion is not None
             else {}
         ),
+        **(
+            {
+                "calidad_aire": validate_calidad_aire(
+                    df_calidad_aire,
+                    calidad_aire_metadata,
+                    df_comunas["codigo_comuna"].to_list(),
+                )
+            }
+            if df_calidad_aire is not None
+            else {}
+        ),
         "perfil_territorial_comunal": validate_perfil_territorial_comunal(
             df_perfil_territorial,
             {
@@ -671,6 +708,7 @@ def _write_data_artifacts(dfs):
     df_autoridades_electas = dfs["autoridades_electas"]
     df_estadisticas_vitales = dfs["estadisticas_vitales"]
     df_permisos_edificacion = dfs["permisos_edificacion"]
+    df_calidad_aire = dfs["calidad_aire"]
     df_regiones = dfs["regiones"]
     df_provincias = dfs["provincias"]
     df_perfil_territorial = dfs["perfil_territorial"]
@@ -695,6 +733,8 @@ def _write_data_artifacts(dfs):
         extra_tables["estadisticas_vitales"] = df_estadisticas_vitales
     if df_permisos_edificacion is not None:
         extra_tables["permisos_edificacion"] = df_permisos_edificacion
+    if df_calidad_aire is not None:
+        extra_tables["calidad_aire"] = df_calidad_aire
 
     # Convertir tablas extra a pandas UNA sola vez para SQLite y Excel.
     # Empresas tiene ~1.57M filas: la conversión es costosa y no debe duplicarse.

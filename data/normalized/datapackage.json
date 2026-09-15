@@ -4,7 +4,7 @@
   "description": "Capa de datos reproducible y curada sobre datasets publicos oficiales de Chile: geografia, demografia, salud, educacion, finanzas municipales e indicadores.",
   "version": "1.31.1",
   "homepage": "https://tooltician.com/chile-hub/",
-  "created": "2026-09-15T00:04:41.920645+00:00",
+  "created": "2026-09-15T01:20:22.174488+00:00",
   "resources": [
     {
       "name": "regiones",
@@ -2013,6 +2013,164 @@
         {
           "title": "Uso autorizado con cita (MINVU CEDOC)",
           "path": "https://centrodeestudios.minvu.gob.cl/repositorio/categoria/permisos-de-edificacion"
+        }
+      ]
+    },
+    {
+      "name": "calidad_aire",
+      "path": "calidad_aire.parquet",
+      "format": "parquet",
+      "mediatype": "application/vnd.apache.parquet",
+      "title": "calidad_aire",
+      "description": "Promedios diarios de contaminantes atmosféricos (MP2.5, MP10, SO2, NO2, CO, O3) por estación de monitoreo, desde el SINCA (MMA). Cobertura parcial: ~65 comunas con estación.",
+      "schema": {
+        "fields": [
+          {
+            "name": "fecha",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "id_estacion",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_estacion",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "codigo_region",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "codigo_comuna",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_comuna",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "latitud",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "longitud",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "codigo_contaminante",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_contaminante",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "unidad",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "valor_promedio_diario",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "valor_max_horario",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "horas_validas",
+            "type": "integer",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "estado_dato",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "fuente",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "url_fuente",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "fecha_fuente",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          }
+        ],
+        "missingValues": [
+          ""
+        ],
+        "primaryKey": [
+          "fecha",
+          "id_estacion",
+          "codigo_contaminante"
+        ]
+      },
+      "sources": [
+        {
+          "title": "SINCA — Ministerio del Medio Ambiente",
+          "path": "https://sinca.mma.gob.cl/index.php/json/listadomapa2k19/"
+        }
+      ],
+      "licenses": [
+        {
+          "title": "Datos públicos MMA; sin licencia explícita, citar fuente oficial",
+          "path": "https://sinca.mma.gob.cl/"
         }
       ]
     }

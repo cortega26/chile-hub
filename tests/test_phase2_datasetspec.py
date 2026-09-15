@@ -195,6 +195,7 @@ class TestPublicInventoryPolicy:
             "autoridades_electas",
             "estadisticas_vitales",
             "permisos_edificacion",
+            "calidad_aire",
             "finanzas_municipales",
             "resultados_educacionales",
             "indicadores_urbanos_siedu",

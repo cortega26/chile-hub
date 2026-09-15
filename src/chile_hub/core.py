@@ -168,6 +168,9 @@ class ChileHub:
         freshness_by_dataset = {
             entry.get("dataset"): entry for entry in self.freshness_audit().get("datasets", [])
         }
+        catalog_by_dataset = {
+            entry.get("dataset"): entry for entry in self.catalog.get("datasets", [])
+        }
         entries = []
         for entry in self.summary():
             dataset_name = entry.get("dataset")
@@ -179,6 +182,11 @@ class ChileHub:
                 {
                     "dataset": dataset_name,
                     "warning_count": entry.get("warning_count", 0),
+                    # Warnings esperados (ADR-014) no cuentan como trabajo
+                    # accionable para priorizar el top issue.
+                    "actionable_warning_count": len(
+                        catalog_by_dataset.get(dataset_name, {}).get("actionable_warnings", [])
+                    ),
                     "freshness_status": current_freshness_status,
                     "build_freshness_status": entry.get("freshness_status"),
                     "current_freshness_status": current_freshness_status,

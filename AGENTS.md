@@ -43,7 +43,7 @@ entender la arquitectura, las reglas no negociables y las convenciones del proye
 ## 1. Propósito del proyecto
 
 `chile-hub` es una capa de datos pública, curada y reproducible sobre **datos oficiales de Chile**.
-Actualmente publica veinticuatro (<!-- START_AGENTS_DATASET_COUNT -->24<!-- END_AGENTS_DATASET_COUNT -->) capas:
+Actualmente publica veinticinco (<!-- START_AGENTS_DATASET_COUNT -->25<!-- END_AGENTS_DATASET_COUNT -->) capas:
 
 | Capa | Fuente | Descripción |
 |:---|:---|:---|
@@ -69,6 +69,7 @@ Actualmente publica veinticuatro (<!-- START_AGENTS_DATASET_COUNT -->24<!-- END_
 | **Autoridades Locales** | BCN SIIT + Wikipedia (CC BY / CC BY-SA) | Gobernadores regionales (Wikipedia) y alcaldes (BCN SIIT, 100% cobertura), segregado de Autoridades Electas por licencia mixta (carril `candidate`) |
 | **Estadísticas Vitales** | INE | Nacimientos y defunciones por comuna de residencia y sexo, anuarios definitivos 2010 en adelante |
 | **Permisos de Edificación** | MINVU CEDOC | Viviendas en unidades y superficie por comuna y año, serie desde 2002 |
+| **Calidad del Aire** | MMA / SINCA | Promedios diarios de contaminantes por estación (~65 comunas, serie incremental) |
 
 **El objetivo no es tener todos los datos de Chile. Es entregar un número pequeño de datasets
 limpios, versionados, validados y consumibles en una línea de código.**
@@ -93,7 +94,7 @@ chile-hub/
 │
 ├── src/
 <!-- START_AGENTS_EXTRACTOR_LIST -->
-│   ├── extractors/                 21 extractores por dataset + 5 módulos compartidos (ver nota abajo)
+│   ├── extractors/                 22 extractores por dataset + 5 módulos compartidos (ver nota abajo)
 │   │   ├── base.py                                       BaseExtractor ABC (contrato para todos los extractores)
 │   │   ├── http_utils.py                                 Reintentos/backoff HTTP compartidos
 │   │   ├── ine_ipc.py                                    Override de IPC desde el INE (fuente autoritativa; Plan 069)
@@ -102,6 +103,7 @@ chile-hub/
 │   │   ├── autoridades_electas_extractor.py              Diputados y senadores en ejercicio → data/staging/
 │   │   ├── autoridades_locales_extractor.py              Autoridades locales (BCN SIIT + Wikipedia); carril `candidate`, sin cadencia automática
 │   │   ├── bcentral_extractor.py                         Indicadores desde mindicador.cl → data/staging/
+│   │   ├── calidad_aire_extractor.py                     Calidad del aire por estación — promedios diarios (SINCA/MMA) → data/staging/
 │   │   ├── cead_delincuencia_live_extractor.py           Delincuencia comunal (CEAD); corre en `monthly-scrape.yml`
 │   │   ├── censo_extractor.py                            Censo 2024 — población comunal (INE) → data/staging/
 │   │   ├── censo_hogares_viviendas_extractor.py          Censo 2024 — hogares y viviendas (INE) → data/staging/
@@ -121,18 +123,18 @@ chile-hub/
 │   │   ├── sinim_finanzas_live_extractor.py              Finanzas municipales — scraper real; corre en `monthly-scrape.yml`
 │   │   └── subdere_extractor.py                          DPA: regiones/provincias/comunas/comunas_enriquecidas (BCN ArcGIS) → data/staging/
 <!-- END_AGENTS_EXTRACTOR_LIST -->
-│   ├── validation.py              Todas las funciones validate_*() — módulo independiente (1 809 líneas)
-│   ├── build_dev_db.py            Orquestador (884 líneas): main() + fases (_load_inputs, _compute_validations, _write_data_artifacts, _generate_reports)
+│   ├── validation.py              Todas las funciones validate_*() — módulo independiente (1 956 líneas)
+│   ├── build_dev_db.py            Orquestador (924 líneas): main() + fases (_load_inputs, _compute_validations, _write_data_artifacts, _generate_reports)
 │   ├── builders/                  Módulos del pipeline extraídos de build_dev_db.py (formats, metadata, reports, artifacts, datasets, catalog, landing, io_utils, _shared, dcat_catalog, data_package, doc_sync, geo, _logging)
 │   ├── chile_hub.py               Compatibility shim (21 líneas) — delega al paquete
 │   ├── chile_hub/                 Paquete Python instalable (ChileHub API + CLI + data manager)
-│   │   ├── core.py                ChileHub class + API pública (1 987 líneas)
+│   │   ├── core.py                ChileHub class + API pública (1 995 líneas)
 │   │   ├── cli.py                 CLI entry points (build_parser/_main/main — TECHDEBT-02, movido de core.py)
 │   │   ├── contracts.py           Schemas de contrato runtime
 │   │   ├── datasets.py            Definición de Dataset(StrEnum) y tipos
 │   │   ├── exceptions.py          Excepciones de dominio de la API
 │   │   ├── data_manager.py        Descarga de bundle, cache, verificación SHA256
-│   │   ├── pipeline_status_utils.py  Reportes Markdown de salud, catálogo y redistribución (994 líneas)
+│   │   ├── pipeline_status_utils.py  Reportes Markdown de salud, catálogo y redistribución (1 000 líneas)
 │   │   ├── _render.py             Helper de renderizado de tablas
 │   │   └── text.py                Utils de texto compartidas
 │   ├── registry/                  DatasetSpec cohort Phase 2–3D (ADR-018): modelo tipado + proyecciones de compatibilidad (dataset_spec.py, 657 líneas)
@@ -196,8 +198,8 @@ codegraph impact validate_comunas                   # Qué se rompe si cambio es
 
 **Reglas para acotar lecturas y ahorrar tokens:**
 - Usar `Read` con `offset`/`limit` — nunca leer archivos grandes enteros de golpe.
-- `base.py` (76 líneas) es seguro de leer completo. `validation.py` (1 809 líneas) — leer por validador individual.
-- `build_dev_db.py` (884 líneas) y `src/chile_hub/core.py` (1 987 líneas) — usar estas áncoras:
+- `base.py` (76 líneas) es seguro de leer completo. `validation.py` (1 956 líneas) — leer por validador individual.
+- `build_dev_db.py` (924 líneas) y `src/chile_hub/core.py` (1 995 líneas) — usar estas áncoras:
 
 | Archivo | Líneas de interés |
 |---|---|
@@ -224,7 +226,7 @@ codegraph impact validate_comunas                   # Qué se rompe si cambio es
              src/extractors/consumo_electrico_extractor.py
              src/extractors/partidos_politicos_extractor.py
              src/extractors/autoridades_electas_extractor.py
-             (los 16 que corre `make extract` / el job diario de CI — ver §11)
+             (los 17 que corre `make extract` / el job diario de CI — ver §11)
              → Produce: data/staging/{dataset}.csv + data/staging/{dataset}.metadata.json
              → Produce: data/raw/{source}_{timestamp}.json  (snapshot crudo)
 
@@ -837,7 +839,7 @@ make doctor             # Python efectivo, dependencias clave y gates anti-drift
 make refresh            # extract → build → verify → test → verify-landing → lint + format-check
 
 # Pasos individuales
-make extract            # Corre los 16 extractores de cadencia diaria → data/staging/
+make extract            # Corre los 17 extractores de cadencia diaria → data/staging/
 make build              # Compila todos los artefactos → data/normalized/
 make verify             # Integridad de artefactos (SHA-256, conteos, schema)
 make verify-readiness   # verify_pipeline.py --profile readiness

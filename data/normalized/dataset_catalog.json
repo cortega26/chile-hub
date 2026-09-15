@@ -1,6 +1,6 @@
 {
-  "generated_at_utc": "2026-09-15T00:04:41.910173+00:00",
-  "dataset_count": 21,
+  "generated_at_utc": "2026-09-15T01:20:22.166676+00:00",
+  "dataset_count": 22,
   "datasets": [
     {
       "dataset": "regiones",
@@ -32,9 +32,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 820.37,
+        "age_hours": 821.63,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-09-15T00:04:41.904525+00:00"
+        "checked_at_utc": "2026-09-15T01:20:22.163693+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -112,9 +112,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 820.37,
+        "age_hours": 821.63,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-09-15T00:04:41.904569+00:00"
+        "checked_at_utc": "2026-09-15T01:20:22.163719+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -199,9 +199,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 820.37,
+        "age_hours": 821.63,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-09-15T00:04:41.904584+00:00"
+        "checked_at_utc": "2026-09-15T01:20:22.163728+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -285,9 +285,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 820.37,
+        "age_hours": 821.63,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-09-15T00:04:41.904592+00:00"
+        "checked_at_utc": "2026-09-15T01:20:22.163733+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -376,9 +376,9 @@
       },
       "freshness": {
         "status": "stale",
-        "age_hours": 775.71,
+        "age_hours": 776.97,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-09-15T00:04:41.904872+00:00"
+        "checked_at_utc": "2026-09-15T01:20:22.163879+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 72,
@@ -413,15 +413,15 @@
       "validation_status": "ok",
       "warnings": [
         "indicadores live refresh reused last published artifact for missing codes: ipc",
-        "indicadores freshness is stale: 775.71h since refresh, policy max is 72h"
+        "indicadores freshness is stale: 776.97h since refresh, policy max is 72h"
       ],
       "actionable_warnings": [
         "indicadores live refresh reused last published artifact for missing codes: ipc",
-        "indicadores freshness is stale: 775.71h since refresh, policy max is 72h"
+        "indicadores freshness is stale: 776.97h since refresh, policy max is 72h"
       ],
       "degradation": {
         "status": "warning",
-        "impact": "indicadores live refresh reused last published artifact for missing codes: ipc; indicadores freshness is stale: 775.71h since refresh, policy max is 72h",
+        "impact": "indicadores live refresh reused last published artifact for missing codes: ipc; indicadores freshness is stale: 776.97h since refresh, policy max is 72h",
         "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
       },
       "notes": [
@@ -473,9 +473,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 820.37,
+        "age_hours": 821.63,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-09-15T00:04:41.904896+00:00"
+        "checked_at_utc": "2026-09-15T01:20:22.163893+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -562,9 +562,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 820.37,
+        "age_hours": 821.63,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-09-15T00:04:41.904908+00:00"
+        "checked_at_utc": "2026-09-15T01:20:22.163902+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 1080,
@@ -643,9 +643,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 820.37,
+        "age_hours": 821.63,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-09-15T00:04:41.904923+00:00"
+        "checked_at_utc": "2026-09-15T01:20:22.163908+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -728,9 +728,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 566.6,
+        "age_hours": 567.86,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-09-15T00:04:41.904935+00:00"
+        "checked_at_utc": "2026-09-15T01:20:22.163914+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -801,9 +801,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 820.37,
+        "age_hours": 821.63,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-09-15T00:04:41.904944+00:00"
+        "checked_at_utc": "2026-09-15T01:20:22.163925+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -880,9 +880,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 333.0,
+        "age_hours": 334.27,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-09-15T00:04:41.904953+00:00"
+        "checked_at_utc": "2026-09-15T01:20:22.163931+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -966,9 +966,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 820.37,
+        "age_hours": 821.63,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-09-15T00:04:41.904962+00:00"
+        "checked_at_utc": "2026-09-15T01:20:22.163938+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -1053,9 +1053,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 820.37,
+        "age_hours": 821.63,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-09-15T00:04:41.904972+00:00"
+        "checked_at_utc": "2026-09-15T01:20:22.163943+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -1113,7 +1113,7 @@
       "source_url": "https://github.com/cortega26/chile-hub",
       "source_mode": "live",
       "source_detail": "derived_from_validated_chile_hub_layers",
-      "refreshed_at_utc": "2026-09-15T00:04:41.904987+00:00",
+      "refreshed_at_utc": "2026-09-15T01:20:22.163952+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -1177,7 +1177,7 @@
         "status": "fresh",
         "age_hours": 0.0,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-09-15T00:04:41.905005+00:00"
+        "checked_at_utc": "2026-09-15T01:20:22.163961+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 1080,
@@ -1264,9 +1264,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 820.26,
+        "age_hours": 821.52,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-09-15T00:04:41.905021+00:00"
+        "checked_at_utc": "2026-09-15T01:20:22.163971+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 1080,
@@ -1356,9 +1356,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 820.26,
+        "age_hours": 821.52,
         "max_age_hours": 175200,
-        "checked_at_utc": "2026-09-15T00:04:41.905034+00:00"
+        "checked_at_utc": "2026-09-15T01:20:22.163978+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 175200,
@@ -1441,9 +1441,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 820.26,
+        "age_hours": 821.52,
         "max_age_hours": 17520,
-        "checked_at_utc": "2026-09-15T00:04:41.905045+00:00"
+        "checked_at_utc": "2026-09-15T01:20:22.163983+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 17520,
@@ -1529,9 +1529,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 820.26,
+        "age_hours": 821.52,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-09-15T00:04:41.905055+00:00"
+        "checked_at_utc": "2026-09-15T01:20:22.163989+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -1622,9 +1622,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 820.24,
+        "age_hours": 821.5,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-09-15T00:04:41.905068+00:00"
+        "checked_at_utc": "2026-09-15T01:20:22.163995+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -1676,7 +1676,7 @@
       "source_url": "https://www.ine.gob.cl/estadisticas-por-tema/demografia-y-poblacion/estadisticas-vitales",
       "source_mode": "live",
       "source_detail": "Anuarios de Estadísticas Vitales (tabulados XLSX, tabla 1.2.2-04 por comuna de residencia). Solo definitivos: los boletines provisionales del INE no publican desglose comunal.",
-      "refreshed_at_utc": "2026-09-14T23:29:24.975832+00:00",
+      "refreshed_at_utc": "2026-09-15T00:40:44.151814+00:00",
       "record_count": 13840,
       "fields": [
         "anio",
@@ -1708,9 +1708,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.59,
+        "age_hours": 0.66,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-09-15T00:04:41.905079+00:00"
+        "checked_at_utc": "2026-09-15T01:20:22.164002+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -1778,7 +1778,7 @@
       "source_url": "https://centrodeestudios.minvu.gob.cl/repositorio/categoria/permisos-de-edificacion",
       "source_mode": "live",
       "source_detail": "Viviendas en unidades y superficie (m2) por comuna y año, serie desde 2002 (MINVU CEDOC, en base a permisos otorgados por las Direcciones de Obras Municipales e INE).",
-      "refreshed_at_utc": "2026-09-15T00:00:56.170127+00:00",
+      "refreshed_at_utc": "2026-09-15T00:39:47.956228+00:00",
       "record_count": 8650,
       "fields": [
         "anio",
@@ -1813,9 +1813,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.06,
+        "age_hours": 0.68,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-09-15T00:04:41.905095+00:00"
+        "checked_at_utc": "2026-09-15T01:20:22.164009+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 1080,
@@ -1857,7 +1857,105 @@
       },
       "notes": [
         "descubrimiento: repositorio-biblionumber",
-        "8650 filas desde 'minvu_permisos_edificacion_anual_20260915T000055Z.xlsx' (hojas: número_total, m2_total, número_departamentos, m2_departamentos, número_casas, m2_casas; años provisionales: [2024, 2025, 2026])"
+        "8650 filas desde 'minvu_permisos_edificacion_anual_20260915T003946Z.xlsx' (hojas: número_total, m2_total, número_departamentos, m2_departamentos, número_casas, m2_casas; años provisionales: [2024, 2025, 2026])"
+      ]
+    },
+    {
+      "dataset": "calidad_aire",
+      "description": "Promedios diarios de contaminantes atmosféricos (MP2.5, MP10, SO2, NO2, CO, O3) por estación de monitoreo, desde el SINCA (MMA). Cobertura parcial: ~65 comunas con estación.",
+      "alias_for": null,
+      "source_name": "SINCA — Ministerio del Medio Ambiente",
+      "source_url": "https://sinca.mma.gob.cl/index.php/json/listadomapa2k19/",
+      "source_mode": "live",
+      "source_detail": "Promedios diarios por estación y contaminante (MP2.5, MP10, SO2, NO2, CO, O3) desde el JSON del SINCA. Cobertura parcial por diseño (~65 comunas con estación). Serie incremental desde la primera cosecha.",
+      "refreshed_at_utc": "2026-09-15T01:10:14.486735+00:00",
+      "record_count": 756,
+      "fields": [
+        "fecha",
+        "id_estacion",
+        "nombre_estacion",
+        "codigo_region",
+        "codigo_comuna",
+        "nombre_comuna",
+        "latitud",
+        "longitud",
+        "codigo_contaminante",
+        "nombre_contaminante",
+        "unidad",
+        "valor_promedio_diario",
+        "valor_max_horario",
+        "horas_validas",
+        "estado_dato",
+        "fuente",
+        "url_fuente",
+        "fecha_fuente"
+      ],
+      "indicator_codes": [],
+      "indicator_delivery": {},
+      "join_keys": [
+        "fecha",
+        "codigo_comuna",
+        "codigo_contaminante"
+      ],
+      "confidence_tier": "Tier B",
+      "reuse_policy": {
+        "status": "public-api-review-terms",
+        "license": "Datos públicos MMA; sin licencia explícita, citar fuente oficial",
+        "license_url": "https://sinca.mma.gob.cl/",
+        "attribution_required": true,
+        "redistribution_ok": true,
+        "summary": "Mediciones de calidad del aire del SINCA (MMA), API JSON pública. Organismo público chileno sin restricción explícita de reúso; citar fuente oficial."
+      },
+      "freshness": {
+        "status": "fresh",
+        "age_hours": 0.17,
+        "max_age_hours": 72,
+        "checked_at_utc": "2026-09-15T01:20:22.164016+00:00"
+      },
+      "freshness_policy": {
+        "max_age_hours": 72,
+        "label": "diaria"
+      },
+      "coverage": {
+        "status": "not_applicable",
+        "expected_record_count": null,
+        "actual_record_count": 756,
+        "coverage_ratio": null,
+        "summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
+        "expected": false
+      },
+      "drift": {
+        "status": "healthy",
+        "summary": "Sin drift operativo detectado en este build.",
+        "recommended_action": "Ninguna."
+      },
+      "usage_examples": {
+        "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars(\"calidad_aire\")\n# Promedio diario de MP2.5 por comuna\ndf.filter(pl.col(\"codigo_contaminante\") == \"mp25\").sort(\"valor_promedio_diario\", descending=True)",
+        "duckdb": "SELECT fecha, codigo_comuna, avg(valor_promedio_diario) AS mp25\nFROM 'data/normalized/calidad_aire.parquet'\nWHERE codigo_contaminante = 'mp25'\nGROUP BY 1, 2 ORDER BY 1 DESC, 3 DESC;",
+        "cli": "chile-hub show calidad_aire"
+      },
+      "outputs": {
+        "parquet": "data/normalized/calidad_aire.parquet",
+        "json": "data/normalized/calidad_aire.json",
+        "duckdb_table": "calidad_aire",
+        "sqlite_table": "calidad_aire",
+        "excel_sheet": "Calidad Aire"
+      },
+      "documentation": "docs/datasets/calidad_aire.md",
+      "validation_status": "ok",
+      "warnings": [
+        "cobertura SINCA: 65/346 comunas (18.8%) — parcial por diseño; solo comunas con estación"
+      ],
+      "actionable_warnings": [],
+      "degradation": {
+        "status": "none",
+        "impact": "1 observación(es) esperada(s): cobertura SINCA: 65/346 comunas (18.8%) — parcial por diseño; solo comunas con estación",
+        "recommended_action": "Ninguna."
+      },
+      "notes": [
+        "inventario: 125 estaciones en el listado; 125 con filas emitidas",
+        "756 filas diarias nuevas desde 'sinca_listadomapa_20260915T011014Z.json'",
+        "historial: fusionado con staging existente"
       ]
     }
   ]
