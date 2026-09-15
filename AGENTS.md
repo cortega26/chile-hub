@@ -94,7 +94,8 @@ chile-hub/
 │
 ├── src/
 <!-- START_AGENTS_EXTRACTOR_LIST -->
-│   ├── extractors/                 22 extractores por dataset + 5 módulos compartidos (ver nota abajo)
+│   ├── extractors/                 22 extractores por dataset + 6 módulos compartidos (ver nota abajo)
+│   │   ├── _sinim_shared.py                              Normalización/metadata compartida stub+scraper (Plan 099)
 │   │   ├── base.py                                       BaseExtractor ABC (contrato para todos los extractores)
 │   │   ├── http_utils.py                                 Reintentos/backoff HTTP compartidos
 │   │   ├── ine_ipc.py                                    Override de IPC desde el INE (fuente autoritativa; Plan 069)
@@ -198,7 +199,7 @@ codegraph impact validate_comunas                   # Qué se rompe si cambio es
 
 **Reglas para acotar lecturas y ahorrar tokens:**
 - Usar `Read` con `offset`/`limit` — nunca leer archivos grandes enteros de golpe.
-- `base.py` (99 líneas) es seguro de leer completo. `validation.py` (1 960 líneas) — leer por validador individual.
+- `base.py` (117 líneas) es seguro de leer completo. `validation.py` (1 960 líneas) — leer por validador individual.
 - `build_dev_db.py` (948 líneas) y `src/chile_hub/core.py` (2 018 líneas) — usar estas áncoras:
 
 | Archivo | Líneas de interés |

@@ -270,6 +270,7 @@ _AGENTS_EXTRACTOR_DESCRIPTIONS = {
     "region_utils.py": "Normalización de nombres de región compartida",
     "source_adapter.py": "Adaptador de fuente compartido",
     "ine_ipc.py": "Override de IPC desde el INE (fuente autoritativa; Plan 069)",
+    "_sinim_shared.py": "Normalización/metadata compartida stub+scraper (Plan 099)",
     "subdere_extractor.py": (
         "DPA: regiones/provincias/comunas/comunas_enriquecidas (BCN ArcGIS) → data/staging/"
     ),
@@ -332,6 +333,10 @@ _SHARED_MODULES = {
     # diario de indicadores — sin esto, el inventario decía 19 extractores
     # cuando hay 20 módulos de extracción (Plan 081).
     "ine_ipc.py",
+    # _sinim_shared.py tampoco es un extractor (normalización/metadata
+    # compartida stub+scraper, Plan 099) pero vive en extractors/ — sin esto,
+    # el inventario lo reporta como fichero huérfano.
+    "_sinim_shared.py",
 }
 
 
