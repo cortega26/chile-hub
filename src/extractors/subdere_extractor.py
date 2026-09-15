@@ -1,4 +1,3 @@
-import json
 import os
 import sys
 from datetime import datetime, timezone
@@ -17,11 +16,17 @@ try:
     from src.extractors.base import (
         BaseExtractor,
         ensure_staging_directories,
+        write_raw_snapshot_atomic,
         write_staging_metadata,
     )
     from src.extractors.http_utils import fetch_with_retry
 except ModuleNotFoundError:
-    from base import BaseExtractor, ensure_staging_directories, write_staging_metadata
+    from base import (
+        BaseExtractor,
+        ensure_staging_directories,
+        write_raw_snapshot_atomic,
+        write_staging_metadata,
+    )
     from http_utils import fetch_with_retry
 
 # curl_cffi impersona el fingerprint TLS de Chrome, evitando bloqueos a nivel de TLS
@@ -400,8 +405,7 @@ def fetch_bcn_comunas():
     # Persistir snapshot raw para trazabilidad
     timestamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     raw_path = os.path.join(RAW_DIR, f"bcn_comunas_{timestamp}.json")
-    with open(raw_path, "w", encoding="utf-8") as f:
-        json.dump(payload, f, ensure_ascii=False)
+    write_raw_snapshot_atomic(raw_path, payload)
     print(f"Snapshot raw BCN guardado en: {raw_path}")
     features = payload.get("features", [])
     if not features:

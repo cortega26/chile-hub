@@ -1,7 +1,6 @@
 """Extractor para la asociacion de comunas a distritos y circunscripciones electorales."""
 
 import datetime
-import json
 import os
 import sys
 from pathlib import Path
@@ -18,10 +17,16 @@ try:
     from src.extractors.base import (
         BaseExtractor,
         ensure_staging_directories,
+        write_raw_snapshot_atomic,
         write_staging_metadata,
     )
 except ModuleNotFoundError:
-    from base import BaseExtractor, ensure_staging_directories, write_staging_metadata
+    from base import (
+        BaseExtractor,
+        ensure_staging_directories,
+        write_raw_snapshot_atomic,
+        write_staging_metadata,
+    )
 
 DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data"))
 RAW_DIR = os.path.join(DATA_DIR, "raw")
@@ -308,8 +313,7 @@ def process_electoral() -> str:
 
     df = build_electoral_df()
 
-    with open(raw_path, "w", encoding="utf-8") as f:
-        json.dump(df.to_dicts(), f, ensure_ascii=False, indent=2)
+    write_raw_snapshot_atomic(raw_path, df.to_dicts())
 
     validation = ElectoralExtractor().validate(df, {"source_mode": "live"})
     if validation["status"] == "error":

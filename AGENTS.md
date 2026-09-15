@@ -124,7 +124,7 @@ chile-hub/
 │   │   └── subdere_extractor.py                          DPA: regiones/provincias/comunas/comunas_enriquecidas (BCN ArcGIS) → data/staging/
 <!-- END_AGENTS_EXTRACTOR_LIST -->
 │   ├── validation.py              Todas las funciones validate_*() — módulo independiente (1 956 líneas)
-│   ├── build_dev_db.py            Orquestador (927 líneas): main() + fases (_load_inputs, _compute_validations, _write_data_artifacts, _generate_reports)
+│   ├── build_dev_db.py            Orquestador (928 líneas): main() + fases (_load_inputs, _compute_validations, _write_data_artifacts, _generate_reports)
 │   ├── builders/                  Módulos del pipeline extraídos de build_dev_db.py (formats, metadata, reports, artifacts, datasets, catalog, landing, io_utils, _shared, dcat_catalog, data_package, doc_sync, geo, _logging)
 │   ├── chile_hub.py               Compatibility shim (21 líneas) — delega al paquete
 │   ├── chile_hub/                 Paquete Python instalable (ChileHub API + CLI + data manager)
@@ -134,7 +134,7 @@ chile-hub/
 │   │   ├── datasets.py            Definición de Dataset(StrEnum) y tipos
 │   │   ├── exceptions.py          Excepciones de dominio de la API
 │   │   ├── data_manager.py        Descarga de bundle, cache, verificación SHA256
-│   │   ├── pipeline_status_utils.py  Reportes Markdown de salud, catálogo y redistribución (1 000 líneas)
+│   │   ├── pipeline_status_utils.py  Reportes Markdown de salud, catálogo y redistribución (1 022 líneas)
 │   │   ├── _render.py             Helper de renderizado de tablas
 │   │   └── text.py                Utils de texto compartidas
 │   ├── registry/                  DatasetSpec cohort Phase 2–3D (ADR-018): modelo tipado + proyecciones de compatibilidad (dataset_spec.py, 657 líneas)
@@ -198,8 +198,8 @@ codegraph impact validate_comunas                   # Qué se rompe si cambio es
 
 **Reglas para acotar lecturas y ahorrar tokens:**
 - Usar `Read` con `offset`/`limit` — nunca leer archivos grandes enteros de golpe.
-- `base.py` (76 líneas) es seguro de leer completo. `validation.py` (1 956 líneas) — leer por validador individual.
-- `build_dev_db.py` (927 líneas) y `src/chile_hub/core.py` (1 995 líneas) — usar estas áncoras:
+- `base.py` (99 líneas) es seguro de leer completo. `validation.py` (1 956 líneas) — leer por validador individual.
+- `build_dev_db.py` (928 líneas) y `src/chile_hub/core.py` (1 995 líneas) — usar estas áncoras:
 
 | Archivo | Líneas de interés |
 |---|---|

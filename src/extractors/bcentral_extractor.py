@@ -12,6 +12,7 @@ Estrategia de actualización:
     preservando el historial ya descargado en staging.
 """
 
+import concurrent.futures
 import datetime
 import json
 import os
@@ -31,10 +32,16 @@ try:
     from src.extractors.base import (
         BaseExtractor,
         ensure_staging_directories,
+        write_raw_snapshot_atomic,
         write_staging_metadata,
     )
 except ModuleNotFoundError:
-    from base import BaseExtractor, ensure_staging_directories, write_staging_metadata
+    from base import (
+        BaseExtractor,
+        ensure_staging_directories,
+        write_raw_snapshot_atomic,
+        write_staging_metadata,
+    )
 
 try:
     from src.extractors.http_utils import fetch_with_retry
@@ -59,6 +66,11 @@ PUBLISHED_INDICATORS_PATH = os.path.join(NORMALIZED_DIR, "indicadores.parquet")
 MINDICADOR_BASE = "https://mindicador.cl/api"
 HISTORY_START_YEAR = 2010  # Año de inicio del historial
 REQUEST_DELAY_SECONDS = 0.3  # Pausa entre llamadas para no saturar la API
+
+# Concurrencia acotada (Plan 010): pool pequeño; la espera por par
+# (REQUEST_DELAY_SECONDS, mismo valor) se solapa entre hilos sin subir topes.
+# El plegado en orden de pares preserva diagnósticos y registros idénticos.
+MINDICADOR_MAX_WORKERS = 3
 
 # Indicadores a extraer en orden de prioridad
 INDICATOR_CODES = ["uf", "dolar", "euro", "utm", "ipc"]
@@ -131,8 +143,7 @@ def save_raw_snapshot(payload: dict, codigo: str, year: int) -> None:
     timestamp = datetime.datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     filename = f"mindicador_{codigo}_{year}_{timestamp}.json"
     path = os.path.join(RAW_DIR, filename)
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(payload, f, ensure_ascii=False, indent=2)
+    write_raw_snapshot_atomic(path, payload)
 
 
 def parse_indicator_payload(payload: dict, codigo: str) -> list:
@@ -251,80 +262,120 @@ def fetch_all_history():
         print(f"Sin staging previo — descargando historial completo desde {HISTORY_START_YEAR}.")
 
     total_calls = len(INDICATOR_CODES) * len(years_to_fetch)
-    call_n = 0
     new_records = []
     refreshed_pairs = set()
 
-    for codigo in INDICATOR_CODES:
-        for year in years_to_fetch:
-            call_n += 1
-            print(f"  [{call_n}/{total_calls}] Descargando {codigo}/{year}…")
-            records = []
-            try:
-                records = fetch_indicator_year(codigo, year)
-                if records:
-                    new_records.extend(records)
-                    refreshed_pairs.add((codigo, year))
-                else:
-                    # Serie vacía para un indicador mensual en el año en curso:
-                    # el dato aún no fue publicado ese mes — comportamiento esperado.
-                    expected_monthly_gap = codigo in MONTHLY_INDICATORS and year == current_year
-                    if not expected_monthly_gap:
-                        pair = f"{codigo}/{year}"
-                        diagnostics["empty_live_pairs"].append(pair)
-                    if existing_df is not None:
-                        has_published_history = (
-                            existing_df.filter(pl.col("codigo_indicador") == codigo).height > 0
-                        )
-                        if has_published_history:
-                            diagnostics["published_backfills"].append(codigo)
-            except Exception as e:
-                diagnostics["fetch_failures"].append(f"{codigo}/{year}: {e}")
-                print(f"  Advertencia: no se pudo obtener {codigo}/{year}: {e}")
-                raw_records = load_latest_raw_snapshot(codigo, year)
-                if raw_records:
-                    print(f"  Recuperando {codigo}/{year} desde snapshot raw local…")
-                    new_records.extend(raw_records)
-                    refreshed_pairs.add((codigo, year))
-                    diagnostics["raw_recoveries"].append(f"{codigo}/{year}")
-                elif existing_df is not None:
-                    diagnostics["preserved_existing_pairs"].append(f"{codigo}/{year}")
+    # Pares en el mismo orden del loop serial anidado (codigo × año).
+    pairs = [(codigo, year) for codigo in INDICATOR_CODES for year in years_to_fetch]
 
-            # Override de último recurso para `ipc` en el año en curso: si
-            # mindicador.cl no lo entrega (serie muerta upstream desde
-            # 2025-12, issue #43), la fuente autoritativa INE publica la
-            # variación mensual en su página pública. Solo aplica cuando el
-            # dato no llegó por la vía normal, y solo para el año en curso
-            # (el INE publica el último mes, no historial).
-            if (
-                codigo == "ipc"
-                and year == current_year
-                and not records
-                and (codigo, year) not in refreshed_pairs
-            ):
-                ine_reading = fetch_ine_ipc()
-                if ine_reading is not None:
-                    print(
-                        f"  IPC desde INE (fuente autoritativa): "
-                        f"{ine_reading.date_iso} = {ine_reading.value}%"
+    def _fetch_pair(pair: tuple[str, int]) -> dict:
+        """Fetch + recuperación de UN par (hilo). Sin diagnósticos aquí.
+
+        Retorna el resultado crudo; el plegado en orden (abajo) replica la
+        contabilidad del serial para diagnósticos byte-idénticos.
+        """
+        codigo, year = pair
+        outcome = {
+            "codigo": codigo,
+            "year": year,
+            "records": [],
+            "error": None,
+            "raw_records": [],
+            "ine_reading": None,
+            "ine_attempted": False,
+        }
+        try:
+            outcome["records"] = fetch_indicator_year(codigo, year)
+        except Exception as e:
+            outcome["error"] = e
+            # Recuperación desde snapshot raw local (como el serial). Si esto
+            # levanta, propaga igual que el serial (aborta el fetch).
+            outcome["raw_records"] = load_latest_raw_snapshot(codigo, year)
+
+        # Override de último recurso para `ipc` en el año en curso (mismas
+        # condiciones que el serial: sin registros y par no refrescado; como
+        # los pares son únicos, equivale al chequeo local de abajo).
+        if (
+            codigo == "ipc"
+            and year == current_year
+            and not outcome["records"]
+            and not outcome["raw_records"]
+        ):
+            outcome["ine_attempted"] = True
+            outcome["ine_reading"] = fetch_ine_ipc()
+
+        # Espera de cortesía idéntica a la serial, solapada entre hilos.
+        time.sleep(REQUEST_DELAY_SECONDS)
+        return outcome
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=MINDICADOR_MAX_WORKERS) as pool:
+        # map preserva el orden de `pairs`: el plegado replica el serial.
+        outcomes = list(pool.map(_fetch_pair, pairs))
+
+    for call_n, outcome in enumerate(outcomes, 1):
+        codigo = outcome["codigo"]
+        year = outcome["year"]
+        pair = f"{codigo}/{year}"
+        records = outcome["records"]
+        print(f"  [{call_n}/{total_calls}] Descargando {codigo}/{year}…")
+        if outcome["error"] is None:
+            if records:
+                new_records.extend(records)
+                refreshed_pairs.add((codigo, year))
+            else:
+                # Serie vacía para un indicador mensual en el año en curso:
+                # el dato aún no fue publicado ese mes — comportamiento esperado.
+                expected_monthly_gap = codigo in MONTHLY_INDICATORS and year == current_year
+                if not expected_monthly_gap:
+                    diagnostics["empty_live_pairs"].append(pair)
+                if existing_df is not None:
+                    has_published_history = (
+                        existing_df.filter(pl.col("codigo_indicador") == codigo).height > 0
                     )
-                    new_records.append(
-                        {
-                            "fecha": ine_reading.date_iso,
-                            "codigo_indicador": "ipc",
-                            "valor": ine_reading.value,
-                        }
-                    )
-                    # NO marcar (ipc, year) en refreshed_pairs: eso haria que el
-                    # merge eliminara TODO el slice ipc del año en curso del
-                    # staging existente y lo reemplazara solo por el registro
-                    # INE (un mes), truncando los meses que mindicador si habia
-                    # entregado. El concat + unique(keep="last") final fusiona
-                    # el registro INE con el historial existente por fecha.
-                    diagnostics.setdefault("ine_override_pairs", []).append(f"{codigo}/{year}")
-                else:
-                    print("  Advertencia: no se pudo obtener IPC desde INE.")
-            time.sleep(REQUEST_DELAY_SECONDS)
+                    if has_published_history:
+                        diagnostics["published_backfills"].append(codigo)
+        else:
+            e = outcome["error"]
+            diagnostics["fetch_failures"].append(f"{codigo}/{year}: {e}")
+            print(f"  Advertencia: no se pudo obtener {codigo}/{year}: {e}")
+            raw_records = outcome["raw_records"]
+            if raw_records:
+                print(f"  Recuperando {codigo}/{year} desde snapshot raw local…")
+                new_records.extend(raw_records)
+                refreshed_pairs.add((codigo, year))
+                diagnostics["raw_recoveries"].append(f"{codigo}/{year}")
+            elif existing_df is not None:
+                diagnostics["preserved_existing_pairs"].append(f"{codigo}/{year}")
+
+        # Override de último recurso para `ipc` en el año en curso: si
+        # mindicador.cl no lo entrega (serie muerta upstream desde
+        # 2025-12, issue #43), la fuente autoritativa INE publica la
+        # variación mensual en su página pública. Solo aplica cuando el
+        # dato no llegó por la vía normal, y solo para el año en curso
+        # (el INE publica el último mes, no historial).
+        if outcome["ine_attempted"]:
+            ine_reading = outcome["ine_reading"]
+            if ine_reading is not None:
+                print(
+                    f"  IPC desde INE (fuente autoritativa): "
+                    f"{ine_reading.date_iso} = {ine_reading.value}%"
+                )
+                new_records.append(
+                    {
+                        "fecha": ine_reading.date_iso,
+                        "codigo_indicador": "ipc",
+                        "valor": ine_reading.value,
+                    }
+                )
+                # NO marcar (ipc, year) en refreshed_pairs: eso haria que el
+                # merge eliminara TODO el slice ipc del año en curso del
+                # staging existente y lo reemplazara solo por el registro
+                # INE (un mes), truncando los meses que mindicador si habia
+                # entregado. El concat + unique(keep="last") final fusiona
+                # el registro INE con el historial existente por fecha.
+                diagnostics.setdefault("ine_override_pairs", []).append(f"{codigo}/{year}")
+            else:
+                print("  Advertencia: no se pudo obtener IPC desde INE.")
 
     if not new_records and existing_df is not None:
         published_codes = sorted(existing_df["codigo_indicador"].unique().to_list())

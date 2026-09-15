@@ -797,11 +797,12 @@ def _write_data_artifacts(dfs):
     write_parquet_atomic(
         df_censo_hogares, os.path.join(NORMALIZED_DIR, "censo_hogares_viviendas.parquet")
     )
+    # JSON compacto (sin indent): tablas completas; Parquet/DuckDB son la
+    # vía para grandes volúmenes (mismo criterio que formats.build_flat_files).
     write_json_atomic(
         df_censo_hogares.to_dicts(),
         os.path.join(NORMALIZED_DIR, "censo_hogares_viviendas.json"),
         ensure_ascii=False,
-        indent=2,
     )
 
     write_parquet_atomic(

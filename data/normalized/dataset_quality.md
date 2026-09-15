@@ -1,9 +1,9 @@
 # chile-hub — Calidad de datasets
 
-- `generated_at_utc`: `2026-09-15T12:16:25.432629+00:00`
+- `generated_at_utc`: `2026-09-15T13:40:57.085033+00:00`
 - `dataset_count`: `22`
-- `average_score`: `93.6`
-- `grade_distribution`: A=18, B=4, C=0, D=0, F=0
+- `average_score`: `94.0`
+- `grade_distribution`: A=19, B=3, C=0, D=0, F=0
 
 | Dataset | Nota | Valid | Contrato | Madurez | Frescura | Cobert | Reúso | Bloqueadores |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | :--- |
@@ -20,7 +20,7 @@
 | `establecimientos_salud` | **A** (90.0) | 100 | 100 | 100 | 100 | 0 | 100 | Cobertura not_applicable |
 | `estadisticas_vitales` | **A** (90.0) | 100 | 100 | 100 | 100 | 0 | 100 | Cobertura not_applicable |
 | `finanzas_municipales` | **B** (85.0) | 100 | 100 | 100 | 100 | 0 | 50 | Cobertura not_applicable; Reutilización: public-api-review-terms |
-| `indicadores` | **B** (82.5) | 100 | 100 | 100 | 50 | 0 | 100 | Datos stale; Cobertura not_applicable |
+| `indicadores` | **A** (90.0) | 100 | 100 | 100 | 100 | 0 | 100 | Cobertura not_applicable |
 | `indicadores_urbanos_siedu` | **A** (97.0) | 100 | 100 | 100 | 100 | 70 | 100 | Cobertura partial |
 | `partidos_politicos` | **A** (100.0) | 100 | 100 | 100 | 100 | 100 | 100 | — |
 | `perfil_territorial_comunal` | **A** (100.0) | 100 | 100 | 100 | 100 | 100 | 100 | — |

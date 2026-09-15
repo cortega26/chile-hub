@@ -557,8 +557,15 @@ def build_source_readiness(pipeline_metadata):
         stalled = False
         review_status = "ok"
         if review_by:
-            try:
-                review_date = datetime.fromisoformat(review_by).replace(tzinfo=UTC)
+            # Import perezoso a propósito: este módulo lo cargan gates
+            # stdlib-only (sync_docs --check, etc.) con un python sin el
+            # paquete instalado, y el shim src.pipeline_status_utils dispara
+            # `import chile_hub` al cargarse. Esta función solo corre en
+            # contexto de build (venv/PYTHONPATH), donde sí resuelve.
+            from src.pipeline_status_utils import parse_review_date
+
+            review_date = parse_review_date(review_by)
+            if review_date is not None:
                 days_until_review = (review_date - datetime.now(UTC)).days
                 stalled = days_until_review < 0
                 # Señal proactiva de cadencia (Plan 083): al acercarse el
@@ -570,8 +577,6 @@ def build_source_readiness(pipeline_metadata):
                 # decisión de carril. Con 90, hoy las 4 fechas próximas
                 # (36-69 días) quedan señaladas.
                 review_status = "due" if stalled else "upcoming" if days_until_review < 90 else "ok"
-            except (ValueError, TypeError):
-                pass
 
         # Acción recomendada
         recommended_action = src.get("next_action", "—")

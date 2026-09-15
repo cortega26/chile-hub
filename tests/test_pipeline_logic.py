@@ -2863,6 +2863,29 @@ class PipelineStatusUtilsTests(unittest.TestCase):
         self.assertEqual(parse_iso_datetime("2026-07-07T12:00:00Z"), expected)
         self.assertEqual(parse_iso_datetime("2026-07-07T12:00:00+00:00"), expected)
 
+    def test_parse_review_date_converts_offset_instead_of_overwriting(self):
+        """Plan 009: review_by con offset (-04:00) debe convertirse a UTC con
+        astimezone, no sobrescribirse con replace(tzinfo=UTC) — el día UTC
+        cambia y con él la señal stalled/upcoming de ambos call sites
+        (_compute_review_status_counts y build_source_readiness)."""
+        from src.pipeline_status_utils import parse_review_date
+
+        # 22:00 en UTC-4 son las 02:00 UTC del día siguiente: el día UTC es
+        # 19, no 18 (replace lo habría dejado en 18).
+        self.assertEqual(
+            parse_review_date("2026-09-18T22:00:00-04:00"),
+            datetime.datetime(2026, 9, 19, 2, 0, tzinfo=datetime.UTC),
+        )
+        # Naive (el formato date-only del registry hoy) se asume UTC: sin
+        # cambio de comportamiento para los valores actuales.
+        self.assertEqual(
+            parse_review_date("2026-12-31"),
+            datetime.datetime(2026, 12, 31, 0, 0, tzinfo=datetime.UTC),
+        )
+        # Ausente o inválido → None (el llamador salta la entrada).
+        self.assertIsNone(parse_review_date(None))
+        self.assertIsNone(parse_review_date("no-es-una-fecha"))
+
     def test_format_reuse_policy(self):
         from src.pipeline_status_utils import format_reuse_policy
 
@@ -2876,6 +2899,37 @@ class PipelineStatusUtilsTests(unittest.TestCase):
 
 class ReportsBuilderTests(unittest.TestCase):
     """Tests para src/builders/reports.py (build_dev_db.py._generate_reports)."""
+
+    def test_gate_modules_have_no_top_level_package_imports(self):
+        """Regresión real de CI (PR #99): un `from src.pipeline_status_utils
+        import …` a nivel de módulo en reports.py tumbó el gate stdlib-only
+        `sync_docs.py --check` — el shim dispara `import chile_hub` al
+        cargarse y el python del job no tiene el paquete instalado.
+
+        Los módulos que cargan los gates (reports, doc_sync, landing) solo
+        pueden importar stdlib, third-party e intra-builders a nivel de
+        módulo; el canal del shim/paquete solo vale en imports perezosos
+        dentro de funciones que corren en contexto de build.
+        """
+        import ast
+
+        gate_modules = ("reports", "doc_sync", "landing")
+        builders_dir = ROOT_DIR / "src" / "builders"
+        offenders = []
+        for name in gate_modules:
+            tree = ast.parse(
+                (builders_dir / f"{name}.py").read_text(encoding="utf-8"), filename=name
+            )
+            for node in tree.body:
+                if not isinstance(node, ast.ImportFrom) or node.level != 0:
+                    continue
+                top = (node.module or "").split(".")[0]
+                if top in {"chile_hub"} or (node.module or "") in {
+                    "src.pipeline_status_utils",
+                    "pipeline_status_utils",
+                }:
+                    offenders.append(f"{name}.py: from {node.module} import … (top-level)")
+        self.assertEqual(offenders, [])
 
     @staticmethod
     def _catalog_entry(dataset, source_mode, warnings=None):

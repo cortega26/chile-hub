@@ -342,29 +342,27 @@ def build_flat_files(
     # SQLite/DuckDB maneja fechas como objetos datetime.date, por lo que convertimos a str para serialización JSON
     df_indicadores_serializable = df_indicadores.with_columns(pl.col("fecha").cast(pl.String))
 
-    write_json_atomic(df_regiones.to_dicts(), regiones_json, ensure_ascii=False, indent=2)
-    write_json_atomic(df_provincias.to_dicts(), provincias_json, ensure_ascii=False, indent=2)
-    write_json_atomic(df_comunas.to_dicts(), comunas_json, ensure_ascii=False, indent=2)
-    write_json_atomic(
-        df_indicadores_serializable.to_dicts(), indicadores_json, ensure_ascii=False, indent=2
-    )
+    write_json_atomic(df_regiones.to_dicts(), regiones_json, ensure_ascii=False)
+    write_json_atomic(df_provincias.to_dicts(), provincias_json, ensure_ascii=False)
+    write_json_atomic(df_comunas.to_dicts(), comunas_json, ensure_ascii=False)
+    write_json_atomic(df_indicadores_serializable.to_dicts(), indicadores_json, ensure_ascii=False)
+    # JSON compacto (sin indent): las tablas son dicts planos con valores
+    # largos y el pretty-print suma ~10-20% de bytes (medido 12.2% sobre los
+    # JSON reales; Plan 010). Parquet y DuckDB son la vía para grandes volúmenes.
     write_json_atomic(
         df_censo.to_dicts(),
         os.path.join(NORMALIZED_DIR, "censo_comunal.json"),
         ensure_ascii=False,
-        indent=2,
     )
     write_json_atomic(
         df_salud.to_dicts(),
         os.path.join(NORMALIZED_DIR, "establecimientos_salud.json"),
         ensure_ascii=False,
-        indent=2,
     )
     write_json_atomic(
         df_educacionales.to_dicts(),
         os.path.join(NORMALIZED_DIR, "establecimientos_educacionales.json"),
         ensure_ascii=False,
-        indent=2,
     )
     # JSON para tablas extra: omitir las masivas (> 100k filas).
     # Parquet y DuckDB son los formatos recomendados para grandes volúmenes.
@@ -381,7 +379,6 @@ def build_flat_files(
             df_extra.to_dicts(),
             os.path.join(NORMALIZED_DIR, f"{table_name}.json"),
             ensure_ascii=False,
-            indent=2,
         )
 
     print(f"  Endpoints JSON exportados a: {NORMALIZED_DIR}")
