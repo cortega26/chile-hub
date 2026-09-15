@@ -2900,6 +2900,37 @@ class PipelineStatusUtilsTests(unittest.TestCase):
 class ReportsBuilderTests(unittest.TestCase):
     """Tests para src/builders/reports.py (build_dev_db.py._generate_reports)."""
 
+    def test_gate_modules_have_no_top_level_package_imports(self):
+        """Regresión real de CI (PR #99): un `from src.pipeline_status_utils
+        import …` a nivel de módulo en reports.py tumbó el gate stdlib-only
+        `sync_docs.py --check` — el shim dispara `import chile_hub` al
+        cargarse y el python del job no tiene el paquete instalado.
+
+        Los módulos que cargan los gates (reports, doc_sync, landing) solo
+        pueden importar stdlib, third-party e intra-builders a nivel de
+        módulo; el canal del shim/paquete solo vale en imports perezosos
+        dentro de funciones que corren en contexto de build.
+        """
+        import ast
+
+        gate_modules = ("reports", "doc_sync", "landing")
+        builders_dir = ROOT_DIR / "src" / "builders"
+        offenders = []
+        for name in gate_modules:
+            tree = ast.parse(
+                (builders_dir / f"{name}.py").read_text(encoding="utf-8"), filename=name
+            )
+            for node in tree.body:
+                if not isinstance(node, ast.ImportFrom) or node.level != 0:
+                    continue
+                top = (node.module or "").split(".")[0]
+                if top in {"chile_hub"} or (node.module or "") in {
+                    "src.pipeline_status_utils",
+                    "pipeline_status_utils",
+                }:
+                    offenders.append(f"{name}.py: from {node.module} import … (top-level)")
+        self.assertEqual(offenders, [])
+
     @staticmethod
     def _catalog_entry(dataset, source_mode, warnings=None):
         return {

@@ -17,7 +17,6 @@ from src.builders._shared import (
     UTC,
 )
 from src.builders.io_utils import replace_delimited_block, write_json_atomic
-from src.pipeline_status_utils import parse_review_date
 
 
 def write_hub_health_json(health):
@@ -558,6 +557,13 @@ def build_source_readiness(pipeline_metadata):
         stalled = False
         review_status = "ok"
         if review_by:
+            # Import perezoso a propósito: este módulo lo cargan gates
+            # stdlib-only (sync_docs --check, etc.) con un python sin el
+            # paquete instalado, y el shim src.pipeline_status_utils dispara
+            # `import chile_hub` al cargarse. Esta función solo corre en
+            # contexto de build (venv/PYTHONPATH), donde sí resuelve.
+            from src.pipeline_status_utils import parse_review_date
+
             review_date = parse_review_date(review_by)
             if review_date is not None:
                 days_until_review = (review_date - datetime.now(UTC)).days
