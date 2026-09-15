@@ -23,10 +23,12 @@ from src.extractors import (
     censo_extractor,
     censo_hogares_viviendas_extractor,
     electoral_extractor,
+    estadisticas_vitales_extractor,
     geometria_comunal_extractor,
     mineduc_establecimientos_extractor,
     mineduc_resultados_extractor,
     partidos_politicos_extractor,
+    permisos_edificacion_extractor,
     res_extractor,
     salud_extractor,
     siedu_extractor,
@@ -2997,6 +2999,513 @@ class GeometriaComunalExtractorTests(unittest.TestCase):
                 ),
             ):
                 result = geometria_comunal_extractor.GeometriaComunalExtractor().run(dry_run=True)
+                self.assertEqual(result["status"], "ok")
+                self.assertFalse(staging_csv.exists())
+
+
+class EstadisticasVitalesExtractorTests(unittest.TestCase):
+    """Tests unitarios para el extractor de estadísticas vitales (INE)."""
+
+    FAKE_LOOKUP = {
+        "santiago": ("13101", "13", "Santiago"),
+        "puente alto": ("13201", "13", "Puente Alto"),
+        "concepcion": ("08101", "08", "Concepción"),
+    }
+    FAKE_PROVINCES = {"santiago", "cordillera", "concepcion"}
+
+    def _rows_2023_layout(self):
+        """Mini-hoja estilo anuario 2023: split por sexo, provincia indentada."""
+        return [
+            ["INDICE", None, None, None, None, None, None],
+            [
+                "1.2.2-04:",
+                "NACIDOS VIVOS, DEFUNCIONES GENERALES POR COMUNA",
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+            [None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None],
+            [
+                "REGIÓN, PROVINCIA Y",
+                "Nacidos Vivos",
+                None,
+                None,
+                "Defunciones Generales",
+                None,
+                None,
+            ],
+            [
+                "COMUNA DE RESIDENCIA",
+                "Hombre",
+                "Mujer",
+                "Indeterminado",
+                "Hombre",
+                "Mujer",
+                "Indeterminado",
+            ],
+            ["TOTAL PAIS", 100, 90, 1, 80, 70, 0],
+            ["METROPOLITANA", None, None, None, None, None, None],
+            ["  Santiago", 60, 50, 0, 40, 35, 0],
+            ["Santiago", 59, 49, 0, 39, 34, 0],
+            ["  Cordillera", 41, 41, 1, 41, 36, 0],
+            ["Puente Alto", 41, 41, 1, 41, 36, 0],
+            ["BIOBÍO", None, None, None, None, None, None],
+            ["  Concepción", 0, 0, 0, 0, 0, 0],
+            ["Concepción", 0, 0, 0, 0, 0, 0],
+            [
+                "FUENTE: Instituto Nacional de Estadísticas (INE).",
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+        ]
+
+    def _rows_2015_layout(self):
+        """Mini-hoja estilo anuario 2015: totales sin sexo, provincia con prefijo."""
+        return [
+            ["volver", None, None, None],
+            ["1.2.2-04: NACIDOS VIVOS, MATRIMONIOS, DEFUNCIONES", None, None, None],
+            [None, None, None, None],
+            [
+                "REGIÓN, PROVINCIA Y COMUNA DE RESIDENCIA",
+                "Nacidos vivos",
+                "Matrimonios",
+                "DEFUNCIONES",
+            ],
+            [None, None, None, "Generales"],
+            ["TOTAL", 191, 50, 150],
+            ["METROPOLITANA", 100, 30, 80],
+            ["Provincia Santiago", 100, 30, 80],
+            ["Santiago", 59, 20, 44],
+            ["Puente Alto", 41, 10, 36],
+        ]
+
+    def test_dataset_name(self):
+        extractor = estadisticas_vitales_extractor.EstadisticasVitalesExtractor()
+        self.assertEqual(extractor.dataset_name, "estadisticas_vitales")
+
+    def test_normalize_rows_writes_required_schema(self):
+        from src.extractors.estadisticas_vitales_extractor import FALLBACK_ROWS, normalize_rows
+
+        df = normalize_rows(FALLBACK_ROWS)
+        required = {
+            "anio",
+            "codigo_region",
+            "codigo_comuna",
+            "nombre_comuna",
+            "evento",
+            "sexo",
+            "cantidad",
+            "estado_dato",
+            "fuente",
+            "url_fuente",
+            "fecha_fuente",
+        }
+        self.assertTrue(required.issubset(set(df.columns)))
+        self.assertEqual(df["codigo_comuna"].dtype, pl.String)
+        self.assertEqual(df["anio"].dtype, pl.Int64)
+        self.assertEqual(df["cantidad"].dtype, pl.Int64)
+        self.assertGreater(df.height, 0)
+
+    def test_normalize_empty_rows(self):
+        from src.extractors.estadisticas_vitales_extractor import normalize_rows
+
+        df = normalize_rows([])
+        self.assertEqual(df.height, 0)
+        self.assertIn("cantidad", df.columns)
+
+    def test_parse_2023_layout_with_sexo_split(self):
+        """Layout 2021-2023: 3 columnas por evento; la provincia indentada se
+        descarta y la comuna conserva sus valores (no los de la provincia)."""
+        from src.extractors.estadisticas_vitales_extractor import _parse_comuna_sheet
+
+        rows, totals, notas = _parse_comuna_sheet(
+            self._rows_2023_layout(),
+            2023,
+            self.FAKE_LOOKUP,
+            self.FAKE_PROVINCES,
+            "http://ejemplo/x.xlsx",
+            "2026-09-14",
+        )
+        self.assertEqual(notas, [])
+        # 3 comunas x 2 eventos x 3 sexos
+        self.assertEqual(len(rows), 18)
+        df = pl.DataFrame(rows)
+        santiago_nac_h = df.filter(
+            (pl.col("codigo_comuna") == "13101")
+            & (pl.col("evento") == "nacimiento")
+            & (pl.col("sexo") == "hombre")
+        )["cantidad"].to_list()
+        # 59 = valor de la comuna; 60 (provincia) debe quedar fuera
+        self.assertEqual(santiago_nac_h, [59])
+        self.assertEqual(
+            totals,
+            {
+                "nacimiento_hombre": 100,
+                "nacimiento_mujer": 90,
+                "nacimiento_indeterminado": 1,
+                "defuncion_hombre": 80,
+                "defuncion_mujer": 70,
+                "defuncion_indeterminado": 0,
+            },
+        )
+
+    def test_parse_2015_layout_totals_without_sexo(self):
+        """Layout 2010-2020: totales sin split; 'Provincia X' se descarta y
+        'DEFUNCIONES'+'Generales' en dos filas mapea a defuncion."""
+        from src.extractors.estadisticas_vitales_extractor import _parse_comuna_sheet
+
+        rows, totals, notas = _parse_comuna_sheet(
+            self._rows_2015_layout(),
+            2015,
+            self.FAKE_LOOKUP,
+            self.FAKE_PROVINCES,
+            "http://ejemplo/x.xlsx",
+            "2026-09-14",
+        )
+        self.assertEqual(notas, [])
+        # 2 comunas x 2 eventos x sexo total
+        self.assertEqual(len(rows), 4)
+        df = pl.DataFrame(rows)
+        self.assertEqual(set(df["sexo"].unique().to_list()), {"total"})
+        puente_def = df.filter(
+            (pl.col("codigo_comuna") == "13201") & (pl.col("evento") == "defuncion")
+        )["cantidad"].to_list()
+        self.assertEqual(puente_def, [36])
+        self.assertEqual(totals, {"nacimiento_total": 191, "defuncion_total": 150})
+
+    def test_parse_skips_unknown_labels_with_note(self):
+        """Etiquetas sin match CUT no tumban el parseo; quedan en notes."""
+        from src.extractors.estadisticas_vitales_extractor import _parse_comuna_sheet
+
+        rows = self._rows_2015_layout()
+        rows.append(["Comuna Inexistente", 1, 2, 3])
+        _, _, notas = _parse_comuna_sheet(
+            rows, 2015, self.FAKE_LOOKUP, self.FAKE_PROVINCES, "u", "x"
+        )
+        self.assertTrue(any("Comuna Inexistente" in n for n in notas))
+
+    def test_discover_skips_non_nacimientos_defunciones_docs(self):
+        """El descubrimiento elige anuarios con nacimientos/defunciones y omite
+        matrimonios-only o años sin anuario (solo provisionales)."""
+        from src.extractors import estadisticas_vitales_extractor as ev
+
+        folders = {"folder": [{"Titulo": "2022", "Id": "f2022"}, {"Titulo": "Series", "Id": "fs"}]}
+        docs_2022 = {
+            "documento": [
+                {
+                    "Titulo": "Anuario de estadísticas vitales 2022, matrimonios y AUC",
+                    "Url": "http://m",
+                },
+                {
+                    "Titulo": "Anuario de estadísticas vitales 2022, nacimientos y defunciones",
+                    "Url": "http://n",
+                },
+            ]
+        }
+
+        def fake_post(url, payload):
+            if url == ev.FOLDERS_URL:
+                return folders
+            return docs_2022
+
+        with patch.object(ev, "_post_json", side_effect=fake_post):
+            found = ev._discover_anuario_docs()
+        self.assertEqual(len(found), 1)
+        self.assertEqual(found[0][0], 2022)
+        # http://n normalizado a https://n por el extractor
+        self.assertEqual(found[0][2], "https://n")
+
+    def test_gate_reconciliacion_drops_mismatched_event(self):
+        """P2 review: el grupo que no cuadra con la fila TOTAL se omite (el
+        validador detecta el evento faltante y aborta ruidosamente)."""
+        from src.extractors.estadisticas_vitales_extractor import _gate_reconciliacion
+
+        rows = [
+            {"evento": "nacimiento", "sexo": "total", "cantidad": 60},
+            {"evento": "defuncion", "sexo": "total", "cantidad": 40},
+        ]
+        totals = {"nacimiento_total": 999, "defuncion_total": 40}
+        kept, errors = _gate_reconciliacion(rows, totals)
+        self.assertEqual(len(kept), 1)
+        self.assertEqual(kept[0]["evento"], "defuncion")
+        self.assertTrue(any("ERROR" in e for e in errors))
+
+    def test_gate_reconciliacion_keeps_matching_rows(self):
+        from src.extractors.estadisticas_vitales_extractor import _gate_reconciliacion
+
+        rows = [
+            {"evento": "nacimiento", "sexo": "total", "cantidad": 60},
+            {"evento": "defuncion", "sexo": "total", "cantidad": 40},
+        ]
+        totals = {"nacimiento_total": 60, "defuncion_total": 40}
+        kept, errors = _gate_reconciliacion(rows, totals)
+        self.assertEqual(len(kept), 2)
+        self.assertEqual(errors, [])
+
+    def test_gate_reconciliacion_without_totals_keeps_rows(self):
+        from src.extractors.estadisticas_vitales_extractor import _gate_reconciliacion
+
+        rows = [{"evento": "nacimiento", "sexo": "total", "cantidad": 60}]
+        kept, errors = _gate_reconciliacion(rows, {})
+        self.assertEqual(len(kept), 1)
+        self.assertEqual(errors, [])
+
+    def test_fetch_recovers_from_snapshots_when_discovery_fails(self):
+        """Si el sitio INE no responde, el extractor reconstruye desde
+        snapshots crudos locales en vez de caer a fallback."""
+        from requests import RequestException
+
+        from src.extractors import estadisticas_vitales_extractor as ev
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            wb = openpyxl.Workbook()
+            ws = wb.active
+            ws.append(["volver"])
+            ws.append(["1.2.2-04: NACIDOS VIVOS"])
+            ws.append([])
+            ws.append(
+                [
+                    "REGIÓN, PROVINCIA Y COMUNA DE RESIDENCIA",
+                    "Nacidos vivos",
+                    "Matrimonios",
+                    "DEFUNCIONES",
+                ]
+            )
+            ws.append([None, None, None, "Generales"])
+            ws.append(["TOTAL", 60, 30, 40])
+            ws.append(["METROPOLITANA", 60, 30, 40])
+            ws.append(["Provincia Santiago", 60, 30, 40])
+            ws.append(["Santiago", 60, 30, 40])
+            snap = Path(tmpdir) / "ine_estadisticas_vitales_2015_20200101T000000Z.xlsx"
+            wb.save(snap)
+            fake_lookup = {"santiago": ("13101", "13", "Santiago")}
+            with (
+                patch.object(ev, "_discover_anuario_docs", side_effect=RequestException("down")),
+                patch.object(ev, "RAW_DIR", tmpdir),
+                patch.object(ev, "_load_comunas_lookup", return_value=(fake_lookup, set())),
+            ):
+                rows, mode, _url, notes = ev.fetch_data()
+        self.assertEqual(mode, "live")
+        self.assertTrue(any(r["codigo_comuna"] == "13101" for r in rows))
+        self.assertTrue(any("snapshots locales" in n for n in notes))
+
+    def test_run_dry_run_returns_validation_without_writing(self):
+        """Dry run ejecuta fetch + normalize + validate sin persistir."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            staging_csv = Path(tmpdir) / "estadisticas_vitales.csv"
+            metadata_path = Path(tmpdir) / "estadisticas_vitales.metadata.json"
+            with (
+                patch.object(estadisticas_vitales_extractor, "STAGING_CSV_PATH", str(staging_csv)),
+                patch.object(estadisticas_vitales_extractor, "METADATA_PATH", str(metadata_path)),
+                patch.object(estadisticas_vitales_extractor, "RAW_DIR", tmpdir),
+                patch.object(estadisticas_vitales_extractor, "STAGING_DIR", tmpdir),
+                patch.object(
+                    estadisticas_vitales_extractor,
+                    "fetch_data",
+                    return_value=(
+                        estadisticas_vitales_extractor.FALLBACK_ROWS,
+                        "fallback",
+                        estadisticas_vitales_extractor.EEVV_PAGE,
+                        ["test"],
+                    ),
+                ),
+            ):
+                result = estadisticas_vitales_extractor.EstadisticasVitalesExtractor().run(
+                    dry_run=True
+                )
+                self.assertEqual(result["status"], "ok")
+                self.assertFalse(staging_csv.exists())
+
+
+class PermisosEdificacionExtractorTests(unittest.TestCase):
+    """Tests unitarios para el extractor de permisos de edificación (MINVU CEDOC)."""
+
+    FAKE_LOOKUP = {
+        "santiago": ("13101", "13", "Santiago"),
+        "puente alto": ("13201", "13", "Puente Alto"),
+        "chillan": ("16101", "16", "Chillán"),
+    }
+
+    def _sheet_rows(self):
+        return [
+            [None, None, None, None],
+            [None, None, None, None],
+            ["Región", "Comuna", 2022, "2023 (*)"],
+            [None, None, None, None],
+            ["Total País ", None, 1000, 900],
+            [None, None, None, None],
+            ["Metropolitana", None, 600, 500],
+            ["Metropolitana", "Santiago", 590, 490],
+            ["Metropolitana", "Puente Alto", 10, 10],
+            ["Biobío", None, 0, 0],
+            ["Ñuble (ex-Biobío)", "Chillán", 50, 0],
+            ["Ñuble", "Chillán", 0, 40],
+            [None, "Notas: (*)", None, None],
+        ]
+
+    def test_dataset_name(self):
+        extractor = permisos_edificacion_extractor.PermisosEdificacionExtractor()
+        self.assertEqual(extractor.dataset_name, "permisos_edificacion")
+
+    def test_normalize_rows_writes_required_schema(self):
+        from src.extractors.permisos_edificacion_extractor import FALLBACK_ROWS, normalize_rows
+
+        df = normalize_rows(FALLBACK_ROWS)
+        required = {
+            "anio",
+            "codigo_region",
+            "codigo_comuna",
+            "nombre_comuna",
+            "unidades_total",
+            "superficie_m2_total",
+            "unidades_casas",
+            "superficie_m2_casas",
+            "unidades_departamentos",
+            "superficie_m2_departamentos",
+            "estado_dato",
+            "fuente",
+        }
+        self.assertTrue(required.issubset(set(df.columns)))
+        self.assertEqual(df["codigo_comuna"].dtype, pl.String)
+        self.assertEqual(df["anio"].dtype, pl.Int64)
+        self.assertEqual(df["unidades_total"].dtype, pl.Int64)
+        self.assertGreater(df.height, 0)
+
+    def test_normalize_empty_rows(self):
+        from src.extractors.permisos_edificacion_extractor import normalize_rows
+
+        df = normalize_rows([])
+        self.assertEqual(df.height, 0)
+        self.assertIn("unidades_total", df.columns)
+
+    def test_sheet_target_mapping(self):
+        from src.extractors.permisos_edificacion_extractor import _sheet_target
+
+        self.assertEqual(_sheet_target("número_total"), "unidades_total")
+        self.assertEqual(_sheet_target("m2_total"), "superficie_m2_total")
+        self.assertEqual(_sheet_target("número_casas"), "unidades_casas")
+        self.assertEqual(_sheet_target("m2_casas"), "superficie_m2_casas")
+        self.assertEqual(_sheet_target("número_departamentos"), "unidades_departamentos")
+        self.assertEqual(_sheet_target("m2_departamentos"), "superficie_m2_departamentos")
+        self.assertIsNone(_sheet_target("Serie Nacimientos"))
+
+    def test_year_from_header_marks_star_provisional(self):
+        from src.extractors.permisos_edificacion_extractor import _year_from_header
+
+        self.assertEqual(_year_from_header(2022), (2022, False))
+        self.assertEqual(_year_from_header("2024 (*)"), (2024, True))
+        # (***) es nota metodológica, no provisionalidad
+        self.assertEqual(_year_from_header("2018 (***)"), (2018, False))
+        self.assertEqual(_year_from_header(None), (None, False))
+
+    def test_parse_sheet_merges_nuble_split_sections(self):
+        """Las secciones 'Ñuble (ex-Biobío)' y 'Ñuble' traen series
+        complementarias (corte 2018): se fusionan sumando por comuna."""
+        from src.extractors.permisos_edificacion_extractor import _parse_sheet
+
+        valores, totales, provisionales = _parse_sheet(self._sheet_rows(), "unidades_total")
+        self.assertEqual(totales, {2022: 1000, 2023: 900})
+        self.assertEqual(provisionales, [2023])
+        # Chillán fusionado: 50 (ex-Biobío, 2022) + 40 (Ñuble, 2023)
+        self.assertEqual(valores["chillan"], {2022: 50, 2023: 40})
+        self.assertEqual(valores["santiago"], {2022: 590, 2023: 490})
+        # Regiones y notas no entran a valores
+        self.assertNotIn("metropolitana", valores)
+        self.assertNotIn("notas: (*)", valores)
+
+    def test_discover_resolves_biblionumber_link(self):
+        """El descubrimiento extrae el `uri` del link con biblionumber=25583."""
+        from src.extractors import permisos_edificacion_extractor as pe
+
+        html = (
+            '<a href="https://catalogo.minvu.cl/cgi-bin/koha/tracklinks.pl'
+            '?uri=https%3A%2F%2Fcatalogo.minvu.cl%2Ff.xlsx&amp;biblionumber=25583">DL</a>'
+        )
+        fake_response = MagicMock()
+        fake_response.text = html
+        fake_response.__enter__.return_value = fake_response
+        with patch.object(pe, "fetch_with_retry", return_value=fake_response):
+            url, metodo = pe._discover_xlsx_url()
+        self.assertEqual(url, "https://catalogo.minvu.cl/f.xlsx")
+        self.assertEqual(metodo, "repositorio-biblionumber")
+
+    def test_discover_falls_back_to_hardcoded_url(self):
+        """Si el repositorio no responde, se usa la URL directa conocida."""
+        from requests import RequestException
+
+        pe = permisos_edificacion_extractor
+        with patch.object(pe, "fetch_with_retry", side_effect=RequestException("down")):
+            url, metodo = pe._discover_xlsx_url()
+        self.assertEqual(url, pe.HARDCODED_XLSX_URL)
+        self.assertTrue(metodo.startswith("directa-conocida"))
+
+    def _wide_row(self, anio, unidades_total, codigo_comuna="13101"):
+        return {
+            "anio": anio,
+            "codigo_comuna": codigo_comuna,
+            "unidades_total": unidades_total,
+            "superficie_m2_total": unidades_total * 80,
+            "unidades_casas": unidades_total,
+            "superficie_m2_casas": unidades_total * 80,
+            "unidades_departamentos": 0,
+            "superficie_m2_departamentos": 0,
+        }
+
+    def test_gate_reconciliacion_anual_drops_mismatched_year(self):
+        """El año que no cuadra con Total País se descarta completo (el
+        validador exige cobertura total por año y aborta ruidosamente)."""
+        from src.extractors.permisos_edificacion_extractor import _gate_reconciliacion_anual
+
+        rows = [self._wide_row(2022, 100), self._wide_row(2023, 50)]
+        totals = {
+            ("unidades_total", 2022): 100,
+            ("superficie_m2_total", 2022): 8000,
+            ("unidades_total", 2023): 999,
+            ("superficie_m2_total", 2023): 4000,
+        }
+        kept, errors = _gate_reconciliacion_anual(rows, totals)
+        self.assertEqual([r["anio"] for r in kept], [2022])
+        self.assertTrue(any("ERROR" in e and "2023" in e for e in errors))
+
+    def test_gate_reconciliacion_anual_keeps_matching_years(self):
+        from src.extractors.permisos_edificacion_extractor import _gate_reconciliacion_anual
+
+        rows = [self._wide_row(2022, 100)]
+        totals = {("unidades_total", 2022): 100, ("superficie_m2_total", 2022): 8000}
+        kept, errors = _gate_reconciliacion_anual(rows, totals)
+        self.assertEqual(len(kept), 1)
+        self.assertEqual(errors, [])
+
+    def test_run_dry_run_returns_validation_without_writing(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            staging_csv = Path(tmpdir) / "permisos_edificacion.csv"
+            metadata_path = Path(tmpdir) / "permisos_edificacion.metadata.json"
+            with (
+                patch.object(permisos_edificacion_extractor, "STAGING_CSV_PATH", str(staging_csv)),
+                patch.object(permisos_edificacion_extractor, "METADATA_PATH", str(metadata_path)),
+                patch.object(permisos_edificacion_extractor, "RAW_DIR", tmpdir),
+                patch.object(permisos_edificacion_extractor, "STAGING_DIR", tmpdir),
+                patch.object(
+                    permisos_edificacion_extractor,
+                    "fetch_data",
+                    return_value=(
+                        permisos_edificacion_extractor.FALLBACK_ROWS,
+                        "fallback",
+                        permisos_edificacion_extractor.REPOSITORIO_URL,
+                        ["test"],
+                    ),
+                ),
+            ):
+                result = permisos_edificacion_extractor.PermisosEdificacionExtractor().run(
+                    dry_run=True
+                )
                 self.assertEqual(result["status"], "ok")
                 self.assertFalse(staging_csv.exists())
 

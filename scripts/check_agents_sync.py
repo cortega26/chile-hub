@@ -151,6 +151,8 @@ CATALOG_KEY_TO_ROW_FRAGMENT = {
     "delincuencia_comunal": "Delincuencia Comunal",
     "autoridades_locales": "Autoridades Locales",
     "geometria_comunal": "Geometría Comunal",
+    "estadisticas_vitales": "Estadísticas Vitales",
+    "permisos_edificacion": "Permisos de Edificación",
 }
 
 

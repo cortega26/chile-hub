@@ -1,0 +1,105 @@
+{
+  "dataset": "estadisticas_vitales",
+  "primary_key": [
+    "anio",
+    "codigo_comuna",
+    "evento",
+    "sexo"
+  ],
+  "required_columns": [
+    "anio",
+    "codigo_region",
+    "codigo_comuna",
+    "nombre_comuna",
+    "evento",
+    "sexo",
+    "cantidad",
+    "estado_dato",
+    "fuente",
+    "url_fuente",
+    "fecha_fuente"
+  ],
+  "column_types": {
+    "anio": "integer",
+    "codigo_region": "string",
+    "codigo_comuna": "string",
+    "nombre_comuna": "string",
+    "evento": "string",
+    "sexo": "string",
+    "cantidad": "integer",
+    "estado_dato": "string",
+    "fuente": "string",
+    "url_fuente": "string",
+    "fecha_fuente": "string"
+  },
+  "nullable_columns": [],
+  "fixed_width_columns": {
+    "codigo_region": 2,
+    "codigo_comuna": 5
+  },
+  "expected_record_count": null,
+  "coverage_policy": "full",
+  "publish_outputs": [
+    "parquet",
+    "json"
+  ],
+  "columns": [
+    {
+      "name": "anio",
+      "type": "integer",
+      "example": 2023
+    },
+    {
+      "name": "codigo_region",
+      "type": "string",
+      "width": 2,
+      "example": "13"
+    },
+    {
+      "name": "codigo_comuna",
+      "type": "string",
+      "width": 5,
+      "example": "13101"
+    },
+    {
+      "name": "nombre_comuna",
+      "type": "string",
+      "example": "Santiago"
+    },
+    {
+      "name": "evento",
+      "type": "string",
+      "example": "nacimiento"
+    },
+    {
+      "name": "sexo",
+      "type": "string",
+      "example": "hombre"
+    },
+    {
+      "name": "cantidad",
+      "type": "integer",
+      "example": 4521
+    },
+    {
+      "name": "estado_dato",
+      "type": "string",
+      "example": "definitivo"
+    },
+    {
+      "name": "fuente",
+      "type": "string",
+      "example": "Instituto Nacional de Estadísticas (INE) — Estadísticas Vitales"
+    },
+    {
+      "name": "url_fuente",
+      "type": "string",
+      "example": "https://www.ine.gob.cl/docs/default-source/.../2023/....xlsx"
+    },
+    {
+      "name": "fecha_fuente",
+      "type": "string",
+      "example": "2026-09-14"
+    }
+  ]
+}

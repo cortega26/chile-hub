@@ -1,8 +1,8 @@
 {
-  "generated_at_utc": "2026-09-03T18:21:20.116335+00:00",
+  "generated_at_utc": "2026-09-15T00:04:41.910173+00:00",
   "overall_status": "warn",
-  "dataset_count": 19,
-  "live_count": 18,
+  "dataset_count": 21,
+  "live_count": 20,
   "fallback_count": 0,
   "stale_count": 1,
   "drifted_count": 1,
@@ -26,7 +26,7 @@
   "primary_package": {
     "path": "data/normalized/chile-hub-publishable-bundle.zip",
     "package_type": "zip",
-    "size_bytes": 29764817,
+    "size_bytes": 30192206,
     "checksum_algorithm": "sha256",
     "checksum_path": "data/normalized/chile-hub-publishable-bundle.zip.sha256",
     "verification_command": "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256"
@@ -137,6 +137,14 @@
       "drift_status": "healthy"
     },
     {
+      "dataset": "estadisticas_vitales",
+      "source_mode": "live",
+      "validation_status": "ok",
+      "freshness_status": "fresh",
+      "coverage_status": "not_applicable",
+      "drift_status": "healthy"
+    },
+    {
       "dataset": "finanzas_municipales",
       "source_mode": "monthly",
       "validation_status": "ok",
@@ -174,6 +182,14 @@
       "validation_status": "ok",
       "freshness_status": "fresh",
       "coverage_status": "full",
+      "drift_status": "healthy"
+    },
+    {
+      "dataset": "permisos_edificacion",
+      "source_mode": "live",
+      "validation_status": "ok",
+      "freshness_status": "fresh",
+      "coverage_status": "not_applicable",
       "drift_status": "healthy"
     },
     {

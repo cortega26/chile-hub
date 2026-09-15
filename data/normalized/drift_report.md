@@ -1,9 +1,9 @@
 # chile-hub drift report
 
-- `generated_at_utc`: `2026-09-03T18:21:20.116335+00:00`
-- `dataset_count`: `19`
+- `generated_at_utc`: `2026-09-15T00:04:41.910173+00:00`
+- `dataset_count`: `21`
 - `drifted_count`: `2`
-- `healthy_count`: `17`
+- `healthy_count`: `19`
 - `fallback_count`: `1`
 - `partial_coverage_count`: `1`
 - `degraded_count`: `0`
@@ -29,6 +29,8 @@
 | `consumo_electrico_comunal` | `drifted` | `fallback` | `not_applicable` | `warning` | 3 | Revisar warnings operativos del dataset antes de consumirlo en producción. |
 | `partidos_politicos` | `healthy` | `live` | `full` | `none` | 1 | Ninguna. |
 | `autoridades_electas` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
+| `estadisticas_vitales` | `healthy` | `live` | `not_applicable` | `none` | 0 | Ninguna. |
+| `permisos_edificacion` | `healthy` | `live` | `not_applicable` | `none` | 0 | Ninguna. |
 
 ## regiones
 
@@ -75,7 +77,7 @@
 - `drift_status`: `drifted`
 - `source_mode`: `live`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
-- `degradation`: indicadores live refresh reused last published artifact for missing codes: ipc; indicadores freshness is stale: 505.99h since refresh, policy max is 72h
+- `degradation`: indicadores live refresh reused last published artifact for missing codes: ipc; indicadores freshness is stale: 775.71h since refresh, policy max is 72h
 - `warning_count`: `2`
 - `diagnostic_summary`: indicadores live refresh reused last published artifact for missing codes: ipc
 - `recommended_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.
@@ -215,6 +217,26 @@
 - `drift_status`: `healthy`
 - `source_mode`: `live`
 - `coverage`: `Cobertura completa: 205/205 filas respecto del baseline esperado.`
+- `degradation`: Sin degradación operativa detectada en este build.
+- `warning_count`: `0`
+- `diagnostic_summary`: Sin degradación operativa detectada en este build.
+- `recommended_action`: Ninguna.
+
+## estadisticas_vitales
+
+- `drift_status`: `healthy`
+- `source_mode`: `live`
+- `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
+- `degradation`: Sin degradación operativa detectada en este build.
+- `warning_count`: `0`
+- `diagnostic_summary`: Sin degradación operativa detectada en este build.
+- `recommended_action`: Ninguna.
+
+## permisos_edificacion
+
+- `drift_status`: `healthy`
+- `source_mode`: `live`
+- `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
 - `degradation`: Sin degradación operativa detectada en este build.
 - `warning_count`: `0`
 - `diagnostic_summary`: Sin degradación operativa detectada en este build.

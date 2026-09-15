@@ -38,6 +38,7 @@ REGION_A_CODIGO = {
     "aysen": "11",
     "magallanes y de la antartica chilena": "12",
     "magallanes y la antartica chilena": "12",
+    "magallanes y antartica": "12",
     "magallanes": "12",
 }
 

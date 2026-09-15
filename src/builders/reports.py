@@ -833,6 +833,8 @@ _DISPLAY_NAMES = {
     "partidos_politicos": "Partidos Políticos",
     "autoridades_electas": "Autoridades Electas",
     "autoridades_locales": "Autoridades Locales",
+    "estadisticas_vitales": "Estadísticas Vitales",
+    "permisos_edificacion": "Permisos de Edificación",
 }
 
 _SOURCE_NAMES = {
@@ -857,6 +859,8 @@ _SOURCE_NAMES = {
     "partidos_politicos": "Cámara de Diputados",
     "autoridades_electas": "Cámara de Diputados + Senado",
     "autoridades_locales": "BCN SIIT + Wikipedia",
+    "estadisticas_vitales": "INE",
+    "permisos_edificacion": "MINVU / CEDOC",
 }
 
 _LICENSE_LABELS = {
@@ -881,6 +885,8 @@ _LICENSE_LABELS = {
     "partidos_politicos": "CC BY",
     "autoridades_electas": "CC BY",
     "autoridades_locales": "CC BY / CC BY-SA",
+    "estadisticas_vitales": "CC BY 4.0",
+    "permisos_edificacion": "Uso c/cita",
 }
 
 # Dataset cuyos registros varían entre builds (directorios vivos).

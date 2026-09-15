@@ -71,10 +71,12 @@ from src.validation import (
     validate_distritos_electorales,
     validate_establecimientos_educacionales,
     validate_establecimientos_salud,
+    validate_estadisticas_vitales,
     validate_finanzas_municipales,
     validate_indicadores,
     validate_indicadores_urbanos_siedu,
     validate_perfil_territorial_comunal,
+    validate_permisos_edificacion,
     validate_provincias,
     validate_regiones,
     validate_resultados_educacionales,
@@ -1389,6 +1391,94 @@ class ValidatorTests(unittest.TestCase):
         result = validate_perfil_territorial_comunal(df, {"notes": []}, ["13101"])
         self.assertEqual(result["status"], "error")
         self.assertTrue(any("expected 346" in error for error in result["errors"]))
+
+    def test_validate_estadisticas_vitales_rejects_empty_and_duplicate_keys(self):
+        cols = {
+            "anio": pl.Int64,
+            "codigo_region": pl.String,
+            "codigo_comuna": pl.String,
+            "nombre_comuna": pl.String,
+            "evento": pl.String,
+            "sexo": pl.String,
+            "cantidad": pl.Int64,
+            "estado_dato": pl.String,
+            "fuente": pl.String,
+            "url_fuente": pl.String,
+            "fecha_fuente": pl.String,
+        }
+        empty = pl.DataFrame(schema=cols)
+        row = {
+            "anio": 2023,
+            "codigo_region": "13",
+            "codigo_comuna": "13101",
+            "nombre_comuna": "Santiago",
+            "evento": "nacimiento",
+            "sexo": "total",
+            "cantidad": 100,
+            "estado_dato": "definitivo",
+            "fuente": "INE",
+            "url_fuente": "https://example.com",
+            "fecha_fuente": "2026-09-14",
+        }
+        duplicate = pl.DataFrame([row, row], schema=cols)
+        self.assertEqual(validate_estadisticas_vitales(empty)["status"], "error")
+        result = validate_estadisticas_vitales(duplicate)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("duplicate" in e for e in result["errors"]))
+
+    def test_estadisticas_vitales_cut_codes_are_fixed_width_strings(self):
+        df = self._load_parquet("estadisticas_vitales")
+        self.assertEqual(df["codigo_comuna"].dtype, pl.String)
+        self.assertTrue((df["codigo_comuna"].str.len_chars() == 5).all())
+        self.assertEqual(df["codigo_region"].dtype, pl.String)
+        self.assertTrue((df["codigo_region"].str.len_chars() == 2).all())
+
+    def test_validate_permisos_edificacion_rejects_empty_and_duplicate_keys(self):
+        cols = {
+            "anio": pl.Int64,
+            "codigo_region": pl.String,
+            "codigo_comuna": pl.String,
+            "nombre_comuna": pl.String,
+            "unidades_total": pl.Int64,
+            "superficie_m2_total": pl.Int64,
+            "unidades_casas": pl.Int64,
+            "superficie_m2_casas": pl.Int64,
+            "unidades_departamentos": pl.Int64,
+            "superficie_m2_departamentos": pl.Int64,
+            "estado_dato": pl.String,
+            "fuente": pl.String,
+            "url_fuente": pl.String,
+            "fecha_fuente": pl.String,
+        }
+        empty = pl.DataFrame(schema=cols)
+        row = {
+            "anio": 2023,
+            "codigo_region": "13",
+            "codigo_comuna": "13101",
+            "nombre_comuna": "Santiago",
+            "unidades_total": 100,
+            "superficie_m2_total": 8000,
+            "unidades_casas": 30,
+            "superficie_m2_casas": 2400,
+            "unidades_departamentos": 70,
+            "superficie_m2_departamentos": 5600,
+            "estado_dato": "definitivo",
+            "fuente": "MINVU",
+            "url_fuente": "https://example.com",
+            "fecha_fuente": "2026-09-15",
+        }
+        duplicate = pl.DataFrame([row, row], schema=cols)
+        self.assertEqual(validate_permisos_edificacion(empty)["status"], "error")
+        result = validate_permisos_edificacion(duplicate)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("duplicate" in e for e in result["errors"]))
+
+    def test_permisos_edificacion_cut_codes_are_fixed_width_strings(self):
+        df = self._load_parquet("permisos_edificacion")
+        self.assertEqual(df["codigo_comuna"].dtype, pl.String)
+        self.assertTrue((df["codigo_comuna"].str.len_chars() == 5).all())
+        self.assertEqual(df["codigo_region"].dtype, pl.String)
+        self.assertTrue((df["codigo_region"].str.len_chars() == 2).all())
 
     @classmethod
     def setUpClass(cls):
@@ -4197,6 +4287,12 @@ class DriftTaxonomyTests(unittest.TestCase):
         - 2 → 1 (issue #42): una extracción real eliminó la fila con RUT
           centinela `"0"`, así que `empresas` se quedó sin warnings accionables.
           Su nota de cobertura RES sigue en `warnings`, declarada esperada.
+        - dataset_count 19 → 20: nuevo dataset `estadisticas_vitales`
+          (anuarios INE 2010→, cobertura total, sin warnings). No altera los
+          contadores de drift/warn/retired.
+        - dataset_count 20 → 21: nuevo dataset `permisos_edificacion`
+          (MINVU CEDOC 2002→, cobertura total, sin warnings). No altera los
+          contadores de drift/warn/retired.
 
         Queda `indicadores`, que es un problema real y abierto (issue #43).
         """
@@ -4204,7 +4300,7 @@ class DriftTaxonomyTests(unittest.TestCase):
         self.assertEqual(health["drifted_count"], 1)
         self.assertEqual(health["warn_count"], 1)
         self.assertEqual(health["retired_count"], 1)
-        self.assertEqual(health["dataset_count"], 19)
+        self.assertEqual(health["dataset_count"], 21)
         self.assertEqual(health["overall_status"], "warn")
         report = json.loads((NORMALIZED_DIR / "drift_report.json").read_text(encoding="utf-8"))
         drifted = sorted(e["dataset"] for e in report["datasets"] if e["drift_status"] == "drifted")

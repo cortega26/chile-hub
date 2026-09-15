@@ -1,0 +1,124 @@
+{
+  "dataset": "permisos_edificacion",
+  "primary_key": [
+    "anio",
+    "codigo_comuna"
+  ],
+  "required_columns": [
+    "anio",
+    "codigo_region",
+    "codigo_comuna",
+    "nombre_comuna",
+    "unidades_total",
+    "superficie_m2_total",
+    "unidades_casas",
+    "superficie_m2_casas",
+    "unidades_departamentos",
+    "superficie_m2_departamentos",
+    "estado_dato",
+    "fuente",
+    "url_fuente",
+    "fecha_fuente"
+  ],
+  "column_types": {
+    "anio": "integer",
+    "codigo_region": "string",
+    "codigo_comuna": "string",
+    "nombre_comuna": "string",
+    "unidades_total": "integer",
+    "superficie_m2_total": "integer",
+    "unidades_casas": "integer",
+    "superficie_m2_casas": "integer",
+    "unidades_departamentos": "integer",
+    "superficie_m2_departamentos": "integer",
+    "estado_dato": "string",
+    "fuente": "string",
+    "url_fuente": "string",
+    "fecha_fuente": "string"
+  },
+  "nullable_columns": [],
+  "fixed_width_columns": {
+    "codigo_region": 2,
+    "codigo_comuna": 5
+  },
+  "expected_record_count": null,
+  "coverage_policy": "full",
+  "publish_outputs": [
+    "parquet",
+    "json"
+  ],
+  "columns": [
+    {
+      "name": "anio",
+      "type": "integer",
+      "example": 2023
+    },
+    {
+      "name": "codigo_region",
+      "type": "string",
+      "width": 2,
+      "example": "13"
+    },
+    {
+      "name": "codigo_comuna",
+      "type": "string",
+      "width": 5,
+      "example": "13101"
+    },
+    {
+      "name": "nombre_comuna",
+      "type": "string",
+      "example": "Santiago"
+    },
+    {
+      "name": "unidades_total",
+      "type": "integer",
+      "example": 2451
+    },
+    {
+      "name": "superficie_m2_total",
+      "type": "integer",
+      "example": 187320
+    },
+    {
+      "name": "unidades_casas",
+      "type": "integer",
+      "example": 312
+    },
+    {
+      "name": "superficie_m2_casas",
+      "type": "integer",
+      "example": 24810
+    },
+    {
+      "name": "unidades_departamentos",
+      "type": "integer",
+      "example": 2139
+    },
+    {
+      "name": "superficie_m2_departamentos",
+      "type": "integer",
+      "example": 162510
+    },
+    {
+      "name": "estado_dato",
+      "type": "string",
+      "example": "definitivo"
+    },
+    {
+      "name": "fuente",
+      "type": "string",
+      "example": "MINVU — Centro de Estudios de Ciudad y Territorio (CEDOC)"
+    },
+    {
+      "name": "url_fuente",
+      "type": "string",
+      "example": "https://catalogo.minvu.cl/cgi-bin/koha/opac-retrieve-file.pl?id=..."
+    },
+    {
+      "name": "fecha_fuente",
+      "type": "string",
+      "example": "2026-09-15"
+    }
+  ]
+}

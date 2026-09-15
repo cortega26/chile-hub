@@ -291,6 +291,12 @@ _AGENTS_EXTRACTOR_DESCRIPTIONS = {
         "Empresas — Registro de Empresas y Sociedades (datos.gob.cl) → data/staging/"
     ),
     "pobreza_extractor.py": "Pobreza comunal SAE (MDS) → data/staging/",
+    "estadisticas_vitales_extractor.py": (
+        "Estadísticas vitales comunales — nacimientos y defunciones (INE) → data/staging/"
+    ),
+    "permisos_edificacion_extractor.py": (
+        "Permisos de edificación por comuna — viviendas (MINVU CEDOC) → data/staging/"
+    ),
     "consumo_electrico_extractor.py": ("Consumo eléctrico comunal (CNE) → data/staging/"),
     "partidos_politicos_extractor.py": ("Partidos políticos vigentes (SERVEL) → data/staging/"),
     "autoridades_electas_extractor.py": ("Diputados y senadores en ejercicio → data/staging/"),
@@ -406,6 +412,7 @@ _README_DATASET_DOMAINS = {
     "censo_comunal": "Demografía",
     "censo_hogares_viviendas": "Demografía",
     "pobreza_comunal": "Demografía",
+    "estadisticas_vitales": "Demografía",
     "establecimientos_salud": "Servicios públicos",
     "establecimientos_educacionales": "Servicios públicos",
     "resultados_educacionales": "Servicios públicos",
@@ -413,6 +420,7 @@ _README_DATASET_DOMAINS = {
     "finanzas_municipales": "Economía",
     "empresas": "Economía",
     "consumo_electrico_comunal": "Economía",
+    "permisos_edificacion": "Economía",
     "indicadores_urbanos_siedu": "Indicadores urbanos",
     "partidos_politicos": "Política",
     "autoridades_electas": "Política",

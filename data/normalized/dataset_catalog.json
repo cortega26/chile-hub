@@ -1,6 +1,6 @@
 {
-  "generated_at_utc": "2026-09-03T18:21:20.116335+00:00",
-  "dataset_count": 19,
+  "generated_at_utc": "2026-09-15T00:04:41.910173+00:00",
+  "dataset_count": 21,
   "datasets": [
     {
       "dataset": "regiones",
@@ -32,9 +32,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 550.65,
+        "age_hours": 820.37,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-09-03T18:21:20.111723+00:00"
+        "checked_at_utc": "2026-09-15T00:04:41.904525+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -112,9 +112,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 550.65,
+        "age_hours": 820.37,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-09-03T18:21:20.111760+00:00"
+        "checked_at_utc": "2026-09-15T00:04:41.904569+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -199,9 +199,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 550.65,
+        "age_hours": 820.37,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-09-03T18:21:20.111773+00:00"
+        "checked_at_utc": "2026-09-15T00:04:41.904584+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -285,9 +285,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 550.65,
+        "age_hours": 820.37,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-09-03T18:21:20.111781+00:00"
+        "checked_at_utc": "2026-09-15T00:04:41.904592+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -376,9 +376,9 @@
       },
       "freshness": {
         "status": "stale",
-        "age_hours": 505.99,
+        "age_hours": 775.71,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-09-03T18:21:20.112049+00:00"
+        "checked_at_utc": "2026-09-15T00:04:41.904872+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 72,
@@ -413,15 +413,15 @@
       "validation_status": "ok",
       "warnings": [
         "indicadores live refresh reused last published artifact for missing codes: ipc",
-        "indicadores freshness is stale: 505.99h since refresh, policy max is 72h"
+        "indicadores freshness is stale: 775.71h since refresh, policy max is 72h"
       ],
       "actionable_warnings": [
         "indicadores live refresh reused last published artifact for missing codes: ipc",
-        "indicadores freshness is stale: 505.99h since refresh, policy max is 72h"
+        "indicadores freshness is stale: 775.71h since refresh, policy max is 72h"
       ],
       "degradation": {
         "status": "warning",
-        "impact": "indicadores live refresh reused last published artifact for missing codes: ipc; indicadores freshness is stale: 505.99h since refresh, policy max is 72h",
+        "impact": "indicadores live refresh reused last published artifact for missing codes: ipc; indicadores freshness is stale: 775.71h since refresh, policy max is 72h",
         "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
       },
       "notes": [
@@ -473,9 +473,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 550.65,
+        "age_hours": 820.37,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-09-03T18:21:20.112071+00:00"
+        "checked_at_utc": "2026-09-15T00:04:41.904896+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -562,9 +562,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 550.64,
+        "age_hours": 820.37,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-09-03T18:21:20.112082+00:00"
+        "checked_at_utc": "2026-09-15T00:04:41.904908+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 1080,
@@ -643,9 +643,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 550.64,
+        "age_hours": 820.37,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-09-03T18:21:20.112091+00:00"
+        "checked_at_utc": "2026-09-15T00:04:41.904923+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -728,9 +728,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 296.88,
+        "age_hours": 566.6,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-09-03T18:21:20.112100+00:00"
+        "checked_at_utc": "2026-09-15T00:04:41.904935+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -801,9 +801,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 550.64,
+        "age_hours": 820.37,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-09-03T18:21:20.112108+00:00"
+        "checked_at_utc": "2026-09-15T00:04:41.904944+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -880,9 +880,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 63.28,
+        "age_hours": 333.0,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-09-03T18:21:20.112117+00:00"
+        "checked_at_utc": "2026-09-15T00:04:41.904953+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -966,9 +966,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 550.64,
+        "age_hours": 820.37,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-09-03T18:21:20.112125+00:00"
+        "checked_at_utc": "2026-09-15T00:04:41.904962+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -1053,9 +1053,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 550.64,
+        "age_hours": 820.37,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-09-03T18:21:20.112134+00:00"
+        "checked_at_utc": "2026-09-15T00:04:41.904972+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -1113,7 +1113,7 @@
       "source_url": "https://github.com/cortega26/chile-hub",
       "source_mode": "live",
       "source_detail": "derived_from_validated_chile_hub_layers",
-      "refreshed_at_utc": "2026-09-03T18:21:20.112147+00:00",
+      "refreshed_at_utc": "2026-09-15T00:04:41.904987+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -1177,7 +1177,7 @@
         "status": "fresh",
         "age_hours": 0.0,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-09-03T18:21:20.112164+00:00"
+        "checked_at_utc": "2026-09-15T00:04:41.905005+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 1080,
@@ -1264,9 +1264,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 550.54,
+        "age_hours": 820.26,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-09-03T18:21:20.112179+00:00"
+        "checked_at_utc": "2026-09-15T00:04:41.905021+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 1080,
@@ -1356,9 +1356,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 550.54,
+        "age_hours": 820.26,
         "max_age_hours": 175200,
-        "checked_at_utc": "2026-09-03T18:21:20.112190+00:00"
+        "checked_at_utc": "2026-09-15T00:04:41.905034+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 175200,
@@ -1441,9 +1441,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 550.54,
+        "age_hours": 820.26,
         "max_age_hours": 17520,
-        "checked_at_utc": "2026-09-03T18:21:20.112201+00:00"
+        "checked_at_utc": "2026-09-15T00:04:41.905045+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 17520,
@@ -1529,9 +1529,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 550.54,
+        "age_hours": 820.26,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-09-03T18:21:20.112210+00:00"
+        "checked_at_utc": "2026-09-15T00:04:41.905055+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -1622,9 +1622,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 550.52,
+        "age_hours": 820.24,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-09-03T18:21:20.112221+00:00"
+        "checked_at_utc": "2026-09-15T00:04:41.905068+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -1666,6 +1666,198 @@
         "distrito_electoral vía Scrapling: 154/155 diputados.",
         "codigo_region/periodo de senadores: 50/50 poblados desde senado.cl (REGION/PERIODOS).",
         "RUT (Cámara) y email/teléfono (Senado) descartados (línea roja de datos personales)."
+      ]
+    },
+    {
+      "dataset": "estadisticas_vitales",
+      "description": "Nacimientos y defunciones por comuna de residencia y sexo, desde los Anuarios de Estadísticas Vitales del INE (definitivos, 2010 en adelante).",
+      "alias_for": null,
+      "source_name": "Instituto Nacional de Estadísticas (INE) — Estadísticas Vitales",
+      "source_url": "https://www.ine.gob.cl/estadisticas-por-tema/demografia-y-poblacion/estadisticas-vitales",
+      "source_mode": "live",
+      "source_detail": "Anuarios de Estadísticas Vitales (tabulados XLSX, tabla 1.2.2-04 por comuna de residencia). Solo definitivos: los boletines provisionales del INE no publican desglose comunal.",
+      "refreshed_at_utc": "2026-09-14T23:29:24.975832+00:00",
+      "record_count": 13840,
+      "fields": [
+        "anio",
+        "codigo_region",
+        "codigo_comuna",
+        "nombre_comuna",
+        "evento",
+        "sexo",
+        "cantidad",
+        "estado_dato",
+        "fuente",
+        "url_fuente",
+        "fecha_fuente"
+      ],
+      "indicator_codes": [],
+      "indicator_delivery": {},
+      "join_keys": [
+        "anio",
+        "codigo_comuna"
+      ],
+      "confidence_tier": "Tier A",
+      "reuse_policy": {
+        "status": "open-attribution",
+        "license": "CC BY 4.0",
+        "license_url": "https://www.ine.gob.cl/terminos-de-uso",
+        "attribution_required": true,
+        "redistribution_ok": true,
+        "summary": "Anuarios de Estadísticas Vitales del INE (nacimientos y defunciones por comuna). Datos abiertos con atribución requerida."
+      },
+      "freshness": {
+        "status": "fresh",
+        "age_hours": 0.59,
+        "max_age_hours": 8760,
+        "checked_at_utc": "2026-09-15T00:04:41.905079+00:00"
+      },
+      "freshness_policy": {
+        "max_age_hours": 8760,
+        "label": "anual"
+      },
+      "coverage": {
+        "status": "not_applicable",
+        "expected_record_count": null,
+        "actual_record_count": 13840,
+        "coverage_ratio": null,
+        "summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
+        "expected": false
+      },
+      "drift": {
+        "status": "healthy",
+        "summary": "Sin drift operativo detectado en este build.",
+        "recommended_action": "Ninguna."
+      },
+      "usage_examples": {
+        "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars(\"estadisticas_vitales\")\n# Nacimientos por comuna 2023\nnac_2023 = df.filter((pl.col(\"anio\") == 2023) & (pl.col(\"evento\") == \"nacimiento\"))",
+        "duckdb": "SELECT anio, codigo_comuna, sum(cantidad) AS hechos\nFROM 'data/normalized/estadisticas_vitales.parquet'\nWHERE evento = 'nacimiento'\nGROUP BY 1, 2 ORDER BY 1, 3 DESC;",
+        "cli": "chile-hub show estadisticas_vitales"
+      },
+      "outputs": {
+        "parquet": "data/normalized/estadisticas_vitales.parquet",
+        "json": "data/normalized/estadisticas_vitales.json",
+        "duckdb_table": "estadisticas_vitales",
+        "sqlite_table": "estadisticas_vitales",
+        "excel_sheet": "Estadísticas Vitales"
+      },
+      "documentation": "docs/datasets/estadisticas_vitales.md",
+      "validation_status": "ok",
+      "warnings": [],
+      "actionable_warnings": [],
+      "degradation": {
+        "status": "none",
+        "impact": "Sin degradación operativa detectada en este build.",
+        "recommended_action": "Ninguna."
+      },
+      "notes": [
+        "2010: 692 filas desde 'Anuario de estadísticas vitales 2010' (hoja 122-04; TOTAL país: 250643 nacimientos, 97930 defunciones)",
+        "2011: 692 filas desde 'Anuario de estadísticas vitales 2011' (hoja 122-04; TOTAL país: 247358 nacimientos, 94985 defunciones)",
+        "2012: 692 filas desde 'Anuario de estadísticas vitales 2012' (hoja 122-04; TOTAL país: 243635 nacimientos, 98711 defunciones)",
+        "2013: 692 filas desde 'Anuario de estadísticas vitales 2013' (hoja 1.2.2-04; TOTAL país: 242005 nacimientos, 99770 defunciones)",
+        "2014: 692 filas desde 'Anuario de estadísticas vitales 2014' (hoja 1.2.2-04; TOTAL país: 250997 nacimientos, 101960 defunciones)",
+        "2015: 692 filas desde 'Anuario de estadísticas vitales 2015' (hoja 1.2.2-04; TOTAL país: 244670 nacimientos, 103327 defunciones)",
+        "2016: 692 filas desde 'Anuario de estadísticas vitales nacimientos 2016' (hoja 1.2.2-04; TOTAL país: 231749 nacimientos, 104026 defunciones)",
+        "2017: 692 filas desde 'Anuario de estadísticas vitales 2017' (hoja 1.2.2-04; TOTAL país: 219186 nacimientos, 106388 defunciones)",
+        "2018: convención de indentado invertida (comuna indentada)",
+        "2018: 692 filas desde 'Anuario de estadísticas vitales 2018' (hoja 122-04; TOTAL país: 221731 nacimientos, 106796 defunciones)",
+        "2019: convención de indentado invertida (comuna indentada)",
+        "2019: 692 filas desde 'Anuario de estadísticas vitales 2019' (hoja 122-04; TOTAL país: 210188 nacimientos, 109658 defunciones)",
+        "2020: convención de indentado invertida (comuna indentada)",
+        "2020: 692 filas desde 'Anuario de estadísticas vitales 2020' (hoja 122-04; TOTAL país: 194978 nacimientos, 126169 defunciones)",
+        "2021: 2076 filas desde 'Anuario de estadísticas vitales 2021' (hoja 122-04; TOTAL país: 177273 nacimientos, 137629 defunciones)",
+        "2022: 2076 filas desde 'Anuario de estadísticas vitales 2022, nacimientos y defunciones' (hoja 122-04; TOTAL país: 189303 nacimientos, 136972 defunciones)",
+        "2023: 2076 filas desde 'Anuario de estadísticas vitales 2023, nacimientos y defunciones' (hoja 122-04; TOTAL país: 174057 nacimientos, 122218 defunciones)"
+      ]
+    },
+    {
+      "dataset": "permisos_edificacion",
+      "description": "Viviendas en unidades y superficie (m2) por comuna y año —casas y departamentos— desde las estadísticas de permisos de edificación del CEDOC (MINVU), serie desde 2002.",
+      "alias_for": null,
+      "source_name": "MINVU — Centro de Estudios de Ciudad y Territorio (CEDOC)",
+      "source_url": "https://centrodeestudios.minvu.gob.cl/repositorio/categoria/permisos-de-edificacion",
+      "source_mode": "live",
+      "source_detail": "Viviendas en unidades y superficie (m2) por comuna y año, serie desde 2002 (MINVU CEDOC, en base a permisos otorgados por las Direcciones de Obras Municipales e INE).",
+      "refreshed_at_utc": "2026-09-15T00:00:56.170127+00:00",
+      "record_count": 8650,
+      "fields": [
+        "anio",
+        "codigo_region",
+        "codigo_comuna",
+        "nombre_comuna",
+        "unidades_total",
+        "superficie_m2_total",
+        "unidades_casas",
+        "superficie_m2_casas",
+        "unidades_departamentos",
+        "superficie_m2_departamentos",
+        "estado_dato",
+        "fuente",
+        "url_fuente",
+        "fecha_fuente"
+      ],
+      "indicator_codes": [],
+      "indicator_delivery": {},
+      "join_keys": [
+        "anio",
+        "codigo_comuna"
+      ],
+      "confidence_tier": "Tier A",
+      "reuse_policy": {
+        "status": "open-attribution",
+        "license": "Uso autorizado con cita (MINVU CEDOC)",
+        "license_url": "https://centrodeestudios.minvu.gob.cl/repositorio/categoria/permisos-de-edificacion",
+        "attribution_required": true,
+        "redistribution_ok": true,
+        "summary": "Estadísticas de permisos de edificación del CEDOC (MINVU). El Centro autoriza el uso de la información citando la fuente."
+      },
+      "freshness": {
+        "status": "fresh",
+        "age_hours": 0.06,
+        "max_age_hours": 1080,
+        "checked_at_utc": "2026-09-15T00:04:41.905095+00:00"
+      },
+      "freshness_policy": {
+        "max_age_hours": 1080,
+        "label": "mensual"
+      },
+      "coverage": {
+        "status": "not_applicable",
+        "expected_record_count": null,
+        "actual_record_count": 8650,
+        "coverage_ratio": null,
+        "summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
+        "expected": false
+      },
+      "drift": {
+        "status": "healthy",
+        "summary": "Sin drift operativo detectado en este build.",
+        "recommended_action": "Ninguna."
+      },
+      "usage_examples": {
+        "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars(\"permisos_edificacion\")\n# Unidades autorizadas por comuna 2023\nunid_2023 = df.filter(pl.col(\"anio\") == 2023).sort(\"unidades_total\", descending=True)",
+        "duckdb": "SELECT anio, codigo_comuna, unidades_total, superficie_m2_total\nFROM 'data/normalized/permisos_edificacion.parquet'\nWHERE anio = 2023 ORDER BY unidades_total DESC LIMIT 10;",
+        "cli": "chile-hub show permisos_edificacion"
+      },
+      "outputs": {
+        "parquet": "data/normalized/permisos_edificacion.parquet",
+        "json": "data/normalized/permisos_edificacion.json",
+        "duckdb_table": "permisos_edificacion",
+        "sqlite_table": "permisos_edificacion",
+        "excel_sheet": "Permisos Edificación"
+      },
+      "documentation": "docs/datasets/permisos_edificacion.md",
+      "validation_status": "ok",
+      "warnings": [],
+      "actionable_warnings": [],
+      "degradation": {
+        "status": "none",
+        "impact": "Sin degradación operativa detectada en este build.",
+        "recommended_action": "Ninguna."
+      },
+      "notes": [
+        "descubrimiento: repositorio-biblionumber",
+        "8650 filas desde 'minvu_permisos_edificacion_anual_20260915T000055Z.xlsx' (hojas: número_total, m2_total, número_departamentos, m2_departamentos, número_casas, m2_casas; años provisionales: [2024, 2025, 2026])"
       ]
     }
   ]

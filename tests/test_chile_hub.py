@@ -49,7 +49,7 @@ INDICADORES_NON_SYNTHETIC_DELIVERY = {
     # visible para que el gate de publicación evalúe el dato real scrapeado.
     "ine_override",
 }
-EXPECTED_DATASET_COUNT = 19
+EXPECTED_DATASET_COUNT = 21
 # Datasets candidate (p. ej. consumo_electrico_comunal) no tienen tarjeta en
 # la landing page, así que build_hub_health filtra el top_issue de los
 # artefactos estáticos (hub_health.json/hub_bundle.json/overview.json y
@@ -170,6 +170,8 @@ class ChileHubTests(unittest.TestCase):
                 "consumo_electrico_comunal",
                 "partidos_politicos",
                 "autoridades_electas",
+                "estadisticas_vitales",
+                "permisos_edificacion",
             ],
         )
 
@@ -223,6 +225,43 @@ class ChileHubTests(unittest.TestCase):
         self.assertIn("codigo_sociedad", df.columns)
         # Verificar que los RUT son strings con formato esperado
         self.assertEqual(df["rut"].dtype, pl.String)
+
+    def test_load_polars_estadisticas_vitales(self):
+        """Serie anual de nacimientos/defunciones por comuna (INE, 2010 en adelante)."""
+        df = self.hub.load_polars("estadisticas_vitales")
+        self.assertEqual(df.height, self.catalog_by_dataset["estadisticas_vitales"]["record_count"])
+        self.assertGreater(df.height, 0)
+        self.assertIn("codigo_comuna", df.columns)
+        self.assertEqual(df["codigo_comuna"].str.len_chars().min(), 5)
+        # Cobertura total: 346 comunas por (anio, evento)
+        self.assertEqual(
+            df.filter((pl.col("anio") == 2023) & (pl.col("evento") == "nacimiento"))[
+                "codigo_comuna"
+            ].n_unique(),
+            346,
+        )
+        # Totales 2023 reconcilian con el anuario INE publicado
+        total_nac_2023 = df.filter((pl.col("anio") == 2023) & (pl.col("evento") == "nacimiento"))[
+            "cantidad"
+        ].sum()
+        self.assertEqual(total_nac_2023, 174057)
+
+    def test_load_polars_permisos_edificacion(self):
+        """Serie anual de viviendas autorizadas por comuna (MINVU CEDOC, 2002 en adelante)."""
+        df = self.hub.load_polars("permisos_edificacion")
+        self.assertEqual(df.height, self.catalog_by_dataset["permisos_edificacion"]["record_count"])
+        self.assertGreater(df.height, 0)
+        self.assertIn("codigo_comuna", df.columns)
+        self.assertEqual(df["codigo_comuna"].str.len_chars().min(), 5)
+        # Cobertura total: 346 comunas en 2023
+        self.assertEqual(
+            df.filter(pl.col("anio") == 2023)["codigo_comuna"].n_unique(),
+            346,
+        )
+        # Invariante fuente: total == casas + departamentos
+        self.assertTrue(
+            (df["unidades_total"] == df["unidades_casas"] + df["unidades_departamentos"]).all()
+        )
 
     def test_load_polars_missing_dataset(self):
         """load_polars con dataset inexistente lanza ChileHubDatasetError."""
@@ -325,6 +364,8 @@ class ChileHubTests(unittest.TestCase):
                 "consumo_electrico_comunal": "ok",
                 "partidos_politicos": "ok",
                 "autoridades_electas": "ok",
+                "estadisticas_vitales": "ok",
+                "permisos_edificacion": "ok",
             },
         )
         warning_counts = {item["dataset"]: item["warning_count"] for item in summary}
@@ -1318,6 +1359,8 @@ class ChileHubCliTests(unittest.TestCase):
                 "consumo_electrico_comunal",
                 "partidos_politicos",
                 "autoridades_electas",
+                "estadisticas_vitales",
+                "permisos_edificacion",
             ],
         )
 

@@ -130,6 +130,8 @@ extract:
 	PYTHONPATH=src $(PYTHON) src/extractors/consumo_electrico_extractor.py
 	PYTHONPATH=src $(PYTHON) src/extractors/partidos_politicos_extractor.py
 	PYTHONPATH=src $(PYTHON) src/extractors/autoridades_electas_extractor.py
+	PYTHONPATH=src $(PYTHON) src/extractors/estadisticas_vitales_extractor.py
+	PYTHONPATH=src $(PYTHON) src/extractors/permisos_edificacion_extractor.py
 
 build:
 	$(PYTHON) src/build_dev_db.py

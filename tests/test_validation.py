@@ -29,9 +29,11 @@ from src.validation import (
     validate_empresas,
     validate_establecimientos_educacionales,
     validate_establecimientos_salud,
+    validate_estadisticas_vitales,
     validate_geometria_comunal,
     validate_indicadores,
     validate_partidos_politicos,
+    validate_permisos_edificacion,
     validate_pobreza_comunal,
     validate_provincias,
     validate_puntos_interes,
@@ -2017,6 +2019,282 @@ class GeometriaComunalValidatorTests(unittest.TestCase):
         result = validate_geometria_comunal(df, valid_commune_codes=VALID_COMMUNE_CODES)
         self.assertEqual(result["status"], "ok")
         self.assertTrue(any("cobertura parcial" in w for w in result["warnings"]))
+
+
+class EstadisticasVitalesValidatorTests(unittest.TestCase):
+    """Tests unitarios para validate_estadisticas_vitales."""
+
+    def _row(self, **overrides):
+        base = {
+            "anio": 2023,
+            "codigo_region": "13",
+            "codigo_comuna": "13101",
+            "nombre_comuna": "Santiago",
+            "evento": "nacimiento",
+            "sexo": "hombre",
+            "cantidad": 100,
+            "estado_dato": "definitivo",
+            "fuente": "INE",
+            "url_fuente": "https://example.com/x.xlsx",
+            "fecha_fuente": "2026-09-14",
+        }
+        base.update(overrides)
+        return base
+
+    def _make_df(self, rows):
+        return pl.DataFrame(
+            rows,
+            schema={
+                "anio": pl.Int64,
+                "codigo_region": pl.String,
+                "codigo_comuna": pl.String,
+                "nombre_comuna": pl.String,
+                "evento": pl.String,
+                "sexo": pl.String,
+                "cantidad": pl.Int64,
+                "estado_dato": pl.String,
+                "fuente": pl.String,
+                "url_fuente": pl.String,
+                "fecha_fuente": pl.String,
+            },
+        )
+
+    def _full_coverage_df(self):
+        # 346 comunas x 2 eventos para 2023 (sexo total)
+        rows = []
+        for i in range(1, 347):
+            for evento in ("nacimiento", "defuncion"):
+                rows.append(
+                    self._row(
+                        codigo_region=f"{i:05d}"[:2],
+                        codigo_comuna=f"{i:05d}",
+                        nombre_comuna=f"Comuna {i}",
+                        evento=evento,
+                        sexo="total",
+                    )
+                )
+        return self._make_df(rows)
+
+    def test_valid_full_coverage_returns_ok(self):
+        result = validate_estadisticas_vitales(
+            self._full_coverage_df(), valid_commune_codes=VALID_COMMUNE_CODES
+        )
+        self.assertEqual(result["status"], "ok")
+        self.assertEqual(result["errors"], [])
+
+    def test_empty_dataframe_returns_error(self):
+        result = validate_estadisticas_vitales(self._make_df([]))
+        self.assertEqual(result["status"], "error")
+
+    def test_duplicate_primary_key_returns_error(self):
+        df = self._make_df([self._row(), self._row()])
+        result = validate_estadisticas_vitales(df, valid_commune_codes=VALID_COMMUNE_CODES)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("duplicate" in e for e in result["errors"]))
+
+    def test_unexpected_evento_returns_error(self):
+        df = self._make_df([self._row(evento="matrimonio")])
+        result = validate_estadisticas_vitales(df)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("evento" in e for e in result["errors"]))
+
+    def test_negative_cantidad_returns_error(self):
+        df = self._make_df([self._row(cantidad=-5)])
+        result = validate_estadisticas_vitales(df)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("negative" in e for e in result["errors"]))
+
+    def test_unknown_commune_returns_error(self):
+        df = self._make_df([self._row(codigo_comuna="99999")])
+        result = validate_estadisticas_vitales(df, valid_commune_codes=VALID_COMMUNE_CODES)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("unknown communes" in e for e in result["errors"]))
+
+    def test_incomplete_coverage_returns_error(self):
+        # Solo 345/346 comunas en 2023-nacimiento: serie incompleta, no publicable.
+        rows = []
+        for i in range(1, 346):
+            rows.append(self._row(codigo_comuna=f"{i:05d}", nombre_comuna=f"Comuna {i}"))
+        df = self._make_df(rows)
+        result = validate_estadisticas_vitales(df, valid_commune_codes=VALID_COMMUNE_CODES)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("cobertura incompleta" in e for e in result["errors"]))
+
+    def test_fallback_source_mode_warns_but_passes(self):
+        df = self._full_coverage_df()
+        result = validate_estadisticas_vitales(
+            df, {"source_mode": "fallback"}, valid_commune_codes=VALID_COMMUNE_CODES
+        )
+        self.assertEqual(result["status"], "ok")
+        self.assertTrue(any("fallback" in w for w in result["warnings"]))
+
+    def test_fallback_partial_coverage_passes_with_warning(self):
+        """P1 review: la muestra mínima de fallback (2 comunas) no debe
+        abortar el build en desarrollo; el publish la rechaza por otra vía."""
+        df = self._make_df(
+            [
+                self._row(codigo_comuna="00001", nombre_comuna="Comuna 1"),
+                self._row(codigo_comuna="00002", nombre_comuna="Comuna 2"),
+            ]
+        )
+        result = validate_estadisticas_vitales(
+            df, {"source_mode": "fallback"}, valid_commune_codes=VALID_COMMUNE_CODES
+        )
+        self.assertEqual(result["status"], "ok")
+        self.assertTrue(any("parcial esperada" in w for w in result["warnings"]))
+
+    def test_gap_year_returns_error(self):
+        """P1 review: un año ausente por completo no genera grupo
+        incompleto, así que la continuidad se verifica explícitamente."""
+        rows = []
+        for anio in (2022, 2024):
+            for i in range(1, 347):
+                for evento in ("nacimiento", "defuncion"):
+                    rows.append(
+                        self._row(
+                            anio=anio,
+                            codigo_region=f"{i:05d}"[:2],
+                            codigo_comuna=f"{i:05d}",
+                            nombre_comuna=f"Comuna {i}",
+                            evento=evento,
+                            sexo="total",
+                        )
+                    )
+        result = validate_estadisticas_vitales(
+            self._make_df(rows), valid_commune_codes=VALID_COMMUNE_CODES
+        )
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("faltantes" in e for e in result["errors"]))
+
+    def test_missing_evento_in_year_returns_error(self):
+        rows = [
+            self._row(codigo_comuna=f"{i:05d}", nombre_comuna=f"Comuna {i}") for i in range(1, 347)
+        ]
+        df = self._make_df(rows)
+        result = validate_estadisticas_vitales(df, valid_commune_codes=VALID_COMMUNE_CODES)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("sin eventos" in e for e in result["errors"]))
+
+
+class PermisosEdificacionValidatorTests(unittest.TestCase):
+    """Tests unitarios para validate_permisos_edificacion."""
+
+    METRICS = [
+        "unidades_total",
+        "superficie_m2_total",
+        "unidades_casas",
+        "superficie_m2_casas",
+        "unidades_departamentos",
+        "superficie_m2_departamentos",
+    ]
+
+    def _row(self, **overrides):
+        base = {
+            "anio": 2023,
+            "codigo_region": "13",
+            "codigo_comuna": "13101",
+            "nombre_comuna": "Santiago",
+            "unidades_total": 100,
+            "superficie_m2_total": 8000,
+            "unidades_casas": 30,
+            "superficie_m2_casas": 2400,
+            "unidades_departamentos": 70,
+            "superficie_m2_departamentos": 5600,
+            "estado_dato": "definitivo",
+            "fuente": "MINVU CEDOC",
+            "url_fuente": "https://example.com/x.xlsx",
+            "fecha_fuente": "2026-09-15",
+        }
+        base.update(overrides)
+        return base
+
+    def _make_df(self, rows):
+        return pl.DataFrame(
+            rows,
+            schema={
+                "anio": pl.Int64,
+                "codigo_region": pl.String,
+                "codigo_comuna": pl.String,
+                "nombre_comuna": pl.String,
+                **{col: pl.Int64 for col in self.METRICS},
+                "estado_dato": pl.String,
+                "fuente": pl.String,
+                "url_fuente": pl.String,
+                "fecha_fuente": pl.String,
+            },
+        )
+
+    def _full_coverage_df(self):
+        rows = []
+        for i in range(1, 347):
+            rows.append(self._row(codigo_region=f"{i:05d}"[:2], codigo_comuna=f"{i:05d}"))
+        return self._make_df(rows)
+
+    def test_valid_full_coverage_returns_ok(self):
+        result = validate_permisos_edificacion(
+            self._full_coverage_df(), valid_commune_codes=VALID_COMMUNE_CODES
+        )
+        self.assertEqual(result["status"], "ok")
+        self.assertEqual(result["errors"], [])
+
+    def test_empty_dataframe_returns_error(self):
+        result = validate_permisos_edificacion(self._make_df([]))
+        self.assertEqual(result["status"], "error")
+
+    def test_duplicate_primary_key_returns_error(self):
+        df = self._make_df([self._row(), self._row()])
+        result = validate_permisos_edificacion(df, valid_commune_codes=VALID_COMMUNE_CODES)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("duplicate" in e for e in result["errors"]))
+
+    def test_total_must_equal_casas_plus_departamentos(self):
+        df = self._make_df([self._row(unidades_total=999)])
+        result = validate_permisos_edificacion(df)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("casas + departamentos" in e for e in result["errors"]))
+
+    def test_negative_metric_returns_error(self):
+        df = self._make_df([self._row(superficie_m2_total=-1)])
+        result = validate_permisos_edificacion(df)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("negative" in e for e in result["errors"]))
+
+    def test_unknown_commune_returns_error(self):
+        df = self._make_df([self._row(codigo_comuna="99999")])
+        result = validate_permisos_edificacion(df, valid_commune_codes=VALID_COMMUNE_CODES)
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("unknown communes" in e for e in result["errors"]))
+
+    def test_incomplete_coverage_returns_error(self):
+        rows = [self._row(codigo_comuna=f"{i:05d}") for i in range(1, 346)]
+        result = validate_permisos_edificacion(
+            self._make_df(rows), valid_commune_codes=VALID_COMMUNE_CODES
+        )
+        self.assertEqual(result["status"], "error")
+        self.assertTrue(any("cobertura incompleta" in e for e in result["errors"]))
+
+    def test_fallback_source_mode_warns_but_passes(self):
+        result = validate_permisos_edificacion(
+            self._full_coverage_df(),
+            {"source_mode": "fallback"},
+            valid_commune_codes=VALID_COMMUNE_CODES,
+        )
+        self.assertEqual(result["status"], "ok")
+        self.assertTrue(any("fallback" in w for w in result["warnings"]))
+
+    def test_fallback_partial_coverage_passes_with_warning(self):
+        """La muestra mínima de fallback no debe abortar el build en desarrollo."""
+        df = self._make_df(
+            [
+                self._row(codigo_comuna="00001"),
+                self._row(codigo_comuna="00002"),
+            ]
+        )
+        result = validate_permisos_edificacion(
+            df, {"source_mode": "fallback"}, valid_commune_codes=VALID_COMMUNE_CODES
+        )
+        self.assertEqual(result["status"], "ok")
+        self.assertTrue(any("parcial esperada" in w for w in result["warnings"]))
 
 
 if __name__ == "__main__":

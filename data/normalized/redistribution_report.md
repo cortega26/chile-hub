@@ -1,8 +1,8 @@
 # chile-hub redistribution report
 
-- `generated_at_utc`: `2026-09-03T18:21:20.116335+00:00`
-- `dataset_count`: `19`
-- `ready_count`: `19`
+- `generated_at_utc`: `2026-09-15T00:04:41.910173+00:00`
+- `dataset_count`: `21`
+- `ready_count`: `21`
 - `review_terms_count`: `0`
 - `unknown_count`: `0`
 
@@ -27,6 +27,8 @@
 | `consumo_electrico_comunal` | `ready` | CC BY | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
 | `partidos_politicos` | `ready` | CC-BY | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
 | `autoridades_electas` | `ready` | CC-BY | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
+| `estadisticas_vitales` | `ready` | CC BY 4.0 | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
+| `permisos_edificacion` | `ready` | Uso autorizado con cita (MINVU CEDOC) | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
 
 ## regiones
 
@@ -217,3 +219,23 @@
 - `redistribution_ok`: `True`
 - `recommended_action`: Publicable con atribucion y referencia de fuente.
 - `summary`: Autoridades electas en ejercicio (diputados y senadores) desde la Cámara de Diputadas y Diputados y el Senado de Chile. Gobernador_regional y alcalde viven en el dataset segregado autoridades_locales (CC-BY-SA).
+
+## estadisticas_vitales
+
+- `publishability_status`: `ready`
+- `license`: `CC BY 4.0`
+- `license_url`: https://www.ine.gob.cl/terminos-de-uso
+- `attribution_required`: `True`
+- `redistribution_ok`: `True`
+- `recommended_action`: Publicable con atribucion y referencia de fuente.
+- `summary`: Anuarios de Estadísticas Vitales del INE (nacimientos y defunciones por comuna). Datos abiertos con atribución requerida.
+
+## permisos_edificacion
+
+- `publishability_status`: `ready`
+- `license`: `Uso autorizado con cita (MINVU CEDOC)`
+- `license_url`: https://centrodeestudios.minvu.gob.cl/repositorio/categoria/permisos-de-edificacion
+- `attribution_required`: `True`
+- `redistribution_ok`: `True`
+- `recommended_action`: Publicable con atribucion y referencia de fuente.
+- `summary`: Estadísticas de permisos de edificación del CEDOC (MINVU). El Centro autoriza el uso de la información citando la fuente.
