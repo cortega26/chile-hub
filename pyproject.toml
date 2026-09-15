@@ -48,6 +48,7 @@ pipeline = [
     "pandas==3.0.3",
     "xlsxwriter==3.2.9",
     "curl_cffi==0.16.3",
+    "defusedxml==0.7.1",
     "openpyxl==3.1.5",
     "structlog==26.1.0",
     "tenacity==9.1.4",
@@ -55,7 +56,10 @@ pipeline = [
     "geopandas>=1.1.4",
 ]
 query = [
-    "duckdb>=1.5.4",
+    # Mismo floor que pipeline + cap mayor (Plan 096): writer y reader
+    # resuelven la misma línea 1.5.x. DuckDB 2.0 (oct-2026) exigirá revisión
+    # consciente, no deriva silenciosa del reader.
+    "duckdb>=1.5.5,<1.6",
 ]
 # Consumo geoespacial opcional para resolve_by_coords(): el mismo set que el
 # pipeline usa para ESCRIBIR el GeoParquet (geopandas/shapely/pyarrow), expuesto
@@ -251,9 +255,11 @@ paths = ["src/chile_hub"]
 exclude = ["src/chile_hub/pipeline_status_utils.py", "src/chile_hub/__main__.py"]
 
 [tool.bandit]
-# Los extractores necesitan subprocess/HTTP/filesystem por diseño.
-# La superficie de ataque real está en la librería core y el pipeline.
-exclude_dirs = ["src/extractors", "tests", "scripts", "data"]
+# Los extractores usan subprocess/HTTP/filesystem por diseño, pero son
+# justamente la superficie de red — se auditan con el mismo umbral y las
+# excepciones intencionales llevan `# nosec` + razón (Plan 096). tests/
+# scripts/data siguen excluidos (código de test y tooling local, no runtime).
+exclude_dirs = ["tests", "scripts", "data"]
 # Umbral mínimo: solo falla en Medium o High.
 severity-level = "medium"
 confidence-level = "medium"

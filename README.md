@@ -49,7 +49,7 @@ pip install chile-hub
 from chile_hub import ChileHub
 
 hub = ChileHub()
-comunas = hub.load_polars("comunas")          # 346 comunas como DataFrame
+comunas = hub.load_polars("comunas")  # 346 comunas como DataFrame
 indicadores = hub.load_polars("indicadores")  # Serie histórica UF, Dólar, Euro, UTM, IPC
 
 # Cruce territorial garantizado — códigos CUT siempre VARCHAR
@@ -210,7 +210,7 @@ chile-hub health       # severidad, frescura, drift y cobertura
 ### Respaldo adicional
 
 <!-- START_TEST_COUNT -->
-- **1030 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
+- **1032 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
 <!-- END_TEST_COUNT -->
 <!-- START_ADR_COUNT -->
 - **19 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
@@ -673,7 +673,9 @@ resumen = (
     .join(salud_por_comuna, on="codigo_comuna", how="left")
     .join(educacion_por_comuna, on="codigo_comuna", how="left")
     .fill_null(0)
-    .select("codigo_comuna", "nombre_comuna", "establecimientos_salud", "establecimientos_educacionales")
+    .select(
+        "codigo_comuna", "nombre_comuna", "establecimientos_salud", "establecimientos_educacionales"
+    )
 )
 print(resumen.head())
 ```

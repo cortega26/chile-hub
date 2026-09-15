@@ -596,9 +596,13 @@ class AutoridadesLocalesExtractor(BaseExtractor):
         gobernadores = raw_data.get("gobernadores") or []
         alcaldes = raw_data.get("alcaldes") or []
         comunas_lookup = raw_data.get("comunas_lookup") or {}
-        assert isinstance(gobernadores, list)
-        assert isinstance(alcaldes, list)
-        assert isinstance(comunas_lookup, dict)
+        # Guards de contrato de entrada con raise explícito (Plan 096, B101).
+        if not isinstance(gobernadores, list):
+            raise TypeError("gobernadores debe ser list")
+        if not isinstance(alcaldes, list):
+            raise TypeError("alcaldes debe ser list")
+        if not isinstance(comunas_lookup, dict):
+            raise TypeError("comunas_lookup debe ser dict")
         return build_autoridades_locales_df(gobernadores, alcaldes, comunas_lookup)
 
     def validate(self, df: pl.DataFrame, metadata: dict) -> dict:

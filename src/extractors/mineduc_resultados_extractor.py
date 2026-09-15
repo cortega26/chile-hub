@@ -9,7 +9,7 @@ Fuente: Rendimiento_2024.rar (MINEDUC Datos Abiertos).
 import datetime
 import os
 import shutil
-import subprocess
+import subprocess  # nosec B404 — solo invoca el binario unrar local (lista, sin shell)
 import sys
 import tempfile
 from pathlib import Path
@@ -179,7 +179,7 @@ def fetch_data(source_url: str = DOWNLOAD_URL) -> tuple[list[dict[str, Any]], st
         with tempfile.TemporaryDirectory() as tmp_dir:
             print(f"Extrayendo CSV a {tmp_dir} ...")
             cmd = [str(unrar_bin), "e", "-y", str(rar_path), tmp_dir + "/"]
-            res = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+            res = subprocess.run(cmd, capture_output=True, text=True, timeout=120)  # nosec B603  # cmd: lista con paths locales (unrar/tmp), sin shell ni input externo
             if res.returncode != 0:
                 raise RuntimeError(f"Error al extraer RAR (code {res.returncode}): {res.stderr}")
 

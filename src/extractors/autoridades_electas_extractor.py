@@ -24,11 +24,12 @@ import json
 import os
 import re
 import sys
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as ET  # nosec B405 — solo anotaciones de tipo; el parseo usa defusedxml
 from pathlib import Path
 from typing import Any
 
 import polars as pl
+from defusedxml.ElementTree import fromstring as _defused_fromstring
 
 UTC = datetime.timezone.utc
 
@@ -277,7 +278,9 @@ def _normalize_senadores(
 def _normalize_diputados(
     xml_bytes: bytes, distritos: dict[str, str], fecha_consulta: str
 ) -> list[dict[str, str | None]]:
-    root = ET.fromstring(xml_bytes)
+    # defusedxml (Plan 096, B314): el XML viene de la red (camara.cl/senado.cl);
+    # ET.fromstring es vulnerable a entity-expansion DoS (billion laughs).
+    root = _defused_fromstring(xml_bytes)
     rows: list[dict[str, str | None]] = []
     for dp in root.findall(".//v:DiputadoPeriodo", CAMARA_NS):
         dip = dp.find("v:Diputado", CAMARA_NS)
@@ -350,9 +353,15 @@ class AutoridadesElectasExtractor(BaseExtractor):
         xml_bytes = raw_data["diputados_xml"]
         distritos = raw_data["distritos"]
         senadores = raw_data.get("senadores") or []
-        assert isinstance(xml_bytes, bytes)
-        assert isinstance(distritos, dict)
-        assert isinstance(senadores, list)
+        # Guards de contrato de entrada con raise explícito (Plan 096, B101):
+        # los asserts desaparecen con `python -O` y este pipeline debe fallar
+        # ruidoso siempre (AGENTS.md §4.2).
+        if not isinstance(xml_bytes, bytes):
+            raise TypeError("diputados_xml debe ser bytes")
+        if not isinstance(distritos, dict):
+            raise TypeError("distritos debe ser dict")
+        if not isinstance(senadores, list):
+            raise TypeError("senadores debe ser list")
         return build_autoridades_df(xml_bytes, distritos, senadores)
 
     def validate(self, df: pl.DataFrame, metadata: dict) -> dict:
@@ -388,7 +397,8 @@ def process_autoridades_electas() -> str:
 
     extractor = AutoridadesElectasExtractor()
     raw = extractor.fetch()
-    assert isinstance(raw["diputados_xml"], bytes)
+    if not isinstance(raw["diputados_xml"], bytes):
+        raise TypeError("diputados_xml debe ser bytes")
     write_raw_snapshot_atomic(raw_path, raw["diputados_xml"])
 
     df = extractor.normalize(raw)

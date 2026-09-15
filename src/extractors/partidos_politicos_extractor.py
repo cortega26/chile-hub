@@ -18,10 +18,11 @@ import html
 import os
 import re
 import sys
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as ET  # nosec B405 — solo anotaciones de tipo; el parseo usa defusedxml
 from pathlib import Path
 
 import polars as pl
+from defusedxml.ElementTree import fromstring as _defused_fromstring
 
 UTC = datetime.timezone.utc
 
@@ -200,7 +201,9 @@ def parse_partidos(
     expone esa señal en ninguna de sus dos páginas de partidos.
     """
     servel_lookup = servel_lookup or {}
-    root = ET.fromstring(xml_bytes)
+    # defusedxml (Plan 096, B314): el XML viene de la red (SERVEL/camara.cl);
+    # ET.fromstring es vulnerable a entity-expansion DoS (billion laughs).
+    root = _defused_fromstring(xml_bytes)
     fecha_consulta = datetime.datetime.now(UTC).date().isoformat()
     rows = []
     for partido in root.findall(".//v:PartidoPolitico", CAMARA_NS):
@@ -258,8 +261,11 @@ class PartidosPoliticosExtractor(BaseExtractor):
     def normalize(self, raw_data: dict[str, object]) -> pl.DataFrame:
         xml_bytes = raw_data["xml"]
         servel_lookup = raw_data.get("servel") or {}
-        assert isinstance(xml_bytes, bytes)
-        assert isinstance(servel_lookup, dict)
+        # Guards de contrato de entrada con raise explícito (Plan 096, B101).
+        if not isinstance(xml_bytes, bytes):
+            raise TypeError("xml debe ser bytes")
+        if not isinstance(servel_lookup, dict):
+            raise TypeError("servel_lookup debe ser dict")
         return parse_partidos(xml_bytes, servel_lookup)
 
     def validate(self, df: pl.DataFrame, metadata: dict) -> dict:
@@ -296,7 +302,8 @@ def process_partidos_politicos() -> str:
     extractor = PartidosPoliticosExtractor()
     raw = extractor.fetch()
     with open(raw_path, "wb") as f:
-        assert isinstance(raw["xml"], bytes)
+        if not isinstance(raw["xml"], bytes):
+            raise TypeError("xml debe ser bytes")
         f.write(raw["xml"])
 
     df = extractor.normalize(raw)

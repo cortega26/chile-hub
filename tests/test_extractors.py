@@ -2429,6 +2429,28 @@ class PartidosPoliticosExtractorTests(unittest.TestCase):
         "</PartidosPoliticosColeccion>"
     ).encode("utf-8")
 
+    # Bomba de entidades en miniatura (Plan 096): con ET.fromstring expandiría
+    # memoria de forma exponencial; defusedxml debe rechazarla al parsear.
+    ENTITY_BOMB = (
+        '<?xml version="1.0" encoding="utf-8"?>'
+        "<!DOCTYPE lolz ["
+        '<!ENTITY lol "lollollollollollollollollollol">'
+        '<!ENTITY lol2 "&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;">'
+        '<!ENTITY lol3 "&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;">'
+        "]>"
+        "<PartidosPoliticosColeccion "
+        'xmlns="http://opendata.camara.cl/camaradiputados/v1">'
+        "<PartidoPolitico><Id>XX</Id><Nombre>&lol3;</Nombre></PartidoPolitico>"
+        "</PartidosPoliticosColeccion>"
+    ).encode("utf-8")
+
+    def test_parse_partidos_rejects_entity_expansion_bomb(self):
+        """Plan 096 (B314): XML con entidades debe fallar cerrado, no expandir."""
+        from defusedxml.common import DefusedXmlException
+
+        with self.assertRaises(DefusedXmlException):
+            partidos_politicos_extractor.parse_partidos(self.ENTITY_BOMB)
+
     def test_parse_partidos_maps_schema_and_dedupes(self):
         df = partidos_politicos_extractor.parse_partidos(self.XML)
         self.assertEqual(df.height, 2)  # deduplicado + descarta el sin id
@@ -2554,6 +2576,27 @@ class AutoridadesElectasExtractorTests(unittest.TestCase):
     ).encode("utf-8")
 
     DISTRITOS = {"1009": "10", "1015": "7"}
+
+    # Bomba de entidades en miniatura (Plan 096): ver comentario equivalente
+    # en PartidosPoliticosExtractorTests.ENTITY_BOMB.
+    ENTITY_BOMB = (
+        '<?xml version="1.0" encoding="utf-8"?>'
+        "<!DOCTYPE lolz ["
+        '<!ENTITY lol "lollollollollollollollollollol">'
+        '<!ENTITY lol2 "&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;">'
+        "]>"
+        '<DiputadosPeriodoColeccion xmlns="http://opendata.camara.cl/camaradiputados/v1">'
+        "<DiputadoPeriodo><Diputado><Id>1</Id><Nombre>&lol2;</Nombre>"
+        "</Diputado></DiputadoPeriodo>"
+        "</DiputadosPeriodoColeccion>"
+    ).encode("utf-8")
+
+    def test_build_rejects_entity_expansion_bomb(self):
+        """Plan 096 (B314): XML con entidades debe fallar cerrado, no expandir."""
+        from defusedxml.common import DefusedXmlException
+
+        with self.assertRaises(DefusedXmlException):
+            autoridades_electas_extractor.build_autoridades_df(self.ENTITY_BOMB, {})
 
     def test_build_maps_schema_partido_y_distrito(self):
         df = autoridades_electas_extractor.build_autoridades_df(self.XML, self.DISTRITOS)

@@ -457,6 +457,7 @@ geo = [
 ]
 pipeline = [
     { name = "curl-cffi" },
+    { name = "defusedxml" },
     { name = "duckdb" },
     { name = "geopandas" },
     { name = "openpyxl" },
@@ -482,8 +483,9 @@ requires-dist = [
     { name = "bandit", marker = "extra == 'dev'", specifier = "==1.9.4" },
     { name = "build", marker = "extra == 'dev'", specifier = "==1.6.1" },
     { name = "curl-cffi", marker = "extra == 'pipeline'", specifier = "==0.16.3" },
+    { name = "defusedxml", marker = "extra == 'pipeline'", specifier = "==0.7.1" },
     { name = "duckdb", marker = "extra == 'pipeline'", specifier = "==1.5.5" },
-    { name = "duckdb", marker = "extra == 'query'", specifier = ">=1.5.4" },
+    { name = "duckdb", marker = "extra == 'query'", specifier = ">=1.5.5,<1.6" },
     { name = "frictionless", marker = "extra == 'dev'", specifier = ">=5.18,<6" },
     { name = "frictionless", marker = "extra == 'validation'", specifier = ">=5.18,<6" },
     { name = "geopandas", marker = "extra == 'geo'", specifier = ">=1.1.4" },

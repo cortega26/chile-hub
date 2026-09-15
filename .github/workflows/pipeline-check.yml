@@ -75,7 +75,10 @@ jobs:
         # PYSEC-2026-2132 (click.edit() command injection, click==8.1.8) se
         # ignora de forma acotada: el pin lo impone python-semantic-release
         # 10.6.2 (último disponible) y nada en el repo llama click.edit()
-        # (el CLI no usa click; PSR tampoco). Revisar cuando PSR relaje el pin.
+        # (el CLI no usa click; PSR tampoco).
+        # EXPIRY (Plan 096): re-evaluar en cada bump de python-semantic-release
+        # (grupo python-dev de dependabot, semanal) y como tope el 2026-12-31:
+        # si el pin ya permite click>=8.3, quitar este flag en el mismo PR.
         run: uv run pip-audit --ignore-vuln PYSEC-2026-2132
 
       - name: Docstring coverage (informational)
@@ -272,7 +275,7 @@ jobs:
             # en un entorno efímero de uv en vez del venv del proyecto. Sin esto, un
             # cache-miss produce 155 registros (0 senadores) y el paso
             # "Check build-synced files" aborta el publish diario (2026-07-19/20).
-            PYTHONPATH=src uv run --no-project --with "scrapling[fetchers]" --with polars --with requests --with structlog --with tenacity --with curl_cffi python src/extractors/autoridades_electas_extractor.py
+            PYTHONPATH=src uv run --no-project --with "scrapling[fetchers]" --with polars --with requests --with structlog --with tenacity --with curl_cffi --with defusedxml python src/extractors/autoridades_electas_extractor.py
           fi
 
       - name: Restore versioned SINIM snapshot

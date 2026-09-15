@@ -3,7 +3,7 @@
 import datetime
 import os
 import shutil
-import subprocess
+import subprocess  # nosec B404 — solo invoca el binario unrar local (lista, sin shell)
 import sys
 from pathlib import Path
 
@@ -80,7 +80,7 @@ def fetch_data() -> tuple[Path, str, str]:
 
         print(f"Extrayendo {rar_path} con {unrar_bin}...")
         cmd = [str(unrar_bin), "x", "-y", str(rar_path), RAW_DIR]
-        res = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+        res = subprocess.run(cmd, capture_output=True, text=True, timeout=60)  # nosec B603  # cmd: lista con paths locales (unrar/rar/RAW_DIR), sin shell ni input externo
 
         # Eliminar archivo RAR temporal para no ensuciar data/raw
         if rar_path.exists():
