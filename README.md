@@ -209,7 +209,7 @@ chile-hub health       # severidad, frescura, drift y cobertura
 ### Respaldo adicional
 
 <!-- START_TEST_COUNT -->
-- **1011 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
+- **1013 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
 <!-- END_TEST_COUNT -->
 <!-- START_ADR_COUNT -->
 - **19 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
@@ -363,6 +363,13 @@ chile-hub health       # severidad, frescura, drift y cobertura
 | `establecimientos_salud_total` | `INTEGER` | `140` |
 | `establecimientos_educacionales_total` | `INTEGER` | `410` |
 | `distrito_electoral` | `VARCHAR` | `"10"` |
+| `crecimiento_natural_ultimo_anio` | `INTEGER` | `12` |
+| `anio_estadisticas_vitales` | `INTEGER` | `2023` |
+| `viviendas_autorizadas_ultimo_anio` | `INTEGER` | `2451` |
+| `superficie_autorizada_m2_ultimo_anio` | `INTEGER` | `187320` |
+| `anio_permisos_edificacion` | `INTEGER` | `2023` |
+| `mp25_promedio_ultimo_anio` | `DOUBLE` | `18.4` |
+| `anio_calidad_aire` | `INTEGER` | `2026` |
 
 **15. empresas** — Registro de Empresas y Sociedades (RES) con RUT, razon social, tipo societario, capital, fecha de constitucion y comuna de domicilio. (PK: rut)
 | Columna | Tipo | Ejemplo |

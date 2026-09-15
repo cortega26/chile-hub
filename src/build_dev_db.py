@@ -460,6 +460,9 @@ def _load_inputs():
         df_finanzas,
         df_resultados_educacionales,
         df_siedu,
+        df_vitales=df_estadisticas_vitales,
+        df_permisos=df_permisos_edificacion,
+        df_calidad=df_calidad_aire,
     )
 
     dfs = {

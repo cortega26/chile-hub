@@ -21,6 +21,73 @@ def derive_geography_layers(df_comunas):
     return df_regiones, df_provincias
 
 
+def _latest_vitales_summary(df_vitales):
+    """Crecimiento natural (nacimientos − defunciones) del último año con datos.
+
+    Retorna None si el upstream no está disponible; el llamador agrega las
+    columnas como nulas para mantener el esquema estable.
+    """
+    if df_vitales is None or df_vitales.height == 0:
+        return None
+    ultimo = df_vitales["anio"].max()
+    return (
+        df_vitales.filter(pl.col("anio") == ultimo)
+        .group_by("codigo_comuna")
+        .agg(
+            pl.col("cantidad").filter(pl.col("evento") == "nacimiento").sum().alias("nacimientos"),
+            pl.col("cantidad").filter(pl.col("evento") == "defuncion").sum().alias("defunciones"),
+        )
+        .with_columns(
+            (pl.col("nacimientos").fill_null(0) - pl.col("defunciones").fill_null(0)).alias(
+                "crecimiento_natural_ultimo_anio"
+            ),
+            pl.lit(ultimo).cast(pl.Int64).alias("anio_estadisticas_vitales"),
+        )
+        .select("codigo_comuna", "crecimiento_natural_ultimo_anio", "anio_estadisticas_vitales")
+        .with_columns(pl.col("codigo_comuna").cast(pl.String))
+    )
+
+
+def _latest_permisos_summary(df_permisos):
+    """Viviendas y superficie autorizadas del último año con datos."""
+    if df_permisos is None or df_permisos.height == 0:
+        return None
+    ultimo = df_permisos["anio"].max()
+    return (
+        df_permisos.filter(pl.col("anio") == ultimo)
+        .select(
+            "codigo_comuna",
+            pl.col("unidades_total").alias("viviendas_autorizadas_ultimo_anio"),
+            pl.col("superficie_m2_total").alias("superficie_autorizada_m2_ultimo_anio"),
+            pl.lit(ultimo).cast(pl.Int64).alias("anio_permisos_edificacion"),
+        )
+        .with_columns(pl.col("codigo_comuna").cast(pl.String))
+    )
+
+
+def _latest_calidad_summary(df_calidad):
+    """MP2.5 promedio del último año con datos (media de medias diarias).
+
+    Solo comunas con estación traen valor; el resto queda nulo (igual que
+    valor_promedio_siedu para comunas fuera de la cobertura SIEDU).
+    """
+    if df_calidad is None or df_calidad.height == 0:
+        return None
+    with_anio = df_calidad.with_columns(
+        pl.col("fecha").str.slice(0, 4).cast(pl.Int64).alias("anio")
+    )
+    ultimo = with_anio["anio"].max()
+    return (
+        with_anio.filter((pl.col("anio") == ultimo) & (pl.col("codigo_contaminante") == "mp25"))
+        .group_by("codigo_comuna")
+        .agg(pl.col("valor_promedio_diario").mean().alias("mp25_promedio_ultimo_anio"))
+        .with_columns(
+            pl.col("codigo_comuna").cast(pl.String),
+            pl.lit(ultimo).cast(pl.Int64).alias("anio_calidad_aire"),
+        )
+    )
+
+
 def build_perfil_territorial_comunal(
     df_comunas,
     df_censo,
@@ -31,6 +98,9 @@ def build_perfil_territorial_comunal(
     df_finanzas,
     df_resultados,
     df_siedu,
+    df_vitales=None,
+    df_permisos=None,
+    df_calidad=None,
 ):
     salud_counts = (
         df_salud.group_by("codigo_comuna")
@@ -80,8 +150,11 @@ def build_perfil_territorial_comunal(
         )
         .with_columns(pl.col("codigo_comuna").cast(pl.String))
     )
+    vitales_summary = _latest_vitales_summary(df_vitales)
+    permisos_summary = _latest_permisos_summary(df_permisos)
+    calidad_summary = _latest_calidad_summary(df_calidad)
 
-    return (
+    perfil = (
         df_comunas.join(
             df_censo.select(
                 "codigo_comuna",
@@ -119,10 +192,31 @@ def build_perfil_territorial_comunal(
         .join(latest_finanzas, on="codigo_comuna", how="left")
         .join(latest_resultados, on="codigo_comuna", how="left")
         .join(siedu_summary, on="codigo_comuna", how="left")
-        .with_columns(
-            pl.col("establecimientos_salud_total").fill_null(0).cast(pl.Int64),
-            pl.col("establecimientos_educacionales_total").fill_null(0).cast(pl.Int64),
-            pl.col("indicadores_siedu_total").fill_null(0).cast(pl.Int64),
-        )
-        .sort("codigo_comuna")
     )
+    if vitales_summary is not None:
+        perfil = perfil.join(vitales_summary, on="codigo_comuna", how="left")
+    else:
+        perfil = perfil.with_columns(
+            pl.lit(None, dtype=pl.Int64).alias("crecimiento_natural_ultimo_anio"),
+            pl.lit(None, dtype=pl.Int64).alias("anio_estadisticas_vitales"),
+        )
+    if permisos_summary is not None:
+        perfil = perfil.join(permisos_summary, on="codigo_comuna", how="left")
+    else:
+        perfil = perfil.with_columns(
+            pl.lit(None, dtype=pl.Int64).alias("viviendas_autorizadas_ultimo_anio"),
+            pl.lit(None, dtype=pl.Int64).alias("superficie_autorizada_m2_ultimo_anio"),
+            pl.lit(None, dtype=pl.Int64).alias("anio_permisos_edificacion"),
+        )
+    if calidad_summary is not None:
+        perfil = perfil.join(calidad_summary, on="codigo_comuna", how="left")
+    else:
+        perfil = perfil.with_columns(
+            pl.lit(None, dtype=pl.Float64).alias("mp25_promedio_ultimo_anio"),
+            pl.lit(None, dtype=pl.Int64).alias("anio_calidad_aire"),
+        )
+    return perfil.with_columns(
+        pl.col("establecimientos_salud_total").fill_null(0).cast(pl.Int64),
+        pl.col("establecimientos_educacionales_total").fill_null(0).cast(pl.Int64),
+        pl.col("indicadores_siedu_total").fill_null(0).cast(pl.Int64),
+    ).sort("codigo_comuna")
