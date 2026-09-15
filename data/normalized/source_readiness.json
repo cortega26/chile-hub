@@ -1,13 +1,13 @@
 {
-  "generated_at_utc": "2026-09-15T00:04:41.910173+00:00",
-  "dataset_count": 24,
-  "stable_count": 20,
+  "generated_at_utc": "2026-09-15T01:20:22.166676+00:00",
+  "dataset_count": 25,
+  "stable_count": 21,
   "candidate_count": 3,
   "experimental_count": 0,
   "deprecated_count": 1,
-  "live_ready_count": 19,
+  "live_ready_count": 20,
   "fallback_only_count": 1,
-  "publish_blocking_count": 21,
+  "publish_blocking_count": 22,
   "review_approaching_count": 6,
   "review_due_count": 0,
   "datasets": [
@@ -586,6 +586,30 @@
       "owner": "core",
       "next_action": "Monitorear que el biblionumber 25583 siga resolviendo al XLSX anual vigente.",
       "recommended_action": "Monitorear que el biblionumber 25583 siga resolviendo al XLSX anual vigente."
+    },
+    {
+      "dataset": "calidad_aire",
+      "maturity_status": "stable",
+      "source_id": "mma_sinca_calidad_aire",
+      "source_name": "SINCA — Ministerio del Medio Ambiente",
+      "official_url": "https://sinca.mma.gob.cl/",
+      "access_method": "api",
+      "license_status": "public-api-review-terms",
+      "source_mode": "live",
+      "source_detail": "Promedios diarios por estación y contaminante (MP2.5, MP10, SO2, NO2, CO, O3) desde el JSON del SINCA. Cobertura parcial por diseño (~65 comunas con estación). Serie incremental desde la primera cosecha.",
+      "live_ready": true,
+      "fallback_allowed": true,
+      "publish_blocking": true,
+      "live_extractor_status": "implemented",
+      "fallback_policy": "allowed_for_dev_blocked_for_publication",
+      "source_contract_url": "github:chile-hub/chile-hub/contracts/datasets/calidad_aire.schema.json",
+      "stalled_after_days": 90,
+      "review_by": "2026-12-31",
+      "stalled": false,
+      "review_status": "ok",
+      "owner": "core",
+      "next_action": "Vigilar estabilidad del endpoint listadomapa2k19 y crecimiento de la serie incremental.",
+      "recommended_action": "Vigilar estabilidad del endpoint listadomapa2k19 y crecimiento de la serie incremental."
     }
   ]
 }

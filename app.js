@@ -1048,6 +1048,10 @@ function renderCatalog(bundle) {
         gobierno: {
             title: "Gobierno y Política",
             datasets: ["partidos_politicos", "autoridades_electas"]
+        },
+        medioambiente: {
+            title: "Medio Ambiente",
+            datasets: ["calidad_aire"]
         }
     };
 

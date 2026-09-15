@@ -23,7 +23,7 @@
 [![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-3776AB.svg?style=flat&logo=python&logoColor=white)]()
 [![Formats](https://img.shields.io/badge/Formats-Parquet%20%7C%20DuckDB%20%7C%20SQLite%20%7C%20JSON%20%7C%20Excel-orange.svg)]()
 <!-- START_DATASET_BADGE -->
-[![Datasets](https://img.shields.io/badge/Datasets-21%20capas-16a34a.svg)]()
+[![Datasets](https://img.shields.io/badge/Datasets-22%20capas-16a34a.svg)]()
 <!-- END_DATASET_BADGE -->
 [![Comunas](https://img.shields.io/badge/Comunas-346-8b5cf6.svg)]()
 
@@ -169,9 +169,10 @@ Pipeline determinista en GitHub Actions: extracción → build → verificación
 | 19 | **Autoridades Electas** | 205 | 🟢 live | Cámara de Diputados + Senado | CC BY | Bajo_demanda |
 | 20 | **Estadísticas Vitales** | 13 840 | 🟢 live | INE | CC BY 4.0 | Anual |
 | 21 | **Permisos de Edificación** | 8 650 | 🟢 live | MINVU / CEDOC | Uso c/cita | Mensual |
-| 22 | **geometria_comunal** 🆕 | — | 🔜 próximamente | — | — | — |
-| 23 | **Delincuencia Comunal** 🆕 | — | 🔜 próximamente | CEAD / SPD | Revisión términos | — |
-| 24 | **Autoridades Locales** 🆕 | — | 🔜 próximamente | BCN SIIT + Wikipedia | CC BY / CC BY-SA | — |
+| 22 | **Calidad del Aire** | 756 | 🟢 live | MMA / SINCA | Revisión términos | Diaria |
+| 23 | **geometria_comunal** 🆕 | — | 🔜 próximamente | — | — | — |
+| 24 | **Delincuencia Comunal** 🆕 | — | 🔜 próximamente | CEAD / SPD | Revisión términos | — |
+| 25 | **Autoridades Locales** 🆕 | — | 🔜 próximamente | BCN SIIT + Wikipedia | CC BY / CC BY-SA | — |
 
 > **🟢 live**: datos extraídos directamente desde la fuente oficial en cada ejecución del pipeline.
 > **🟡 fallback**: datos servidos desde un respaldo curado mientras se completa la extracción en vivo.
@@ -190,11 +191,11 @@ confiabilidad, auditables y verificables en cada build:
 | Pilar | Descripción | Artefacto auditable |
 |:---|:---|:---|
 | **Procedencia documentada** | Cada dataset declara su fuente oficial exacta con URL directa al organismo público emisor (BCN, INE, MINEDUC, BCCh, MINSAL, datos.gob.cl). | [`provenance_report.md`](data/normalized/provenance_report.md) — fuente, modo y timestamp por capa |
-| **Auditoría legal explícita** | <!-- START_REDISTRIBUTION_SUMMARY -->Licencia, atribución requerida y permiso de redistribución verificados dataset por dataset. **21 de 21 capas** pasan la auditoría (`ready`).<!-- END_REDISTRIBUTION_SUMMARY --> | [`redistribution_report.md`](data/normalized/redistribution_report.md) + [`AGENTS.md §6`](AGENTS.md) |
+| **Auditoría legal explícita** | <!-- START_REDISTRIBUTION_SUMMARY -->Licencia, atribución requerida y permiso de redistribución verificados dataset por dataset. **22 de 22 capas** pasan la auditoría (`ready`).<!-- END_REDISTRIBUTION_SUMMARY --> | [`redistribution_report.md`](data/normalized/redistribution_report.md) + [`AGENTS.md §6`](AGENTS.md) |
 | **Pipeline fail-loud** | Si una validación falla, el pipeline **aborta** — no publica datos corruptos, no emite advertencias silenciosas. | [`ADR-001`](docs/adr/ADR-001-pipeline-lineal-determinista.md) — fail-loud como decisión de arquitectura |
-| **Contratos de esquema** | <!-- START_CONTRACT_COUNT -->24 contratos JSON Schema ([`contracts/datasets/`](contracts/datasets/)) definen columnas esperadas, tipos, claves primarias y cobertura. Se validan **en cada build** automáticamente.<!-- END_CONTRACT_COUNT --> | [`ADR-005`](docs/adr/ADR-005-contratos-esquema-json-schema.md) + `contracts/datasets/*.json` |
-| **Salud transparente** | <!-- START_HEALTH_SUMMARY -->Dashboard público con severidad, frescura, cobertura, drift y degradación por dataset. 19 capas `ok`, 1 `warn`, 0 `error`.<!-- END_HEALTH_SUMMARY --> | [`hub_health.md`](data/normalized/hub_health.md) — estado completo actualizado en cada build |
-| **Calidad medida** | <!-- START_QUALITY_SUMMARY -->Puntuación compuesta A-F por dataset: **promedio 94.0/100** (18 A, 3 B). Dimensiones: validación, contrato, madurez de fuente, frescura, cobertura, política de reúso.<!-- END_QUALITY_SUMMARY --> | [`dataset_quality.md`](data/normalized/dataset_quality.md) — scorecard completo |
+| **Contratos de esquema** | <!-- START_CONTRACT_COUNT -->25 contratos JSON Schema ([`contracts/datasets/`](contracts/datasets/)) definen columnas esperadas, tipos, claves primarias y cobertura. Se validan **en cada build** automáticamente.<!-- END_CONTRACT_COUNT --> | [`ADR-005`](docs/adr/ADR-005-contratos-esquema-json-schema.md) + `contracts/datasets/*.json` |
+| **Salud transparente** | <!-- START_HEALTH_SUMMARY -->Dashboard público con severidad, frescura, cobertura, drift y degradación por dataset. 20 capas `ok`, 1 `warn`, 0 `error`.<!-- END_HEALTH_SUMMARY --> | [`hub_health.md`](data/normalized/hub_health.md) — estado completo actualizado en cada build |
+| **Calidad medida** | <!-- START_QUALITY_SUMMARY -->Puntuación compuesta A-F por dataset: **promedio 93.6/100** (18 A, 4 B). Dimensiones: validación, contrato, madurez de fuente, frescura, cobertura, política de reúso.<!-- END_QUALITY_SUMMARY --> | [`dataset_quality.md`](data/normalized/dataset_quality.md) — scorecard completo |
 
 Cada pilar se audita automáticamente en cada ejecución del pipeline. Los reportes se
 regeneran en cada build — no son documentos estáticos mantenidos a mano. Para auditar
@@ -208,7 +209,7 @@ chile-hub health       # severidad, frescura, drift y cobertura
 ### Respaldo adicional
 
 <!-- START_TEST_COUNT -->
-- **994 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
+- **1011 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
 <!-- END_TEST_COUNT -->
 <!-- START_ADR_COUNT -->
 - **19 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
@@ -459,7 +460,29 @@ chile-hub health       # severidad, frescura, drift y cobertura
 | `url_fuente` | `VARCHAR` | `"https://catalogo.minvu.cl/cgi-bin/koha/opac-retrieve-file.pl?id=..."` |
 | `fecha_fuente` | `VARCHAR` | `"2026-09-15"` |
 
-**22. geometria_comunal** — Límites poligonales de las 346 comunas de Chile (GeoParquet, geometría 'generalizada' — simplificada para cartografía a escala nacional, no apta para trabajo de precisión geodésica ni catastral). Fuente: BCN ArcGIS (tematico/Comunas_Generalizadas). Artefacto separado de `comunas`, unido por `codigo_comuna`. (en carril candidate — datos no incluidos en el bundle público) (PK: codigo_comuna)
+**22. calidad_aire** — Promedios diarios de contaminantes atmosféricos (MP2.5, MP10, SO2, NO2, CO, O3) por estación de monitoreo, desde el SINCA (MMA). Cobertura parcial: ~65 comunas con estación. (PK: fecha, id_estacion, codigo_contaminante)
+| Columna | Tipo | Ejemplo |
+|:---|:---|:---|
+| `fecha` | `VARCHAR` | `"2026-09-14"` |
+| `id_estacion` | `VARCHAR` | `"271"` |
+| `nombre_estacion` | `VARCHAR` | `"Quilicura"` |
+| `codigo_region` | `VARCHAR(2)` | `"13"` |
+| `codigo_comuna` | `VARCHAR(5)` | `"13144"` |
+| `nombre_comuna` | `VARCHAR` | `"Quilicura"` |
+| `latitud` | `DOUBLE` | `-33.36` |
+| `longitud` | `DOUBLE` | `-70.73` |
+| `codigo_contaminante` | `VARCHAR` | `"mp25"` |
+| `nombre_contaminante` | `VARCHAR` | `"MP 2,5"` |
+| `unidad` | `VARCHAR` | `"ug/m3"` |
+| `valor_promedio_diario` | `DOUBLE` | `18.4` |
+| `valor_max_horario` | `DOUBLE` | `42.0` |
+| `horas_validas` | `INTEGER` | `24` |
+| `estado_dato` | `VARCHAR` | `"definitivo"` |
+| `fuente` | `VARCHAR` | `"SINCA — Ministerio del Medio Ambiente"` |
+| `url_fuente` | `VARCHAR` | `"https://sinca.mma.gob.cl/index.php/json/listadomapa2k19/"` |
+| `fecha_fuente` | `VARCHAR` | `"2026-09-15"` |
+
+**23. geometria_comunal** — Límites poligonales de las 346 comunas de Chile (GeoParquet, geometría 'generalizada' — simplificada para cartografía a escala nacional, no apta para trabajo de precisión geodésica ni catastral). Fuente: BCN ArcGIS (tematico/Comunas_Generalizadas). Artefacto separado de `comunas`, unido por `codigo_comuna`. (en carril candidate — datos no incluidos en el bundle público) (PK: codigo_comuna)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
 | `codigo_region` | `VARCHAR(2)` | `"01"` |
@@ -469,7 +492,7 @@ chile-hub health       # severidad, frescura, drift y cobertura
 | `nombre_region` | `VARCHAR` | `"Región de Tarapacá"` |
 | `geometry` | `BINARY` | `"WKB — Polygon o MultiPolygon en EPSG:4326 (WGS84), geoparquet 1.0"` |
 
-**23. delincuencia_comunal** — Casos policiales de Delitos de Mayor Connotación Social (DMCS) y otras categorías por comuna y mes, reportados por Carabineros y PDI al Ministerio del Interior. Fuente: CEAD (Centro de Estudios y Análisis del Delito), Subsecretaría de Prevención del Delito. (en carril candidate — datos no incluidos en el bundle público) (PK: anio, mes, codigo_comuna, familia_delito)
+**24. delincuencia_comunal** — Casos policiales de Delitos de Mayor Connotación Social (DMCS) y otras categorías por comuna y mes, reportados por Carabineros y PDI al Ministerio del Interior. Fuente: CEAD (Centro de Estudios y Análisis del Delito), Subsecretaría de Prevención del Delito. (en carril candidate — datos no incluidos en el bundle público) (PK: anio, mes, codigo_comuna, familia_delito)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
 | `codigo_comuna` | `VARCHAR(5)` | `"01101"` |
@@ -479,7 +502,7 @@ chile-hub health       # severidad, frescura, drift y cobertura
 | `familia_delito` | `VARCHAR` | `"robos_violentos"` |
 | `casos` | `INTEGER` | `245` |
 
-**24. autoridades_locales** — Autoridades locales/subnacionales de Chile: gobernadores regionales (Wikipedia, CC-BY-SA) y alcaldes (BCN SIIT, dato público gubernamental). Wikipedia se mantiene como fuente de gobernadores y enriquecimiento opcional de periodo_inicio para alcaldes. Dataset segregado de autoridades_electas por licencia mixta. (en carril candidate — datos no incluidos en el bundle público) (PK: id_autoridad)
+**25. autoridades_locales** — Autoridades locales/subnacionales de Chile: gobernadores regionales (Wikipedia, CC-BY-SA) y alcaldes (BCN SIIT, dato público gubernamental). Wikipedia se mantiene como fuente de gobernadores y enriquecimiento opcional de periodo_inicio para alcaldes. Dataset segregado de autoridades_electas por licencia mixta. (en carril candidate — datos no incluidos en el bundle público) (PK: id_autoridad)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
 | `id_autoridad` | `VARCHAR` | `"gobernador_01"` |
@@ -715,6 +738,7 @@ flowchart TB
 | Servicios públicos | `salud_extractor.py`, `mineduc_establecimientos_extractor.py`, `mineduc_resultados_extractor.py` |
 | Economía | `bcentral_extractor.py`, `sinim_finanzas_extractor.py`, `sinim_finanzas_live_extractor.py`, `res_extractor.py`, `consumo_electrico_extractor.py`, `permisos_edificacion_extractor.py` |
 | Indicadores urbanos | `siedu_extractor.py` |
+| Medio ambiente | `calidad_aire_extractor.py` |
 | Política | `partidos_politicos_extractor.py`, `autoridades_electas_extractor.py`, `autoridades_locales_extractor.py` |
 | Seguridad (carril `candidate`) | `cead_delincuencia_live_extractor.py` |
 | Derivado en `build_dev_db.py` (sin extractor) | `perfil_territorial_comunal` |

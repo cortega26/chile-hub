@@ -297,6 +297,9 @@ _AGENTS_EXTRACTOR_DESCRIPTIONS = {
     "permisos_edificacion_extractor.py": (
         "Permisos de edificación por comuna — viviendas (MINVU CEDOC) → data/staging/"
     ),
+    "calidad_aire_extractor.py": (
+        "Calidad del aire por estación — promedios diarios (SINCA/MMA) → data/staging/"
+    ),
     "consumo_electrico_extractor.py": ("Consumo eléctrico comunal (CNE) → data/staging/"),
     "partidos_politicos_extractor.py": ("Partidos políticos vigentes (SERVEL) → data/staging/"),
     "autoridades_electas_extractor.py": ("Diputados y senadores en ejercicio → data/staging/"),
@@ -422,6 +425,7 @@ _README_DATASET_DOMAINS = {
     "consumo_electrico_comunal": "Economía",
     "permisos_edificacion": "Economía",
     "indicadores_urbanos_siedu": "Indicadores urbanos",
+    "calidad_aire": "Medio ambiente",
     "partidos_politicos": "Política",
     "autoridades_electas": "Política",
     "autoridades_locales": "Política",
@@ -435,6 +439,7 @@ _README_DOMAIN_ORDER = [
     "Servicios públicos",
     "Economía",
     "Indicadores urbanos",
+    "Medio ambiente",
     "Política",
     "Seguridad (carril `candidate`)",
 ]

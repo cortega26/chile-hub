@@ -1807,3 +1807,150 @@ def validate_permisos_edificacion(
         "errors": errors,
         "warnings": warnings,
     }
+
+
+def validate_calidad_aire(
+    df: pl.DataFrame,
+    metadata: dict[str, Any] | None = None,
+    valid_commune_codes: list[str] | None = None,
+) -> dict[str, Any]:
+    """Valida el dataset de calidad del aire por estación (SINCA / MMA).
+
+    Chequeos:
+    - Columnas requeridas
+    - Duplicados de clave primaria (fecha, id_estacion, codigo_contaminante)
+    - Dominios cerrados: codigo_contaminante, estado_dato
+    - Métricas no negativas y sin nulos; horas_validas >= 1
+    - Formato de fecha ISO y de códigos CUT
+    - Integridad referencial con la DPA (error: toda comuna presente debe
+      existir; la cobertura parcial es esperada por diseño y va como warning
+      declarado, no como error — mismo patrón que SIEDU).
+    """
+    errors: list[str] = []
+    warnings: list[str] = []
+    expected_warnings: list[str] = []
+    row_count = df.height
+
+    required = [
+        "fecha",
+        "id_estacion",
+        "nombre_estacion",
+        "codigo_region",
+        "codigo_comuna",
+        "nombre_comuna",
+        "codigo_contaminante",
+        "nombre_contaminante",
+        "unidad",
+        "valor_promedio_diario",
+        "valor_max_horario",
+        "horas_validas",
+        "estado_dato",
+        "fuente",
+        "url_fuente",
+        "fecha_fuente",
+    ]
+    missing = _missing_columns(df, required)
+    if missing:
+        errors.append(f"missing required columns: {missing}")
+        return {
+            "dataset": "calidad_aire",
+            "status": "error",
+            "record_count": row_count,
+            "errors": errors,
+            "warnings": warnings,
+            "expected_warnings": expected_warnings,
+        }
+
+    if row_count == 0:
+        errors.append("calidad_aire dataset is empty")
+        return {
+            "dataset": "calidad_aire",
+            "status": "error",
+            "record_count": row_count,
+            "errors": errors,
+            "warnings": warnings,
+            "expected_warnings": expected_warnings,
+        }
+
+    # Duplicados de clave primaria
+    dup_count = _duplicate_count(df, ["fecha", "id_estacion", "codigo_contaminante"])
+    if dup_count > 0:
+        errors.append(
+            "found {0} duplicate rows by primary key "
+            "(fecha, id_estacion, codigo_contaminante)".format(dup_count)
+        )
+
+    # Formato de códigos CUT
+    invalid_region = _invalid_fixed_length_count(df, "codigo_region", 2)
+    if invalid_region > 0:
+        errors.append(f"found {invalid_region} codigo_region with invalid length (expected 2)")
+
+    invalid_cut = _invalid_fixed_length_count(df, "codigo_comuna", 5)
+    if invalid_cut > 0:
+        errors.append(f"found {invalid_cut} codigo_comuna with invalid length (expected 5)")
+
+    # Dominios cerrados
+    valid_contaminantes = {"mp25", "mp10", "so2", "no2", "co", "o3"}
+    unexpected = set(df["codigo_contaminante"].drop_nulls().unique().to_list())
+    unexpected -= valid_contaminantes
+    if unexpected:
+        errors.append(f"unexpected codigo_contaminante values: {sorted(unexpected)}")
+
+    valid_estados = {"definitivo", "provisional"}
+    unexpected_estados = set(df["estado_dato"].drop_nulls().unique().to_list()) - valid_estados
+    if unexpected_estados:
+        errors.append(f"unexpected estado_dato values: {sorted(unexpected_estados)}")
+
+    # Métricas: sin nulos, no negativas, al menos 1 hora válida
+    for col in ("valor_promedio_diario", "valor_max_horario"):
+        null_count = df.filter(pl.col(col).is_null()).height
+        if null_count > 0:
+            errors.append(f"found {null_count} rows with null {col}")
+        negative_count = df.filter(pl.col(col) < 0).height
+        if negative_count > 0:
+            errors.append(f"found {negative_count} rows with negative {col}")
+    zero_hours = df.filter(pl.col("horas_validas") < 1).height
+    if zero_hours > 0:
+        errors.append(f"found {zero_hours} rows with horas_validas < 1")
+
+    # Formato de fecha ISO
+    bad_dates = df.filter(~pl.col("fecha").str.contains(r"^\d{4}-\d{2}-\d{2}$")).height
+    if bad_dates > 0:
+        errors.append(f"found {bad_dates} rows with non-ISO fecha")
+
+    # Integridad referencial con la DPA
+    unknown = _unknown_codes(df, "codigo_comuna", valid_commune_codes)
+    if unknown:
+        errors.append(f"calidad_aire references unknown communes: {unknown}")
+
+    # Cobertura parcial por diseño (solo comunas con estación): warning
+    # declarado como esperado, igual que SIEDU.
+    if valid_commune_codes is not None and len(valid_commune_codes) > 0:
+        comunas_con_dato = df["codigo_comuna"].n_unique()
+        coverage_pct = round(comunas_con_dato / len(valid_commune_codes) * 100, 1)
+        _add_expected_warning(
+            warnings,
+            expected_warnings,
+            f"cobertura SINCA: {comunas_con_dato}/{len(valid_commune_codes)} comunas "
+            f"({coverage_pct}%) — parcial por diseño; solo comunas con estación",
+        )
+
+    # Volumen de estaciones: caída brusca del inventario indica fuente rota.
+    n_estaciones = df["id_estacion"].n_unique()
+    if n_estaciones < 100:
+        warnings.append(
+            f"solo {n_estaciones} estaciones con datos (esperado ~125); "
+            "posible caída parcial del SINCA"
+        )
+
+    if metadata and metadata.get("source_mode") == "fallback":
+        warnings.append("calidad_aire source_mode is fallback; usando datos de muestra mínima.")
+
+    return {
+        "dataset": "calidad_aire",
+        "status": "error" if errors else "ok",
+        "record_count": row_count,
+        "errors": errors,
+        "warnings": warnings,
+        "expected_warnings": expected_warnings,
+    }

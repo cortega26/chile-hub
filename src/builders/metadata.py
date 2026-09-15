@@ -417,6 +417,7 @@ def build_dataset_metadata(dfs, meta):
     df_autoridades_electas = dfs["autoridades_electas"]
     df_estadisticas_vitales = dfs["estadisticas_vitales"]
     df_permisos_edificacion = dfs["permisos_edificacion"]
+    df_calidad_aire = dfs["calidad_aire"]
     df_regiones = dfs["regiones"]
     df_provincias = dfs["provincias"]
     df_perfil_territorial = dfs["perfil_territorial"]
@@ -437,6 +438,7 @@ def build_dataset_metadata(dfs, meta):
     autoridades_electas_metadata = meta["autoridades_electas"]
     estadisticas_vitales_metadata = meta["estadisticas_vitales"]
     permisos_edificacion_metadata = meta["permisos_edificacion"]
+    calidad_aire_metadata = meta["calidad_aire"]
 
     dataset_metadata = {
         "regiones": {
@@ -812,6 +814,28 @@ def build_dataset_metadata(dfs, meta):
                 }
             }
             if df_permisos_edificacion is not None and permisos_edificacion_metadata is not None
+            else {}
+        ),
+        **(
+            {
+                "calidad_aire": {
+                    "dataset": "calidad_aire",
+                    "source_name": calidad_aire_metadata.get("source_name", ""),
+                    "source_url": calidad_aire_metadata.get("source_url", ""),
+                    "source_mode": calidad_aire_metadata.get("source_mode", "fallback"),
+                    "source_detail": calidad_aire_metadata.get("source_detail", ""),
+                    "refreshed_at_utc": calidad_aire_metadata.get("refreshed_at_utc", ""),
+                    "record_count": df_calidad_aire.height,
+                    "fields": df_calidad_aire.columns,
+                    "notes": calidad_aire_metadata.get("notes", []),
+                    "reuse_policy": DATASET_CATALOG_CONFIG["calidad_aire"]["reuse_policy"],
+                    "freshness": build_freshness(
+                        calidad_aire_metadata.get("refreshed_at_utc", ""),
+                        DATASET_CATALOG_CONFIG["calidad_aire"]["freshness_policy"]["max_age_hours"],
+                    ),
+                }
+            }
+            if df_calidad_aire is not None and calidad_aire_metadata is not None
             else {}
         ),
     }

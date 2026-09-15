@@ -1,0 +1,155 @@
+{
+  "dataset": "calidad_aire",
+  "primary_key": [
+    "fecha",
+    "id_estacion",
+    "codigo_contaminante"
+  ],
+  "required_columns": [
+    "fecha",
+    "id_estacion",
+    "nombre_estacion",
+    "codigo_region",
+    "codigo_comuna",
+    "nombre_comuna",
+    "latitud",
+    "longitud",
+    "codigo_contaminante",
+    "nombre_contaminante",
+    "unidad",
+    "valor_promedio_diario",
+    "valor_max_horario",
+    "horas_validas",
+    "estado_dato",
+    "fuente",
+    "url_fuente",
+    "fecha_fuente"
+  ],
+  "column_types": {
+    "fecha": "string",
+    "id_estacion": "string",
+    "nombre_estacion": "string",
+    "codigo_region": "string",
+    "codigo_comuna": "string",
+    "nombre_comuna": "string",
+    "latitud": "float",
+    "longitud": "float",
+    "codigo_contaminante": "string",
+    "nombre_contaminante": "string",
+    "unidad": "string",
+    "valor_promedio_diario": "float",
+    "valor_max_horario": "float",
+    "horas_validas": "integer",
+    "estado_dato": "string",
+    "fuente": "string",
+    "url_fuente": "string",
+    "fecha_fuente": "string"
+  },
+  "nullable_columns": [
+    "latitud",
+    "longitud"
+  ],
+  "fixed_width_columns": {
+    "codigo_region": 2,
+    "codigo_comuna": 5
+  },
+  "expected_record_count": null,
+  "coverage_policy": "partial_expected",
+  "publish_outputs": [
+    "parquet"
+  ],
+  "columns": [
+    {
+      "name": "fecha",
+      "type": "string",
+      "example": "2026-09-14"
+    },
+    {
+      "name": "id_estacion",
+      "type": "string",
+      "example": "271"
+    },
+    {
+      "name": "nombre_estacion",
+      "type": "string",
+      "example": "Quilicura"
+    },
+    {
+      "name": "codigo_region",
+      "type": "string",
+      "width": 2,
+      "example": "13"
+    },
+    {
+      "name": "codigo_comuna",
+      "type": "string",
+      "width": 5,
+      "example": "13144"
+    },
+    {
+      "name": "nombre_comuna",
+      "type": "string",
+      "example": "Quilicura"
+    },
+    {
+      "name": "latitud",
+      "type": "float",
+      "example": -33.36
+    },
+    {
+      "name": "longitud",
+      "type": "float",
+      "example": -70.73
+    },
+    {
+      "name": "codigo_contaminante",
+      "type": "string",
+      "example": "mp25"
+    },
+    {
+      "name": "nombre_contaminante",
+      "type": "string",
+      "example": "MP 2,5"
+    },
+    {
+      "name": "unidad",
+      "type": "string",
+      "example": "ug/m3"
+    },
+    {
+      "name": "valor_promedio_diario",
+      "type": "float",
+      "example": 18.4
+    },
+    {
+      "name": "valor_max_horario",
+      "type": "float",
+      "example": 42.0
+    },
+    {
+      "name": "horas_validas",
+      "type": "integer",
+      "example": 24
+    },
+    {
+      "name": "estado_dato",
+      "type": "string",
+      "example": "definitivo"
+    },
+    {
+      "name": "fuente",
+      "type": "string",
+      "example": "SINCA — Ministerio del Medio Ambiente"
+    },
+    {
+      "name": "url_fuente",
+      "type": "string",
+      "example": "https://sinca.mma.gob.cl/index.php/json/listadomapa2k19/"
+    },
+    {
+      "name": "fecha_fuente",
+      "type": "string",
+      "example": "2026-09-15"
+    }
+  ]
+}

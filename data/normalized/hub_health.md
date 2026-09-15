@@ -1,15 +1,15 @@
 # chile-hub health summary
 
-- `generated_at_utc`: `2026-09-15T00:04:41.910173+00:00`
+- `generated_at_utc`: `2026-09-15T01:20:22.166676+00:00`
 - `overall_status`: `warn`
-- `dataset_count`: `21`
-- `ok_count`: `19`
+- `dataset_count`: `22`
+- `ok_count`: `20`
 - `warn_count`: `1`
 - `error_count`: `0`
-- `live_count`: `20`
+- `live_count`: `21`
 - `fallback_count`: `0`
 - `stale_count`: `1`
-- `publishable_count`: `20`
+- `publishable_count`: `21`
 - `review_terms_count`: `0`
 - `unknown_reuse_count`: `0`
 - `degraded_count`: `0`
@@ -17,15 +17,16 @@
 - `partial_coverage_count`: `1`
 - `unknown_coverage_count`: `0`
 - `drifted_count`: `1`
-- `warning_count`: `6`
-- `top_issue`: `empresas` (freshness=fresh, drift=healthy, warnings=1)
-- `top_issue_reason`: RES solo cubre constituciones bajo Ley 20.659 (regimen simplificado). No incluye empresas del regimen tradicional (Diario Oficial) ni empresas anteriores a mayo 2013.
-- `top_issue_action`: Ninguna.
-- `top_issue_summary`: empresas: RES solo cubre constituciones bajo Ley 20.659 (regimen simplificado). No incluye empresas del regimen tradicional (Diario Oficial) ni empresas anteriores a mayo 2013. [source_detail=datos_gob_cl_ckan_api; warnings=1; freshness=fresh; drift=healthy; action=Ninguna.]
+- `warning_count`: `7`
+- `top_issue`: `indicadores` (freshness=stale, drift=drifted, warnings=2)
+- `top_issue_reason`: indicadores live refresh reused last published artifact for missing codes: ipc
+- `top_issue_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.
+- `top_issue_summary`: indicadores: indicadores live refresh reused last published artifact for missing codes: ipc [source_detail=public_api_with_published_backfill; warnings=2; freshness=stale; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]
 
 | Dataset | Severity | Mode | Freshness | Coverage | Drift | Publishability | Degradation | Validation | Warnings |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | ---: |
 | `autoridades_electas` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
+| `calidad_aire` | `ok` | `live` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 1 |
 | `censo_comunal` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `censo_hogares_viviendas` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `comunas` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |

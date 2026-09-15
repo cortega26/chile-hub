@@ -1,13 +1,13 @@
 # chile-hub — Madurez de fuente
 
-- `generated_at_utc`: `2026-09-15T00:04:41.910173+00:00`
-- `stable_count`: `20`
+- `generated_at_utc`: `2026-09-15T01:20:22.166676+00:00`
+- `stable_count`: `21`
 - `candidate_count`: `3`
 - `experimental_count`: `0`
 - `deprecated_count`: `1`
-- `live_ready_count`: `19`
+- `live_ready_count`: `20`
 - `fallback_only_count`: `1`
-- `publish_blocking_count`: `21`
+- `publish_blocking_count`: `22`
 - `review_approaching_count`: `6`
 - `review_due_count`: `0`
 
@@ -37,3 +37,4 @@
 | `autoridades_locales` | `candidate` | `wikipedia_autoridades_locales` | `not_built` | `✗` | `permitido` | `✓` | `implemented` | `⏳` | ⏳ REVIEW BY 2026-10-05 — 19 días. Ampliar cobertura de alcaldes (~165/345 identificados; ~121 sin página en Wikipedia, ~59 sin marca de vigencia clara); buscar fuente redistribuible no-share-alike para promover a stable_publishable. |
 | `estadisticas_vitales` | `stable` | `ine_estadisticas_vitales` | `live` | `✓` | `permitido` | `✓` | `implemented` | `—` | Monitorear publicación del anuario 2024 (el extractor lo incorpora solo). |
 | `permisos_edificacion` | `stable` | `minvu_permisos_edificacion` | `live` | `✓` | `permitido` | `✓` | `implemented` | `—` | Monitorear que el biblionumber 25583 siga resolviendo al XLSX anual vigente. |
+| `calidad_aire` | `stable` | `mma_sinca_calidad_aire` | `live` | `✓` | `permitido` | `✓` | `implemented` | `—` | Vigilar estabilidad del endpoint listadomapa2k19 y crecimiento de la serie incremental. |

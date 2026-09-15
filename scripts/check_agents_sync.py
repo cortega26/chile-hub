@@ -153,6 +153,7 @@ CATALOG_KEY_TO_ROW_FRAGMENT = {
     "geometria_comunal": "Geometría Comunal",
     "estadisticas_vitales": "Estadísticas Vitales",
     "permisos_edificacion": "Permisos de Edificación",
+    "calidad_aire": "Calidad del Aire",
 }
 
 

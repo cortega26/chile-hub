@@ -30,3 +30,4 @@ decision.
 | [Resultados electorales, autoridades electas y partidos](electoral-results-authorities-parties.md) | needs-research | Requiere separar datos agregados publicables de datos personales electorales excluidos. |
 | [Estadísticas vitales comunales (nacimientos/defunciones)](estadisticas-vitales-comunal.md) | accepted | Implementado como `estadisticas_vitales` (anuarios INE 2010→, cobertura 346/346). |
 | [Permisos de edificación por comuna (MINVU CEDOC)](permisos-edificacion-minvu.md) | accepted | Implementado como `permisos_edificacion` (serie 2002→, cobertura 346/346). |
+| [Calidad del aire por estación (SINCA / MMA)](calidad-aire-sinca.md) | accepted | Implementado como `calidad_aire` (serie diaria incremental, ~65 comunas). |
