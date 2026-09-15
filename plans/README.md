@@ -166,9 +166,9 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 | 091 | [Opcionales ruidosos + fallback sintético strict](091-optional-datasets-strict.md) | P1 | M | MED | — | TODO (REVERTED 2026-09-15: bc3e02f→79b41fa — choca con garantía Phase-1 "omitted optional does not block core build"; el gate publication ya cubre los 3 casos. Requiere decisión del mantenedor o cierre como cubierto) |
 | 092 | [Paralelizar formatos + `indicadores_hoy` = última fecha](092-parallel-formats-hoy-payload.md) | P2 | M | MED | 090 | DONE (2026-09-15, commit c9d8c2a — payload última-fecha-por-código + clamp hoy UTC; paralelización descartada con números; branch advisor/wave-2) |
 | 093 | [Scans O(K·N)→`partition_by` + allowlist única + cache acotado](093-validation-scans-cache.md) | P2 | M | LOW | — | DONE (2026-09-15, commit 3a155bd — partition_by idéntico, allowlist ×15→1, LRU cap 8; anio no persistido por costo-beneficio; branch advisor/wave-2) |
-| 094 | [Toolchain única + targets locales](094-dx-single-toolchain.md) | P1 | S | LOW | — | TODO |
-| 095 | [Floor Python `>=3.11` + despineo pandas](095-python-311-floor.md) | P1 | M | LOW | — | TODO |
-| 096 | [`duckdb` acotado + pip-audit expiry + bandit a extractors](096-deps-alignment-bandit.md) | P1 | S-M | LOW-MED | — | TODO |
+| 094 | [Toolchain única + targets locales](094-dx-single-toolchain.md) | P1 | S | LOW | — | DONE (2026-09-15, commit 1e5bb3c — ruff 0.16.7 + mypy 2.3.1 single-source, hook pip-audit espeja CI, make typecheck/audit/sec; + c74b80e isort canónico 0.16.7; branch advisor/wave-3) |
+| 095 | [Floor Python `>=3.11` + despineo pandas](095-python-311-floor.md) | P1 | M | LOW | — | DONE (2026-09-15, commit 6f92aa2 — floor, pandas sin marcador, matriz sin 3.10, lock solo-sustracciones, test matriz actualizado; branch advisor/wave-3) |
+| 096 | [`duckdb` acotado + pip-audit expiry + bandit a extractors](096-deps-alignment-bandit.md) | P1 | S-M | LOW-MED | — | DONE (2026-09-15, commit f7e31a7 — duckdb query acotado, pip-audit expiry 2026-12-31/PSR-bump, bandit a extractors + fix B314 real con defusedxml 0.7.1 y asserts→raise; branch advisor/wave-3) |
 | 097 | [Docs quirúrgicos: counts, badge, §5 como puntero](097-docs-surgical-fixes.md) | P1 | S | LOW | — | TODO |
 | 098 | [Arquitectura docs + anti-drift extendido](098-docs-architecture.md) | P2 | M | MED | 097 | TODO |
 | 099 | [Deuda media: sinim-shared + salud canónica + `_paths`](099-shared-debt.md) | P2 | M | MED | 091 | TODO |

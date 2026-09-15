@@ -23,7 +23,7 @@
 | 0 Baseline | — | 1/1 | DONE (2026-09-15) |
 | 1 Correctness S | 086–090 | 5/5 | DONE (2026-09-15, branch advisor/wave-1; suite 1027 passed) |
 | 2 Correctness/Perf M | 091–093 | 2/3 | 092, 093 DONE; 091 REVERTED (ver backlog) |
-| 3 Deps/Tooling/Sec | 094–096 | 0/3 | TODO |
+| 3 Deps/Tooling/Sec | 094–096 | 3/3 | DONE (2026-09-15, branch advisor/wave-3; bandit 0 issues, suite 1032 passed) |
 | 4 Docs agentes | 097–098 | 0/2 | TODO |
 | 5 Deuda+spikes | 099–100 | 0/2 | TODO |
 | 6 L diferido (pre-existente) | 077–079 + split gods | 0/3 | TODO (ver `plans/README.md`) |
@@ -39,9 +39,9 @@
 - [ ] 091 Opcionales ausentes ruidosos + fallback sintético strict (P1/M) — REVERTED 2026-09-15 (79b41fa): el abort en build rompe la garantía Phase-1 de core-build sin opcionales (7+1 tests); el gate publication ya rechaza missing/non-live/stale. Devuelto al backlog para decisión del mantenedor (alternativa: cerrar como cubierto por el gate).
 - [x] 092 Payload hoy por código + no-paralelizar con números (P2/M, c9d8c2a)
 - [x] 093 partition_by + allowlist única + cache LRU (P2/M, 3a155bd)
-- [ ] 094 Toolchain única: ruff/mypy una versión + `make typecheck/audit/sec` (P1/S, —)
-- [ ] 095 Floor Python `>=3.11` + despineo pandas + matriz CI (P1/M, —)
-- [ ] 096 `duckdb` query acotado + pip-audit expiry + bandit a extractors (P1/S-M, —)
+- [x] 094 Toolchain única + targets locales (P1/S, 1e5bb3c + c74b80e isort)
+- [x] 095 Floor py311 + despineo pandas (P1/M, 6f92aa2)
+- [x] 096 duckdb acotado + pip-audit expiry + bandit extractors + fix B314 (P1/S-M, f7e31a7)
 - [ ] 097 Docs quirúrgicos: CLAUDE counts, badge capas, §5 como puntero (P1/S, —)
 - [ ] 098 Docs arquitectura: SOURCE índice, CLAUDE→30 líneas, anti-drift extendido (P2/M, tras 097) + fix regex `check_agents_sync.py:54` (aceptar `\d{4}` sin espacio; hoy `1034` pelado no matchea y atribuye el número vecino — hallado en Wave 2, workaround: formato `1 034`)
 - [ ] 099 Deuda media: sinim-shared + salud canónica + `sys.path`→`_paths` (P2/M, tras 091)
