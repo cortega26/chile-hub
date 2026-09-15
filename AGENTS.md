@@ -918,7 +918,7 @@ protegido por un chequeo automatizado en vez de depender solo de buena voluntad.
 | Tabla de extractores por dominio en README | `data/dataset_catalog_config.json` vía `doc_sync.py::sync_readme_extractor_table()` | `scripts/sync_docs.py --check` |
 | Bloque Schema de cada `docs/datasets/{nombre}.md` | `contracts/datasets/{nombre}.schema.json` vía `doc_sync.py::sync_docs_schema_blocks()` | `scripts/sync_docs.py --check` |
 | Hechos operacionales del piloto DatasetSpec (Phase 2–3D cohort) | `data/dataset_specs/` (22 specs: complete) — proyección shadow en `_shared.py`/`reports.py` | `tests/test_phase2_datasetspec.py` (equivalencia vs. catálogo/registry/contrato legacy, 24 tests) |
-| Hechos contables de AGENTS.md (anclas de líneas, listas de módulos del §2, tabla de capas del §1) | código (`wc -l`, `src/`, `data/dataset_catalog_config.json`) — prosa curada, no bloque regenerado | `scripts/check_agents_sync.py` |
+| Hechos contables de docs de agentes (anclas de líneas y listas del §2 + tabla §1 de AGENTS.md; ausencia de conteos literales en CLAUDE.md/SOURCE_OF_TRUTH.md) | código (`wc -l`, `src/`, `data/dataset_catalog_config.json`) — prosa curada, no bloque regenerado | `scripts/check_agents_sync.py --docs AGENTS.md,CLAUDE.md,SOURCE_OF_TRUTH.md` |
 | Liveness de `official_url` de fuentes | `data/source_registry.json` | `.github/workflows/source-urls.yml` + `scripts/check_source_urls.py` (semanal, no bloquea publish) |
 
 ### Mecanismo: `scripts/check_landing_sync.py`
@@ -1000,7 +1000,10 @@ mantenimiento manual. Su protección es doble: los bloques `START_AGENTS_*`
 que no se regeneran (anclas de líneas, listas de módulos del árbol §2, tabla de
 capas §1) los verifica `scripts/check_agents_sync.py` en `make doctor` y en el
 job `quality` — ver su docstring para la regla exacta de qué se chequea y qué
-no (solo hechos contables, nunca prosa).
+no (solo hechos contables, nunca prosa). Regla "un hecho, un dueño": las
+áncoras de líneas solo viven en AGENTS.md (verificadas); en CLAUDE.md y
+SOURCE_OF_TRUTH.md el gate exige su *ausencia* (un conteo literal ahí es
+deriva, no información).
 
 **Seguimiento recomendado, no implementado todavía** (mayor alcance):
 automatizar la tabla "CLI de referencia" de README.md introspeccionando

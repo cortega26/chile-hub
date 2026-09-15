@@ -3453,6 +3453,48 @@ class SyncLandingMetadataTests(unittest.TestCase):
                     landing.sync_landing_metadata("https://example.cl/chile-hub/")
 
 
+class CheckAgentsSyncTests(unittest.TestCase):
+    """Tests para scripts/check_agents_sync.py (Plan 098): el gate anti-drift
+    de los docs de agentes. Regla "un hecho, un dueño" — áncoras solo en
+    AGENTS.md (verificadas), prohibidas en CLAUDE.md/SOURCE_OF_TRUTH.md."""
+
+    def _run_checks(self, doc, content):
+        from scripts import check_agents_sync as cas
+
+        saved = list(cas.ERRORS)
+        del cas.ERRORS[:]
+        try:
+            if doc == "AGENTS.md":
+                cas.check_line_count_anchors(doc, "sin áncoras aquí")
+            else:
+                cas.check_no_line_counts(doc, content)
+            return list(cas.ERRORS)
+        finally:
+            del cas.ERRORS[:]
+            cas.ERRORS.extend(saved)
+
+    def test_no_counts_allowed_outside_agents(self):
+        self.assertEqual(self._run_checks("CLAUDE.md", "solo prosa, sin números"), [])
+        errors = self._run_checks("SOURCE_OF_TRUTH.md", "`src/validation.py` (1234 lineas)")
+        self.assertTrue(any("SOURCE_OF_TRUTH.md" in e and "1234" in e for e in errors))
+
+    def test_accented_and_plain_spelling_both_match(self):
+        """El agujero original: el regex solo veía "líneas" con acento y
+        SOURCE_OF_TRUTH.md usaba "lineas" sin acento durante meses."""
+        from scripts.check_agents_sync import LINE_COUNT_PATTERN
+
+        self.assertTrue(LINE_COUNT_PATTERN.search("`x.py` (99 líneas)"))
+        self.assertTrue(LINE_COUNT_PATTERN.search("`x.py` (1034 lineas)"))
+        self.assertTrue(LINE_COUNT_PATTERN.search("`x.py` (1 960 líneas)"))
+
+    def test_committed_docs_pass_the_gate(self):
+        """Los tres docs commiteados pasan el gate extendido."""
+        from scripts.check_agents_sync import main
+
+        main([])  # default = los tres docs (argv vacío como en producción)
+        main(["--docs", "CLAUDE.md,SOURCE_OF_TRUTH.md"])
+
+
 class CheckLandingSyncTests(unittest.TestCase):
     """Tests para scripts/check_landing_sync.py, el gate que corre en cada
     push/PR.

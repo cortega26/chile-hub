@@ -69,6 +69,10 @@
 - Wave 6 tras Wave 2 (caracterización 077 antes de cualquier refactor).
 - `079` tras `077` (pre-existente, ver `plans/README.md`).
 
+## Follow-ups detectados durante waves (no re-auditar, sí trackear)
+
+- [ ] Ficha `delincuencia_comunal` en `source_registry.json` con campos estructurados stales tras la degradación del 2026-09-15: `maturity_status: candidate` + `live_extractor_status: implemented` + `review_by: 2027-09-15` contradicen `next_action` ("degradado a rejected", extractor neutralizado). Requiere decisión del mantenedor sobre los valores enum + interplay con gates antes de tocar (hallado en Wave 4, fuera de scope docs).
+
 ## Rechazados en esta auditoría (no re-auditar)
 
 - Conflicto `click` dev-vs-scraping: by-design (`pyproject.toml:94-107` + `conflicts` + entorno efímero en CI).

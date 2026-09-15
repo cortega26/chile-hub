@@ -71,6 +71,25 @@ no madura a un extractor estable ni demuestra mantención, se degrada a `rejecte
 o se archiva. Sin esta regla, el estado se pudre en un `candidate` permanente sin
 mantenimiento —el patrón que ya vivió `finanzas_municipales` (SINIM)—.
 
+## Mapa estado → carril → campos del registry
+
+Los estados de decisión viven en este documento; los carriles y campos viven
+en `data/source_registry.json` (ver `AGENTS.md §1`). La equivalencia es:
+
+| Estado | Carril (`publication_track`) | En bundle (`public_bundle_eligible`) | Ejemplo |
+|:---|:---|:---:|:---|
+| `accepted` | `stable_publishable` | Sí | `indicadores`, `comunas` |
+| `under-review` | `candidate` | No | `autoridades_locales` (`review_by` + regla de salida arriba) |
+| `needs-research` / `deferred` | sin carril (no implementado) | No | — |
+| `rejected` | sin carril o `candidate` histórico no publicable | No | `delincuencia_comunal` (extractor neutralizado) |
+
+Notas: `maturity_status` (`stable`/`candidate`/`deprecated`) describe madurez
+de la fuente, no el carril — p. ej. `consumo_electrico_comunal` es
+`candidate` + `deprecated` (fuente CNE descontinuada) pero sigue construyéndose
+localmente. `cadencia`, `review_by` y `live_extractor_status` completan la
+ficha operativa por dataset. AGENTS.md y CONTRIBUTING.md usan estos mismos
+nombres por referencia, sin redefinirlos.
+
 ## Razones comunes de rechazo
 
 - La fuente prohíbe reutilizar los datos, no solo redistribuirlos (la sola falta de redistribución no rechaza: define carril `candidate` o referencia; los términos ambiguos pasan a `needs-research`).

@@ -63,22 +63,22 @@ confiables** — no una cobertura exhaustiva.
 ```
 src/
 ├── extractors/
-│   ├── base.py                    ABC BaseExtractor — 76 lineas, leer completo
+│   ├── base.py                    ABC BaseExtractor — breve, leer completo
 │   └── {name}_extractor.py        Un archivo por dataset, extiende BaseExtractor
-├── validation.py                  TODAS las validate_*() — 1 956 lineas, leer por validador
-├── build_dev_db.py                Orquestador del pipeline (927 lineas) — main() + fases:
+├── validation.py                  TODAS las validate_*() — leer por validador
+├── build_dev_db.py                Orquestador del pipeline — main() + fases:
 │   _load_inputs / _compute_validations / _write_data_artifacts / _generate_reports
 │   El bloque validations = {…} vive en _compute_validations()
 ├── builders/                      Modulos del pipeline (extraidos de build_dev_db.py):
 │   _shared, io_utils, formats, metadata, reports, artifacts, datasets, catalog, landing,
 │   dcat_catalog, data_package, doc_sync, geo, _logging, staging_schema
-├── chile_hub.py                   Shim de compatibilidad (21 lineas) — delega al paquete inferior
+├── chile_hub.py                   Shim de compatibilidad — delega al paquete inferior
 ├── chile_hub/
-│   ├── core.py                    Clase ChileHub + API publica completa — 1 995 lineas
-│   ├── cli.py                     Entry points de CLI (713 lineas, extraido de core.py)
-│   ├── data_manager.py            Descarga de bundles, cache, SHA256 — ~430 lineas
-│   └── pipeline_status_utils.py   Constructores de reportes (health, catalog, redistribution) — 1 000 lineas
-├── pipeline_status_utils.py       Shim de reexport (21 lineas) — para scripts con PYTHONPATH=src.
+│   ├── core.py                    Clase ChileHub + API publica completa
+│   ├── cli.py                     Entry points de CLI (extraido de core.py)
+│   ├── data_manager.py            Descarga de bundles, cache, SHA256
+│   └── pipeline_status_utils.py   Constructores de reportes (health, catalog, redistribution)
+├── pipeline_status_utils.py       Shim de reexport — para scripts con PYTHONPATH=src.
 │   No dupliques logica aqui: la implementacion real es chile_hub/pipeline_status_utils.py (arriba)
 ├── registry/                      DatasetSpec cohort Phase 2–3D, 22 specs (ADR-018)
 
@@ -116,8 +116,8 @@ tests/                      15 archivos — inventario completo en AGENTS.md §8
 | Navegar archivos grandes sin leerlos en frio | `CLAUDE.md` → seccion **CodeGraph** |
 | Encontrar donde esta definido un simbolo | `codegraph find <name>` o `grep -n "def <name>" src/` |
 | Leer API publica de ChileHub | `src/chile_hub/core.py` (clase ChileHub, todos los metodos publicos) |
-| Leer toda la logica de validacion | `src/validation.py` (1 956 lineas — leer por validador) |
-| Leer contrato de extractors | `src/extractors/base.py` (76 lineas — seguro de leer completo) |
+| Leer toda la logica de validacion | `src/validation.py` (leer por validador) |
+| Leer contrato de extractors | `src/extractors/base.py` (breve — seguro de leer completo) |
 
 ---
 

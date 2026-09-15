@@ -1,24 +1,30 @@
-"""Verifica hechos contables de AGENTS.md contra su fuente de verdad.
+"""Verifica hechos contables de los docs de agentes contra su fuente de verdad.
 
 Complementa a `scripts/sync_docs.py` (que regenera los bloques delimitados
-`START_AGENTS_*`): este script cubre la prosa EDITORIAL de AGENTS.md que
-§12 no automatiza (a propósito) y que por eso tiende a stale — conteos de
-líneas usados como áncoras de lectura, listas de módulos en el árbol del
-§2, la tabla de capas del §1 y el conteo de archivos de test del árbol.
+`START_AGENTS_*`): este script cubre la prosa EDITORIAL que §12 no automatiza
+(a propósito) y que por eso tiende a stale. Regla "un hecho, un dueño"
+(Plan 098):
+
+- AGENTS.md: único dueño de áncoras de líneas, listas de módulos del árbol
+  del §2, tabla de capas del §1 y conteo de tests — todo verificado aquí.
+- CLAUDE.md / SOURCE_OF_TRUTH.md: PROHIBIDOS los conteos literales de líneas
+  de código (rotan en silencio); solo se verifica su ausencia.
 
 Regla: solo verifica hechos contables (números y existencia de archivos),
 nunca prosa. Si un hecho no es derivable mecánicamente, no se chequea aquí.
 
-Corre en `make doctor` y en el job `quality` de CI. Stdlib-only (igual que
-`check_landing_sync.py` y `sync_docs.py`).
+Uso: `scripts/check_agents_sync.py [--docs AGENTS.md,CLAUDE.md,SOURCE_OF_TRUTH.md]`
+(por defecto los tres). Corre en `make doctor` y en el job `quality` de CI.
+Stdlib-only (igual que `check_landing_sync.py` y `sync_docs.py`).
 """
 
+import argparse
 import os
 import re
 import sys
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-AGENTS_PATH = os.path.join(ROOT_DIR, "AGENTS.md")
+DEFAULT_DOCS = ["AGENTS.md", "CLAUDE.md", "SOURCE_OF_TRUTH.md"]
 SRC_DIR = os.path.join(ROOT_DIR, "src")
 TESTS_DIR = os.path.join(ROOT_DIR, "tests")
 BUILDERS_DIR = os.path.join(SRC_DIR, "builders")
@@ -50,8 +56,13 @@ def load_catalog() -> dict:
 #    El nombre puede ser un path relativo (`chile_hub/pipeline_status_utils.py`)
 #    o un basename ambiguo (`core.py`); en ese caso pasa si ALGÚN archivo
 #    de src/ con ese basename coincide con el conteo declarado.
+#    Formatos aceptados: "928", "1034", "1 034" (miles con espacio,
+#    convención del repo). Junto a "lineas" sin acento (`l[ií]neas`):
+#    SOURCE_OF_TRUTH.md usó esa grafía durante meses sin que el gate la
+#    viera (Plan 098) — el `?` suelto tras "líneas" solo opcionalizaba la
+#    ese final, nunca el acento.
 # ---------------------------------------------------------------------------
-LINE_COUNT_PATTERN = re.compile(r"([\w/]+\.py)[^\n]*?\((\d{1,3}(?: \d{3})*) líneas\)")
+LINE_COUNT_PATTERN = re.compile(r"([\w/]+\.py)[^\n]*?\((\d{1,4}(?: \d{3})*) l[ií]neas\)")
 
 
 def _find_by_basename(basename: str) -> list[str]:
@@ -65,7 +76,7 @@ def _find_by_basename(basename: str) -> list[str]:
     return found
 
 
-def check_line_count_anchors(content: str) -> None:
+def check_line_count_anchors(doc: str, content: str) -> None:
     for name, claimed in LINE_COUNT_PATTERN.findall(content):
         claimed_count = int(claimed.replace(" ", ""))
         if "/" in name:
@@ -75,7 +86,7 @@ def check_line_count_anchors(content: str) -> None:
             candidates = _find_by_basename(name)
         if not candidates:
             fail(
-                f"AGENTS.md cita '{name} (… líneas)' pero no existe ningún archivo "
+                f"{doc} cita '{name} (… líneas)' pero no existe ningún archivo "
                 f"con ese nombre bajo src/. ¿Se renombró o eliminó el módulo?"
             )
             continue
@@ -83,10 +94,26 @@ def check_line_count_anchors(content: str) -> None:
         if not matching:
             actual = "; ".join(f"{p}: {wc_lines(p)}" for p in sorted(candidates))
             fail(
-                f"AGENTS.md dice '{name} ({claimed} líneas)' pero el conteo real es: "
+                f"{doc} dice '{name} ({claimed} líneas)' pero el conteo real es: "
                 f"{actual}. Corre `make sync-docs` si es un bloque delimitado, o "
                 f"actualiza el número a mano."
             )
+
+
+def check_no_line_counts(doc: str, content: str) -> None:
+    """En docs que no son AGENTS.md, cualquier áncora de líneas es deriva.
+
+    Los conteos literales solo viven en AGENTS.md (verificados arriba); aquí
+    solo se exige su ausencia. Cubre ambas grafías ("líneas"/"lineas"): el
+    gate histórico solo veía la primera.
+    """
+    for name, claimed in LINE_COUNT_PATTERN.findall(content):
+        fail(
+            f"{doc} contiene un conteo literal '{name} ({claimed} líneas)' — "
+            f"los conteos de código solo viven en AGENTS.md (verificados). "
+            f"Reemplázalo por guía cualitativa ('breve, leer completo') o un "
+            f"enlace a AGENTS.md."
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -203,22 +230,39 @@ def check_tests_tree(content: str) -> None:
             )
 
 
-def main() -> None:
-    with open(AGENTS_PATH, "r", encoding="utf-8") as f:
-        content = f.read()
+def main(argv: list[str] | None = None) -> None:
+    parser = argparse.ArgumentParser(
+        description="Verifica hechos contables de los docs de agentes.",
+    )
+    parser.add_argument(
+        "--docs",
+        default=",".join(DEFAULT_DOCS),
+        help="Docs a verificar, separados por coma (default: %(default)s).",
+    )
+    docs = [d.strip() for d in parser.parse_args(argv).docs.split(",") if d.strip()]
 
-    check_line_count_anchors(content)
-    check_builders_list(content)
-    check_chilehub_package_list(content)
-    check_layers_table(content)
-    check_tests_tree(content)
+    for doc in docs:
+        path = os.path.join(ROOT_DIR, doc)
+        if not os.path.isfile(path):
+            fail(f"Documento esperado no existe: {doc}")
+            continue
+        with open(path, "r", encoding="utf-8") as f:
+            content = f.read()
+        if doc == "AGENTS.md":
+            check_line_count_anchors(doc, content)
+            check_builders_list(content)
+            check_chilehub_package_list(content)
+            check_layers_table(content)
+            check_tests_tree(content)
+        else:
+            check_no_line_counts(doc, content)
 
     if ERRORS:
-        print("check_agents_sync: AGENTS.md desincronizado con el código:\n")
+        print(f"check_agents_sync: docs desincronizados con el código ({', '.join(docs)}):\n")
         for msg in ERRORS:
             print(f"  - {msg}")
         sys.exit(1)
-    print("check_agents_sync: hechos contables de AGENTS.md OK")
+    print(f"check_agents_sync: hechos contables OK ({', '.join(docs)})")
 
 
 if __name__ == "__main__":
