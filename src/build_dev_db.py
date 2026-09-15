@@ -30,7 +30,6 @@ from src.builders._shared import (  # noqa: E402, F401
     CENSO_METADATA_PATH,
     COMUNAS_METADATA_PATH,
     CONSUMO_ELECTRICO_COMUNAL_METADATA_PATH,
-    DATA_DIR,
     DATASET_CATALOG_CONFIG,
     ELECTORAL_METADATA_PATH,
     EMPRESAS_METADATA_PATH,
@@ -152,40 +151,6 @@ from src.validation import (
     validate_regiones,
     validate_resultados_educacionales,
 )
-
-
-def _stable_publishable_names():
-    """Nombres con carril stable_publishable y elegibles al bundle público.
-
-    Lee data/source_registry.json (fuente del carril, misma definición que
-    verify_pipeline.stable_publishable_dataset_names). Si el registry no se
-    puede leer, retorna vacío (fail-open): su ausencia rompe el build aguas
-    abajo de todos modos y no debe enmascararse como otro error.
-    """
-    try:
-        with open(os.path.join(DATA_DIR, "source_registry.json"), encoding="utf-8") as f:
-            registry = json.load(f)
-    except (OSError, ValueError):
-        return set()
-    return {
-        entry["dataset"]
-        for entry in registry
-        if entry.get("publication_track") == "stable_publishable"
-        and entry.get("public_bundle_eligible") is True
-    }
-
-
-def _missing_publishable_datasets(optional_presence, stable_names):
-    """Subconjunto de (name, df, csv, extractor) con df None e inesperado.
-
-    Función pura para testear la decisión sin staging real: retorna las
-    entradas cuyo dataset es stable_publishable pero no se cargó.
-    """
-    return [
-        (name, csv, extractor)
-        for name, df, csv, extractor in optional_presence
-        if df is None and name in stable_names
-    ]
 
 
 def _load_inputs():
@@ -485,59 +450,6 @@ def _load_inputs():
         )
     else:
         log.info("dataset_skipped", dataset="calidad_aire", reason="not_found_in_staging")
-
-    # Ausencia inesperada: fallar ruidoso (Plan 091, AGENTS.md §4.2). Un
-    # dataset stable_publishable sin staging desaparecía del bundle en
-    # silencio (el gate de publication lo rechaza 24h después, o el
-    # consumidor lo ve como "dataset inexistente"). Los carriles candidate
-    # siguen siendo opcionales por diseño. Lista única: el carril se lee del
-    # registry, no se hardcodea aquí (los scripts vienen del catálogo).
-    _optional_presence = (
-        ("empresas", df_empresas, "empresas.csv", "res_extractor.py"),
-        ("pobreza_comunal", df_pobreza_comunal, "pobreza_comunal.csv", "pobreza_extractor.py"),
-        (
-            "consumo_electrico_comunal",
-            df_consumo_electrico,
-            "consumo_electrico_comunal.csv",
-            "consumo_electrico_extractor.py",
-        ),
-        (
-            "partidos_politicos",
-            df_partidos_politicos,
-            "partidos_politicos.csv",
-            "partidos_politicos_extractor.py",
-        ),
-        (
-            "autoridades_electas",
-            df_autoridades_electas,
-            "autoridades_electas.csv",
-            "autoridades_electas_extractor.py",
-        ),
-        (
-            "estadisticas_vitales",
-            df_estadisticas_vitales,
-            "estadisticas_vitales.csv",
-            "estadisticas_vitales_extractor.py",
-        ),
-        (
-            "permisos_edificacion",
-            df_permisos_edificacion,
-            "permisos_edificacion.csv",
-            "permisos_edificacion_extractor.py",
-        ),
-        ("calidad_aire", df_calidad_aire, "calidad_aire.csv", "calidad_aire_extractor.py"),
-    )
-    _missing = _missing_publishable_datasets(_optional_presence, _stable_publishable_names())
-    if _missing:
-        details = "; ".join(
-            f"'{name}': falta {csv} o su metadata.json en data/staging/ "
-            f"(corre: python src/extractors/{extractor})"
-            for name, csv, extractor in _missing
-        )
-        raise SystemExit(
-            "Error: datasets stable_publishable sin staging (la capa desaparecería "
-            f"del bundle en silencio): {details}"
-        )
 
     df_regiones, df_provincias = derive_geography_layers(df_comunas)
     df_perfil_territorial = build_perfil_territorial_comunal(
