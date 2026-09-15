@@ -12,6 +12,24 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.34.1 - 2026-09-15
+
+### Corregido
+
+- **landing**: Segunda ocurrencia hardcodeada del conteo (review PR #98)
+  ([#98](https://github.com/cortega26/chile-hub/pull/98),
+  [`2b780d7`](https://github.com/cortega26/chile-hub/commit/2b780d7aa8e640a8d59dcc219ab33dc804667680))
+
+### Documentación
+
+- Alinea README, landing y SOURCE_OF_TRUTH con el estado actual
+  ([#98](https://github.com/cortega26/chile-hub/pull/98),
+  [`2b780d7`](https://github.com/cortega26/chile-hub/commit/2b780d7aa8e640a8d59dcc219ab33dc804667680))
+
+- **delincuencia**: Cuerpo en pasado/deprecated (responde review PR #97)
+  ([`79598af`](https://github.com/cortega26/chile-hub/commit/79598afed8195d838b5771122014ae38ecd6a2ba))
+
+
 ## 1.34.0 - 2026-09-15
 
 ### Agregado
