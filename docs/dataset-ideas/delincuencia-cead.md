@@ -2,7 +2,7 @@
 
 ## Estado
 
-- **Decisión actual**: **implemented** — extractor operativo en carril `candidate` (2026-06-30)
+- **Decisión actual**: **rejected** — degradado 2026-09-15 en revisión anticipada del `review_by` 2026-09-21
 - **Prioridad tentativa**: P1 por valor, condicionada por la fuente
 - **Esfuerzo estimado**: M si aparece una descarga estructurada estable; L si hay
   que mantener un extractor sobre scraping
@@ -10,10 +10,27 @@
 - **Categoría**: seguridad / civic-data / data-quality
 - **Registrado**: 2026-06-21
 - **Implementado**: 2026-06-30 — `src/extractors/cead_delincuencia_live_extractor.py`
+- **Degradado**: 2026-09-15 — extractor neutralizado (`NotImplementedError`),
+  removido de `monthly-scrape.yml`, registry en `deprecated`
 - **review_by**: 2026-09-21 (`stalled_after_days`: 90)
 - **Carril de destino**: `candidate` (fuera del bundle público)
-- **Fuente verificada**: sí — sin descarga oficial estable; el acceso real es
-  scraping de tablas HTML vía POST al endpoint PHP de CEAD; ver Referencias.
+
+## Por qué se degradó a `rejected` (2026-09-15)
+
+Verificación de fuentes del 2026-09-15, tres vías, todas negativas:
+
+1. **datos.gob.cl (API CKAN)**: solo bulk inicial de 2015-10-30 con links muertos
+   (`seguridadpublica.gob.cl` desaparecido) y reportes de una municipalidad.
+   Nada nacional vigente y estructurado.
+2. **Portal CEAD**: responde 403 a requests simples (protección anti-bots —
+   la misma razón por la que el scraper era frágil) y solo publica
+   PDF/presentaciones; sus Excel son microdatos de encuestas (ENUSC),
+   no serie comunal.
+3. **XLSX de Carabineros en datos.gob.cl**: edición 2015, desactualizado.
+
+Además el dataset nunca fue redistribuible (`redistribution_ok: false`), por
+lo que jamás podía entrar al bundle público: todo costo de mantención era
+puro costo sin llegada a usuarios del bundle.
 
 ## Mini-scorecard
 

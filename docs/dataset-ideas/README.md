@@ -24,7 +24,7 @@ decision.
 |---|---|---|
 | [Pobreza comunal (CASEN / SAE)](pobreza-comunal-casen.md) | accepted | Fuente XLSX comunal del Observatorio Social verificada; pendiente el manejo de comunas sin estimación. |
 | [Consumo eléctrico comunal (CNE / Energía Abierta)](consumo-electrico-comunal.md) | accepted | Descarga Excel + API JSON verificadas; capa limpia de bajo costo operacional. |
-| [Delincuencia comunal (CEAD / DMCS)](delincuencia-cead.md) | under-review | Alto valor (seguridad), pero solo scraping frágil; carril `candidate`, `review_by` 2026-09-21. |
+| [Delincuencia comunal (CEAD / DMCS)](delincuencia-cead.md) | rejected | Degradado 2026-09-15: sin fuente estructurada oficial y no redistribuible; extractor neutralizado. |
 | [Plus Codes y puntos de referencia vial](plus-codes-road-reference-layer.md) | needs-research | Requiere validar fuente vial redistribuible y volumen nacional. |
 | [Apoyos formales para emprendedores](entrepreneurship-support-programs.md) | needs-research | Requiere evaluar si Chile Emprende u otra fuente expone datos estructurados. |
 | [Resultados electorales, autoridades electas y partidos](electoral-results-authorities-parties.md) | needs-research | Requiere separar datos agregados publicables de datos personales electorales excluidos. |

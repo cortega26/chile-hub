@@ -1981,16 +1981,18 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertNotIn("data/normalized/ README.md index.html app.js", self.release_workflow_text)
 
     def test_monthly_scrape_uses_project_extras_not_dependency_groups(self):
+        # 2 → 1 el 2026-09-15: delincuencia_comunal degradado a rejected,
+        # su job CEAD salió del workflow; solo queda el job SINIM.
         self.assertNotIn("uv sync --group dev", self.monthly_workflow_text)
         self.assertEqual(
-            self.monthly_workflow_text.count("uv sync --extra pipeline --extra dev"), 2
+            self.monthly_workflow_text.count("uv sync --extra pipeline --extra dev"), 1
         )
-        self.assertEqual(self.monthly_workflow_text.count("uv lock --locked"), 2)
+        self.assertEqual(self.monthly_workflow_text.count("uv lock --locked"), 1)
         self.assertIn("Validate SINIM staging output", self.monthly_workflow_text)
         self.assertNotIn("uv run make build", self.monthly_workflow_text)
         self.assertNotIn("git add --ignore-missing", self.monthly_workflow_text)
         self.assertEqual(
-            self.monthly_workflow_text.count('[ -e "$path" ] && git add -f "$path"'), 2
+            self.monthly_workflow_text.count('[ -e "$path" ] && git add -f "$path"'), 1
         )
 
     def test_codeql_python_analysis_uses_no_build_mode(self):

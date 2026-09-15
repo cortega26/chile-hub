@@ -8,8 +8,8 @@ operativa son los workflows, esta página es la vista de referencia.
 
 | Carril | Workflow / comando | Cadencia | Datasets |
 |:---|:---|:---|:---|
-| **Diario** | `make extract` · job `build-and-test` de `pipeline-check.yml` | diaria (10:00 UTC) | regiones, provincias, comunas, comunas_enriquecidas, indicadores, censo_comunal, censo_hogares_viviendas, establecimientos_salud, distritos_electorales, establecimientos_educacionales, resultados_educacionales, indicadores_urbanos_siedu, empresas, pobreza_comunal, consumo_electrico_comunal, partidos_politicos, autoridades_electas |
-| **Mensual** | `monthly-scrape.yml` | mensual (manual + workflow_dispatch) | finanzas_municipales (`sinim_finanzas_live_extractor.py`), delincuencia_comunal (`cead_delincuencia_live_extractor.py`) |
+| **Diario** | `make extract` · job `build-and-test` de `pipeline-check.yml` | diaria (10:00 UTC) | regiones, provincias, comunas, comunas_enriquecidas, indicadores, censo_comunal, censo_hogares_viviendas, establecimientos_salud, distritos_electorales, establecimientos_educacionales, resultados_educacionales, indicadores_urbanos_siedu, empresas, pobreza_comunal, consumo_electrico_comunal, partidos_politicos, autoridades_electas, estadisticas_vitales, permisos_edificacion, calidad_aire |
+| **Mensual** | `monthly-scrape.yml` | mensual (manual + workflow_dispatch) | finanzas_municipales (`sinim_finanzas_live_extractor.py`) — `delincuencia_comunal` degradado a rejected 2026-09-15 y removido de este workflow |
 | **Ad hoc / candidate** | manual (workflow_dispatch, sin schedule) | a demanda | geometria_comunal (`geometria-comunal.yml`), autoridades_locales (BCN SIIT + Wikipedia, sin cadencia automática) |
 | **Stub (no operativo)** | — | nunca desde jobs programados | `sinim_finanzas_extractor.py` es un fallback de desarrollo; el job diario **no** debe invocarlo (guardrail: `tests/test_ci_config.py::SinimDailyJobGuardrailTests`) |
 
