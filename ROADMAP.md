@@ -45,7 +45,7 @@
 - [x] 097 Docs quirúrgicos + convención de conteos (P1/S, de12198)
 - [x] 098 Docs arquitectura + gate ×3 + regex fix (P2/M, 4fdc4ce) + fix regex `check_agents_sync.py:54` (aceptar `\d{4}` sin espacio; hoy `1034` pelado no matchea y atribuye el número vecino — hallado en Wave 2, workaround: formato `1 034`)
 - [x] 099 Deuda media: `_sinim_shared` + salud documentada-sin-churn + sys.path congelado (P2/M)
-- [x] 100 Spike Polars `2.0rc1`: 22/22 parquet idénticos, suite verde, cero cambios a prod (P2/M; re-correr en GA; follow-ups: geoarrow-extension en `resolve_by_coords`, bump 1.44.1 dentro de `<2`, mismo trato a DuckDB 2.0 en su RC)
+- [x] 100 Spike Polars `2.0rc1`: 22/22 parquet idénticos, suite verde, cero cambios a prod (P2/M; re-correr en GA; follow-ups: bump 1.44.1 dentro de `<2` — HECHO en pendientes; geoarrow: sin path de producto vía polars —solo geopandas/DuckDB—, reverificar en GA; mismo trato a DuckDB 2.0 en su RC)
 - [ ] Wave 6: terminar 077→079 y luego split god objects por dominio (L, tras Wave 2)
 
 ## Goto por síntoma
@@ -71,7 +71,8 @@
 
 ## Follow-ups detectados durante waves (no re-auditar, sí trackear)
 
-- [ ] Ficha `delincuencia_comunal` en `source_registry.json` con campos estructurados stales tras la degradación del 2026-09-15: `maturity_status: candidate` + `live_extractor_status: implemented` + `review_by: 2027-09-15` contradicen `next_action` ("degradado a rejected", extractor neutralizado). Requiere decisión del mantenedor sobre los valores enum + interplay con gates antes de tocar (hallado en Wave 4, fuera de scope docs).
+- [x] Ficha `delincuencia_comunal` con campos stales → RESUELTO en pendientes: `maturity_status: deprecated` + `live_extractor_status: fallback_only` (enum-válidos, gates verdes) + spec sincronizado + retired-set actualizado. Contadores intactos (sin staging, ni entra al health).
+- [ ] 091 (dos reverts): cerrada como "cubierta por el gate publication". Reabrir solo con rediseño del contrato Phase-1 (decisión del mantenedor).
 
 ## Rechazados en esta auditoría (no re-auditar)
 
