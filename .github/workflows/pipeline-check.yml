@@ -72,7 +72,11 @@ jobs:
         run: uv run bandit -c pyproject.toml -r src/
 
       - name: Dependency audit (pip-audit)
-        run: uv run pip-audit
+        # PYSEC-2026-2132 (click.edit() command injection, click==8.1.8) se
+        # ignora de forma acotada: el pin lo impone python-semantic-release
+        # 10.6.2 (último disponible) y nada en el repo llama click.edit()
+        # (el CLI no usa click; PSR tampoco). Revisar cuando PSR relaje el pin.
+        run: uv run pip-audit --ignore-vuln PYSEC-2026-2132
 
       - name: Docstring coverage (informational)
         run: uv run interrogate --fail-under=80 src/chile_hub || true
