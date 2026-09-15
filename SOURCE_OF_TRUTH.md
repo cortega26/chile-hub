@@ -15,7 +15,7 @@ related_docs:
   - CLAUDE.md              # Punto de entrada para sesiones Claude Code
   - CONTRIBUTING.md        # Verificaciones locales y flujo de PR
   - docs/dataset-inclusion-criteria.md  # Criterios de aceptación/deprecación
-last_updated: 2026-07-14
+last_updated: 2026-09-15
 ---
 
 # SOURCE_OF_TRUTH.md — Índice Maestro de Navegación
@@ -63,35 +63,40 @@ confiables** — no una cobertura exhaustiva.
 ```
 src/
 ├── extractors/
-│   ├── base.py                    ABC BaseExtractor — 73 lineas, leer completo
+│   ├── base.py                    ABC BaseExtractor — 76 lineas, leer completo
 │   └── {name}_extractor.py        Un archivo por dataset, extiende BaseExtractor
-├── validation.py                  TODAS las validate_*() — 1 194 lineas, leer por validador
-├── build_dev_db.py                Orquestador del pipeline (867 lineas) — main() + fases:
+├── validation.py                  TODAS las validate_*() — 1 956 lineas, leer por validador
+├── build_dev_db.py                Orquestador del pipeline (927 lineas) — main() + fases:
 │   _load_inputs / _compute_validations / _write_data_artifacts / _generate_reports
 │   El bloque validations = {…} vive en _compute_validations()
 ├── builders/                      Modulos del pipeline (extraidos de build_dev_db.py):
-│   _shared, io_utils, formats, metadata, reports, artifacts, datasets, catalog, landing
+│   _shared, io_utils, formats, metadata, reports, artifacts, datasets, catalog, landing,
+│   dcat_catalog, data_package, doc_sync, geo, _logging, staging_schema
 ├── chile_hub.py                   Shim de compatibilidad (21 lineas) — delega al paquete inferior
 ├── chile_hub/
-│   ├── core.py                    Clase ChileHub + API publica completa — 2 302 lineas
-│   ├── cli.py                     Puntos de entrada de CLI (5 lineas)
-│   ├── data_manager.py            Descarga de bundles, cache, SHA256 — ~200 lineas
-│   └── pipeline_status_utils.py   Constructores de reportes (health, catalog, redistribution) — 994 lineas
+│   ├── core.py                    Clase ChileHub + API publica completa — 1 995 lineas
+│   ├── cli.py                     Entry points de CLI (713 lineas, extraido de core.py)
+│   ├── data_manager.py            Descarga de bundles, cache, SHA256 — ~430 lineas
+│   └── pipeline_status_utils.py   Constructores de reportes (health, catalog, redistribution) — 1 000 lineas
 ├── pipeline_status_utils.py       Shim de reexport (21 lineas) — para scripts con PYTHONPATH=src.
 │   No dupliques logica aqui: la implementacion real es chile_hub/pipeline_status_utils.py (arriba)
-├── registry/                      DatasetSpec piloto Phase 2 (ADR-018 — ver docs/architecture-migration-phase-2-pilot.md)
+├── registry/                      DatasetSpec cohort Phase 2–3D, 22 specs (ADR-018)
 
 data/
-├── dataset_specs/  DatasetSpec del piloto (partidos_politicos.json)
+├── dataset_specs/  22 DatasetSpecs (sin spec: calidad_aire, estadisticas_vitales, permisos_edificacion)
 ├── raw/        Snapshots de auditoria — solo append, nunca editar
 ├── staging/    {dataset}.csv + {dataset}.metadata.json — entradas del pipeline
 └── normalized/ Artefactos generados — NUNCA editar manualmente; siempre regenerar
 
-tests/                      9 archivos — inventario completo en AGENTS.md §8, no lo dupliques aqui
+tests/                      15 archivos — inventario completo en AGENTS.md §8, no lo dupliques aqui
 ├── test_chile_hub.py        Requiere data/normalized/ — ejecutar `make build` primero
 ├── test_core.py             Requiere data/normalized/
-└── test_extractors.py, test_pipeline_logic.py, test_validation.py, test_data_package.py,
-    test_packaging_runtime.py, test_render.py, test_ci_config.py   No requieren datos normalizados
+├── test_data_package.py, test_packaging_runtime.py, test_verify_pipeline.py,
+│   test_builders_artifacts.py   Requieren data/normalized/
+└── test_extractors.py, test_pipeline_logic.py, test_validation.py, test_render.py,
+    test_ci_config.py, test_data_manager.py, test_builders_formats.py,
+    test_phase1_characterization.py, test_phase2_datasetspec.py
+    No requieren datos normalizados
 ```
 
 ---
@@ -111,8 +116,8 @@ tests/                      9 archivos — inventario completo en AGENTS.md §8,
 | Navegar archivos grandes sin leerlos en frio | `CLAUDE.md` → seccion **CodeGraph** |
 | Encontrar donde esta definido un simbolo | `codegraph find <name>` o `grep -n "def <name>" src/` |
 | Leer API publica de ChileHub | `src/chile_hub/core.py` (clase ChileHub, todos los metodos publicos) |
-| Leer toda la logica de validacion | `src/validation.py` (1 194 lineas — leer por validador) |
-| Leer contrato de extractors | `src/extractors/base.py` (73 lineas — seguro de leer completo) |
+| Leer toda la logica de validacion | `src/validation.py` (1 956 lineas — leer por validador) |
+| Leer contrato de extractors | `src/extractors/base.py` (76 lineas — seguro de leer completo) |
 
 ---
 
