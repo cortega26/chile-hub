@@ -12,6 +12,22 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.36.3 - 2026-09-15
+
+### Corregido
+
+- **091-cierre + delincuencia**: Spec sync, retired tests y datos regenerados
+  ([`be5eddb`](https://github.com/cortega26/chile-hub/commit/be5eddb3f88eae3b616a003673252e2bbfc45c41))
+
+- **registry**: Delincuencia a maturity deprecated + live fallback_only
+  ([`38e7f87`](https://github.com/cortega26/chile-hub/commit/38e7f87cc8f2963a226a3f05a4dc08c455972c92))
+
+### Documentación
+
+- **pendientes**: Tracking resuelto (091 cerrada, delincuencia, polars 1.44.2)
+  ([`c6a774c`](https://github.com/cortega26/chile-hub/commit/c6a774c8aebe388e100a0abc23c066c2c9c0542a))
+
+
 ## 1.36.2 - 2026-09-15
 
 ### Corregido
