@@ -26,7 +26,7 @@
 | 3 Deps/Tooling/Sec | 094–096 | 3/3 | DONE (2026-09-15, branch advisor/wave-3; bandit 0 issues, suite 1032 passed) |
 | 4 Docs agentes | 097–098 | 2/2 | DONE (2026-09-15, branch advisor/wave-4; doctor+lint+format verdes) |
 | 5 Deuda+spikes | 099–100 | 2/2 | DONE (2026-09-15, branch advisor/wave-5; suite 1037 passed) |
-| 6 L diferido (pre-existente) | 077–079 + split gods | 0/3 | TODO (ver `plans/README.md`) |
+| 6 Verificación pre-existente | 077–079 | 3/3 | DONE (2026-09-15: 077 ya en 90%, 078 cerrado con evidencia, 079 con test geo; branch advisor/wave-6) |
 
 ## Backlog (orden de ejecución)
 
@@ -46,7 +46,7 @@
 - [x] 098 Docs arquitectura + gate ×3 + regex fix (P2/M, 4fdc4ce) + fix regex `check_agents_sync.py:54` (aceptar `\d{4}` sin espacio; hoy `1034` pelado no matchea y atribuye el número vecino — hallado en Wave 2, workaround: formato `1 034`)
 - [x] 099 Deuda media: `_sinim_shared` + salud documentada-sin-churn + sys.path congelado (P2/M)
 - [x] 100 Spike Polars `2.0rc1`: 22/22 parquet idénticos, suite verde, cero cambios a prod (P2/M; re-correr en GA; follow-ups: bump 1.44.1 dentro de `<2` — HECHO en pendientes; geoarrow: sin path de producto vía polars —solo geopandas/DuckDB—, reverificar en GA; mismo trato a DuckDB 2.0 en su RC)
-- [ ] Wave 6: terminar 077→079 y luego split god objects por dominio (L, tras Wave 2)
+- [x] Wave 6: 077 verificado (90%), 078 cerrado con evidencia, 079 con test geo. Splits de god objects: sin plan activo (requerirían 077 como red + decisión de alcance; no se abren aquí).
 
 ## Goto por síntoma
 

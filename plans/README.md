@@ -136,9 +136,9 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 | 074 | [Anomalías temporales sobre el punto más reciente (IPC negativo)](074-anomalies-last-point-attribution.md) | P2 | S | LOW | — | DONE (2026-08-12, commit 1b95c1c — detector de nivel para punto ≤0; branch advisor/074 sin merge) |
 | 075 | [Acoplar valor y período en el regex del override INE](075-ine-regex-value-period-coupling.md) | P2 | S | LOW-MED | — | DONE (2026-08-12) |
 | 076 | [RES incremental — descargar solo el año en curso](076-res-incremental-fetch.md) | P2 | M | MED | — | DONE (2026-08-12) |
-| 077 | [Caracterizar build_dev_db.py (cobertura 21% → ≥60%)](077-characterize-build-dev-db.md) | P2 | L | MED | — | TODO |
-| 078 | [Paralelizar CEAD y geometría (scrapes secuenciales)](078-parallelize-cead-geometria.md) | P2 | M | MED | — | TODO |
-| 079 | [Cobertura de writers y extractores sin test (geo, CEAD, reports)](079-cover-geo-cead-reports.md) | P2 | M | LOW | 077 (helper) | TODO |
+| 077 | [Caracterizar build_dev_db.py (cobertura 21% → ≥60%)](077-characterize-build-dev-db.md) | P2 | L | MED | — | DONE (2026-09-15, sin cambios — suite completa ya da 90%: la caracterización Phase-1 aterrizó después del plan; branch advisor/wave-6) |
+| 078 | [Paralelizar CEAD y geometría (scrapes secuenciales)](078-parallelize-cead-geometria.md) | P2 | M | MED | — | CLOSED sin cambios (2026-09-15 — CEAD: código+job eliminados con la deprecación; geometría: ya es por-región (16 reqs) en job manual sin incidentes de timeout, y el servicio castiga carga (500s documentados): concurrencia arriesga lo contrario; branch advisor/wave-6) |
+| 079 | [Cobertura de writers y extractores sin test (geo, CEAD, reports)](079-cover-geo-cead-reports.md) | P2 | M | LOW | 077 (helper) | DONE (2026-09-15, commit 5c14b8f — geo.py 0%→100% round-trip; reports ya en 69%; CEAD obsoleto con stub testeado; branch advisor/wave-6) |
 | 080 | [Higiene de tests (red real, sleeps, staleness, e2e, Makefile)](080-test-hygiene-batch.md) | P3 | M | LOW-MED | — | DONE (2026-08-12) |
 | 081 | [Docs — quickstart R, marcas de carril, inventario de extractores](081-docs-quickstart-lanes-inventory.md) | P3 | S | LOW | — | DONE (2026-08-12, commit 6f4c8b2 — quickstart R corregido, carriles marcados, ine_ipc en inventario; branch advisor/081 sin merge) |
 | 082 | [Mostrar el carril candidate en la landing](082-landing-candidate-lane.md) | P3 | M | MED | 070, 071 | DONE (2026-08-12) |
