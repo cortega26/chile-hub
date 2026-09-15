@@ -305,6 +305,73 @@ class TestBuildFlatFiles:
                 data = pl.read_json(jpath)
                 assert data.shape[0] > 0, f"JSON vacio: {jpath}"
 
+    def test_indicadores_hoy_has_latest_per_code_only(self):
+        """Plan 092: indicadores_hoy.json lleva solo la última fecha por
+        código (el fixture trae UF@07-01, DOLAR@07-01, UF@07-02 → 2 filas:
+        UF@07-02 + DOLAR@07-01). El historial completo sigue en Parquet."""
+        import json as _json
+
+        dfs = _make_fixtures()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            normalized = os.path.join(tmpdir, "normalized")
+            os.makedirs(normalized, exist_ok=True)
+
+            with patch("src.builders.formats.NORMALIZED_DIR", normalized):
+                build_flat_files(
+                    dfs["regiones"],
+                    dfs["provincias"],
+                    dfs["comunas"],
+                    dfs["indicadores"],
+                    dfs["censo_comunal"],
+                    dfs["establecimientos_salud"],
+                    dfs["establecimientos_educacionales"],
+                )
+
+            with open(os.path.join(normalized, "indicadores_hoy.json"), encoding="utf-8") as f:
+                rows = _json.load(f)
+            assert {(r["codigo_indicador"], r["fecha"]) for r in rows} == {
+                ("UF", "2026-07-02"),
+                ("DOLAR", "2026-07-01"),
+            }
+
+    def test_indicadores_hoy_excludes_future_dated_values(self):
+        """La UF se publica por adelantado: una fila futura no debe salir en
+        el payload, porque app.js filtra `fecha <= today` y la card quedaría
+        sin valor visible."""
+        import json as _json
+
+        dfs = _make_fixtures()
+        dfs["indicadores"] = pl.DataFrame(
+            {
+                "fecha": [datetime.date(2026, 7, 1), datetime.date(2099, 1, 1)],
+                "codigo_indicador": ["UF", "UF"],
+                "valor": [38000.0, 99999.0],
+            },
+            schema={"fecha": pl.Date, "codigo_indicador": pl.String, "valor": pl.Float64},
+        )
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            normalized = os.path.join(tmpdir, "normalized")
+            os.makedirs(normalized, exist_ok=True)
+
+            with patch("src.builders.formats.NORMALIZED_DIR", normalized):
+                build_flat_files(
+                    dfs["regiones"],
+                    dfs["provincias"],
+                    dfs["comunas"],
+                    dfs["indicadores"],
+                    dfs["censo_comunal"],
+                    dfs["establecimientos_salud"],
+                    dfs["establecimientos_educacionales"],
+                )
+
+            with open(os.path.join(normalized, "indicadores_hoy.json"), encoding="utf-8") as f:
+                rows = _json.load(f)
+            assert [(r["codigo_indicador"], r["fecha"], r["valor"]) for r in rows] == [
+                ("UF", "2026-07-01", 38000.0)
+            ]
+
 
 class TestBuildDuckDB:
     """build_duckdb: base de datos DuckDB con tablas y dtypes correctos."""

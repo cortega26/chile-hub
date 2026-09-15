@@ -4,13 +4,19 @@ Cada función recibe los DataFrames ya normalizados y escribe un artefacto en
 disco de forma atómica.
 """
 
+import datetime
 import os
 import sqlite3
 
 import duckdb
 import polars as pl
 
-from src.builders._shared import DATASET_CATALOG_CONFIG, EXCEL_MAX_ROWS, NORMALIZED_DIR
+from src.builders._shared import (
+    DATASET_CATALOG_CONFIG,
+    EXCEL_MAX_ROWS,
+    NORMALIZED_DIR,
+    UTC,
+)
 from src.builders.io_utils import pd_excel_writer, write_json_atomic, write_parquet_atomic
 
 # Umbrales de skip para tablas masivas (Plan 090): SQLite no es eficiente con
@@ -404,12 +410,26 @@ def build_flat_files(
 
     # Para JSON estáticos orientados a frontend, exportamos como lista de diccionarios
     # SQLite/DuckDB maneja fechas como objetos datetime.date, por lo que convertimos a str para serialización JSON
-    df_indicadores_serializable = df_indicadores.with_columns(pl.col("fecha").cast(pl.String))
+    # indicadores_hoy.json lleva SOLO la última fecha publicada por código
+    # (Plan 092): el frontend (app.js loadKPIs) filtra `fecha <= today` y toma
+    # el último, así que el payload pre-computa exactamente eso y el contrato
+    # se preserva idéntico; el historial completo sigue en
+    # indicadores.parquet/.db/.duckdb. Por código y no global: las series
+    # mensuales (utm/ipc) tienen última fecha distinta de las diarias
+    # (uf/dolar/euro) y un max() global las borraría. Con tope en hoy UTC:
+    # la UF se publica por adelantado (p. ej. max 2026-10-09 con hoy
+    # 2026-09-15) y un max() puro dejaría las KPI cards sin valor visible.
+    _hoy = datetime.datetime.now(UTC).date()
+    df_indicadores_hoy = (
+        df_indicadores.filter(pl.col("fecha") <= _hoy)
+        .filter(pl.col("fecha") == pl.col("fecha").max().over("codigo_indicador"))
+        .with_columns(pl.col("fecha").cast(pl.String))
+    )
 
     write_json_atomic(df_regiones.to_dicts(), regiones_json, ensure_ascii=False)
     write_json_atomic(df_provincias.to_dicts(), provincias_json, ensure_ascii=False)
     write_json_atomic(df_comunas.to_dicts(), comunas_json, ensure_ascii=False)
-    write_json_atomic(df_indicadores_serializable.to_dicts(), indicadores_json, ensure_ascii=False)
+    write_json_atomic(df_indicadores_hoy.to_dicts(), indicadores_json, ensure_ascii=False)
     # JSON compacto (sin indent): las tablas son dicts planos con valores
     # largos y el pretty-print suma ~10-20% de bytes (medido 12.2% sobre los
     # JSON reales; Plan 010). Parquet y DuckDB son la vía para grandes volúmenes.

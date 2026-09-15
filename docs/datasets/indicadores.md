@@ -111,7 +111,7 @@ Cruces sugeridos:
 ## Advertencias
 
 - la salida puede provenir de datos live, de una mezcla live + recuperación parcial o de fallback local
-- `indicadores_hoy.json` es un nombre orientado a consumo, pero el dataset puede incluir más de una fecha
+- `indicadores_hoy.json` lleva solo la última fecha publicada por código (una fila por `codigo_indicador`); el historial completo vive en `indicadores.parquet`/`.db`/`.duckdb`
 - la cobertura histórica sigue siendo oportunista; no es todavía un archivo histórico oficial curado capa por capa
 - la capa sirve bien para conveniencia operativa, pero no aún como fuente definitiva de archivo histórico
 - el modo efectivo del último refresh queda registrado en `data/staging/indicadores.metadata.json` y consolidado en `data/normalized/pipeline_metadata.json`
