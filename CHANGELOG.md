@@ -12,6 +12,21 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.34.2 - 2026-09-15
+
+### Corregido
+
+- **ci**: Import perezoso del shim en reports.py + guardrail AST
+  ([#99](https://github.com/cortega26/chile-hub/pull/99),
+  [`dec962c`](https://github.com/cortega26/chile-hub/commit/dec962c3311374462f363403c87017807a52a533))
+
+### Mejorado
+
+- **pipeline**: Snapshots atómicos, fix de timezone y fetch concurrente
+  ([#99](https://github.com/cortega26/chile-hub/pull/99),
+  [`dec962c`](https://github.com/cortega26/chile-hub/commit/dec962c3311374462f363403c87017807a52a533))
+
+
 ## 1.34.1 - 2026-09-15
 
 ### Corregido
