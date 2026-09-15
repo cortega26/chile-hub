@@ -67,8 +67,9 @@ MINDICADOR_BASE = "https://mindicador.cl/api"
 HISTORY_START_YEAR = 2010  # Año de inicio del historial
 REQUEST_DELAY_SECONDS = 0.3  # Pausa entre llamadas para no saturar la API
 
-# Concurrencia acotada (Plan 010): pool pequeño; la espera por par
-# (REQUEST_DELAY_SECONDS, mismo valor) se solapa entre hilos sin subir topes.
+# Concurrencia acotada (Plan 010, throttle Plan 089): pool pequeño + submits
+# espaciados REQUEST_DELAY_SECONDS. La espera vive ENTRE submits, no dentro del
+# worker: N hilos durmiendo en paralelo no espaciaban nada contra la API.
 # El plegado en orden de pares preserva diagnósticos y registros idénticos.
 MINDICADOR_MAX_WORKERS = 3
 
@@ -227,7 +228,7 @@ def load_existing_staging():
                     .sort(["fecha", "codigo_indicador"])
                 )
                 published_backfills = sorted(published_df["codigo_indicador"].unique().to_list())
-        return df, datetime.date.today().year, published_backfills
+        return df, datetime.datetime.now(UTC).date().year, published_backfills
     except Exception as e:
         print(f"Advertencia: no se pudo leer el staging existente: {e}. Se hará fetch completo.")
         return None, None, []
@@ -244,7 +245,7 @@ def fetch_all_history():
     si no fue posible construir un dataset usable.
     """
     existing_df, _, published_backfills = load_existing_staging()
-    current_year = datetime.date.today().year
+    current_year = datetime.datetime.now(UTC).date().year
     diagnostics = {
         "fetch_failures": [],
         "raw_recoveries": [],
@@ -304,13 +305,17 @@ def fetch_all_history():
             outcome["ine_attempted"] = True
             outcome["ine_reading"] = fetch_ine_ipc()
 
-        # Espera de cortesía idéntica a la serial, solapada entre hilos.
-        time.sleep(REQUEST_DELAY_SECONDS)
         return outcome
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=MINDICADOR_MAX_WORKERS) as pool:
-        # map preserva el orden de `pairs`: el plegado replica el serial.
-        outcomes = list(pool.map(_fetch_pair, pairs))
+        # Submits espaciados (Plan 089): el orden de `futures` replica el de
+        # `pairs`, así que el plegado replica el serial; el sleep entre
+        # submits sí impone la cortesía contra la API.
+        futures = []
+        for next_pair in pairs:
+            futures.append(pool.submit(_fetch_pair, next_pair))
+            time.sleep(REQUEST_DELAY_SECONDS)
+        outcomes = [future.result() for future in futures]
 
     for call_n, outcome in enumerate(outcomes, 1):
         codigo = outcome["codigo"]
@@ -431,7 +436,7 @@ def generate_fallback_indicators() -> pl.DataFrame:
     Marcado explícitamente como fallback en los metadatos.
     """
     print("Generando dataset de indicadores de fallback (simulación offline)…")
-    today = datetime.date.today()
+    today = datetime.datetime.now(UTC).date()
     base_values = {
         "uf": 40500.00,
         "dolar": 900.00,

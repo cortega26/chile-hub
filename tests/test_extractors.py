@@ -466,6 +466,44 @@ class BCentralExtractorTests(unittest.TestCase):
         uf_rows = df.filter(pl.col("codigo_indicador") == "uf")
         self.assertIn(39001.0, uf_rows["valor"].to_list())
 
+    def test_fetch_all_history_spaces_submissions(self):
+        """Plan 089: los submits al pool van espaciados REQUEST_DELAY_SECONDS
+        (cortesía real contra mindicador.cl). El sleep solapado dentro del
+        worker no espaciaba nada: N hilos dormían en paralelo."""
+        import threading
+        import time as _time
+
+        current_year = datetime.date.today().year
+        call_times = []
+        lock = threading.Lock()
+
+        def fetch(codigo, year):
+            with lock:
+                call_times.append(_time.monotonic())
+            return [{"fecha": f"{year}-01-01", "codigo_indicador": codigo, "valor": 1.0}]
+
+        with (
+            patch.object(
+                bcentral_extractor,
+                "load_existing_staging",
+                return_value=(None, None, []),
+            ),
+            patch.object(bcentral_extractor, "HISTORY_START_YEAR", current_year),
+            patch.object(bcentral_extractor, "REQUEST_DELAY_SECONDS", 0.05),
+            patch.object(bcentral_extractor, "fetch_indicator_year", side_effect=fetch),
+            patch.object(bcentral_extractor, "load_latest_raw_snapshot", return_value=[]),
+        ):
+            df, _ = bcentral_extractor.fetch_all_history()
+
+        self.assertIsNotNone(df)
+        # 5 pares (un año): los inicios de fetch van espaciados ~delay.
+        # Cota tolerante al 50% (el scheduling solo puede AUMENTAR gaps, no
+        # reducirlos bajo el espaciamiento de submits menos jitter de hilos).
+        self.assertEqual(len(call_times), 5)
+        gaps = [b - a for a, b in zip(sorted(call_times), sorted(call_times)[1:])]
+        self.assertTrue(gaps, "se esperaban llamadas espaciadas")
+        self.assertGreaterEqual(min(gaps), 0.025)
+
 
 class IneIpcExtractorTests(unittest.TestCase):
     """Override de IPC desde la fuente autoritativa INE (issue #43).
