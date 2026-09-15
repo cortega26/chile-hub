@@ -3829,6 +3829,33 @@ class DocSyncTests(unittest.TestCase):
 
             self.assertIn("Datasets-2%20capas", readme.read_text(encoding="utf-8"))
 
+    def test_python_badge_derives_from_requires_python(self):
+        from src.builders import doc_sync
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            (Path(tmpdir) / "pyproject.toml").write_text(
+                '[project]\nname = "x"\nrequires-python = ">=3.11,<3.15"\n',
+                encoding="utf-8",
+            )
+            readme = self._readme(tmpdir, "PYTHON_BADGE")
+
+            with (
+                patch.object(doc_sync, "ROOT_DIR", tmpdir),
+                patch.object(doc_sync, "README_PATH", str(readme)),
+            ):
+                doc_sync.sync_readme_python_badge()
+
+            content = readme.read_text(encoding="utf-8")
+            self.assertIn("python-3.11%20%7C%203.12%20%7C%203.13%20%7C%203.14", content)
+            self.assertNotIn("3.10", content)
+
+    def test_supported_python_minors_rejects_unexpected_format(self):
+        from src.builders.doc_sync import supported_python_minors
+
+        self.assertEqual(supported_python_minors(">=3.11,<3.15"), [11, 12, 13, 14])
+        with self.assertRaises(SystemExit):
+            supported_python_minors(">=3.11")
+
     def test_redistribution_summary_from_fixture(self):
         from src.builders import doc_sync
 

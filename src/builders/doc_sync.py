@@ -10,6 +10,7 @@ propietarios canónicos y dónde corre la generación/verificación.
 import ast
 import json
 import os
+import re
 
 from src.builders._shared import DATASET_CATALOG_CONFIG, NORMALIZED_DIR, ROOT_DIR
 from src.builders.io_utils import read_json_if_exists, read_project_version, replace_delimited_block
@@ -87,6 +88,47 @@ def sync_readme_dataset_badge(check_only=False):
     )
     return replace_delimited_block(
         README_PATH, "DATASET_BADGE", body, check_only=check_only, separator="\n"
+    )
+
+
+def read_requires_python(root_dir):
+    """Lee `[project] requires-python` de pyproject.toml (fuente única)."""
+    import tomllib
+
+    pyproject_path = os.path.join(root_dir, "pyproject.toml")
+    with open(pyproject_path, "rb") as f:
+        pyproject_data = tomllib.load(f)
+    requires = pyproject_data.get("project", {}).get("requires-python")
+    if not requires:
+        raise SystemExit(f"{pyproject_path} no tiene [project] requires-python")
+    return requires
+
+
+def supported_python_minors(requires_python):
+    """Minors soportados desde un `requires-python` tipo ">=3.11,<3.15".
+
+    Falla ruidoso si el rango no matchea el formato esperado — un badge
+    generado con versiones adivinadas es peor que un gate rojo.
+    """
+    lower = re.search(r">=\s*3\.(\d+)", requires_python)
+    upper = re.search(r"<\s*3\.(\d+)", requires_python)
+    if not lower or not upper:
+        raise SystemExit(
+            f"requires-python con formato inesperado: {requires_python!r} "
+            "(se esperaba '>=3.X,<3.Y')"
+        )
+    return list(range(int(lower.group(1)), int(upper.group(1))))
+
+
+def sync_readme_python_badge(check_only=False):
+    minors = supported_python_minors(read_requires_python(ROOT_DIR))
+    versions = "%20%7C%20".join(f"3.{m}" for m in minors)
+    body = (
+        "[![Python](https://img.shields.io/badge/python-"
+        f"{versions}-3776AB.svg?style=flat&logo=python&logoColor=white)]()"
+    )
+    return replace_delimited_block(
+        README_PATH, "PYTHON_BADGE", body, check_only=check_only, separator="\n"
     )
 
 
@@ -609,6 +651,7 @@ SYNC_FUNCS = [
     sync_readme_adr_count,
     sync_readme_contract_count,
     sync_readme_dataset_badge,
+    sync_readme_python_badge,
     sync_readme_version_pin_example,
     sync_readme_redistribution_summary,
     sync_readme_health_summary,

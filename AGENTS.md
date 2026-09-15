@@ -909,6 +909,7 @@ protegido por un chequeo automatizado en vez de depender solo de buena voluntad.
 | Conteo de ADRs en README | `docs/adr/*.md` | `scripts/sync_docs.py --check` |
 | Conteo de contratos en README | `contracts/datasets/*.schema.json` | `scripts/sync_docs.py --check` |
 | Badge "N capas" y resumen de auditoría legal en README | `data/dataset_catalog_config.json` / `data/normalized/redistribution_report.json` | `scripts/sync_docs.py --check` |
+| Badge de versiones Python en README | `pyproject.toml` (`[project] requires-python`) vía `doc_sync.py::sync_readme_python_badge()` | `scripts/sync_docs.py --check` |
 | Resumen de salud (`ok`/`warn`/`error`) en README | `data/normalized/hub_health.json` | `scripts/sync_docs.py --check` |
 | Historial de salud del hub (sparkline en landing) | `data/normalized/hub_health_history.jsonl` — append-only, una línea por build, cap 400 líneas (~13 meses), idempotente por `generated_at_utc` | `append_hub_health_history()` (`src/builders/reports.py`); registrado en `artifact_manifest.json` |
 | Score de calidad (A-F) en README | `data/normalized/dataset_quality.json` | `scripts/sync_docs.py --check` |
