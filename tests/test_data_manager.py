@@ -573,3 +573,83 @@ class GeoCacheIntegrityTests(unittest.TestCase):
         with self.assertRaises(ChileHubDataError) as ctx:
             validate_geometry(duplicated)
         self.assertIn("duplicados", str(ctx.exception))
+
+
+class GeoParquetWriterTests(unittest.TestCase):
+    """Tests para src/builders/geo.py::write_geometria_comunal_parquet (Plan 079).
+
+    El writer del GeoParquet no tenía cobertura: un bug en el encoding WKB,
+    el footer `geo` o el CRS pasaría directo al workflow manual. Round-trip
+    con geometrías sintéticas (sin red, sin artefacto real de 5 MB).
+    """
+
+    def _staging_df(self):
+        import polars as pl
+
+        squares = [
+            ("13", "13101", "Santiago", "santiago", "Metropolitana", -70.7, -70.6, -33.5, -33.4),
+            ("13", "13102", "Agustín", "agustin", "Metropolitana", -70.6, -70.5, -33.5, -33.4),
+            ("01", "01101", "Arica", "arica", "Tarapacá", -70.4, -70.3, -18.6, -18.5),
+        ]
+        return pl.DataFrame(
+            {
+                "codigo_region": [s[0] for s in squares],
+                "codigo_comuna": [s[1] for s in squares],
+                "nombre_comuna": [s[2] for s in squares],
+                "nombre_comuna_clean": [s[3] for s in squares],
+                "nombre_region": [s[4] for s in squares],
+                "geometry_wkt": [
+                    f"POLYGON (({lo} {la}, {hi} {la}, {hi} {ha}, {lo} {ha}, {lo} {la}))"
+                    for _, _, _, _, _, lo, hi, la, ha in squares
+                ],
+            }
+        )
+
+    def test_round_trip_preserves_crs_columns_and_geometries(self):
+        """WKT staging → GeoParquet 1.0/WKB → lectura: CRS, columnas,
+        conteo y geometrías no vacías; footer `geo` presente."""
+        import geopandas as gpd
+        import pyarrow.parquet as pq
+
+        from src.builders.geo import write_geometria_comunal_parquet
+
+        df = self._staging_df()
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = str(Path(tmpdir) / "geometria.parquet")
+            write_geometria_comunal_parquet(df, path)
+
+            gdf = gpd.read_parquet(path)
+            self.assertEqual(gdf.crs.to_epsg(), 4326)
+            for col in (
+                "codigo_region",
+                "codigo_comuna",
+                "nombre_comuna",
+                "nombre_comuna_clean",
+                "nombre_region",
+                "geometry",
+            ):
+                self.assertIn(col, gdf.columns)
+            self.assertEqual(len(gdf), 3)
+            self.assertTrue((~gdf.geometry.is_empty).all())
+            self.assertEqual(sorted(gdf["codigo_comuna"].to_list()), ["01101", "13101", "13102"])
+
+            footer = pq.read_metadata(path).metadata
+            self.assertIn(b"geo", footer)
+
+    def test_zero_tolerance_preserves_shapes(self):
+        """Con `simplify_tolerance=0` no hay simplificación: áreas idénticas
+        a las de entrada (el default 0.001 solo generaliza)."""
+        import geopandas as gpd
+        from shapely import wkt
+
+        from src.builders.geo import write_geometria_comunal_parquet
+
+        df = self._staging_df()
+        expected_areas = [wkt.loads(g).area for g in df["geometry_wkt"].to_list()]
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = str(Path(tmpdir) / "geometria.parquet")
+            write_geometria_comunal_parquet(df, path, simplify_tolerance=0)
+
+            gdf = gpd.read_parquet(path)
+            for got, expected in zip(gdf.geometry.area.to_list(), expected_areas):
+                self.assertAlmostEqual(got, expected, places=9)
