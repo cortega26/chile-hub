@@ -125,6 +125,42 @@ class PipelineLogicTests(unittest.TestCase):
             with self.assertRaisesRegex(SystemExit, "no cumple con el esquema obligatorio"):
                 load_metadata(str(incomplete_json_file))
 
+    def test_missing_publishable_flags_stable_absent_only(self):
+        """Plan 091: solo la ausencia INESPERADA (stable sin staging) se
+        reporta; candidate ausente o datasets cargados no."""
+        from src.build_dev_db import _missing_publishable_datasets
+
+        presence = [
+            ("empresas", None, "empresas.csv", "res_extractor.py"),
+            ("consumo_electrico_comunal", None, "consumo.csv", "consumo_extractor.py"),
+            ("pobreza_comunal", object(), "pobreza.csv", "pobreza_extractor.py"),
+        ]
+        missing = _missing_publishable_datasets(presence, {"empresas"})
+        self.assertEqual(
+            missing,
+            [("empresas", "empresas.csv", "res_extractor.py")],
+            "solo empresas (stable ausente); consumo es candidate, pobreza ya cargada",
+        )
+        self.assertEqual(_missing_publishable_datasets(presence, set()), [])
+
+    def test_stable_publishable_names_matches_registry_lanes(self):
+        """El carril se lee del registry: los 7 opcionales stable van,
+        consumo_electrico_comunal (candidate) no."""
+        from src.build_dev_db import _stable_publishable_names
+
+        names = _stable_publishable_names()
+        for expected in (
+            "empresas",
+            "pobreza_comunal",
+            "partidos_politicos",
+            "autoridades_electas",
+            "estadisticas_vitales",
+            "permisos_edificacion",
+            "calidad_aire",
+        ):
+            self.assertIn(expected, names)
+        self.assertNotIn("consumo_electrico_comunal", names)
+
     def _stable_registry_entry(self, name, fallback_policy="none"):
         """Build a minimal stable_publishable registry entry for testing."""
         return {
