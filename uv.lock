@@ -144,7 +144,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "colorama", marker = "sys_platform == 'win32'" },
     { name = "pyyaml" },
-    { name = "rich", version = "15.0.0", source = { registry = "https://pypi.org/simple" } },
+    { name = "rich" },
     { name = "stevedore" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/aa/c3/0cb80dfe0f3076e5da7e4c5ad8e57bac6ac357ff4a6406205501cade4965/bandit-1.9.4.tar.gz", hash = "sha256:b589e5de2afe70bd4d53fa0c1da6199f4085af666fde00e8a034f152a52cd628", size = 4242677, upload-time = "2026-02-25T06:44:15.503Z" }
@@ -458,14 +458,13 @@ wheels = [
 
 [[package]]
 name = "chile-hub"
-version = "1.31.1"
+version = "1.32.0"
 source = { editable = "." }
 dependencies = [
     { name = "platformdirs" },
     { name = "polars" },
     { name = "requests" },
-    { name = "rich", version = "14.3.4", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-9-chile-hub-scraping'" },
-    { name = "rich", version = "15.0.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-9-chile-hub-dev' or extra != 'extra-9-chile-hub-scraping'" },
+    { name = "rich" },
 ]
 
 [package.optional-dependencies]
@@ -2599,7 +2598,7 @@ dependencies = [
     { name = "pip-requirements-parser" },
     { name = "platformdirs" },
     { name = "requests" },
-    { name = "rich", version = "15.0.0", source = { registry = "https://pypi.org/simple" } },
+    { name = "rich" },
     { name = "tomli" },
     { name = "tomli-w" },
 ]
@@ -3266,7 +3265,7 @@ dependencies = [
     { name = "pydantic" },
     { name = "python-gitlab" },
     { name = "requests" },
-    { name = "rich", version = "15.0.0", source = { registry = "https://pypi.org/simple" } },
+    { name = "rich" },
     { name = "shellingham" },
     { name = "tomlkit" },
 ]
@@ -3448,42 +3447,11 @@ wheels = [
 
 [[package]]
 name = "rich"
-version = "14.3.4"
-source = { registry = "https://pypi.org/simple" }
-resolution-markers = [
-    "python_full_version >= '3.14' and sys_platform == 'win32'",
-    "python_full_version >= '3.14' and sys_platform == 'emscripten'",
-    "python_full_version >= '3.14' and sys_platform != 'emscripten' and sys_platform != 'win32'",
-    "python_full_version >= '3.11' and python_full_version < '3.14' and sys_platform == 'win32'",
-    "python_full_version >= '3.11' and python_full_version < '3.14' and sys_platform == 'emscripten'",
-    "python_full_version >= '3.11' and python_full_version < '3.14' and sys_platform != 'emscripten' and sys_platform != 'win32'",
-    "python_full_version < '3.11'",
-]
-dependencies = [
-    { name = "markdown-it-py", marker = "extra == 'extra-9-chile-hub-scraping'" },
-    { name = "pygments", marker = "extra == 'extra-9-chile-hub-scraping'" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/e9/67/cae617f1351490c25a4b8ac3b8b63a4dda609295d8222bad12242dfdc629/rich-14.3.4.tar.gz", hash = "sha256:817e02727f2b25b40ef56f5aa2217f400c8489f79ca8f46ea2b70dd5e14558a9", size = 230524, upload-time = "2026-04-11T02:57:45.419Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/b3/76/6d163cfac87b632216f71879e6b2cf17163f773ff59c00b5ff4900a80fa3/rich-14.3.4-py3-none-any.whl", hash = "sha256:07e7adb4690f68864777b1450859253bed81a99a31ac321ac1817b2313558952", size = 310480, upload-time = "2026-04-11T02:57:47.484Z" },
-]
-
-[[package]]
-name = "rich"
 version = "15.0.0"
 source = { registry = "https://pypi.org/simple" }
-resolution-markers = [
-    "python_full_version >= '3.14' and sys_platform == 'win32'",
-    "python_full_version >= '3.14' and sys_platform == 'emscripten'",
-    "python_full_version >= '3.14' and sys_platform != 'emscripten' and sys_platform != 'win32'",
-    "python_full_version >= '3.11' and python_full_version < '3.14' and sys_platform == 'win32'",
-    "python_full_version >= '3.11' and python_full_version < '3.14' and sys_platform == 'emscripten'",
-    "python_full_version >= '3.11' and python_full_version < '3.14' and sys_platform != 'emscripten' and sys_platform != 'win32'",
-    "python_full_version < '3.11'",
-]
 dependencies = [
-    { name = "markdown-it-py", marker = "extra == 'extra-9-chile-hub-dev' or extra != 'extra-9-chile-hub-scraping'" },
-    { name = "pygments", marker = "extra == 'extra-9-chile-hub-dev' or extra != 'extra-9-chile-hub-scraping'" },
+    { name = "markdown-it-py" },
+    { name = "pygments" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/c0/8f/0722ca900cc807c13a6a0c696dacf35430f72e0ec571c4275d2371fca3e9/rich-15.0.0.tar.gz", hash = "sha256:edd07a4824c6b40189fb7ac9bc4c52536e9780fbbfbddf6f1e2502c31b068c36", size = 230680, upload-time = "2026-04-12T08:24:00.75Z" }
 wheels = [
@@ -4053,7 +4021,7 @@ dependencies = [
     { name = "requests" },
     { name = "requests-toolbelt" },
     { name = "rfc3986" },
-    { name = "rich", version = "15.0.0", source = { registry = "https://pypi.org/simple" } },
+    { name = "rich" },
     { name = "urllib3" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/92/3c/58f808a359700f39a967dffede33efeac809262c03303fa3eec6afff8f49/twine-7.0.0.tar.gz", hash = "sha256:85cdb29c518efef867360ae4acd4b0dfd61c8654a22fca08e6f8539f05022177", size = 215032, upload-time = "2026-07-27T15:59:00.825Z" }
@@ -4068,8 +4036,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "annotated-doc" },
     { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-9-chile-hub-dev' and extra == 'extra-9-chile-hub-scraping')" },
-    { name = "rich", version = "14.3.4", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-9-chile-hub-scraping'" },
-    { name = "rich", version = "15.0.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-9-chile-hub-dev' or extra != 'extra-9-chile-hub-scraping'" },
+    { name = "rich" },
     { name = "shellingham" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/7c/f7/68adc395201b20b872d68e975386832e8005ffeacedd43a1d837a32815be/typer-0.26.8.tar.gz", hash = "sha256:c244a6bd558886fe3f8780efb6bdd28bb9aff005a94eedebaa5cb32926fe2f7e", size = 202097, upload-time = "2026-06-26T09:22:45.705Z" }

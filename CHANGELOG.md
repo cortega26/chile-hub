@@ -12,6 +12,42 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.32.0 - 2026-09-15
+
+### Corregido
+
+- **datasets**: Gates de integridad para vitales y permisos (review PR #93)
+  ([#93](https://github.com/cortega26/chile-hub/pull/93),
+  [`f00dbc4`](https://github.com/cortega26/chile-hub/commit/f00dbc4b810d0c576eb7bd9b1726deaf3f5b27ae))
+
+- **deps**: Ignore acotado de PYSEC-2026-2132 en pip-audit
+  ([#93](https://github.com/cortega26/chile-hub/pull/93),
+  [`f00dbc4`](https://github.com/cortega26/chile-hub/commit/f00dbc4b810d0c576eb7bd9b1726deaf3f5b27ae))
+
+### Mantenimiento
+
+- **deps**: Bump actions/deploy-pages from 5.0.0 to 5.0.1
+  ([#89](https://github.com/cortega26/chile-hub/pull/89),
+  [`607b1fe`](https://github.com/cortega26/chile-hub/commit/607b1fe7583b6023b511d49c454f495a4ba720a8))
+
+- **deps**: Sync uv.lock [skip ci] ([#88](https://github.com/cortega26/chile-hub/pull/88),
+  [`871e8f8`](https://github.com/cortega26/chile-hub/commit/871e8f873a564ad1519964618825189c7effbd6f))
+
+- **deps-dev**: Bump the python-dev group with 4 updates
+  ([#88](https://github.com/cortega26/chile-hub/pull/88),
+  [`871e8f8`](https://github.com/cortega26/chile-hub/commit/871e8f873a564ad1519964618825189c7effbd6f))
+
+### Agregado
+
+- **datasets**: Add estadisticas_vitales (INE, 2010-2023)
+  ([#93](https://github.com/cortega26/chile-hub/pull/93),
+  [`f00dbc4`](https://github.com/cortega26/chile-hub/commit/f00dbc4b810d0c576eb7bd9b1726deaf3f5b27ae))
+
+- **datasets**: Add permisos_edificacion (MINVU CEDOC, 2002-2026)
+  ([#93](https://github.com/cortega26/chile-hub/pull/93),
+  [`f00dbc4`](https://github.com/cortega26/chile-hub/commit/f00dbc4b810d0c576eb7bd9b1726deaf3f5b27ae))
+
+
 ## 1.31.1 - 2026-09-03
 
 ### Corregido
