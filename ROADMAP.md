@@ -39,9 +39,9 @@
 - [ ] 091 Opcionales ausentes ruidosos + fallback sintético strict (P1/M) — REVERTED 2026-09-15 (79b41fa): el abort en build rompe la garantía Phase-1 de core-build sin opcionales (7+1 tests); el gate publication ya rechaza missing/non-live/stale. Devuelto al backlog para decisión del mantenedor (alternativa: cerrar como cubierto por el gate).
 - [x] 092 Payload hoy por código + no-paralelizar con números (P2/M, c9d8c2a)
 - [x] 093 partition_by + allowlist única + cache LRU (P2/M, 3a155bd)
-- [x] 094 Toolchain única + targets locales (P1/S, 1e5bb3c + c74b80e isort)
-- [x] 095 Floor py311 + despineo pandas (P1/M, 6f92aa2)
-- [x] 096 duckdb acotado + pip-audit expiry + bandit extractors + fix B314 (P1/S-M, f7e31a7)
+- [x] 094 Toolchain única + targets locales (P1/S, 972ffbb + 238bc10 isort)
+- [x] 095 Floor py311 + despineo pandas (P1/M, 79fde6a)
+- [x] 096 duckdb acotado + pip-audit expiry + bandit extractors + fix B314 (P1/S-M, 7beda93)
 - [ ] 097 Docs quirúrgicos: CLAUDE counts, badge capas, §5 como puntero (P1/S, —)
 - [ ] 098 Docs arquitectura: SOURCE índice, CLAUDE→30 líneas, anti-drift extendido (P2/M, tras 097) + fix regex `check_agents_sync.py:54` (aceptar `\d{4}` sin espacio; hoy `1034` pelado no matchea y atribuye el número vecino — hallado en Wave 2, workaround: formato `1 034`)
 - [ ] 099 Deuda media: sinim-shared + salud canónica + `sys.path`→`_paths` (P2/M, tras 091)
