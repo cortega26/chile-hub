@@ -36,9 +36,9 @@
 - [x] 088 Cobertura catálogo→validación + 3 exenciones explícitas (P1/S, 48a60be)
 - [x] 089 bcentral UTC×3 + submits espaciados (P1/S, fbddeaa)
 - [x] 090 Frames pandas compartidos + skip pre-conversión (P1/S, 62143ac)
-- [ ] 091 Opcionales ausentes ruidosos + fallback sintético strict (P1/M) — REVERTED 2026-09-15 (9b7641c): el abort en build rompe la garantía Phase-1 de core-build sin opcionales (7+1 tests); el gate publication ya rechaza missing/non-live/stale. Devuelto al backlog para decisión del mantenedor (alternativa: cerrar como cubierto por el gate).
-- [ ] 092 Paralelizar formatos + `indicadores_hoy` = última fecha (P2/M, tras 090)
-- [ ] 093 Scans O(K·N)→`partition_by` + allowlist única + cache acotado (P2/M, —)
+- [ ] 091 Opcionales ausentes ruidosos + fallback sintético strict (P1/M) — REVERTED 2026-09-15 (79b41fa): el abort en build rompe la garantía Phase-1 de core-build sin opcionales (7+1 tests); el gate publication ya rechaza missing/non-live/stale. Devuelto al backlog para decisión del mantenedor (alternativa: cerrar como cubierto por el gate).
+- [x] 092 Payload hoy por código + no-paralelizar con números (P2/M, c9d8c2a)
+- [x] 093 partition_by + allowlist única + cache LRU (P2/M, 3a155bd)
 - [ ] 094 Toolchain única: ruff/mypy una versión + `make typecheck/audit/sec` (P1/S, —)
 - [ ] 095 Floor Python `>=3.11` + despineo pandas + matriz CI (P1/M, —)
 - [ ] 096 `duckdb` query acotado + pip-audit expiry + bandit a extractors (P1/S-M, —)
