@@ -29,7 +29,7 @@
 
 <p>
   <a href="#-instalar-y-usar-en-segundos">Instalación</a> ·
-  <a href="#las-19-capas-de-datos">Capas</a> ·
+  <a href="#las-22-capas-de-datos">Capas</a> ·
   <a href="#arquitectura-del-pipeline">Arquitectura</a> ·
   <a href="#cli-de-referencia">CLI</a> ·
   <a href="#fuentes-licencias-y-reúso">Licencias</a>
@@ -142,7 +142,7 @@ Pipeline determinista en GitHub Actions: extracción → build → verificación
 
 ---
 
-## Las 19 capas de datos
+## Las 22 capas de datos
 
 <!-- START_DATASET_TABLE -->
 
