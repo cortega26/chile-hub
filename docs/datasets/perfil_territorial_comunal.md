@@ -1,12 +1,12 @@
 # Perfil Territorial Comunal
 
 > **Carril:** `stable_publishable` — incluido en el bundle público (Plan
-> 084). Capa derivada en `build_dev_db.py` de 9 datasets upstream; su
+> 084). Capa derivada en `build_dev_db.py` de 12 datasets upstream; su
 > `freshness_policy` es `derivada`, no una fuente viva.
 
 ## Descripción
 
-Tabla derivada con una fila por comuna que consolida la DPA, Censo 2024, hogares y viviendas, salud, educación, distritos electorales, finanzas municipales, resultados educacionales y resumen SIEDU.
+Tabla derivada con una fila por comuna que consolida la DPA, Censo 2024, hogares y viviendas, salud, educación, distritos electorales, finanzas municipales, resultados educacionales, resumen SIEDU, crecimiento natural (estadísticas vitales), viviendas autorizadas (permisos de edificación) y MP2.5 promedio (calidad del aire).
 
 ## Fuente y licencia
 
@@ -57,5 +57,12 @@ respaldo. Con 346/346 comunas y cero warnings, su `drift_status` es `healthy`.
 | `establecimientos_salud_total` | `INTEGER` | `140` | Sí | — |
 | `establecimientos_educacionales_total` | `INTEGER` | `410` | Sí | — |
 | `distrito_electoral` | `VARCHAR` | `"10"` | No | — |
+| `crecimiento_natural_ultimo_anio` | `INTEGER` | `12` | No | — |
+| `anio_estadisticas_vitales` | `INTEGER` | `2023` | No | — |
+| `viviendas_autorizadas_ultimo_anio` | `INTEGER` | `2451` | No | — |
+| `superficie_autorizada_m2_ultimo_anio` | `INTEGER` | `187320` | No | — |
+| `anio_permisos_edificacion` | `INTEGER` | `2023` | No | — |
+| `mp25_promedio_ultimo_anio` | `DOUBLE` | `18.4` | No | — |
+| `anio_calidad_aire` | `INTEGER` | `2026` | No | — |
 
 <!-- END_DATASET_SCHEMA -->

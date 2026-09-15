@@ -16,9 +16,24 @@
     "codigo_region": "string",
     "codigo_provincia": "string",
     "codigo_comuna": "string",
-    "poblacion_censada": "integer"
+    "poblacion_censada": "integer",
+    "crecimiento_natural_ultimo_anio": "integer",
+    "anio_estadisticas_vitales": "integer",
+    "viviendas_autorizadas_ultimo_anio": "integer",
+    "superficie_autorizada_m2_ultimo_anio": "integer",
+    "anio_permisos_edificacion": "integer",
+    "mp25_promedio_ultimo_anio": "float",
+    "anio_calidad_aire": "integer"
   },
-  "nullable_columns": [],
+  "nullable_columns": [
+    "crecimiento_natural_ultimo_anio",
+    "anio_estadisticas_vitales",
+    "viviendas_autorizadas_ultimo_anio",
+    "superficie_autorizada_m2_ultimo_anio",
+    "anio_permisos_edificacion",
+    "mp25_promedio_ultimo_anio",
+    "anio_calidad_aire"
+  ],
   "fixed_width_columns": {
     "codigo_region": 2,
     "codigo_provincia": 3,
@@ -56,6 +71,41 @@
       "name": "distrito_electoral",
       "type": "string",
       "example": "10"
+    },
+    {
+      "name": "crecimiento_natural_ultimo_anio",
+      "type": "integer",
+      "example": 12
+    },
+    {
+      "name": "anio_estadisticas_vitales",
+      "type": "integer",
+      "example": 2023
+    },
+    {
+      "name": "viviendas_autorizadas_ultimo_anio",
+      "type": "integer",
+      "example": 2451
+    },
+    {
+      "name": "superficie_autorizada_m2_ultimo_anio",
+      "type": "integer",
+      "example": 187320
+    },
+    {
+      "name": "anio_permisos_edificacion",
+      "type": "integer",
+      "example": 2023
+    },
+    {
+      "name": "mp25_promedio_ultimo_anio",
+      "type": "float",
+      "example": 18.4
+    },
+    {
+      "name": "anio_calidad_aire",
+      "type": "integer",
+      "example": 2026
     }
   ]
 }

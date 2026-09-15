@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-09-15T01:20:22.166676+00:00",
+  "generated_at_utc": "2026-09-15T02:05:46.688089+00:00",
   "dataset_count": 22,
   "datasets": [
     {
@@ -32,9 +32,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 821.63,
+        "age_hours": 822.39,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-09-15T01:20:22.163693+00:00"
+        "checked_at_utc": "2026-09-15T02:05:46.685150+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -112,9 +112,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 821.63,
+        "age_hours": 822.39,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-09-15T01:20:22.163719+00:00"
+        "checked_at_utc": "2026-09-15T02:05:46.685174+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -199,9 +199,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 821.63,
+        "age_hours": 822.39,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-09-15T01:20:22.163728+00:00"
+        "checked_at_utc": "2026-09-15T02:05:46.685184+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -285,9 +285,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 821.63,
+        "age_hours": 822.39,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-09-15T01:20:22.163733+00:00"
+        "checked_at_utc": "2026-09-15T02:05:46.685189+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -376,9 +376,9 @@
       },
       "freshness": {
         "status": "stale",
-        "age_hours": 776.97,
+        "age_hours": 777.73,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-09-15T01:20:22.163879+00:00"
+        "checked_at_utc": "2026-09-15T02:05:46.685322+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 72,
@@ -413,15 +413,15 @@
       "validation_status": "ok",
       "warnings": [
         "indicadores live refresh reused last published artifact for missing codes: ipc",
-        "indicadores freshness is stale: 776.97h since refresh, policy max is 72h"
+        "indicadores freshness is stale: 777.73h since refresh, policy max is 72h"
       ],
       "actionable_warnings": [
         "indicadores live refresh reused last published artifact for missing codes: ipc",
-        "indicadores freshness is stale: 776.97h since refresh, policy max is 72h"
+        "indicadores freshness is stale: 777.73h since refresh, policy max is 72h"
       ],
       "degradation": {
         "status": "warning",
-        "impact": "indicadores live refresh reused last published artifact for missing codes: ipc; indicadores freshness is stale: 776.97h since refresh, policy max is 72h",
+        "impact": "indicadores live refresh reused last published artifact for missing codes: ipc; indicadores freshness is stale: 777.73h since refresh, policy max is 72h",
         "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
       },
       "notes": [
@@ -473,9 +473,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 821.63,
+        "age_hours": 822.39,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-09-15T01:20:22.163893+00:00"
+        "checked_at_utc": "2026-09-15T02:05:46.685336+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -562,9 +562,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 821.63,
+        "age_hours": 822.38,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-09-15T01:20:22.163902+00:00"
+        "checked_at_utc": "2026-09-15T02:05:46.685344+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 1080,
@@ -643,9 +643,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 821.63,
+        "age_hours": 822.38,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-09-15T01:20:22.163908+00:00"
+        "checked_at_utc": "2026-09-15T02:05:46.685351+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -728,9 +728,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 567.86,
+        "age_hours": 568.62,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-09-15T01:20:22.163914+00:00"
+        "checked_at_utc": "2026-09-15T02:05:46.685358+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -801,9 +801,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 821.63,
+        "age_hours": 822.38,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-09-15T01:20:22.163925+00:00"
+        "checked_at_utc": "2026-09-15T02:05:46.685363+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -880,9 +880,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 334.27,
+        "age_hours": 335.02,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-09-15T01:20:22.163931+00:00"
+        "checked_at_utc": "2026-09-15T02:05:46.685368+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -966,9 +966,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 821.63,
+        "age_hours": 822.38,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-09-15T01:20:22.163938+00:00"
+        "checked_at_utc": "2026-09-15T02:05:46.685374+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -1053,9 +1053,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 821.63,
+        "age_hours": 822.38,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-09-15T01:20:22.163943+00:00"
+        "checked_at_utc": "2026-09-15T02:05:46.685381+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -1113,7 +1113,7 @@
       "source_url": "https://github.com/cortega26/chile-hub",
       "source_mode": "live",
       "source_detail": "derived_from_validated_chile_hub_layers",
-      "refreshed_at_utc": "2026-09-15T01:20:22.163952+00:00",
+      "refreshed_at_utc": "2026-09-15T02:05:46.685389+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -1157,7 +1157,14 @@
         "tasa_retiro",
         "establecimientos_reportados",
         "indicadores_siedu_total",
-        "valor_promedio_siedu"
+        "valor_promedio_siedu",
+        "crecimiento_natural_ultimo_anio",
+        "anio_estadisticas_vitales",
+        "viviendas_autorizadas_ultimo_anio",
+        "superficie_autorizada_m2_ultimo_anio",
+        "anio_permisos_edificacion",
+        "mp25_promedio_ultimo_anio",
+        "anio_calidad_aire"
       ],
       "indicator_codes": [],
       "indicator_delivery": {},
@@ -1177,7 +1184,7 @@
         "status": "fresh",
         "age_hours": 0.0,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-09-15T01:20:22.163961+00:00"
+        "checked_at_utc": "2026-09-15T02:05:46.685402+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 1080,
@@ -1264,9 +1271,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 821.52,
+        "age_hours": 822.28,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-09-15T01:20:22.163971+00:00"
+        "checked_at_utc": "2026-09-15T02:05:46.685411+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 1080,
@@ -1356,9 +1363,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 821.52,
+        "age_hours": 822.28,
         "max_age_hours": 175200,
-        "checked_at_utc": "2026-09-15T01:20:22.163978+00:00"
+        "checked_at_utc": "2026-09-15T02:05:46.685418+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 175200,
@@ -1441,9 +1448,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 821.52,
+        "age_hours": 822.28,
         "max_age_hours": 17520,
-        "checked_at_utc": "2026-09-15T01:20:22.163983+00:00"
+        "checked_at_utc": "2026-09-15T02:05:46.685425+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 17520,
@@ -1529,9 +1536,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 821.52,
+        "age_hours": 822.28,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-09-15T01:20:22.163989+00:00"
+        "checked_at_utc": "2026-09-15T02:05:46.685431+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -1622,9 +1629,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 821.5,
+        "age_hours": 822.26,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-09-15T01:20:22.163995+00:00"
+        "checked_at_utc": "2026-09-15T02:05:46.685438+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -1708,9 +1715,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.66,
+        "age_hours": 1.42,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-09-15T01:20:22.164002+00:00"
+        "checked_at_utc": "2026-09-15T02:05:46.685445+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -1813,9 +1820,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.68,
+        "age_hours": 1.43,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-09-15T01:20:22.164009+00:00"
+        "checked_at_utc": "2026-09-15T02:05:46.685452+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 1080,
@@ -1908,9 +1915,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.17,
+        "age_hours": 0.93,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-09-15T01:20:22.164016+00:00"
+        "checked_at_utc": "2026-09-15T02:05:46.685459+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 72,
