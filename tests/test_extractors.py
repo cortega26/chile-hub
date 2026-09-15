@@ -930,6 +930,32 @@ class SinimFinanzasExtractorTests(unittest.TestCase):
             result = sinim_finanzas_extractor.SinimFinanzasExtractor().run(dry_run=True)
         self.assertEqual(result["status"], "ok")
 
+    def test_stub_and_live_share_normalization(self):
+        """Plan 099 (TECHDEBT-03): stub y scraper delegan en `_sinim_shared` —
+        misma fixture, mismo DataFrame y misma metadata (a igual política)."""
+        from src.extractors import _sinim_shared, sinim_finanzas_live_extractor
+
+        rows = sinim_finanzas_extractor.FALLBACK_ROWS
+        df_stub = sinim_finanzas_extractor.normalize_rows(rows)
+        df_live = sinim_finanzas_live_extractor.normalize_rows(rows)
+        self.assertTrue(df_stub.equals(df_live))
+
+        # Los wrappers conservan la firma de 4 args (compat); la equivalencia
+        # real se prueba sobre la implementación compartida de 5 args.
+        policy = sinim_finanzas_extractor.REUSE_POLICY
+        meta_stub = _sinim_shared.build_metadata(df_stub, "fallback", "url", [], policy)
+        meta_live = _sinim_shared.build_metadata(df_live, "fallback", "url", [], policy)
+        # refreshed_at_utc difiere por microsegundos entre llamadas: se
+        # compara todo lo demás.
+        for meta in (meta_stub, meta_live):
+            self.assertIn("refreshed_at_utc", meta)
+            del meta["refreshed_at_utc"]
+        self.assertEqual(meta_stub, meta_live)
+        # Y los wrappers delegan (misma salida a igual política).
+        meta_wrapped = sinim_finanzas_extractor.build_metadata(df_stub, "fallback", "url", [])
+        del meta_wrapped["refreshed_at_utc"]
+        self.assertEqual(meta_wrapped, meta_stub)
+
 
 class MineducResultadosExtractorTests(unittest.TestCase):
     def test_normalize_rows_writes_required_schema(self):

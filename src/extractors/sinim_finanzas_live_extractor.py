@@ -38,10 +38,8 @@ try:
         ensure_staging_directories,
         write_staging_metadata,
     )
-    from src.extractors.source_adapter import build_standard_metadata
 except ModuleNotFoundError:
     from base import BaseExtractor, ensure_staging_directories, write_staging_metadata
-    from source_adapter import build_standard_metadata
 
 DATA_DIR = Path(__file__).resolve().parents[2] / "data"
 RAW_DIR = DATA_DIR / "raw"
@@ -413,41 +411,22 @@ def _get_fallback_rows() -> list[dict[str, Any]]:
     ]
 
 
+try:
+    from src.extractors._sinim_shared import build_metadata as _shared_build_metadata
+    from src.extractors._sinim_shared import normalize_rows as _shared_normalize_rows
+except ModuleNotFoundError:  # ejecución como script (python src/extractors/*.py)
+    from _sinim_shared import build_metadata as _shared_build_metadata
+    from _sinim_shared import normalize_rows as _shared_normalize_rows
+
+
 def normalize_rows(rows: list[dict[str, Any]]) -> pl.DataFrame:
-    """Normaliza filas al esquema canónico de finanzas_municipales."""
-    return (
-        pl.DataFrame(rows)
-        .with_columns(
-            pl.col("anio").cast(pl.Int32),
-            pl.col("codigo_comuna").cast(pl.String).str.zfill(5),
-            pl.col("nombre_comuna").cast(pl.String),
-            pl.col("ingresos_totales").cast(pl.Float64),
-            pl.col("gastos_totales").cast(pl.Float64),
-            pl.col("ingresos_propios_permanentes").cast(pl.Float64),
-            pl.col("fondo_comun_municipal").cast(pl.Float64),
-            pl.col("gasto_personal").cast(pl.Float64),
-            pl.col("gasto_inversion").cast(pl.Float64),
-        )
-        .sort(["anio", "codigo_comuna"])
-    )
+    """Delega en `_sinim_shared` (una sola implementación, Plan 099)."""
+    return _shared_normalize_rows(rows)
 
 
 def build_metadata(df: pl.DataFrame, source_mode: str, source_url: str, notes: list[str]) -> dict:
-    """Construye metadata.json para staging."""
-    return build_standard_metadata(
-        dataset="finanzas_municipales",
-        source_name="SINIM - SUBDERE",
-        source_url=source_url,
-        source_mode=source_mode,
-        source_detail=(
-            "live_scraping_sinim_portal"
-            if source_mode == "live"
-            else "curated_fallback_pending_direct_export"
-        ),
-        df=df,
-        notes=notes,
-        reuse_policy=REUSE_POLICY,
-    )
+    """Delega en `_sinim_shared` con la política propia del scraper."""
+    return _shared_build_metadata(df, source_mode, source_url, notes, REUSE_POLICY)
 
 
 def process_sinim_finanzas() -> str:
