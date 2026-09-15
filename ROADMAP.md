@@ -24,7 +24,7 @@
 | 1 Correctness S | 086–090 | 5/5 | DONE (2026-09-15, branch advisor/wave-1; suite 1027 passed) |
 | 2 Correctness/Perf M | 091–093 | 2/3 | 092, 093 DONE; 091 REVERTED (ver backlog) |
 | 3 Deps/Tooling/Sec | 094–096 | 3/3 | DONE (2026-09-15, branch advisor/wave-3; bandit 0 issues, suite 1032 passed) |
-| 4 Docs agentes | 097–098 | 0/2 | TODO |
+| 4 Docs agentes | 097–098 | 2/2 | DONE (2026-09-15, branch advisor/wave-4; doctor+lint+format verdes) |
 | 5 Deuda+spikes | 099–100 | 0/2 | TODO |
 | 6 L diferido (pre-existente) | 077–079 + split gods | 0/3 | TODO (ver `plans/README.md`) |
 
@@ -42,8 +42,8 @@
 - [x] 094 Toolchain única + targets locales (P1/S, 972ffbb + 238bc10 isort)
 - [x] 095 Floor py311 + despineo pandas (P1/M, 79fde6a)
 - [x] 096 duckdb acotado + pip-audit expiry + bandit extractors + fix B314 (P1/S-M, 7beda93)
-- [ ] 097 Docs quirúrgicos: CLAUDE counts, badge capas, §5 como puntero (P1/S, —)
-- [ ] 098 Docs arquitectura: SOURCE índice, CLAUDE→30 líneas, anti-drift extendido (P2/M, tras 097) + fix regex `check_agents_sync.py:54` (aceptar `\d{4}` sin espacio; hoy `1034` pelado no matchea y atribuye el número vecino — hallado en Wave 2, workaround: formato `1 034`)
+- [x] 097 Docs quirúrgicos + convención de conteos (P1/S, e99cac5)
+- [x] 098 Docs arquitectura + gate ×3 + regex fix (P2/M, eeeec8e) + fix regex `check_agents_sync.py:54` (aceptar `\d{4}` sin espacio; hoy `1034` pelado no matchea y atribuye el número vecino — hallado en Wave 2, workaround: formato `1 034`)
 - [ ] 099 Deuda media: sinim-shared + salud canónica + `sys.path`→`_paths` (P2/M, tras 091)
 - [ ] 100 Spike Polars `2.0rc1` en rama + golden-diff (P2/M, tras 092; sin prod)
 - [ ] Wave 6: terminar 077→079 y luego split god objects por dominio (L, tras Wave 2)
