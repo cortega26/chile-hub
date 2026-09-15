@@ -3656,6 +3656,51 @@ class CalidadAireExtractorTests(unittest.TestCase):
         canon, puntos = _parse_realtime_series(self._serie("ZZZZ", []))
         self.assertEqual((canon, puntos), ("", []))
 
+    def test_fetch_data_snapshot_recovery_is_not_live(self):
+        """Plan 086: si el listado cae y se usa un snapshot de disco, el modo
+        debe ser "fallback" (no "live") e identificar el snapshot en notas."""
+        import requests as _requests
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            snapshot = Path(tmpdir) / "sinca_listadomapa_test.json"
+            snapshot.write_text(json.dumps(self._payload()), encoding="utf-8")
+            with (
+                patch.object(
+                    calidad_aire_extractor, "_load_comunas_lookup", return_value=self.FAKE_LOOKUP
+                ),
+                patch.object(calidad_aire_extractor, "RAW_DIR", tmpdir),
+                patch.object(calidad_aire_extractor, "STAGING_DIR", tmpdir),
+                patch.object(
+                    calidad_aire_extractor,
+                    "fetch_with_retry",
+                    side_effect=_requests.RequestException("listado caído"),
+                ),
+            ):
+                rows, mode, _, notes = calidad_aire_extractor.fetch_data()
+            self.assertTrue(len(rows) > 0)
+            self.assertEqual(mode, "fallback")
+            self.assertTrue(any("sinca_listadomapa_test.json" in n for n in notes))
+
+    def test_fetch_data_without_snapshot_is_fallback(self):
+        import requests as _requests
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with (
+                patch.object(
+                    calidad_aire_extractor, "_load_comunas_lookup", return_value=self.FAKE_LOOKUP
+                ),
+                patch.object(calidad_aire_extractor, "RAW_DIR", tmpdir),
+                patch.object(calidad_aire_extractor, "STAGING_DIR", tmpdir),
+                patch.object(
+                    calidad_aire_extractor,
+                    "fetch_with_retry",
+                    side_effect=_requests.RequestException("listado caído"),
+                ),
+            ):
+                rows, mode, _, _ = calidad_aire_extractor.fetch_data()
+            self.assertEqual(rows, calidad_aire_extractor.FALLBACK_ROWS)
+            self.assertEqual(mode, "fallback")
+
     def test_run_dry_run_returns_validation_without_writing(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             staging_csv = Path(tmpdir) / "calidad_aire.csv"

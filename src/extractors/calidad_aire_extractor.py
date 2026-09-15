@@ -310,6 +310,7 @@ def fetch_data() -> tuple[list[dict], str, str, list[str]]:
     except FileNotFoundError as exc:
         return FALLBACK_ROWS, "fallback", LISTADO_URL, [str(exc)]
 
+    from_snapshot = False
     try:
         with fetch_with_retry(LISTADO_URL, timeout=120) as response:
             response.raise_for_status()
@@ -330,6 +331,10 @@ def fetch_data() -> tuple[list[dict], str, str, list[str]]:
         except (OSError, ValueError) as exc2:
             notes.append(f"snapshot ilegible ({exc2})")
             return FALLBACK_ROWS, "fallback", LISTADO_URL, notes
+        # El payload viene de disco (potencialmente viejo): no es "live".
+        # Se reporta "fallback" para que freshness/publication lo traten como
+        # no-fresco (Plan 086). Ver VALID_SOURCE_MODES en _shared.py.
+        from_snapshot = True
 
     hoy = datetime.datetime.now(UTC).strftime("%Y-%m-%d")
     rows, parse_notes, _ = _parse_listado(payload, lookup, LISTADO_URL, fecha_fuente, hoy)
@@ -337,6 +342,9 @@ def fetch_data() -> tuple[list[dict], str, str, list[str]]:
     if not rows:
         notes.append("listado sin filas parseables")
         return FALLBACK_ROWS, "fallback", LISTADO_URL, notes
+    if from_snapshot:
+        notes.append(f"{len(rows)} filas diarias recuperadas desde snapshot '{target.name}'")
+        return rows, "fallback", LISTADO_URL, notes
     notes.append(f"{len(rows)} filas diarias nuevas desde '{target.name}'")
     return rows, "live", LISTADO_URL, notes
 
