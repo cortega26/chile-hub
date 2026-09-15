@@ -4,7 +4,7 @@
   "description": "Capa de datos reproducible y curada sobre datasets publicos oficiales de Chile: geografia, demografia, salud, educacion, finanzas municipales e indicadores.",
   "version": "1.31.1",
   "homepage": "https://tooltician.com/chile-hub/",
-  "created": "2026-09-15T01:20:22.174488+00:00",
+  "created": "2026-09-15T02:05:46.695758+00:00",
   "resources": [
     {
       "name": "regiones",
@@ -1237,6 +1237,34 @@
           {
             "name": "valor_promedio_siedu",
             "type": "string"
+          },
+          {
+            "name": "crecimiento_natural_ultimo_anio",
+            "type": "integer"
+          },
+          {
+            "name": "anio_estadisticas_vitales",
+            "type": "integer"
+          },
+          {
+            "name": "viviendas_autorizadas_ultimo_anio",
+            "type": "integer"
+          },
+          {
+            "name": "superficie_autorizada_m2_ultimo_anio",
+            "type": "integer"
+          },
+          {
+            "name": "anio_permisos_edificacion",
+            "type": "integer"
+          },
+          {
+            "name": "mp25_promedio_ultimo_anio",
+            "type": "string"
+          },
+          {
+            "name": "anio_calidad_aire",
+            "type": "integer"
           }
         ],
         "missingValues": [

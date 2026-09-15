@@ -1481,6 +1481,13 @@ class ValidatorTests(unittest.TestCase):
         self.assertEqual(df["codigo_region"].dtype, pl.String)
         self.assertTrue((df["codigo_region"].str.len_chars() == 2).all())
 
+    def test_calidad_aire_cut_codes_are_fixed_width_strings(self):
+        df = self._load_parquet("calidad_aire")
+        self.assertEqual(df["codigo_comuna"].dtype, pl.String)
+        self.assertTrue((df["codigo_comuna"].str.len_chars() == 5).all())
+        self.assertEqual(df["codigo_region"].dtype, pl.String)
+        self.assertTrue((df["codigo_region"].str.len_chars() == 2).all())
+
     def test_validate_calidad_aire_rejects_empty_and_duplicate_keys(self):
         cols = {
             "fecha": pl.String,
@@ -1525,13 +1532,6 @@ class ValidatorTests(unittest.TestCase):
         self.assertEqual(result["status"], "error")
         self.assertTrue(any("duplicate" in e for e in result["errors"]))
 
-    def test_calidad_aire_cut_codes_are_fixed_width_strings(self):
-        df = self._load_parquet("calidad_aire")
-        self.assertEqual(df["codigo_comuna"].dtype, pl.String)
-        self.assertTrue((df["codigo_comuna"].str.len_chars() == 5).all())
-        self.assertEqual(df["codigo_region"].dtype, pl.String)
-        self.assertTrue((df["codigo_region"].str.len_chars() == 2).all())
-
     @classmethod
     def setUpClass(cls):
         cls.normalized_dir = ROOT_DIR / "data" / "normalized"
@@ -1563,6 +1563,152 @@ class ValidatorTests(unittest.TestCase):
         self.assertTrue((regiones["codigo_region"].str.len_chars() == 2).all())
         self.assertEqual(provincias["codigo_provincia"].dtype, pl.String)
         self.assertTrue((provincias["codigo_provincia"].str.len_chars() == 3).all())
+
+
+class PerfilEnrichmentTests(unittest.TestCase):
+    """El perfil consolida los upstreams nuevos (vitales, permisos, aire)."""
+
+    def _base_frames(self):
+        comunas = pl.DataFrame({"codigo_comuna": ["13101", "13102"]})
+        censo = pl.DataFrame(
+            {
+                "codigo_comuna": ["13101", "13102"],
+                "poblacion_censada": [1000, 2000],
+                "hombres": [480, 990],
+                "mujeres": [520, 1010],
+                "poblacion_0_14": [200, 400],
+                "poblacion_15_29": [200, 400],
+                "poblacion_30_44": [200, 400],
+                "poblacion_45_64": [200, 400],
+                "poblacion_65_mas": [200, 400],
+            }
+        )
+        hogares = pl.DataFrame(
+            {
+                "codigo_comuna": ["13101", "13102"],
+                "viviendas_censadas": [300, 600],
+                "hogares_censados": [280, 560],
+                "promedio_personas_hogar": [3.5, 3.5],
+            }
+        )
+        salud = pl.DataFrame({"codigo_comuna": ["13101"]})
+        educ = pl.DataFrame({"codigo_comuna": ["13101", "13101"]})
+        electoral = pl.DataFrame(
+            {
+                "codigo_comuna": ["13101", "13102"],
+                "distrito_electoral": ["10", "10"],
+                "circunscripcion_senatorial": ["7", "7"],
+            }
+        )
+        cols_fin = [
+            "codigo_comuna",
+            "anio",
+            "ingresos_totales",
+            "gastos_totales",
+            "ingresos_propios_permanentes",
+            "fondo_comun_municipal",
+            "gasto_personal",
+            "gasto_inversion",
+        ]
+        finanzas = pl.DataFrame(
+            [
+                ["13101", 2023, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                ["13102", 2023, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0],
+            ],
+            schema=cols_fin,
+            orient="row",
+        )
+        cols_res = [
+            "codigo_comuna",
+            "anio",
+            "matricula_total",
+            "asistencia_promedio",
+            "tasa_aprobacion",
+            "tasa_reprobacion",
+            "tasa_retiro",
+            "establecimientos_reportados",
+        ]
+        resultados = pl.DataFrame(
+            [
+                ["13101", 2023, 100, 90.0, 90.0, 5.0, 5.0, 3],
+                ["13102", 2023, 200, 90.0, 90.0, 5.0, 5.0, 6],
+            ],
+            schema=cols_res,
+            orient="row",
+        )
+        siedu = pl.DataFrame(
+            {
+                "codigo_comuna": ["13101"],
+                "codigo_indicador": ["x"],
+                "valor": [1.0],
+            }
+        )
+        return (comunas, censo, hogares, salud, educ, electoral, finanzas, resultados, siedu)
+
+    def _run(self, vitales=None, permisos=None, calidad=None):
+        from src.builders.datasets import build_perfil_territorial_comunal
+
+        return build_perfil_territorial_comunal(
+            *self._base_frames(),
+            df_vitales=vitales,
+            df_permisos=permisos,
+            df_calidad=calidad,
+        )
+
+    def test_enrichment_latest_year_and_math(self):
+        vitales = pl.DataFrame(
+            {
+                "codigo_comuna": ["13101"] * 4,
+                "anio": [2022, 2022, 2023, 2023],
+                "evento": ["nacimiento", "defuncion", "nacimiento", "defuncion"],
+                "cantidad": [100, 30, 90, 100],
+            }
+        )
+        permisos = pl.DataFrame(
+            {
+                "codigo_comuna": ["13101", "13101"],
+                "anio": [2022, 2023],
+                "unidades_total": [50, 70],
+                "superficie_m2_total": [5000, 7000],
+            }
+        )
+        calidad = pl.DataFrame(
+            {
+                "codigo_comuna": ["13101", "13101"],
+                "fecha": ["2026-09-13", "2026-09-14"],
+                "codigo_contaminante": ["mp25", "mp25"],
+                "valor_promedio_diario": [10.0, 30.0],
+            }
+        )
+        df = self._run(vitales=vitales, permisos=permisos, calidad=calidad)
+        row = df.filter(pl.col("codigo_comuna") == "13101").to_dicts()[0]
+        # Último año disponible por capa, no el primero
+        self.assertEqual(row["anio_estadisticas_vitales"], 2023)
+        self.assertEqual(row["crecimiento_natural_ultimo_anio"], -10)
+        self.assertEqual(row["anio_permisos_edificacion"], 2023)
+        self.assertEqual(row["viviendas_autorizadas_ultimo_anio"], 70)
+        self.assertEqual(row["superficie_autorizada_m2_ultimo_anio"], 7000)
+        self.assertEqual(row["anio_calidad_aire"], 2026)
+        self.assertAlmostEqual(row["mp25_promedio_ultimo_anio"], 20.0)
+        # Comuna sin estación queda nula (no inventada)
+        row2 = df.filter(pl.col("codigo_comuna") == "13102").to_dicts()[0]
+        self.assertIsNone(row2["mp25_promedio_ultimo_anio"])
+        self.assertEqual(df.height, 2)
+
+    def test_missing_upstreams_yield_null_columns(self):
+        """Sin upstreams nuevos el esquema se mantiene con columnas nulas."""
+        df = self._run()
+        for col in (
+            "crecimiento_natural_ultimo_anio",
+            "anio_estadisticas_vitales",
+            "viviendas_autorizadas_ultimo_anio",
+            "superficie_autorizada_m2_ultimo_anio",
+            "anio_permisos_edificacion",
+            "mp25_promedio_ultimo_anio",
+            "anio_calidad_aire",
+        ):
+            self.assertIn(col, df.columns)
+            self.assertTrue(df[col].is_null().all())
 
 
 class IndicatorFallbackTests(unittest.TestCase):
