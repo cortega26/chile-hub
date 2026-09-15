@@ -32,7 +32,7 @@ repos:
     hooks:
       - id: mypy
         pass_filenames: false
-        additional_dependencies: [polars==1.41.2, requests==2.34.2, tenacity==9.1.4]
+        additional_dependencies: [polars==1.44.2, requests==2.34.2, tenacity==9.1.4]
 
   - repo: local
     hooks:

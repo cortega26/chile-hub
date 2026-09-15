@@ -34,7 +34,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Information Analysis",
 ]
 dependencies = [
-    "polars>=1.41.2,<2",
+    "polars>=1.44.1,<2",
     "requests>=2.34.2",
     "platformdirs>=4.10.0",
     "rich>=14.0",
