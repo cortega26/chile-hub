@@ -21,6 +21,23 @@ ALLOWED_WITHOUT_DEDICATED_VALIDATOR = {
     "comunas_enriquecidas",
 }
 
+# Claves del catálogo sin entrada en el bloque `validations = {...}` de
+# build_dev_db.py. Cada una necesita carril + razón explícitos: un dataset
+# declarado en el catálogo pero nunca validado publica (o desaparece) en
+# silencio (Plan 088, AGENTS.md §10). Al ganar un build path, la entrada se
+# mueve a un registro real — el gate fuerza esa edición.
+ALLOWED_UNVALIDATED_DATASETS = {
+    # candidate/bajo_demanda (ADR-012): su extractor NO corre en `make
+    # extract`; se valida y publica vía scripts/build_geometria_comunal.py.
+    "geometria_comunal": "candidate lane, separate build script (ADR-012)",
+    # rejected/deprecated 2026-09-15: extractor neutralizado, fuera del bundle.
+    "delincuencia_comunal": "rejected lane, deprecated 2026-09-15",
+    # candidate/bajo_demanda: extractor + doc existen pero no hay build path
+    # en build_dev_db.py (sin staging/normalized). Requiere plan de dataset
+    # propio (validate_autoridades_locales + wiring) para salir de aquí.
+    "autoridades_locales": "candidate lane bajo_demanda, no build path yet",
+}
+
 
 def load_tree(path: Path) -> ast.Module:
     return ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
@@ -66,14 +83,24 @@ def registered_validation_keys() -> set[str]:
     return keys
 
 
+def catalog_keys() -> set[str]:
+    import json as _json
+
+    catalog_path = ROOT_DIR / "data" / "dataset_catalog_config.json"
+    with open(catalog_path, "r", encoding="utf-8") as f:
+        return set(_json.load(f).keys())
+
+
 def main() -> None:
     functions = validation_functions()
     registered = registered_validation_keys()
+    catalog = catalog_keys()
 
     unregistered = sorted(functions - registered - ALLOWED_UNREGISTERED_VALIDATORS)
     missing_dedicated = sorted(registered - functions - ALLOWED_WITHOUT_DEDICATED_VALIDATOR)
+    unvalidated = sorted(catalog - registered - set(ALLOWED_UNVALIDATED_DATASETS))
 
-    if unregistered or missing_dedicated:
+    if unregistered or missing_dedicated or unvalidated:
         messages = []
         if unregistered:
             messages.append(
@@ -83,11 +110,19 @@ def main() -> None:
             messages.append(
                 "validation keys without validate_* functions: " + ", ".join(missing_dedicated)
             )
+        if unvalidated:
+            messages.append(
+                "catalog datasets without validation entry in build_dev_db.py "
+                "(add a validator or an explicit ALLOWED_UNVALIDATED_DATASETS reason): "
+                + ", ".join(unvalidated)
+            )
         raise SystemExit("ERROR: " + "; ".join(messages))
 
     print(
         "validation registration ok: "
-        f"{len(registered)} validation keys, {len(functions)} validate_* functions"
+        f"{len(registered)} validation keys, {len(functions)} validate_* functions, "
+        f"{len(catalog)} catalog keys "
+        f"({len(ALLOWED_UNVALIDATED_DATASETS)} with explicit unvalidated exemption)"
     )
 
 

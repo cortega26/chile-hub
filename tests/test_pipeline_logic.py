@@ -3940,6 +3940,44 @@ class ExtractorRegistryTests(unittest.TestCase):
             self.assertTrue(any("falta el campo" in e for e in errors))
 
 
+class ValidationCoverageTests(unittest.TestCase):
+    """Tests para la regla de cobertura catálogo→validación de
+    scripts/check_validation_registration.py (Plan 088): toda clave del
+    catálogo debe tener entrada en `validations = {...}` o una exención
+    explícita con carril + razón en ALLOWED_UNVALIDATED_DATASETS."""
+
+    def test_real_tree_passes_with_documented_exemptions(self):
+        from scripts import check_validation_registration as cvr
+
+        # No debe levantar en el árbol real; además el set no-cubierto debe
+        # ser exactamente el exento (ni más ni menos).
+        try:
+            cvr.main()
+        except SystemExit as exc:
+            self.fail(f"checker failed on real tree: {exc}")
+        uncovered = cvr.catalog_keys() - cvr.registered_validation_keys()
+        self.assertEqual(uncovered, set(cvr.ALLOWED_UNVALIDATED_DATASETS))
+
+    def test_exemptions_reference_real_catalog_keys_with_reasons(self):
+        from scripts import check_validation_registration as cvr
+
+        catalog = cvr.catalog_keys()
+        for key, reason in cvr.ALLOWED_UNVALIDATED_DATASETS.items():
+            self.assertIn(key, catalog, f"stale exemption: '{key}' not in catalog")
+            self.assertTrue(reason.strip(), f"exemption '{key}' needs a lane + reason")
+
+    def test_unexempted_uncovered_dataset_fails(self):
+        from scripts import check_validation_registration as cvr
+
+        real_catalog = cvr.catalog_keys()
+        with patch.object(
+            cvr, "catalog_keys", return_value=set(real_catalog) | {"dataset_fantasma"}
+        ):
+            with self.assertRaises(SystemExit) as ctx:
+                cvr.main()
+        self.assertIn("dataset_fantasma", str(ctx.exception))
+
+
 class AdoptionStatsTests(unittest.TestCase):
     """Tests sin red del parseo/construcción de la señal de adopción (Plan 052).
 
