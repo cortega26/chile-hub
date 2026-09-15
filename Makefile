@@ -1,7 +1,7 @@
 PYTHON ?= $(if $(wildcard .venv/bin/python),.venv/bin/python,python3)
 VENV_DIR ?= .venv
 
-.PHONY: help bootstrap install-browsers doctor bump-version release extract build verify verify-readiness verify-publication verify-landing test coverage lint lint-fix format format-check docs-coverage package package-check package-smoke check refresh sync-docs status catalog hub-list hub-summary hub-summary-table hub-example hub-artifacts hub-shared-artifacts hub-shared-artifacts-table hub-reports hub-reports-table hub-report hub-inventory hub-inventory-table hub-snapshot hub-snapshot-table hub-overview hub-overview-table hub-status hub-status-table hub-health hub-health-table hub-bundle hub-freshness-audit hub-freshness-audit-table hub-runtime-status hub-runtime-status-table hub-top-issue hub-top-issue-text hub-top-issue-table hub-packages hub-packages-table hub-package hub-package-verify hub-redistribution hub-redistribution-table hub-provenance hub-provenance-table hub-drift hub-drift-table hub-source-readiness hub-dataset-quality package-bundle clean-publishable docs-build docs-serve
+.PHONY: help bootstrap install-browsers doctor bump-version release extract build verify verify-readiness verify-publication verify-landing test coverage lint lint-fix format format-check typecheck audit sec docs-coverage package package-check package-smoke check refresh sync-docs status catalog hub-list hub-summary hub-summary-table hub-example hub-artifacts hub-shared-artifacts hub-shared-artifacts-table hub-reports hub-reports-table hub-report hub-inventory hub-inventory-table hub-snapshot hub-snapshot-table hub-overview hub-overview-table hub-status hub-status-table hub-health hub-health-table hub-bundle hub-freshness-audit hub-freshness-audit-table hub-runtime-status hub-runtime-status-table hub-top-issue hub-top-issue-text hub-top-issue-table hub-packages hub-packages-table hub-package hub-package-verify hub-redistribution hub-redistribution-table hub-provenance hub-provenance-table hub-drift hub-drift-table hub-source-readiness hub-dataset-quality package-bundle clean-publishable docs-build docs-serve
 
 help:
 	@printf "Targets disponibles:\n"
@@ -23,8 +23,11 @@ help:
 	@printf "  make package          Construye wheel + sdist\n"
 	@printf "  make package-check    Valida dist/* con twine\n"
 	@printf "  make package-smoke    Instala wheel local y prueba import + CLI\n"
-	@printf "  make check            Ejecuta build + verify + test + verify-landing\n"
-	@printf "  make refresh          Ejecuta extract + build + verify + test + verify-landing + lint + format-check\n"
+	@printf "  make check            Ejecuta build + verify + test + verify-landing + gates estrictos\n"
+	@printf "  make refresh          Ejecuta extract + build + verify + test + verify-landing + lint + format-check + gates\n"
+	@printf "  make typecheck        Mypy (misma invocación que CI)\n"
+	@printf "  make audit            pip-audit (mismos flags que CI)\n"
+	@printf "  make sec              Bandit SAST sobre src/ (igual que CI)\n"
 	@printf "  make sync-docs        Sincroniza hechos hardcodeados en README.md (ver AGENTS.md §12)\n"
 	@printf "  make status           Imprime resumen humano del pipeline\n"
 	@printf "  make catalog          Muestra dataset_catalog.json\n"
@@ -166,6 +169,18 @@ lint:
 lint-fix:
 	$(PYTHON) -m ruff check --fix src/ tests/ scripts/
 
+# Gates estrictos con la invocación exacta de CI (Plan 094): antes solo
+# fallaban tras el push. `audit` espeja los flags de CI (ver 096 para el
+# rationale del ignore).
+typecheck:
+	$(PYTHON) -m mypy
+
+audit:
+	$(PYTHON) -m pip_audit --ignore-vuln PYSEC-2026-2132
+
+sec:
+	$(PYTHON) -m bandit -c pyproject.toml -r src/
+
 format:
 	$(PYTHON) -m ruff format src/ tests/ scripts/
 
@@ -192,7 +207,7 @@ package-smoke: package-check
 	$(PYTHON) -c "from chile_hub import ChileHub; print(ChileHub)"
 	chile-hub --help
 
-check: build verify test verify-landing lint format-check
+check: build verify test verify-landing lint format-check typecheck audit sec
 
 freshness-badge:
 	$(PYTHON) scripts/generate_freshness_badge.py
@@ -200,7 +215,7 @@ freshness-badge:
 coverage-badge:
 	$(PYTHON) scripts/generate_coverage_badge.py
 
-refresh: extract build verify test verify-landing lint format-check freshness-badge
+refresh: extract build verify test verify-landing lint format-check typecheck audit sec freshness-badge
 
 status:
 	$(PYTHON) scripts/pipeline_status.py

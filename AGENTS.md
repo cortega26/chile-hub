@@ -276,12 +276,12 @@ directamente; siempre regenerar corriendo el pipeline desde el paso 2.
 
 ```python
 # ✅ Correcto
-codigo_comuna   = "01101"   # str, siempre 5 caracteres
-codigo_provincia = "011"    # str, siempre 3 caracteres
-codigo_region   = "01"      # str, siempre 2 caracteres
+codigo_comuna = "01101"  # str, siempre 5 caracteres
+codigo_provincia = "011"  # str, siempre 3 caracteres
+codigo_region = "01"  # str, siempre 2 caracteres
 
 # ❌ Incorrecto — Excel y algunas bases de datos silenciosamente pierden el cero
-codigo_comuna = 1101    # int: pierde el cero inicial de Tarapacá
+codigo_comuna = 1101  # int: pierde el cero inicial de Tarapacá
 ```
 
 Los códigos deben preservarse como `VARCHAR` en DuckDB/SQLite, como `str` en Python
@@ -838,7 +838,12 @@ make bootstrap          # Crea .venv, instala deps + Playwright/Chromium
 make doctor             # Python efectivo, dependencias clave y gates anti-drift (§12)
 
 # Pipeline completo (lo más común)
-make refresh            # extract → build → verify → test → verify-landing → lint + format-check
+make refresh            # extract → build → verify → test → verify-landing → lint + format-check + gates estrictos
+
+# Gates estrictos (misma invocación que CI; también en `make check`)
+make typecheck          # mypy
+make audit              # pip-audit (mismos flags que CI)
+make sec                # bandit SAST sobre src/
 
 # Pasos individuales
 make extract            # Corre los 17 extractores de cadencia diaria → data/staging/

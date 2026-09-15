@@ -16,19 +16,23 @@ repos:
         args: ['--maxkb=500']
       - id: check-json
 
+  # Versiones single-source con CI y el lock (Plan 094): ruff == 0.16.7
+  # (pyproject dev-pin), mypy == 2.3.1 con deps pineadas a uv.lock. Un pin
+  # distinto por superficie hacía que el mismo código pasara en un lado y
+  # fallara en otro.
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.17
+    rev: v0.16.7
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
       - id: ruff-format
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v2.1.0
+    rev: v2.3.1
     hooks:
       - id: mypy
         pass_filenames: false
-        additional_dependencies: [polars>=1.41.2, requests>=2.34.2, tenacity>=9.1.4]
+        additional_dependencies: [polars==1.41.2, requests==2.34.2, tenacity==9.1.4]
 
   - repo: local
     hooks:
@@ -40,7 +44,10 @@ repos:
         files: ^(pyproject\.toml|README\.md|AGENTS\.md|src/chile_hub/datasets\.py|src/builders/|scripts/sync_docs\.py|docs/adr/|tests/|data/dataset_catalog_config\.json|contracts/datasets/)$
       - id: pip-audit
         name: pip-audit
-        entry: uv run pip-audit
+        # Mismos flags que CI (Plan 094): sin el ignore, este hook falla en
+        # local con PYSEC-2026-2132 mientras CI pasa. Rationale del ignore en
+        # pipeline-check.yml (Plan 096 lo convierte en mecanismo con expiración).
+        entry: uv run pip-audit --ignore-vuln PYSEC-2026-2132
         language: system
         pass_filenames: false
         files: ^pyproject\.toml$

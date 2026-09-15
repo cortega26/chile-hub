@@ -85,10 +85,11 @@ jobs:
         run: uv lock --locked
 
       - name: Check Python lint
-        run: uvx ruff@0.15.17 check src/ tests/ scripts/
+        # Pin single-source con pyproject dev + pre-commit (Plan 094).
+        run: uvx ruff@0.16.7 check src/ tests/ scripts/
 
       - name: Check Python format
-        run: uvx ruff@0.15.17 format --check src/ tests/ scripts/
+        run: uvx ruff@0.16.7 format --check src/ tests/ scripts/
 
       - name: Check dataset registry/docs/contracts sync
         run: python scripts/check_companion_paths.py registry
