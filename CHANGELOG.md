@@ -12,6 +12,15 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.34.0 - 2026-09-15
+
+### Agregado
+
+- **datasets**: Perfil_territorial_comunal consolida vitales, permisos y aire
+  ([#95](https://github.com/cortega26/chile-hub/pull/95),
+  [`0c8b693`](https://github.com/cortega26/chile-hub/commit/0c8b6937b2fcbaea3cb1032c5580dff1d481d241))
+
+
 ## 1.33.0 - 2026-09-15
 
 ### Mantenimiento
