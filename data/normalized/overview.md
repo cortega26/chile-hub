@@ -1,21 +1,21 @@
 # chile-hub overview
 
-- `generated_at_utc`: `2026-09-15T12:16:25.432629+00:00`
+- `generated_at_utc`: `2026-09-15T13:40:57.085033+00:00`
 - `overall_status`: `warn`
 - `dataset_count`: `22`
 - `live_count`: `21`
 - `fallback_count`: `0`
-- `stale_count`: `1`
+- `stale_count`: `0`
 - `drifted_count`: `1`
 - `degraded_count`: `0`
 - `partial_coverage_count`: `1`
-- `warning_count`: `7`
+- `warning_count`: `6`
 - `shared_artifact_count`: `25`
 - `package_count`: `1`
-- `top_issue`: `indicadores` (freshness=stale, drift=drifted, warnings=2)
+- `top_issue`: `indicadores` (freshness=fresh, drift=drifted, warnings=1)
 - `top_issue_reason`: indicadores live refresh reused last published artifact for missing codes: ipc
 - `top_issue_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.
-- `top_issue_summary`: indicadores: indicadores live refresh reused last published artifact for missing codes: ipc [source_detail=public_api_with_published_backfill; warnings=2; freshness=stale; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]
+- `top_issue_summary`: indicadores: indicadores live refresh reused last published artifact for missing codes: ipc [source_detail=public_api_with_published_backfill; warnings=1; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]
 
 | Dataset | Mode | Validation | Freshness | Coverage | Drift |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -32,7 +32,7 @@
 | `establecimientos_salud` | `live` | `ok` | `fresh` | `not_applicable` | `healthy` |
 | `estadisticas_vitales` | `live` | `ok` | `fresh` | `not_applicable` | `healthy` |
 | `finanzas_municipales` | `monthly` | `ok` | `fresh` | `not_applicable` | `healthy` |
-| `indicadores` | `live` | `ok` | `stale` | `not_applicable` | `drifted` |
+| `indicadores` | `live` | `ok` | `fresh` | `not_applicable` | `drifted` |
 | `indicadores_urbanos_siedu` | `live` | `ok` | `fresh` | `partial` | `healthy` |
 | `partidos_politicos` | `live` | `ok` | `fresh` | `full` | `healthy` |
 | `perfil_territorial_comunal` | `live` | `ok` | `fresh` | `full` | `healthy` |
@@ -46,7 +46,7 @@
 
 - `path`: `data/normalized/chile-hub-publishable-bundle.zip`
 - `package_type`: `zip`
-- `size_bytes`: `30237923`
+- `size_bytes`: `30238639`
 - `checksum`: `sha256` via `data/normalized/chile-hub-publishable-bundle.zip.sha256`
 - `verification_command`: `shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256`
 

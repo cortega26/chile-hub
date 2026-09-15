@@ -36,7 +36,7 @@ from src.extractors import (
     sinim_finanzas_extractor,
     subdere_extractor,
 )
-from src.extractors.base import BaseExtractor
+from src.extractors.base import BaseExtractor, write_raw_snapshot_atomic
 from src.extractors.ine_ipc import IneIpcReading
 
 # ROOT_DIR is defined above
@@ -269,6 +269,49 @@ class BCentralExtractorTests(unittest.TestCase):
             self.assertRaises(HTTPError),
         ):
             bcentral_extractor.fetch_indicator_year("uf", 2026)
+
+    def test_crashed_snapshot_write_leaves_no_partial_file(self):
+        """Plan 009: un crash a mitad de escritura no debe dejar un snapshot
+        parcial — el snapshot previo sigue siendo el último válido que lee
+        load_latest_raw_snapshot (escritura atómica vía tmp + os.replace)."""
+        with (
+            tempfile.TemporaryDirectory() as tmpdir,
+            patch.object(bcentral_extractor, "RAW_DIR", tmpdir),
+        ):
+            bcentral_extractor.save_raw_snapshot(self._payload(count=2), "uf", 2026)
+            self.assertEqual(len(bcentral_extractor.load_latest_raw_snapshot("uf", 2026)), 2)
+
+            # Simula un crash entre la escritura del tmp y el rename.
+            with (
+                patch("os.replace", side_effect=OSError("simulated crash")),
+                self.assertRaises(OSError),
+            ):
+                bcentral_extractor.save_raw_snapshot(self._payload(count=5), "uf", 2026)
+
+            # Sin archivo parcial en la ruta final: solo el previo, intacto.
+            snapshots = sorted(Path(tmpdir).glob("mindicador_uf_2026_*.json"))
+            self.assertEqual(len(snapshots), 1)
+            records = bcentral_extractor.load_latest_raw_snapshot("uf", 2026)
+            self.assertEqual(len(records), 2)
+            self.assertEqual(records[0]["valor"], 39000.0)
+
+    def test_write_raw_snapshot_atomic_round_trips_all_payload_types(self):
+        """El helper cubre los tres usos reales: dict JSON (bcentral, subdere,
+        electoral), str y bytes (XML de autoridades_electas)."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            json_path = Path(tmpdir) / "snap.json"
+            write_raw_snapshot_atomic(json_path, {"serie": [{"valor": 1}]})
+            self.assertEqual(
+                json.loads(json_path.read_text(encoding="utf-8"))["serie"][0]["valor"], 1
+            )
+
+            text_path = Path(tmpdir) / "snap.txt"
+            write_raw_snapshot_atomic(text_path, "hola")
+            self.assertEqual(text_path.read_text(encoding="utf-8"), "hola")
+
+            bytes_path = Path(tmpdir) / "snap.xml"
+            write_raw_snapshot_atomic(bytes_path, b"<root/>")
+            self.assertEqual(bytes_path.read_bytes(), b"<root/>")
 
     def test_fetch_indicator_year_uses_timeout_above_observed_ipc_latency(self):
         """El timeout de mindicador.cl debe cubrir la latencia erratica de `ipc`.

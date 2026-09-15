@@ -79,9 +79,8 @@ def _compute_review_status_counts():
         review_by = entry.get("review_by")
         if not review_by:
             continue
-        try:
-            review_date = datetime.fromisoformat(review_by).replace(tzinfo=UTC)
-        except (ValueError, TypeError):
+        review_date = parse_review_date(review_by)
+        if review_date is None:
             continue
         days_until_review = (review_date - datetime.now(UTC)).days
         if days_until_review < 0:
@@ -135,6 +134,29 @@ def parse_iso_datetime(value):
     try:
         parsed = datetime.fromisoformat(value)
     except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        return parsed.replace(tzinfo=UTC)
+    return parsed.astimezone(UTC)
+
+
+def parse_review_date(review_by):
+    """Parsea un valor `review_by` del registry a datetime aware en UTC.
+
+    Espeja :func:`parse_iso_datetime`: los valores naive se asumen UTC y
+    los aware se convierten con ``astimezone(UTC)`` — nunca ``replace``,
+    que sobrescribiría el offset y movería el día UTC en silencio para
+    entradas con offset (p. ej. ``2026-09-18T22:00:00-04:00`` es día 19
+    en UTC, no 18). Retorna ``None`` ante valores ausentes o inválidos
+    para que el llamador salte la entrada.
+    """
+    if not review_by:
+        return None
+    if isinstance(review_by, str) and review_by.endswith("Z"):
+        review_by = review_by[:-1] + "+00:00"
+    try:
+        parsed = datetime.fromisoformat(review_by)
+    except (ValueError, TypeError):
         return None
     if parsed.tzinfo is None:
         return parsed.replace(tzinfo=UTC)

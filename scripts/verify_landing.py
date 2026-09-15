@@ -12,6 +12,12 @@ import tomllib
 ROOT_DIR = Path(__file__).resolve().parents[1]
 UTC = timezone.utc
 BUNDLE_PATH = ROOT_DIR / "data" / "normalized" / "hub_bundle.json"
+# Mirrors the confirmed host-wide Content-Security-Policy that Cloudflare serves for
+# tooltician.com (one Transform Rule shared by this landing and the tooltician-site
+# pages). Owner-confirmed 2026-09-13: includes the GA4 inline-bootstrap hash and the
+# region1.google-analytics.com GA4 regional hit endpoint required by the site, plus
+# chile-hub's GoatCounter/DuckDB-Wasm origins. Keep in sync with the Cloudflare rule
+# and platform/tooltician-site/docs/cloudflare-security-headers.md.
 PRODUCTION_CSP = (
     "default-src 'self'; base-uri 'self'; form-action 'self' https://formspree.io; "
     "frame-ancestors 'none'; object-src 'none'; "
@@ -20,10 +26,13 @@ PRODUCTION_CSP = (
     "'sha256-Jg+1a9BpA31iySvZGcqQpUpwXgkkS/6nQZErUKX8Es=' "
     "'sha256-AgdfQ26gNc5sf5Njp+l68xeI3QwSHUs5YBMqXmFAwUo=' "
     "'sha256-R+ThK1ExJbsszqXj3FZbVZ15e9+xFQeukNF1TYuHXp8=' "
-    "https://gc.zgo.at; "
+    "'sha256-4IyZhVv+RWju+1/qJEKCsZqtEjlfkQeg7lwN85qT6Y8=' "
+    "https://gc.zgo.at https://www.googletagmanager.com https://www.google-analytics.com; "
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
     "img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; "
-    "connect-src 'self' https://gc.zgo.at https://formspree.io; "
+    "connect-src 'self' blob: https://gc.zgo.at https://formspree.io "
+    "https://extensions.duckdb.org https://www.google-analytics.com "
+    "https://region1.google-analytics.com https://www.googletagmanager.com; "
     "manifest-src 'self'; media-src 'self'; worker-src 'self' blob:; upgrade-insecure-requests"
 )
 

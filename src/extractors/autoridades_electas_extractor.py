@@ -40,12 +40,18 @@ try:
     from src.extractors.base import (
         BaseExtractor,
         ensure_staging_directories,
+        write_raw_snapshot_atomic,
         write_staging_metadata,
     )
     from src.extractors.http_utils import fetch_with_retry
     from src.extractors.region_utils import region_nombre_a_codigo
 except ModuleNotFoundError:
-    from base import BaseExtractor, ensure_staging_directories, write_staging_metadata
+    from base import (
+        BaseExtractor,
+        ensure_staging_directories,
+        write_raw_snapshot_atomic,
+        write_staging_metadata,
+    )
     from http_utils import fetch_with_retry
     from region_utils import region_nombre_a_codigo
 
@@ -382,9 +388,8 @@ def process_autoridades_electas() -> str:
 
     extractor = AutoridadesElectasExtractor()
     raw = extractor.fetch()
-    with open(raw_path, "wb") as f:
-        assert isinstance(raw["diputados_xml"], bytes)
-        f.write(raw["diputados_xml"])
+    assert isinstance(raw["diputados_xml"], bytes)
+    write_raw_snapshot_atomic(raw_path, raw["diputados_xml"])
 
     df = extractor.normalize(raw)
     validation = extractor.validate(df, {"source_mode": "live"})

@@ -30,6 +30,29 @@ def write_staging_metadata(path: str, metadata: dict[str, Any]) -> None:
     os.replace(tmp_path, path)
 
 
+def write_raw_snapshot_atomic(path: str | Path, payload: Any) -> None:
+    """Persiste un snapshot crudo en data/raw/ de forma atómica.
+
+    Escribe a un hermano temporal y lo mueve con ``os.replace`` (mismo
+    patrón que :func:`write_staging_metadata`): un crash a mitad de
+    escritura nunca deja un archivo parcial que un lector (p. ej.
+    ``load_latest_raw_snapshot``) pueda confundir con un snapshot válido.
+    Acepta dict/list (se serializan a JSON), ``str`` o ``bytes``.
+    """
+    path_str = os.fspath(path)
+    tmp_path = path_str + ".tmp"
+    if isinstance(payload, (dict, list)):
+        with open(tmp_path, "w", encoding="utf-8") as f:
+            json.dump(payload, f, ensure_ascii=False, indent=2)
+    elif isinstance(payload, bytes):
+        with open(tmp_path, "wb") as f:
+            f.write(payload)
+    else:
+        with open(tmp_path, "w", encoding="utf-8") as f:
+            f.write(payload)
+    os.replace(tmp_path, path_str)
+
+
 class BaseExtractor(ABC):
     """Contrato común para extractores de chile-hub.
 

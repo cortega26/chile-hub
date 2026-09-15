@@ -17,6 +17,7 @@ from src.builders._shared import (
     UTC,
 )
 from src.builders.io_utils import replace_delimited_block, write_json_atomic
+from src.pipeline_status_utils import parse_review_date
 
 
 def write_hub_health_json(health):
@@ -557,8 +558,8 @@ def build_source_readiness(pipeline_metadata):
         stalled = False
         review_status = "ok"
         if review_by:
-            try:
-                review_date = datetime.fromisoformat(review_by).replace(tzinfo=UTC)
+            review_date = parse_review_date(review_by)
+            if review_date is not None:
                 days_until_review = (review_date - datetime.now(UTC)).days
                 stalled = days_until_review < 0
                 # Señal proactiva de cadencia (Plan 083): al acercarse el
@@ -570,8 +571,6 @@ def build_source_readiness(pipeline_metadata):
                 # decisión de carril. Con 90, hoy las 4 fechas próximas
                 # (36-69 días) quedan señaladas.
                 review_status = "due" if stalled else "upcoming" if days_until_review < 90 else "ok"
-            except (ValueError, TypeError):
-                pass
 
         # Acción recomendada
         recommended_action = src.get("next_action", "—")
