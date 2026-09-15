@@ -22,7 +22,7 @@
 |------|--------|------|--------|
 | 0 Baseline | — | 1/1 | DONE (2026-09-15) |
 | 1 Correctness S | 086–090 | 5/5 | DONE (2026-09-15, branch advisor/wave-1; suite 1027 passed) |
-| 2 Correctness/Perf M | 091–093 | 0/3 | TODO |
+| 2 Correctness/Perf M | 091–093 | 2/3 | 092, 093 DONE; 091 REVERTED (ver backlog) |
 | 3 Deps/Tooling/Sec | 094–096 | 0/3 | TODO |
 | 4 Docs agentes | 097–098 | 0/2 | TODO |
 | 5 Deuda+spikes | 099–100 | 0/2 | TODO |
@@ -36,7 +36,7 @@
 - [x] 088 Cobertura catálogo→validación + 3 exenciones explícitas (P1/S, 48a60be)
 - [x] 089 bcentral UTC×3 + submits espaciados (P1/S, fbddeaa)
 - [x] 090 Frames pandas compartidos + skip pre-conversión (P1/S, 62143ac)
-- [ ] 091 Opcionales ausentes ruidosos + fallback sintético strict (P1/M, —)
+- [ ] 091 Opcionales ausentes ruidosos + fallback sintético strict (P1/M) — REVERTED 2026-09-15 (9b7641c): el abort en build rompe la garantía Phase-1 de core-build sin opcionales (7+1 tests); el gate publication ya rechaza missing/non-live/stale. Devuelto al backlog para decisión del mantenedor (alternativa: cerrar como cubierto por el gate).
 - [ ] 092 Paralelizar formatos + `indicadores_hoy` = última fecha (P2/M, tras 090)
 - [ ] 093 Scans O(K·N)→`partition_by` + allowlist única + cache acotado (P2/M, —)
 - [ ] 094 Toolchain única: ruff/mypy una versión + `make typecheck/audit/sec` (P1/S, —)

@@ -163,7 +163,7 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 | 088 | [Cobertura catálogo→validación: gate + exenciones explícitas](088-catalog-validation-coverage.md) | P1 | S | LOW | — | DONE (2026-09-15, commit 48a60be — regla catálogo−registered + 3 exenciones; branch advisor/wave-1) |
 | 089 | [bcentral: fechas a UTC y throttle real](089-bcentral-tz-throttle.md) | P1 | S | LOW | — | DONE (2026-09-15, commit fbddeaa — UTC×3 + submits espaciados; branch advisor/wave-1) |
 | 090 | [Una sola conversión `to_pandas()` + descarte pre-conversión](090-single-pandas-conversion.md) | P1 | S | LOW | — | DONE (2026-09-15, commit 62143ac — frames compartidos, skip pre-conversión, equivalencia byte-probada; branch advisor/wave-1) |
-| 091 | [Opcionales ruidosos + fallback sintético strict](091-optional-datasets-strict.md) | P1 | M | MED | — | TODO |
+| 091 | [Opcionales ruidosos + fallback sintético strict](091-optional-datasets-strict.md) | P1 | M | MED | — | TODO (REVERTED 2026-09-15: f0d917d→9b7641c — choca con garantía Phase-1 "omitted optional does not block core build"; el gate publication ya cubre los 3 casos. Requiere decisión del mantenedor o cierre como cubierto) |
 | 092 | [Paralelizar formatos + `indicadores_hoy` = última fecha](092-parallel-formats-hoy-payload.md) | P2 | M | MED | 090 | TODO |
 | 093 | [Scans O(K·N)→`partition_by` + allowlist única + cache acotado](093-validation-scans-cache.md) | P2 | M | LOW | — | TODO |
 | 094 | [Toolchain única + targets locales](094-dx-single-toolchain.md) | P1 | S | LOW | — | TODO |
