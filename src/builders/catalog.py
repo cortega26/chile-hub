@@ -1,9 +1,8 @@
 """Escritura del metadata del pipeline y del catálogo de datasets."""
 
 import os
-from datetime import datetime
-
 import tomllib
+from datetime import datetime
 
 from src.builders._shared import DATASET_CATALOG_CONFIG, NORMALIZED_DIR, ROOT_DIR, UTC
 from src.builders.io_utils import write_json_atomic

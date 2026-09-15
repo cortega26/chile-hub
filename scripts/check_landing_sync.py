@@ -25,9 +25,8 @@ NO cubre la tabla de capas del README — de eso se encarga `scripts/sync_docs.p
 
 import re
 import sys
-from pathlib import Path
-
 import tomllib
+from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT_DIR))

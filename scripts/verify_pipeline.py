@@ -1,11 +1,11 @@
 import argparse
 import sys
+import tomllib
 import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 
 import polars as pl
-import tomllib
 
 UTC = timezone.utc
 

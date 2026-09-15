@@ -2,12 +2,11 @@ import contextlib
 import json
 import socket
 import threading
+import tomllib
 from datetime import datetime, timezone
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse
-
-import tomllib
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 UTC = timezone.utc
