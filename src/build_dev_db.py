@@ -64,6 +64,8 @@ from src.builders.datasets import (  # noqa: E402
 from src.builders.dcat_catalog import write_dcat_catalog_json  # noqa: E402
 from src.builders.doc_sync import sync_all_docs  # noqa: E402
 from src.builders.formats import (  # noqa: E402
+    EXCEL_MAX_ROWS_SKIP,
+    SQLITE_MAX_ROWS,
     build_duckdb,
     build_excel,
     build_flat_files,
@@ -739,9 +741,23 @@ def _write_data_artifacts(dfs):
     if df_calidad_aire is not None:
         extra_tables["calidad_aire"] = df_calidad_aire
 
-    # Convertir tablas extra a pandas UNA sola vez para SQLite y Excel.
-    # Empresas tiene ~1.57M filas: la conversión es costosa y no debe duplicarse.
-    extra_tables_pd = {name: df.to_pandas() for name, df in extra_tables.items()}
+    # Convertir a pandas UNA sola vez para SQLite y Excel (Plan 090).
+    # Empresas tiene ~1.57M filas: la conversión es costosa y no debe
+    # duplicarse — y las tablas que ambos formatos descartan por masivas ni
+    # siquiera se convierten (skip decidido por height Polars, sin convertir).
+    _pd_max_rows = max(SQLITE_MAX_ROWS, EXCEL_MAX_ROWS_SKIP)
+    extra_tables_pd = {
+        name: df.to_pandas() for name, df in extra_tables.items() if df.height <= _pd_max_rows
+    }
+    base_tables_pd = {
+        "regiones": df_regiones.to_pandas(),
+        "provincias": df_provincias.to_pandas(),
+        "comunas": df_comunas.to_pandas(),
+        "indicadores": df_indicadores.to_pandas(),
+        "censo_comunal": df_censo.to_pandas(),
+        "establecimientos_salud": df_salud.to_pandas(),
+        "establecimientos_educacionales": df_educacionales.to_pandas(),
+    }
 
     # Compilar entregables
     log.info("artifacts_build_start", total_formats=4)
@@ -766,8 +782,9 @@ def _write_data_artifacts(dfs):
         df_salud,
         df_educacionales,
         extra_tables,
-        extra_tables_pd,
-        os.path.join(NORMALIZED_DIR, "chile_data.db"),
+        extra_tables_pd=extra_tables_pd,
+        base_tables_pd=base_tables_pd,
+        output_path=os.path.join(NORMALIZED_DIR, "chile_data.db"),
     )
     log.info("artifact_format_done", format="sqlite", progress="2/4")
     build_excel(
@@ -779,8 +796,9 @@ def _write_data_artifacts(dfs):
         df_salud,
         df_educacionales,
         extra_tables,
-        extra_tables_pd,
-        os.path.join(NORMALIZED_DIR, "chile_data_latest.xlsx"),
+        extra_tables_pd=extra_tables_pd,
+        base_tables_pd=base_tables_pd,
+        output_path=os.path.join(NORMALIZED_DIR, "chile_data_latest.xlsx"),
     )
     log.info("artifact_format_done", format="excel", progress="3/4")
     build_flat_files(

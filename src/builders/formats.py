@@ -13,6 +13,13 @@ import polars as pl
 from src.builders._shared import DATASET_CATALOG_CONFIG, EXCEL_MAX_ROWS, NORMALIZED_DIR
 from src.builders.io_utils import pd_excel_writer, write_json_atomic, write_parquet_atomic
 
+# Umbrales de skip para tablas masivas (Plan 090): SQLite no es eficiente con
+# tablas gigantes y Excel tiene límite físico. Se exponen a nivel módulo para
+# que el orquestador pueda decidir el skip ANTES de pagar to_pandas().
+SQLITE_MAX_ROWS = 500_000
+SQLITE_MAX_VARS = 999
+EXCEL_MAX_ROWS_SKIP = 500_000
+
 
 def build_duckdb(
     df_regiones,
@@ -90,25 +97,44 @@ def build_sqlite(
     extra_tables,
     extra_tables_pd=None,
     output_path=None,
+    # Nuevo último (Plan 090): va al final para no romper callers que pasan
+    # output_path posicionalmente (tests/test_pipeline_logic.py::ExcelGuardTests).
+    base_tables_pd=None,
 ):
     print(f"Compilando base de datos SQLite en: {output_path}")
     tmp_path = output_path + ".tmp"
     if os.path.exists(tmp_path):
         os.remove(tmp_path)
 
-    # Convertimos a Pandas para inserción con to_sql de pandas
-    df_regiones_pd = df_regiones.to_pandas()
-    df_provincias_pd = df_provincias.to_pandas()
-    df_comunas_pd = df_comunas.to_pandas()
-    df_indicadores_pd = df_indicadores.to_pandas()
-    df_censo_pd = df_censo.to_pandas()
-    df_salud_pd = df_salud.to_pandas()
-    df_educacionales_pd = df_educacionales.to_pandas()
+    # Convertimos a Pandas para inserción con to_sql de pandas. Si el
+    # orquestador ya convirtió las 7 tablas base una sola vez, se reutilizan
+    # (Plan 090); si no, se convierten aquí (compatibilidad con callers directos).
+    if base_tables_pd is None:
+        base_tables_pd = {
+            "regiones": df_regiones.to_pandas(),
+            "provincias": df_provincias.to_pandas(),
+            "comunas": df_comunas.to_pandas(),
+            "indicadores": df_indicadores.to_pandas(),
+            "censo_comunal": df_censo.to_pandas(),
+            "establecimientos_salud": df_salud.to_pandas(),
+            "establecimientos_educacionales": df_educacionales.to_pandas(),
+        }
+    df_regiones_pd = base_tables_pd["regiones"]
+    df_provincias_pd = base_tables_pd["provincias"]
+    df_comunas_pd = base_tables_pd["comunas"]
+    df_indicadores_pd = base_tables_pd["indicadores"]
+    df_censo_pd = base_tables_pd["censo_comunal"]
+    df_salud_pd = base_tables_pd["establecimientos_salud"]
+    df_educacionales_pd = base_tables_pd["establecimientos_educacionales"]
     if extra_tables_pd is None:
-        extra_tables_pd = {name: df.to_pandas() for name, df in extra_tables.items()}
+        extra_tables_pd = {}
 
     # SQLite no maneja Date de forma nativa como tipo fecha real (los guarda como string ISO)
-    # Por lo tanto, convertimos las fechas a string ISO antes de guardar
+    # Por lo tanto, convertimos las fechas a string ISO antes de guardar.
+    # OJO: base_tables_pd es COMPARTIDO con build_excel (Plan 090) — mutar el
+    # frame lo degradaría a texto también en el XLSX (fecha datetime → str).
+    # Se copia antes de mutar.
+    df_indicadores_pd = base_tables_pd["indicadores"].copy()
     df_indicadores_pd["fecha"] = df_indicadores_pd["fecha"].astype(str)
 
     conn = sqlite3.connect(tmp_path)
@@ -125,20 +151,32 @@ def build_sqlite(
         )
         # SQLite no es eficiente para tablas masivas.  Omitimos las que
         # superen el umbral; DuckDB y Parquet cubren ese caso de uso.
-        _SQLITE_MAX_ROWS = 500_000
-        _SQLITE_MAX_VARS = 999
-        for table_name, df_extra in extra_tables_pd.items():
-            num_rows = len(df_extra)
-            if num_rows > _SQLITE_MAX_ROWS:
+        # El tamaño se decide sobre el frame Polars ANTES de convertir
+        # (Plan 090): no se paga to_pandas() por tablas que se descartan.
+        for table_name, df_extra_pl in extra_tables.items():
+            num_rows = df_extra_pl.height
+            if num_rows > SQLITE_MAX_ROWS:
                 print(
                     f"  Omite SQLite para {table_name} ({num_rows:,} filas > "
-                    f"{_SQLITE_MAX_ROWS:,}) — usa DuckDB o Parquet.",
+                    f"{SQLITE_MAX_ROWS:,}) — usa DuckDB o Parquet.",
+                    flush=True,
+                )
+                continue
+            df_extra = extra_tables_pd.get(table_name)
+            if df_extra is None:
+                df_extra = df_extra_pl.to_pandas()
+            elif len(df_extra) > SQLITE_MAX_ROWS:
+                # Backstop legacy: dict provisto inconsistente con el frame
+                # Polars (antes el skip se decidía sobre el dict convertido).
+                print(
+                    f"  Omite SQLite para {table_name} ({len(df_extra):,} filas > "
+                    f"{SQLITE_MAX_ROWS:,}) — usa DuckDB o Parquet.",
                     flush=True,
                 )
                 continue
             num_cols = len(df_extra.columns)
             if num_rows > 10_000 and num_cols > 0:
-                chunksize = _SQLITE_MAX_VARS // num_cols
+                chunksize = SQLITE_MAX_VARS // num_cols
                 df_extra.to_sql(
                     table_name,
                     conn,
@@ -188,18 +226,32 @@ def build_excel(
     extra_tables,
     extra_tables_pd=None,
     output_path=None,
+    # Nuevo último (Plan 090): ver nota equivalente en build_sqlite.
+    base_tables_pd=None,
 ):
     print(f"Generando archivo Excel consolidado para no técnicos en: {output_path}")
-    # Convertir a Pandas para exportar de forma robusta con XlsxWriter
-    df_regiones_pd = df_regiones.to_pandas()
-    df_provincias_pd = df_provincias.to_pandas()
-    df_comunas_pd = df_comunas.to_pandas()
-    df_indicadores_pd = df_indicadores.to_pandas()
-    df_censo_pd = df_censo.to_pandas()
-    df_salud_pd = df_salud.to_pandas()
-    df_educacionales_pd = df_educacionales.to_pandas()
+    # Convertir a Pandas para exportar de forma robusta con XlsxWriter.
+    # Igual que build_sqlite: reutilizar el dict compartido si viene dado
+    # (Plan 090), o convertir aquí para callers directos.
+    if base_tables_pd is None:
+        base_tables_pd = {
+            "regiones": df_regiones.to_pandas(),
+            "provincias": df_provincias.to_pandas(),
+            "comunas": df_comunas.to_pandas(),
+            "indicadores": df_indicadores.to_pandas(),
+            "censo_comunal": df_censo.to_pandas(),
+            "establecimientos_salud": df_salud.to_pandas(),
+            "establecimientos_educacionales": df_educacionales.to_pandas(),
+        }
+    df_regiones_pd = base_tables_pd["regiones"]
+    df_provincias_pd = base_tables_pd["provincias"]
+    df_comunas_pd = base_tables_pd["comunas"]
+    df_indicadores_pd = base_tables_pd["indicadores"]
+    df_censo_pd = base_tables_pd["censo_comunal"]
+    df_salud_pd = base_tables_pd["establecimientos_salud"]
+    df_educacionales_pd = base_tables_pd["establecimientos_educacionales"]
     if extra_tables_pd is None:
-        extra_tables_pd = {name: df.to_pandas() for name, df in extra_tables.items()}
+        extra_tables_pd = {}
 
     # Limpieza visual y formateo para Excel
     # En Excel, queremos que el Código Comuna siga siendo un string para que no se pierdan los ceros iniciales
@@ -215,15 +267,27 @@ def build_excel(
         df_educacionales_pd.to_excel(
             writer, sheet_name="Establecimientos Educacionales", index=False
         )
-        # Escribir tablas extra, dividiendo las que excedan el límite de filas de Excel
-        _EXCEL_MAX_ROWS_SKIP = 500_000
+        # Escribir tablas extra, dividiendo las que excedan el límite de filas de Excel.
+        # El tamaño se decide sobre el frame Polars ANTES de convertir
+        # (Plan 090): no se paga to_pandas() por tablas que se descartan.
         extra_sheet_names = {}  # table_name -> [sheet_names]
-        for table_name, df_extra in extra_tables_pd.items():
-            num_rows = len(df_extra)
-            if num_rows > _EXCEL_MAX_ROWS_SKIP:
+        for table_name, df_extra_pl in extra_tables.items():
+            num_rows = df_extra_pl.height
+            if num_rows > EXCEL_MAX_ROWS_SKIP:
                 print(
                     f"  Omite Excel para {table_name} ({num_rows:,} filas > "
-                    f"{_EXCEL_MAX_ROWS_SKIP:,}) — usa DuckDB o Parquet.",
+                    f"{EXCEL_MAX_ROWS_SKIP:,}) — usa DuckDB o Parquet.",
+                    flush=True,
+                )
+                continue
+            df_extra = extra_tables_pd.get(table_name)
+            if df_extra is None:
+                df_extra = df_extra_pl.to_pandas()
+            elif len(df_extra) > EXCEL_MAX_ROWS_SKIP:
+                # Backstop legacy: ver comentario equivalente en build_sqlite.
+                print(
+                    f"  Omite Excel para {table_name} ({len(df_extra):,} filas > "
+                    f"{EXCEL_MAX_ROWS_SKIP:,}) — usa DuckDB o Parquet.",
                     flush=True,
                 )
                 continue

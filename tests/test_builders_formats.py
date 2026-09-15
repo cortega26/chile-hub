@@ -474,6 +474,46 @@ class TestBuildSQLite:
             finally:
                 conn.close()
 
+    def test_sqlite_oversized_table_skipped_without_conversion(self):
+        """Plan 090: la tabla extra >500k se omite SIN convertirla a pandas
+        (el skip se decide por height Polars, antes de to_pandas)."""
+        dfs = _make_fixtures()
+        oversized = {"oversized_test": _make_oversized_table()}
+
+        converted_heights = []
+        orig_to_pandas = pl.DataFrame.to_pandas
+
+        def spy_to_pandas(self, *args, **kwargs):
+            converted_heights.append(self.height)
+            return orig_to_pandas(self, *args, **kwargs)
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db_path = os.path.join(tmpdir, "test.db")
+            with patch.object(pl.DataFrame, "to_pandas", spy_to_pandas):
+                build_sqlite(
+                    dfs["regiones"],
+                    dfs["provincias"],
+                    dfs["comunas"],
+                    dfs["indicadores"],
+                    dfs["censo_comunal"],
+                    dfs["establecimientos_salud"],
+                    dfs["establecimientos_educacionales"],
+                    extra_tables=oversized,
+                    output_path=db_path,
+                )
+
+            assert 500_001 not in converted_heights, "la tabla masiva no debió convertirse a pandas"
+
+            conn = sqlite3.connect(db_path)
+            try:
+                cursor = conn.cursor()
+                cursor.execute(
+                    "SELECT name FROM sqlite_master WHERE type='table' AND name='oversized_test'"
+                )
+                assert cursor.fetchone() is None
+            finally:
+                conn.close()
+
     def test_sqlite_oversized_table_skipped(self):
         """Tabla extra que supera 500k filas se omite en SQLite."""
         dfs = _make_fixtures()
