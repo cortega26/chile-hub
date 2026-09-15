@@ -12,6 +12,39 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.36.2 - 2026-09-15
+
+### Corregido
+
+- **099-seguimiento**: Inventario doc_sync + ancora base.py
+  ([`261374b`](https://github.com/cortega26/chile-hub/commit/261374bc87bc632cfa07a8cb2d42ceb58c35c451))
+
+### Documentación
+
+- **097**: Counts, convencion de capas y criterios como puntero
+  ([`de12198`](https://github.com/cortega26/chile-hub/commit/de12198892d5035bf3dffd231b1264262126b97d))
+
+- **098**: Un hecho un dueño + anti-drift a 3 docs + regex fix
+  ([`4fdc4ce`](https://github.com/cortega26/chile-hub/commit/4fdc4ce054be8493e779a11c35c96ef748a4f8b7))
+
+- **wave-4**: Marca 097-098 DONE con commits y scoreboard
+  ([`9463983`](https://github.com/cortega26/chile-hub/commit/9463983dee073384c2ccad2937999977f2ef8188))
+
+- **wave-4**: SHAs de tracking tras rebase sobre 1.36.1
+  ([`3976669`](https://github.com/cortega26/chile-hub/commit/39766697937ea1080e66da35d32fdcf5b929648e))
+
+- **wave-5**: Marca 099-100 DONE con evidencia y scoreboard
+  ([`3a9f1a8`](https://github.com/cortega26/chile-hub/commit/3a9f1a888de5ad440fee576a0e1b6d4493d2d515))
+
+### Refactorizado
+
+- **deuda**: _sinim_shared + idiom sys.path congelado
+  ([`6763d00`](https://github.com/cortega26/chile-hub/commit/6763d003308a3833176abd419278d9bdfb6daab9))
+
+- **sinim**: Normalize/metadata compartidos en _sinim_shared
+  ([`8c5123c`](https://github.com/cortega26/chile-hub/commit/8c5123c317fe480b9894c4de22eeb6261210489f))
+
+
 ## 1.36.1 - 2026-09-15
 
 ### Corregido
