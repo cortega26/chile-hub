@@ -972,13 +972,19 @@ def sync_readme_layers_table(check_only=False):
         license_label = _LICENSE_LABELS.get(ds_name, "—")
 
         has_outputs = bool(cfg.get("outputs"))
+        # Capas degradadas (descripción con prefijo DEPRECATED): ni
+        # consumibles ni "próximamente" — estado terminal propio.
+        is_deprecated = cfg.get("description", "").startswith("DEPRECATED")
 
         source_mode = h.get("source_mode", "unknown")
         coverage_note = cfg.get("coverage_note", "")
         coverage_status = h.get("coverage_status", "unknown")
 
         # Indicador de modo
-        if not has_outputs:
+        if is_deprecated:
+            mode_emoji = "🚫 deprecated"
+            registros = "—"
+        elif not has_outputs:
             mode_emoji = "🔜 próximamente"
             registros = "—"
         elif coverage_note.startswith("parcial"):
@@ -1032,13 +1038,15 @@ def sync_readme_layers_table(check_only=False):
 
         # Advertencia para capas parciales
         name_display = f"**{display_name}**"
-        if not has_outputs:
+        if is_deprecated:
+            name_display += " 🚫"
+        elif not has_outputs:
             name_display += " 🆕"
         elif coverage_note.startswith("parcial"):
             name_display += " ⚠️"
 
         # Etiqueta de actualización
-        if not has_outputs:
+        if is_deprecated or not has_outputs:
             actualizacion = "—"
         else:
             freshness_label = cfg.get("freshness_policy", {}).get("label", "")
@@ -1066,6 +1074,8 @@ def sync_readme_layers_table(check_only=False):
         " Capa candidata, no completa.\n"
         "> **🔜 próximamente**: capa en carril candidate — extractor implementado,"
         " datos no incluidos en el bundle público.\n"
+        "> **🚫 deprecated**: capa degradada a rechazada — sin mantención ni"
+        " bundle; su doc queda como referencia histórica.\n"
         "> Para auditar el estado exacto de cada capa:"
         " `chile-hub provenance` y `chile-hub health`."
     )

@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-09-15T02:05:46.688089+00:00",
+  "generated_at_utc": "2026-09-15T12:16:25.432629+00:00",
   "overall_status": "warn",
   "dataset_count": 22,
   "retired_count": 1,
@@ -19,7 +19,7 @@
   "unknown_coverage_count": 0,
   "drifted_count": 1,
   "warning_count": 7,
-  "review_approaching_count": 5,
+  "review_approaching_count": 4,
   "review_due_count": 0,
   "top_issue": {
     "dataset": "indicadores",

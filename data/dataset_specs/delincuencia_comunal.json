@@ -23,10 +23,10 @@
     "live_ready": false,
     "fallback_allowed": true,
     "publish_blocking": true,
-    "review_by": "2026-09-21",
+    "review_by": "2027-09-15",
     "stalled_after_days": 90,
     "owner": "core",
-    "next_action": "Monitorear estabilidad del scraping; buscar fuente estructurada oficial (datos.gob.cl, export CEAD). Degradar a rejected si no madura para review_by."
+    "next_action": "DEGRADADO a rejected 2026-09-15 (review anticipada): en 90+ días no apareció descarga estructurada oficial (datos.gob.cl solo tiene bulk 2015 con links muertos; portal CEAD con protección anti-bots y solo PDF/presentaciones) y el dataset nunca fue redistribuible. Extractor neutralizado (NotImplementedError) y removido del scrape mensual. Reevaluar solo si el CEAD publica descarga oficial."
   },
   "reuse_policy": {
     "status": "public-api-review-terms",
@@ -41,7 +41,7 @@
     "label": "mensual"
   },
   "documentation": {
-    "description": "Casos policiales de Delitos de Mayor Connotación Social (DMCS) y otras categorías por comuna y mes, reportados por Carabineros y PDI al Ministerio del Interior. Fuente: CEAD (Centro de Estudios y Análisis del Delito), Subsecretaría de Prevención del Delito.",
+    "description": "DEPRECATED 2026-09-15: Casos policiales de Delitos de Mayor Connotación Social (DMCS) y otras categorías por comuna y mes. Sin fuente estructurada oficial (solo scraping frágil) y no redistribuible; extractor neutralizado y fuera del scrape mensual. Ver docs/datasets/delincuencia_comunal.md.",
     "path": "docs/datasets/delincuencia_comunal.md",
     "usage_examples": {
       "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars(\"delincuencia_comunal\")\n# Casos de robos violentos por comuna en 2024\nrobos = df.filter(pl.col(\"familia_delito\") == \"robos_violentos\")",

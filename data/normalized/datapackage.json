@@ -2,9 +2,9 @@
   "name": "chile-hub",
   "title": "chile-hub -- Datos publicos de Chile curados",
   "description": "Capa de datos reproducible y curada sobre datasets publicos oficiales de Chile: geografia, demografia, salud, educacion, finanzas municipales e indicadores.",
-  "version": "1.31.1",
+  "version": "1.34.0",
   "homepage": "https://tooltician.com/chile-hub/",
-  "created": "2026-09-15T02:05:46.695758+00:00",
+  "created": "2026-09-15T12:16:25.439075+00:00",
   "resources": [
     {
       "name": "regiones",

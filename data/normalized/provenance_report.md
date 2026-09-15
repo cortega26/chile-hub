@@ -1,34 +1,34 @@
 # chile-hub provenance report
 
-- `generated_at_utc`: `2026-09-15T02:05:46.688089+00:00`
+- `generated_at_utc`: `2026-09-15T12:16:25.432629+00:00`
 - `dataset_count`: `22`
 - `live_count`: `21`
 - `fallback_count`: `1`
 
 | Dataset | Source | Mode | Detail | Refreshed | Freshness | Warnings | Reuse |
 | :--- | :--- | :--- | :--- | :--- | :--- | ---: | :--- |
-| `regiones` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-08-11T19:42:23.780877+00:00` | `fresh (822.39h / 2160h)` | 0 | `open-attribution` |
-| `provincias` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-08-11T19:42:23.780877+00:00` | `fresh (822.39h / 2160h)` | 0 | `open-attribution` |
-| `comunas` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-08-11T19:42:23.780877+00:00` | `fresh (822.39h / 2160h)` | 0 | `open-attribution` |
-| `comunas_enriquecidas` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-08-11T19:42:23.780877+00:00` | `fresh (822.39h / 2160h)` | 0 | `open-attribution` |
-| `indicadores` | Banco Central de Chile (via mindicador.cl) | `live` | `public_api_with_published_backfill` | `2026-08-13T16:22:04.519950+00:00` | `stale (777.73h / 72h)` | 2 | `open-attribution` |
-| `censo_comunal` | Instituto Nacional de Estadisticas - Censo 2024 | `live` | `official_xlsx` | `2026-08-11T19:42:36.653758+00:00` | `fresh (822.39h / 87600h)` | 0 | `open-attribution` |
-| `establecimientos_salud` | Ministerio de Salud - Establecimientos de Salud | `live` | `datos_gob_csv` | `2026-08-11T19:42:40.802326+00:00` | `fresh (822.38h / 1080h)` | 0 | `open-attribution` |
-| `establecimientos_educacionales` | Ministerio de Educación - Directorio Oficial de Establecimientos | `live` | `mineduc_datos_abiertos_rar` | `2026-08-11T19:42:41.413175+00:00` | `fresh (822.38h / 8760h)` | 0 | `open-attribution` |
-| `censo_hogares_viviendas` | Instituto Nacional de Estadisticas - Censo 2024 | `live` | `official_xlsx` | `2026-08-22T09:28:35.974071+00:00` | `fresh (568.62h / 87600h)` | 0 | `open-attribution` |
-| `distritos_electorales` | BCN / Biblioteca del Congreso Nacional de Chile | `live` | `bcn_electoral_mapping_generated` | `2026-08-11T19:42:40.945699+00:00` | `fresh (822.38h / 87600h)` | 0 | `open-attribution` |
-| `finanzas_municipales` | SINIM - SUBDERE | `monthly` | `curated_fallback_pending_direct_export` | `2026-09-01T03:04:24.987281+00:00` | `fresh (335.02h / 8760h)` | 0 | `public-api-review-terms` |
-| `resultados_educacionales` | Centro de Estudios MINEDUC - Rendimiento 2024 | `live` | `mineduc_rendimiento_2024_rar_agregado_por_comuna` | `2026-08-11T19:42:44.201011+00:00` | `fresh (822.38h / 8760h)` | 0 | `open-attribution` |
-| `indicadores_urbanos_siedu` | INE - Sistema de Indicadores y Estándares de Desarrollo Urbano | `live` | `ine_siedu_xlsm_cinco_mediciones_2018_2022` | `2026-08-11T19:42:46.514973+00:00` | `fresh (822.38h / 8760h)` | 1 | `open-attribution` |
-| `perfil_territorial_comunal` | chile-hub | `live` | `derived_from_validated_chile_hub_layers` | `2026-09-15T02:05:46.685389+00:00` | `fresh (0.0h / 1080h)` | 0 | `open-attribution` |
-| `empresas` | Ministerio de Economia, Fomento y Turismo - Registro de Empresas y Sociedades (RES) | `live` | `datos_gob_cl_ckan_api` | `2026-08-11T19:49:00.139637+00:00` | `fresh (822.28h / 1080h)` | 1 | `open-attribution` |
-| `pobreza_comunal` | Observatorio Social — Ministerio de Desarrollo Social y Familia | `live` | `Estimaciones de Pobreza Comunal vía SAE desde encuesta CASEN` | `2026-08-11T19:49:01.701838+00:00` | `fresh (822.28h / 175200h)` | 1 | `open-attribution` |
-| `consumo_electrico_comunal` | CNE — Energía Abierta | `fallback` | `Consumo eléctrico anual por comuna y tipo de cliente` | `2026-08-11T19:49:06.413089+00:00` | `fresh (822.28h / 17520h)` | 3 | `open-attribution` |
-| `partidos_politicos` | Cámara de Diputadas y Diputados (datos abiertos) + SERVEL | `live` | `WSComun.asmx/retornarPartidosPoliticos + servel.cl/partidos-politicos (estado legal)` | `2026-08-11T19:49:08.719490+00:00` | `fresh (822.28h / 87600h)` | 1 | `open-attribution` |
-| `autoridades_electas` | Cámara de Diputadas y Diputados + Senado de Chile | `live` | `WSDiputado.asmx/retornarDiputadosPeriodoActual + camara.cl + senado.cl (Scrapling)` | `2026-08-11T19:50:16.685023+00:00` | `fresh (822.26h / 87600h)` | 0 | `open-attribution` |
-| `estadisticas_vitales` | Instituto Nacional de Estadísticas (INE) — Estadísticas Vitales | `live` | `Anuarios de Estadísticas Vitales (tabulados XLSX, tabla 1.2.2-04 por comuna de residencia). Solo definitivos: los boletines provisionales del INE no publican desglose comunal.` | `2026-09-15T00:40:44.151814+00:00` | `fresh (1.42h / 8760h)` | 0 | `open-attribution` |
-| `permisos_edificacion` | MINVU — Centro de Estudios de Ciudad y Territorio (CEDOC) | `live` | `Viviendas en unidades y superficie (m2) por comuna y año, serie desde 2002 (MINVU CEDOC, en base a permisos otorgados por las Direcciones de Obras Municipales e INE).` | `2026-09-15T00:39:47.956228+00:00` | `fresh (1.43h / 1080h)` | 0 | `open-attribution` |
-| `calidad_aire` | SINCA — Ministerio del Medio Ambiente | `live` | `Promedios diarios por estación y contaminante (MP2.5, MP10, SO2, NO2, CO, O3) desde el JSON del SINCA. Cobertura parcial por diseño (~65 comunas con estación). Serie incremental desde la primera cosecha.` | `2026-09-15T01:10:14.486735+00:00` | `fresh (0.93h / 72h)` | 1 | `public-api-review-terms` |
+| `regiones` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-08-11T19:42:23.780877+00:00` | `fresh (832.57h / 2160h)` | 0 | `open-attribution` |
+| `provincias` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-08-11T19:42:23.780877+00:00` | `fresh (832.57h / 2160h)` | 0 | `open-attribution` |
+| `comunas` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-08-11T19:42:23.780877+00:00` | `fresh (832.57h / 2160h)` | 0 | `open-attribution` |
+| `comunas_enriquecidas` | BCN ArcGIS | `live` | `bcn_arcgis` | `2026-08-11T19:42:23.780877+00:00` | `fresh (832.57h / 2160h)` | 0 | `open-attribution` |
+| `indicadores` | Banco Central de Chile (via mindicador.cl) | `live` | `public_api_with_published_backfill` | `2026-08-13T16:22:04.519950+00:00` | `stale (787.91h / 72h)` | 2 | `open-attribution` |
+| `censo_comunal` | Instituto Nacional de Estadisticas - Censo 2024 | `live` | `official_xlsx` | `2026-08-11T19:42:36.653758+00:00` | `fresh (832.56h / 87600h)` | 0 | `open-attribution` |
+| `establecimientos_salud` | Ministerio de Salud - Establecimientos de Salud | `live` | `datos_gob_csv` | `2026-08-11T19:42:40.802326+00:00` | `fresh (832.56h / 1080h)` | 0 | `open-attribution` |
+| `establecimientos_educacionales` | Ministerio de Educación - Directorio Oficial de Establecimientos | `live` | `mineduc_datos_abiertos_rar` | `2026-08-11T19:42:41.413175+00:00` | `fresh (832.56h / 8760h)` | 0 | `open-attribution` |
+| `censo_hogares_viviendas` | Instituto Nacional de Estadisticas - Censo 2024 | `live` | `official_xlsx` | `2026-08-22T09:28:35.974071+00:00` | `fresh (578.8h / 87600h)` | 0 | `open-attribution` |
+| `distritos_electorales` | BCN / Biblioteca del Congreso Nacional de Chile | `live` | `bcn_electoral_mapping_generated` | `2026-08-11T19:42:40.945699+00:00` | `fresh (832.56h / 87600h)` | 0 | `open-attribution` |
+| `finanzas_municipales` | SINIM - SUBDERE | `monthly` | `curated_fallback_pending_direct_export` | `2026-09-01T03:04:24.987281+00:00` | `fresh (345.2h / 8760h)` | 0 | `public-api-review-terms` |
+| `resultados_educacionales` | Centro de Estudios MINEDUC - Rendimiento 2024 | `live` | `mineduc_rendimiento_2024_rar_agregado_por_comuna` | `2026-08-11T19:42:44.201011+00:00` | `fresh (832.56h / 8760h)` | 0 | `open-attribution` |
+| `indicadores_urbanos_siedu` | INE - Sistema de Indicadores y Estándares de Desarrollo Urbano | `live` | `ine_siedu_xlsm_cinco_mediciones_2018_2022` | `2026-08-11T19:42:46.514973+00:00` | `fresh (832.56h / 8760h)` | 1 | `open-attribution` |
+| `perfil_territorial_comunal` | chile-hub | `live` | `derived_from_validated_chile_hub_layers` | `2026-09-15T12:16:25.430072+00:00` | `fresh (0.0h / 1080h)` | 0 | `open-attribution` |
+| `empresas` | Ministerio de Economia, Fomento y Turismo - Registro de Empresas y Sociedades (RES) | `live` | `datos_gob_cl_ckan_api` | `2026-08-11T19:49:00.139637+00:00` | `fresh (832.46h / 1080h)` | 1 | `open-attribution` |
+| `pobreza_comunal` | Observatorio Social — Ministerio de Desarrollo Social y Familia | `live` | `Estimaciones de Pobreza Comunal vía SAE desde encuesta CASEN` | `2026-08-11T19:49:01.701838+00:00` | `fresh (832.46h / 175200h)` | 1 | `open-attribution` |
+| `consumo_electrico_comunal` | CNE — Energía Abierta | `fallback` | `Consumo eléctrico anual por comuna y tipo de cliente` | `2026-08-11T19:49:06.413089+00:00` | `fresh (832.46h / 17520h)` | 3 | `open-attribution` |
+| `partidos_politicos` | Cámara de Diputadas y Diputados (datos abiertos) + SERVEL | `live` | `WSComun.asmx/retornarPartidosPoliticos + servel.cl/partidos-politicos (estado legal)` | `2026-08-11T19:49:08.719490+00:00` | `fresh (832.45h / 87600h)` | 1 | `open-attribution` |
+| `autoridades_electas` | Cámara de Diputadas y Diputados + Senado de Chile | `live` | `WSDiputado.asmx/retornarDiputadosPeriodoActual + camara.cl + senado.cl (Scrapling)` | `2026-08-11T19:50:16.685023+00:00` | `fresh (832.44h / 87600h)` | 0 | `open-attribution` |
+| `estadisticas_vitales` | Instituto Nacional de Estadísticas (INE) — Estadísticas Vitales | `live` | `Anuarios de Estadísticas Vitales (tabulados XLSX, tabla 1.2.2-04 por comuna de residencia). Solo definitivos: los boletines provisionales del INE no publican desglose comunal.` | `2026-09-15T00:40:44.151814+00:00` | `fresh (11.59h / 8760h)` | 0 | `open-attribution` |
+| `permisos_edificacion` | MINVU — Centro de Estudios de Ciudad y Territorio (CEDOC) | `live` | `Viviendas en unidades y superficie (m2) por comuna y año, serie desde 2002 (MINVU CEDOC, en base a permisos otorgados por las Direcciones de Obras Municipales e INE).` | `2026-09-15T00:39:47.956228+00:00` | `fresh (11.61h / 1080h)` | 0 | `open-attribution` |
+| `calidad_aire` | SINCA — Ministerio del Medio Ambiente | `live` | `Promedios diarios por estación y contaminante (MP2.5, MP10, SO2, NO2, CO, O3) desde el JSON del SINCA. Cobertura parcial por diseño (~65 comunas con estación). Serie incremental desde la primera cosecha.` | `2026-09-15T01:10:14.486735+00:00` | `fresh (11.1h / 72h)` | 1 | `public-api-review-terms` |
 
 ## regiones
 
@@ -37,7 +37,7 @@
 - `source_mode`: `live`
 - `source_detail`: `bcn_arcgis`
 - `refreshed_at_utc`: `2026-08-11T19:42:23.780877+00:00`
-- `freshness`: `fresh (822.39h / 2160h)`
+- `freshness`: `fresh (832.57h / 2160h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: bcn_skipped_null_code_records: 1
 - `reuse_status`: `open-attribution`
@@ -50,7 +50,7 @@
 - `source_mode`: `live`
 - `source_detail`: `bcn_arcgis`
 - `refreshed_at_utc`: `2026-08-11T19:42:23.780877+00:00`
-- `freshness`: `fresh (822.39h / 2160h)`
+- `freshness`: `fresh (832.57h / 2160h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: bcn_skipped_null_code_records: 1
 - `reuse_status`: `open-attribution`
@@ -63,7 +63,7 @@
 - `source_mode`: `live`
 - `source_detail`: `bcn_arcgis`
 - `refreshed_at_utc`: `2026-08-11T19:42:23.780877+00:00`
-- `freshness`: `fresh (822.39h / 2160h)`
+- `freshness`: `fresh (832.57h / 2160h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: bcn_skipped_null_code_records: 1
 - `reuse_status`: `open-attribution`
@@ -76,7 +76,7 @@
 - `source_mode`: `live`
 - `source_detail`: `bcn_arcgis`
 - `refreshed_at_utc`: `2026-08-11T19:42:23.780877+00:00`
-- `freshness`: `fresh (822.39h / 2160h)`
+- `freshness`: `fresh (832.57h / 2160h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: bcn_skipped_null_code_records: 1
 - `reuse_status`: `open-attribution`
@@ -89,7 +89,7 @@
 - `source_mode`: `live`
 - `source_detail`: `public_api_with_published_backfill`
 - `refreshed_at_utc`: `2026-08-13T16:22:04.519950+00:00`
-- `freshness`: `stale (777.73h / 72h)`
+- `freshness`: `stale (787.91h / 72h)`
 - `warning_count`: `2`
 - `diagnostic_summary`: indicadores live refresh reused last published artifact for missing codes: ipc
 - `reuse_status`: `open-attribution`
@@ -102,7 +102,7 @@
 - `source_mode`: `live`
 - `source_detail`: `official_xlsx`
 - `refreshed_at_utc`: `2026-08-11T19:42:36.653758+00:00`
-- `freshness`: `fresh (822.39h / 87600h)`
+- `freshness`: `fresh (832.56h / 87600h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: age_bands_derived_from_quinquennial_groups
 - `reuse_status`: `open-attribution`
@@ -115,7 +115,7 @@
 - `source_mode`: `live`
 - `source_detail`: `datos_gob_csv`
 - `refreshed_at_utc`: `2026-08-11T19:42:40.802326+00:00`
-- `freshness`: `fresh (822.38h / 1080h)`
+- `freshness`: `fresh (832.56h / 1080h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: Sin observaciones operativas.
 - `reuse_status`: `open-attribution`
@@ -128,7 +128,7 @@
 - `source_mode`: `live`
 - `source_detail`: `mineduc_datos_abiertos_rar`
 - `refreshed_at_utc`: `2026-08-11T19:42:41.413175+00:00`
-- `freshness`: `fresh (822.38h / 8760h)`
+- `freshness`: `fresh (832.56h / 8760h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: Sin observaciones operativas.
 - `reuse_status`: `open-attribution`
@@ -141,7 +141,7 @@
 - `source_mode`: `live`
 - `source_detail`: `official_xlsx`
 - `refreshed_at_utc`: `2026-08-22T09:28:35.974071+00:00`
-- `freshness`: `fresh (568.62h / 87600h)`
+- `freshness`: `fresh (578.8h / 87600h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: Sin observaciones operativas.
 - `reuse_status`: `open-attribution`
@@ -154,7 +154,7 @@
 - `source_mode`: `live`
 - `source_detail`: `bcn_electoral_mapping_generated`
 - `refreshed_at_utc`: `2026-08-11T19:42:40.945699+00:00`
-- `freshness`: `fresh (822.38h / 87600h)`
+- `freshness`: `fresh (832.56h / 87600h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: Sin observaciones operativas.
 - `reuse_status`: `open-attribution`
@@ -167,7 +167,7 @@
 - `source_mode`: `monthly`
 - `source_detail`: `curated_fallback_pending_direct_export`
 - `refreshed_at_utc`: `2026-09-01T03:04:24.987281+00:00`
-- `freshness`: `fresh (335.02h / 8760h)`
+- `freshness`: `fresh (345.2h / 8760h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: live: Playwright configurando filtros SINIM
 - `reuse_status`: `public-api-review-terms`
@@ -180,7 +180,7 @@
 - `source_mode`: `live`
 - `source_detail`: `mineduc_rendimiento_2024_rar_agregado_por_comuna`
 - `refreshed_at_utc`: `2026-08-11T19:42:44.201011+00:00`
-- `freshness`: `fresh (822.38h / 8760h)`
+- `freshness`: `fresh (832.56h / 8760h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: privacy_safe_comuna_year_aggregation
 - `reuse_status`: `open-attribution`
@@ -193,7 +193,7 @@
 - `source_mode`: `live`
 - `source_detail`: `ine_siedu_xlsm_cinco_mediciones_2018_2022`
 - `refreshed_at_utc`: `2026-08-11T19:42:46.514973+00:00`
-- `freshness`: `fresh (822.38h / 8760h)`
+- `freshness`: `fresh (832.56h / 8760h)`
 - `warning_count`: `1`
 - `diagnostic_summary`: indicadores_urbanos_siedu has intentionally partial urban coverage
 - `reuse_status`: `open-attribution`
@@ -205,7 +205,7 @@
 - `source_url`: https://github.com/cortega26/chile-hub
 - `source_mode`: `live`
 - `source_detail`: `derived_from_validated_chile_hub_layers`
-- `refreshed_at_utc`: `2026-09-15T02:05:46.685389+00:00`
+- `refreshed_at_utc`: `2026-09-15T12:16:25.430072+00:00`
 - `freshness`: `fresh (0.0h / 1080h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: derived_dataset
@@ -219,7 +219,7 @@
 - `source_mode`: `live`
 - `source_detail`: `datos_gob_cl_ckan_api`
 - `refreshed_at_utc`: `2026-08-11T19:49:00.139637+00:00`
-- `freshness`: `fresh (822.28h / 1080h)`
+- `freshness`: `fresh (832.46h / 1080h)`
 - `warning_count`: `1`
 - `diagnostic_summary`: RES solo cubre constituciones bajo Ley 20.659 (regimen simplificado). No incluye empresas del regimen tradicional (Diario Oficial) ni empresas anteriores a mayo 2013.
 - `reuse_status`: `open-attribution`
@@ -232,7 +232,7 @@
 - `source_mode`: `live`
 - `source_detail`: `Estimaciones de Pobreza Comunal vía SAE desde encuesta CASEN`
 - `refreshed_at_utc`: `2026-08-11T19:49:01.701838+00:00`
-- `freshness`: `fresh (822.28h / 175200h)`
+- `freshness`: `fresh (832.46h / 175200h)`
 - `warning_count`: `1`
 - `diagnostic_summary`: cobertura SAE: 345/346 comunas (99.7%) — parcial por diseño; comunas sin muestra no tienen estimación
 - `reuse_status`: `open-attribution`
@@ -245,7 +245,7 @@
 - `source_mode`: `fallback`
 - `source_detail`: `Consumo eléctrico anual por comuna y tipo de cliente`
 - `refreshed_at_utc`: `2026-08-11T19:49:06.413089+00:00`
-- `freshness`: `fresh (822.28h / 17520h)`
+- `freshness`: `fresh (832.46h / 17520h)`
 - `warning_count`: `3`
 - `diagnostic_summary`: tipos de cliente: ['Comercial', 'Residencial']
 - `reuse_status`: `open-attribution`
@@ -258,7 +258,7 @@
 - `source_mode`: `live`
 - `source_detail`: `WSComun.asmx/retornarPartidosPoliticos + servel.cl/partidos-politicos (estado legal)`
 - `refreshed_at_utc`: `2026-08-11T19:49:08.719490+00:00`
-- `freshness`: `fresh (822.28h / 87600h)`
+- `freshness`: `fresh (832.45h / 87600h)`
 - `warning_count`: `1`
 - `diagnostic_summary`: estado_legal poblado (vía SERVEL) en 15/36 partidos
 - `reuse_status`: `open-attribution`
@@ -271,7 +271,7 @@
 - `source_mode`: `live`
 - `source_detail`: `WSDiputado.asmx/retornarDiputadosPeriodoActual + camara.cl + senado.cl (Scrapling)`
 - `refreshed_at_utc`: `2026-08-11T19:50:16.685023+00:00`
-- `freshness`: `fresh (822.26h / 87600h)`
+- `freshness`: `fresh (832.44h / 87600h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: v1: diputados (155) + senadores (50). Gobernador_regional/alcalde viven en el dataset segregado autoridades_locales (licencia CC-BY-SA).
 - `reuse_status`: `open-attribution`
@@ -284,7 +284,7 @@
 - `source_mode`: `live`
 - `source_detail`: `Anuarios de Estadísticas Vitales (tabulados XLSX, tabla 1.2.2-04 por comuna de residencia). Solo definitivos: los boletines provisionales del INE no publican desglose comunal.`
 - `refreshed_at_utc`: `2026-09-15T00:40:44.151814+00:00`
-- `freshness`: `fresh (1.42h / 8760h)`
+- `freshness`: `fresh (11.59h / 8760h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: 2010: 692 filas desde 'Anuario de estadísticas vitales 2010' (hoja 122-04; TOTAL país: 250643 nacimientos, 97930 defunciones)
 - `reuse_status`: `open-attribution`
@@ -297,7 +297,7 @@
 - `source_mode`: `live`
 - `source_detail`: `Viviendas en unidades y superficie (m2) por comuna y año, serie desde 2002 (MINVU CEDOC, en base a permisos otorgados por las Direcciones de Obras Municipales e INE).`
 - `refreshed_at_utc`: `2026-09-15T00:39:47.956228+00:00`
-- `freshness`: `fresh (1.43h / 1080h)`
+- `freshness`: `fresh (11.61h / 1080h)`
 - `warning_count`: `0`
 - `diagnostic_summary`: descubrimiento: repositorio-biblionumber
 - `reuse_status`: `open-attribution`
@@ -310,7 +310,7 @@
 - `source_mode`: `live`
 - `source_detail`: `Promedios diarios por estación y contaminante (MP2.5, MP10, SO2, NO2, CO, O3) desde el JSON del SINCA. Cobertura parcial por diseño (~65 comunas con estación). Serie incremental desde la primera cosecha.`
 - `refreshed_at_utc`: `2026-09-15T01:10:14.486735+00:00`
-- `freshness`: `fresh (0.93h / 72h)`
+- `freshness`: `fresh (11.1h / 72h)`
 - `warning_count`: `1`
 - `diagnostic_summary`: cobertura SINCA: 65/346 comunas (18.8%) — parcial por diseño; solo comunas con estación
 - `reuse_status`: `public-api-review-terms`

@@ -65,7 +65,7 @@ Actualmente publica veinticinco (<!-- START_AGENTS_DATASET_COUNT -->25<!-- END_A
 | **Consumo Eléctrico Comunal** | CNE / Energía Abierta | Consumo eléctrico anual por comuna y tipo de cliente (carril `candidate` — fuente CNE descontinuada, `maturity_status: deprecated`) |
 | **Partidos Políticos** | Cámara de Diputados / SERVEL | Roster de partidos políticos vigentes e históricos con estado legal |
 | **Autoridades Electas** | Cámara de Diputados + Senado | Diputados y senadores en ejercicio, con partido y distrito o circunscripción |
-| **Delincuencia Comunal** | CEAD / Subsecretaría de Prevención del Delito | Casos policiales DMCS y otras categorías por comuna y mes (carril `candidate`, ver nota abajo) |
+| **Delincuencia Comunal** | CEAD / Subsecretaría de Prevención del Delito | ~~Casos policiales DMCS por comuna y mes~~ — DEPRECATED 2026-09-15 (sin fuente estructurada, no redistribuible; extractor neutralizado) |
 | **Autoridades Locales** | BCN SIIT + Wikipedia (CC BY / CC BY-SA) | Gobernadores regionales (Wikipedia) y alcaldes (BCN SIIT, 100% cobertura), segregado de Autoridades Electas por licencia mixta (carril `candidate`) |
 | **Estadísticas Vitales** | INE | Nacimientos y defunciones por comuna de residencia y sexo, anuarios definitivos 2010 en adelante |
 | **Permisos de Edificación** | MINVU CEDOC | Viviendas en unidades y superficie por comuna y año, serie desde 2002 |
@@ -104,7 +104,7 @@ chile-hub/
 │   │   ├── autoridades_locales_extractor.py              Autoridades locales (BCN SIIT + Wikipedia); carril `candidate`, sin cadencia automática
 │   │   ├── bcentral_extractor.py                         Indicadores desde mindicador.cl → data/staging/
 │   │   ├── calidad_aire_extractor.py                     Calidad del aire por estación — promedios diarios (SINCA/MMA) → data/staging/
-│   │   ├── cead_delincuencia_live_extractor.py           Delincuencia comunal (CEAD); corre en `monthly-scrape.yml`
+│   │   ├── cead_delincuencia_live_extractor.py           Delincuencia comunal (CEAD) — NEUTRALIZADO (deprecated 2026-09-15); fuera de `monthly-scrape.yml`
 │   │   ├── censo_extractor.py                            Censo 2024 — población comunal (INE) → data/staging/
 │   │   ├── censo_hogares_viviendas_extractor.py          Censo 2024 — hogares y viviendas (INE) → data/staging/
 │   │   ├── consumo_electrico_extractor.py                Consumo eléctrico comunal (CNE) → data/staging/
@@ -231,8 +231,10 @@ codegraph impact validate_comunas                   # Qué se rompe si cambio es
              → Produce: data/raw/{source}_{timestamp}.json  (snapshot crudo)
 
              Cadencia distinta / carril `candidate` (NO corren en `make extract`):
-             sinim_finanzas_live_extractor.py y cead_delincuencia_live_extractor.py
-             (vía `monthly-scrape.yml`); autoridades_locales_extractor.py (ad hoc);
+             sinim_finanzas_live_extractor.py (vía `monthly-scrape.yml`;
+             `cead_delincuencia_live_extractor.py` neutralizado tras degradar
+             `delincuencia_comunal` a rejected 2026-09-15);
+             autoridades_locales_extractor.py (ad hoc);
              geometria_comunal_extractor.py (vía `geometria-comunal.yml`, ADR-012).
              sinim_finanzas_extractor.py es un stub de fallback, no un paso del
              pipeline diario — nunca invocarlo desde un job programado (ver

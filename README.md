@@ -171,13 +171,14 @@ Pipeline determinista en GitHub Actions: extracción → build → verificación
 | 21 | **Permisos de Edificación** | 8 650 | 🟢 live | MINVU / CEDOC | Uso c/cita | Mensual |
 | 22 | **Calidad del Aire** | 756 | 🟢 live | MMA / SINCA | Revisión términos | Diaria |
 | 23 | **geometria_comunal** 🆕 | — | 🔜 próximamente | — | — | — |
-| 24 | **Delincuencia Comunal** 🆕 | — | 🔜 próximamente | CEAD / SPD | Revisión términos | — |
+| 24 | **Delincuencia Comunal** 🚫 | — | 🚫 deprecated | CEAD / SPD | Revisión términos | — |
 | 25 | **Autoridades Locales** 🆕 | — | 🔜 próximamente | BCN SIIT + Wikipedia | CC BY / CC BY-SA | — |
 
 > **🟢 live**: datos extraídos directamente desde la fuente oficial en cada ejecución del pipeline.
 > **🟡 fallback**: datos servidos desde un respaldo curado mientras se completa la extracción en vivo.
 > **🔶 parcial**: cobertura inferior al 50% del universo esperado. Capa candidata, no completa.
 > **🔜 próximamente**: capa en carril candidate — extractor implementado, datos no incluidos en el bundle público.
+> **🚫 deprecated**: capa degradada a rechazada — sin mantención ni bundle; su doc queda como referencia histórica.
 > Para auditar el estado exacto de cada capa: `chile-hub provenance` y `chile-hub health`.
 
 <!-- END_DATASET_TABLE -->
@@ -209,7 +210,7 @@ chile-hub health       # severidad, frescura, drift y cobertura
 ### Respaldo adicional
 
 <!-- START_TEST_COUNT -->
-- **1013 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
+- **1015 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
 <!-- END_TEST_COUNT -->
 <!-- START_ADR_COUNT -->
 - **19 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
@@ -499,7 +500,7 @@ chile-hub health       # severidad, frescura, drift y cobertura
 | `nombre_region` | `VARCHAR` | `"Región de Tarapacá"` |
 | `geometry` | `BINARY` | `"WKB — Polygon o MultiPolygon en EPSG:4326 (WGS84), geoparquet 1.0"` |
 
-**24. delincuencia_comunal** — Casos policiales de Delitos de Mayor Connotación Social (DMCS) y otras categorías por comuna y mes, reportados por Carabineros y PDI al Ministerio del Interior. Fuente: CEAD (Centro de Estudios y Análisis del Delito), Subsecretaría de Prevención del Delito. (en carril candidate — datos no incluidos en el bundle público) (PK: anio, mes, codigo_comuna, familia_delito)
+**24. delincuencia_comunal** — DEPRECATED 2026-09-15: Casos policiales de Delitos de Mayor Connotación Social (DMCS) y otras categorías por comuna y mes. Sin fuente estructurada oficial (solo scraping frágil) y no redistribuible; extractor neutralizado y fuera del scrape mensual. Ver docs/datasets/delincuencia_comunal.md. (en carril candidate — datos no incluidos en el bundle público) (PK: anio, mes, codigo_comuna, familia_delito)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
 | `codigo_comuna` | `VARCHAR(5)` | `"01101"` |

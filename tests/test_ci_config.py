@@ -94,9 +94,11 @@ class SinimDailyJobGuardrailTests(unittest.TestCase):
             if "extractors/" in line and "_extractor.py" in line
         }
         monthly = MONTHLY_SCRAPE_WORKFLOW.read_text(encoding="utf-8")
+        # delincuencia_comunal degradado a rejected 2026-09-15: su extractor
+        # está neutralizado y fuera del workflow; el único mensual es SINIM.
         monthly_extractors = {
             f"src/extractors/{name}"
-            for name in ("sinim_finanzas_live_extractor.py", "cead_delincuencia_live_extractor.py")
+            for name in ("sinim_finanzas_live_extractor.py",)
             if f"{name}" in monthly
         }
         overlap = daily_extractors & monthly_extractors

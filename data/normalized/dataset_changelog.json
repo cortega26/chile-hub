@@ -1,6 +1,6 @@
 {
-  "generated_at_utc": "2026-09-15T02:05:46.688089+00:00",
-  "previous_generated_at_utc": "2026-09-15T01:20:22.166676+00:00",
+  "generated_at_utc": "2026-09-15T12:16:25.432629+00:00",
+  "previous_generated_at_utc": "2026-09-15T11:57:40.284582+00:00",
   "dataset_count": 22,
   "datasets": [
     {
@@ -328,15 +328,7 @@
       "previous_record_count": 346,
       "current_record_count": 346,
       "record_count_delta": 0,
-      "added_fields": [
-        "anio_calidad_aire",
-        "anio_estadisticas_vitales",
-        "anio_permisos_edificacion",
-        "crecimiento_natural_ultimo_anio",
-        "mp25_promedio_ultimo_anio",
-        "superficie_autorizada_m2_ultimo_anio",
-        "viviendas_autorizadas_ultimo_anio"
-      ],
+      "added_fields": [],
       "removed_fields": [],
       "previous_source_mode": "live",
       "current_source_mode": "live",
@@ -344,20 +336,12 @@
       "current_freshness_status": "fresh",
       "previous_validation_status": "ok",
       "current_validation_status": "ok",
-      "change_severity": "minor",
+      "change_severity": "none",
       "breaking_changes": [],
-      "new_columns": [
-        "anio_calidad_aire",
-        "anio_estadisticas_vitales",
-        "anio_permisos_edificacion",
-        "crecimiento_natural_ultimo_anio",
-        "mp25_promedio_ultimo_anio",
-        "superficie_autorizada_m2_ultimo_anio",
-        "viviendas_autorizadas_ultimo_anio"
-      ],
+      "new_columns": [],
       "removed_columns": [],
       "primary_key_changed": false,
-      "contract_changed": true
+      "contract_changed": false
     },
     {
       "dataset": "permisos_edificacion",
