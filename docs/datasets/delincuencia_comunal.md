@@ -7,15 +7,17 @@
 >
 > **Carril:** `candidate` — NO incluido en el bundle público.
 > **Fuente:** Centro de Estudios y Análisis del Delito (CEAD), Subsecretaría de Prevención del Delito, Ministerio del Interior.
-> **review_by:** 2026-09-21 · **stalled_after_days:** 90
+> **review_by:** 2027-09-15 (revisión pasiva anual; la decisión de degradación ya se tomó, ver ficha de la idea) · **stalled_after_days:** 90
 
 ## Descripción
 
 Casos policiales de Delitos de Mayor Connotación Social (DMCS) y otras categorías
 por comuna y mes, reportados por Carabineros y la Policía de Investigaciones (PDI)
-al Ministerio del Interior. Los datos se obtienen vía scraping del endpoint PHP del
-portal CEAD y se publican exclusivamente en el carril `candidate` (fuera del bundle
-público), por fragilidad de la fuente y falta de licencia explícita.
+al Ministerio del Interior. Los datos se obtenían vía scraping del endpoint PHP del
+portal CEAD y se publicaban exclusivamente en el carril `candidate` (fuera del bundle
+público), por fragilidad de la fuente y falta de licencia explícita. La extracción
+se detuvo con la degradación (el extractor está neutralizado y el workflow mensual
+eliminado); lo documentado abajo describe el formato histórico congelado.
 
 ## Schema
 
@@ -45,16 +47,17 @@ público), por fragilidad de la fuente y falta de licencia explícita.
 | `incivilidades` | Desórdenes públicos, comercio ilegal, etc. |
 | `otros_delitos_o_faltas` | Resto de delitos y faltas no clasificados |
 
-## Cobertura
+## Cobertura (congelada)
 
-- **Geográfica:** 346 comunas (teórica; real depende del éxito del scraping)
-- **Temporal:** 2005 en adelante (según disponibilidad del portal CEAD)
-- **Frecuencia de actualización:** mensual (workflow programado)
+- **Geográfica:** 346 comunas (teórica; real dependía del éxito del scraping)
+- **Temporal:** 2005 en adelante (según disponibilidad histórica del portal CEAD)
+- **Frecuencia de actualización:** ninguna desde la degradación (antes: mensual vía workflow programado, hoy eliminado)
 
 ## Limitaciones
 
-1. **Fuente frágil:** el scraping depende de un endpoint PHP sin API pública
-   documentada. Cambios en el portal pueden romper el extractor sin aviso.
+1. **Fuente frágil (causa de la degradación):** el scraping dependía de un endpoint PHP sin API pública
+   documentada. Cambios en el portal lo rompían sin aviso — y el portal sumó
+   protección anti-bots, cerrando esa vía.
 2. **Sin licencia explícita:** el portal CEAD no declara términos de
    redistribución. Por esto el dataset va en carril `candidate`, no en el
    bundle público.
@@ -66,11 +69,15 @@ público), por fragilidad de la fuente y falta de licencia explícita.
 5. **Scraping por comuna individual:** se requiere una petición HTTP por
    comuna (~346 por año), lo que toma 10-15 minutos.
 
-## Regla de salida
+## Regla de salida (ejecutada 2026-09-15)
 
 Si para `review_by` (2026-09-21) no aparece una fuente estructurada estable
 (API, descarga CSV/Excel oficial, o mirror en datos.gob.cl) y el scraping
 sigue rompiéndose, este dataset se degrada a `rejected` y se archiva.
+
+La condición se cumplió en la revisión anticipada del 2026-09-15
+(verificación en 3 vías documentada en la ficha de la idea): degradado a
+`rejected`, extractor neutralizado y workflow mensual eliminado.
 
 ## Referencias
 
