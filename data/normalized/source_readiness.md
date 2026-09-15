@@ -1,12 +1,12 @@
 # chile-hub — Madurez de fuente
 
-- `generated_at_utc`: `2026-09-15T13:40:57.085033+00:00`
+- `generated_at_utc`: `2026-09-15T17:36:48.057196+00:00`
 - `stable_count`: `21`
-- `candidate_count`: `3`
+- `candidate_count`: `2`
 - `experimental_count`: `0`
-- `deprecated_count`: `1`
+- `deprecated_count`: `2`
 - `live_ready_count`: `20`
-- `fallback_only_count`: `1`
+- `fallback_only_count`: `2`
 - `publish_blocking_count`: `22`
 - `review_approaching_count`: `4`
 - `review_due_count`: `0`
@@ -31,7 +31,7 @@
 | `pobreza_comunal` | `stable` | `mds_pobreza_comunal` | `live` | `✓` | `permitido` | `—` | `implemented` | `—` | Monitorear publicación de próxima ronda CASEN (2024-2025). |
 | `consumo_electrico_comunal` | `deprecated` | `cne_consumo_electrico_comunal` | `fallback` | `✗` | `permitido` | `✓` | `fallback_only` | `—` | Fuente confirmada caída de forma permanente (investigado 2026-07-07): CNE decomisionó el catálogo Junar de energiaabierta.cl; la página del dataset no ofrece archivo ni API de reemplazo (el enlace API del sitio apunta a /visualizaciones/en-mantencion/). El dataset nunca tuvo un fetch en vivo exitoso — solo publica FALLBACK_ROWS de muestra. Degradado a deprecated/candidate por AGENTS.md §6 (protocolo de fuente permanentemente caída); reevaluar solo si CNE publica un reemplazo oficial. |
 | `geometria_comunal` | `candidate` | `bcn_arcgis_geometria_comunal` | `not_built` | `✗` | `permitido` | `✓` | `implemented` | `⏳` | ⏳ REVIEW BY 2026-10-21 — 35 días. Cobertura 345/346 (falta codigo_comuna=12202/Antártica, hueco conocido de la fuente BCN — ver ADR-012). Evaluar promoción a stable_publishable una vez confirmada cadencia de refresco y estabilidad del endpoint ArcGIS (region 12/Magallanes requiere fallback comuna-por-comuna por payload combinado grande). |
-| `delincuencia_comunal` | `candidate` | `cead_delincuencia_comunal` | `not_built` | `✗` | `permitido` | `✓` | `implemented` | `—` | DEGRADADO a rejected 2026-09-15 (review anticipada): en 90+ días no apareció descarga estructurada oficial (datos.gob.cl solo tiene bulk 2015 con links muertos; portal CEAD con protección anti-bots y solo PDF/presentaciones) y el dataset nunca fue redistribuible. Extractor neutralizado (NotImplementedError) y removido del scrape mensual. Reevaluar solo si el CEAD publica descarga oficial. |
+| `delincuencia_comunal` | `deprecated` | `cead_delincuencia_comunal` | `not_built` | `✗` | `permitido` | `✓` | `fallback_only` | `—` | DEGRADADO a rejected 2026-09-15 (review anticipada): en 90+ días no apareció descarga estructurada oficial (datos.gob.cl solo tiene bulk 2015 con links muertos; portal CEAD con protección anti-bots y solo PDF/presentaciones) y el dataset nunca fue redistribuible. Extractor neutralizado (NotImplementedError) y removido del scrape mensual. Reevaluar solo si el CEAD publica descarga oficial. |
 | `partidos_politicos` | `stable` | `camara_partidos_politicos` | `live` | `✓` | `permitido` | `✓` | `implemented` | `⏳` | ⏳ REVIEW BY 2026-10-05 — 19 días. estado_legal/fecha_constitucion completados desde SERVEL (15/36 partidos matcheados por nombre; el resto son históricos no listados en SERVEL). ambito (nacional/regional) queda nullable: no se encontró esa señal en ninguna fuente institucional disponible. |
 | `autoridades_electas` | `stable` | `camara_senado_autoridades_electas` | `live` | `✓` | `permitido` | `✓` | `implemented` | `⏳` | ⏳ REVIEW BY 2026-10-05 — 19 días. codigo_region/periodo de senadores completados desde senado.cl (REGION/PERIODOS). gobernador_regional y alcalde viven en el dataset segregado autoridades_locales (CC-BY-SA, candidate) por decisión de licencia. |
 | `autoridades_locales` | `candidate` | `wikipedia_autoridades_locales` | `not_built` | `✗` | `permitido` | `✓` | `implemented` | `⏳` | ⏳ REVIEW BY 2026-10-05 — 19 días. Ampliar cobertura de alcaldes (~165/345 identificados; ~121 sin página en Wikipedia, ~59 sin marca de vigencia clara); buscar fuente redistribuible no-share-alike para promover a stable_publishable. |

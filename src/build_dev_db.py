@@ -451,6 +451,12 @@ def _load_inputs():
     else:
         log.info("dataset_skipped", dataset="calidad_aire", reason="not_found_in_staging")
 
+    # Nota (Plan 091, revertido dos veces): NO fallar por opcionales ausentes
+    # o a medio-estado aquí. El harness offline sanciona CSV-sin-metadata como
+    # configuración legítima (las constantes *_METADATA_PATH ni siquiera se
+    # parchean en tests) y la garantía Phase-1 es "omitted optional does not
+    # block a core build". El gate estricto vive en verify_pipeline.py
+    # --profile publication (missing/non-live/stale). Ver ROADMAP.
     df_regiones, df_provincias = derive_geography_layers(df_comunas)
     df_perfil_territorial = build_perfil_territorial_comunal(
         df_comunas,

@@ -4702,7 +4702,12 @@ class DriftTaxonomyTests(unittest.TestCase):
     def test_retired_set_comes_from_registry_not_hardcoded(self):
         from src.chile_hub.pipeline_status_utils import _load_retired_datasets
 
-        self.assertEqual(_load_retired_datasets(), {"consumo_electrico_comunal"})
+        # 2026-09-15: delincuencia_comunal pasó a maturity deprecated
+        # (fuente CEAD muerta, extractor neutralizado) y entró al conjunto.
+        self.assertEqual(
+            _load_retired_datasets(),
+            {"consumo_electrico_comunal", "delincuencia_comunal"},
+        )
 
     def test_retired_dataset_excluded_from_counters_but_still_listed(self):
         from src.chile_hub.pipeline_status_utils import build_hub_health
@@ -4742,7 +4747,10 @@ class DriftTaxonomyTests(unittest.TestCase):
         """Guardrail: solo el registry puede retirar; nada más."""
         health = json.loads((NORMALIZED_DIR / "hub_health.json").read_text(encoding="utf-8"))
         for entry in health["datasets"]:
-            if entry["dataset"] != "consumo_electrico_comunal":
+            if entry["dataset"] not in {
+                "consumo_electrico_comunal",
+                "delincuencia_comunal",  # deprecated 2026-09-15 (fuente CEAD muerta)
+            }:
                 self.assertFalse(entry["retired"], entry["dataset"])
 
     def test_warnings_still_contain_every_message(self):

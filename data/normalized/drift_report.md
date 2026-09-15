@@ -1,6 +1,6 @@
 # chile-hub drift report
 
-- `generated_at_utc`: `2026-09-15T13:40:57.085033+00:00`
+- `generated_at_utc`: `2026-09-15T17:36:48.057196+00:00`
 - `dataset_count`: `22`
 - `drifted_count`: `2`
 - `healthy_count`: `20`
