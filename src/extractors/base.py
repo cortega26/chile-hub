@@ -1,4 +1,22 @@
-"""Contrato comun para extractores de chile-hub."""
+"""Contrato comun para extractores de chile-hub.
+
+Convención `sys.path` (Plan 099, congela TECHDEBT-05): cada extractor corre en
+dos modos — como script (`PYTHONPATH=src python src/extractors/x.py`, vía
+Makefile/CI) y como paquete (`src.extractors.x`, vía tests/build). Los imports
+absolutos `src.*` solo resuelven en modo paquete, y los relativos (`from base
+import …`) solo en modo script; por eso cada módulo trae el idiom canónico ::
+
+    ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+    if ROOT_DIR not in sys.path:
+        sys.path.insert(0, ROOT_DIR)
+
+seguido del `try: from src... except ModuleNotFoundError: from ... import ...`.
+El idiom es load-bearing (quitarlo rompe `make extract`) y no se reemplaza por
+`_paths.find_root()` (dependencia circular: `_paths` vive bajo `src/` y aún no
+es importable en ese punto). Nuevos extractores deben copiarlo tal cual; el
+test `SysPathIdiomTests` en `tests/test_ci_config.py` lo exige y falla ante
+cualquier otra manipulación de `sys.path` en `src/extractors/`.
+"""
 
 import json
 import os

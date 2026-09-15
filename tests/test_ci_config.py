@@ -920,6 +920,50 @@ class BotWriteRaceGuardrailTests(unittest.TestCase):
         self.assertIn("sync_readme_version_pin_example", content)
 
 
+class SysPathIdiomTests(unittest.TestCase):
+    """El idiom `sys.path` de extractores es load-bearing y canónico (Plan 099,
+    documentado en `src/extractors/base.py`): cada extractor corre como script
+    (`make extract`) y como paquete (tests/build), y los imports absolutos
+    `src.*` solo resuelven con ROOT_DIR en `sys.path`. Este gate congela el
+    idiom — falla ante cualquier OTRA manipulación de `sys.path` en
+    `src/extractors/`, no ante el idiom en sí (los shims `src/chile_hub.py`,
+    `src/pipeline_status_utils.py` y `src/build_dev_db.py` viven fuera de
+    `src/extractors/` y tienen su propio propósito documentado)."""
+
+    def test_extractors_only_use_canonical_sys_path_idiom(self):
+        import re
+
+        # Solo mutaciones reales (insert/append/asignación); menciones en
+        # prosa o comentarios (p. ej. el docstring de base.py que documenta
+        # el idiom) no cuentan.
+        mutation = re.compile(r"sys\.path\s*(\[|=|\.insert|\.append)")
+        guards = {
+            "if ROOT_DIR not in sys.path:",
+            "if str(ROOT_DIR) not in sys.path:",
+        }
+        inserts = {
+            "sys.path.insert(0, ROOT_DIR)",
+            "sys.path.insert(0, str(ROOT_DIR))",
+        }
+        extractors_dir = ROOT_DIR / "src" / "extractors"
+        offenders = []
+        for path in sorted(extractors_dir.glob("*.py")):
+            lines = path.read_text(encoding="utf-8").splitlines()
+            for i, line in enumerate(lines):
+                stripped = line.strip()
+                if not mutation.search(stripped):
+                    continue
+                prev_stripped = lines[i - 1].strip() if i > 0 else ""
+                if stripped not in inserts or prev_stripped not in guards:
+                    offenders.append(f"{path.name}:{i + 1}: {stripped}")
+        self.assertEqual(
+            offenders,
+            [],
+            "Manipulación de sys.path fuera del idiom canónico "
+            "(ver docstring de src/extractors/base.py):\n" + "\n".join(offenders),
+        )
+
+
 if __name__ == "__main__":
     import pytest
 
