@@ -3,17 +3,81 @@ let comunas = [];
 let filteredComunas = [];
 
 // Analytics cookieless — GoatCounter
-// Registra descargas de datasets sin cookies ni PII.
+// Solo carga en producción (tooltician.com): local y previews no envían nada.
+// La CSP de producción bloquea handlers inline (`onclick=`): los eventos se
+// enlazan con un único listener delegado (ver initAnalyticsClicks).
+// Nunca se envía SQL, resultados, mensajes de error ni datos personales.
+const ANALYTICS_HOSTS = ["tooltician.com", "www.tooltician.com"];
+const GOATCOUNTER_ENDPOINT = "https://chile-hub.goatcounter.com/count";
+const GOATCOUNTER_SCRIPT = "https://gc.zgo.at/count.js";
+
+function analyticsEnabled() {
+    return (
+        window.location.protocol !== "file:" &&
+        ANALYTICS_HOSTS.includes(window.location.hostname.toLowerCase())
+    );
+}
+
+function loadGoatCounter() {
+    if (!analyticsEnabled() || document.querySelector("script[data-goatcounter]")) return;
+    const script = document.createElement("script");
+    script.async = true;
+    script.dataset.goatcounter = GOATCOUNTER_ENDPOINT;
+    script.src = GOATCOUNTER_SCRIPT;
+    document.head.appendChild(script);
+}
+
 // goatcounter.count() es no-op si GoatCounter no está cargado.
-function trackDownload(dataset, format) {
+function chTrack(path, title) {
+    if (!analyticsEnabled()) return;
     if (window.goatcounter && window.goatcounter.count) {
-        window.goatcounter.count({
-            path: '/download/' + format + '/' + dataset,
-            title: 'Descarga ' + format.toUpperCase() + ' — ' + dataset,
-            event: true,
-        });
+        window.goatcounter.count({ path, title, event: true });
     }
 }
+window.chTrack = chTrack;
+
+function trackDownload(dataset, format) {
+    chTrack(
+        "/download/" + format + "/" + dataset,
+        "Descarga " + format.toUpperCase() + " — " + dataset
+    );
+}
+
+// Documentación: docs del repo en GitHub y el sitio de referencia (`reference/`,
+// mkdocs). Solo se envía la ruta pública del documento.
+const DOCS_LINK_RE = /^\/cortega26\/chile-hub\/(?:blob|tree)\/[^/]+\/(docs\/.+)$/;
+const REFERENCE_PATH_RE = /^(?:\/chile-hub)?\/(reference\/.*)$/;
+
+function docsPathFor(url) {
+    if (url.hostname === "github.com") {
+        const match = DOCS_LINK_RE.exec(url.pathname);
+        return match ? match[1] : null;
+    }
+    if (url.origin === window.location.origin) {
+        const match = REFERENCE_PATH_RE.exec(url.pathname);
+        return match ? match[1] : null;
+    }
+    return null;
+}
+
+function initAnalyticsClicks() {
+    loadGoatCounter();
+    document.addEventListener("click", (event) => {
+        const link = event.target instanceof Element ? event.target.closest("a") : null;
+        if (!link) return;
+        if (link.dataset.dlDataset && link.dataset.dlFormat) {
+            trackDownload(link.dataset.dlDataset, link.dataset.dlFormat);
+            return;
+        }
+        try {
+            const docsPath = docsPathFor(new URL(link.href, window.location.href));
+            if (docsPath) chTrack("docs_outbound", "Docs — " + docsPath);
+        } catch (_) {
+            /* enlace no parseable: no se mide */
+        }
+    });
+}
+initAnalyticsClicks();
 let currentPage = 1;
 const rowsPerPage = 10;
 
@@ -680,7 +744,7 @@ function showDatasetDrawer(dataset) {
                                 <strong style="color: var(--text-primary);">Formato Parquet</strong>
                                 <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.15rem;">tipo: parquet · sha256: ${parquetHash}</div>
                             </div>
-                            <a class="btn btn-primary" href="${escapeHtml(dataset.outputs.parquet)}" download style="font-size: 0.8rem; padding: 0.35rem 0.75rem;" onclick="trackDownload('${escapeHtml(dataset.dataset)}', 'parquet')">Descargar</a>
+                            <a class="btn btn-primary" href="${escapeHtml(dataset.outputs.parquet)}" download style="font-size: 0.8rem; padding: 0.35rem 0.75rem;" data-dl-dataset="${escapeHtml(dataset.dataset)}" data-dl-format="parquet">Descargar</a>
                         </div>
                     ` : ""}
                     ${dataset.outputs?.json ? `
@@ -689,7 +753,7 @@ function showDatasetDrawer(dataset) {
                                 <strong style="color: var(--text-primary);">Formato JSON</strong>
                                 <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.15rem;">tipo: json · sha256: ${jsonHash}</div>
                             </div>
-                            <a class="btn btn-primary" href="${escapeHtml(dataset.outputs.json)}" download style="font-size: 0.8rem; padding: 0.35rem 0.75rem;" onclick="trackDownload('${escapeHtml(dataset.dataset)}', 'json')">Descargar</a>
+                            <a class="btn btn-primary" href="${escapeHtml(dataset.outputs.json)}" download style="font-size: 0.8rem; padding: 0.35rem 0.75rem;" data-dl-dataset="${escapeHtml(dataset.dataset)}" data-dl-format="json">Descargar</a>
                         </div>
                     ` : ""}
                 </div>
@@ -1108,7 +1172,7 @@ function renderCatalog(bundle) {
 
                     <div class="dataset-card-actions">
                         <a href="#dataset-${escapeHtml(dataset.dataset)}" class="btn-card-action primary btn-details">Ver Ficha</a>
-                        ${dataset.outputs?.parquet ? `<a class="btn-card-action" href="${escapeHtml(dataset.outputs.parquet)}" download onclick="trackDownload('${escapeHtml(dataset.dataset)}', 'parquet')">Parquet</a>` : ""}
+                        ${dataset.outputs?.parquet ? `<a class="btn-card-action" href="${escapeHtml(dataset.outputs.parquet)}" download data-dl-dataset="${escapeHtml(dataset.dataset)}" data-dl-format="parquet">Parquet</a>` : ""}
                     </div>
                 </article>
             `;
