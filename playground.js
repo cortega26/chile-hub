@@ -57,11 +57,19 @@ function renderResult(rows, container) {
   container.innerHTML = html;
 }
 
+// Métricas del playground: solo el nombre del evento y una etapa de un conjunto
+// fijo. Nunca SQL, resultados, mensajes de error ni número de filas.
+function trackPlayground(name, title) {
+  if (typeof window.chTrack === "function") window.chTrack(name, title);
+}
+
 async function runQuery(sql, statusEl, resultEl) {
   statusEl.textContent = "Cargando motor SQL…";
   resultEl.innerHTML = "";
+  let stage = "engine";
   try {
     const db = await getDb();
+    stage = "download";
     const base = new URL(".", window.location.href).href;
 
     const parquetRegex = /read_parquet\s*\(\s*'([^']+)'\s*\)/g;
@@ -86,6 +94,7 @@ async function runQuery(sql, statusEl, resultEl) {
       }
     }
 
+    stage = "query";
     const conn = await db.connect();
     const arrowTable = await conn.query(modifiedSql);
     const rows = arrowTable.toArray().map((row) => row.toJSON());
@@ -93,7 +102,9 @@ async function runQuery(sql, statusEl, resultEl) {
     statusEl.textContent = `${arrowTable.numRows} filas`;
     statusEl.className = "";
     await conn.close();
+    trackPlayground("playground_query_success", "Playground — consulta correcta");
   } catch (err) {
+    trackPlayground("playground_query_error", "Playground — error en " + stage);
     console.error("SQL Explorer:", err);
     statusEl.textContent = `Error: ${err.message}`;
     statusEl.className = "sql-error";

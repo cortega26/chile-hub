@@ -1,5 +1,6 @@
 import contextlib
 import json
+import re
 import socket
 import threading
 import tomllib
@@ -12,11 +13,13 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 UTC = timezone.utc
 BUNDLE_PATH = ROOT_DIR / "data" / "normalized" / "hub_bundle.json"
 # Mirrors the confirmed host-wide Content-Security-Policy that Cloudflare serves for
-# tooltician.com (one Transform Rule shared by this landing and the tooltician-site
-# pages). Owner-confirmed 2026-09-13: includes the GA4 inline-bootstrap hash and the
+# tooltician.com. Owner-confirmed 2026-09-13: includes the GA4 inline-bootstrap hash and the
 # region1.google-analytics.com GA4 regional hit endpoint required by the site, plus
-# chile-hub's GoatCounter/DuckDB-Wasm origins. Keep in sync with the Cloudflare rule
-# and platform/tooltician-site/docs/cloudflare-security-headers.md.
+# chile-hub's GoatCounter/DuckDB-Wasm origins. Since 2026-09-20 the /chile-hub/ path
+# has its own Cloudflare rule that adds Cloudflare Web Analytics
+# (static.cloudflareinsights.com, cloudflareinsights.com) and the GoatCounter endpoint
+# (chile-hub.goatcounter.com); the other paths (e.g. /polla/) keep the base policy.
+# Keep in sync with platform/tooltician-site/docs/cloudflare-security-headers.md.
 PRODUCTION_CSP = (
     "default-src 'self'; base-uri 'self'; form-action 'self' https://formspree.io; "
     "frame-ancestors 'none'; object-src 'none'; "
@@ -26,12 +29,14 @@ PRODUCTION_CSP = (
     "'sha256-AgdfQ26gNc5sf5Njp+l68xeI3QwSHUs5YBMqXmFAwUo=' "
     "'sha256-R+ThK1ExJbsszqXj3FZbVZ15e9+xFQeukNF1TYuHXp8=' "
     "'sha256-4IyZhVv+RWju+1/qJEKCsZqtEjlfkQeg7lwN85qT6Y8=' "
-    "https://gc.zgo.at https://www.googletagmanager.com https://www.google-analytics.com; "
+    "https://gc.zgo.at https://www.googletagmanager.com https://www.google-analytics.com "
+    "https://static.cloudflareinsights.com; "
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
     "img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; "
     "connect-src 'self' blob: https://gc.zgo.at https://formspree.io "
     "https://extensions.duckdb.org https://www.google-analytics.com "
-    "https://region1.google-analytics.com https://www.googletagmanager.com; "
+    "https://region1.google-analytics.com https://www.googletagmanager.com "
+    "https://cloudflareinsights.com https://chile-hub.goatcounter.com; "
     "manifest-src 'self'; media-src 'self'; worker-src 'self' blob:; upgrade-insecure-requests"
 )
 
@@ -140,7 +145,25 @@ def local_server():
         server.server_close()
 
 
+INLINE_HANDLER_RE = re.compile(
+    r"""\son(?:click|dblclick|change|input|submit|load|error|focus|blur|key\w+|mouse\w+)\s*=\s*["']"""
+)
+
+
+def verify_no_inline_handlers():
+    """La CSP de producción bloquea `onclick=` y similares: no deben volver."""
+    for name in ("index.html", "app.js"):
+        text = (ROOT_DIR / name).read_text(encoding="utf-8")
+        match = INLINE_HANDLER_RE.search(text)
+        if match:
+            fail(
+                f"{name} contiene un handler inline ({match.group(0).strip()}), bloqueado por "
+                "la CSP de producción. Usa data-* + listener delegado (ver initAnalyticsClicks)."
+            )
+
+
 def verify_landing():
+    verify_no_inline_handlers()
     try:
         from playwright.sync_api import sync_playwright
     except ImportError:
@@ -199,6 +222,10 @@ def verify_landing():
 
         if browser_errors:
             fail(f"Browser errors while rendering landing: {browser_errors}")
+
+        # Analítica: local nunca carga GoatCounter (solo tooltician.com).
+        if page.evaluate("Boolean(document.querySelector('script[data-goatcounter]'))"):
+            fail("GoatCounter se cargó en un host local; debe limitarse a tooltician.com")
 
         # Version and public URL verification.
         # The versioned app.js URL is generated from pyproject.toml on every
