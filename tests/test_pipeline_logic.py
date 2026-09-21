@@ -2826,6 +2826,124 @@ class PipelineStatusUtilsTests(unittest.TestCase):
         self.assertIsNotNone(top)
         self.assertEqual(top["attention_priority"], 1)
 
+    def test_compute_top_issue_stale_beats_drifted(self):
+        """Regresión 2026-09-21: calidad_aire (serie diaria stale) desplazó a
+        consumo_electrico_comunal (fallback drifted) del top en vivo y 10 tests
+        de test_chile_hub.py cayeron por tener el nombre anterior fijado. La
+        regla lo ordena así a propósito — stale es prioridad 0, drift es
+        prioridad 1 — así que el fix fue retirar el nombre fijado, no tocar
+        el ranking. Este test fija la regla con las formas del incidente."""
+        from src.pipeline_status_utils import compute_top_issue
+
+        entries = [
+            {
+                "dataset": "consumo_electrico_comunal",
+                "warning_count": 0,
+                "freshness_status": "fresh",
+                "drift_status": "drifted",
+            },
+            {
+                "dataset": "calidad_aire",
+                "warning_count": 0,
+                "freshness_status": "stale",
+                "drift_status": "healthy",
+            },
+        ]
+        top = compute_top_issue(entries)
+        self.assertEqual(top["dataset"], "calidad_aire")
+        self.assertEqual(top["attention_priority"], 0)
+
+    def test_compute_top_issue_tiebreak_is_alphabetical(self):
+        """2026-09-21: calidad_aire e indicadores quedaron stale a la vez
+        (prioridad 0 ambas); gana la primera alfabéticamente."""
+        from src.pipeline_status_utils import compute_top_issue
+
+        entries = [
+            {
+                "dataset": "indicadores",
+                "warning_count": 0,
+                "freshness_status": "stale",
+                "drift_status": "drifted",
+            },
+            {
+                "dataset": "calidad_aire",
+                "warning_count": 0,
+                "freshness_status": "stale",
+                "drift_status": "healthy",
+            },
+        ]
+        top = compute_top_issue(entries)
+        self.assertEqual(top["dataset"], "calidad_aire")
+        self.assertEqual(top["attention_priority"], 0)
+
+    def test_compute_top_issue_unknown_freshness_priority_zero(self):
+        from src.pipeline_status_utils import compute_top_issue
+
+        entries = [
+            {
+                "dataset": "a",
+                "warning_count": 0,
+                "freshness_status": "fresh",
+                "drift_status": "drifted",
+            },
+            {
+                "dataset": "b",
+                "warning_count": 0,
+                "freshness_status": "unknown",
+                "drift_status": "healthy",
+            },
+        ]
+        top = compute_top_issue(entries)
+        self.assertEqual(top["dataset"], "b")
+        self.assertEqual(top["attention_priority"], 0)
+
+    def test_compute_top_issue_degradation_priority_one(self):
+        from src.pipeline_status_utils import compute_top_issue
+
+        entries = [
+            {
+                "dataset": "a",
+                "warning_count": 0,
+                "freshness_status": "fresh",
+                "drift_status": "healthy",
+                "degradation_status": "warning",
+            },
+            {
+                "dataset": "b",
+                "warning_count": 0,
+                "freshness_status": "fresh",
+                "drift_status": "healthy",
+            },
+        ]
+        top = compute_top_issue(entries)
+        self.assertEqual(top["dataset"], "a")
+        self.assertEqual(top["attention_priority"], 1)
+
+    def test_compute_top_issue_custom_freshness_field(self):
+        """El parámetro freshness_field permite rankear sobre otro campo
+        (p. ej. current_freshness_status en vistas runtime)."""
+        from src.pipeline_status_utils import compute_top_issue
+
+        entries = [
+            {
+                "dataset": "a",
+                "warning_count": 0,
+                "freshness_status": "fresh",
+                "current_freshness_status": "fresh",
+                "drift_status": "healthy",
+            },
+            {
+                "dataset": "b",
+                "warning_count": 0,
+                "freshness_status": "fresh",
+                "current_freshness_status": "stale",
+                "drift_status": "healthy",
+            },
+        ]
+        top = compute_top_issue(entries, freshness_field="current_freshness_status")
+        self.assertEqual(top["dataset"], "b")
+        self.assertEqual(top["attention_priority"], 0)
+
     def test_compute_top_issue_all_healthy_returns_none(self):
         from src.pipeline_status_utils import compute_top_issue
 
