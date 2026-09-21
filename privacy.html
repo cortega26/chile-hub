@@ -49,31 +49,21 @@
         <a href="index.html">← chile-hub</a>
     </header>
     <h1>Privacidad</h1>
-    <p><strong>Última actualización:</strong> 2026-09-20</p>
+    <p><strong>Última actualización:</strong> 2026-09-21</p>
 
     <h2>Qué medimos y por qué</h2>
-    <p>Este sitio usa <a href="https://www.goatcounter.com/">GoatCounter</a>, una herramienta de análisis web de código abierto que <strong>no usa cookies</strong> y no almacena datos personales.</p>
-    <p>Lo que recolectamos (datos agregados, sin identificar personas):</p>
-    <ul>
-        <li><strong>Páginas vistas</strong> — qué páginas se visitan y con qué frecuencia.</li>
-        <li><strong>Referrer</strong> — desde qué sitio o enlace llegaste (ej. LinkedIn, GitHub, Google).</li>
-        <li><strong>Tamaño de pantalla</strong> y <strong>país</strong> aproximado — solo para entender si el sitio se ve bien en distintos dispositivos y desde dónde se accede.</li>
-        <li><strong>Descargas de datasets</strong> — al hacer clic en "Descargar" un archivo <code>.parquet</code> o <code>.json</code>, registramos qué dataset se descargó, sin identificar quién lo hizo.</li>
-        <li><strong>Uso del playground SQL</strong> — solo que se ejecutó una consulta y si terminó bien o con error (y en qué etapa: motor, descarga o consulta). <strong>Nunca</strong> registramos el SQL que escribes, los resultados ni los mensajes de error.</li>
-        <li><strong>Clics a documentación</strong> — al abrir un documento de la carpeta <code>docs/</code> del repositorio, registramos la ruta pública de ese documento.</li>
-    </ul>
+    <p>El sitio se sirve a través de Cloudflare, que puede medir cargas de página y rendimiento con <a href="https://www.cloudflare.com/web-analytics/">Cloudflare Web Analytics</a>: sin cookies, sin fingerprinting y sin seguimiento entre sitios; solo métricas agregadas.</p>
+    <p>La landing en sí no ejecuta ningún otro servicio de analítica ni envía datos de uso a terceros: las descargas de datasets, el playground SQL y los enlaces a documentación funcionan sin registrar quién los usó.</p>
+    <p><strong>Nota 2026-09-21:</strong> se retiró un contador de terceros (GoatCounter) que había quedado cableado sin una cuenta del mantenedor — nunca existió un dashboard asociado y su endpoint rechazaba los envíos. Ver ADR-020. El sitio ya no contacta ese servicio.</p>
 
     <h2>Qué NO hacemos</h2>
     <ul>
         <li><strong>No usamos cookies.</strong> Ni propias ni de terceros.</li>
-        <li><strong>No almacenamos direcciones IP.</strong> GoatCounter las descarta tras determinar el país aproximado; nunca se escriben a disco.</li>
-        <li><strong>No hacemos fingerprinting</strong> ni identificamos usuarios únicos.</li>
+        <li><strong>No almacenamos direcciones IP</strong> ni identificamos usuarios únicos.</li>
+        <li><strong>No hacemos fingerprinting.</strong></li>
         <li><strong>No compartimos datos con terceros.</strong> No hay anuncios, no hay trackers, no hay redes publicitarias.</li>
         <li><strong>No recolectamos datos personales</strong> (nombre, email, ubicación precisa, historial de navegación).</li>
     </ul>
-
-    <h2>GoatCounter</h2>
-    <p>GoatCounter es un proyecto de código abierto (<a href="https://github.com/arzgebirg/beautiful-goatcounter">EUPL/AGPL</a>) diseñado para cumplir con GDPR sin banners de cookies. Sus datos se almacenan en servidores europeos. El dashboard de estadísticas es accesible solo por el mantenedor del sitio.</p>
 
     <h2>Cloudflare Web Analytics</h2>
     <p>El sitio se sirve a través de Cloudflare, que puede medir cargas de página y rendimiento con <a href="https://www.cloudflare.com/web-analytics/">Cloudflare Web Analytics</a>: sin cookies, sin fingerprinting y sin seguimiento entre sitios; solo métricas agregadas.</p>

@@ -15,10 +15,11 @@ BUNDLE_PATH = ROOT_DIR / "data" / "normalized" / "hub_bundle.json"
 # Mirrors the confirmed host-wide Content-Security-Policy that Cloudflare serves for
 # tooltician.com. Owner-confirmed 2026-09-13: includes the GA4 inline-bootstrap hash and the
 # region1.google-analytics.com GA4 regional hit endpoint required by the site, plus
-# chile-hub's GoatCounter/DuckDB-Wasm origins. Since 2026-09-20 the /chile-hub/ path
+# chile-hub's DuckDB-Wasm origins. Since 2026-09-20 the /chile-hub/ path
 # has its own Cloudflare rule that adds Cloudflare Web Analytics
-# (static.cloudflareinsights.com, cloudflareinsights.com) and the GoatCounter endpoint
-# (chile-hub.goatcounter.com); the other paths (e.g. /polla/) keep the base policy.
+# (static.cloudflareinsights.com, cloudflareinsights.com); the other paths (e.g. /polla/)
+# keep the base policy. ADR-020 (2026-09-21) retiró el GoatCounter no autorizado:
+# ningún origen de terceros de analítica debe volver a este espejo.
 # Keep in sync with platform/tooltician-site/docs/cloudflare-security-headers.md.
 PRODUCTION_CSP = (
     "default-src 'self'; base-uri 'self'; form-action 'self' https://formspree.io; "
@@ -29,14 +30,14 @@ PRODUCTION_CSP = (
     "'sha256-AgdfQ26gNc5sf5Njp+l68xeI3QwSHUs5YBMqXmFAwUo=' "
     "'sha256-R+ThK1ExJbsszqXj3FZbVZ15e9+xFQeukNF1TYuHXp8=' "
     "'sha256-4IyZhVv+RWju+1/qJEKCsZqtEjlfkQeg7lwN85qT6Y8=' "
-    "https://gc.zgo.at https://www.googletagmanager.com https://www.google-analytics.com "
+    "https://www.googletagmanager.com https://www.google-analytics.com "
     "https://static.cloudflareinsights.com; "
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
     "img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; "
-    "connect-src 'self' blob: https://gc.zgo.at https://formspree.io "
+    "connect-src 'self' blob: https://formspree.io "
     "https://extensions.duckdb.org https://www.google-analytics.com "
     "https://region1.google-analytics.com https://www.googletagmanager.com "
-    "https://cloudflareinsights.com https://chile-hub.goatcounter.com; "
+    "https://cloudflareinsights.com; "
     "manifest-src 'self'; media-src 'self'; worker-src 'self' blob:; upgrade-insecure-requests"
 )
 
@@ -223,9 +224,16 @@ def verify_landing():
         if browser_errors:
             fail(f"Browser errors while rendering landing: {browser_errors}")
 
-        # Analítica: local nunca carga GoatCounter (solo tooltician.com).
-        if page.evaluate("Boolean(document.querySelector('script[data-goatcounter]'))"):
-            fail("GoatCounter se cargó en un host local; debe limitarse a tooltician.com")
+        # Analítica: la landing no carga ningún contador de terceros
+        # (ADR-020: se retiró el GoatCounter no autorizado el 2026-09-21).
+        # Solo Cloudflare Web Analytics (beacon del edge, sin script local).
+        if page.evaluate(
+            "Boolean(document.querySelector('script[data-goatcounter]'))"
+            " || Boolean(document.querySelector('script[src*=\"zgo.at\"]'))"
+        ):
+            fail(
+                "La landing carga un contador de terceros; solo se permite el beacon de Cloudflare"
+            )
 
         # Version and public URL verification.
         # The versioned app.js URL is generated from pyproject.toml on every

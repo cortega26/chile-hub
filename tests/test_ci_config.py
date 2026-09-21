@@ -964,6 +964,77 @@ class SysPathIdiomTests(unittest.TestCase):
         )
 
 
+class UnauthorizedTelemetryGuardrailTests(unittest.TestCase):
+    """Regresión: la landing cargó un contador GoatCounter hacia un endpoint
+    (`chile-hub.goatcounter.com`) para el que el mantenedor jamás abrió una
+    cuenta (PR #101, 2026-09-20; retirado en ADR-020 el 2026-09-21). Los pings
+    salían de cada visita a un tercero desconocido y el endpoint respondía
+    HTTP 400 — cero valor, todo el riesgo. Además existían cambios locales sin
+    commitear que habrían eliminado la medición de otra forma: la regla es que
+    la telemetría de terceros requiere cuenta del mantenedor + aprobación
+    explícita + privacy.html + este guardrail; sin esos cuatro elementos, el
+    commit se revierte.
+    """
+
+    # Archivos que se sirven tal cual a los visitantes: ninguna mención al
+    # contador, ni siquiera en comentarios (un copy-paste futuro podría
+    # reactivarlo sin que nadie note el origen).
+    SERVED_SURFACE = (
+        ROOT_DIR / "app.js",
+        ROOT_DIR / "playground.js",
+        ROOT_DIR / "index.html",
+    )
+
+    # Orígenes reales del servicio retirado: el loader y el endpoint de conteo.
+    # Se buscan con contexto de URL para no colisionar con la nota histórica
+    # de privacy.html ni con los selectores negativos del propio check.
+    COUNTER_ORIGINS = (
+        "chile-hub.goatcounter.com",
+        "gc.zgo.at",
+    )
+
+    def test_no_counter_in_served_files(self):
+        offenders = []
+        for path in self.SERVED_SURFACE:
+            content = path.read_text(encoding="utf-8").lower()
+            for marker in ("goatcounter", "zgo.at"):
+                if marker in content:
+                    offenders.append(f"{path.name}: {marker}")
+        self.assertEqual(
+            offenders,
+            [],
+            "Contador de terceros en archivos servidos (ADR-020): la landing "
+            "no debe referenciarlo ni en código ni en comentarios.\n" + "\n".join(offenders),
+        )
+
+    def test_csp_mirror_has_no_counter_origins(self):
+        """El espejo CSP de verify_landing.py no debe autorizar los orígenes
+        del contador: si vuelven al espejo, la regla de Cloudflare los
+        permitiría aunque nada los cargue hoy."""
+        content = (ROOT_DIR / "scripts" / "verify_landing.py").read_text(encoding="utf-8")
+        offenders = [o for o in self.COUNTER_ORIGINS if o in content]
+        self.assertEqual(
+            offenders,
+            [],
+            "El espejo CSP autoriza orígenes del contador retirado (ADR-020): "
+            + ", ".join(offenders),
+        )
+
+    def test_privacy_page_makes_no_active_counter_claim(self):
+        """privacy.html puede nombrar el incidente en pasado (nota 2026-09-21),
+        pero no debe afirmar un servicio activo ni enlazar su sitio/dashboard."""
+        content = (ROOT_DIR / "privacy.html").read_text(encoding="utf-8").lower()
+        offenders = []
+        for marker in ("goatcounter.com", "dashboard de estadísticas es accesible"):
+            if marker in content:
+                offenders.append(marker)
+        self.assertEqual(
+            offenders,
+            [],
+            "privacy.html afirma un contador activo (ADR-020): " + ", ".join(offenders),
+        )
+
+
 if __name__ == "__main__":
     import pytest
 
