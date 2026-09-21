@@ -45,7 +45,7 @@ dependencies = [
 pipeline = [
     "duckdb==1.5.5",
     "pyarrow>=24.0.0",
-    "pandas==3.0.3",
+    "pandas==3.0.6",
     "xlsxwriter==3.2.9",
     "curl_cffi==0.16.3",
     "defusedxml==0.7.1",
