@@ -12,6 +12,38 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.36.5 - 2026-09-21
+
+### Corregido
+
+- **analytics**: Make GoatCounter and download tracking work under the production CSP
+  ([#101](https://github.com/cortega26/chile-hub/pull/101),
+  [`88f7d96`](https://github.com/cortega26/chile-hub/commit/88f7d9640bdd7ab826aa670348fa70007a1448e5))
+
+- **analytics**: Retira el contador GoatCounter no autorizado (ADR-020)
+  ([#102](https://github.com/cortega26/chile-hub/pull/102),
+  [`1fa810a`](https://github.com/cortega26/chile-hub/commit/1fa810a3ca73971a1e20543ae6cd67ee88b3e536))
+
+- **tests**: Oráculo independiente para el top issue en vivo
+  ([#103](https://github.com/cortega26/chile-hub/pull/103),
+  [`3f7aad6`](https://github.com/cortega26/chile-hub/commit/3f7aad6c9e8f475349c2bc25e56e21427651a3f5))
+
+- **tests**: Top issue en vivo por consistencia, no por nombre fijado
+  ([#103](https://github.com/cortega26/chile-hub/pull/103),
+  [`3f7aad6`](https://github.com/cortega26/chile-hub/commit/3f7aad6c9e8f475349c2bc25e56e21427651a3f5))
+
+### Mantenimiento
+
+- **deps**: Bump gitpython to 3.1.62 (PYSEC-2026-3982/3983/3984)
+  ([#101](https://github.com/cortega26/chile-hub/pull/101),
+  [`88f7d96`](https://github.com/cortega26/chile-hub/commit/88f7d9640bdd7ab826aa670348fa70007a1448e5))
+
+### Documentación
+
+- **python-badge**: Versiones desde requires-python, sin 3.10
+  ([`e8e07d1`](https://github.com/cortega26/chile-hub/commit/e8e07d1fbd07db8132e23df8789b1ea8175412fb))
+
+
 ## 1.36.4 - 2026-09-15
 
 ### Corregido
