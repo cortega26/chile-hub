@@ -62,7 +62,6 @@ EXPECTED_DATASET_COUNT = 22
 # entonces el top real es "indicadores" (stale crónico, issue #43). Cambiar
 # este valor solo si la salud de las fuentes lo justifica.
 EXPECTED_BUILD_TOP_ISSUE = "indicadores"
-EXPECTED_LIVE_TOP_ISSUE = "consumo_electrico_comunal"
 
 
 def _assert_summary_has_recovery_source_detail(test_case, summary):
@@ -136,6 +135,31 @@ def _assert_normalized_not_stale():
         "Run 'make build' (or 'python src/build_dev_db.py') to rebuild, "
         "then re-run pytest."
     )
+
+
+def _live_top_issue_dataset(hub):
+    """Dataset ganador del ranking de atención con el reloj actual.
+
+    El top issue en vivo ROTA con los datos: el 2026-09-21 calidad_aire
+    (serie diaria stale) desplazó a consumo_electrico_comunal (fallback
+    drifted) — la regla funcionando según diseño (stale = prioridad 0,
+    drift = prioridad 1, desempate alfabético), no una regresión. Fijar un
+    nombre aquí es frágil por construcción (10 tests cayeron en CI por eso):
+    los tests en vivo afirman CONSISTENCIA (todas las superficies reportan el
+    mismo ganador) y la REGLA se fija con entradas sintéticas en
+    test_pipeline_logic.py (stale-vs-drifted, desempate alfabético,
+    freshness desconocida, degradación).
+
+    (Posición a propósito tras _assert_normalized_not_stale: la tabla de
+    tests de AGENTS.md detecta "data/normalized" en los primeros 4096 bytes
+    del archivo — ver _test_file_requires_normalized en doc_sync.py.)
+    """
+    top_issue = hub.top_issue()
+    assert top_issue is not None, (
+        "se esperaba un top issue activo; si el hub queda sin top issue es "
+        "porque todas las series están fresh y sanas — revisar el supuesto"
+    )
+    return top_issue["dataset"]
 
 
 class ChileHubTests(unittest.TestCase):
@@ -500,8 +524,9 @@ class ChileHubTests(unittest.TestCase):
         )
         self.assertTrue(overview["current_checked_at_utc"])
         self.assertIsNotNone(overview["top_issue"])
-        self.assertEqual(overview["top_issue"]["dataset"], EXPECTED_LIVE_TOP_ISSUE)
-        self.assertIn(EXPECTED_LIVE_TOP_ISSUE, overview["top_issue_summary"])
+        live_top_issue = _live_top_issue_dataset(self.hub)
+        self.assertEqual(overview["top_issue"]["dataset"], live_top_issue)
+        self.assertIn(live_top_issue, overview["top_issue_summary"])
         self.assertTrue(overview["top_issue"]["diagnostic_summary"])
         self.assertEqual(overview["primary_package"]["package_type"], "zip")
         self.assertEqual(
@@ -579,8 +604,9 @@ class ChileHubTests(unittest.TestCase):
         self.assertEqual(runtime["dataset_count"], EXPECTED_DATASET_COUNT)
         self.assertEqual(len(runtime["datasets"]), EXPECTED_DATASET_COUNT)
         self.assertIsNotNone(runtime["top_issue"])
-        self.assertEqual(runtime["top_issue"]["dataset"], EXPECTED_LIVE_TOP_ISSUE)
-        self.assertIn(EXPECTED_LIVE_TOP_ISSUE, runtime["top_issue_summary"])
+        live_top_issue = _live_top_issue_dataset(self.hub)
+        self.assertEqual(runtime["top_issue"]["dataset"], live_top_issue)
+        self.assertIn(live_top_issue, runtime["top_issue_summary"])
         self.assertTrue(runtime["top_issue"]["diagnostic_summary"])
         indicadores = next(
             entry for entry in runtime["datasets"] if entry["dataset"] == "indicadores"
@@ -601,7 +627,7 @@ class ChileHubTests(unittest.TestCase):
         self.assertIn("top_issue_reason=", table)
         self.assertIn("top_issue_action=", table)
         self.assertIn("top_issue_summary=", table)
-        self.assertIn(f"top_issue={EXPECTED_LIVE_TOP_ISSUE}", table)
+        self.assertIn(f"top_issue={_live_top_issue_dataset(self.hub)}", table)
         self.assertIn("dataset", table)
         self.assertIn("mode", table)
         self.assertIn("severity", table)
@@ -610,7 +636,7 @@ class ChileHubTests(unittest.TestCase):
     def test_top_issue(self):
         top_issue = self.hub.top_issue()
         self.assertIsNotNone(top_issue)
-        self.assertEqual(top_issue["dataset"], EXPECTED_LIVE_TOP_ISSUE)
+        self.assertEqual(top_issue["dataset"], _live_top_issue_dataset(self.hub))
         self.assertIn(top_issue["build_freshness_status"], {"fresh", "stale", "unknown"})
         self.assertIn(top_issue["current_freshness_status"], {"fresh", "stale", "unknown"})
         self.assertIn(top_issue["drift_status"], {"healthy", "drifted"})
@@ -623,7 +649,7 @@ class ChileHubTests(unittest.TestCase):
         self.assertIn("source_detail", table)
         self.assertIn("diagnostic_summary", table)
         self.assertIn("recommended_action", table)
-        self.assertIn(EXPECTED_LIVE_TOP_ISSUE, table)
+        self.assertIn(_live_top_issue_dataset(self.hub), table)
 
     def test_primary_package_and_verification(self):
         package = self.hub.primary_package()
@@ -650,7 +676,7 @@ class ChileHubTests(unittest.TestCase):
         self.assertIn(f"status_build: {self.health['overall_status']}", snapshot)
         self.assertIn("status_current:", snapshot)
         self.assertIn("current_freshness:", snapshot)
-        self.assertIn(f"top_issue: {EXPECTED_LIVE_TOP_ISSUE}", snapshot)
+        self.assertIn(f"top_issue: {_live_top_issue_dataset(self.hub)}", snapshot)
         self.assertIn("top_issue_reason:", snapshot)
         self.assertIn("top_issue_action:", snapshot)
         self.assertIn("package: data/normalized/chile-hub-publishable-bundle.zip", snapshot)
@@ -1321,6 +1347,7 @@ class ChileHubCliTests(unittest.TestCase):
         # artefactos stale — el guard solo se llamaba en 3 de 9 clases.
         _assert_normalized_not_stale()
         cls.health = ChileHub().health()
+        cls.hub = ChileHub()
 
     def run_cli(self, *args):
         env = os.environ.copy()
@@ -1496,7 +1523,7 @@ class ChileHubCliTests(unittest.TestCase):
         self.assertIn(f"status_build: {self.health['overall_status']}", result.stdout)
         self.assertIn("status_current:", result.stdout)
         self.assertIn("current_freshness:", result.stdout)
-        self.assertIn(f"top_issue: {EXPECTED_LIVE_TOP_ISSUE}", result.stdout)
+        self.assertIn(f"top_issue: {_live_top_issue_dataset(self.hub)}", result.stdout)
         self.assertIn("top_issue_reason:", result.stdout)
         self.assertIn("top_issue_action:", result.stdout)
         self.assertIn("package: data/normalized/chile-hub-publishable-bundle.zip", result.stdout)
@@ -1619,14 +1646,17 @@ class ChileHubCliTests(unittest.TestCase):
 
     def test_cli_top_issue(self):
         result = self.run_cli("top-issue")
-        self.assertIn(f'"dataset": "{EXPECTED_LIVE_TOP_ISSUE}"', result.stdout)
-        self.assertIn('"drift_status": "drifted"', result.stdout)
+        live_top_issue = self.hub.top_issue()
+        self.assertIsNotNone(live_top_issue)
+        self.assertIn(f'"dataset": "{live_top_issue["dataset"]}"', result.stdout)
+        self.assertIn(f'"drift_status": "{live_top_issue["drift_status"]}"', result.stdout)
 
     def test_cli_top_issue_text(self):
         result = self.run_cli("top-issue", "--format", "text")
         self.assertIn("chile-hub top issue", result.stdout)
-        self.assertIn(f"dataset={EXPECTED_LIVE_TOP_ISSUE}", result.stdout)
-        self.assertIn(EXPECTED_LIVE_TOP_ISSUE, result.stdout)
+        live_top_issue = _live_top_issue_dataset(self.hub)
+        self.assertIn(f"dataset={live_top_issue}", result.stdout)
+        self.assertIn(live_top_issue, result.stdout)
         self.assertIn("reason=", result.stdout)
         self.assertIn("action=", result.stdout)
 
@@ -1634,7 +1664,7 @@ class ChileHubCliTests(unittest.TestCase):
         result = self.run_cli("top-issue", "--format", "table")
         self.assertIn("chile-hub top issue", result.stdout)
         self.assertIn("dataset", result.stdout)
-        self.assertIn(EXPECTED_LIVE_TOP_ISSUE, result.stdout)
+        self.assertIn(_live_top_issue_dataset(self.hub), result.stdout)
 
     def test_cli_packages(self):
         result = self.run_cli("packages")
