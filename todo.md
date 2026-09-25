@@ -111,6 +111,24 @@ están pendientes de review.
       mirror de Hugging Face quedó actualizado por CI (21 subsets, 20:26 UTC),
       sin intervención manual.
 
+## Infra 2026-09-25 — Plan 106 (snapshot de release liviano)
+
+- [x] Diagnóstico: tarball de `v1.37.6` = 412 MB (2 JSON geometría 81 MB, CSV
+      75 MB, `duckdb-eh.wasm` 36 MB sin referencias); ingesta Zenodo ~1 h en
+      "Received" sin DOI.
+- [x] Geometría cruda (JSON + CSV) fuera de git → assets del prerelease
+      `geometry-audit` desde `geometria-comunal.yml`; commit sólo parquet +
+      metadata + sha256.
+- [x] `duckdb-eh.wasm` eliminado (no referenciado); `mvp.wasm` se mantiene
+      vendoreado (CDN diferido por CSP host-wide de Cloudflare, ADR-021).
+- [x] Guardrails: presupuesto de árbol <160 MB, rutas durables del commit,
+      upload de auditoría, ausencia del wasm EH.
+- [x] ADR-021 + nota en `docs/datasets/geometria_comunal.md`.
+- [x] Verificado: árbol **412 → 140.1 MB**; suite 1106 verde; doctor,
+      verify-landing, docs-build, lint, format, typecheck OK.
+- [ ] Zenodo: esperar v1.37.7 (árbol liviano) y aplicar el DOI (concept) en
+      `CITATION.cff` + `docs/citation.md` + badge README.
+
 ## Housekeeping
 
 - [x] Archivar planes DONE (055, 056, 060, 061, 062) a `plans/archive/`

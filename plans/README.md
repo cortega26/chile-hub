@@ -201,6 +201,16 @@ Los 5 planes quedaron **DONE y archivados** el mismo día (2026-09-25) — ver
 | 104 | [Servidor MCP (`chile-hub[mcp]`) — datos para agentes](archive/104-mcp-server.md) | M | MED | DONE (2026-09-25, commit `25b00ed` — extra `[mcp]` + `chile-hub-mcp`, tools puras read-only, import perezoso (mcp 2.x), lock regenerado; branch `advisor/distribution-wave-1`) |
 | 105 | [Páginas por comuna (SEO programático) desde el perfil territorial](archive/105-comuna-pages-programmatic-seo.md) | M | MED | DONE (2026-09-25, commit `330786e` — 347 páginas generadas (346 comunas + índice) + sitemap, JSON-LD por página, wiring en pages-deploy; branch `advisor/distribution-wave-1`) |
 
+## Plan 106 — infra de release (2026-09-25)
+
+> **Infra post-distribución (2026-09-25)**: snapshot de release liviano para
+> Zenodo (ADR-021). El árbol de `v1.37.6` pesaba 412 MB y su ingesta quedó ~1 h
+> en "Received"; geometría cruda y wasm EH no usado salen del árbol.
+
+| # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
+|---|------|----------|----------|--------|-----------|--------|
+| 106 | [Snapshot de release liviano (geometría fuera de git + wasm no usado)](106-slim-release-snapshot.md) | P2 | S-M | MED | — | DONE (2026-09-25 — árbol 412→140 MB, auditoría a prerelease `geometry-audit`, ADR-021, guardrails; branch `advisor/106-slim-release-snapshot`) |
+
 ## Dependencias 086–100 (ver `ROADMAP.md` para el grafo completo)
 
 **Wave 1 (P1/S, paralelo):** 086, 087, 088, 089, 090.

@@ -44,6 +44,26 @@
 
 ---
 
+## Infra 2026-09-25 (activa)
+
+### Scoreboard
+
+| Wave | Planes | Done | Estado |
+|------|--------|------|--------|
+| Infra release | 106 | 1/1 | DONE (2026-09-25 — árbol 412→140 MB; ADR-021) |
+
+### Backlog
+
+- [x] 106 Snapshot liviano: geometría cruda fuera de git (prerelease `geometry-audit`) + `duckdb-eh.wasm` eliminado; guardrail de presupuesto (<160 MB)
+
+### Goto por síntoma
+
+| Quiero… | Ir a |
+|---|---|
+| detalle ejecutor | `plans/106-slim-release-snapshot.md` + `docs/adr/ADR-021-snapshot-release-liviano.md` |
+
+---
+
 ## Auditoría 2026-09-15 (historial, cerrada — commit `3315eb6`)
 
 > **Qué es esta sección:** goto de tracking de la auditoría 2026-09-15.

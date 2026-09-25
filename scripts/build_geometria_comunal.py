@@ -38,7 +38,11 @@ def main() -> None:
     parser.add_argument(
         "--skip-fetch",
         action="store_true",
-        help="No corre el extractor; reusa data/staging/geometria_comunal.csv existente.",
+        help=(
+            "No corre el extractor; reusa data/staging/geometria_comunal.csv "
+            "existente (requiere una extracción previa local: el CSV no está "
+            "en git, ver ADR-021)."
+        ),
     )
     args = parser.parse_args()
 

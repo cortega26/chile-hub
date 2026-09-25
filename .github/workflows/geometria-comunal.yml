@@ -107,13 +107,15 @@ jobs:
       - name: Commit validated candidate artifacts
         run: |
           git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Sólo artefactos durables: parquet + metadata + checksum. Los
+          # snapshots crudos (JSON de BCN, CSV intermedio) NO van al árbol de
+          # git — Zenodo archiva el tarball de cada tag y sumaban ~240 MB
+          # (ADR-021); se publican como assets del prerelease geometry-audit.
           for path in \
             data/normalized/geometria_comunal.parquet \
-            data/staging/geometria_comunal.csv \
             data/staging/geometria_comunal.metadata.json \
-            data/normalized/geometria_comunal.parquet.sha256 \
-            data/raw/bcn_geometria_comunal_*.json
+            data/normalized/geometria_comunal.parquet.sha256
           do
             [ -e "$path" ] && git add -f "$path"
           done
@@ -123,6 +125,23 @@ jobs:
             git commit -m "chore(data): refresh candidate comunal geometry [skip ci]"
             git push
           fi
+
+      - name: Upload raw audit to release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Auditoría cruda permanente fuera del árbol (ADR-021): el tarball
+          # del tag queda liviano para Zenodo y el snapshot sigue accesible.
+          # El tag `geometry-audit` no matchea tag_format="v{version}" de PSR.
+          if ! gh release view geometry-audit >/dev/null 2>&1; then
+            gh release create geometry-audit --target main --prerelease \
+              --title "Geometry audit snapshots (no versionado)" \
+              --notes "Snapshots crudos de auditoría de geometria_comunal. No forman parte del árbol de git (ADR-021)."
+          fi
+          gh release upload geometry-audit \
+            data/raw/bcn_geometria_comunal_*.json \
+            data/staging/geometria_comunal.csv \
+            --clobber
 
       - name: Summary
         run: |

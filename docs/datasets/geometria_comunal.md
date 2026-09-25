@@ -12,6 +12,16 @@ Es el dataset hermano de `resolve_comunas()` (nombre → CUT, Plan 050): éste r
 - **Gate de licencia completo:** [`docs/adr/ADR-012-geometria-comunal-y-reverse-geocoding.md`](../adr/ADR-012-geometria-comunal-y-reverse-geocoding.md)
 - **Carril:** `candidate` — cobertura 345/346 (falta `codigo_comuna=12202`, Antártica; mismo hueco que `comunas` ya suplementa a mano).
 
+## Auditoría cruda
+
+Los snapshots crudos de BCN (`bcn_geometria_comunal_*.json`) y el CSV intermedio
+(`geometria_comunal.csv`) **no se versionan en git**: viven como assets del
+prerelease
+[`geometry-audit`](https://github.com/cortega26/chile-hub/releases/tag/geometry-audit),
+que el workflow sube en cada refresh. Zenodo archiva el tarball del repo en cada
+tag y esos ~240 MB no son artefacto publicado (ADR-021). El commit del workflow
+lleva sólo el GeoParquet, su `.sha256` y el metadata de staging.
+
 ## Formato del artefacto
 
 `data/normalized/geometria_comunal.parquet` es **GeoParquet 1.0** (footer `geo` estándar, geometría codificada **WKB**, CRS **EPSG:4326 / WGS84**) — no un Parquet con una columna de texto WKT. Herramientas GIS (QGIS, geopandas, DuckDB con la extensión `spatial`, deck.gl, Observable) lo leen directamente como una capa geoespacial.
@@ -30,11 +40,12 @@ La geometría es **simplificada** (tolerancia Douglas-Peucker ≈ 0.001° ≈ 10
 import geopandas as gpd
 
 gdf = gpd.read_parquet("data/normalized/geometria_comunal.parquet")
-print(gdf.crs)          # EPSG:4326
+print(gdf.crs)  # EPSG:4326
 print(gdf.geometry.iloc[0].geom_type)  # Polygon | MultiPolygon
 
 # Join con otro dataset chile-hub por codigo_comuna
 from chile_hub import ChileHub
+
 hub = ChileHub()
 pobreza = hub.load_polars("pobreza_comunal").to_pandas()
 gdf_pobreza = gdf.merge(pobreza, on="codigo_comuna")

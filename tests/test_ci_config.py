@@ -662,22 +662,23 @@ class GeometriaCandidateWorkflowGuardrailTests(unittest.TestCase):
         self.assertNotIn("--skip-fetch", self.content)
         self.assertIn('metadata.get("source_mode") == "live"', self.content)
 
-    def test_commit_stages_only_allowed_geometry_artifacts_and_checksum(self):
+    def test_commit_stages_only_durable_geometry_artifacts(self):
+        """ADR-021: el commit sólo lleva parquet + metadata + checksum.
+
+        Raw (JSON de BCN) y CSV intermedio salen a los assets del prerelease
+        `geometry-audit`: en git inflaban el tarball de cada tag (~240 MB).
+        """
         expected_paths = [
             "data/normalized/geometria_comunal.parquet",
-            "data/staging/geometria_comunal.csv",
             "data/staging/geometria_comunal.metadata.json",
             "data/normalized/geometria_comunal.parquet.sha256",
-            "data/raw/bcn_geometria_comunal_*.json",
         ]
-        for path in expected_paths:
-            self.assertIn(path, self.content)
         self.assertIn("sha256sum -c geometria_comunal.parquet.sha256", self.content)
         self.assertIn('git add -f "$path"', self.content)
         self.assertIn("[skip ci]", self.content)
 
         commit_block = self.content.split("Commit validated candidate artifacts", 1)[1].split(
-            "- name: Summary", 1
+            "- name: Upload raw audit to release assets", 1
         )[0]
         staged_paths = [
             line.strip().rstrip("\\").strip()
@@ -685,12 +686,80 @@ class GeometriaCandidateWorkflowGuardrailTests(unittest.TestCase):
             if "data/" in line
         ]
         self.assertEqual(staged_paths, expected_paths)
+        self.assertNotIn("data/raw/", commit_block)
+
+    def test_raw_audit_is_uploaded_to_audit_release(self):
+        audit_block = self.content.split("Upload raw audit to release assets", 1)[1].split(
+            "- name: Summary", 1
+        )[0]
+        self.assertIn("gh release upload geometry-audit", audit_block)
+        self.assertIn("data/raw/bcn_geometria_comunal_*.json", audit_block)
+        self.assertIn("data/staging/geometria_comunal.csv", audit_block)
+        self.assertIn("--clobber", audit_block)
+        self.assertIn("--prerelease", audit_block)
 
     def test_workflow_does_not_call_stable_pipeline_or_bundle(self):
         self.assertNotIn("make build", self.content)
         self.assertNotIn("make extract", self.content)
         self.assertNotIn("package-bundle", self.content)
         self.assertNotIn("build_dev_db.py", self.content)
+
+
+class ReleaseSnapshotWeightGuardrailTests(unittest.TestCase):
+    """ADR-021: el árbol de cada tag debe quedar liviano para Zenodo.
+
+    Regresión real (2026-09-25): el tarball de v1.37.6 pesaba 412 MB (2 JSON de
+    geometría de 81 MB + CSV de 75 MB + wasm EH de 36 MB) y la ingesta de
+    Zenodo quedó ~1 h en "Received" sin emitir el DOI.
+    """
+
+    def test_unused_duckdb_eh_wasm_is_gone(self):
+        self.assertFalse(
+            (ROOT_DIR / "vendor" / "duckdb" / "duckdb-eh.wasm").exists(),
+            "duckdb-eh.wasm no está referenciado y no debe volver",
+        )
+        playground = (ROOT_DIR / "playground.js").read_text(encoding="utf-8")
+        self.assertNotIn("duckdb-eh", playground)
+
+    def test_geometry_raw_and_csv_are_not_tracked(self):
+        import subprocess
+
+        result = subprocess.run(
+            ["git", "ls-files", "data/raw", "data/staging"],
+            cwd=ROOT_DIR,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        tracked = result.stdout
+        self.assertNotIn("bcn_geometria_comunal", tracked)
+        self.assertNotIn("geometria_comunal.csv", tracked)
+        self.assertIn("geometria_comunal.metadata.json", tracked)
+
+    def test_tracked_tree_stays_under_budget(self):
+        """Mide el set versionado actual (workspace), no HEAD: así el guardrail
+        también falla antes de commitear si alguien re-agrega un archivo pesado."""
+        import subprocess
+
+        result = subprocess.run(
+            ["git", "ls-files", "-z"],
+            cwd=ROOT_DIR,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        total = 0
+        for name in result.stdout.split("\0"):
+            if not name:
+                continue
+            path = ROOT_DIR / name
+            if path.is_file():
+                total += path.stat().st_size
+        self.assertLess(
+            total,
+            160 * 1024 * 1024,
+            f"el árbol versionado pesa {total / 1024 / 1024:.1f} MB (>160 MB)",
+        )
 
 
 def _extract_make_target(makefile_content: str, target_name: str) -> str:
