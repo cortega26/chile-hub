@@ -11,8 +11,10 @@ mismo contrato que documenta `docs/http-access.md`; no descarga el bundle.
 from __future__ import annotations
 
 import datetime
+import io
 
 import polars as pl
+import requests
 
 from .datasets import Dataset
 from .text import normalize_comuna_name
@@ -28,7 +30,15 @@ def _parquet_url(base_url: str, name: str) -> str:
 
 def _read_dataset(name: str, base_url: str) -> pl.DataFrame:
     dataset = Dataset.from_string(name)  # ValueError con sugerencia si no existe
-    return pl.read_parquet(_parquet_url(base_url, dataset.value))
+    url = _parquet_url(base_url, dataset.value)
+    if url.startswith(("http://", "https://")):
+        # GitHub Pages no envía `Content-Length` y el reader HTTP de polars lo
+        # exige ("Content-Length Header missing from response"). Descargar con
+        # requests y parsear los bytes funciona con cualquier servidor.
+        response = requests.get(url, timeout=60)
+        response.raise_for_status()
+        return pl.read_parquet(io.BytesIO(response.content))
+    return pl.read_parquet(url)
 
 
 def list_datasets() -> list[dict]:

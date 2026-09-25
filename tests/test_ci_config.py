@@ -1255,6 +1255,28 @@ class PermisosSnapshotGuardrailTests(unittest.TestCase):
         self.assertLess(snapshots[-1].stat().st_size, 500 * 1024)
 
 
+class HttpAccessDocsGuardrailTests(unittest.TestCase):
+    """El ejemplo Python de acceso HTTP no debe volver al patrón roto.
+
+    Regresión real (2026-09-25): `pl.read_parquet("https://…")` falla contra
+    GitHub Pages con "Content-Length Header missing from response"; el ejemplo
+    documentado y el snippet del playground usaban justamente eso.
+    """
+
+    def test_http_access_python_example_downloads_with_requests(self):
+        content = (DOCS_DIR / "http-access.md").read_text(encoding="utf-8")
+        self.assertNotIn('pl.read_parquet("https://', content)
+        self.assertIn("io.BytesIO(requests.get(url", content)
+
+    def test_landing_python_snippet_downloads_with_requests(self):
+        content = (ROOT_DIR / "index.html").read_text(encoding="utf-8")
+        # Los dos ejemplos remotos (playground y tarjeta quickstart) deben
+        # descargar con requests; ninguno puede pasar la URL directo a polars.
+        self.assertGreaterEqual(content.count("io.BytesIO(requests.get(url"), 2)
+        self.assertNotIn("pl.read_parquet(url)", content)
+        self.assertNotRegex(content, r'pl\.read_parquet\(\s*<span class="string">"https://')
+
+
 if __name__ == "__main__":
     import pytest
 

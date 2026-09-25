@@ -2970,12 +2970,13 @@
                     </div>
                     <div class="console-body">
                         <div class="console-panel active" id="play-py">
-                            <pre><code><span class="keyword">import</span> polars <span class="keyword">as</span> pl
+                            <pre><code><span class="keyword">import</span> io
+<span class="keyword">import</span> polars <span class="keyword">as</span> pl
+<span class="keyword">import</span> requests
 
 <span class="comment"># Cargar comunas de Chile en una línea</span>
-df = pl.read_parquet(
-    <span class="string">"https://tooltician.com/chile-hub/data/normalized/comunas.parquet"</span>
-)
+url = <span class="string">"https://tooltician.com/chile-hub/data/normalized/comunas.parquet"</span>
+df = pl.read_parquet(io.BytesIO(requests.get(url, timeout=60).content))
 print(df.head())</code></pre>
                         </div>
                         <div class="console-panel" id="play-sql">
@@ -3194,10 +3195,13 @@ hub.resolve_comunas(["santiago", "nunoa"])</pre>
                         <button class="quickstart-copy" data-copy-target="quickstart-python" aria-label="Copiar código de integración para Python y Polars">Copiar</button>
                     </div>
                     <div class="quickstart-desc">Carga el Parquet publicado directamente desde cualquier notebook o servicio.</div>
-                    <pre class="quickstart-code" id="quickstart-python">import polars as pl
+                    <pre class="quickstart-code" id="quickstart-python">import io
+
+import polars as pl
+import requests
 
 url = "https://tooltician.com/chile-hub/data/normalized/comunas.parquet"
-df = pl.read_parquet(url)</pre>
+df = pl.read_parquet(io.BytesIO(requests.get(url, timeout=60).content))</pre>
                 </article>
                 <article class="quickstart-card">
                     <div class="quickstart-head">

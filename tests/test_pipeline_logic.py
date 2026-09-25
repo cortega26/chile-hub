@@ -5201,6 +5201,49 @@ class McpToolsTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 get_indicadores(desde="01-02-2026", base_url=tmpdir)
 
+    def test_read_dataset_over_http_without_content_length(self):
+        """GitHub Pages no envía Content-Length y polars URL directo falla.
+
+        Regresión real (2026-09-25): las tools MCP fallaban en vivo con
+        "Content-Length Header missing from response" al leer el Parquet
+        público. Se descarga con requests y se parsea desde bytes.
+        """
+        import threading
+        from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+        from chile_hub.mcp_tools import get_dataset
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "comunas.parquet"
+            pl.DataFrame({"codigo_comuna": ["01101"], "nombre_comuna": ["Iquique"]}).write_parquet(
+                path
+            )
+            payload = path.read_bytes()
+
+            class _NoLengthHandler(BaseHTTPRequestHandler):
+                # HTTP/1.0 sin Content-Length: el body se delimita al cerrar
+                # la conexión, igual que el hosting estático real.
+                def do_GET(self):  # noqa: N802
+                    self.send_response(200)
+                    self.send_header("Content-Type", "application/octet-stream")
+                    self.end_headers()
+                    self.wfile.write(payload)
+
+                def log_message(self, *args):  # pragma: no cover - silencio
+                    pass
+
+            server = ThreadingHTTPServer(("127.0.0.1", 0), _NoLengthHandler)
+            thread = threading.Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            try:
+                base = f"http://127.0.0.1:{server.server_port}"
+                result = get_dataset("comunas", limite=1, base_url=base)
+                self.assertEqual(result["filas_totales"], 1)
+                self.assertEqual(result["registros"][0]["codigo_comuna"], "01101")
+            finally:
+                server.shutdown()
+                server.server_close()
+
     def test_server_module_import_is_lazy(self):
         """Sin el extra `mcp`, importar el módulo no debe romper; `build_server`
         debe dar un error explícito con la instrucción de instalación."""

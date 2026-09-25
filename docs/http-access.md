@@ -29,11 +29,20 @@ curl -s https://tooltician.com/chile-hub/data/normalized/data.json | jq '.datase
 ## Python
 
 ```python
-import polars as pl
+import io
 
-df = pl.read_parquet("https://tooltician.com/chile-hub/data/normalized/comunas.parquet")
+import polars as pl
+import requests
+
+url = "https://tooltician.com/chile-hub/data/normalized/comunas.parquet"
+df = pl.read_parquet(io.BytesIO(requests.get(url, timeout=60).content))
 print(df.head())
 ```
+
+> **Por qué no `pl.read_parquet(url)` directo:** GitHub Pages no envía el header
+> `Content-Length` y el reader HTTP de polars lo exige (`Content-Length Header
+> missing from response`). Descarga con `requests` (como arriba) o usa DuckDB
+> con `httpfs`, que sí lo soporta.
 
 O usando la librería, con el descriptor Frictionless:
 
