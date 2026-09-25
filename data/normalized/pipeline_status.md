@@ -1,6 +1,6 @@
 # chile-hub pipeline status
 
-- `generated_at_utc`: `2026-09-25T19:33:06.508520+00:00`
+- `generated_at_utc`: `2026-09-25T19:43:40.331750+00:00`
 - `overall_status`: `warn`
 - `warning_count`: `6`
 - `top_issue`: `indicadores` (freshness=fresh, drift=drifted, warnings=1)
@@ -12,31 +12,31 @@
 | Dataset | Source | Mode | Detail | Freshness | Coverage | Records | Validation | Warnings |
 | :--- | :--- | :--- | :--- | :--- | :--- | ---: | :--- | :--- |
 | `autoridades_electas` | Cámara de Diputadas y Diputados + Senado de Chile | `live` | `WSDiputado.asmx/retornarDiputadosPeriodoActual + camara.cl + senado.cl (Scrapling)` | `fresh (0.0h / 87600h)` | `full` | 205 | `ok` | none |
-| `calidad_aire` | SINCA — Ministerio del Medio Ambiente | `live` | `Promedios diarios por estación y contaminante (MP2.5, MP10, SO2, NO2, CO, O3) desde el JSON del SINCA. Cobertura parcial por diseño (~65 comunas con estación). Serie incremental desde la primera cosecha.` | `fresh (0.02h / 72h)` | `not_applicable` | 1510 | `ok` | cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación |
+| `calidad_aire` | SINCA — Ministerio del Medio Ambiente | `live` | `Promedios diarios por estación y contaminante (MP2.5, MP10, SO2, NO2, CO, O3) desde el JSON del SINCA. Cobertura parcial por diseño (~65 comunas con estación). Serie incremental desde la primera cosecha.` | `fresh (0.0h / 72h)` | `not_applicable` | 1510 | `ok` | cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación |
 | `censo_comunal` | Instituto Nacional de Estadisticas - Censo 2024 | `live` | `official_xlsx` | `fresh (0.04h / 87600h)` | `full` | 346 | `ok` | none |
 | `censo_hogares_viviendas` | Instituto Nacional de Estadisticas - Censo 2024 | `live` | `official_xlsx` | `fresh (0.04h / 87600h)` | `full` | 346 | `ok` | none |
 | `comunas` | BCN ArcGIS | `live` | `bcn_arcgis` | `fresh (0.04h / 2160h)` | `full` | 346 | `ok` | none |
 | `comunas_enriquecidas` | BCN ArcGIS | `live` | `bcn_arcgis` | `fresh (0.04h / 2160h)` | `full` | 346 | `ok` | none |
 | `consumo_electrico_comunal` | CNE — Energía Abierta | `fallback` | `Consumo eléctrico anual por comuna y tipo de cliente` | `fresh (0.03h / 17520h)` | `not_applicable` | 3 | `ok` | tipos de cliente: ['Comercial', 'Residencial']; años disponibles: [2023]; consumo_electrico_comunal source_mode is fallback; usando datos de muestra mínima. |
-| `distritos_electorales` | BCN / Biblioteca del Congreso Nacional de Chile | `live` | `bcn_electoral_mapping_generated` | `fresh (0.03h / 87600h)` | `full` | 346 | `ok` | none |
+| `distritos_electorales` | BCN / Biblioteca del Congreso Nacional de Chile | `live` | `bcn_electoral_mapping_generated` | `fresh (0.04h / 87600h)` | `full` | 346 | `ok` | none |
 | `empresas` | Ministerio de Economia, Fomento y Turismo - Registro de Empresas y Sociedades (RES) | `live` | `datos_gob_cl_ckan_api` | `fresh (0.03h / 1080h)` | `not_applicable` | 1609373 | `ok` | RES solo cubre constituciones bajo Ley 20.659 (regimen simplificado). No incluye empresas del regimen tradicional (Diario Oficial) ni empresas anteriores a mayo 2013. |
-| `establecimientos_educacionales` | Ministerio de Educación - Directorio Oficial de Establecimientos | `live` | `mineduc_datos_abiertos_rar` | `fresh (0.03h / 8760h)` | `not_applicable` | 12898 | `ok` | none |
-| `establecimientos_salud` | Ministerio de Salud - Establecimientos de Salud | `live` | `datos_gob_csv` | `fresh (0.03h / 1080h)` | `not_applicable` | 5743 | `ok` | none |
-| `estadisticas_vitales` | Instituto Nacional de Estadísticas (INE) — Estadísticas Vitales | `live` | `Anuarios de Estadísticas Vitales (tabulados XLSX, tabla 1.2.2-04 por comuna de residencia). Solo definitivos: los boletines provisionales del INE no publican desglose comunal.` | `fresh (0.02h / 8760h)` | `not_applicable` | 13840 | `ok` | none |
-| `finanzas_municipales` | SINIM - SUBDERE | `monthly` | `curated_fallback_pending_direct_export` | `fresh (592.48h / 8760h)` | `not_applicable` | 345 | `ok` | none |
+| `establecimientos_educacionales` | Ministerio de Educación - Directorio Oficial de Establecimientos | `live` | `mineduc_datos_abiertos_rar` | `fresh (0.04h / 8760h)` | `not_applicable` | 12898 | `ok` | none |
+| `establecimientos_salud` | Ministerio de Salud - Establecimientos de Salud | `live` | `datos_gob_csv` | `fresh (0.04h / 1080h)` | `not_applicable` | 5743 | `ok` | none |
+| `estadisticas_vitales` | Instituto Nacional de Estadísticas (INE) — Estadísticas Vitales | `live` | `Anuarios de Estadísticas Vitales (tabulados XLSX, tabla 1.2.2-04 por comuna de residencia). Solo definitivos: los boletines provisionales del INE no publican desglose comunal.` | `fresh (0.01h / 8760h)` | `not_applicable` | 13840 | `ok` | none |
+| `finanzas_municipales` | SINIM - SUBDERE | `monthly` | `curated_fallback_pending_direct_export` | `fresh (592.65h / 8760h)` | `not_applicable` | 345 | `ok` | none |
 | `indicadores` | Banco Central de Chile (via mindicador.cl) | `live` | `public_api_with_published_backfill` | `fresh (0.04h / 72h)` | `not_applicable` | 665 | `ok` | indicadores live refresh reused last published artifact for missing codes: ipc |
-| `indicadores_urbanos_siedu` | INE - Sistema de Indicadores y Estándares de Desarrollo Urbano | `live` | `ine_siedu_xlsm_cinco_mediciones_2018_2022` | `fresh (0.03h / 8760h)` | `partial` | 6701 | `ok` | indicadores_urbanos_siedu has intentionally partial urban coverage |
+| `indicadores_urbanos_siedu` | INE - Sistema de Indicadores y Estándares de Desarrollo Urbano | `live` | `ine_siedu_xlsm_cinco_mediciones_2018_2022` | `fresh (0.04h / 8760h)` | `partial` | 6701 | `ok` | indicadores_urbanos_siedu has intentionally partial urban coverage |
 | `partidos_politicos` | Cámara de Diputadas y Diputados (datos abiertos) + SERVEL | `live` | `WSComun.asmx/retornarPartidosPoliticos + servel.cl/partidos-politicos (estado legal)` | `fresh (0.03h / 87600h)` | `full` | 37 | `ok` | estado_legal poblado (vía SERVEL) en 16/37 partidos |
 | `perfil_territorial_comunal` | chile-hub | `live` | `derived_from_validated_chile_hub_layers` | `fresh (0.0h / 1080h)` | `full` | 346 | `ok` | none |
-| `permisos_edificacion` | MINVU — Centro de Estudios de Ciudad y Territorio (CEDOC) | `monthly` | `Viviendas en unidades y superficie (m2) por comuna y año, serie desde 2002 (MINVU CEDOC, en base a permisos otorgados por las Direcciones de Obras Municipales e INE).` | `fresh (0.41h / 1080h)` | `not_applicable` | 8650 | `ok` | none |
+| `permisos_edificacion` | MINVU — Centro de Estudios de Ciudad y Territorio (CEDOC) | `monthly` | `Viviendas en unidades y superficie (m2) por comuna y año, serie desde 2002 (MINVU CEDOC, en base a permisos otorgados por las Direcciones de Obras Municipales e INE).` | `fresh (0.58h / 1080h)` | `not_applicable` | 8650 | `ok` | none |
 | `pobreza_comunal` | Observatorio Social — Ministerio de Desarrollo Social y Familia | `live` | `Estimaciones de Pobreza Comunal vía SAE desde encuesta CASEN` | `fresh (0.03h / 175200h)` | `not_applicable` | 690 | `ok` | cobertura SAE: 345/346 comunas (99.7%) — parcial por diseño; comunas sin muestra no tienen estimación |
 | `provincias` | BCN ArcGIS | `live` | `bcn_arcgis` | `fresh (0.04h / 2160h)` | `full` | 56 | `ok` | none |
 | `regiones` | BCN ArcGIS | `live` | `bcn_arcgis` | `fresh (0.04h / 2160h)` | `full` | 16 | `ok` | none |
-| `resultados_educacionales` | Centro de Estudios MINEDUC - Rendimiento 2024 | `live` | `mineduc_rendimiento_2024_rar_agregado_por_comuna` | `fresh (0.03h / 8760h)` | `not_applicable` | 345 | `ok` | none |
+| `resultados_educacionales` | Centro de Estudios MINEDUC - Rendimiento 2024 | `live` | `mineduc_rendimiento_2024_rar_agregado_por_comuna` | `fresh (0.04h / 8760h)` | `not_applicable` | 345 | `ok` | none |
 
 ## autoridades_electas
 
-- `refreshed_at_utc`: `2026-09-25T19:32:50.839314+00:00`
+- `refreshed_at_utc`: `2026-09-25T19:43:31.022570+00:00`
 - `freshness`: `fresh (0.0h / 87600h)`
 - `coverage`: `Cobertura completa: 205/205 filas respecto del baseline esperado.`
 - `fields`: `id_autoridad, nombre, cargo, institucion, partido, pacto, distrito_electoral, circunscripcion_senatorial, codigo_comuna, codigo_region, periodo_inicio, periodo_fin, estado_mandato, fuente, url_fuente, fecha_consulta`
@@ -45,16 +45,16 @@
 
 ## calidad_aire
 
-- `refreshed_at_utc`: `2026-09-25T19:32:02.867828+00:00`
-- `freshness`: `fresh (0.02h / 72h)`
+- `refreshed_at_utc`: `2026-09-25T19:43:24.606750+00:00`
+- `freshness`: `fresh (0.0h / 72h)`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
 - `fields`: `fecha, id_estacion, nombre_estacion, codigo_region, codigo_comuna, nombre_comuna, latitud, longitud, codigo_contaminante, nombre_contaminante, unidad, valor_promedio_diario, valor_max_horario, horas_validas, estado_dato, fuente, url_fuente, fecha_fuente`
-- `notes`: inventario: 126 estaciones en el listado; 126 con filas emitidas; 754 filas diarias nuevas desde 'sinca_listadomapa_20260925T193202Z.json'; historial: fusionado con staging existente
+- `notes`: inventario: 126 estaciones en el listado; 126 con filas emitidas; 754 filas diarias nuevas desde 'sinca_listadomapa_20260925T194324Z.json'; historial: sembrado desde Parquet publicado (1510 filas)
 - `warnings`: cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación
 
 ## censo_comunal
 
-- `refreshed_at_utc`: `2026-09-25T19:30:58.830142+00:00`
+- `refreshed_at_utc`: `2026-09-25T19:41:09.792317+00:00`
 - `freshness`: `fresh (0.04h / 87600h)`
 - `coverage`: `Cobertura completa: 346/346 filas respecto del baseline esperado.`
 - `fields`: `codigo_region, nombre_region, codigo_provincia, nombre_provincia, codigo_comuna, nombre_comuna, poblacion_censada, hombres, mujeres, razon_hombre_mujer, poblacion_0_14, poblacion_15_29, poblacion_30_44, poblacion_45_64, poblacion_65_mas`
@@ -63,7 +63,7 @@
 
 ## censo_hogares_viviendas
 
-- `refreshed_at_utc`: `2026-09-25T19:30:59.506503+00:00`
+- `refreshed_at_utc`: `2026-09-25T19:41:10.731565+00:00`
 - `freshness`: `fresh (0.04h / 87600h)`
 - `coverage`: `Cobertura completa: 346/346 filas respecto del baseline esperado.`
 - `fields`: `codigo_region, nombre_region, codigo_provincia, nombre_provincia, codigo_comuna, nombre_comuna, viviendas_censadas, viviendas_particulares_ocupadas, viviendas_particulares_desocupadas, viviendas_colectivas, hogares_censados, promedio_personas_hogar`
@@ -71,7 +71,7 @@
 
 ## comunas
 
-- `refreshed_at_utc`: `2026-09-25T19:30:53.884418+00:00`
+- `refreshed_at_utc`: `2026-09-25T19:41:01.316351+00:00`
 - `freshness`: `fresh (0.04h / 2160h)`
 - `coverage`: `Cobertura completa: 346/346 filas respecto del baseline esperado.`
 - `fields`: `codigo_region, nombre_region, abreviatura, codigo_provincia, nombre_provincia, codigo_comuna, nombre_comuna, nombre_comuna_clean, latitud_cabecera, longitud_cabecera, poblacion_estimada`
@@ -80,7 +80,7 @@
 
 ## comunas_enriquecidas
 
-- `refreshed_at_utc`: `2026-09-25T19:30:53.884418+00:00`
+- `refreshed_at_utc`: `2026-09-25T19:41:01.316351+00:00`
 - `freshness`: `fresh (0.04h / 2160h)`
 - `coverage`: `Cobertura completa: 346/346 filas respecto del baseline esperado.`
 - `fields`: `codigo_region, nombre_region, abreviatura, codigo_provincia, nombre_provincia, codigo_comuna, nombre_comuna, nombre_comuna_clean, latitud_cabecera, longitud_cabecera, poblacion_estimada`
@@ -89,7 +89,7 @@
 
 ## consumo_electrico_comunal
 
-- `refreshed_at_utc`: `2026-09-25T19:31:32.683081+00:00`
+- `refreshed_at_utc`: `2026-09-25T19:41:52.985646+00:00`
 - `freshness`: `fresh (0.03h / 17520h)`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
 - `fields`: `codigo_region, codigo_comuna, nombre_comuna, anio, tipo_cliente, consumo_kwh, numero_clientes, fuente, url_fuente, fecha_fuente`
@@ -98,41 +98,41 @@
 
 ## distritos_electorales
 
-- `refreshed_at_utc`: `2026-09-25T19:31:02.321582+00:00`
-- `freshness`: `fresh (0.03h / 87600h)`
+- `refreshed_at_utc`: `2026-09-25T19:41:12.099707+00:00`
+- `freshness`: `fresh (0.04h / 87600h)`
 - `coverage`: `Cobertura completa: 346/346 filas respecto del baseline esperado.`
 - `fields`: `codigo_comuna, nombre_comuna, distrito_electoral, circunscripcion_senatorial`
 - `warnings`: none
 
 ## empresas
 
-- `refreshed_at_utc`: `2026-09-25T19:31:26.608169+00:00`
+- `refreshed_at_utc`: `2026-09-25T19:41:43.636971+00:00`
 - `freshness`: `fresh (0.03h / 1080h)`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
 - `fields`: `rut, razon_social, codigo_sociedad, tipo_actuacion, capital, fecha_actuacion, fecha_registro, fecha_aprobacion_sii, anio, mes, comuna_tributaria, region_tributaria, comuna_social, region_social`
-- `notes`: filas descartadas por RUT centinela ['0']: 0; Solo incluye empresas constituidas bajo el Regimen Simplificado (Ley 20.659) desde mayo 2013.; No contiene dirección postal (solo comuna y región).; No contiene actividad económica (giro).; No refleja cese de actividades ni modificaciones posteriores.; Los codigos de region usan el formato numerico del SII (1-15), distinto del codigo CUT (01-16). Verificar antes de cruzar con DPA.
+- `notes`: filas descartadas por RUT centinela ['0']: 1; Solo incluye empresas constituidas bajo el Regimen Simplificado (Ley 20.659) desde mayo 2013.; No contiene dirección postal (solo comuna y región).; No contiene actividad económica (giro).; No refleja cese de actividades ni modificaciones posteriores.; Los codigos de region usan el formato numerico del SII (1-15), distinto del codigo CUT (01-16). Verificar antes de cruzar con DPA.
 - `warnings`: RES solo cubre constituciones bajo Ley 20.659 (regimen simplificado). No incluye empresas del regimen tradicional (Diario Oficial) ni empresas anteriores a mayo 2013.
 
 ## establecimientos_educacionales
 
-- `refreshed_at_utc`: `2026-09-25T19:31:05.300600+00:00`
-- `freshness`: `fresh (0.03h / 8760h)`
+- `refreshed_at_utc`: `2026-09-25T19:41:14.969959+00:00`
+- `freshness`: `fresh (0.04h / 8760h)`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
 - `fields`: `rbd, dv_rbd, nombre_establecimiento, codigo_region, codigo_comuna, dependencia_administrativa, latitud, longitud, estado_funcionamiento`
 - `warnings`: none
 
 ## establecimientos_salud
 
-- `refreshed_at_utc`: `2026-09-25T19:31:02.109334+00:00`
-- `freshness`: `fresh (0.03h / 1080h)`
+- `refreshed_at_utc`: `2026-09-25T19:41:11.982622+00:00`
+- `freshness`: `fresh (0.04h / 1080h)`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
 - `fields`: `codigo_establecimiento, nombre_establecimiento, tipo_establecimiento, dependencia_administrativa, nivel_atencion, codigo_region, nombre_region, codigo_comuna, nombre_comuna, tiene_servicio_urgencia, tipo_urgencia, latitud, longitud, estado_funcionamiento`
 - `warnings`: none
 
 ## estadisticas_vitales
 
-- `refreshed_at_utc`: `2026-09-25T19:31:57.700229+00:00`
-- `freshness`: `fresh (0.02h / 8760h)`
+- `refreshed_at_utc`: `2026-09-25T19:43:12.337685+00:00`
+- `freshness`: `fresh (0.01h / 8760h)`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
 - `fields`: `anio, codigo_region, codigo_comuna, nombre_comuna, evento, sexo, cantidad, estado_dato, fuente, url_fuente, fecha_fuente`
 - `notes`: 2010: 692 filas desde 'Anuario de estadísticas vitales 2010' (hoja 122-04; TOTAL país: 250643 nacimientos, 97930 defunciones); 2011: 692 filas desde 'Anuario de estadísticas vitales 2011' (hoja 122-04; TOTAL país: 247358 nacimientos, 94985 defunciones); 2012: 692 filas desde 'Anuario de estadísticas vitales 2012' (hoja 122-04; TOTAL país: 243635 nacimientos, 98711 defunciones); 2013: 692 filas desde 'Anuario de estadísticas vitales 2013' (hoja 1.2.2-04; TOTAL país: 242005 nacimientos, 99770 defunciones); 2014: 692 filas desde 'Anuario de estadísticas vitales 2014' (hoja 1.2.2-04; TOTAL país: 250997 nacimientos, 101960 defunciones); 2015: 692 filas desde 'Anuario de estadísticas vitales 2015' (hoja 1.2.2-04; TOTAL país: 244670 nacimientos, 103327 defunciones); 2016: 692 filas desde 'Anuario de estadísticas vitales nacimientos 2016' (hoja 1.2.2-04; TOTAL país: 231749 nacimientos, 104026 defunciones); 2017: 692 filas desde 'Anuario de estadísticas vitales 2017' (hoja 1.2.2-04; TOTAL país: 219186 nacimientos, 106388 defunciones); 2018: convención de indentado invertida (comuna indentada); 2018: 692 filas desde 'Anuario de estadísticas vitales 2018' (hoja 122-04; TOTAL país: 221731 nacimientos, 106796 defunciones); 2019: convención de indentado invertida (comuna indentada); 2019: 692 filas desde 'Anuario de estadísticas vitales 2019' (hoja 122-04; TOTAL país: 210188 nacimientos, 109658 defunciones); 2020: convención de indentado invertida (comuna indentada); 2020: 692 filas desde 'Anuario de estadísticas vitales 2020' (hoja 122-04; TOTAL país: 194978 nacimientos, 126169 defunciones); 2021: 2076 filas desde 'Anuario de estadísticas vitales 2021' (hoja 122-04; TOTAL país: 177273 nacimientos, 137629 defunciones); 2022: 2076 filas desde 'Anuario de estadísticas vitales 2022, nacimientos y defunciones' (hoja 122-04; TOTAL país: 189303 nacimientos, 136972 defunciones); 2023: 2076 filas desde 'Anuario de estadísticas vitales 2023, nacimientos y defunciones' (hoja 122-04; TOTAL país: 174057 nacimientos, 122218 defunciones)
@@ -141,7 +141,7 @@
 ## finanzas_municipales
 
 - `refreshed_at_utc`: `2026-09-01T03:04:24.987281+00:00`
-- `freshness`: `fresh (592.48h / 8760h)`
+- `freshness`: `fresh (592.65h / 8760h)`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
 - `fields`: `anio, codigo_comuna, nombre_comuna, ingresos_totales, gastos_totales, ingresos_propios_permanentes, fondo_comun_municipal, gasto_personal, gasto_inversion`
 - `notes`: live: Playwright configurando filtros SINIM; live: descargando XML Spreadsheet; live: parseando XML Spreadsheet; live: 345 municipios extraídos (snapshot: sinim_finanzas_municipales_20260901T030218Z.xlsx)
@@ -149,7 +149,7 @@
 
 ## indicadores
 
-- `refreshed_at_utc`: `2026-09-25T19:30:57.069320+00:00`
+- `refreshed_at_utc`: `2026-09-25T19:41:05.189920+00:00`
 - `freshness`: `fresh (0.04h / 72h)`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
 - `fields`: `fecha, codigo_indicador, valor`
@@ -159,8 +159,8 @@
 
 ## indicadores_urbanos_siedu
 
-- `refreshed_at_utc`: `2026-09-25T19:31:11.336747+00:00`
-- `freshness`: `fresh (0.03h / 8760h)`
+- `refreshed_at_utc`: `2026-09-25T19:41:25.588118+00:00`
+- `freshness`: `fresh (0.04h / 8760h)`
 - `coverage`: `Comunas urbanas incluidas por SIEDU, no las 346 comunas del país.`
 - `fields`: `anio, codigo_comuna, codigo_indicador, nombre_indicador, categoria, valor, unidad, fuente_original, cobertura_tipo`
 - `notes`: partial_urban_coverage_expected; deduplicado_anno_mas_reciente_por_indicador_comuna; 5_mediciones_2018_2022_consolidadas; live_data: xlsm parseado, 6701 registros, 117 comunas, 68 indicadores
@@ -168,7 +168,7 @@
 
 ## partidos_politicos
 
-- `refreshed_at_utc`: `2026-09-25T19:31:34.848514+00:00`
+- `refreshed_at_utc`: `2026-09-25T19:41:54.754952+00:00`
 - `freshness`: `fresh (0.03h / 87600h)`
 - `coverage`: `Cobertura completa: 37/36 filas respecto del baseline esperado.`
 - `fields`: `id_partido, nombre, sigla, estado_legal, fecha_constitucion, ambito, fuente, url_fuente, fecha_consulta`
@@ -177,7 +177,7 @@
 
 ## perfil_territorial_comunal
 
-- `refreshed_at_utc`: `2026-09-25T19:33:06.502402+00:00`
+- `refreshed_at_utc`: `2026-09-25T19:43:40.329401+00:00`
 - `freshness`: `fresh (0.0h / 1080h)`
 - `coverage`: `Cobertura completa: 346/346 filas respecto del baseline esperado.`
 - `fields`: `codigo_region, nombre_region, abreviatura, codigo_provincia, nombre_provincia, codigo_comuna, nombre_comuna, nombre_comuna_clean, latitud_cabecera, longitud_cabecera, poblacion_estimada, poblacion_censada, poblacion_hombres, poblacion_mujeres, poblacion_0_14, poblacion_15_29, poblacion_30_44, poblacion_45_64, poblacion_65_mas, viviendas_censadas, hogares_censados, promedio_personas_por_hogar, establecimientos_salud_total, establecimientos_educacionales_total, distrito_electoral, circunscripcion_senatorial, anio_finanzas, ingresos_totales, gastos_totales, ingresos_propios_permanentes, fondo_comun_municipal, gasto_personal, gasto_inversion, anio_resultados_educacionales, matricula_total, asistencia_promedio, tasa_aprobacion, tasa_reprobacion, tasa_retiro, establecimientos_reportados, indicadores_siedu_total, valor_promedio_siedu, crecimiento_natural_ultimo_anio, anio_estadisticas_vitales, viviendas_autorizadas_ultimo_anio, superficie_autorizada_m2_ultimo_anio, anio_permisos_edificacion, mp25_promedio_ultimo_anio, anio_calidad_aire`
@@ -187,15 +187,15 @@
 ## permisos_edificacion
 
 - `refreshed_at_utc`: `2026-09-25T19:08:42+00:00`
-- `freshness`: `fresh (0.41h / 1080h)`
+- `freshness`: `fresh (0.58h / 1080h)`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
 - `fields`: `anio, codigo_region, codigo_comuna, nombre_comuna, unidades_total, superficie_m2_total, unidades_casas, superficie_m2_casas, unidades_departamentos, superficie_m2_departamentos, estado_dato, fuente, url_fuente, fecha_fuente`
-- `notes`: descubrimiento: simulado; descarga falló, usando snapshot versionado minvu_permisos_edificacion_anual_20260925T190842Z.xlsx (bloqueado por IP (simulado)); 8650 filas desde 'minvu_permisos_edificacion_anual_20260925T190842Z.xlsx' (hojas: número_total, m2_total, número_departamentos, m2_departamentos, número_casas, m2_casas; años provisionales: [2024, 2025, 2026])
+- `notes`: descubrimiento: repositorio-biblionumber; descarga falló, usando snapshot versionado minvu_permisos_edificacion_anual_20260925T190842Z.xlsx (Failed to perform, curl: (35) BoringSSL SSL_connect: Connection closed abruptly (SSL_ERROR_SYSCALL; error queue empty) in connection to catalogo.minvu.cl:443. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.); 8650 filas desde 'minvu_permisos_edificacion_anual_20260925T190842Z.xlsx' (hojas: número_total, m2_total, número_departamentos, m2_departamentos, número_casas, m2_casas; años provisionales: [2024, 2025, 2026])
 - `warnings`: none
 
 ## pobreza_comunal
 
-- `refreshed_at_utc`: `2026-09-25T19:31:28.058012+00:00`
+- `refreshed_at_utc`: `2026-09-25T19:41:47.962792+00:00`
 - `freshness`: `fresh (0.03h / 175200h)`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
 - `fields`: `codigo_region, codigo_comuna, nombre_comuna, anio, dimension, tasa, limite_inferior, limite_superior, metodologia, fuente, url_fuente, fecha_fuente`
@@ -204,7 +204,7 @@
 
 ## provincias
 
-- `refreshed_at_utc`: `2026-09-25T19:30:53.884418+00:00`
+- `refreshed_at_utc`: `2026-09-25T19:41:01.316351+00:00`
 - `freshness`: `fresh (0.04h / 2160h)`
 - `coverage`: `Cobertura completa: 56/56 filas respecto del baseline esperado.`
 - `fields`: `codigo_region, nombre_region, codigo_provincia, nombre_provincia`
@@ -213,7 +213,7 @@
 
 ## regiones
 
-- `refreshed_at_utc`: `2026-09-25T19:30:53.884418+00:00`
+- `refreshed_at_utc`: `2026-09-25T19:41:01.316351+00:00`
 - `freshness`: `fresh (0.04h / 2160h)`
 - `coverage`: `Cobertura completa: 16/16 filas respecto del baseline esperado.`
 - `fields`: `codigo_region, nombre_region`
@@ -222,8 +222,8 @@
 
 ## resultados_educacionales
 
-- `refreshed_at_utc`: `2026-09-25T19:31:10.046626+00:00`
-- `freshness`: `fresh (0.03h / 8760h)`
+- `refreshed_at_utc`: `2026-09-25T19:41:23.450586+00:00`
+- `freshness`: `fresh (0.04h / 8760h)`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
 - `fields`: `anio, codigo_comuna, matricula_total, asistencia_promedio, tasa_aprobacion, tasa_reprobacion, tasa_retiro, establecimientos_reportados`
 - `notes`: privacy_safe_comuna_year_aggregation; sit_fin_r_Y=retirado T=trasladado asistencia_only_for_P_R_students; source_file: mineduc_rendimiento_2024.rar, comunas_agregadas: 345

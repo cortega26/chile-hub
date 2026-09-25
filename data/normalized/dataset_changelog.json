@@ -1,13 +1,13 @@
 {
-  "generated_at_utc": "2026-09-25T19:33:06.508520+00:00",
-  "previous_generated_at_utc": "2026-09-25T19:32:28.005486+00:00",
+  "generated_at_utc": "2026-09-25T19:43:40.331750+00:00",
+  "previous_generated_at_utc": "2026-09-25T19:33:06.508520+00:00",
   "dataset_count": 22,
   "datasets": [
     {
       "dataset": "autoridades_electas",
-      "previous_record_count": 155,
+      "previous_record_count": 205,
       "current_record_count": 205,
-      "record_count_delta": 50,
+      "record_count_delta": 0,
       "added_fields": [],
       "removed_fields": [],
       "previous_source_mode": "live",
@@ -16,7 +16,7 @@
       "current_freshness_status": "fresh",
       "previous_validation_status": "ok",
       "current_validation_status": "ok",
-      "change_severity": "patch",
+      "change_severity": "none",
       "breaking_changes": [],
       "new_columns": [],
       "removed_columns": [],
