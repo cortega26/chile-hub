@@ -19,50 +19,50 @@ están pendientes de review.
 
 ### Plan 101 — subsets HF + `hf://`
 
-- [ ] Drift check corrido
-- [ ] `_build_dataset_configs()` + placeholder en la card + dry-run con 19 configs
-- [ ] Ejemplo de uso por config + metadata de licencia/tamaño corregida
-- [ ] `hf://` documentado en `docs/http-access.md`
-- [ ] `HfDatasetCardTests` + guardrail de placeholders en verde
-- [ ] Done criteria verificados; fila de `plans/README.md` + `ROADMAP.md` a DONE
+- [x] Drift check corrido
+- [x] `_build_dataset_configs()` + placeholder en la card + dry-run con 19 configs
+- [x] Ejemplo de uso por config + metadata de licencia/tamaño corregida
+- [x] `hf://` documentado en `docs/http-access.md`
+- [x] `HfDatasetCardTests` + guardrail de placeholders en verde
+- [x] Done criteria verificados; fila de `plans/README.md` + `ROADMAP.md` a DONE
 
 ### Plan 102 — JSON-LD por dataset + sitemap index + `llms.txt`
 
-- [ ] Drift check corrido
-- [ ] `sitemap.xml` → sitemapindex (3 hijos) + `sitemap-pages.xml`
-- [ ] `build_dataset_json_ld()` en `src/builders/landing.py`
-- [ ] `scripts/inject_dataset_json_ld.py` idempotente + wiring en `pages-deploy.yml`
-- [ ] `llms.txt` en raíz
-- [ ] `DatasetSeoTests` + guardrails de CI en verde
-- [ ] Done criteria verificados; fila de `plans/README.md` + `ROADMAP.md` a DONE
+- [x] Drift check corrido
+- [x] `sitemap.xml` → sitemapindex (3 hijos) + `sitemap-pages.xml`
+- [x] `build_dataset_json_ld()` en `src/builders/landing.py`
+- [x] `scripts/inject_dataset_json_ld.py` idempotente + wiring en `pages-deploy.yml`
+- [x] `llms.txt` en raíz
+- [x] `DatasetSeoTests` + guardrails de CI en verde
+- [x] Done criteria verificados; fila de `plans/README.md` + `ROADMAP.md` a DONE
 
 ### Plan 103 — `CITATION.cff` + citación/Zenodo
 
-- [ ] Drift check corrido
-- [ ] `CITATION.cff` (sin `version:` — evita drift con PSR)
-- [ ] `docs/citation.md` + nav + sección "Cómo citar" en README
-- [ ] `examples/notebooks/README.md` con 4 badges Colab
-- [ ] `CitationFileGuardrailTests` en verde
-- [ ] Checklist Zenodo documentado (acción del operador) y Done criteria verificados
-- [ ] Fila de `plans/README.md` + `ROADMAP.md` a DONE
+- [x] Drift check corrido
+- [x] `CITATION.cff` (sin `version:` — evita drift con PSR)
+- [x] `docs/citation.md` + nav + sección "Cómo citar" en README
+- [x] `examples/notebooks/README.md` con 4 badges Colab
+- [x] `CitationFileGuardrailTests` en verde
+- [x] Checklist Zenodo documentado (acción del operador) y Done criteria verificados
+- [x] Fila de `plans/README.md` + `ROADMAP.md` a DONE
 
 ### Plan 104 — servidor MCP
 
-- [ ] Drift check corrido
-- [ ] `mcp_tools.py` puro (4 tools, `base_url` inyectable)
-- [ ] `mcp_server.py` con import perezoso y mensaje de instalación
-- [ ] Extra `mcp` + entry point `chile-hub-mcp` + `uv lock` (gate `--check`)
-- [ ] `docs/mcp.md` + nav; `McpToolsTests` + guardrail de packaging en verde
-- [ ] Done criteria verificados; fila de `plans/README.md` + `ROADMAP.md` a DONE
+- [x] Drift check corrido
+- [x] `mcp_tools.py` puro (4 tools, `base_url` inyectable)
+- [x] `mcp_server.py` con import perezoso y mensaje de instalación
+- [x] Extra `mcp` + entry point `chile-hub-mcp` + `uv lock` (gate `--check`)
+- [x] `docs/mcp.md` + nav; `McpToolsTests` + guardrail de packaging en verde
+- [x] Done criteria verificados; fila de `plans/README.md` + `ROADMAP.md` a DONE
 
 ### Plan 105 — páginas por comuna
 
-- [ ] Drift check corrido
-- [ ] Render puro (slug, página, índice, sitemap) con escapado HTML
-- [ ] Generador CLI determinista (346 comunas + índice + sitemap)
-- [ ] Wiring en `pages-deploy.yml` + `/comunas/` en `.gitignore`
-- [ ] `ComunaPagesTests` en verde
-- [ ] Done criteria verificados; fila de `plans/README.md` + `ROADMAP.md` a DONE
+- [x] Drift check corrido
+- [x] Render puro (slug, página, índice, sitemap) con escapado HTML
+- [x] Generador CLI determinista (346 comunas + índice + sitemap)
+- [x] Wiring en `pages-deploy.yml` + `/comunas/` en `.gitignore`
+- [x] `ComunaPagesTests` en verde
+- [x] Done criteria verificados; fila de `plans/README.md` + `ROADMAP.md` a DONE
 
 ## Housekeeping
 

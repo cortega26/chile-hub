@@ -13,17 +13,17 @@
 
 | Wave | Planes | Done | Estado |
 |------|--------|------|--------|
-| D1 HF + SEO | 101–102 | 0/2 | TODO |
-| D2 Citación + MCP | 103–104 | 0/2 | TODO |
-| D3 Comunas | 105 | 0/1 | TODO |
+| D1 HF + SEO | 101–102 | 2/2 | DONE (2026-09-25, branch advisor/distribution-wave-1; suite 1083) |
+| D2 Citación + MCP | 103–104 | 2/2 | DONE (2026-09-25) |
+| D3 Comunas | 105 | 1/1 | DONE (2026-09-25) |
 
 ### Backlog (orden de ejecución)
 
-- [ ] 101 Subsets HF + `hf://` (P2/S) — visor por capa + acceso cero-instalación
-- [ ] 102 JSON-LD por dataset + sitemap index + `llms.txt` (P2/M)
-- [ ] 103 `CITATION.cff` + docs citación + DOI Zenodo (P3/S; paso del operador: activar Zenodo)
-- [ ] 104 Servidor MCP extra `[mcp]` + lock (P2/M)
-- [ ] 105 Páginas por comuna generadas en deploy (P2/M, tras 102)
+- [x] 101 Subsets HF + `hf://` (P2/S, 5c3fd32) — visor por capa + acceso cero-instalación
+- [x] 102 JSON-LD por dataset + sitemap index + `llms.txt` (P2/M, 528220f)
+- [x] 103 `CITATION.cff` + docs citación + DOI Zenodo (P3/S, edd41a3; **pendiente operador**: activar Zenodo y pegar DOI)
+- [x] 104 Servidor MCP extra `[mcp]` + lock (P2/M, 25b00ed)
+- [x] 105 Páginas por comuna generadas en deploy (P2/M, 330786e)
 
 ### Goto por síntoma (distribución)
 

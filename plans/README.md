@@ -190,11 +190,11 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 
 | # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
 |---|------|----------|----------|--------|-----------|--------|
-| 101 | [Subsets reales en el visor de Hugging Face + acceso `hf://`](101-hf-dataset-subsets-and-hf-url.md) | P2 | S | LOW | — | TODO |
-| 102 | [Datos estructurados por dataset, sitemap index y `llms.txt`](102-seo-structured-data-sitemap-llms.md) | P2 | M | LOW-MED | — | TODO |
-| 103 | [Infraestructura de citación (`CITATION.cff`) + ruta DOI Zenodo](103-citation-doi-academic.md) | P3 | S | LOW | — | TODO |
-| 104 | [Servidor MCP (`chile-hub[mcp]`) — datos para agentes](104-mcp-server.md) | P2 | M | MED | — | TODO |
-| 105 | [Páginas por comuna (SEO programático) desde el perfil territorial](105-comuna-pages-programmatic-seo.md) | P2 | M | MED | 102 | TODO |
+| 101 | [Subsets reales en el visor de Hugging Face + acceso `hf://`](101-hf-dataset-subsets-and-hf-url.md) | P2 | S | LOW | — | DONE (2026-09-25, commit `5c3fd32` — `configs:` por capa (21 subsets), ejemplo por config, `hf://` documentado, guardrails; branch `advisor/distribution-wave-1`) |
+| 102 | [Datos estructurados por dataset, sitemap index y `llms.txt`](102-seo-structured-data-sitemap-llms.md) | P2 | M | LOW-MED | — | DONE (2026-09-25, commit `528220f` — sitemapindex + `sitemap-pages.xml`, `build_dataset_json_ld()`, inyector idempotente en pages-deploy, `llms.txt`; branch `advisor/distribution-wave-1`) |
+| 103 | [Infraestructura de citación (`CITATION.cff`) + ruta DOI Zenodo](103-citation-doi-academic.md) | P3 | S | LOW | — | DONE (2026-09-25, commit `edd41a3` — `CITATION.cff` sin `version:`, `docs/citation.md` + checklist Zenodo, README de notebooks con Colab; branch `advisor/distribution-wave-1`) |
+| 104 | [Servidor MCP (`chile-hub[mcp]`) — datos para agentes](104-mcp-server.md) | P2 | M | MED | — | DONE (2026-09-25, commit `25b00ed` — extra `[mcp]` + `chile-hub-mcp`, tools puras read-only, import perezoso (mcp 2.x), lock regenerado; branch `advisor/distribution-wave-1`) |
+| 105 | [Páginas por comuna (SEO programático) desde el perfil territorial](105-comuna-pages-programmatic-seo.md) | P2 | M | MED | 102 | DONE (2026-09-25, commit `330786e` — 347 páginas generadas (346 comunas + índice) + sitemap, JSON-LD por página, wiring en pages-deploy; branch `advisor/distribution-wave-1`) |
 
 ## Dependencias 086–100 (ver `ROADMAP.md` para el grafo completo)
 
