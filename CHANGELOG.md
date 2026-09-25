@@ -12,6 +12,14 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.37.2 - 2026-09-25
+
+### Corregido
+
+- **extractores**: Stealth_get compartido anti-403 + diagnóstico de fallback
+  ([`ef37bb6`](https://github.com/cortega26/chile-hub/commit/ef37bb68737958d355eba79d92edf648ad058d0d))
+
+
 ## 1.37.1 - 2026-09-25
 
 ### Corregido
