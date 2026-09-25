@@ -12,6 +12,14 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.37.7 - 2026-09-25
+
+### Corregido
+
+- **release**: Snapshot liviano — geometría cruda fuera de git y wasm EH eliminado
+  ([`9b4e559`](https://github.com/cortega26/chile-hub/commit/9b4e559b2cc69905f67555203b245e3708ba454d))
+
+
 ## 1.37.6 - 2026-09-25
 
 ### Corregido
