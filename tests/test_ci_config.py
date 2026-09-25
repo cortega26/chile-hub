@@ -1086,6 +1086,18 @@ class DistributionSeoGuardrailTests(unittest.TestCase):
         self.assertIn("data.json", content)
         self.assertIn("huggingface.co/datasets/cortega26/chile-hub", content)
 
+    def test_pages_deploy_builds_comuna_pages(self):
+        """Plan 105: el deploy debe generar las páginas por comuna antes de subir."""
+        content = (ROOT_DIR / ".github" / "workflows" / "pages-deploy.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("build_comuna_pages.py", content)
+        self.assertIn("--out-dir comunas", content)
+
+    def test_comunas_dir_is_gitignored(self):
+        content = (ROOT_DIR / ".gitignore").read_text(encoding="utf-8")
+        self.assertIn("/comunas/", content)
+
 
 class CitationFileGuardrailTests(unittest.TestCase):
     """Plan 103: citación canónica (CITATION.cff + docs + ruta DOI Zenodo).

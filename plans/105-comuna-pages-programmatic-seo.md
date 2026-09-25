@@ -84,8 +84,9 @@ atribuido. La página se genera en el deploy, no se commitea.
 Implementar en `scripts/build_comuna_pages.py` funciones puras (sin I/O) para
 testear:
 - `comuna_slug(row)` → `nombre_comuna_clean` con espacios reemplazados por `-`;
-  si hay colisión en el dataset, sufijo `-{codigo_comuna}` (hoy no ocurre, pero
-  el generador debe fallar ruidoso si detecta una colisión sin resolver).
+  `assign_slugs(rows)` resuelve colisiones con sufijo `-{codigo_comuna}` en
+  todas las afectadas (determinista; hoy no ocurre ninguna) y falla ruidoso si
+  tras el sufijo aún quedan slugs duplicados.
 - `render_comuna_page(row, pobreza_ingresos, pobreza_multidim)` → HTML completo
   con: `<title>` y meta description únicos ("Comuna de {nombre}: población,
   pobreza y datos oficiales"), tabla de indicadores agrupada (identidad,
@@ -126,7 +127,7 @@ En `tests/test_pipeline_logic.py`, clase `ComunaPagesTests` con fixtures
 sintéticas (2 comunas, una con tilde/ñ y una con apóstrofe):
 - `render_comuna_page` incluye el nombre escapado, el CUT como texto de 5 y un
   bloque JSON-LD parseable.
-- `comuna_slug` colisiona → STOP explícito (SystemExit con mensaje).
+- `assign_slugs` con dos comunas homónimas → slugs únicos con sufijo CUT.
 - `render_sitemap` contiene exactamente las URLs dadas y escapa `&`.
 - El generador con Parquet sintéticos en `tmp_path` produce 347 archivos y es
   determinista (dos corridas con el mismo `--generated-at` → bytes iguales).
@@ -155,7 +156,8 @@ Stop and report back (do not improvise) if:
 
 - `perfil_territorial_comunal.parquet` no tiene 346 filas únicas por
   `codigo_comuna` o cambia de esquema.
-- Hay colisión de `nombre_comuna_clean` sin una regla de slug definida.
+- Una colisión de slugs persiste tras aplicar el sufijo CUT (implicaría
+  `codigo_comuna` duplicado, que ya se valida en `load_rows`).
 - El generador necesita generar más de ~400 páginas o tarda >30 s (el job de
   Pages tiene timeout de 10 min: sería señal de un join mal hecho).
 - Una verificación falla dos veces tras un intento razonable de fix.

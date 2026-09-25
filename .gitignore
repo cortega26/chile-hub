@@ -50,6 +50,9 @@ dist/
 # MkDocs — sitio de documentación generado (Plan 021)
 /reference/
 
+# Páginas por comuna generadas en el deploy de Pages (Plan 105)
+/comunas/
+
 
 # CodeGraph
 .codegraph/daemon.pid

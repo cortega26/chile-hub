@@ -5217,6 +5217,149 @@ class McpToolsTests(unittest.TestCase):
             self.assertEqual(server.name, "chile-hub")
 
 
+class ComunaPagesTests(unittest.TestCase):
+    """Plan 105: páginas SEO por comuna generadas desde el perfil territorial.
+
+    Regresión a evitar: cifras hardcodeadas (deben salir del Parquet), HTML sin
+    escapar (nombres con tildes/apóstrofes), slugs colisionando en silencio, o
+    páginas no deterministas (dos corridas iguales deben dar bytes iguales).
+    """
+
+    PERFIL_ROW = {
+        "codigo_region": "13",
+        "nombre_region": "Metropolitana de Santiago",
+        "codigo_provincia": "131",
+        "nombre_provincia": "Santiago",
+        "codigo_comuna": "13120",
+        "nombre_comuna": 'Ñuñoa "centro" <norte>',
+        "nombre_comuna_clean": "nunoa",
+        "poblacion_estimada": 250000,
+        "poblacion_censada": 240000,
+        "establecimientos_salud_total": 12,
+        "establecimientos_educacionales_total": 40,
+    }
+
+    def test_render_comuna_page_escapes_text_and_has_json_ld(self):
+        from scripts.build_comuna_pages import render_comuna_page
+
+        page = render_comuna_page(
+            self.PERFIL_ROW,
+            {"ingresos": 5.4, "multidimensional": 8.1},
+            "nunoa",
+            "https://tooltician.com/chile-hub",
+            "2026-09-25",
+        )
+        self.assertIn("&lt;norte&gt;", page)
+        self.assertNotIn("<norte>", page)
+        self.assertIn("13120", page, "el CUT debe aparecer como texto")
+        self.assertIn("5.4%", page)
+        self.assertEqual(page.count("application/ld+json"), 2, "Dataset + BreadcrumbList")
+        blocks = re.findall(
+            r'<script type="application/ld\+json">\n(.*?)\n</script>', page, flags=re.DOTALL
+        )
+        for block in blocks:
+            json.loads(block)
+
+    def test_assign_slugs_resolves_collisions_with_cut(self):
+        from scripts.build_comuna_pages import assign_slugs
+
+        rows = [
+            {"codigo_comuna": "01101", "nombre_comuna_clean": "comuna repetida"},
+            {"codigo_comuna": "13120", "nombre_comuna_clean": "comuna repetida"},
+            {"codigo_comuna": "05101", "nombre_comuna_clean": "valparaiso"},
+        ]
+        slugs = assign_slugs(rows)
+        self.assertEqual(len(set(slugs.values())), 3)
+        self.assertEqual(slugs["05101"], "valparaiso")
+        self.assertIn("01101", slugs["01101"])
+        self.assertIn("13120", slugs["13120"])
+
+    def test_render_sitemap_escapes_and_counts(self):
+        from scripts.build_comuna_pages import render_sitemap
+
+        xml = render_sitemap(["https://tooltician.com/chile-hub/comunas/?a=1&b=2"], "2026-09-25")
+        self.assertIn("&amp;", xml)
+        self.assertEqual(xml.count("<url>"), 1)
+        self.assertIn("<lastmod>2026-09-25</lastmod>", xml)
+
+    def test_main_generates_pages_deterministically(self):
+        import datetime
+
+        from scripts.build_comuna_pages import main
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            perfil = pl.DataFrame(
+                [
+                    self.PERFIL_ROW,
+                    {
+                        **self.PERFIL_ROW,
+                        "codigo_comuna": "05101",
+                        "nombre_comuna": "Valparaíso",
+                        "nombre_comuna_clean": "valparaiso",
+                    },
+                ]
+            )
+            pobreza = pl.DataFrame(
+                {
+                    "codigo_comuna": ["13120", "13120", "05101"],
+                    "dimension": ["ingresos", "multidimensional", "ingresos"],
+                    "tasa": [5.4, 8.1, 7.2],
+                    "anio": [2022, 2022, 2022],
+                }
+            )
+            perfil_path = Path(tmpdir) / "perfil.parquet"
+            pobreza_path = Path(tmpdir) / "pobreza.parquet"
+            perfil.write_parquet(perfil_path)
+            pobreza.write_parquet(pobreza_path)
+
+            outs = []
+            for sub in ("a", "b"):
+                out = Path(tmpdir) / sub
+                rc = main(
+                    [
+                        "--out-dir",
+                        str(out),
+                        "--perfil",
+                        str(perfil_path),
+                        "--pobreza",
+                        str(pobreza_path),
+                        "--generated-at",
+                        "2026-09-25",
+                    ]
+                )
+                self.assertEqual(rc, 0)
+                outs.append(out)
+
+            files_a = sorted(str(p.relative_to(outs[0])) for p in outs[0].rglob("*") if p.is_file())
+            files_b = sorted(str(p.relative_to(outs[1])) for p in outs[1].rglob("*") if p.is_file())
+            self.assertEqual(files_a, files_b)
+            self.assertEqual(len(files_a), 4, "índice + 2 comunas + sitemap")
+            for rel in files_a:
+                self.assertEqual(
+                    (outs[0] / rel).read_bytes(),
+                    (outs[1] / rel).read_bytes(),
+                    f"{rel} no es determinista",
+                )
+            self.assertTrue(
+                datetime.date(2026, 9, 25).isoformat() in (outs[0] / "sitemap.xml").read_text()
+            )
+
+    def test_load_rows_rejects_duplicate_cut(self):
+        from scripts.build_comuna_pages import load_rows
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            perfil = pl.DataFrame([self.PERFIL_ROW, self.PERFIL_ROW])
+            pobreza = pl.DataFrame(
+                {"codigo_comuna": ["13120"], "dimension": ["ingresos"], "tasa": [5.0]}
+            )
+            perfil_path = Path(tmpdir) / "perfil.parquet"
+            pobreza_path = Path(tmpdir) / "pobreza.parquet"
+            perfil.write_parquet(perfil_path)
+            pobreza.write_parquet(pobreza_path)
+            with self.assertRaises(SystemExit):
+                load_rows(perfil_path, pobreza_path)
+
+
 if __name__ == "__main__":
     import pytest
 
