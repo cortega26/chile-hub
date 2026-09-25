@@ -9,6 +9,24 @@ Viviendas autorizadas en unidades y superficie (m²) por comuna y año —total,
 - **Reutilización:** uso autorizado citando la fuente (política del CEDOC desde 2023)
 - **URL:** https://centrodeestudios.minvu.gob.cl/repositorio/categoria/permisos-de-edificacion
 
+## Modo de extracción (`monthly`)
+
+El archivo se sirve desde `catalogo.minvu.cl`, que **bloquea a los runners de
+GitHub** (medido 2026-09-25): el TCP conecta pero el handshake TLS se corta para
+todos los clientes probados — curl/requests (OpenSSL), curl_cffi (Firefox,
+Safari, Chrome, Edge, Tor) y browsers stealth de scrapling
+(`StealthyFetcher`/`DynamicFetcher`). Es filtrado por IP de origen, no por
+fingerprint: ninguna librería cliente lo sortea.
+
+Por eso el extractor reutiliza un **snapshot crudo versionado** en
+`data/raw/minvu_permisos_edificacion_anual_*.xlsx` y lo publica con
+`source_mode: monthly` (fuente genuina no re-fetcheada en cada build diario,
+mismo contrato que `finanzas_municipales`). La frescura usa la fecha del
+snapshot (política de 1080 h); si la descarga live vuelve a funcionar desde el
+runner, el modo regresa solo a `live`. Para refrescar el snapshot desde una red
+sin bloqueo: `python src/extractors/permisos_edificacion_extractor.py` y
+commitear el XLSX nuevo en `data/raw/`.
+
 ## Esquema
 
 `anio`, `codigo_region`, `codigo_comuna`, `nombre_comuna`, `unidades_total`, `superficie_m2_total`, `unidades_casas`, `superficie_m2_casas`, `unidades_departamentos`, `superficie_m2_departamentos`, `estado_dato` (definitivo | provisional), `fuente`, `url_fuente`, `fecha_fuente`
@@ -25,11 +43,7 @@ hub = ChileHub()
 df = hub.load_polars("permisos_edificacion")
 
 # Actividad constructora por comuna 2023 (proxy de dinamismo local)
-top = (
-    df.filter(pl.col("anio") == 2023)
-    .sort("unidades_total", descending=True)
-    .head(10)
-)
+top = df.filter(pl.col("anio") == 2023).sort("unidades_total", descending=True).head(10)
 print(top)
 ```
 

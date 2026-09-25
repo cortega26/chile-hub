@@ -11,7 +11,18 @@ Descubrimiento del archivo: la página del repositorio CEDOC enlaza cada
 publicación con su `biblionumber` estable (25583 para este archivo); el
 extractor resuelve el href actual y decodifica el parámetro `uri`. Si la
 página no responde, usa la URL directa conocida; si la descarga falla,
-reutiliza el último snapshot crudo.
+reutiliza el último snapshot crudo versionado en `data/raw/` con
+`source_mode=monthly` (lane no-fallback, como `finanzas_municipales`).
+
+Bloqueo conocido desde runners de GitHub (medido 2026-09-25): el TCP a
+`catalogo.minvu.cl:443` conecta, pero el handshake TLS se corta para TODOS
+los clientes probados — curl/OpenSSL, requests/OpenSSL, curl_cffi/BoringSSL
+con fingerprints Firefox 133/144/147, Safari 180/184/260, Chrome 131/136/146/150,
+Edge 101 y Tor 145 — y también para browsers stealth (scrapling
+StealthyFetcher → ERR_CONNECTION_CLOSED, DynamicFetcher → ERR_CONNECTION_RESET).
+Es filtrado por IP de origen (o middlebox), no por fingerprint ni user-agent:
+ninguna librería cliente lo sortea. No reintentar el bypass sin cambiar de red
+de salida; el snapshot versionado es la fuente operativa hasta entonces.
 
 Alcance MVP: solo el archivo anual por comuna (el mensual por comuna queda
 como extensión documentada). `estado_dato` es "provisional" para años

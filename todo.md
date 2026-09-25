@@ -90,6 +90,15 @@ están pendientes de review.
 - [x] Causa raíz del schedule roto por meses: cadena pip-audit (gitpython
       3.1.59) + fallback de permisos. Ambos cerrados. El schedule diario
       10:00 UTC debería volver a publicar.
+- [x] **scrapling no sortea el bloqueo** (medido 2026-09-25 en runner): TCP
+      conecta, pero el handshake TLS se corta para curl/OpenSSL,
+      requests/OpenSSL, curl_cffi con Firefox 133/144/147, Safari 180/184/260,
+      Chrome 131/136/146/150, Edge 101 y Tor 145, y para los browsers stealth
+      (`StealthyFetcher` → ERR_CONNECTION_CLOSED, `DynamicFetcher` →
+      ERR_CONNECTION_RESET). Es filtrado por IP de origen, no por fingerprint:
+      ninguna librería cliente lo resuelve. Documentado en el docstring del
+      extractor y en `docs/datasets/permisos_edificacion.md` para no
+      re-litigarlo.
 - [x] Hallazgo de timing (no bug): el release 1.37.3 lo disparó el run de push
       (readiness) antes de que el dispatch subiera su artefacto (19:38 vs
       19:44), así que `hf-publish` se saltó por `ready=false`. El próximo
