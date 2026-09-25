@@ -40,9 +40,7 @@ O usando la librería, con el descriptor Frictionless:
 ```python
 from chile_hub import ChileHub
 
-hub = ChileHub.from_datapackage(
-    "https://tooltician.com/chile-hub/data/normalized/datapackage.json"
-)
+hub = ChileHub.from_datapackage("https://tooltician.com/chile-hub/data/normalized/datapackage.json")
 ```
 
 > `from_datapackage(url)` valida el descriptor remoto pero todavía no devuelve un
@@ -80,3 +78,32 @@ SELECT codigo_comuna, nombre_comuna
 FROM 'https://tooltician.com/chile-hub/data/normalized/comunas.parquet'
 LIMIT 5;
 ```
+
+## Hugging Face Hub (cero instalación, también para agentes)
+
+El bundle publicable se replica en
+[Hugging Face Hub](https://huggingface.co/datasets/cortega26/chile-hub) con un
+**subset por capa** (selector "Subset" del visor y SQL Console incluidos). Es el
+camino más corto para explorar los datos sin instalar nada:
+
+```python
+from datasets import load_dataset
+
+comunas = load_dataset("cortega26/chile-hub", "comunas", split="train")
+```
+
+DuckDB 1.5+ lee el repositorio directamente con el protocolo `hf://`
+(extensión `httpfs`, sin descargar el bundle):
+
+```sql
+INSTALL httpfs; LOAD httpfs;
+SELECT codigo_comuna, nombre_comuna
+FROM 'hf://datasets/cortega26/chile-hub/data/comunas.parquet'
+LIMIT 5;
+```
+
+> La revisión `@~parquet` (`hf://datasets/cortega26/chile-hub@~parquet/…`)
+> contiene la copia auto-convertida por Hugging Face; los archivos bajo
+> `data/` son los originales del bundle. El mirror publica únicamente el carril
+> `stable_publishable`; para el carril `candidate` usa el sitio estático o el
+> paquete Python.

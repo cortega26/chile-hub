@@ -4978,6 +4978,61 @@ class DriftTaxonomyTests(unittest.TestCase):
         )
 
 
+class HfDatasetCardTests(unittest.TestCase):
+    """Plan 101: el visor de Hugging Face debe ver un subset por capa.
+
+    Regresión a evitar: sin `configs:` en la card, el Dataset Viewer fusiona
+    los Parquet publicados en un único subset `default` (1.62M filas mezclando
+    `autoridades_electas` con el resto) y un visitante no puede distinguir capas.
+    """
+
+    def test_build_dataset_configs_one_subset_per_layer(self):
+        from scripts.publish_hf_dataset import _build_dataset_configs
+
+        entries = [
+            ("censo_comunal", Path("/tmp/censo_comunal.parquet")),
+            ("comunas", Path("/tmp/comunas.parquet")),
+        ]
+        block = _build_dataset_configs(entries)
+        self.assertEqual(block.count("config_name:"), 2)
+        self.assertIn("config_name: comunas", block)
+        self.assertIn("path: data/comunas.parquet", block)
+        # `default: true` sólo en comunas (punto de entrada del hub).
+        self.assertEqual(block.count("default: true"), 1)
+        self.assertIn(
+            "config_name: comunas\n    data_files:\n      - split: train\n        path: data/comunas.parquet\n    default: true",
+            block,
+        )
+
+    def test_staging_readme_has_parseable_configs(self):
+        """El README generado debe tener un front-matter YAML válido con N configs."""
+        try:
+            import yaml
+        except ImportError:  # pragma: no cover — dev extra incluye PyYAML vía mkdocs
+            self.skipTest("PyYAML no disponible")
+        from scripts.publish_hf_dataset import build_staging_dir
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            entries = []
+            for name in ("comunas", "censo_comunal"):
+                path = Path(tmpdir) / f"{name}.parquet"
+                pl.DataFrame({"codigo_comuna": ["01101"]}).write_parquet(path)
+                entries.append((name, path))
+            dest = Path(tmpdir) / "staging"
+            build_staging_dir(dest, entries, [])
+
+            readme = (dest / "README.md").read_text(encoding="utf-8")
+            self.assertNotIn("{{DATASET_CONFIGS}}", readme, "placeholder sin sustituir")
+            self.assertNotIn("data_files=", readme, "el ejemplo debe usar el config name")
+            front_matter = readme.split("---", 2)[1]
+            metadata = yaml.safe_load(front_matter)
+            configs = metadata["configs"]
+            self.assertEqual(len(configs), 2)
+            self.assertEqual(
+                sorted(cfg["config_name"] for cfg in configs), ["censo_comunal", "comunas"]
+            )
+
+
 if __name__ == "__main__":
     import pytest
 

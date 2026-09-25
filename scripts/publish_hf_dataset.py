@@ -124,6 +124,26 @@ def select_publishable_files() -> tuple[list[tuple[str, Path]], list[Path]]:
     return parquet_entries, catalog_json_files
 
 
+def _build_dataset_configs(parquet_entries: list[tuple[str, Path]]) -> str:
+    """Bloque YAML ``configs:`` con un subset por capa publicada.
+
+    Sin ``configs:`` en la card, el Dataset Viewer de Hugging Face fusiona
+    todos los Parquet en un único subset ``default`` (el visor mostraba 1.62M
+    filas mezclando ``autoridades_electas`` con el resto). Un ``config_name``
+    por archivo da un subset limpio por capa; ``comunas`` queda como default
+    por ser el punto de entrada natural del hub.
+    """
+    lines = ["configs:"]
+    for name, _ in parquet_entries:
+        lines.append(f"  - config_name: {name}")
+        lines.append("    data_files:")
+        lines.append("      - split: train")
+        lines.append(f"        path: data/{name}.parquet")
+        if name == "comunas":
+            lines.append("    default: true")
+    return "\n".join(lines)
+
+
 def _build_dataset_table(catalog: dict, selected_names: set[str]) -> str:
     """Tabla de la card con SOLO las capas seleccionadas para publicar."""
     rows = ["| Dataset | Filas aprox. | Licencia |", "|:---|---:|:---|"]
@@ -157,10 +177,12 @@ def build_staging_dir(
     catalog = _read_catalog()
     template = CARD_TEMPLATE_PATH.read_text(encoding="utf-8")
     # La card se genera con el conteo y la tabla REALES de lo publicado
-    # (Plan 070: antes decía 19 capas fijas y listaba candidate).
+    # (Plan 070: antes decía 19 capas fijas y listaba candidate), más un
+    # subset por capa para que el visor de HF no las fusione en un blob.
     table = _build_dataset_table(catalog, {name for name, _ in parquet_entries})
     card = template.replace("{{DATASET_TABLE}}", table)
     card = card.replace("{{DATASET_COUNT}}", str(len(parquet_entries)))
+    card = card.replace("{{DATASET_CONFIGS}}", _build_dataset_configs(parquet_entries))
     (dest / "README.md").write_text(card, encoding="utf-8")
 
 

@@ -1035,6 +1035,27 @@ class UnauthorizedTelemetryGuardrailTests(unittest.TestCase):
         )
 
 
+class HfDatasetCardGuardrailTests(unittest.TestCase):
+    """Plan 101: la card de HF debe conservar los placeholders que sustituye
+    `scripts/publish_hf_dataset.py`, y el acceso `hf://` debe estar documentado.
+
+    Regresión a evitar: alguien "limpia" los placeholders al editar la card y
+    el README del mirror queda con el conteo/tabla/configs congelados; o el
+    único camino cero-instalación (DuckDB `hf://`) desaparece de la docs.
+    """
+
+    def test_card_template_keeps_placeholders(self):
+        content = (DOCS_DIR / "hf" / "dataset-card.md").read_text(encoding="utf-8")
+        for marker in ("{{DATASET_COUNT}}", "{{DATASET_TABLE}}", "{{DATASET_CONFIGS}}"):
+            self.assertIn(marker, content, f"la card perdió {marker}")
+        self.assertNotIn("data_files=", content, "el ejemplo debe usar el config name")
+
+    def test_http_access_documents_hf_url(self):
+        content = (DOCS_DIR / "http-access.md").read_text(encoding="utf-8")
+        self.assertIn("hf://datasets/cortega26/chile-hub", content)
+        self.assertIn('load_dataset("cortega26/chile-hub", "comunas"', content)
+
+
 if __name__ == "__main__":
     import pytest
 
