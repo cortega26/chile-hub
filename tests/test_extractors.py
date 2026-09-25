@@ -2130,6 +2130,69 @@ class HttpUtilsRetryTests(unittest.TestCase):
         self.assertFalse(_is_retryable(ValueError("algo inesperado")))
 
 
+class StealthGetTests(unittest.TestCase):
+    """`http_utils.stealth_get`: anti-403 por fingerprint TLS / User-Agent.
+
+    Contexto real (2026-09-25): el extractor de permisos de edificación cayó a
+    fallback en CI dos veces consecutivas (MINVU/CEDOC) mientras la fuente
+    respondía 200 desde local; `subdere` ya usaba este patrón y se consolidó
+    como helper compartido. Regresión a evitar: que el GET vuelva a salir con
+    el cliente por defecto sin impersonación ni headers de navegador.
+    """
+
+    def test_uses_chrome_impersonation_when_curl_cffi_available(self):
+        from src.extractors import http_utils as hu
+
+        captured = {}
+
+        def fake_fetch(url, **kwargs):
+            captured.update(kwargs)
+            return mock_response({"ok": True})
+
+        with (
+            patch.object(hu, "_CURL_CFFI_AVAILABLE", True),
+            patch.object(hu, "fetch_with_retry", side_effect=fake_fetch),
+        ):
+            hu.stealth_get("https://example.com", timeout=5)
+        self.assertEqual(captured.get("impersonate"), "chrome124")
+        self.assertIn("get_fn", captured)
+
+    def test_falls_back_to_browser_headers_without_curl_cffi(self):
+        from src.extractors import http_utils as hu
+
+        captured = {}
+
+        def fake_fetch(url, **kwargs):
+            captured.update(kwargs)
+            return mock_response({"ok": True})
+
+        with (
+            patch.object(hu, "_CURL_CFFI_AVAILABLE", False),
+            patch.object(hu, "fetch_with_retry", side_effect=fake_fetch),
+        ):
+            hu.stealth_get("https://example.com", timeout=5)
+        self.assertIn("Mozilla", captured["headers"]["User-Agent"])
+        self.assertIn("es-CL", captured["headers"]["Accept-Language"])
+        self.assertNotIn("impersonate", captured)
+
+    def test_caller_headers_win_over_defaults(self):
+        from src.extractors import http_utils as hu
+
+        captured = {}
+
+        def fake_fetch(url, **kwargs):
+            captured.update(kwargs)
+            return mock_response({"ok": True})
+
+        with (
+            patch.object(hu, "_CURL_CFFI_AVAILABLE", False),
+            patch.object(hu, "fetch_with_retry", side_effect=fake_fetch),
+        ):
+            hu.stealth_get("https://example.com", headers={"X-Test": "1"})
+        self.assertEqual(captured["headers"]["X-Test"], "1")
+        self.assertIn("Mozilla", captured["headers"]["User-Agent"])
+
+
 class PobrezaComunalExtractorTests(unittest.TestCase):
     """Tests unitarios para el extractor de pobreza comunal (CASEN / SAE)."""
 
@@ -3579,8 +3642,7 @@ class PermisosEdificacionExtractorTests(unittest.TestCase):
         )
         fake_response = MagicMock()
         fake_response.text = html
-        fake_response.__enter__.return_value = fake_response
-        with patch.object(pe, "fetch_with_retry", return_value=fake_response):
+        with patch.object(pe, "_stealth_get", return_value=fake_response):
             url, metodo = pe._discover_xlsx_url()
         self.assertEqual(url, "https://catalogo.minvu.cl/f.xlsx")
         self.assertEqual(metodo, "repositorio-biblionumber")
@@ -3590,7 +3652,7 @@ class PermisosEdificacionExtractorTests(unittest.TestCase):
         from requests import RequestException
 
         pe = permisos_edificacion_extractor
-        with patch.object(pe, "fetch_with_retry", side_effect=RequestException("down")):
+        with patch.object(pe, "_stealth_get", side_effect=RequestException("down")):
             url, metodo = pe._discover_xlsx_url()
         self.assertEqual(url, pe.HARDCODED_XLSX_URL)
         self.assertTrue(metodo.startswith("directa-conocida"))

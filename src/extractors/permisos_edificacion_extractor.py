@@ -47,9 +47,9 @@ except ModuleNotFoundError:
     from base import BaseExtractor, ensure_staging_directories, write_staging_metadata
 
 try:
-    from src.extractors.http_utils import fetch_with_retry
+    from src.extractors.http_utils import stealth_get as _stealth_get
 except ModuleNotFoundError:
-    from http_utils import fetch_with_retry
+    from http_utils import stealth_get as _stealth_get
 
 try:
     from src.extractors.region_utils import norm_text
@@ -186,9 +186,9 @@ def _discover_xlsx_url() -> tuple[str, str]:
     conocida (el `id` de Koha puede rotar entre versiones).
     """
     try:
-        with fetch_with_retry(REPOSITORIO_URL, timeout=60) as response:
-            response.raise_for_status()
-            html = response.text
+        response = _stealth_get(REPOSITORIO_URL, timeout=60)
+        response.raise_for_status()
+        html = response.text
         for href in re.findall(
             r'href="([^"]*biblionumber=' + BIBLIONUMBER_ANUAL + r'[^"]*)"', html
         ):
@@ -206,9 +206,9 @@ def _discover_xlsx_url() -> tuple[str, str]:
 def _download_xlsx(url: str) -> Path:
     """Descarga el XLSX y guarda snapshot crudo. Retorna la ruta."""
     target = _snapshot_path()
-    with fetch_with_retry(url, timeout=120) as response:
-        response.raise_for_status()
-        target.write_bytes(response.content)
+    response = _stealth_get(url, timeout=120)
+    response.raise_for_status()
+    target.write_bytes(response.content)
     return target
 
 
@@ -545,6 +545,11 @@ def process_permisos_edificacion() -> dict:
     df.write_csv(STAGING_CSV_PATH)
     write_staging_metadata(METADATA_PATH, metadata)
     print(f"permisos_edificacion: {df.height} filas escritas en staging (mode={mode})")
+    if mode == "fallback":
+        # Diagnóstico visible en el log de CI: sin esto, un fallback por 403/WAF
+        # sólo se ve como "2 filas (mode=fallback)" y la causa queda enterrada
+        # en el metadata de staging (que no se publica).
+        print(f"permisos_edificacion notas: {' | '.join(notes)}")
 
     return metadata
 

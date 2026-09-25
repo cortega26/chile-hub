@@ -69,6 +69,22 @@ están pendientes de review.
 - [x] `ComunaPagesTests` en verde
 - [x] Done criteria verificados; fila de `plans/README.md` + `ROADMAP.md` a DONE
 
+## Incidencia 2026-09-25 — `permisos_edificacion` en fallback desde CI
+
+- [x] Diagnóstico: dos dispatches `publish=true` fallaron en `Build and verify
+      data` porque MINVU/CEDOC devolvía fallback (2 filas) y el health pasaba a
+      19 ok / 2 warn, dejando el README stale. La fuente responde 200 desde
+      local (página + XLSX 502 KB): bloqueo al runner de GitHub, no caída.
+- [x] Fix: `stealth_get()` en `http_utils.py` (curl_cffi impersonando Chrome,
+      fallback a headers de navegador) — patrón que `subdere` ya usaba,
+      consolidado como helper compartido y aplicado a `permisos_edificacion`
+      y a `subdere.download_subdere_file()`.
+- [x] Diagnóstico permanente: el extractor imprime las notas cuando cae a
+      fallback (antes sólo quedaban en el metadata de staging, no publicado).
+- [x] Tests: `StealthGetTests` (3) + tests de permisos actualizados al nuevo
+      seam (`_stealth_get`). Extracción local live verificada: 8 650 filas.
+- [ ] Verificar en CI: dispatch `publish=true` verde y artefacto publication-grade.
+
 ## Housekeeping
 
 - [x] Archivar planes DONE (055, 056, 060, 061, 062) a `plans/archive/`

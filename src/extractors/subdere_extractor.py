@@ -4,7 +4,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import polars as pl
-import requests
 
 UTC = timezone.utc
 
@@ -19,7 +18,7 @@ try:
         write_raw_snapshot_atomic,
         write_staging_metadata,
     )
-    from src.extractors.http_utils import fetch_with_retry
+    from src.extractors.http_utils import stealth_get as _stealth_get
 except ModuleNotFoundError:
     from base import (
         BaseExtractor,
@@ -27,37 +26,7 @@ except ModuleNotFoundError:
         write_raw_snapshot_atomic,
         write_staging_metadata,
     )
-    from http_utils import fetch_with_retry
-
-# curl_cffi impersona el fingerprint TLS de Chrome, evitando bloqueos a nivel de TLS
-# que rechazan al user-agent por defecto de la librería requests de Python.
-try:
-    from curl_cffi import requests as _cffi_requests
-
-    _CURL_CFFI_AVAILABLE = True
-except ImportError:
-    _CURL_CFFI_AVAILABLE = False
-
-
-def _stealth_get(url: str, **kwargs):
-    """
-    HTTP GET con impersonación de Chrome (curl_cffi) cuando está disponible,
-    con fallback a requests estándar + headers de navegador.
-    Resuelve rechazos TLS de servidores que bloquean fingerprints de Python.
-    Ambas rutas incluyen reintentos exponenciales para errores transitorios.
-    """
-    if _CURL_CFFI_AVAILABLE:
-        return fetch_with_retry(url, get_fn=_cffi_requests.get, impersonate="chrome124", **kwargs)
-    # Fallback: headers de navegador para evitar bloqueos por User-Agent
-    headers = kwargs.pop("headers", {})
-    headers.setdefault(
-        "User-Agent",
-        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
-        "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-    )
-    headers.setdefault("Accept", "application/json, text/plain, */*")
-    headers.setdefault("Accept-Language", "es-CL,es;q=0.9,en;q=0.8")
-    return fetch_with_retry(url, get_fn=requests.get, headers=headers, **kwargs)
+    from http_utils import stealth_get as _stealth_get
 
 
 # Configuración de rutas
@@ -465,16 +434,16 @@ def download_subdere_file():
     target_path = os.path.join(RAW_DIR, "cut_2018.xls")
     print(f"Intentando descargar base territorial de SUBDERE: {SUBDERE_DPA_URL}")
     try:
-        with fetch_with_retry(SUBDERE_DPA_URL, timeout=10) as response:
-            if response.status_code == 200:
-                with open(target_path, "wb") as f:
-                    f.write(response.content)
-                print("Descarga completada y almacenada en raw/cut_2018.xls")
-                return target_path
-            else:
-                print(
-                    f"Error de descarga HTTP: Código {response.status_code}. Se utilizará el fallback local."
-                )
+        response = _stealth_get(SUBDERE_DPA_URL, timeout=10)
+        if response.status_code == 200:
+            with open(target_path, "wb") as f:
+                f.write(response.content)
+            print("Descarga completada y almacenada en raw/cut_2018.xls")
+            return target_path
+        else:
+            print(
+                f"Error de descarga HTTP: Código {response.status_code}. Se utilizará el fallback local."
+            )
     except Exception as e:
         print(f"Error al descargar la base territorial: {e}. Se utilizará el fallback local.")
     return None

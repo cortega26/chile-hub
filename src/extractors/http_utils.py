@@ -13,6 +13,41 @@ from tenacity import (
     wait_exponential,
 )
 
+# curl_cffi impersona el fingerprint TLS de Chrome, evitando bloqueos a nivel
+# de TLS que rechazan al user-agent por defecto de requests. Opcional: si no
+# está instalado (extra pipeline), stealth_get degrada a requests + headers de
+# navegador.
+try:
+    from curl_cffi import requests as _cffi_requests
+
+    _CURL_CFFI_AVAILABLE = True
+except ImportError:  # pragma: no cover - depende del entorno
+    _CURL_CFFI_AVAILABLE = False
+
+BROWSER_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+    ),
+    "Accept": "application/json, text/plain, */*",
+    "Accept-Language": "es-CL,es;q=0.9,en;q=0.8",
+}
+
+
+def stealth_get(url: str, **kwargs: Any) -> Any:
+    """HTTP GET anti-403 con impersonación de Chrome o headers de navegador.
+
+    Algunos portales públicos (MINVU, BCN) rechazan el fingerprint TLS o el
+    User-Agent de `requests` con 403, sobre todo desde IPs de CI. Con
+    curl_cffi disponible se impersona Chrome; si no, se envían headers de
+    navegador. Ambas rutas incluyen los reintentos de `fetch_with_retry`.
+    """
+    if _CURL_CFFI_AVAILABLE:
+        return fetch_with_retry(url, get_fn=_cffi_requests.get, impersonate="chrome124", **kwargs)
+    headers = dict(BROWSER_HEADERS)
+    headers.update(kwargs.pop("headers", {}))
+    return fetch_with_retry(url, get_fn=requests.get, headers=headers, **kwargs)
+
 
 def _is_retryable(exc: BaseException) -> bool:
     """True para errores de red transitorios y respuestas 5xx; False para 4xx y otros."""
