@@ -1300,6 +1300,15 @@ class ReleaseArtifactLayoutGuardrailTests(unittest.TestCase):
         content = PYPI_RELEASE_WORKFLOW.read_text(encoding="utf-8")
         self.assertIn('cp -a "$staging/data/normalized/." data/normalized/', content)
 
+    def test_publish_restamps_adopted_artifact_version(self):
+        """Race release↔publish (2026-09-25): el artifact puede ser anterior al
+        release y el publish pisaba el cache-buster/pin con la versión vieja.
+        El publish debe re-estampar la versión de main antes de commitear."""
+        content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        publish_block = content.split("Commit refreshed artifacts")[1].split("git commit")[0]
+        self.assertIn("sync_release_artifact_version.py", publish_block)
+        self.assertIn("sync_docs.py --version-only", publish_block)
+
 
 if __name__ == "__main__":
     import pytest

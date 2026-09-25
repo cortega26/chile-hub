@@ -551,6 +551,13 @@ jobs:
           # el README del checkout de main (stale) y el cache-buster viejo.
           cp -a .pipeline-output/data/normalized/. data/normalized/
           cp .pipeline-output/README.md .pipeline-output/index.html .pipeline-output/app.js .
+          # Re-estampa la versión de main (pyproject del checkout) sobre lo
+          # adoptado: el artifact pudo construirse antes del release
+          # (race release↔publish 2026-09-25: el publish pisó el cache-buster
+          # 1.37.3 con el 1.37.2 del artifact). Mismos scripts que el job
+          # release, ambos stdlib — no requieren setup de Python.
+          python scripts/sync_release_artifact_version.py
+          python scripts/sync_docs.py --version-only
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           # README.md incluido (fix/write-races): el build regenera los bloques
