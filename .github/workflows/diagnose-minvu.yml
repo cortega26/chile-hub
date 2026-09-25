@@ -1,0 +1,53 @@
+name: Diagnose MINVU download
+
+# Workflow desechable de diagnóstico: prueba qué transporte HTTP/TLS logra
+# descargar el XLSX de catalogo.minvu.cl desde un runner de GitHub. Se borra
+# una vez identificado el transporte que funciona.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Set up uv
+        uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+
+      - name: Probe curl CLI transports
+        run: |
+          URL="https://catalogo.minvu.cl/cgi-bin/koha/opac-retrieve-file.pl?id=adc446143de3847f7f66d3f93b83ddf3"
+          UA="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+          for label in "default:" "http1.1:--http1.1" "tls1.2:--tlsv1.2 --tls-max 1.2" "ipv4:-4"; do
+            name="${label%%:*}"; flags="${label#*:}"
+            printf "curl %s: " "$name"
+            curl -sS $flags -o /dev/null -w "http=%{http_code} size=%{size_download}\n" \
+              --max-time 60 -A "$UA" "$URL" || echo "FAILED exit=$?"
+          done
+
+      - name: Probe python transports
+        run: |
+          uv run --no-project --with requests --with curl_cffi python - <<'PY'
+          import requests
+          import curl_cffi.requests as cffi
+
+          URL = "https://catalogo.minvu.cl/cgi-bin/koha/opac-retrieve-file.pl?id=adc446143de3847f7f66d3f93b83ddf3"
+          UA = ("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+                "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
+          probes = [
+              ("requests-default", lambda: requests.get(URL, timeout=45)),
+              ("requests-browser-UA", lambda: requests.get(URL, timeout=45, headers={"User-Agent": UA})),
+              ("curl_cffi-chrome124", lambda: cffi.get(URL, impersonate="chrome124", timeout=45)),
+              ("curl_cffi-none", lambda: cffi.get(URL, timeout=45)),
+          ]
+          for label, fn in probes:
+              try:
+                  r = fn()
+                  print(f"{label}: http={r.status_code} size={len(r.content)}")
+              except Exception as exc:
+                  print(f"{label}: ERROR {type(exc).__name__}: {str(exc)[:200]}")
+          PY
