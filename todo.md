@@ -99,12 +99,17 @@ están pendientes de review.
       ninguna librería cliente lo resuelve. Documentado en el docstring del
       extractor y en `docs/datasets/permisos_edificacion.md` para no
       re-litigarlo.
-- [x] Hallazgo de timing (no bug): el release 1.37.3 lo disparó el run de push
-      (readiness) antes de que el dispatch subiera su artefacto (19:38 vs
-      19:44), así que `hf-publish` se saltó por `ready=false`. El próximo
-      release con commit publicable encontrará el artefacto publication-grade
-      del dispatch y correrá `hf-publish` por CI (el mirror ya quedó al día
-      manualmente con 21 subsets).
+- [x] El timing del release 1.37.3 destapó **dos bugs reales de layout** del
+      artifact (nunca antes visibles porque ningún release llegaba a validarlo):
+      `is_publication_grade` buscaba la provenance en la raíz y `try_download`
+      copiaba `$dir/.` con el artifact anidado (`data/normalized/`, PR #77);
+      `hf-publish` bajaba directo a `data/normalized` creando
+      `data/normalized/data/normalized/`. Corregidos en `pypi-release.yml`
+      (acepta ambos layouts) con guardrail de test.
+- [x] **Cadena CI verificada end-to-end**: release **1.37.5** con assets de
+      datos adjuntos y job `hf-publish` en **success** por primera vez — el
+      mirror de Hugging Face quedó actualizado por CI (21 subsets, 20:26 UTC),
+      sin intervención manual.
 
 ## Housekeeping
 
