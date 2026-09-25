@@ -12,6 +12,28 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.37.0 - 2026-09-25
+
+### Documentación
+
+- **citation**: CITATION.cff, guía de citación y ruta DOI Zenodo
+  ([`edd41a3`](https://github.com/cortega26/chile-hub/commit/edd41a31deeb25d39d0463f07f9b3c4b5f992b79))
+
+### Agregado
+
+- **hf**: Subsets por capa en el visor de Hugging Face + acceso hf://
+  ([`5c3fd32`](https://github.com/cortega26/chile-hub/commit/5c3fd32510bd7c4bee61c581e778d1428604a8a2))
+
+- **mcp**: Servidor MCP opcional (chile-hub[mcp]) para agentes
+  ([`25b00ed`](https://github.com/cortega26/chile-hub/commit/25b00ed601e7e878091642fc70cdc2e805b075a8))
+
+- **seo**: JSON-LD por dataset, sitemap index y llms.txt
+  ([`528220f`](https://github.com/cortega26/chile-hub/commit/528220f32a58653d0efbda139b80ff90a7b7928f))
+
+- **seo**: Páginas por comuna generadas en el deploy
+  ([`330786e`](https://github.com/cortega26/chile-hub/commit/330786ee64e9b214caf3be27532a8ea9228c7ba9))
+
+
 ## 1.36.5 - 2026-09-21
 
 ### Corregido
