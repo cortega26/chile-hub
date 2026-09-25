@@ -12,6 +12,30 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.37.4 - 2026-09-25
+
+### Corregido
+
+- **http**: Descarga el Parquet remoto con requests (GitHub Pages sin Content-Length)
+  ([`68d339d`](https://github.com/cortega26/chile-hub/commit/68d339d36bb56d036edd89d84f21db74d6172321))
+
+### Mantenimiento
+
+- **ci**: Amplía diagnóstico MINVU a matriz de fingerprints + browsers scrapling
+  ([`b5686a2`](https://github.com/cortega26/chile-hub/commit/b5686a22c6f1329edb8f468c89080860267054f7))
+
+- **ci**: Diagnóstico temporal de scrapling contra catalogo.minvu.cl
+  ([`feac4a0`](https://github.com/cortega26/chile-hub/commit/feac4a09e84ec036e9aa10f2534a5f2af4e8ab42))
+
+- **landing**: Sincroniza cache-buster a 1.37.3 + cierre de incidente MINVU
+  ([`79cfaf1`](https://github.com/cortega26/chile-hub/commit/79cfaf14799faa90bde6067c43e987644d87483c))
+
+### Documentación
+
+- **permisos**: Documenta que scrapling no sortea el bloqueo de catalogo.minvu.cl
+  ([`c23a6ab`](https://github.com/cortega26/chile-hub/commit/c23a6ab34815ce3a71c9b216c88c4cd02c81c452))
+
+
 ## 1.37.3 - 2026-09-25
 
 ### Corregido
