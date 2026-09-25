@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://tooltician.com/chile-hub/</loc>
-    <lastmod>2026-06-17</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>
-</urlset>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>https://tooltician.com/chile-hub/sitemap-pages.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://tooltician.com/chile-hub/reference/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://tooltician.com/chile-hub/comunas/sitemap.xml</loc>
+  </sitemap>
+</sitemapindex>

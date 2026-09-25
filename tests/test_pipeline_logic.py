@@ -5033,6 +5033,75 @@ class HfDatasetCardTests(unittest.TestCase):
             )
 
 
+class DatasetSeoTests(unittest.TestCase):
+    """Plan 102: páginas de dataset elegibles para Google Dataset Search.
+
+    Regresión a evitar: las páginas `reference/datasets/{capa}/` tienen
+    canonical pero cero schema.org, así que no pueden aparecer en el catálogo
+    de datasets de Google; y el sitemap raíz sólo declaraba 1 URL, dejando 86
+    páginas de docs descubribles únicamente por crawling.
+    """
+
+    def test_build_dataset_json_ld_shape(self):
+        from src.builders.landing import build_dataset_json_ld
+
+        entry = build_dataset_json_ld("comunas", "https://tooltician.com/chile-hub")
+        self.assertEqual(entry["@type"], "Dataset")
+        self.assertEqual(
+            entry["url"], "https://tooltician.com/chile-hub/reference/datasets/comunas/"
+        )
+        self.assertEqual(entry["spatialCoverage"]["name"], "Chile")
+        self.assertEqual(entry["isPartOf"]["@type"], "DataCatalog")
+        self.assertTrue(
+            entry["distribution"]["contentUrl"].endswith("data/normalized/comunas.parquet")
+        )
+
+    def test_inject_page_is_idempotent_and_parseable(self):
+        from scripts.inject_dataset_json_ld import inject_page
+
+        entry = {"@type": "Dataset", "name": "Comunas"}
+        html = "<html><head><title>x</title></head><body></body></html>"
+        once = inject_page(html, entry)
+        twice = inject_page(once, entry)
+        self.assertEqual(twice.count("chile-hub-dataset-json-ld"), 1)
+        self.assertEqual(once, twice, "re-ejecutar no debe cambiar el HTML")
+        match = re.search(
+            r'id="chile-hub-dataset-json-ld">\n(.*?)\n</script>', once, flags=re.DOTALL
+        )
+        self.assertIsNotNone(match)
+        self.assertEqual(json.loads(match.group(1))["name"], "Comunas")
+
+    def test_main_fails_loud_without_dataset_pages(self):
+        from scripts.inject_dataset_json_ld import main
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with self.assertRaises(SystemExit):
+                main(["--site-dir", tmpdir])
+
+    def test_main_injects_real_catalog_page(self):
+        from scripts.inject_dataset_json_ld import main
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            page_dir = Path(tmpdir) / "datasets" / "comunas"
+            page_dir.mkdir(parents=True)
+            (page_dir / "index.html").write_text(
+                "<html><head><title>Comunas</title></head><body></body></html>",
+                encoding="utf-8",
+            )
+            rc = main(
+                [
+                    "--site-dir",
+                    tmpdir,
+                    "--catalog",
+                    str(ROOT_DIR / "data" / "dataset_catalog_config.json"),
+                ]
+            )
+            self.assertEqual(rc, 0)
+            injected = (page_dir / "index.html").read_text(encoding="utf-8")
+            self.assertIn("chile-hub-dataset-json-ld", injected)
+            self.assertIn("reference/datasets/comunas/", injected)
+
+
 if __name__ == "__main__":
     import pytest
 

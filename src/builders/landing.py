@@ -98,6 +98,54 @@ def build_catalog_json_ld(public_site_url):
     }
 
 
+def build_dataset_json_ld(key, public_site_url, catalog=None):
+    """Entrada schema.org ``Dataset`` de una capa, con URL canónica de docs.
+
+    Fuente única del hecho "página de documentación ↔ capa": la usa el
+    inyector post-build de mkdocs (`scripts/inject_dataset_json_ld.py`) para
+    que `reference/datasets/{key}/` sea elegible en Google Dataset Search, y
+    la reutilizan sus tests. Función pura: no lee ni escribe archivos.
+
+    `catalog` permite inyectar un catálogo alternativo en tests; por defecto
+    usa el catálogo real cargado en `_shared`.
+    """
+    source = catalog if catalog is not None else DATASET_CATALOG_CONFIG
+    config = source[key]
+    reuse_policy = config.get("reuse_policy", {})
+    outputs = config.get("outputs") or {}
+    public_site_url = normalize_site_url(public_site_url)
+
+    entry = {
+        "@context": "https://schema.org",
+        "@type": "Dataset",
+        "name": DISPLAY_NAMES.get(key, key),
+        "description": config.get("description", ""),
+        "url": f"{public_site_url}reference/datasets/{key}/",
+        "license": reuse_policy.get("license_url", DEFAULT_LICENSE_URL),
+        "creator": {
+            "@type": "Organization",
+            "name": CREATORS.get(key, "chile-hub"),
+        },
+        "spatialCoverage": {"@type": "Place", "name": "Chile"},
+        "inLanguage": "es",
+        "isPartOf": {
+            "@type": "DataCatalog",
+            "name": "chile-hub",
+            "url": public_site_url,
+        },
+    }
+
+    parquet_rel_path = outputs.get("parquet")
+    if parquet_rel_path:
+        entry["distribution"] = {
+            "@type": "DataDownload",
+            "encodingFormat": "application/vnd.apache.parquet",
+            "contentUrl": f"{public_site_url}{parquet_rel_path}",
+        }
+
+    return entry
+
+
 def render_catalog_json_ld_block(public_site_url):
     """Renderiza el bloque HTML completo (marcadores incluidos) del JSON-LD.
 

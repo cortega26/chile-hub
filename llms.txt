@@ -1,0 +1,24 @@
+# chile-hub
+
+> Capa de datos pública, curada y reproducible sobre datos oficiales de Chile.
+> Más de veinte capas (DPA, Censo 2024, indicadores económicos, salud,
+> educación, pobreza, finanzas municipales, electoral y más) normalizadas,
+> validadas y listas para consumir en una línea de código.
+
+## Datos
+
+- Catálogo DCAT: https://tooltician.com/chile-hub/data/normalized/data.json
+- Descriptor Frictionless: https://tooltician.com/chile-hub/data/normalized/datapackage.json
+- Catálogo de datasets: https://tooltician.com/chile-hub/data/normalized/dataset_catalog.json
+- Parquet por capa: https://tooltician.com/chile-hub/data/normalized/{capa}.parquet
+- Mirror Hugging Face (un subset por capa): https://huggingface.co/datasets/cortega26/chile-hub
+- Bundle ZIP versionado: https://github.com/cortega26/chile-hub/releases/latest/download/chile-hub-publishable-bundle.zip
+
+## Documentación
+
+- Sitio: https://tooltician.com/chile-hub/
+- Acceso HTTP estático: https://tooltician.com/chile-hub/reference/http-access/
+- Uso desde R: https://tooltician.com/chile-hub/reference/r-quickstart/
+- Referencia de API: https://tooltician.com/chile-hub/reference/api/
+- Cómo citar: https://tooltician.com/chile-hub/reference/citation/
+- Repositorio: https://github.com/cortega26/chile-hub

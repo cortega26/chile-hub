@@ -1056,6 +1056,37 @@ class HfDatasetCardGuardrailTests(unittest.TestCase):
         self.assertIn('load_dataset("cortega26/chile-hub", "comunas"', content)
 
 
+class DistributionSeoGuardrailTests(unittest.TestCase):
+    """Plan 102: descubrimiento del sitio (sitemap index, JSON-LD, llms.txt).
+
+    Regresión a evitar: que el sitemap raíz vuelva a ser una sola URL, que el
+    deploy deje de inyectar el schema.org de datasets, o que desaparezca el
+    `llms.txt` que guía a los agentes.
+    """
+
+    def test_sitemap_is_an_index_with_all_children(self):
+        content = (ROOT_DIR / "sitemap.xml").read_text(encoding="utf-8")
+        self.assertIn("<sitemapindex", content)
+        for child in ("sitemap-pages.xml", "reference/sitemap.xml", "comunas/sitemap.xml"):
+            self.assertIn(child, content, f"el índice no declara {child}")
+
+    def test_pages_deploy_injects_dataset_json_ld(self):
+        content = (ROOT_DIR / ".github" / "workflows" / "pages-deploy.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("inject_dataset_json_ld.py", content)
+
+    def test_robots_declares_an_existing_sitemap(self):
+        robots = (ROOT_DIR / "robots.txt").read_text(encoding="utf-8")
+        self.assertIn("Sitemap:", robots)
+        self.assertTrue((ROOT_DIR / "sitemap.xml").is_file())
+
+    def test_llms_txt_lists_catalog_and_mirror(self):
+        content = (ROOT_DIR / "llms.txt").read_text(encoding="utf-8")
+        self.assertIn("data.json", content)
+        self.assertIn("huggingface.co/datasets/cortega26/chile-hub", content)
+
+
 if __name__ == "__main__":
     import pytest
 
