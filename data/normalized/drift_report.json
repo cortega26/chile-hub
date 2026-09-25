@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-09-15T17:36:48.057196+00:00",
+  "generated_at_utc": "2026-09-25T19:33:06.508520+00:00",
   "dataset_count": 22,
   "drifted_count": 2,
   "healthy_count": 20,
@@ -267,13 +267,13 @@
       "drift_status": "healthy",
       "source_mode": "live",
       "coverage_status": "full",
-      "coverage_ratio": 1.0,
-      "coverage_summary": "Cobertura completa: 36/36 filas respecto del baseline esperado.",
+      "coverage_ratio": 1.0278,
+      "coverage_summary": "Cobertura completa: 37/36 filas respecto del baseline esperado.",
       "degradation_status": "none",
-      "degradation_impact": "1 observación(es) esperada(s): estado_legal poblado (vía SERVEL) en 15/36 partidos",
+      "degradation_impact": "1 observación(es) esperada(s): estado_legal poblado (vía SERVEL) en 16/37 partidos",
       "drift_summary": "Sin drift operativo detectado en este build.",
       "warning_count": 1,
-      "diagnostic_summary": "estado_legal poblado (vía SERVEL) en 15/36 partidos",
+      "diagnostic_summary": "estado_legal poblado (vía SERVEL) en 16/37 partidos",
       "recommended_action": "Ninguna.",
       "documentation": "docs/datasets/partidos_politicos.md"
     },
@@ -310,7 +310,7 @@
     {
       "dataset": "permisos_edificacion",
       "drift_status": "healthy",
-      "source_mode": "live",
+      "source_mode": "monthly",
       "coverage_status": "not_applicable",
       "coverage_ratio": null,
       "coverage_summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
@@ -330,10 +330,10 @@
       "coverage_ratio": null,
       "coverage_summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
       "degradation_status": "none",
-      "degradation_impact": "1 observación(es) esperada(s): cobertura SINCA: 65/346 comunas (18.8%) — parcial por diseño; solo comunas con estación",
+      "degradation_impact": "1 observación(es) esperada(s): cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación",
       "drift_summary": "Sin drift operativo detectado en este build.",
       "warning_count": 1,
-      "diagnostic_summary": "cobertura SINCA: 65/346 comunas (18.8%) — parcial por diseño; solo comunas con estación",
+      "diagnostic_summary": "cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación",
       "recommended_action": "Ninguna.",
       "documentation": "docs/datasets/calidad_aire.md"
     }

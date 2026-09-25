@@ -160,21 +160,21 @@ Pipeline determinista en GitHub Actions: extracción → build → verificación
 | 5 | **Indicadores Económicos** | Serie histórica | 🟢 live | BCCh / mindicador.cl | Libre c/cita | Diaria |
 | 6 | **Censo Comunal 2024** | 346 | 🟢 live | INE | CC BY 4.0 | Decenal |
 | 7 | **Censo Hogares y Viviendas** | 346 | 🟢 live | INE | CC BY 4.0 | Decenal |
-| 8 | **Establecimientos de Salud** | 5717 | 🟢 live | MINSAL / datos.gob.cl | CC0 | Mensual |
+| 8 | **Establecimientos de Salud** | 5743 | 🟢 live | MINSAL / datos.gob.cl | CC0 | Mensual |
 | 9 | **Distritos Electorales** | 346 | 🟢 live | BCN / Ley 20.840 | CC0 | — |
 | 10 | **Establecimientos Educacionales** | ~12 898 | 🟢 live | MINEDUC | CC BY 3.0 CL | Anual |
 | 11 | **Finanzas Municipales** ⚠️ | 345 (parcial) | 🔶 parcial | SINIM / SUBDERE | Revisión términos | Anual |
 | 12 | **Resultados Educacionales** | 345 | 🟢 live | MINEDUC | CC BY 3.0 CL | Anual |
 | 13 | **Indicadores Urbanos SIEDU** | 6 701 (parcial) | 🟢 live | INE / SIEDU | Datos abiertos INE | Anual |
 | 14 | **Perfil Territorial Comunal** | 346 | 🟢 live | chile-hub derivado | Fuentes abiertas | Derivada |
-| 15 | **Empresas (RES)** | ~1 590 979 | 🟢 live | Min. Economía / datos.gob.cl | CC-BY 3.0 CL | Mensual |
+| 15 | **Empresas (RES)** | ~1 609 373 | 🟢 live | Min. Economía / datos.gob.cl | CC-BY 3.0 CL | Mensual |
 | 16 | **Pobreza Comunal (SAE)** | 690 | 🟢 live | MDS / Observatorio Social | Datos abiertos MDS | Bienal/trienal |
 | 17 | **Consumo Eléctrico Comunal** | 3 | 🟡 fallback | CNE / Energía Abierta | CC BY | Anual |
-| 18 | **Partidos Políticos** | 36 | 🟢 live | Cámara de Diputados | CC BY | Bajo_demanda |
+| 18 | **Partidos Políticos** | 37 | 🟢 live | Cámara de Diputados | CC BY | Bajo_demanda |
 | 19 | **Autoridades Electas** | 205 | 🟢 live | Cámara de Diputados + Senado | CC BY | Bajo_demanda |
 | 20 | **Estadísticas Vitales** | 13 840 | 🟢 live | INE | CC BY 4.0 | Anual |
-| 21 | **Permisos de Edificación** | 8 650 | 🟢 live | MINVU / CEDOC | Uso c/cita | Mensual |
-| 22 | **Calidad del Aire** | 756 | 🟢 live | MMA / SINCA | Revisión términos | Diaria |
+| 21 | **Permisos de Edificación** | 8 650 | ⚪ monthly | MINVU / CEDOC | Uso c/cita | Mensual |
+| 22 | **Calidad del Aire** | 1 510 | 🟢 live | MMA / SINCA | Revisión términos | Diaria |
 | 23 | **geometria_comunal** 🆕 | — | 🔜 próximamente | — | — | — |
 | 24 | **Delincuencia Comunal** 🚫 | — | 🚫 deprecated | CEAD / SPD | Revisión términos | — |
 | 25 | **Autoridades Locales** 🆕 | — | 🔜 próximamente | BCN SIIT + Wikipedia | CC BY / CC BY-SA | — |
@@ -215,7 +215,7 @@ chile-hub health       # severidad, frescura, drift y cobertura
 ### Respaldo adicional
 
 <!-- START_TEST_COUNT -->
-- **1089 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
+- **1095 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
 <!-- END_TEST_COUNT -->
 <!-- START_ADR_COUNT -->
 - **20 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".

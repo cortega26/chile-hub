@@ -3694,6 +3694,97 @@ class PermisosEdificacionExtractorTests(unittest.TestCase):
         self.assertEqual(len(kept), 1)
         self.assertEqual(errors, [])
 
+    def test_snapshot_refreshed_at_parses_filename(self):
+        """El timestamp del snapshot es la fecha honesta del modo monthly."""
+        from src.extractors.permisos_edificacion_extractor import _snapshot_refreshed_at
+
+        path = Path("minvu_permisos_edificacion_anual_20260925T190842Z.xlsx")
+        self.assertEqual(_snapshot_refreshed_at(path), "2026-09-25T19:08:42+00:00")
+        self.assertIsNone(_snapshot_refreshed_at(Path("snapshot_sin_fecha.xlsx")))
+
+    def test_fetch_data_reuses_versioned_snapshot_as_monthly(self):
+        """Si la descarga live falla y hay snapshot versionado, el modo es
+        `monthly` (no `fallback` ni `live`) y refreshed_at sale del nombre.
+
+        Contexto real: CI no puede descargar catalogo.minvu.cl (bloqueo por
+        IP); el snapshot vive en data/raw/ versionado en git.
+        """
+        from src.extractors import permisos_edificacion_extractor as pe
+
+        fake_lookup = self.FAKE_LOOKUP
+
+        class _FakeSheet:
+            def __init__(self, rows):
+                self._rows = rows
+
+            def iter_rows(self, values_only=True):
+                return iter(self._rows)
+
+        class _FakeWorkbook:
+            sheetnames = [
+                "Número Total",
+                "M2 Total",
+                "Número Casas",
+                "M2 Casas",
+                "Número Departamentos",
+                "M2 Departamentos",
+            ]
+
+            def __init__(self, rows):
+                self._rows = rows
+
+            def __getitem__(self, name):
+                return _FakeSheet(self._rows)
+
+            def close(self):
+                pass
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            snap = Path(tmpdir) / "minvu_permisos_edificacion_anual_20260925T190842Z.xlsx"
+            snap.write_bytes(b"placeholder")
+
+            # Total País ajustado a la suma real de comunas del fixture
+            # (650/540) para que el gate de reconciliación no descarte los años.
+            rows_fixture = self._sheet_rows()
+            rows_fixture[4] = ["Total País ", None, 650, 540]
+
+            with (
+                patch.object(pe, "RAW_DIR", tmpdir),
+                patch.object(pe, "_load_comunas_lookup", return_value=fake_lookup),
+                patch.object(
+                    pe, "_discover_xlsx_url", return_value=(pe.HARDCODED_XLSX_URL, "test")
+                ),
+                patch.object(pe, "_download_xlsx", side_effect=OSError("bloqueado por IP")),
+                patch.object(
+                    pe.openpyxl,
+                    "load_workbook",
+                    side_effect=lambda *a, **k: _FakeWorkbook(rows_fixture),
+                ),
+            ):
+                rows, mode, _url, notes, refreshed_at = pe.fetch_data()
+
+        self.assertEqual(mode, "monthly")
+        self.assertEqual(refreshed_at, "2026-09-25T19:08:42+00:00")
+        self.assertTrue(any("snapshot versionado" in n for n in notes))
+        self.assertTrue(rows)
+
+    def test_fetch_data_without_snapshot_is_fallback(self):
+        """Sin snapshot versionado, un fallo de descarga sigue siendo fallback."""
+        from src.extractors import permisos_edificacion_extractor as pe
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with (
+                patch.object(pe, "RAW_DIR", tmpdir),
+                patch.object(pe, "_load_comunas_lookup", return_value={}),
+                patch.object(
+                    pe, "_discover_xlsx_url", return_value=(pe.HARDCODED_XLSX_URL, "test")
+                ),
+                patch.object(pe, "_download_xlsx", side_effect=OSError("bloqueado por IP")),
+            ):
+                rows, mode, _url, _notes, refreshed_at = pe.fetch_data()
+        self.assertEqual(mode, "fallback")
+        self.assertIsNone(refreshed_at)
+
     def test_run_dry_run_returns_validation_without_writing(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             staging_csv = Path(tmpdir) / "permisos_edificacion.csv"
@@ -3711,6 +3802,7 @@ class PermisosEdificacionExtractorTests(unittest.TestCase):
                         "fallback",
                         permisos_edificacion_extractor.REPOSITORIO_URL,
                         ["test"],
+                        None,
                     ),
                 ),
             ):

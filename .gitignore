@@ -15,6 +15,13 @@ data/normalized/*
 !data/normalized/*.zip
 !data/normalized/*.sha256
 
+# Snapshot crudo versionado de MINVU CEDOC: los runners de GitHub no pueden
+# descargar catalogo.minvu.cl (bloqueo por IP), así que el extractor reutiliza
+# este snapshot con source_mode=monthly. Ver docs/datasets/permisos_edificacion.md.
+!data/raw/
+data/raw/*
+!data/raw/minvu_permisos_edificacion_anual_*.xlsx
+
 # Entornos virtuales de Python
 .venv/
 venv/

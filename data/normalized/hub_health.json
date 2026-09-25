@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-09-15T17:36:48.057196+00:00",
+  "generated_at_utc": "2026-09-25T19:33:06.508520+00:00",
   "overall_status": "warn",
   "dataset_count": 22,
   "retired_count": 1,
@@ -72,7 +72,7 @@
       "coverage_ratio": null,
       "drift_status": "healthy",
       "source_detail": "Promedios diarios por estación y contaminante (MP2.5, MP10, SO2, NO2, CO, O3) desde el JSON del SINCA. Cobertura parcial por diseño (~65 comunas con estación). Serie incremental desde la primera cosecha.",
-      "diagnostic_summary": "cobertura SINCA: 65/346 comunas (18.8%) — parcial por diseño; solo comunas con estación",
+      "diagnostic_summary": "cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación",
       "recommended_action": "Ninguna.",
       "retired": false
     },
@@ -363,10 +363,10 @@
       "publishability_status": "ready",
       "degradation_status": "none",
       "coverage_status": "full",
-      "coverage_ratio": 1.0,
+      "coverage_ratio": 1.0278,
       "drift_status": "healthy",
       "source_detail": "WSComun.asmx/retornarPartidosPoliticos + servel.cl/partidos-politicos (estado legal)",
-      "diagnostic_summary": "estado_legal poblado (vía SERVEL) en 15/36 partidos",
+      "diagnostic_summary": "estado_legal poblado (vía SERVEL) en 16/37 partidos",
       "recommended_action": "Ninguna.",
       "retired": false
     },
@@ -394,7 +394,7 @@
     {
       "dataset": "permisos_edificacion",
       "severity": "ok",
-      "source_mode": "live",
+      "source_mode": "monthly",
       "freshness_status": "fresh",
       "validation_status": "ok",
       "warning_count": 0,

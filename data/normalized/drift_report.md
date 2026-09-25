@@ -1,6 +1,6 @@
 # chile-hub drift report
 
-- `generated_at_utc`: `2026-09-15T17:36:48.057196+00:00`
+- `generated_at_utc`: `2026-09-25T19:33:06.508520+00:00`
 - `dataset_count`: `22`
 - `drifted_count`: `2`
 - `healthy_count`: `20`
@@ -30,7 +30,7 @@
 | `partidos_politicos` | `healthy` | `live` | `full` | `none` | 1 | Ninguna. |
 | `autoridades_electas` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
 | `estadisticas_vitales` | `healthy` | `live` | `not_applicable` | `none` | 0 | Ninguna. |
-| `permisos_edificacion` | `healthy` | `live` | `not_applicable` | `none` | 0 | Ninguna. |
+| `permisos_edificacion` | `healthy` | `monthly` | `not_applicable` | `none` | 0 | Ninguna. |
 | `calidad_aire` | `healthy` | `live` | `not_applicable` | `none` | 1 | Ninguna. |
 
 ## regiones
@@ -207,10 +207,10 @@
 
 - `drift_status`: `healthy`
 - `source_mode`: `live`
-- `coverage`: `Cobertura completa: 36/36 filas respecto del baseline esperado.`
-- `degradation`: 1 observación(es) esperada(s): estado_legal poblado (vía SERVEL) en 15/36 partidos
+- `coverage`: `Cobertura completa: 37/36 filas respecto del baseline esperado.`
+- `degradation`: 1 observación(es) esperada(s): estado_legal poblado (vía SERVEL) en 16/37 partidos
 - `warning_count`: `1`
-- `diagnostic_summary`: estado_legal poblado (vía SERVEL) en 15/36 partidos
+- `diagnostic_summary`: estado_legal poblado (vía SERVEL) en 16/37 partidos
 - `recommended_action`: Ninguna.
 
 ## autoridades_electas
@@ -236,7 +236,7 @@
 ## permisos_edificacion
 
 - `drift_status`: `healthy`
-- `source_mode`: `live`
+- `source_mode`: `monthly`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
 - `degradation`: Sin degradación operativa detectada en este build.
 - `warning_count`: `0`
@@ -248,7 +248,7 @@
 - `drift_status`: `healthy`
 - `source_mode`: `live`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
-- `degradation`: 1 observación(es) esperada(s): cobertura SINCA: 65/346 comunas (18.8%) — parcial por diseño; solo comunas con estación
+- `degradation`: 1 observación(es) esperada(s): cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación
 - `warning_count`: `1`
-- `diagnostic_summary`: cobertura SINCA: 65/346 comunas (18.8%) — parcial por diseño; solo comunas con estación
+- `diagnostic_summary`: cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación
 - `recommended_action`: Ninguna.

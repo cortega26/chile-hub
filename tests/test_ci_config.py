@@ -1221,6 +1221,40 @@ class HfMirrorDispatchGuardrailTests(unittest.TestCase):
         self.assertNotIn("git push", content)
 
 
+class PermisosSnapshotGuardrailTests(unittest.TestCase):
+    """permisos_edificacion desde CI: snapshot versionado + modo monthly.
+
+    Contexto real (2026-09-25): los runners de GitHub no pueden descargar
+    catalogo.minvu.cl (bloqueo por IP, todos los transportes TLS fallan), el
+    extractor caía a fallback de 2 filas y el README diario quedaba en drift.
+    La fuente sigue accesible desde la máquina del mantenedor; el snapshot se
+    versiona en `data/raw/` y el extractor lo reutiliza con `source_mode:
+    monthly` (lane no-fallback, como finanzas_municipales).
+    """
+
+    def test_daily_extract_runs_permisos_even_on_cache_hit(self):
+        content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        cache_hit_block = content.split("Cache de staging encontrado")[1].split("else")[0]
+        self.assertIn(
+            "permisos_edificacion_extractor.py",
+            cache_hit_block,
+            "la rama de cache-hit debe ejecutar permisos_edificacion siempre",
+        )
+
+    def test_daily_extract_has_versioned_snapshot_sanity_check(self):
+        content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("Sanity-check versioned MINVU snapshot", content)
+        self.assertIn("minvu_permisos_edificacion_anual_", content)
+
+    def test_versioned_snapshot_exists_and_fits_large_file_limit(self):
+        snapshots = sorted(
+            (ROOT_DIR / "data" / "raw").glob("minvu_permisos_edificacion_anual_*.xlsx")
+        )
+        self.assertTrue(snapshots, "falta el snapshot versionado de MINVU CEDOC")
+        # check-added-large-files usa --maxkb=500 (500*1024 bytes).
+        self.assertLess(snapshots[-1].stat().st_size, 500 * 1024)
+
+
 if __name__ == "__main__":
     import pytest
 

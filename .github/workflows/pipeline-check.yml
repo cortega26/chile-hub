@@ -250,6 +250,12 @@ jobs:
             echo "Cache de staging encontrado. Ejecutando solo extractores de alta frecuencia..."
             python src/extractors/bcentral_extractor.py
             python src/extractors/res_extractor.py
+            # MINVU CEDOC: los runners no alcanzan catalogo.minvu.cl (bloqueo por
+            # IP), así que el extractor reutiliza el snapshot versionado en
+            # data/raw/ con source_mode=monthly. Se ejecuta SIEMPRE, incluso con
+            # cache-hit, para que el modo no dependa de si el cache quedó
+            # envenenado con el fallback de 2 filas (drift del README diario).
+            python src/extractors/permisos_edificacion_extractor.py
             # Los demás extractores usan datos cacheados de data/staging/ y data/raw/
           else
             echo "Cache no encontrado. Ejecutando extracción completa..."
@@ -277,6 +283,18 @@ jobs:
             # "Check build-synced files" aborta el publish diario (2026-07-19/20).
             PYTHONPATH=src uv run --no-project --with "scrapling[fetchers]" --with polars --with requests --with structlog --with tenacity --with curl_cffi --with defusedxml python src/extractors/autoridades_electas_extractor.py
           fi
+
+      - name: Sanity-check versioned MINVU snapshot
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: |
+          # El snapshot versionado es la única fuente de permisos_edificacion
+          # desde runners de GitHub (catalogo.minvu.cl bloquea por IP). Si
+          # desaparece, el extractor cae a fallback y el publish diario se
+          # detiene con drift — mejor abortar aquí con el mensaje exacto.
+          ls data/raw/minvu_permisos_edificacion_anual_*.xlsx >/dev/null 2>&1 || {
+            echo "::error::Falta el snapshot versionado de MINVU CEDOC (data/raw/minvu_permisos_edificacion_anual_*.xlsx)."
+            exit 1
+          }
 
       - name: Restore versioned SINIM snapshot
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'

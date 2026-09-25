@@ -178,6 +178,27 @@ def _snapshot_path() -> Path:
     return Path(RAW_DIR) / f"minvu_permisos_edificacion_anual_{stamp}.xlsx"
 
 
+SNAPSHOT_GLOB = "minvu_permisos_edificacion_anual_*.xlsx"
+_SNAPSHOT_STAMP_RE = re.compile(r"_(\d{8}T\d{6}Z)\.xlsx$")
+
+
+def _snapshot_refreshed_at(path: Path) -> str | None:
+    """ISO UTC del timestamp del nombre del snapshot, o None si no parsea.
+
+    El nombre incluye el momento real de la descarga live; usarlo como
+    `refreshed_at_utc` hace que la frescura del dataset envejezca de verdad
+    cuando CI reutiliza un snapshot versionado (en vez de fingir "ahora").
+    """
+    match = _SNAPSHOT_STAMP_RE.search(path.name)
+    if not match:
+        return None
+    try:
+        parsed = datetime.datetime.strptime(match.group(1), "%Y%m%dT%H%M%SZ").replace(tzinfo=UTC)
+    except ValueError:
+        return None
+    return parsed.isoformat()
+
+
 def _discover_xlsx_url() -> tuple[str, str]:
     """Resuelve la URL actual del XLSX anual. Retorna (url, método).
 
@@ -378,19 +399,33 @@ def _gate_reconciliacion_anual(
     return kept, errores
 
 
-def fetch_data() -> tuple[list[dict], str, str, list[str]]:
+def fetch_data() -> tuple[list[dict], str, str, list[str], str | None]:
     """Obtiene permisos de edificación por comuna desde MINVU CEDOC.
 
-    Retorna (rows, source_mode, source_url, notes).
+    Retorna (rows, source_mode, source_url, notes, refreshed_at_utc).
+
+    `source_mode` es "live" si el XLSX se descargó en esta corrida; si la
+    descarga falla y se reutiliza un snapshot versionado en `data/raw/`, es
+    "monthly" (fuente genuina no re-fetcheada en este build — mismo contrato
+    que `finanzas_municipales`, ver NON_FALLBACK_SOURCE_MODES). CI no puede
+    alcanzar `catalogo.minvu.cl` (bloqueo por IP desde runners de GitHub),
+    por eso el snapshot se versiona en el repo; cuando la descarga vuelve a
+    funcionar, el modo regresa solo a "live".
+
+    `refreshed_at_utc` es el timestamp del snapshot cuando se reutiliza, para
+    que la frescura (1080 h) envejezca de verdad; None en modo live (el
+    caller usa "ahora").
     """
     ensure_staging_directories()
     notes: list[str] = []
     fecha_fuente = datetime.datetime.now(UTC).strftime("%Y-%m-%d")
+    from_snapshot = False
+    refreshed_at: str | None = None
 
     try:
         lookup = _load_comunas_lookup()
     except FileNotFoundError as exc:
-        return FALLBACK_ROWS, "fallback", REPOSITORIO_URL, [str(exc)]
+        return FALLBACK_ROWS, "fallback", REPOSITORIO_URL, [str(exc)], None
 
     try:
         url, metodo = _discover_xlsx_url()
@@ -403,14 +438,23 @@ def fetch_data() -> tuple[list[dict], str, str, list[str]]:
         try:
             path = _download_xlsx(url)
         except (requests.RequestException, OSError) as exc:
-            snapshots = sorted(Path(RAW_DIR).glob("minvu_permisos_edificacion_anual_*.xlsx"))
+            snapshots = sorted(Path(RAW_DIR).glob(SNAPSHOT_GLOB))
             if not snapshots:
                 raise
             path = snapshots[-1]
-            notes.append(f"descarga falló, usando snapshot {path.name} ({exc})")
+            from_snapshot = True
+            refreshed_at = _snapshot_refreshed_at(path)
+            notes.append(f"descarga falló, usando snapshot versionado {path.name} ({exc})")
+            if refreshed_at is None:
+                notes.append("snapshot sin timestamp parseable en el nombre; no se puede fechar")
     except (requests.RequestException, OSError) as exc:
         notes.append(f"sin datos live ni snapshot ({exc})")
-        return FALLBACK_ROWS, "fallback", REPOSITORIO_URL, notes
+        return FALLBACK_ROWS, "fallback", REPOSITORIO_URL, notes, None
+
+    if from_snapshot and refreshed_at is None:
+        # Sin fecha confiable no se puede sostener la frescura: se declara
+        # fallback en vez de publicar un snapshot de edad desconocida.
+        return FALLBACK_ROWS, "fallback", REPOSITORIO_URL, notes, None
 
     wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
     try:
@@ -448,7 +492,7 @@ def fetch_data() -> tuple[list[dict], str, str, list[str]]:
 
     if not series:
         notes.append("ninguna hoja aportó filas")
-        return FALLBACK_ROWS, "fallback", REPOSITORIO_URL, notes
+        return FALLBACK_ROWS, "fallback", REPOSITORIO_URL, notes, None
 
     unmatched = sorted(c for (c, _) in series if c not in lookup)
     if unmatched:
@@ -484,7 +528,8 @@ def fetch_data() -> tuple[list[dict], str, str, list[str]]:
         f"{len(rows)} filas desde '{path.name}' "
         f"(hojas: {', '.join(hojas_ok)}; años provisionales: {sorted(provisionales) or 'ninguno'})"
     )
-    return rows, "live", REPOSITORIO_URL, notes
+    mode = "monthly" if from_snapshot else "live"
+    return rows, mode, REPOSITORIO_URL, notes, refreshed_at
 
 
 def normalize_rows(rows: list[dict]) -> pl.DataFrame:
@@ -514,8 +559,14 @@ def normalize_rows(rows: list[dict]) -> pl.DataFrame:
     ).select(REQUIRED_COLUMNS)
 
 
-def build_metadata(mode: str, source_url: str, notes: list[str], row_count: int) -> dict:
-    """Construye metadatos estándar para el dataset."""
+def build_metadata(
+    mode: str, source_url: str, notes: list[str], row_count: int, refreshed_at: str | None = None
+) -> dict:
+    """Construye metadatos estándar para el dataset.
+
+    `refreshed_at` sólo se usa cuando el modo es `monthly` (snapshot
+    versionado): la fecha honesta es la del snapshot, no la de este build.
+    """
     return {
         "dataset": "permisos_edificacion",
         "source_name": SOURCE_NAME,
@@ -526,7 +577,7 @@ def build_metadata(mode: str, source_url: str, notes: list[str], row_count: int)
             "desde 2002 (MINVU CEDOC, en base a permisos otorgados por las "
             "Direcciones de Obras Municipales e INE)."
         ),
-        "refreshed_at_utc": datetime.datetime.now(UTC).isoformat(),
+        "refreshed_at_utc": refreshed_at or datetime.datetime.now(UTC).isoformat(),
         "record_count": row_count,
         "fields": REQUIRED_COLUMNS,
         "notes": notes,
@@ -536,10 +587,10 @@ def build_metadata(mode: str, source_url: str, notes: list[str], row_count: int)
 
 def process_permisos_edificacion() -> dict:
     """Ejecuta el flujo completo de extracción y staging."""
-    rows, mode, source_url, notes = fetch_data()
+    rows, mode, source_url, notes, refreshed_at = fetch_data()
     df = normalize_rows(rows)
 
-    metadata = build_metadata(mode, source_url, notes, df.height)
+    metadata = build_metadata(mode, source_url, notes, df.height, refreshed_at=refreshed_at)
 
     ensure_staging_directories()
     df.write_csv(STAGING_CSV_PATH)
@@ -568,7 +619,7 @@ class PermisosEdificacionExtractor(BaseExtractor):
         return fetch_data()
 
     def normalize(self, raw_data):
-        rows, _mode, _url, _notes = raw_data
+        rows, _mode, _url, _notes, _refreshed = raw_data
         return normalize_rows(rows)
 
     def validate(self, df, metadata: dict) -> dict:
