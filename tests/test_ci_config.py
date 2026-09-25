@@ -1050,6 +1050,35 @@ class HfDatasetCardGuardrailTests(unittest.TestCase):
             self.assertIn(marker, content, f"la card perdió {marker}")
         self.assertNotIn("data_files=", content, "el ejemplo debe usar el config name")
 
+    def test_card_license_name_matches_hf_pattern(self):
+        """HF rechaza el upload si `license_name` no cumple /^[a-z0-9-.]+$/.
+
+        Regresión real (2026-09-25): el primer publish manual con `configs:`
+        falló en `upload_folder` con "Invalid metadata in README.md" porque
+        `license_name` decía "Licencias por capa (ver DATA_LICENSES.md)".
+        Se valida el README **generado** (el que sube a HF), no la plantilla:
+        la plantilla tiene el placeholder `{{DATASET_CONFIGS}}`, que no es YAML
+        válido por sí solo.
+        """
+        import tempfile
+
+        import polars as pl
+        import yaml
+
+        from scripts.publish_hf_dataset import build_staging_dir
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            parquet = Path(tmpdir) / "comunas.parquet"
+            pl.DataFrame({"codigo_comuna": ["01101"]}).write_parquet(parquet)
+            dest = Path(tmpdir) / "staging"
+            build_staging_dir(dest, [("comunas", parquet)], [])
+
+            readme = (dest / "README.md").read_text(encoding="utf-8")
+            metadata = yaml.safe_load(readme.split("---", 2)[1])
+            license_name = metadata.get("license_name")
+            self.assertIsNotNone(license_name)
+            self.assertRegex(license_name, r"^[a-z0-9-.]+$")
+
     def test_http_access_documents_hf_url(self):
         content = (DOCS_DIR / "http-access.md").read_text(encoding="utf-8")
         self.assertIn("hf://datasets/cortega26/chile-hub", content)

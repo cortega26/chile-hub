@@ -25,6 +25,11 @@ están pendientes de review.
 - [x] `hf://` documentado en `docs/http-access.md`
 - [x] `HfDatasetCardTests` + guardrail de placeholders en verde
 - [x] Done criteria verificados; fila de `plans/README.md` + `ROADMAP.md` a DONE
+- [x] **Defecto real hallado al publicar de verdad** (2026-09-25): HF rechazó
+      el README con "Invalid metadata" porque `license_name` no cumple
+      `/^[a-z0-9-.]+$/`. Corregido a `chile-hub-data-licenses` + guardrail
+      en `test_ci_config.py`. La subida se hizo por workflow manual
+      `hf-publish.yml` (el job de release no corre sin release nuevo).
 
 ### Plan 102 — JSON-LD por dataset + sitemap index + `llms.txt`
 

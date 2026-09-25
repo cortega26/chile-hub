@@ -1,6 +1,6 @@
 ---
 license: other
-license_name: Licencias por capa (ver DATA_LICENSES.md)
+license_name: chile-hub-data-licenses
 license_link: https://github.com/cortega26/chile-hub/blob/main/DATA_LICENSES.md
 pretty_name: chile-hub — Datos públicos de Chile curados
 language: [es]

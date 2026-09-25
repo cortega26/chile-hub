@@ -99,7 +99,9 @@ parquet publicables (21 al 2026-09-25).
 
 En `docs/hf/dataset-card.md`: reemplazar el ejemplo `data_files=` por
 `load_dataset("cortega26/chile-hub", "comunas", split="train")`; agregar
-`license_name` + `license_link` apuntando a `DATA_LICENSES.md`; corregir
+`license_name: chile-hub-data-licenses` (HF exige el patrón
+`/^[a-z0-9-.]+$/`; un valor con espacios/mayúsculas rechaza el upload) +
+`license_link` apuntando a `DATA_LICENSES.md`; corregir
 `size_categories` a `1M<n<10M` (el visor reporta 1.62M filas). No tocar
 `{{DATASET_TABLE}}` / `{{DATASET_COUNT}}`.
 
