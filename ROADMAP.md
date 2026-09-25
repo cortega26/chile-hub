@@ -29,8 +29,8 @@
 
 | Quiero… | Ir a |
 |---|---|
-| ejecutar lo siguiente | primer `[ ]` del Backlog + su `plans/1NN-*.md` |
-| detalle ejecutor (pasos, verifies, STOP) | `plans/README.md` + `plans/1NN-*.md` |
+| ejecutar lo siguiente | primer `[ ]` del Backlog (ninguno: wave cerrada 2026-09-25) |
+| detalle ejecutor (pasos, verifies, STOP) | `plans/README.md` + `plans/archive/1NN-*.md` |
 | canales evaluados y descartados | `plans/README.md` (nota de la auditoría 2026-09-25) |
 
 ### Dependencias
