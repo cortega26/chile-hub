@@ -12,6 +12,19 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.37.1 - 2026-09-25
+
+### Corregido
+
+- **hf**: License_name válido para el schema de Hugging Face
+  ([`83de106`](https://github.com/cortega26/chile-hub/commit/83de1065c371bed6611e873ade7f25d353366e74))
+
+### Integración continua
+
+- **hf**: Workflow manual para resincronizar el mirror de Hugging Face
+  ([`425281a`](https://github.com/cortega26/chile-hub/commit/425281ac1f1bb915f836973f85cb3c4accf59b23))
+
+
 ## 1.37.0 - 2026-09-25
 
 ### Documentación
