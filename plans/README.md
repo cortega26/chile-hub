@@ -174,6 +174,28 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 | 099 | [Deuda media: sinim-shared + salud canónica + `_paths`](099-shared-debt.md) | P2 | M | MED | 091 | DONE (2026-09-15, commits 8c5123c+6763d00+261374b — `_sinim_shared` con test de equivalencia; salud: mapeo muestra que no hay dualidad real (sin churn); sys.path congelado con gate; branch advisor/wave-5) |
 | 100 | [Spike Polars `2.0rc1` en rama (sin prod)](100-polars2-spike.md) | P2 | M | MED | 092 | DONE (2026-09-15 — evidencia: 22/22 parquet + JSONs idénticos salvo wall-clock; suite 403 verde bajo RC; sin cambios a prod; ver commit; branch advisor/wave-5) |
 
+> **Auditoría de distribución (2026-09-25, commit `039fc03`)**: planes
+> **101–105**. Foco exclusivo en canales de tráfico/adopción sin presupuesto:
+> el paquete ya tiene tracción (2.218 instalaciones/mes PyPI, 135
+> descargas/mes en el mirror HF) y el cuello de botella es descubrimiento, no
+> producto. Los 5 hallazgos net-positive seleccionados: visor de HF por capa +
+> acceso `hf://` (**101**), datos estructurados/sitemap/`llms.txt` (**102**),
+> citación + ruta DOI Zenodo (**103**), servidor MCP (**104**) y páginas por
+> comuna SEO programático (**105**). **Diferidos/rechazados**: Kaggle
+> (re-deferido: el mecanismo es el mismo que HF; reconsiderar con el efecto
+> medido del fix 101), comparador de comunas como producto (rechazado:
+> superficie especulativa que duplica el playground DuckDB, sin señal de
+> demanda), Colab badges sueltos (absorbidos por 103). Branch del wave:
+> `advisor/distribution-wave-1` (precedente: `advisor/wave-1` de 086–090).
+
+| # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
+|---|------|----------|----------|--------|-----------|--------|
+| 101 | [Subsets reales en el visor de Hugging Face + acceso `hf://`](101-hf-dataset-subsets-and-hf-url.md) | P2 | S | LOW | — | TODO |
+| 102 | [Datos estructurados por dataset, sitemap index y `llms.txt`](102-seo-structured-data-sitemap-llms.md) | P2 | M | LOW-MED | — | TODO |
+| 103 | [Infraestructura de citación (`CITATION.cff`) + ruta DOI Zenodo](103-citation-doi-academic.md) | P3 | S | LOW | — | TODO |
+| 104 | [Servidor MCP (`chile-hub[mcp]`) — datos para agentes](104-mcp-server.md) | P2 | M | MED | — | TODO |
+| 105 | [Páginas por comuna (SEO programático) desde el perfil territorial](105-comuna-pages-programmatic-seo.md) | P2 | M | MED | 102 | TODO |
+
 ## Dependencias 086–100 (ver `ROADMAP.md` para el grafo completo)
 
 **Wave 1 (P1/S, paralelo):** 086, 087, 088, 089, 090.

@@ -1,6 +1,52 @@
-# Roadmap — auditoría 2026-09-15 (commit `3315eb6`)
+# Roadmap — chile-hub
 
-> **Qué es este archivo:** goto de tracking de la auditoría 2026-09-15.
+> **Auditoría activa (2026-09-25): distribución.** Planes **101–105** —
+> canales de tráfico/adopción sin presupuesto, ejecutados en el branch
+> `advisor/distribution-wave-1` (precedente: `advisor/wave-1`). Misma rutina de
+> cierre que abajo. La sección "Auditoría 2026-09-15" de más abajo queda como
+> **historial cerrado** (todas sus waves DONE).
+> **No duplicar contenido de planes aquí** — solo estado y links.
+
+## Auditoría distribución 2026-09-25 (activa)
+
+### Scoreboard
+
+| Wave | Planes | Done | Estado |
+|------|--------|------|--------|
+| D1 HF + SEO | 101–102 | 0/2 | TODO |
+| D2 Citación + MCP | 103–104 | 0/2 | TODO |
+| D3 Comunas | 105 | 0/1 | TODO |
+
+### Backlog (orden de ejecución)
+
+- [ ] 101 Subsets HF + `hf://` (P2/S) — visor por capa + acceso cero-instalación
+- [ ] 102 JSON-LD por dataset + sitemap index + `llms.txt` (P2/M)
+- [ ] 103 `CITATION.cff` + docs citación + DOI Zenodo (P3/S; paso del operador: activar Zenodo)
+- [ ] 104 Servidor MCP extra `[mcp]` + lock (P2/M)
+- [ ] 105 Páginas por comuna generadas en deploy (P2/M, tras 102)
+
+### Goto por síntoma (distribución)
+
+| Quiero… | Ir a |
+|---|---|
+| ejecutar lo siguiente | primer `[ ]` del Backlog + su `plans/1NN-*.md` |
+| detalle ejecutor (pasos, verifies, STOP) | `plans/README.md` + `plans/1NN-*.md` |
+| canales evaluados y descartados | `plans/README.md` (nota de la auditoría 2026-09-25) |
+
+### Dependencias
+
+- `105` tras `102`: comparte el contrato del `sitemap.xml` index y la
+  convención de JSON-LD (`src/builders/landing.py`).
+- `104` no depende de `101`, pero el visor HF corregido es el canal
+  complementario para agentes (HF tiene MCP oficial); no bloquear por eso.
+- `103` es independiente; el checkbox de Zenodo requiere acción del operador
+  (activar la integración GitHub↔Zenodo), no código.
+
+---
+
+## Auditoría 2026-09-15 (historial, cerrada — commit `3315eb6`)
+
+> **Qué es esta sección:** goto de tracking de la auditoría 2026-09-15.
 > Waves → scoreboard → backlog → dependencias. El detalle ejecutable vive en
 > `plans/086-*.md…100-*.md` (self-contained, estilo `plans/080-*` + template
 > improve); el índice ejecutor sigue siendo `plans/README.md`; la métrica

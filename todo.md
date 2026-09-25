@@ -9,6 +9,61 @@ todavía — `main` sigue mostrando la fila activa hasta que el operador confirm
 merge (ver spec.md, paso 10). No es drift; es el estado esperado mientras los branches
 están pendientes de review.
 
+## Auditoría distribución 2026-09-25 — planes 101–105 (cola activa)
+
+> Branch del wave: `advisor/distribution-wave-1`. Fuente: auditoría de canales
+> de adopción sin presupuesto (commit `039fc03`); ver nota y tabla en
+> `plans/README.md` + scoreboard en `ROADMAP.md`. Descartados con rationale:
+> Kaggle (mismo mecanismo que HF, re-deferido) y comparador de comunas como
+> producto (superficie especulativa que duplica el playground).
+
+### Plan 101 — subsets HF + `hf://`
+
+- [ ] Drift check corrido
+- [ ] `_build_dataset_configs()` + placeholder en la card + dry-run con 19 configs
+- [ ] Ejemplo de uso por config + metadata de licencia/tamaño corregida
+- [ ] `hf://` documentado en `docs/http-access.md`
+- [ ] `HfDatasetCardTests` + guardrail de placeholders en verde
+- [ ] Done criteria verificados; fila de `plans/README.md` + `ROADMAP.md` a DONE
+
+### Plan 102 — JSON-LD por dataset + sitemap index + `llms.txt`
+
+- [ ] Drift check corrido
+- [ ] `sitemap.xml` → sitemapindex (3 hijos) + `sitemap-pages.xml`
+- [ ] `build_dataset_json_ld()` en `src/builders/landing.py`
+- [ ] `scripts/inject_dataset_json_ld.py` idempotente + wiring en `pages-deploy.yml`
+- [ ] `llms.txt` en raíz
+- [ ] `DatasetSeoTests` + guardrails de CI en verde
+- [ ] Done criteria verificados; fila de `plans/README.md` + `ROADMAP.md` a DONE
+
+### Plan 103 — `CITATION.cff` + citación/Zenodo
+
+- [ ] Drift check corrido
+- [ ] `CITATION.cff` (sin `version:` — evita drift con PSR)
+- [ ] `docs/citation.md` + nav + sección "Cómo citar" en README
+- [ ] `examples/notebooks/README.md` con 4 badges Colab
+- [ ] `CitationFileGuardrailTests` en verde
+- [ ] Checklist Zenodo documentado (acción del operador) y Done criteria verificados
+- [ ] Fila de `plans/README.md` + `ROADMAP.md` a DONE
+
+### Plan 104 — servidor MCP
+
+- [ ] Drift check corrido
+- [ ] `mcp_tools.py` puro (4 tools, `base_url` inyectable)
+- [ ] `mcp_server.py` con import perezoso y mensaje de instalación
+- [ ] Extra `mcp` + entry point `chile-hub-mcp` + `uv lock` (gate `--check`)
+- [ ] `docs/mcp.md` + nav; `McpToolsTests` + guardrail de packaging en verde
+- [ ] Done criteria verificados; fila de `plans/README.md` + `ROADMAP.md` a DONE
+
+### Plan 105 — páginas por comuna
+
+- [ ] Drift check corrido
+- [ ] Render puro (slug, página, índice, sitemap) con escapado HTML
+- [ ] Generador CLI determinista (346 comunas + índice + sitemap)
+- [ ] Wiring en `pages-deploy.yml` + `/comunas/` en `.gitignore`
+- [ ] `ComunaPagesTests` en verde
+- [ ] Done criteria verificados; fila de `plans/README.md` + `ROADMAP.md` a DONE
+
 ## Housekeeping
 
 - [x] Archivar planes DONE (055, 056, 060, 061, 062) a `plans/archive/`
