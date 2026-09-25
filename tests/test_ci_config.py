@@ -1165,6 +1165,33 @@ class McpPackagingGuardrailTests(unittest.TestCase):
         self.assertTrue((DOCS_DIR / "mcp.md").is_file())
 
 
+class HfMirrorDispatchGuardrailTests(unittest.TestCase):
+    """Plan 101: canal manual de resincronización del mirror de HF.
+
+    Contexto real: el job `hf-publish` de `pypi-release.yml` sólo corre con un
+    release NUEVO + artefacto publication-grade. Tras el release 1.37.0 el
+    mirror quedó en 18 parquet sin `configs:` porque no había release
+    pendiente; este dispatch lo resincroniza. Regresiones a evitar: que el
+    workflow pierda el secret, que use otro script (dos fuentes de verdad de
+    qué es publicable) o que commitee al repo.
+    """
+
+    HF_DISPATCH_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "hf-publish.yml"
+
+    def test_dispatch_workflow_uses_the_shared_secret_and_script(self):
+        content = self.HF_DISPATCH_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("workflow_dispatch:", content)
+        self.assertIn("secrets.HF_TOKEN", content)
+        self.assertIn("scripts/publish_hf_dataset.py", content)
+        self.assertIn("--repo-id cortega26/chile-hub", content)
+
+    def test_dispatch_workflow_is_read_only_and_never_commits(self):
+        content = self.HF_DISPATCH_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("contents: read", content)
+        self.assertNotIn("git commit", content)
+        self.assertNotIn("git push", content)
+
+
 if __name__ == "__main__":
     import pytest
 

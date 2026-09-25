@@ -1,0 +1,57 @@
+name: Hugging Face Mirror Publish
+
+# Canal manual de resincronización del mirror de Hugging Face.
+#
+# El job `hf-publish` de `pypi-release.yml` sólo corre cuando hay un release
+# NUEVO (`released=true`) Y un artefacto publication-grade (`ready=true`); si
+# el mirror quedó atrás sin un release pendiente, este dispatch lo
+# resincroniza sin tocar la cadena de release. Usa el mismo secret `HF_TOKEN`
+# y el mismo script (fuente única de la selección de capas publicables).
+#
+# No commitea nada al repo ni bloquea ningún pipeline: sólo sube a HF Hub.
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Solo armar el staging, sin subir nada"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  hf-publish:
+    name: Publish dataset to Hugging Face Hub
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+
+      - name: Publish mirror
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          if [[ -z "$HF_TOKEN" ]]; then
+            echo "::error::Falta el secret HF_TOKEN en el repositorio."
+            exit 1
+          fi
+          args=""
+          if [[ "${{ inputs.dry_run }}" == "true" ]]; then
+            args="--dry-run"
+          fi
+          # El script es stdlib-only (huggingface_hub se importa de forma
+          # perezosa): --no-project evita instalar el pipeline completo.
+          uv run --no-project --with huggingface_hub \
+            python scripts/publish_hf_dataset.py --repo-id cortega26/chile-hub $args
