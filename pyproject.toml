@@ -73,6 +73,13 @@ geo = [
 validation = [
     "frictionless>=5.18,<6",
 ]
+# Servidor MCP (stdio) para que agentes de código consuman los datasets.
+# Extra opcional y aislado: `mcp_server.py` importa `mcp` de forma perezosa y
+# la instalación base (polars/requests) no cambia. Rango runtime, no pin de
+# pipeline: el protocolo evoluciona rápido y el consumidor resuelve la última.
+mcp = [
+    "mcp>=2.2,<3",
+]
 dev = [
     "build==1.6.1",
     "twine==7.0.0",
@@ -111,6 +118,7 @@ conflicts = [
 
 [project.scripts]
 chile-hub = "chile_hub.cli:main"
+chile-hub-mcp = "chile_hub.mcp_server:main"
 
 [project.urls]
 Homepage = "https://tooltician.com/chile-hub/"

@@ -5102,6 +5102,121 @@ class DatasetSeoTests(unittest.TestCase):
             self.assertIn("reference/datasets/comunas/", injected)
 
 
+class McpToolsTests(unittest.TestCase):
+    """Plan 104: tools MCP puras, sin red ni el paquete `mcp`.
+
+    Regresión a evitar: que las tools dependan del bundle (descarga de 30 MB),
+    que pierdan el CUT como string de 5, o que el import del paquete se rompa
+    cuando el extra `mcp` no está instalado.
+    """
+
+    def _write_parquet(self, tmpdir: str, name: str, df) -> str:
+        df.write_parquet(Path(tmpdir) / f"{name}.parquet")
+        return tmpdir
+
+    def test_list_datasets_covers_enum(self):
+        from chile_hub.datasets import Dataset
+        from chile_hub.mcp_tools import list_datasets
+
+        entries = list_datasets()
+        self.assertEqual(len(entries), len(list(Dataset)))
+        comunas = next(e for e in entries if e["nombre"] == "comunas")
+        self.assertTrue(comunas["parquet"].endswith("/comunas.parquet"))
+
+    def test_get_dataset_reads_local_parquet_and_caps_limit(self):
+        from chile_hub.mcp_tools import MAX_LIMIT, get_dataset
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            df = pl.DataFrame(
+                {
+                    "codigo_comuna": ["01101", "13101", "05101"],
+                    "nombre_comuna": ["Iquique", "Santiago", "Valparaíso"],
+                }
+            )
+            self._write_parquet(tmpdir, "comunas", df)
+
+            result = get_dataset("comunas", limite=2, base_url=tmpdir)
+            self.assertEqual(result["filas_totales"], 3)
+            self.assertEqual(result["filas_devueltas"], 2)
+            self.assertEqual(result["registros"][0]["codigo_comuna"], "01101")
+
+            # Un límite mayor al máximo duro no explota: devuelve lo disponible.
+            result = get_dataset("comunas", limite=MAX_LIMIT * 10, base_url=tmpdir)
+            self.assertEqual(result["filas_devueltas"], 3)
+
+            with self.assertRaises(ValueError):
+                get_dataset("comunas", limite=0, base_url=tmpdir)
+
+    def test_get_dataset_unknown_name_raises(self):
+        from chile_hub.mcp_tools import get_dataset
+
+        with self.assertRaises(ValueError):
+            get_dataset("no_existe", base_url="/tmp")
+
+    def test_resolve_comunas_normalizes_and_preserves_cut(self):
+        from chile_hub.mcp_tools import resolve_comunas
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            df = pl.DataFrame(
+                {
+                    "codigo_comuna": ["13120", "05101"],
+                    "nombre_comuna": ["Ñuñoa", "Valparaíso"],
+                    "nombre_comuna_clean": ["nunoa", "valparaiso"],
+                }
+            )
+            self._write_parquet(tmpdir, "comunas", df)
+
+            results = resolve_comunas(["ÑUÑOA", "valparaiso", "No Existe"], base_url=tmpdir)
+            self.assertEqual(results[0]["codigo_comuna"], "13120")
+            self.assertEqual(results[1]["codigo_comuna"], "05101")
+            self.assertFalse(results[2]["matched"])
+            self.assertIsNone(results[2]["codigo_comuna"])
+
+    def test_get_indicadores_filters_by_code_and_dates(self):
+        import datetime
+
+        from chile_hub.mcp_tools import get_indicadores
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            df = pl.DataFrame(
+                {
+                    "fecha": [
+                        datetime.date(2026, 1, 1),
+                        datetime.date(2026, 2, 1),
+                        datetime.date(2026, 3, 1),
+                    ],
+                    "codigo_indicador": ["uf", "uf", "dolar"],
+                    "valor": [39000.0, 39500.0, 950.0],
+                }
+            )
+            self._write_parquet(tmpdir, "indicadores", df)
+
+            result = get_indicadores(
+                codigo="uf", desde="2026-02-01", hasta="2026-02-28", base_url=tmpdir
+            )
+            self.assertEqual(result["filas_devueltas"], 1)
+            self.assertEqual(result["registros"][0]["valor"], 39500.0)
+            self.assertEqual(result["codigos"], ["dolar", "uf"])
+
+            with self.assertRaises(ValueError):
+                get_indicadores(desde="01-02-2026", base_url=tmpdir)
+
+    def test_server_module_import_is_lazy(self):
+        """Sin el extra `mcp`, importar el módulo no debe romper; `build_server`
+        debe dar un error explícito con la instrucción de instalación."""
+        import chile_hub.mcp_server as mcp_server
+
+        try:
+            import mcp  # noqa: F401
+        except ImportError:
+            with self.assertRaises(SystemExit) as ctx:
+                mcp_server.build_server()
+            self.assertIn("chile-hub[mcp]", str(ctx.exception))
+        else:
+            server = mcp_server.build_server()
+            self.assertEqual(server.name, "chile-hub")
+
+
 if __name__ == "__main__":
     import pytest
 

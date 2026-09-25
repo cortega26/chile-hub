@@ -1123,6 +1123,36 @@ class CitationFileGuardrailTests(unittest.TestCase):
         )
 
 
+class McpPackagingGuardrailTests(unittest.TestCase):
+    """Plan 104: el servidor MCP debe quedar opcional y no romper el import base.
+
+    Regresión a evitar: mover el import de `mcp` al nivel de módulo (rompería
+    `import chile_hub` para todo el que no instaló el extra) o perder el
+    console script que usan los clientes MCP.
+    """
+
+    def test_pyproject_declares_optional_mcp_extra_and_script(self):
+        content = (ROOT_DIR / "pyproject.toml").read_text(encoding="utf-8")
+        self.assertIn("mcp = [", content)
+        self.assertIn('chile-hub-mcp = "chile_hub.mcp_server:main"', content)
+
+    def test_server_imports_mcp_lazily(self):
+        content = (ROOT_DIR / "src" / "chile_hub" / "mcp_server.py").read_text(encoding="utf-8")
+        before_build = content.split("def build_server", 1)[0]
+        self.assertNotIn(
+            "from mcp.server.mcpserver import MCPServer",
+            before_build,
+            "el import de mcp debe vivir dentro de build_server",
+        )
+        self.assertIn("from mcp.server.mcpserver import MCPServer", content)
+        self.assertIn("chile-hub[mcp]", content)
+
+    def test_docs_mcp_page_is_in_nav(self):
+        nav = MKDOCS_CONFIG.read_text(encoding="utf-8")
+        self.assertIn("mcp.md", nav)
+        self.assertTrue((DOCS_DIR / "mcp.md").is_file())
+
+
 if __name__ == "__main__":
     import pytest
 

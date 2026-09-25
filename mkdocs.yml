@@ -53,6 +53,7 @@ nav:
   - Inicio: index.md
   - Instalación: installation.md
   - Acceso HTTP estático: http-access.md
+  - Servidor MCP: mcp.md
   - Carriles de extracción: extraction-lanes.md
   - Uso desde R: r-quickstart.md
   - Citar chile-hub: citation.md
