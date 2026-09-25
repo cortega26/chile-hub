@@ -1277,6 +1277,30 @@ class HttpAccessDocsGuardrailTests(unittest.TestCase):
         self.assertNotRegex(content, r'pl\.read_parquet\(\s*<span class="string">"https://')
 
 
+class ReleaseArtifactLayoutGuardrailTests(unittest.TestCase):
+    """El artifact de pipeline anida `data/normalized/` (PR #77).
+
+    Regresión real (2026-09-25): `is_publication_grade` buscaba la provenance
+    en la raíz del artifact y `try_download` copiaba `$dir/.`; con el layout
+    anidado, ningún release validaba el artifact publication-grade
+    (`ready=false` siempre) y `hf-publish` descargaba a
+    `data/normalized/data/normalized/`. Resultado: releases sin datos adjuntos
+    y mirror HF nunca actualizado por CI.
+    """
+
+    def test_release_accepts_nested_provenance(self):
+        content = PYPI_RELEASE_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn('"$dir/data/normalized/pipeline_artifact_provenance.json"', content)
+
+    def test_release_adopts_nested_normalized(self):
+        content = PYPI_RELEASE_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn('cp -a "$staging_dir/data/normalized/." data/normalized/', content)
+
+    def test_hf_publish_adopts_nested_normalized(self):
+        content = PYPI_RELEASE_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn('cp -a "$staging/data/normalized/." data/normalized/', content)
+
+
 if __name__ == "__main__":
     import pytest
 

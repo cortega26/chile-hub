@@ -90,8 +90,14 @@ jobs:
           # data/normalized tras validar el artefacto.
           is_publication_grade() {
             local dir="$1"
-            [[ -f "$dir/pipeline_artifact_provenance.json" ]] || return 1
-            python - "$dir/pipeline_artifact_provenance.json" <<'PY' || return 1
+            # El artifact anida data/normalized/ (junto con README/index/app
+            # desde PR #77); el layout plano es el histórico. Aceptar ambos.
+            local prov="$dir/pipeline_artifact_provenance.json"
+            if [[ ! -f "$prov" && -f "$dir/data/normalized/pipeline_artifact_provenance.json" ]]; then
+              prov="$dir/data/normalized/pipeline_artifact_provenance.json"
+            fi
+            [[ -f "$prov" ]] || return 1
+            python - "$prov" <<'PY' || return 1
           import json, sys
           p = json.load(open(sys.argv[1], encoding="utf-8"))
           sys.exit(
@@ -111,9 +117,16 @@ jobs:
               --dir "$staging_dir" 2>/dev/null || return 1
             is_publication_grade "$staging_dir" || return 1
             # Solo al validar el artefacto se adopta sobre data/normalized.
+            # El artifact actual trae data/normalized/ anidado; el plano es el
+            # layout histórico. Sin esta rama, la adopción creaba
+            # data/normalized/data/normalized/ y verify fallaba.
             rm -rf data/normalized
             mkdir -p data/normalized
-            cp -a "$staging_dir/." data/normalized/
+            if [[ -d "$staging_dir/data/normalized" ]]; then
+              cp -a "$staging_dir/data/normalized/." data/normalized/
+            else
+              cp -a "$staging_dir/." data/normalized/
+            fi
           }
 
           if [[ "${{ github.event_name }}" == "workflow_run" ]]; then
@@ -386,9 +399,22 @@ jobs:
           fi
 
           if [[ -n "$run_id" ]]; then
+            # El artifact anida data/normalized/ (junto con README/index/app
+            # desde PR #77); descargar a staging y adoptar solo el contenido de
+            # data/normalized. Bajarlo directo a data/normalized creaba
+            # data/normalized/data/normalized/ y el publisher no encontraba
+            # los parquet del catálogo.
+            staging=".hf-pipeline-output"
+            rm -rf "$staging"
+            mkdir -p "$staging"
             gh run download "$run_id" \
               --name "pipeline-output-$run_id" \
-              --dir data/normalized
+              --dir "$staging"
+            if [[ -d "$staging/data/normalized" ]]; then
+              cp -a "$staging/data/normalized/." data/normalized/
+            else
+              cp -a "$staging/." data/normalized/
+            fi
           else
             echo "Error: No verified pipeline data assets found (release no expuso run_id)."
             exit 1
