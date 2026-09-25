@@ -1,0 +1,59 @@
+name: Diagnose MINVU via scrapling
+
+# Workflow desechable: responde si scrapling (curl_cffi y Camoufox/Firefox)
+# puede descargar catalogo.minvu.cl desde un runner de GitHub, y caracteriza
+# si el bloqueo es TCP (IP) o TLS (fingerprint/middlebox). Se borra tras el
+# resultado.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: TCP + TLS probes
+        run: |
+          HOST="catalogo.minvu.cl"
+          echo "== TCP connect (nc) =="
+          timeout 15 bash -c "cat < /dev/null > /dev/tcp/$HOST/443" \
+            && echo "TCP 443: CONNECT ok" || echo "TCP 443: FAIL exit=$?"
+          echo "== openssl s_client =="
+          timeout 25 openssl s_client -connect "$HOST:443" -servername "$HOST" \
+            </dev/null 2>&1 | grep -E "CONNECTED|Verify|SSL_|error|alert|Cipher" | head -12 \
+            || echo "openssl: FAIL exit=$?"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+
+      - name: scrapling probes
+        run: |
+          uv run --no-project --with "scrapling[fetchers]" --with curl_cffi python - <<'PY'
+          URL = "https://catalogo.minvu.cl/cgi-bin/koha/opac-retrieve-file.pl?id=adc446143de3847f7f66d3f93b83ddf3"
+
+          try:
+              import scrapling
+              print("scrapling:", getattr(scrapling, "__version__", "?"))
+          except Exception as exc:
+              print("import scrapling ERROR:", type(exc).__name__, str(exc)[:200])
+
+          print("== Fetcher (curl_cffi) ==")
+          try:
+              from scrapling.fetchers import Fetcher
+              page = Fetcher.get(URL, stealthy_headers=True)
+              print("Fetcher:", page.status, len(page.body or b""))
+          except Exception as exc:
+              print("Fetcher ERROR:", type(exc).__name__, str(exc)[:300])
+
+          print("== StealthyFetcher (Camoufox/Firefox) ==")
+          try:
+              from scrapling.fetchers import StealthyFetcher
+              page = StealthyFetcher.fetch(URL, headless=True, network_idle=True)
+              print("StealthyFetcher:", page.status, len(page.body or b""))
+          except Exception as exc:
+              print("StealthyFetcher ERROR:", type(exc).__name__, str(exc)[:300])
+          PY
