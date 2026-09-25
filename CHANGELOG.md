@@ -12,6 +12,19 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.37.6 - 2026-09-25
+
+### Corregido
+
+- **ci**: Publish re-estampa la versión de main sobre el artifact adoptado
+  ([`b2ac307`](https://github.com/cortega26/chile-hub/commit/b2ac3071f6b97d8064186cc5cb0be3f28c93d8c5))
+
+### Documentación
+
+- **todo**: Cierra el incidente con la cadena CI verificada end-to-end
+  ([`61b65b8`](https://github.com/cortega26/chile-hub/commit/61b65b87d6f469bdae9e8a29c4ca2c6ebee6f584))
+
+
 ## 1.37.5 - 2026-09-25
 
 ### Corregido
