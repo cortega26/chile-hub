@@ -12,6 +12,19 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.37.3 - 2026-09-25
+
+### Corregido
+
+- **extractores**: Permisos_edificacion en modo monthly con snapshot versionado + refresh de datos
+  ([`8d30636`](https://github.com/cortega26/chile-hub/commit/8d3063607d4fcfed89a3b0a863b9c31d225114f5))
+
+### Mantenimiento
+
+- **ci**: Workflow temporal de diagnóstico de transporte MINVU
+  ([`2e7cc89`](https://github.com/cortega26/chile-hub/commit/2e7cc89fb950c7beb70df43ccfab78f84dee094f))
+
+
 ## 1.37.2 - 2026-09-25
 
 ### Corregido
