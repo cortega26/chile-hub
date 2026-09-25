@@ -12,6 +12,14 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.37.5 - 2026-09-25
+
+### Corregido
+
+- **ci**: Release y hf-publish adoptan el artifact anidado (data/normalized/)
+  ([`58a9d34`](https://github.com/cortega26/chile-hub/commit/58a9d341963f1a1ee9f7a00d39022ff39d572261))
+
+
 ## 1.37.4 - 2026-09-25
 
 ### Corregido
