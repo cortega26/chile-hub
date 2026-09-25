@@ -83,7 +83,19 @@ están pendientes de review.
       fallback (antes sólo quedaban en el metadata de staging, no publicado).
 - [x] Tests: `StealthGetTests` (3) + tests de permisos actualizados al nuevo
       seam (`_stealth_get`). Extracción local live verificada: 8 650 filas.
-- [ ] Verificar en CI: dispatch `publish=true` verde y artefacto publication-grade.
+- [x] Verificado en CI: dispatch `publish=true` **verde** (run 36180604630) —
+      build, verify publication, landing y publish OK; artefacto
+      publication-grade `pipeline-output-36180604630` subido; `main` recibió
+      `chore(data): daily refresh [skip ci]`.
+- [x] Causa raíz del schedule roto por meses: cadena pip-audit (gitpython
+      3.1.59) + fallback de permisos. Ambos cerrados. El schedule diario
+      10:00 UTC debería volver a publicar.
+- [x] Hallazgo de timing (no bug): el release 1.37.3 lo disparó el run de push
+      (readiness) antes de que el dispatch subiera su artefacto (19:38 vs
+      19:44), así que `hf-publish` se saltó por `ready=false`. El próximo
+      release con commit publicable encontrará el artefacto publication-grade
+      del dispatch y correrá `hf-publish` por CI (el mirror ya quedó al día
+      manualmente con 21 subsets).
 
 ## Housekeeping
 

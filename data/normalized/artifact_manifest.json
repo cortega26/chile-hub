@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-09-25T19:43:40.377162+00:00",
+  "generated_at_utc": "2026-09-25T19:47:51.970288+00:00",
   "artifact_count": 64,
   "artifacts": [
     {
@@ -9,7 +9,7 @@
       "shared_type": "artifact_manifest",
       "format": "json",
       "size_bytes": 19534,
-      "sha256": "3fef229b695760468d382f9cdfd82d77be151c8bc9385269ab1f866a8dc37605"
+      "sha256": "9aa0391688129816347db1365c4c4a03eba5f7809821dc1f23f63e4ce3d8ae8c"
     },
     {
       "path": "data/normalized/autoridades_electas.json",
@@ -108,7 +108,7 @@
       "shared_type": "datapackage",
       "format": "json",
       "size_bytes": 56889,
-      "sha256": "a57d34cca40c3bd75c7ff18168c26bc7508efd5513e989672f6a855a29949d6b"
+      "sha256": "5576291fc6252e8adc751deda7580d0e4e2c25bf8182085f7ff79947002b0a17"
     },
     {
       "path": "data/normalized/dataset_catalog.json",
@@ -287,8 +287,8 @@
       "output_type": null,
       "shared_type": "hub_bundle",
       "format": "json",
-      "size_bytes": 90526,
-      "sha256": "5751816170f677471250593a3d4f27d5e73e7cdbc32cbb08c52c5afcfca22078"
+      "size_bytes": 90525,
+      "sha256": "b60ec7d6b05ace6a04e70245c2381347094c40fe3d5e184935aca81cc800cba9"
     },
     {
       "path": "data/normalized/hub_health.json",
@@ -369,7 +369,7 @@
       "shared_type": "overview",
       "format": "json",
       "size_bytes": 6888,
-      "sha256": "51a59c71355a9f5c67c5e7a730d792c8897b23f896bfa71a7403cca931b79257"
+      "sha256": "3a7f39121ae711057c5742e7eefa79581c40451c9078e3cb37dbce6cad5ed738"
     },
     {
       "path": "data/normalized/overview.md",
@@ -378,7 +378,7 @@
       "shared_type": "overview",
       "format": "markdown",
       "size_bytes": 3483,
-      "sha256": "a373dc20c9f5df02cf1951d657c64967a813b0ed8d92151f096e6a0f6cb568fc"
+      "sha256": "02dce98a5e04b3d1eb565608098338d4bc11cd2b3308ca35be6283520b2039e7"
     },
     {
       "path": "data/normalized/partidos_politicos.json",
@@ -441,7 +441,7 @@
       "shared_type": "pipeline_metadata",
       "format": "json",
       "size_bytes": 73759,
-      "sha256": "ee35a47eeaaef06fa6b10530af25b38061f47d7a52abc4c1487c3eb6e98e36a8"
+      "sha256": "be60e7fa705cb0f505f5d9d6e58170b3ab15866fc638b62447ee9e35c5a137fa"
     },
     {
       "path": "data/normalized/pipeline_status.md",
@@ -583,8 +583,8 @@
     {
       "path": "data/normalized/chile-hub-publishable-bundle.zip",
       "package_type": "zip",
-      "size_bytes": 30471431,
-      "sha256": "a7087d304fdc264d571f25befd5ad46b05eae3babcee10ac86bcda6a48b48628",
+      "size_bytes": 30471405,
+      "sha256": "ceb44c6fbf7809417f17c9de43435e23b5d96218a94a0253f1651562ca35b632",
       "checksum_algorithm": "sha256",
       "checksum_path": "data/normalized/chile-hub-publishable-bundle.zip.sha256",
       "verification_command": "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256"
