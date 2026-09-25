@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: >-
+  Si usas chile-hub en trabajo académico o profesional, cita el software y
+  atribuye la fuente de cada capa (ver docs/citation.md).
+title: "chile-hub: datos públicos de Chile curados y validados"
+abstract: >-
+  Capa de datos pública, curada y reproducible sobre datos oficiales de Chile:
+  división político-administrativa, censo 2024, indicadores económicos, salud,
+  educación, pobreza, finanzas municipales, electoral y más, normalizados,
+  validados y publicados en Parquet, DuckDB, SQLite, JSON y Excel.
+type: software
+authors:
+  - family-names: Ortega
+    given-names: Carlos
+repository-code: "https://github.com/cortega26/chile-hub"
+url: "https://tooltician.com/chile-hub/"
+license: MIT
+keywords:
+  - chile
+  - open-data
+  - datos abiertos
+  - parquet
+  - duckdb
+  - polars
+# Cuando Zenodo emita el DOI (ver docs/citation.md), agregar aquí:
+# doi: 10.5281/zenodo.XXXXXXX
+# y el bloque identifiers correspondiente.

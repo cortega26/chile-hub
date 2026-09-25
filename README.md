@@ -215,7 +215,7 @@ chile-hub health       # severidad, frescura, drift y cobertura
 ### Respaldo adicional
 
 <!-- START_TEST_COUNT -->
-- **1064 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
+- **1067 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
 <!-- END_TEST_COUNT -->
 <!-- START_ADR_COUNT -->
 - **20 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
@@ -996,6 +996,13 @@ El código Python se distribuye bajo **[MIT](LICENSE)**. Los datasets conservan
 las licencias, permisos y requisitos de atribución de sus fuentes oficiales.
 Consulta [DATA_LICENSES.md](DATA_LICENSES.md), `chile-hub redistribution` y
 `chile-hub provenance` antes de redistribuir artefactos derivados.
+
+### Cómo citar
+
+Si usas chile-hub en un paper, tesis, curso o informe, cita el software y
+atribuye la fuente de cada capa. GitHub muestra el botón **"Cite this
+repository"** a partir de [`CITATION.cff`](CITATION.cff); las recetas BibTeX/APA
+y la ruta para un DOI Zenodo están en [`docs/citation.md`](docs/citation.md).
 
 ---
 

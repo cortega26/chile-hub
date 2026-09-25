@@ -1087,6 +1087,42 @@ class DistributionSeoGuardrailTests(unittest.TestCase):
         self.assertIn("huggingface.co/datasets/cortega26/chile-hub", content)
 
 
+class CitationFileGuardrailTests(unittest.TestCase):
+    """Plan 103: citación canónica (CITATION.cff + docs + ruta DOI Zenodo).
+
+    Regresión a evitar: que desaparezca el botón "Cite this repository" por
+    perder el archivo o sus claves mínimas, y que `version:` se agregue a
+    CITATION.cff (derivaría con cada release de PSR — la versión vive sólo en
+    pyproject.toml, AGENTS.md §7).
+    """
+
+    def test_citation_cff_has_required_keys_and_no_version(self):
+        import yaml
+
+        content = (ROOT_DIR / "CITATION.cff").read_text(encoding="utf-8")
+        data = yaml.safe_load(content)
+        self.assertEqual(data["cff-version"], "1.2.0")
+        self.assertEqual(data["type"], "software")
+        self.assertTrue(data.get("authors"))
+        self.assertIn("repository-code", data)
+        self.assertIn("license", data)
+        self.assertNotIn("version", data, "CITATION.cff no debe declarar version (drift con PSR)")
+
+    def test_citation_page_is_in_mkdocs_nav(self):
+        nav = MKDOCS_CONFIG.read_text(encoding="utf-8")
+        self.assertIn("citation.md", nav)
+        self.assertTrue((DOCS_DIR / "citation.md").is_file())
+
+    def test_notebooks_readme_has_colab_badges(self):
+        content = (ROOT_DIR / "examples" / "notebooks" / "README.md").read_text(encoding="utf-8")
+        # Un enlace "Open in Colab" por notebook (el badge SVG también contiene
+        # el dominio, por eso se cuenta el path al repo, no el dominio).
+        self.assertEqual(
+            content.count("colab.research.google.com/github/cortega26/chile-hub/blob/main"),
+            4,
+        )
+
+
 if __name__ == "__main__":
     import pytest
 

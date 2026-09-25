@@ -55,6 +55,7 @@ nav:
   - Acceso HTTP estático: http-access.md
   - Carriles de extracción: extraction-lanes.md
   - Uso desde R: r-quickstart.md
+  - Citar chile-hub: citation.md
   - Referencia de API: api.md
   - Criterios de inclusión: dataset-inclusion-criteria.md
   - Compatibilidad de datasets: dataset-compatibility-policy.md
