@@ -12,6 +12,14 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.39.1 - 2026-09-26
+
+### Corregido
+
+- **mapa**: Elimina huecos y solapamientos entre comunas
+  ([`6761352`](https://github.com/cortega26/chile-hub/commit/67613528c267306e1fdbb5c2f302299326da9061))
+
+
 ## 1.39.0 - 2026-09-26
 
 ### Agregado
