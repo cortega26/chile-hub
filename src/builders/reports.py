@@ -985,21 +985,21 @@ def sync_readme_layers_table(check_only=False):
         coverage_note = cfg.get("coverage_note", "")
         coverage_status = h.get("coverage_status", "unknown")
 
-        # Indicador de modo
+        # Indicador de modo (texto plano: sin emojis, ver sync_readme_layers_table)
         if is_deprecated:
-            mode_emoji = "🚫 deprecated"
+            mode_label = "deprecated"
             registros = "—"
         elif not has_outputs:
-            mode_emoji = "🔜 próximamente"
+            mode_label = "candidato"
             registros = "—"
         elif coverage_note.startswith("parcial"):
-            mode_emoji = "🔶 parcial"
+            mode_label = "parcial"
         elif source_mode == "live":
-            mode_emoji = "🟢 live"
+            mode_label = "live"
         elif source_mode == "fallback":
-            mode_emoji = "🟡 fallback"
+            mode_label = "fallback"
         else:
-            mode_emoji = f"⚪ {source_mode}"
+            mode_label = source_mode
 
         # Conteo de registros (solo para capas con outputs)
         if has_outputs:
@@ -1041,14 +1041,8 @@ def sync_readme_layers_table(check_only=False):
                 rc = s.get("record_count")
                 registros = f"{rc:,}".replace(",", " ") if rc is not None else "—"
 
-        # Advertencia para capas parciales
+        # Nombre sin decoraciones: el estado ya vive en la columna Modo
         name_display = f"**{display_name}**"
-        if is_deprecated:
-            name_display += " 🚫"
-        elif not has_outputs:
-            name_display += " 🆕"
-        elif coverage_note.startswith("parcial"):
-            name_display += " ⚠️"
 
         # Etiqueta de actualización
         if is_deprecated or not has_outputs:
@@ -1061,7 +1055,7 @@ def sync_readme_layers_table(check_only=False):
                 actualizacion = freshness_label.capitalize()
 
         rows.append(
-            f"| {i} | {name_display} | {registros} | {mode_emoji} | {source_name} | {license_label} | {actualizacion} |"
+            f"| {i} | {name_display} | {registros} | {mode_label} | {source_name} | {license_label} | {actualizacion} |"
         )
 
     header = (
@@ -1071,15 +1065,15 @@ def sync_readme_layers_table(check_only=False):
     table_lines = [header] + rows
 
     legend = (
-        "> **🟢 live**: datos extraídos directamente desde la fuente oficial"
+        "> **live**: datos extraídos directamente desde la fuente oficial"
         " en cada ejecución del pipeline.\n"
-        "> **🟡 fallback**: datos servidos desde un respaldo curado mientras"
+        "> **fallback**: datos servidos desde un respaldo curado mientras"
         " se completa la extracción en vivo.\n"
-        "> **🔶 parcial**: cobertura inferior al 50% del universo esperado."
+        "> **parcial**: cobertura inferior al 50% del universo esperado."
         " Capa candidata, no completa.\n"
-        "> **🔜 próximamente**: capa en carril candidate — extractor implementado,"
+        "> **candidato**: capa en carril candidate — extractor implementado,"
         " datos no incluidos en el bundle público.\n"
-        "> **🚫 deprecated**: capa degradada a rechazada — sin mantención ni"
+        "> **deprecated**: capa degradada a rechazada — sin mantención ni"
         " bundle; su doc queda como referencia histórica.\n"
         "> Para auditar el estado exacto de cada capa:"
         " `chile-hub provenance` y `chile-hub health`."
