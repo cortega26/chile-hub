@@ -1379,6 +1379,49 @@ class ReleaseArtifactLayoutGuardrailTests(unittest.TestCase):
         self.assertIn("sync_docs.py --version-only", publish_block)
 
 
+class BuildSyncedGateGuardrailTests(unittest.TestCase):
+    """Plan 108: README.md lleva datos del día y lo commitea el job publish.
+
+    Con README.md dentro del `exit 1` de "Check build-synced files", cada cambio
+    legítimo de conteo abortaba el publish que lo habría commiteado: el schedule
+    no publicó del 2026-08-13 al 2026-09-26. Estos guardrails evitan reintroducir
+    el deadlock sin su reemplazo (guard de record_count en verify_pipeline).
+    """
+
+    def _gate_step(self) -> str:
+        content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        start = content.index("- name: Check build-synced files")
+        end = content.index("- name:", start + 1)
+        return content[start:end]
+
+    def test_readme_diff_is_notice_not_failure(self):
+        step = self._gate_step()
+        self.assertIn("git diff --quiet -- README.md", step)
+        self.assertIn("::notice::", step)
+        self.assertNotIn("index.html app.js README.md", step)
+
+    def test_landing_files_still_fail_loud(self):
+        step = self._gate_step()
+        self.assertIn("git diff --quiet -- index.html app.js", step)
+        self.assertIn("exit 1", step)
+
+    def test_publish_still_commits_readme(self):
+        content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("git add --all data/normalized/ index.html app.js README.md", content)
+
+    def test_record_drop_override_is_wired_and_not_interpolated(self):
+        content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("allow_record_drop:", content)
+        self.assertIn('--allow-record-drop "$ALLOW_RECORD_DROP"', content)
+        self.assertNotIn('--allow-record-drop "${{', content)
+        self.assertIn('"allow_record_drop": os.environ.get("ALLOW_RECORD_DROP", "")', content)
+
+    def test_release_replays_record_drop_override(self):
+        content = PYPI_RELEASE_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn('p.get("allow_record_drop", "")', content)
+        self.assertIn('--allow-record-drop "$record_drop"', content)
+
+
 if __name__ == "__main__":
     import pytest
 

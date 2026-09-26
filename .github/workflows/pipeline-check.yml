@@ -24,6 +24,11 @@ on:
         required: false
         type: string
         default: ""
+      allow_record_drop:
+        description: "Dataset(s) separados por coma cuya caída de record_count >20% ya fue confirmada con la fuente (plan 108). Ej: partidos_politicos"
+        required: false
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -312,14 +317,30 @@ jobs:
       - name: Check build-synced files
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: |
-          if ! git diff --quiet -- index.html app.js README.md; then
-            git diff -- index.html app.js README.md
-            echo "::error::Build-synced files are stale. Run python src/build_dev_db.py and commit index.html/app.js/README.md."
+          # README.md lleva bloques derivados de los datos del día (tabla de
+          # capas, health/quality) y los commitea el job publish ("Commit
+          # refreshed artifacts"). Exigir que ya estén commiteados bloqueaba el
+          # publish que los actualiza: deadlock 2026-08-13 -> 2026-09-26 (plan
+          # 108). Las regresiones de datos que este diff delataba las atrapa
+          # ahora verify_pipeline.py --profile publication (source_mode y
+          # caída de record_count).
+          if ! git diff --quiet -- README.md; then
+            git diff -- README.md
+            echo "::notice::README.md cambia con los datos del día; lo commitea el job publish."
+          fi
+          if ! git diff --quiet -- index.html app.js; then
+            git diff -- index.html app.js
+            echo "::error::Build-synced files are stale. Run python src/build_dev_db.py and commit index.html/app.js."
             exit 1
           fi
 
       - name: Verify pipeline artifacts
         id: verify-pipeline
+        # Inputs de texto libre vía env, no interpolados en el script (evita
+        # inyección de shell desde workflow_dispatch).
+        env:
+          ALLOW_STALE_BACKFILLS: ${{ inputs.allow_stale_backfills }}
+          ALLOW_RECORD_DROP: ${{ inputs.allow_record_drop }}
         run: |
           if [[ "${{ github.event_name }}" == "schedule" || "${{ inputs.publish }}" == "true" ]]; then
             profile=publication
@@ -328,7 +349,8 @@ jobs:
           fi
           echo "profile=$profile" >> "$GITHUB_OUTPUT"
           python scripts/verify_pipeline.py --profile "$profile" \
-            --allow-stale-backfills "${{ inputs.allow_stale_backfills }}"
+            --allow-stale-backfills "$ALLOW_STALE_BACKFILLS" \
+            --allow-record-drop "$ALLOW_RECORD_DROP"
 
       - name: Explain verification profile
         run: |
@@ -370,6 +392,9 @@ jobs:
               # override aplicado al publicar (p. ej. --allow-stale-backfills ipc)
               # se perderia y el release rechazaria un artefacto ya verificado.
               "allow_stale_backfills": "${{ inputs.allow_stale_backfills }}",
+              # Idem para el guard de caída de record_count (plan 108): el
+              # release re-verifica con el mismo dataset_changelog.json.
+              "allow_record_drop": os.environ.get("ALLOW_RECORD_DROP", ""),
           }
           Path("data/normalized/pipeline_artifact_provenance.json").write_text(
               json.dumps(metadata, indent=2, sort_keys=True) + "\n",
@@ -378,6 +403,7 @@ jobs:
           PY
         env:
           PUBLISH_INPUT: ${{ inputs.publish || 'false' }}
+          ALLOW_RECORD_DROP: ${{ inputs.allow_record_drop }}
 
       - name: Run unit and contract tests
         run: python -m pytest -v --cov=src --cov-report=term-missing --cov-report=xml

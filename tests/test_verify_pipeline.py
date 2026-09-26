@@ -872,3 +872,88 @@ class VerifySyntheticTests(unittest.TestCase):
     def _stop_patches(self) -> None:
         for p in self._synthetic_patchers:
             p.stop()
+
+
+class RecordDropGuardTests(unittest.TestCase):
+    """Plan 108: el perfil publication rechaza caídas grandes de record_count.
+
+    Reemplaza la señal implícita del diff de README.md en "Check build-synced
+    files" (autoridades_electas 205 -> 155 con 0 senadores, 2026-07-19/20).
+    """
+
+    @staticmethod
+    def _registry(*names: str) -> list[dict]:
+        return [VerifySyntheticTests._stable_registry_entry(name) for name in names]
+
+    @staticmethod
+    def _live(*names: str) -> dict:
+        return {
+            "datasets": {
+                name: {"source_mode": "live", "freshness": {"status": "fresh"}} for name in names
+            }
+        }
+
+    @staticmethod
+    def _changelog(name: str, previous, current) -> dict:
+        delta = current - previous if isinstance(previous, int) else None
+        return {
+            "datasets": [
+                {
+                    "dataset": name,
+                    "previous_record_count": previous,
+                    "current_record_count": current,
+                    "record_count_delta": delta,
+                }
+            ]
+        }
+
+    def _run(self, name: str, previous, current, **kwargs) -> None:
+        vp.verify_publication_policy(
+            self._live(name),
+            registry=self._registry(name),
+            changelog=self._changelog(name, previous, current),
+            **kwargs,
+        )
+
+    def test_autoridades_incident_drop_is_rejected(self) -> None:
+        with patch("builtins.print"), self.assertRaises(SystemExit):
+            self._run("autoridades_electas", 205, 155)
+
+    def test_growth_and_small_drops_pass(self) -> None:
+        self._run("calidad_aire", 756, 1510)
+        self._run("establecimientos_salud", 5717, 5743)
+        # Peor caída live histórica (3,1%: indicadores 446 -> 432).
+        self._run("dataset_volatil", 446, 432)
+
+    def test_drop_at_threshold_passes(self) -> None:
+        self._run("autoridades_electas", 100, 80)
+        with patch("builtins.print"), self.assertRaises(SystemExit):
+            self._run("autoridades_electas", 100, 79)
+
+    def test_explicit_override_accepts_confirmed_drop(self) -> None:
+        self._run("partidos_politicos", 37, 20, allow_record_drop={"partidos_politicos"})
+
+    def test_override_is_scoped_to_named_dataset(self) -> None:
+        with patch("builtins.print"), self.assertRaises(SystemExit):
+            self._run("autoridades_electas", 205, 155, allow_record_drop={"partidos_politicos"})
+
+    def test_new_dataset_without_previous_count_is_skipped(self) -> None:
+        self._run("geometria_comunal", None, 345)
+
+    def test_candidate_datasets_are_not_gated(self) -> None:
+        violations = vp.record_drop_violations(
+            self._changelog("consumo_electrico_comunal", 300, 3), stable_names=set()
+        )
+        self.assertEqual(violations, [])
+
+    def test_violation_message_names_the_override(self) -> None:
+        violations = vp.record_drop_violations(
+            self._changelog("autoridades_electas", 205, 155), {"autoridades_electas"}
+        )
+        self.assertEqual(len(violations), 1)
+        self.assertIn("205 -> 155", violations[0])
+        self.assertIn("--allow-record-drop autoridades_electas", violations[0])
+
+    def test_cli_parses_allow_record_drop(self) -> None:
+        args = vp.build_parser().parse_args(["--allow-record-drop", "a, b,"])
+        self.assertEqual(args.allow_record_drop, "a, b,")

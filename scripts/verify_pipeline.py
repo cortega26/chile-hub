@@ -504,6 +504,41 @@ def verify_staging_not_newer_than_normalized():
     )
 
 
+# Plan 108: caída máxima de record_count (vs. el último publicado) que tolera
+# el perfil publication en un dataset stable_publishable. En 116 versiones
+# publicadas, la peor caída en modo live fue 3,1% (indicadores); las caídas
+# grandes fueron todas fallbacks, que ya bloquea el chequeo de source_mode.
+# Este guard reemplaza la señal implícita que daba el diff de README.md en
+# "Check build-synced files" (autoridades_electas 205 -> 155, 2026-07-19/20).
+DEFAULT_MAX_RECORD_DROP_PCT = 20.0
+
+
+def record_drop_violations(changelog, stable_names, allow_record_drop=None):
+    """Datasets stable_publishable cuyo conteo cae más que el umbral.
+
+    Usa `record_count_delta` de dataset_changelog.json, que el build calcula
+    contra el pipeline_metadata.json publicado antes de regenerarlo.
+    """
+    violations = []
+    for entry in (changelog or {}).get("datasets", []):
+        name = entry.get("dataset")
+        if name not in stable_names or name in (allow_record_drop or set()):
+            continue
+        previous = entry.get("previous_record_count")
+        delta = entry.get("record_count_delta")
+        if not isinstance(previous, int) or not isinstance(delta, int) or previous <= 0:
+            continue
+        drop_pct = -delta / previous * 100
+        if drop_pct > DEFAULT_MAX_RECORD_DROP_PCT:
+            violations.append(
+                f"{name}: record_count cayó {drop_pct:.1f}% "
+                f"({previous} -> {entry.get('current_record_count')}), umbral "
+                f"{DEFAULT_MAX_RECORD_DROP_PCT:.0f}%; override con --allow-record-drop "
+                f"{name} tras confirmar con la fuente (plan 108)"
+            )
+    return violations
+
+
 def stable_publishable_dataset_names(registry):
     """Return dataset names whose publication track is stable_publishable."""
     return {
@@ -520,9 +555,15 @@ def verify_publication_policy(
     manifest=None,
     allow_known_anomalies=None,
     allow_stale_backfills=None,
+    changelog=None,
+    allow_record_drop=None,
 ):
     if metadata is None:
         metadata = load_json(NORMALIZED_DIR / "pipeline_metadata.json")
+        # Solo en corridas reales: los tests que inyectan metadata no deben
+        # leer el changelog del árbol de trabajo.
+        if changelog is None:
+            changelog = load_json(NORMALIZED_DIR / "dataset_changelog.json")
 
     if registry is None:
         registry = load_json(SOURCE_REGISTRY_PATH)
@@ -640,6 +681,8 @@ def verify_publication_policy(
                 f"(ver drift_report.json recommended_action; override con "
                 "--allow-known-anomalies tras confirmar con la fuente, ver ADR-013)"
             )
+
+    violations.extend(record_drop_violations(changelog, stable_publicable, allow_record_drop))
 
     if violations:
         fail("Publication policy rejected this build: " + "; ".join(violations))
@@ -1837,6 +1880,12 @@ def build_parser():
         "published_backfill cuya antigüedad ya fue revisada contra la fuente. "
         "Ver ADR-016. Ej.: --allow-stale-backfills ipc",
     )
+    parser.add_argument(
+        "--allow-record-drop",
+        default="",
+        help="Lista separada por comas de datasets cuya caída de record_count "
+        "ya fue confirmada contra la fuente (plan 108). Ej.: --allow-record-drop partidos_politicos",
+    )
     return parser
 
 
@@ -1851,6 +1900,7 @@ def main():
     allow_stale_backfills = {
         code.strip() for code in args.allow_stale_backfills.split(",") if code.strip()
     }
+    allow_record_drop = {name.strip() for name in args.allow_record_drop.split(",") if name.strip()}
 
     # Verificaciones comunes a todos los perfiles
     if profile != "release":
@@ -1882,6 +1932,7 @@ def main():
         verify_publication_policy(
             allow_known_anomalies=allow_known_anomalies,
             allow_stale_backfills=allow_stale_backfills,
+            allow_record_drop=allow_record_drop,
         )
 
 
