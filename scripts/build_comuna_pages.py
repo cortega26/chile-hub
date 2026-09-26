@@ -26,6 +26,9 @@ import polars as pl
 ROOT_DIR = Path(__file__).resolve().parents[1]
 PERFIL_PATH = ROOT_DIR / "data" / "normalized" / "perfil_territorial_comunal.parquet"
 POBREZA_PATH = ROOT_DIR / "data" / "normalized" / "pobreza_comunal.parquet"
+# Asset del mapa (build diario): trae los permisos del último año completo y su
+# año; el perfil publica el año en curso, que suele estar parcial.
+METRICAS_PATH = ROOT_DIR / "data" / "normalized" / "mapa_metricas.json"
 PUBLIC_SITE_URL = "https://tooltician.com/chile-hub/"
 PARQUET_BASE = "https://tooltician.com/chile-hub/data/normalized"
 
@@ -85,8 +88,12 @@ MUNICIPIO = [
 TERRITORIO = [
     ("Indicadores urbanos SIEDU", "indicadores_siedu_total"),
     ("Crecimiento natural (último año)", "crecimiento_natural_ultimo_anio"),
-    ("Viviendas autorizadas (último año)", "viviendas_autorizadas_ultimo_anio"),
-    ("Superficie autorizada m² (último año)", "superficie_autorizada_m2_ultimo_anio"),
+    ("Viviendas autorizadas (último año completo)", "viviendas_autorizadas_ultimo_anio"),
+    (
+        "Superficie autorizada m² (último año completo)",
+        "superficie_autorizada_m2_ultimo_anio",
+    ),
+    ("Año de permisos", "anio_permisos_edificacion"),
     ("MP2,5 promedio (último año)", "mp25_promedio_ultimo_anio"),
 ]
 
@@ -100,13 +107,14 @@ MONEY_FIELDS = {
 }
 FLOAT_FIELDS = {"promedio_personas_por_hogar", "mp25_promedio_ultimo_anio", "valor_promedio_siedu"}
 PERCENT_FIELDS = {"asistencia_promedio", "tasa_aprobacion", "tasa_reprobacion", "tasa_retiro"}
+YEAR_FIELDS = {"anio_permisos_edificacion"}
 
 PAGE_CSS = """
 :root { --bg:#f7f6f0; --ink:#1a221f; --muted:#5b6b64; --brand:#123d30; --line:#dcd9cc; }
 * { box-sizing: border-box; }
 body { margin:0; background:var(--bg); color:var(--ink);
   font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; line-height:1.55; }
-main { max-width: 900px; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
+main { max-width: 900px; margin: 0 auto; padding: 1.75rem 1.25rem 4rem; }
 a { color: var(--brand); }
 .crumbs { font-size:.85rem; color:var(--muted); margin-bottom:1rem; }
 h1 { font-size:1.9rem; margin:0 0 .25rem; }
@@ -120,11 +128,96 @@ td:last-child { text-align:right; font-variant-numeric:tabular-nums; }
 .actions { margin:1.5rem 0; display:flex; flex-wrap:wrap; gap:.6rem; }
 .actions a { background:var(--brand); color:#fff; text-decoration:none; padding:.5rem .9rem;
   border-radius:8px; font-size:.9rem; }
+.actions a.secondary { background:#fff; color:var(--brand); border:1px solid var(--brand); }
 footer { border-top:1px solid var(--line); margin-top:2.5rem; padding-top:1rem;
   color:var(--muted); font-size:.82rem; }
 .list { columns:2; column-gap:2rem; font-size:.92rem; }
-@media (max-width:640px){ .list{columns:1;} }
+.site-header { background:#fff; border-bottom:1px solid var(--line); }
+.site-header .inner { max-width:900px; margin:0 auto; padding:.7rem 1.25rem; display:flex;
+  align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap; }
+.site-header .brand { font-weight:700; text-decoration:none; color:var(--ink); }
+.site-header .brand span { color:var(--brand); }
+.site-header nav { display:flex; gap:1rem; flex-wrap:wrap; font-size:.88rem; }
+.site-header nav a { color:var(--muted); text-decoration:none; }
+.site-header nav a:hover { color:var(--ink); }
+.card pre { margin:.4rem 0 0; background:#11211d; color:#e2ede9; padding:.75rem .9rem;
+  border-radius:8px; font-size:.8rem; overflow-x:auto; }
+.bars { display:flex; flex-direction:column; gap:.45rem; }
+.bar-row { display:grid; grid-template-columns:70px 1fr 70px; align-items:center; gap:.6rem;
+  font-size:.85rem; }
+.bar-track { background:var(--bg); border-radius:4px; height:14px; overflow:hidden; }
+.bar-fill { background:var(--brand); height:100%; border-radius:4px; }
+.bar-value { text-align:right; font-variant-numeric:tabular-nums; color:var(--muted); }
+@media (max-width:640px){ .list{columns:1;} .bar-row{grid-template-columns:56px 1fr 64px;} }
 """
+
+
+def _shell_header(site_url: str) -> str:
+    base = site_url.rstrip("/")
+    return (
+        '<header class="site-header"><div class="inner">'
+        f'<a class="brand" href="{base}/">chile<span>-hub</span></a>'
+        '<nav aria-label="Navegación principal">'
+        f'<a href="{base}/">Datos</a>'
+        f'<a href="{base}/#mapa">Mapa</a>'
+        f'<a href="{base}/comunas/">Comunas</a>'
+        f'<a href="{base}/reference/">Documentación</a>'
+        '<a href="https://github.com/cortega26/chile-hub">GitHub</a>'
+        "</nav></div></header>"
+    )
+
+
+def _shell_footer(site_url: str, generated_at: str) -> str:
+    base = site_url.rstrip("/")
+    return (
+        "<footer>"
+        "Fuentes: INE, BCN, MINSAL, MINEDUC, MDS, SINIM/SUBDERE y MMA, curados y "
+        f'validados por <a href="{base}/">chile-hub</a>. '
+        f'<a href="{base}/comunas/">Explorar todas las comunas</a> · '
+        f'<a href="{base}/reference/">Documentación</a> · '
+        '<a href="https://github.com/cortega26/chile-hub/blob/main/DATA_LICENSES.md">Licencias</a>. '
+        f"Generado el {generated_at}."
+        "</footer>"
+    )
+
+
+def _etaria_card(row: dict) -> str:
+    """Barras horizontales de los 5 tramos etarios (sin JS)."""
+    tramos = [
+        ("0 a 14", row.get("poblacion_0_14")),
+        ("15 a 29", row.get("poblacion_15_29")),
+        ("30 a 44", row.get("poblacion_30_44")),
+        ("45 a 64", row.get("poblacion_45_64")),
+        ("65 o más", row.get("poblacion_65_mas")),
+    ]
+    valores = [valor for _, valor in tramos if isinstance(valor, (int, float))]
+    if not valores:
+        return ""
+    maximo = max(valores) or 1
+    barras = "".join(
+        '<div class="bar-row">'
+        f"<span>{html.escape(label)}</span>"
+        '<span class="bar-track">'
+        f'<span class="bar-fill" style="width:{max(2, round((valor or 0) / maximo * 100))}%"></span>'
+        "</span>"
+        f'<span class="bar-value">{_fmt(valor)}</span>'
+        "</div>"
+        for label, valor in tramos
+    )
+    return (
+        '<section class="card"><h2>Estructura etaria (Censo 2024)</h2>'
+        f'<div class="bars">{barras}</div></section>'
+    )
+
+
+def _related_card(related: list[tuple[str, str]], site_url: str) -> str:
+    if not related:
+        return ""
+    base = site_url.rstrip("/")
+    links = " · ".join(
+        f'<a href="{base}/comunas/{slug}/">{html.escape(nombre)}</a>' for nombre, slug in related
+    )
+    return f'<section class="card"><h2>Comunas de la misma provincia</h2><p>{links}</p></section>'
 
 
 def comuna_slug(row: dict) -> str:
@@ -166,6 +259,8 @@ def _fmt(value, field: str | None = None) -> str:
         return html.escape(value)
     if isinstance(value, bool):
         return "sí" if value else "no"
+    if field in YEAR_FIELDS:
+        return str(int(value))
     if isinstance(value, float):
         if field in PERCENT_FIELDS:
             return f"{value:.1f}%"
@@ -222,11 +317,18 @@ def _json_for_html(obj: dict) -> str:
 
 
 def render_comuna_page(
-    row: dict, poverty: dict, slug: str, site_url: str, generated_at: str
+    row: dict,
+    poverty: dict,
+    slug: str,
+    site_url: str,
+    generated_at: str,
+    related: list[tuple[str, str]] | None = None,
 ) -> str:
     """HTML completo de una comuna. Todos los textos se escapan."""
     nombre = str(row["nombre_comuna"])
-    page_url = f"{site_url.rstrip('/')}/comunas/{slug}/"
+    base = site_url.rstrip("/")
+    cut = str(row["codigo_comuna"])
+    page_url = f"{base}/comunas/{slug}/"
     title = f"Comuna de {nombre}: población, pobreza y datos oficiales"
     description = (
         f"Indicadores oficiales de {nombre} ({row['nombre_region']}): población "
@@ -282,8 +384,9 @@ def render_comuna_page(
 </script>
 </head>
 <body>
+{_shell_header(site_url)}
 <main>
-<nav class="crumbs"><a href="{site_url.rstrip("/")}/">chile-hub</a> › <a href="{site_url.rstrip("/")}/comunas/">Comunas</a> › {html.escape(nombre)}</nav>
+<nav class="crumbs"><a href="{base}/">chile-hub</a> › <a href="{base}/comunas/">Comunas</a> › {html.escape(nombre)}</nav>
 <h1>{html.escape(nombre)}</h1>
 <p class="sub">Región de {html.escape(str(row["nombre_region"]))} · Provincia de {html.escape(str(row.get("nombre_provincia", "s/d")))}</p>
 <div class="grid">
@@ -294,25 +397,36 @@ def render_comuna_page(
 {_table("Servicios", _pairs(row, SERVICIOS))}
 {_table("Finanzas municipales", _pairs(row, MUNICIPIO))}
 {_table("Territorio y medio ambiente", _pairs(row, TERRITORIO))}
+{_etaria_card(row)}
 </div>
 <div class="actions">
-<a href="{PARQUET_BASE}/perfil_territorial_comunal.parquet">Descargar Parquet</a>
-<a href="{PARQUET_BASE}/perfil_territorial_comunal.json">Descargar JSON</a>
-<a href="{site_url.rstrip("/")}/reference/datasets/perfil_territorial_comunal/">Documentación de la capa</a>
+<a href="{base}/#mapa">Ver en el mapa</a>
+<a class="secondary" href="{PARQUET_BASE}/perfil_territorial_comunal.parquet">Descargar Parquet</a>
+<a class="secondary" href="{PARQUET_BASE}/perfil_territorial_comunal.json">Descargar JSON</a>
+<a class="secondary" href="{base}/reference/datasets/perfil_territorial_comunal/">Documentación de la capa</a>
 </div>
-<footer>
-Fuente: datos oficiales de INE, BCN, MINSAL, MINEDUC, MDS, SINIM/SUBDERE y MMA,
-curados y validados por <a href="{site_url.rstrip("/")}/">chile-hub</a>.
-Atribución por capa en <a href="https://github.com/cortega26/chile-hub/blob/main/DATA_LICENSES.md">DATA_LICENSES.md</a>.
-Generado el {generated_at}.
-</footer>
+<section class="card">
+<h2>Usar estos datos en Python</h2>
+<pre>pip install chile-hub
+
+import polars as pl
+from chile_hub import ChileHub
+
+hub = ChileHub()
+comunas = hub.load_polars("comunas")
+mi_comuna = comunas.filter(pl.col("codigo_comuna") == "{html.escape(cut)}")</pre>
+</section>
+{_related_card(related or [], site_url)}
+{_shell_footer(site_url, generated_at)}
 </main>
 </body>
 </html>
 """
 
 
-def render_index(rows: list[dict], slugs: dict[str, str], site_url: str) -> str:
+def render_index(
+    rows: list[dict], slugs: dict[str, str], site_url: str, generated_at: str = "hoy"
+) -> str:
     by_region: dict[str, list[dict]] = {}
     for row in rows:
         by_region.setdefault(str(row["nombre_region"]), []).append(row)
@@ -336,6 +450,7 @@ def render_index(rows: list[dict], slugs: dict[str, str], site_url: str) -> str:
 <style>{PAGE_CSS}</style>
 </head>
 <body>
+{_shell_header(site_url)}
 <main>
 <nav class="crumbs"><a href="{site_url.rstrip("/")}/">chile-hub</a> › Comunas</nav>
 <h1>Comunas de Chile</h1>
@@ -343,7 +458,7 @@ def render_index(rows: list[dict], slugs: dict[str, str], site_url: str) -> str:
 <div class="grid">
 {"".join(sections)}
 </div>
-<footer>Fuentes oficiales de Chile, curadas y validadas por <a href="{site_url.rstrip("/")}/">chile-hub</a>.</footer>
+{_shell_footer(site_url, generated_at)}
 </main>
 </body>
 </html>
@@ -379,12 +494,29 @@ def load_rows(perfil_path: Path, pobreza_path: Path) -> tuple[list[dict], dict[s
     return rows, poverty
 
 
+def _load_metricas(path: Path = METRICAS_PATH) -> dict[str, dict]:
+    """Métricas del mapa (build diario); vacío si el asset aún no existe."""
+    if not path.exists():
+        return {}
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {}
+    metricas = payload.get("metricas", {})
+    return metricas if isinstance(metricas, dict) else {}
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out-dir", default=str(ROOT_DIR / "comunas"))
     parser.add_argument("--site-url", default=PUBLIC_SITE_URL)
     parser.add_argument("--perfil", default=str(PERFIL_PATH))
     parser.add_argument("--pobreza", default=str(POBREZA_PATH))
+    parser.add_argument(
+        "--metricas",
+        default=str(METRICAS_PATH),
+        help="Asset del mapa con permisos del último año completo (opcional).",
+    )
     parser.add_argument(
         "--generated-at",
         default=datetime.datetime.now(datetime.UTC).date().isoformat(),
@@ -393,14 +525,36 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     rows, poverty = load_rows(Path(args.perfil), Path(args.pobreza))
+    metricas = _load_metricas(Path(args.metricas))
+    for row in rows:
+        valores = metricas.get(str(row["codigo_comuna"]), {})
+        if "viviendas_autorizadas" in valores:
+            row["viviendas_autorizadas_ultimo_anio"] = valores["viviendas_autorizadas"]
+            row["superficie_autorizada_m2_ultimo_anio"] = valores.get("superficie_autorizada_m2")
+            row["anio_permisos_edificacion"] = valores.get("viviendas_autorizadas_anio")
     slugs = assign_slugs(rows)
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
+
+    by_province: dict[str, list[dict]] = {}
+    for row in rows:
+        by_province.setdefault(str(row.get("nombre_provincia", "")), []).append(row)
 
     for row in rows:
         slug = slugs[str(row["codigo_comuna"])]
         page_dir = out_dir / slug
         page_dir.mkdir(parents=True, exist_ok=True)
+        siblings = sorted(
+            (
+                other
+                for other in by_province.get(str(row.get("nombre_provincia", "")), [])
+                if other["codigo_comuna"] != row["codigo_comuna"]
+            ),
+            key=lambda other: str(other["nombre_comuna"]),
+        )[:12]
+        related = [
+            (str(other["nombre_comuna"]), slugs[str(other["codigo_comuna"])]) for other in siblings
+        ]
         (page_dir / "index.html").write_text(
             render_comuna_page(
                 row,
@@ -408,11 +562,14 @@ def main(argv: list[str] | None = None) -> int:
                 slug,
                 args.site_url,
                 args.generated_at,
+                related=related,
             ),
             encoding="utf-8",
         )
 
-    (out_dir / "index.html").write_text(render_index(rows, slugs, args.site_url), encoding="utf-8")
+    (out_dir / "index.html").write_text(
+        render_index(rows, slugs, args.site_url, args.generated_at), encoding="utf-8"
+    )
     urls = [f"{args.site_url.rstrip('/')}/comunas/"] + [
         f"{args.site_url.rstrip('/')}/comunas/{slugs[str(row['codigo_comuna'])]}/" for row in rows
     ]

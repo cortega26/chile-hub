@@ -5303,6 +5303,96 @@ class ComunaPagesTests(unittest.TestCase):
         for block in blocks:
             json.loads(block)
 
+    def test_render_comuna_page_has_shell_chart_and_related(self):
+        from scripts.build_comuna_pages import render_comuna_page
+
+        row = {
+            **self.PERFIL_ROW,
+            "poblacion_0_14": 55702,
+            "poblacion_15_29": 107884,
+            "poblacion_30_44": 151332,
+            "poblacion_45_64": 88501,
+            "poblacion_65_mas": 35437,
+        }
+        page = render_comuna_page(
+            row,
+            {"ingresos": 5.4},
+            "nunoa",
+            "https://tooltician.com/chile-hub",
+            "2026-09-25",
+            related=[("Valparaíso", "valparaiso")],
+        )
+        self.assertIn('class="site-header"', page)
+        self.assertIn(">Mapa<", page)
+        self.assertEqual(page.count('class="bar-fill"'), 5, "5 tramos etarios")
+        self.assertIn("Ver en el mapa", page)
+        self.assertIn("pip install chile-hub", page)
+        self.assertIn("Comunas de la misma provincia", page)
+        self.assertIn('href="https://tooltician.com/chile-hub/comunas/valparaiso/"', page)
+        self.assertIn("Licencias", page)
+
+    def test_main_uses_complete_permit_year_from_metrics(self):
+        import json as json_module
+
+        from scripts.build_comuna_pages import main
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            perfil = pl.DataFrame(
+                [
+                    {
+                        **self.PERFIL_ROW,
+                        "viviendas_autorizadas_ultimo_anio": 1,
+                        "superficie_autorizada_m2_ultimo_anio": 157,
+                        "anio_permisos_edificacion": 2026,
+                    }
+                ]
+            )
+            pobreza = pl.DataFrame(
+                {"codigo_comuna": ["13120"], "dimension": ["ingresos"], "tasa": [5.0]}
+            )
+            perfil_path = Path(tmpdir) / "perfil.parquet"
+            pobreza_path = Path(tmpdir) / "pobreza.parquet"
+            metricas_path = Path(tmpdir) / "metricas.json"
+            perfil.write_parquet(perfil_path)
+            pobreza.write_parquet(pobreza_path)
+            metricas_path.write_text(
+                json_module.dumps(
+                    {
+                        "metricas": {
+                            "13120": {
+                                "viviendas_autorizadas": 1435,
+                                "superficie_autorizada_m2": 69274,
+                                "viviendas_autorizadas_anio": 2025,
+                            }
+                        }
+                    }
+                ),
+                encoding="utf-8",
+            )
+            out = Path(tmpdir) / "out"
+            self.assertEqual(
+                main(
+                    [
+                        "--out-dir",
+                        str(out),
+                        "--perfil",
+                        str(perfil_path),
+                        "--pobreza",
+                        str(pobreza_path),
+                        "--metricas",
+                        str(metricas_path),
+                        "--generated-at",
+                        "2026-09-25",
+                    ]
+                ),
+                0,
+            )
+            page = (out / "nunoa" / "index.html").read_text(encoding="utf-8")
+            self.assertIn("Viviendas autorizadas (último año completo)", page)
+            self.assertIn("1.435", page)
+            self.assertIn("2025", page)
+            self.assertNotIn("<td>2026</td>", page)
+
     def test_assign_slugs_resolves_collisions_with_cut(self):
         from scripts.build_comuna_pages import assign_slugs
 
@@ -5366,6 +5456,8 @@ class ComunaPagesTests(unittest.TestCase):
                         str(perfil_path),
                         "--pobreza",
                         str(pobreza_path),
+                        "--metricas",
+                        str(Path(tmpdir) / "sin-metricas.json"),
                         "--generated-at",
                         "2026-09-25",
                     ]

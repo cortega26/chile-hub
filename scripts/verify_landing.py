@@ -736,6 +736,22 @@ def verify_landing():
         if not sql_input_box or sql_input_box["width"] < 500:
             fail(f"El editor SQL debe ocupar el ancho en desktop: {sql_input_box}")
 
+        # SQL Explorer 2.0: ejemplos precargados, export CSV y pista de teclado.
+        example_select = page.locator("#sql-example")
+        if example_select.count() != 1:
+            fail("Falta el selector de ejemplos SQL (#sql-example)")
+        if example_select.locator("option").count() < 6:
+            fail("El selector de ejemplos SQL debe ofrecer al menos 6 consultas")
+        page.select_option("#sql-example", "censo")
+        page.wait_for_timeout(100)
+        if "poblacion_censada" not in page.locator("#sql-input").input_value():
+            fail("El ejemplo de SQL no se cargó en el editor")
+        sql_export = page.locator("#sql-export")
+        if sql_export.count() != 1 or not sql_export.is_disabled():
+            fail("El botón de exportar CSV debe existir y partir deshabilitado")
+        if "Ctrl" not in page.locator(".sql-hint").inner_text():
+            fail("Falta la pista de teclado (Ctrl + Enter) del explorador SQL")
+
         # Mapa territorial: Leaflet + GeoJSON simplificado + panel de lectura.
         # El mapa se inicializa en diferido cuando entra al viewport.
         # El flujo anterior deja el drawer abierto: ciérralo vía hash (mismo
