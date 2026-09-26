@@ -12,6 +12,14 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.41.0 - 2026-09-26
+
+### Agregado
+
+- **ux**: SQL Explorer 2.0 y shell de páginas por comuna
+  ([`6e6cd97`](https://github.com/cortega26/chile-hub/commit/6e6cd9762130bd631707670ff82348aec949f67d))
+
+
 ## 1.40.0 - 2026-09-26
 
 ### Agregado
