@@ -12,6 +12,14 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.40.0 - 2026-09-26
+
+### Agregado
+
+- **mapa**: Métricas del mapa en un asset propio y año de permisos completo
+  ([`34f8593`](https://github.com/cortega26/chile-hub/commit/34f85935b7fbf163f5e1ba00e6b32f90213a7c08))
+
+
 ## 1.39.1 - 2026-09-26
 
 ### Corregido
