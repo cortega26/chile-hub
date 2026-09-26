@@ -1,32 +1,32 @@
 # chile-hub dataset catalog
 
-- `generated_at_utc`: `2026-09-25T19:43:40.331750+00:00`
+- `generated_at_utc`: `2026-09-26T13:54:48.444523+00:00`
 - `dataset_count`: `22`
 
 | Dataset | Source | Mode | Freshness | Reuse | Records | Confidence | Join Keys | Validation |
 | :--- | :--- | :--- | :--- | :--- | ---: | :--- | :--- | :--- |
-| `regiones` | BCN ArcGIS | `live` | `fresh (0.04h / 2160h)` | `open-attribution (CC BY)` | 16 | `Tier B` | `codigo_region` | `ok` |
-| `provincias` | BCN ArcGIS | `live` | `fresh (0.04h / 2160h)` | `open-attribution (CC BY)` | 56 | `Tier B` | `codigo_provincia, codigo_region` | `ok` |
-| `comunas` | BCN ArcGIS | `live` | `fresh (0.04h / 2160h)` | `open-attribution (CC BY)` | 346 | `Tier B` | `codigo_comuna, codigo_region` | `ok` |
-| `comunas_enriquecidas` | BCN ArcGIS | `live` | `fresh (0.04h / 2160h)` | `open-attribution (CC BY)` | 346 | `Tier B` | `codigo_comuna` | `ok` |
-| `indicadores` | Banco Central de Chile (via mindicador.cl) | `live` | `fresh (0.04h / 72h)` | `open-attribution (Reproducción libre con citación (BCCh / INE))` | 665 | `Tier A/B` | `fecha, codigo_indicador` | `ok` |
-| `censo_comunal` | Instituto Nacional de Estadisticas - Censo 2024 | `live` | `fresh (0.04h / 87600h)` | `open-attribution (CC BY 4.0)` | 346 | `Tier A` | `codigo_comuna, codigo_region` | `ok` |
-| `establecimientos_salud` | Ministerio de Salud - Establecimientos de Salud | `live` | `fresh (0.04h / 1080h)` | `open-attribution (CC0)` | 5743 | `Tier A` | `codigo_establecimiento, codigo_comuna` | `ok` |
-| `establecimientos_educacionales` | Ministerio de Educación - Directorio Oficial de Establecimientos | `live` | `fresh (0.04h / 8760h)` | `open-attribution (CC-BY-3.0)` | 12898 | `Tier A` | `codigo_comuna` | `ok` |
-| `censo_hogares_viviendas` | Instituto Nacional de Estadisticas - Censo 2024 | `live` | `fresh (0.04h / 87600h)` | `open-attribution (CC BY 4.0)` | 346 | `Tier A` | `codigo_comuna, codigo_region` | `ok` |
-| `distritos_electorales` | BCN / Biblioteca del Congreso Nacional de Chile | `live` | `fresh (0.04h / 87600h)` | `open-attribution (CC0)` | 346 | `Tier A` | `codigo_comuna` | `ok` |
-| `finanzas_municipales` | SINIM - SUBDERE | `monthly` | `fresh (592.65h / 8760h)` | `public-api-review-terms (Datos públicos municipales; términos de reutilización sujetos a revisión)` | 345 | `Tier B` | `anio, codigo_comuna` | `ok` |
-| `resultados_educacionales` | Centro de Estudios MINEDUC - Rendimiento 2024 | `live` | `fresh (0.04h / 8760h)` | `open-attribution (CC-BY-3.0)` | 345 | `Tier B` | `anio, codigo_comuna` | `ok` |
-| `indicadores_urbanos_siedu` | INE - Sistema de Indicadores y Estándares de Desarrollo Urbano | `live` | `fresh (0.04h / 8760h)` | `open-attribution (Licencia de Datos Abiertos INE)` | 6701 | `Tier B` | `anio, codigo_comuna, codigo_indicador` | `ok` |
+| `regiones` | BCN ArcGIS | `live` | `fresh (0.05h / 2160h)` | `open-attribution (CC BY)` | 16 | `Tier B` | `codigo_region` | `ok` |
+| `provincias` | BCN ArcGIS | `live` | `fresh (0.05h / 2160h)` | `open-attribution (CC BY)` | 56 | `Tier B` | `codigo_provincia, codigo_region` | `ok` |
+| `comunas` | BCN ArcGIS | `live` | `fresh (0.05h / 2160h)` | `open-attribution (CC BY)` | 346 | `Tier B` | `codigo_comuna, codigo_region` | `ok` |
+| `comunas_enriquecidas` | BCN ArcGIS | `live` | `fresh (0.05h / 2160h)` | `open-attribution (CC BY)` | 346 | `Tier B` | `codigo_comuna` | `ok` |
+| `indicadores` | Banco Central de Chile (via mindicador.cl) | `live` | `fresh (0.05h / 72h)` | `open-attribution (Reproducción libre con citación (BCCh / INE))` | 667 | `Tier A/B` | `fecha, codigo_indicador` | `ok` |
+| `censo_comunal` | Instituto Nacional de Estadisticas - Censo 2024 | `live` | `fresh (0.05h / 87600h)` | `open-attribution (CC BY 4.0)` | 346 | `Tier A` | `codigo_comuna, codigo_region` | `ok` |
+| `establecimientos_salud` | Ministerio de Salud - Establecimientos de Salud | `live` | `fresh (0.05h / 1080h)` | `open-attribution (CC0)` | 5743 | `Tier A` | `codigo_establecimiento, codigo_comuna` | `ok` |
+| `establecimientos_educacionales` | Ministerio de Educación - Directorio Oficial de Establecimientos | `live` | `fresh (0.05h / 8760h)` | `open-attribution (CC-BY-3.0)` | 12898 | `Tier A` | `codigo_comuna` | `ok` |
+| `censo_hogares_viviendas` | Instituto Nacional de Estadisticas - Censo 2024 | `live` | `fresh (0.05h / 87600h)` | `open-attribution (CC BY 4.0)` | 346 | `Tier A` | `codigo_comuna, codigo_region` | `ok` |
+| `distritos_electorales` | BCN / Biblioteca del Congreso Nacional de Chile | `live` | `fresh (0.05h / 87600h)` | `open-attribution (CC0)` | 346 | `Tier A` | `codigo_comuna` | `ok` |
+| `finanzas_municipales` | SINIM - SUBDERE | `monthly` | `fresh (610.84h / 8760h)` | `public-api-review-terms (Datos públicos municipales; términos de reutilización sujetos a revisión)` | 345 | `Tier B` | `anio, codigo_comuna` | `ok` |
+| `resultados_educacionales` | Centro de Estudios MINEDUC - Rendimiento 2024 | `live` | `fresh (0.05h / 8760h)` | `open-attribution (CC-BY-3.0)` | 345 | `Tier B` | `anio, codigo_comuna` | `ok` |
+| `indicadores_urbanos_siedu` | INE - Sistema de Indicadores y Estándares de Desarrollo Urbano | `live` | `fresh (0.05h / 8760h)` | `open-attribution (Licencia de Datos Abiertos INE)` | 6701 | `Tier B` | `anio, codigo_comuna, codigo_indicador` | `ok` |
 | `perfil_territorial_comunal` | chile-hub | `live` | `fresh (0.0h / 1080h)` | `open-attribution (Derivada de fuentes abiertas con atribución)` | 346 | `Tier B` | `codigo_comuna` | `ok` |
-| `empresas` | Ministerio de Economia, Fomento y Turismo - Registro de Empresas y Sociedades (RES) | `live` | `fresh (0.03h / 1080h)` | `open-attribution (CC-BY)` | 1609373 | `Tier B` | `rut` | `ok` |
-| `pobreza_comunal` | Observatorio Social — Ministerio de Desarrollo Social y Familia | `live` | `fresh (0.03h / 175200h)` | `open-attribution (Datos abiertos MDS)` | 690 | `Tier A` | `codigo_comuna, codigo_region` | `ok` |
-| `consumo_electrico_comunal` | CNE — Energía Abierta | `fallback` | `fresh (0.03h / 17520h)` | `open-attribution (CC BY)` | 3 | `Tier C` | `codigo_comuna, codigo_region` | `ok` |
+| `empresas` | Ministerio de Economia, Fomento y Turismo - Registro de Empresas y Sociedades (RES) | `live` | `fresh (0.04h / 1080h)` | `open-attribution (CC-BY)` | 1609373 | `Tier B` | `rut` | `ok` |
+| `pobreza_comunal` | Observatorio Social — Ministerio de Desarrollo Social y Familia | `live` | `fresh (0.04h / 175200h)` | `open-attribution (Datos abiertos MDS)` | 690 | `Tier A` | `codigo_comuna, codigo_region` | `ok` |
+| `consumo_electrico_comunal` | CNE — Energía Abierta | `fallback` | `fresh (0.04h / 17520h)` | `open-attribution (CC BY)` | 3 | `Tier C` | `codigo_comuna, codigo_region` | `ok` |
 | `partidos_politicos` | Cámara de Diputadas y Diputados (datos abiertos) + SERVEL | `live` | `fresh (0.03h / 87600h)` | `open-attribution (CC-BY)` | 37 | `Tier B` | `id_partido` | `ok` |
 | `autoridades_electas` | Cámara de Diputadas y Diputados + Senado de Chile | `live` | `fresh (0.0h / 87600h)` | `open-attribution (CC-BY)` | 205 | `Tier B` | `distrito_electoral, circunscripcion_senatorial, codigo_region` | `ok` |
 | `estadisticas_vitales` | Instituto Nacional de Estadísticas (INE) — Estadísticas Vitales | `live` | `fresh (0.01h / 8760h)` | `open-attribution (CC BY 4.0)` | 13840 | `Tier A` | `anio, codigo_comuna` | `ok` |
-| `permisos_edificacion` | MINVU — Centro de Estudios de Ciudad y Territorio (CEDOC) | `monthly` | `fresh (0.58h / 1080h)` | `open-attribution (Uso autorizado con cita (MINVU CEDOC))` | 8650 | `Tier A` | `anio, codigo_comuna` | `ok` |
-| `calidad_aire` | SINCA — Ministerio del Medio Ambiente | `live` | `fresh (0.0h / 72h)` | `public-api-review-terms (Datos públicos MMA; sin licencia explícita, citar fuente oficial)` | 1510 | `Tier B` | `fecha, codigo_comuna, codigo_contaminante` | `ok` |
+| `permisos_edificacion` | MINVU — Centro de Estudios de Ciudad y Territorio (CEDOC) | `monthly` | `fresh (18.77h / 1080h)` | `open-attribution (Uso autorizado con cita (MINVU CEDOC))` | 8650 | `Tier A` | `anio, codigo_comuna` | `ok` |
+| `calidad_aire` | SINCA — Ministerio del Medio Ambiente | `live` | `fresh (0.01h / 72h)` | `public-api-review-terms (Datos públicos MMA; sin licencia explícita, citar fuente oficial)` | 1885 | `Tier B` | `fecha, codigo_comuna, codigo_contaminante` | `ok` |
 
 ## regiones
 
@@ -34,7 +34,7 @@ Capa derivada de regiones para filtros, joins y referencias administrativas de a
 
 - `source_url`: https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query
 - `documentation`: `docs/datasets/regiones.md`
-- `freshness`: `fresh (0.04h / 2160h)`
+- `freshness`: `fresh (0.05h / 2160h)`
 - `reuse_policy`: `{"status": "open-attribution", "license": "CC BY", "license_url": "https://datos.bcn.cl/es/informacion/lo-que-esta-haciendo-bcn", "attribution_required": true, "redistribution_ok": true, "summary": "Derivada de datos abiertos BCN reutilizables con atribucion."}`
 - `fields`: `codigo_region, nombre_region`
 - `join_keys`: `codigo_region`
@@ -49,7 +49,7 @@ Capa derivada de provincias para cruces intermedios entre region y comuna.
 
 - `source_url`: https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query
 - `documentation`: `docs/datasets/provincias.md`
-- `freshness`: `fresh (0.04h / 2160h)`
+- `freshness`: `fresh (0.05h / 2160h)`
 - `reuse_policy`: `{"status": "open-attribution", "license": "CC BY", "license_url": "https://datos.bcn.cl/es/informacion/lo-que-esta-haciendo-bcn", "attribution_required": true, "redistribution_ok": true, "summary": "Derivada de datos abiertos BCN reutilizables con atribucion."}`
 - `fields`: `codigo_region, nombre_region, codigo_provincia, nombre_provincia`
 - `join_keys`: `codigo_provincia, codigo_region`
@@ -64,7 +64,7 @@ Base territorial normalizada para cruces por region, provincia y comuna.
 
 - `source_url`: https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query
 - `documentation`: `docs/datasets/comunas.md`
-- `freshness`: `fresh (0.04h / 2160h)`
+- `freshness`: `fresh (0.05h / 2160h)`
 - `reuse_policy`: `{"status": "open-attribution", "license": "CC BY", "license_url": "https://datos.bcn.cl/es/informacion/lo-que-esta-haciendo-bcn", "attribution_required": true, "redistribution_ok": true, "summary": "Fuente operativa BCN dentro de su superficie de datos abiertos; atribucion requerida."}`
 - `fields`: `codigo_region, nombre_region, abreviatura, codigo_provincia, nombre_provincia, codigo_comuna, nombre_comuna, nombre_comuna_clean, latitud_cabecera, longitud_cabecera, poblacion_estimada`
 - `join_keys`: `codigo_comuna, codigo_region`
@@ -79,7 +79,7 @@ Comunas con coordenadas de cabecera y poblacion estimada INE, listas para analis
 
 - `source_url`: https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query
 - `documentation`: `docs/datasets/comunas_enriquecidas.md`
-- `freshness`: `fresh (0.04h / 2160h)`
+- `freshness`: `fresh (0.05h / 2160h)`
 - `reuse_policy`: `{"status": "open-attribution", "license": "CC BY", "license_url": "https://datos.bcn.cl/es/informacion/lo-que-esta-haciendo-bcn", "attribution_required": true, "redistribution_ok": true, "summary": "Derivada de datos abiertos BCN con coordenadas e informacion INE."}`
 - `fields`: `codigo_region, nombre_region, abreviatura, codigo_provincia, nombre_provincia, codigo_comuna, nombre_comuna, nombre_comuna_clean, latitud_cabecera, longitud_cabecera, poblacion_estimada`
 - `join_keys`: `codigo_comuna`
@@ -94,7 +94,7 @@ Serie de indicadores economicos diarios de referencia para analisis y software.
 
 - `source_url`: https://mindicador.cl/api
 - `documentation`: `docs/datasets/indicadores.md`
-- `freshness`: `fresh (0.04h / 72h)`
+- `freshness`: `fresh (0.05h / 72h)`
 - `reuse_policy`: `{"status": "open-attribution", "license": "Reproducción libre con citación (BCCh / INE)", "license_url": "https://www.bcentral.cl/web/banco-central/terminos-y-condiciones", "attribution_required": true, "redistribution_ok": true, "summary": "Datos del Banco Central de Chile (BCCh) e INE. Libre reproducción con citación. Acceso vía mindicador.cl (API pública de la comunidad)."}`
 - `fields`: `fecha, codigo_indicador, valor`
 - `indicator_codes`: `dolar, euro, ipc, uf, utm`
@@ -111,7 +111,7 @@ Perfil demografico comunal del Censo 2024 con sexo y grandes grupos de edad.
 
 - `source_url`: https://censo2024.ine.gob.cl/wp-content/uploads/2025/03/D1_Poblacion-censada-por-sexo-y-edad-en-grupos-quinquenales.xlsx
 - `documentation`: `docs/datasets/censo_comunal.md`
-- `freshness`: `fresh (0.04h / 87600h)`
+- `freshness`: `fresh (0.05h / 87600h)`
 - `reuse_policy`: `{"status": "open-attribution", "license": "CC BY 4.0", "license_url": "https://www.ine.gob.cl/terminos-de-uso", "attribution_required": true, "redistribution_ok": true, "summary": "Resultados oficiales del Censo 2024 publicados por el INE."}`
 - `fields`: `codigo_region, nombre_region, codigo_provincia, nombre_provincia, codigo_comuna, nombre_comuna, poblacion_censada, hombres, mujeres, razon_hombre_mujer, poblacion_0_14, poblacion_15_29, poblacion_30_44, poblacion_45_64, poblacion_65_mas`
 - `join_keys`: `codigo_comuna, codigo_region`
@@ -126,7 +126,7 @@ Directorio vigente de establecimientos de salud con tipo, dependencia, urgencia 
 
 - `source_url`: https://datos.gob.cl/dataset/3bf4cf7c-f638-4735-9a01-f65faae4beca/resource/2c44d782-3365-44e3-aefb-2c8b8363a1bc/download/establecimientos_20260922.csv
 - `documentation`: `docs/datasets/establecimientos_salud.md`
-- `freshness`: `fresh (0.04h / 1080h)`
+- `freshness`: `fresh (0.05h / 1080h)`
 - `reuse_policy`: `{"status": "open-attribution", "license": "CC0", "license_url": "http://www.opendefinition.org/licenses/cc-zero", "attribution_required": false, "redistribution_ok": true, "summary": "Directorio oficial MINSAL publicado en datos.gob.cl bajo CC0."}`
 - `fields`: `codigo_establecimiento, nombre_establecimiento, tipo_establecimiento, dependencia_administrativa, nivel_atencion, codigo_region, nombre_region, codigo_comuna, nombre_comuna, tiene_servicio_urgencia, tipo_urgencia, latitud, longitud, estado_funcionamiento`
 - `join_keys`: `codigo_establecimiento, codigo_comuna`
@@ -140,7 +140,7 @@ Directorio oficial del Ministerio de Educación (MINEDUC) con Rol Base de Datos 
 
 - `source_url`: https://datosabiertos.mineduc.cl/wp-content/uploads/2025/11/Directorio-Oficial-EE-2025.rar
 - `documentation`: `docs/datasets/establecimientos_educacionales.md`
-- `freshness`: `fresh (0.04h / 8760h)`
+- `freshness`: `fresh (0.05h / 8760h)`
 - `reuse_policy`: `{"status": "open-attribution", "license": "CC-BY-3.0", "license_url": "https://creativecommons.org/licenses/by/3.0/cl/", "attribution_required": true, "redistribution_ok": true, "summary": "Directorio oficial MINEDUC publicado por el Centro de Estudios del Ministerio de Educación de Chile bajo licencia CC BY."}`
 - `fields`: `rbd, dv_rbd, nombre_establecimiento, codigo_region, codigo_comuna, dependencia_administrativa, latitud, longitud, estado_funcionamiento`
 - `join_keys`: `codigo_comuna`
@@ -154,7 +154,7 @@ Viviendas y hogares censados por comuna, ocupacion y tamano medio del hogar.
 
 - `source_url`: https://censo2024.ine.gob.cl/wp-content/uploads/2025/03/V1_Viviendas-y-hogares-censados.xlsx
 - `documentation`: `docs/datasets/censo_hogares_viviendas.md`
-- `freshness`: `fresh (0.04h / 87600h)`
+- `freshness`: `fresh (0.05h / 87600h)`
 - `reuse_policy`: `{"status": "open-attribution", "license": "CC BY 4.0", "license_url": "https://www.ine.gob.cl/terminos-de-uso", "attribution_required": true, "redistribution_ok": true, "summary": "Resultados oficiales del Censo 2024 publicados por el INE."}`
 - `fields`: `codigo_region, nombre_region, codigo_provincia, nombre_provincia, codigo_comuna, nombre_comuna, viviendas_censadas, viviendas_particulares_ocupadas, viviendas_particulares_desocupadas, viviendas_colectivas, hogares_censados, promedio_personas_hogar`
 - `join_keys`: `codigo_comuna, codigo_region`
@@ -168,7 +168,7 @@ Asociación de comunas a distritos electorales (diputados) y circunscripciones s
 
 - `source_url`: https://www.bcn.cl/siit/observatorio/ley20840
 - `documentation`: `docs/datasets/distritos_electorales.md`
-- `freshness`: `fresh (0.04h / 87600h)`
+- `freshness`: `fresh (0.05h / 87600h)`
 - `reuse_policy`: `{"status": "open-attribution", "license": "CC0", "license_url": "http://www.opendefinition.org/licenses/cc-zero", "attribution_required": false, "redistribution_ok": true, "summary": "Asociación comunal a distritos y circunscripciones electorales basada en Ley N° 20.840."}`
 - `fields`: `codigo_comuna, nombre_comuna, distrito_electoral, circunscripcion_senatorial`
 - `join_keys`: `codigo_comuna`
@@ -182,7 +182,7 @@ Indicadores financieros municipales anuales desde SINIM/SUBDERE. CAPA PARCIAL/CA
 
 - `source_url`: https://datos.sinim.gov.cl/datos_municipales.php
 - `documentation`: `docs/datasets/finanzas_municipales.md`
-- `freshness`: `fresh (592.65h / 8760h)`
+- `freshness`: `fresh (610.84h / 8760h)`
 - `reuse_policy`: `{"status": "public-api-review-terms", "license": "Datos públicos municipales; términos de reutilización sujetos a revisión", "license_url": "https://datos.sinim.gov.cl/", "attribution_required": true, "redistribution_ok": true, "summary": "Información municipal pública publicada por SINIM/SUBDERE; citar fuente oficial."}`
 - `fields`: `anio, codigo_comuna, nombre_comuna, ingresos_totales, gastos_totales, ingresos_propios_permanentes, fondo_comun_municipal, gasto_personal, gasto_inversion`
 - `join_keys`: `anio, codigo_comuna`
@@ -197,7 +197,7 @@ Resultados educacionales agregados por comuna y año, sin registros personales.
 
 - `source_url`: https://datosabiertos.mineduc.cl/wp-content/uploads/2025/04/Rendimiento_2024.rar
 - `documentation`: `docs/datasets/resultados_educacionales.md`
-- `freshness`: `fresh (0.04h / 8760h)`
+- `freshness`: `fresh (0.05h / 8760h)`
 - `reuse_policy`: `{"status": "open-attribution", "license": "CC-BY-3.0", "license_url": "https://creativecommons.org/licenses/by/3.0/cl/", "attribution_required": true, "redistribution_ok": true, "summary": "Datos agregados desde publicaciones del Centro de Estudios MINEDUC; citar fuente oficial."}`
 - `fields`: `anio, codigo_comuna, matricula_total, asistencia_promedio, tasa_aprobacion, tasa_reprobacion, tasa_retiro, establecimientos_reportados`
 - `join_keys`: `anio, codigo_comuna`
@@ -212,7 +212,7 @@ Indicadores urbanos SIEDU en formato largo con cobertura comunal parcial esperad
 
 - `source_url`: https://www.ine.gob.cl/docs/default-source/sistema-de-indicadores-y-estandares-de-desarrollo-urbano/indicadores/actualizaci%C3%B3n-2019/matriz-siedu-publicacion.xlsm
 - `documentation`: `docs/datasets/indicadores_urbanos_siedu.md`
-- `freshness`: `fresh (0.04h / 8760h)`
+- `freshness`: `fresh (0.05h / 8760h)`
 - `reuse_policy`: `{"status": "open-attribution", "license": "Licencia de Datos Abiertos INE", "license_url": "https://www.ine.gob.cl/terminos-de-uso", "attribution_required": true, "redistribution_ok": true, "summary": "Indicadores urbanos SIEDU publicados por INE para comunas urbanas seleccionadas."}`
 - `fields`: `anio, codigo_comuna, codigo_indicador, nombre_indicador, categoria, valor, unidad, fuente_original, cobertura_tipo`
 - `join_keys`: `anio, codigo_comuna, codigo_indicador`
@@ -242,7 +242,7 @@ Registro de Empresas y Sociedades (RES) con RUT, razon social, tipo societario, 
 
 - `source_url`: https://datos.gob.cl/dataset/registro-de-empresas-y-sociedades
 - `documentation`: `docs/datasets/empresas.md`
-- `freshness`: `fresh (0.03h / 1080h)`
+- `freshness`: `fresh (0.04h / 1080h)`
 - `reuse_policy`: `{"status": "open-attribution", "license": "CC-BY", "license_url": "https://creativecommons.org/licenses/by/3.0/cl/", "attribution_required": true, "redistribution_ok": true, "summary": "Registro de Empresas y Sociedades (RES) del Ministerio de Economia, publicado en datos.gob.cl bajo CC-BY. Solo incluye constituciones bajo Ley 20.659 (regimen simplificado) desde 2013."}`
 - `fields`: `rut, razon_social, codigo_sociedad, tipo_actuacion, capital, fecha_actuacion, fecha_registro, fecha_aprobacion_sii, anio, mes, comuna_tributaria, region_tributaria, comuna_social, region_social`
 - `join_keys`: `rut`
@@ -257,7 +257,7 @@ Estimaciones de pobreza comunal por ingresos y multidimensional derivadas de la 
 
 - `source_url`: https://observatorio.ministeriodesarrollosocial.gob.cl/storage/docs/pobreza-comunal/2022/Estimaciones_Tasa_Pobreza_Ingresos_Comunas_2022.xlsx
 - `documentation`: `docs/datasets/pobreza_comunal.md`
-- `freshness`: `fresh (0.03h / 175200h)`
+- `freshness`: `fresh (0.04h / 175200h)`
 - `reuse_policy`: `{"status": "open-attribution", "license": "Datos abiertos MDS", "license_url": "https://observatorio.ministeriodesarrollosocial.gob.cl/", "attribution_required": true, "redistribution_ok": true, "summary": "Estimaciones de pobreza comunal publicadas por el Observatorio Social del MDS. Atribución requerida."}`
 - `fields`: `codigo_region, codigo_comuna, nombre_comuna, anio, dimension, tasa, limite_inferior, limite_superior, metodologia, fuente, url_fuente, fecha_fuente`
 - `join_keys`: `codigo_comuna, codigo_region`
@@ -272,7 +272,7 @@ Consumo eléctrico anual por comuna y tipo de cliente (Residencial, Comercial, I
 
 - `source_url`: http://datos.energiaabierta.cl/dataviews/241686/consumo-electrico-anual-por-comuna-y-tipo-de-cliente/
 - `documentation`: `docs/datasets/consumo_electrico_comunal.md`
-- `freshness`: `fresh (0.03h / 17520h)`
+- `freshness`: `fresh (0.04h / 17520h)`
 - `reuse_policy`: `{"status": "open-attribution", "license": "CC BY", "license_url": "http://energiaabierta.cl/", "attribution_required": true, "redistribution_ok": true, "summary": "Consumo eléctrico anual por comuna publicado por la CNE en Energía Abierta. Atribución requerida."}`
 - `fields`: `codigo_region, codigo_comuna, nombre_comuna, anio, tipo_cliente, consumo_kwh, numero_clientes, fuente, url_fuente, fecha_fuente`
 - `join_keys`: `codigo_comuna, codigo_region`
@@ -332,7 +332,7 @@ Viviendas en unidades y superficie (m2) por comuna y año —casas y departament
 
 - `source_url`: https://centrodeestudios.minvu.gob.cl/repositorio/categoria/permisos-de-edificacion
 - `documentation`: `docs/datasets/permisos_edificacion.md`
-- `freshness`: `fresh (0.58h / 1080h)`
+- `freshness`: `fresh (18.77h / 1080h)`
 - `reuse_policy`: `{"status": "open-attribution", "license": "Uso autorizado con cita (MINVU CEDOC)", "license_url": "https://centrodeestudios.minvu.gob.cl/repositorio/categoria/permisos-de-edificacion", "attribution_required": true, "redistribution_ok": true, "summary": "Estadísticas de permisos de edificación del CEDOC (MINVU). El Centro autoriza el uso de la información citando la fuente."}`
 - `fields`: `anio, codigo_region, codigo_comuna, nombre_comuna, unidades_total, superficie_m2_total, unidades_casas, superficie_m2_casas, unidades_departamentos, superficie_m2_departamentos, estado_dato, fuente, url_fuente, fecha_fuente`
 - `join_keys`: `anio, codigo_comuna`
@@ -347,11 +347,11 @@ Promedios diarios de contaminantes atmosféricos (MP2.5, MP10, SO2, NO2, CO, O3)
 
 - `source_url`: https://sinca.mma.gob.cl/index.php/json/listadomapa2k19/
 - `documentation`: `docs/datasets/calidad_aire.md`
-- `freshness`: `fresh (0.0h / 72h)`
+- `freshness`: `fresh (0.01h / 72h)`
 - `reuse_policy`: `{"status": "public-api-review-terms", "license": "Datos públicos MMA; sin licencia explícita, citar fuente oficial", "license_url": "https://sinca.mma.gob.cl/", "attribution_required": true, "redistribution_ok": true, "summary": "Mediciones de calidad del aire del SINCA (MMA), API JSON pública. Organismo público chileno sin restricción explícita de reúso; citar fuente oficial."}`
 - `fields`: `fecha, id_estacion, nombre_estacion, codigo_region, codigo_comuna, nombre_comuna, latitud, longitud, codigo_contaminante, nombre_contaminante, unidad, valor_promedio_diario, valor_max_horario, horas_validas, estado_dato, fuente, url_fuente, fecha_fuente`
 - `join_keys`: `fecha, codigo_comuna, codigo_contaminante`
 - `outputs`: `{"parquet": "data/normalized/calidad_aire.parquet", "json": "data/normalized/calidad_aire.json", "duckdb_table": "calidad_aire", "sqlite_table": "calidad_aire", "excel_sheet": "Calidad Aire"}`
 - `usage_examples`: `{"python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars(\"calidad_aire\")\n# Promedio diario de MP2.5 por comuna\ndf.filter(pl.col(\"codigo_contaminante\") == \"mp25\").sort(\"valor_promedio_diario\", descending=True)", "duckdb": "SELECT fecha, codigo_comuna, avg(valor_promedio_diario) AS mp25\nFROM 'data/normalized/calidad_aire.parquet'\nWHERE codigo_contaminante = 'mp25'\nGROUP BY 1, 2 ORDER BY 1 DESC, 3 DESC;", "cli": "chile-hub show calidad_aire"}`
 - `warnings`: cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación
-- `notes`: inventario: 126 estaciones en el listado; 126 con filas emitidas; 754 filas diarias nuevas desde 'sinca_listadomapa_20260925T194324Z.json'; historial: sembrado desde Parquet publicado (1510 filas)
+- `notes`: inventario: 124 estaciones en el listado; 124 con filas emitidas; 748 filas diarias nuevas desde 'sinca_listadomapa_20260926T135427Z.json'; historial: sembrado desde Parquet publicado (1510 filas)
