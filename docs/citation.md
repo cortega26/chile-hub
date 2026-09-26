@@ -16,6 +16,7 @@ atribuye además la fuente de cada capa que hayas usado.
   title  = {chile-hub: datos públicos de Chile curados y validados},
   author = {Ortega, Carlos},
   year   = {2026},
+  doi    = {10.5281/zenodo.22968698},
   url    = {https://tooltician.com/chile-hub/},
   note   = {Versión X.Y.Z}
 }
@@ -43,16 +44,24 @@ Ejemplo (Censo 2024):
 
 ## DOI (Zenodo)
 
-El repositorio está preparado para la integración GitHub↔Zenodo, que emite un
-DOI gratuito por cada release. Pasos para el mantenedor (una sola vez):
+**DOI (concept — todas las versiones):**
+[10.5281/zenodo.22968698](https://doi.org/10.5281/zenodo.22968698)
 
-1. Entrar a [zenodo.org](https://zenodo.org) con la cuenta de GitHub y, en
-   *Settings → GitHub*, activar el repositorio `cortega26/chile-hub`.
-2. Hacer un release normal (`make release`, que crea el tag y el GitHub Release).
-3. Zenodo archiva el release y emite un **concept DOI** (todas las versiones) y
-   un **version DOI** (ese release).
-4. Pegar el concept DOI en `CITATION.cff` (campo `doi:` + `identifiers`) y en
-   esta página; a partir de ahí cada release actualiza el version DOI solo.
+La integración GitHub↔Zenodo está activa: cada release recibe su **version DOI**
+automáticamente y el **concept DOI** siempre resuelve a la última versión.
+Primeros releases archivados:
 
-Mientras no exista DOI, cita la versión con la URL del repositorio y el número
-de versión de `pyproject.toml`.
+| Release | Version DOI |
+|:---|:---|
+| v1.37.6 | [10.5281/zenodo.22968699](https://doi.org/10.5281/zenodo.22968699) |
+| v1.37.7 | [10.5281/zenodo.22969328](https://doi.org/10.5281/zenodo.22969328) |
+
+Pasos seguidos (referencia, ya completados):
+
+1. Cuenta de Zenodo vinculada a GitHub y repositorio `cortega26/chile-hub`
+   habilitado en *GitHub → Sync now*.
+2. Release normal creado por el CI (`fix`/`feat` → `python-semantic-release`).
+3. Zenodo archiva el release y emite version DOI + concept DOI.
+4. Concept DOI pegado en `CITATION.cff` (`doi:` + `identifiers`) y en esta
+   página. No hace falta mantener nada más: los próximos releases se archivan
+   solos.

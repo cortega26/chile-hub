@@ -126,8 +126,9 @@ están pendientes de review.
 - [x] ADR-021 + nota en `docs/datasets/geometria_comunal.md`.
 - [x] Verificado: árbol **412 → 140.1 MB**; suite 1106 verde; doctor,
       verify-landing, docs-build, lint, format, typecheck OK.
-- [ ] Zenodo: esperar v1.37.7 (árbol liviano) y aplicar el DOI (concept) en
-      `CITATION.cff` + `docs/citation.md` + badge README.
+- [x] Zenodo publicado: concept DOI `10.5281/zenodo.22968698` aplicado en
+      `CITATION.cff` + `docs/citation.md` + badge README. Version DOIs:
+      v1.37.6 = `10.5281/zenodo.22968699`, v1.37.7 = `10.5281/zenodo.22969328`.
 
 ## Housekeeping
 

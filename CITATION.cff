@@ -22,6 +22,8 @@ keywords:
   - parquet
   - duckdb
   - polars
-# Cuando Zenodo emita el DOI (ver docs/citation.md), agregar aquí:
-# doi: 10.5281/zenodo.XXXXXXX
-# y el bloque identifiers correspondiente.
+doi: 10.5281/zenodo.22968698
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.22968698
+    description: Concept DOI (todas las versiones)
