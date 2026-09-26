@@ -67,5 +67,5 @@ gh api repos/cortega26/chile-hub --jq '{stars: .stargazers_count, forks: .forks_
 - GitHub: stars 92, forks 10 — fuente: API GitHub
 - Search Console: `sin dato` (pendiente operador)
 - Issues de leads: #107, #108, #109 — abiertos y etiquetados
-- Schedule diario: falló (2026-09-25, failure): sin detalle
+- Schedule diario: falló 23–25 sep (commit 039fc03) — "Build-synced files are stale" en Build and verify data; causa: el gate compara README.md, cuyos conteos cambian con los datos del día y solo los commitea el publish que el gate bloquea (deadlock; sin publish programado desde 2026-08-13; disparador puntual: permisos_edificacion en fallback, corregido en 8d30636). Fix propuesto en plan 108 (branch fix/108-build-synced-stale)
 - Notas: sitemap índice + 3 hijos verificados en vivo (200/200/200).
