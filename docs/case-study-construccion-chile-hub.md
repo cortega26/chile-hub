@@ -64,7 +64,7 @@ región (2 dígitos), provincia (3) y comuna (5). En casi todos los portales
 chilenos, el CUT se representa como entero — y eso rompe los joins.
 
 `01101` (Iquique) como entero es `1101`. Pierdes el cero inicial que identifica
-la región de Tarapacá. Multiplica eso por 346 comunas, 15 datasets y miles de
+la región de Tarapacá. Multiplica eso por 346 comunas, 22 capas y miles de
 joins, y tienes una fuente inagotable de bugs silenciosos.
 
 **Decisión:** todo CUT es `VARCHAR` de ancho fijo desde el momento de la
@@ -104,8 +104,10 @@ No todos los datasets tienen la misma madurez. El sistema de carriles
   revisión (`review_by`) y regla de salida si no madura.
 
 Esta separación permite experimentar con fuentes inestables sin degradar la
-calidad del bundle. Actualmente 13 capas son `live` y 2 son `fallback`; 0
-términos en revisión.
+calidad del bundle. A septiembre de 2026 hay **21 capas `stable_publishable` y 4
+`candidate`** (geometría comunal, autoridades locales, consumo eléctrico y
+delincuencia —esta última degradada a `rejected`—), cada una con fecha de
+revisión (`review_by`) y regla de salida.
 
 ### 3.4 Versionado dual: software y datos
 
@@ -124,29 +126,41 @@ inflar el changelog. La frescura de cada dataset se monitorea por separado en
 
 ## 4. Resultados
 
-A junio de 2026, el proyecto produjo:
+A septiembre de 2026, el proyecto produce:
 
 | Métrica | Valor |
 |:---|---:|
-| Capas de datos | 15 |
-| Modo `live` (extracción directa) | 13 de 15 |
-| Modo `fallback` (respaldo curado) | 2 de 15 |
-| Calidad promedio | **93.5 / 100** |
-| Nota A | 14 de 15 capas |
-| Auditoría legal (redistribuible) | 15 de 15 (`ready`) |
-| Tests | 490+ (372 pytest + verificaciones de pipeline) |
-| ADRs | 5 |
-| Contratos JSON Schema | 15 |
-| Refresh automatizado | Diario vía CI/CD |
+| Capas construibles | 22 (21 publicables) |
+| Comunas cubiertas | 346/346 en las capas DPA |
+| Calidad promedio | **94.0 / 100** (19 A, 3 B) |
+| Salud del hub | 20 `ok`, 1 `warn`, 0 `error` |
+| Auditoría legal (redistribuible) | 22 de 22 (`ready`) |
+| Tests | 1 106 |
+| ADRs | 21 |
+| Contratos JSON Schema | 25 |
+| Instalaciones PyPI | ~2 200 / mes |
+| Mirror Hugging Face | 21 subsets, ~135 descargas / mes |
+| Páginas estáticas por comuna | 347 |
+| DOI citable | [10.5281/zenodo.22968698](https://doi.org/10.5281/zenodo.22968698) |
 
 El pipeline corre íntegro en GitHub Actions, produce artefactos Parquet,
 DuckDB, SQLite, JSON y Excel, y publica el bundle en cada release. La landing
 en `tooltician.com/chile-hub/` se regenera con cada build.
 
-**Lo que no se ve en la tabla:** 0 datos corruptos publicados. El pipeline
-falló varias veces — por fuentes caídas, cambios de esquema no anunciados,
-archivos Excel renombrados en el portal del MINEDUC — y en cada caso **abortó
-antes de publicar**. El fail-loud funcionó exactamente como fue diseñado.
+**Distribución (desde julio de 2026).** El proyecto dejó de ser sólo un
+paquete: el bundle publicable se replica en Hugging Face Hub con un subset por
+capa, existe un servidor MCP (`chile-hub[mcp]`) para agentes de código, cada
+capa tiene su página de documentación con JSON-LD schema.org, hay 347 páginas
+estáticas por comuna con indicadores oficiales, `llms.txt` guía a los agentes
+que navegan el sitio, y Zenodo emite un DOI por release (concept DOI estable
+para citar). Todo se publica desde CI, sin intervención manual.
+
+**Lo que no se ve en la tabla:** 0 datos corruptos publicados. El pipeline falló
+varias veces — fuentes caídas, cambios de esquema no anunciados, archivos Excel
+renombrados en el portal del MINEDUC, y un portal (MINVU CEDOC) que bloquea por
+IP a los runners de GitHub — y en cada caso **abortó antes de publicar** o
+degradó a un modo declarado (snapshot versionado `monthly`). El fail-loud
+funcionó exactamente como fue diseñado.
 
 ---
 
@@ -167,15 +181,17 @@ antes de publicar**. El fail-loud funcionó exactamente como fue diseñado.
 
 ### Lo que fue difícil
 
-- **Mantener 15 extractores como única persona.** Cada fuente tiene su
+- **Mantener 22 extractores como única persona.** Cada fuente tiene su
   idiosincrasia: una API JSON, un Excel con celdas fusionadas, un archivo RAR
   con contraseña, un portal que requiere POST con JavaScript. El costo de
   mantenimiento no es escribir el extractor, es **monitorear que no se rompa**
   cuando la fuente cambia.
 - **El scraping gubernamental es frágil por definición.** `finanzas_municipales`
-  tiene 3 de 346 comunas porque el portal SINIM requiere scraping
-  JavaScript/POST y no se ha estabilizado. Está honestamente etiquetado como
-  `🔶 parcial` mientras se trabaja en una solución.
+  pasó de 3 a 345 de 346 comunas tras estabilizar el scraping del SINIM
+  (2026), pero sigue etiquetada `🔶 parcial` porque su cobertura no es total.
+  `permisos_edificacion` vive en modo `monthly` desde un snapshot versionado
+  porque su portal bloquea a los runners de CI por IP: la fuente funciona, el
+  runner no puede alcanzarla.
 - **El balance entre "más datasets" y "más confiabilidad".** La tentación de
   agregar capas existe, pero cada capa nueva es un compromiso de mantenimiento
   permanente. La regla: solo entra lo que tiene valor de cruce por
@@ -222,6 +238,10 @@ ZIP](https://github.com/cortega26/chile-hub/releases) sin instalar nada.
 ## Referencias
 
 - [README del proyecto](https://github.com/cortega26/chile-hub/blob/main/README.md)
+- [DOI (Zenodo)](https://doi.org/10.5281/zenodo.22968698) — concept DOI, todas las versiones
+- [Mirror en Hugging Face Hub](https://huggingface.co/datasets/cortega26/chile-hub) — 21 subsets
+- [Servidor MCP para agentes](https://tooltician.com/chile-hub/reference/mcp/)
+- [Cómo citar](https://tooltician.com/chile-hub/reference/citation/)
 - [Pipeline y validación](https://github.com/cortega26/chile-hub/blob/main/AGENTS.md)
 - [Reporte de procedencia](https://github.com/cortega26/chile-hub/blob/main/data/normalized/provenance_report.md)
 - [Auditoría legal de redistribución](https://github.com/cortega26/chile-hub/blob/main/data/normalized/redistribution_report.md)

@@ -130,6 +130,21 @@ están pendientes de review.
       `CITATION.cff` + `docs/citation.md` + badge README. Version DOIs:
       v1.37.6 = `10.5281/zenodo.22968699`, v1.37.7 = `10.5281/zenodo.22969328`.
 
+## Distribución — activación 2026-09-26 (post-lanzamiento)
+
+- [x] Caso de estudio actualizado al estado real (22 capas, 1.106 tests, 21 ADRs,
+      94.0/100, DOI, HF, MCP, comunas, incidentes del pipeline).
+- [x] Borrador de post técnico LinkedIn actualizado (post de fondo; el de
+      seguimiento ya se publicó con 141 reacciones y 16 comentarios).
+- [x] `docs/launch-pack.md`: Show HN + post dev.to + checklist de siembra +
+      leads accionables de los comentarios (DGA/DMC, energía, desastres,
+      replicación Bolivia/Perú).
+- [x] `docs/adoption-review.md`: baseline de canales + umbrales de decisión a
+      2–4 semanas (SEO, Kaggle, agentes, comparador, contribución).
+- [ ] Operador: registrar Search Console y enviar el sitemap (sin eso no hay
+      decisión de SEO posible).
+- [ ] Operador: responder comentarios del post y abrir issues de los leads.
+
 ## Housekeeping
 
 - [x] Archivar planes DONE (055, 056, 060, 061, 062) a `plans/archive/`
