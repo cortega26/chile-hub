@@ -59,3 +59,13 @@ gh api repos/cortega26/chile-hub --jq '{stars: .stargazers_count, forks: .forks_
 - **Pendiente de operador:** registrar el sitio en Google Search Console y
   enviar `https://tooltician.com/chile-hub/sitemap.xml` — sin eso, la decisión
   de SEO no se puede tomar con datos.
+
+### 2026-09-26 — revisión (agente)
+
+- PyPI (mes/semana/día): 2218 / 1172 / 32 — fuente: `data/normalized/adoption.json` (generado 2026-09-21)
+- HF: descargas 197, likes 0 — fuente: API HF
+- GitHub: stars 92, forks 10 — fuente: API GitHub
+- Search Console: `sin dato` (pendiente operador)
+- Issues de leads: #107, #108, #109 — abiertos y etiquetados
+- Schedule diario: falló (2026-09-25, failure): sin detalle
+- Notas: sitemap índice + 3 hijos verificados en vivo (200/200/200).
