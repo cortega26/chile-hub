@@ -469,6 +469,7 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            white-space: nowrap;
         }
 
         .badge-alpha {
@@ -486,12 +487,12 @@
             display: flex;
             align-items: center;
             flex-wrap: wrap;
-            gap: 1.5rem;
+            gap: 1rem;
         }
 
         .site-nav a {
             color: var(--text-secondary);
-            font-size: 0.88rem;
+            font-size: 0.85rem;
             font-weight: 550;
             text-decoration: none;
             transition: var(--transition);
@@ -1563,6 +1564,15 @@
             overflow-x: auto;
             white-space: pre;
             max-width: 100%;
+        }
+
+        /* El editor SQL es un textarea: sin width explícito cae al ancho de
+           `cols` (~130px) y la sección se ve rota en desktop. */
+        #sql-input {
+            width: 100%;
+            box-sizing: border-box;
+            resize: vertical;
+            min-height: 96px;
         }
 
         /* Contribute Panel */

@@ -732,6 +732,9 @@ def verify_landing():
             fail("Falta el botón del explorador SQL (#sql-run-btn)")
         if page.locator("#sql-input").count() != 1:
             fail("Falta el textarea del explorador SQL (#sql-input)")
+        sql_input_box = page.locator("#sql-input").bounding_box()
+        if not sql_input_box or sql_input_box["width"] < 500:
+            fail(f"El editor SQL debe ocupar el ancho en desktop: {sql_input_box}")
 
         # Móvil: el toggle reemplaza las 3 líneas de enlaces del nav
         mobile = browser.new_page(viewport={"width": 390, "height": 844})
