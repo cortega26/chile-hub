@@ -1,6 +1,6 @@
 {
-  "generated_at_utc": "2026-09-26T13:54:48.444523+00:00",
-  "previous_generated_at_utc": "2026-09-25T19:43:40.331750+00:00",
+  "generated_at_utc": "2026-09-26T14:01:02.246604+00:00",
+  "previous_generated_at_utc": "2026-09-26T13:54:48.444523+00:00",
   "dataset_count": 22,
   "datasets": [
     {
@@ -25,9 +25,9 @@
     },
     {
       "dataset": "calidad_aire",
-      "previous_record_count": 1510,
+      "previous_record_count": 1885,
       "current_record_count": 1885,
-      "record_count_delta": 375,
+      "record_count_delta": 0,
       "added_fields": [],
       "removed_fields": [],
       "previous_source_mode": "live",
@@ -36,7 +36,7 @@
       "current_freshness_status": "fresh",
       "previous_validation_status": "ok",
       "current_validation_status": "ok",
-      "change_severity": "patch",
+      "change_severity": "none",
       "breaking_changes": [],
       "new_columns": [],
       "removed_columns": [],
@@ -265,9 +265,9 @@
     },
     {
       "dataset": "indicadores",
-      "previous_record_count": 665,
+      "previous_record_count": 667,
       "current_record_count": 667,
-      "record_count_delta": 2,
+      "record_count_delta": 0,
       "added_fields": [],
       "removed_fields": [],
       "previous_source_mode": "live",
@@ -276,7 +276,7 @@
       "current_freshness_status": "fresh",
       "previous_validation_status": "ok",
       "current_validation_status": "ok",
-      "change_severity": "patch",
+      "change_severity": "none",
       "breaking_changes": [],
       "new_columns": [],
       "removed_columns": [],

@@ -1,6 +1,6 @@
 # chile-hub — Madurez de fuente
 
-- `generated_at_utc`: `2026-09-26T13:54:48.444523+00:00`
+- `generated_at_utc`: `2026-09-26T14:01:02.246604+00:00`
 - `stable_count`: `21`
 - `candidate_count`: `2`
 - `experimental_count`: `0`
