@@ -55,6 +55,7 @@
 ### Backlog
 
 - [x] 106 Snapshot liviano: geometría cruda fuera de git (prerelease `geometry-audit`) + `duckdb-eh.wasm` eliminado; guardrail de presupuesto (<160 MB)
+- [x] 107 Handoff de activación para agente (GSC, sitemap, schedule, adopción); issues de leads #107/#108/#109 creados
 
 ### Goto por síntoma
 

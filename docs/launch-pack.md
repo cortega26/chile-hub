@@ -19,6 +19,10 @@
 
 Números actuales (2026-09-26): 22 capas construibles / 21 publicables · 1.106
 tests · 94.0/100 de calidad · ~2.200 instalaciones PyPI/mes · 90 stars · 10 forks.
+Post de seguimiento: **148 reacciones, 17 comentarios**; issues de leads:
+[#107](https://github.com/cortega26/chile-hub/issues/107),
+[#108](https://github.com/cortega26/chile-hub/issues/108),
+[#109](https://github.com/cortega26/chile-hub/issues/109).
 
 ---
 
@@ -105,18 +109,20 @@ primer comentario: PyPI, GitHub, landing, DOI.
 
 ---
 
-## 5. Leads accionables del post del 2026-09-26 (16 comentarios)
+## 5. Leads accionables del post del 2026-09-26 (17 comentarios)
 
-> Tiempo-sensible: responder en la misma semana, abrir issues y etiquetarlos.
+> **Estado 2026-09-26:** el autor ya respondió a Reynaldo (guía de fuentes/licencias).
+> La vista pública de LinkedIn no muestra todas las respuestas anidadas: confirmar
+> en la UI las de Cristian, Tushar y Luis. Los 3 pedidos ya tienen issue.
 
-| Persona | Señal | Acción concreta |
-|:---|:---|:---|
-| Cristian Orrego (CEAZAmet) | Quiere **DGA (meteo/caudales) + DMC** históricos y actuales en un solo lugar | Abrir `dataset_request` con la fuente propuesta; evaluar contra `docs/dataset-inclusion-criteria.md` (licencia + API/dump estable) |
-| Tushar Punjabi | Quiere aportar datos de **energía/renovables y consumo** | Responder con `CONTRIBUTING.md` + playbook de extractores; ojo: `consumo_electrico_comunal` está `deprecated` (fuente CNE descontinuada) — una fuente nueva sería bienvenida |
-| Luis Oliveros (PhD Data Science) | Tiene **datos de desastres 2024–2026** scrapeados, sin curar | Pedir fuente y licencia; evaluar como dataset candidate |
-| Reynaldo Fulguera (Bolivia) | Quiere **replicar el framework en su ciudad** | Compartir `AGENTS.md` + caso de estudio + ADRs; posible colaboración regional |
-| Gabriela Marín / Valentina Huepe (Perú) | Iniciativa similar en Perú | Conectar y comparar arquitecturas (el framework es transferible) |
-| Ninotschka, José Astorga, Hugo, Marcelo | Apoyo/gracias | Responder y agradecer; no convertir en venta |
+| Persona | Señal | Issue | Acción |
+|:---|:---|:---|:---|
+| Cristian Orrego (CEAZAmet) | **DGA (meteo/caudales) + DMC** históricos y actuales en un solo lugar | [#107](https://github.com/cortega26/chile-hub/issues/107) | Confirmar respuesta en LinkedIn; validar API/dump + licencia contra `docs/dataset-inclusion-criteria.md` |
+| Tushar Punjabi | Aportar datos de **energía/renovables y consumo** | [#108](https://github.com/cortega26/chile-hub/issues/108) | Confirmar respuesta; compartir `CONTRIBUTING.md` + playbook; ojo: `consumo_electrico_comunal` está `deprecated` |
+| Luis Oliveros (PhD Data Science) | **Datos de desastres 2024–2026** scrapeados, sin curar | [#109](https://github.com/cortega26/chile-hub/issues/109) | Confirmar respuesta; pedir fuente primaria y licencia (sin eso queda `under-review`) |
+| Reynaldo Fulguera (Bolivia) | Replicar el framework en su ciudad | — | **Respondida** (guía de fuentes/licencias); compartir `AGENTS.md` + caso de estudio |
+| Gabriela Marín / Valentina Huepe (Perú) | Iniciativa similar en Perú | — | Conectar y comparar arquitecturas |
+| Ninotschka, José Astorga, Hugo, Marcelo, Daniel Olivares | Apoyo/gracias | — | Responder y agradecer; no convertir en venta |
 
 **Guardrails:** no prometer fechas ni features; toda sugerencia entra por
 `dataset_request` y pasa los criterios de inclusión. La conversación pública es

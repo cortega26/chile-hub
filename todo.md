@@ -141,9 +141,14 @@ están pendientes de review.
       replicación Bolivia/Perú).
 - [x] `docs/adoption-review.md`: baseline de canales + umbrales de decisión a
       2–4 semanas (SEO, Kaggle, agentes, comparador, contribución).
-- [ ] Operador: registrar Search Console y enviar el sitemap (sin eso no hay
-      decisión de SEO posible).
-- [ ] Operador: responder comentarios del post y abrir issues de los leads.
+- [x] Issues de los leads creados: #107 (DGA/DMC), #108 (energía), #109
+      (desastres). Respuesta a Reynaldo verificada; confirmar las anidadas de
+      Cristian/Tushar/Luis en la UI.
+- [x] Handoff para agente pequeño: `plans/107-activacion-lanzamiento-handoff.md`
+      (GSC meta tag, sitemap, verificación del schedule, registro de adopción;
+      con fallbacks y STOP conditions).
+- [ ] Operador: registrar Search Console (el agente agrega el meta tag cuando
+      le pases el token) y enviar el sitemap desde la UI.
 
 ## Housekeeping
 
