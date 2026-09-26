@@ -14,7 +14,8 @@ import os
 
 import geopandas as gpd
 import polars as pl
-from shapely import set_precision, wkt
+from shapely import make_valid, set_precision, wkt
+from shapely.errors import GEOSException
 from shapely.geometry import MultiPolygon, mapping
 
 # Tolerancia de simplificación en grados (~100 m en la latitud de Chile).
@@ -25,15 +26,16 @@ from shapely.geometry import MultiPolygon, mapping
 GEOMETRIA_SIMPLIFY_TOLERANCE_DEG = 0.001
 
 # Asset visual del mapa coroplético del sitio (Leaflet): no es el dataset.
-# El GeoParquet pesa ~5 MB porque conserva la forma reconocible de cada
-# comuna; para un mapa nacional se simplifica más fuerte, se descartan islotes
-# menores a ~1 km² y se hace snap a una grilla de 0.001° (~100 m). Resultado:
-# ~390 KB (≈60 KB comprimido en la CDN) con las 345 comunas y sus islas
+# La fuente BCN "generalizada" no es una cobertura perfecta (bordes de comunas
+# vecinas con desajustes de hasta ~km), así que además de simplificar se
+# reparan geometrías inválidas y se hace snap a una grilla de 0.002° (~200 m):
+# las costuras que sobreviven se ocultan en el render con un borde del mismo
+# color que el relleno. Resultado: ~600 KB con las 345 comunas y sus islas
 # principales. La regla y su porqué viven en ADR-012; el dataset en carril
 # candidate sigue intacto.
-MAPA_WEB_SIMPLIFY_TOLERANCE_DEG = 0.02
+MAPA_WEB_SIMPLIFY_TOLERANCE_DEG = 0.01
 MAPA_WEB_MIN_PART_AREA_DEG2 = 1e-4
-MAPA_WEB_PRECISION_DEG = 0.001
+MAPA_WEB_PRECISION_DEG = 0.002
 
 
 def _keep_main_parts(geometry, min_part_area: float):
@@ -70,10 +72,18 @@ def write_mapa_comunal_geojson(
     features = []
     for row in df.sort("codigo_comuna").iter_rows(named=True):
         geometry = wkt.loads(row["geometry_wkt"])
+        # 25 comunas de la fuente no son válidas (auto-intersecciones); sin
+        # repararlas set_precision falla con TopologyException.
+        geometry = make_valid(geometry)
         geometry = _keep_main_parts(geometry, min_part_area)
         if simplify_tolerance > 0:
             geometry = geometry.simplify(simplify_tolerance, preserve_topology=True)
-        geometry = set_precision(geometry, precision_deg)
+        if precision_deg > 0:
+            try:
+                geometry = make_valid(set_precision(geometry, precision_deg))
+            except GEOSException:
+                # Geometría irreducible a la grilla: se conserva sin snap.
+                geometry = make_valid(geometry)
         features.append(
             {
                 "type": "Feature",
