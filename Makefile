@@ -1,7 +1,7 @@
 PYTHON ?= $(if $(wildcard .venv/bin/python),.venv/bin/python,python3)
 VENV_DIR ?= .venv
 
-.PHONY: help bootstrap install-browsers doctor bump-version release extract build verify verify-readiness verify-publication verify-landing test coverage lint lint-fix format format-check typecheck audit sec docs-coverage package package-check package-smoke check refresh sync-docs status catalog hub-list hub-summary hub-summary-table hub-example hub-artifacts hub-shared-artifacts hub-shared-artifacts-table hub-reports hub-reports-table hub-report hub-inventory hub-inventory-table hub-snapshot hub-snapshot-table hub-overview hub-overview-table hub-status hub-status-table hub-health hub-health-table hub-bundle hub-freshness-audit hub-freshness-audit-table hub-runtime-status hub-runtime-status-table hub-top-issue hub-top-issue-text hub-top-issue-table hub-packages hub-packages-table hub-package hub-package-verify hub-redistribution hub-redistribution-table hub-provenance hub-provenance-table hub-drift hub-drift-table hub-source-readiness hub-dataset-quality package-bundle clean-publishable docs-build docs-serve
+.PHONY: help bootstrap install-browsers doctor bump-version release extract build verify verify-readiness verify-publication verify-landing test coverage lint lint-fix format format-check typecheck audit sec docs-coverage package package-check package-smoke check refresh sync-docs status catalog hub-list hub-summary hub-summary-table hub-example hub-artifacts hub-shared-artifacts hub-shared-artifacts-table hub-reports hub-reports-table hub-report hub-inventory hub-inventory-table hub-snapshot hub-snapshot-table hub-overview hub-overview-table hub-status hub-status-table hub-health hub-health-table hub-bundle hub-freshness-audit hub-freshness-audit-table hub-runtime-status hub-runtime-status-table hub-top-issue hub-top-issue-text hub-top-issue-table hub-packages hub-packages-table hub-package hub-package-verify hub-redistribution hub-redistribution-table hub-provenance hub-provenance-table hub-drift hub-drift-table hub-source-readiness hub-dataset-quality package-bundle clean-publishable docs-build docs-serve notebooks
 
 help:
 	@printf "Targets disponibles:\n"
@@ -73,6 +73,7 @@ help:
 	@printf "  make hub-dataset-quality Muestra puntuacion de calidad por dataset\n"
 	@printf "  make package-bundle   Genera ZIP publicable desde el manifest\n"
 	@printf "  make clean-publishable Elimina artefactos livianos versionables\n"
+	@printf "  make notebooks        Ejecuta examples/notebooks/ con el bundle publicado\n"
 
 bootstrap:
 	uv sync --extra pipeline --extra dev
@@ -195,6 +196,9 @@ docs-build:
 
 docs-serve:
 	$(PYTHON) -m mkdocs serve
+
+notebooks:
+	$(PYTHON) scripts/refresh_notebooks.py
 
 package:
 	$(PYTHON) -m build
