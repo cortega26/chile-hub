@@ -28,8 +28,10 @@ incluido en esa comparación. El README lleva bloques **derivados de los datos
 del día**:
 
 - La tabla de capas, con conteos y estado live/fallback por dataset.
-- `HEALTH_SUMMARY`, con el conteo `ok`/`warn`, que depende de la frescura y por
-  lo tanto de la fecha.
+- `HEALTH_SUMMARY`, con el conteo `ok`/`warn`, que incluye la frescura.
+  Probablemente cambie con la fecha aunque los datos no cambien. No está
+  verificado: en el run #702, el paso de 20/1 a 19/2 coincide con el fallback
+  de permisos.
 - `QUALITY_SUMMARY`.
 
 Este es el diff real del run #702, sacado del log del job `108122522900`:
@@ -114,6 +116,13 @@ como punto de partida. Además:
 Con esto, el incidente de autoridades sigue abortando el publish, y ahora con
 un mensaje explícito en vez de un diff de README.
 
+No hace falta partir de cero. `src/builders/reports.py` ya calcula
+`previous_record_count` / `current_record_count` / `record_count_delta` por
+dataset para `dataset_changelog.json`, aunque solo como información: marca
+severidad `patch` y no bloquea. El guard puede leer ese delta del changelog del
+build, en vez de hacer `git show`. El `drift_report` de `verify_pipeline.py`
+solo cubre anomalías de indicadores, así que no sirve para esto.
+
 ### Alternativa descartada
 
 Hacer que el step de build auto-commitee el README antes del gate, como el job
@@ -122,9 +131,12 @@ reabre las carreras release↔publish documentadas en el workflow.
 
 ## Verificación
 
-1. `make doctor` y `.venv/bin/python -m pytest tests/ -q` (incluye
-   `test_ci_config.py`: revisar si algún guardrail fija el texto del gate y
-   actualizarlo en el mismo commit).
+1. `make doctor` y `.venv/bin/python -m pytest tests/ -q`. Ningún test de
+   `tests/test_ci_config.py` fija el texto del gate: `LandingSyncGateGuardrailTests`
+   y `AutoridadesElectasScraplingGuardrailTests` solo lo mencionan en docstrings.
+   Para que el cambio no se revierta en silencio, se agrega un guardrail que
+   verifique que el step no hace `exit 1` por `README.md` y que el publish
+   mantiene `README.md` en su `git add`.
 2. Tras el merge: el operador dispara `gh workflow run pipeline-check.yml -f publish=true`
    (o espera el schedule de ~14:30 UTC) y confirma lo siguiente:
    - "Build and verify data" en success, con el `::notice` si hay diff de README.
