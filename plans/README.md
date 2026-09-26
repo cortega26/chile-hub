@@ -211,6 +211,8 @@ Los 5 planes quedaron **DONE y archivados** el mismo día (2026-09-25) — ver
 |---|------|----------|----------|--------|-----------|--------|
 | 106 | [Snapshot de release liviano (geometría fuera de git + wasm no usado)](106-slim-release-snapshot.md) | P2 | S-M | MED | — | DONE (2026-09-25 — árbol 412→140 MB, auditoría a prerelease `geometry-audit`, ADR-021, guardrails; branch `advisor/106-slim-release-snapshot`) |
 | 107 | [Handoff de activación de lanzamiento (agente autónomo)](107-activacion-lanzamiento-handoff.md) | P2 | S | LOW | — | READY (2026-09-26 — handoff para Cowork: GSC meta tag, sitemap, schedule, adopción; fallbacks + STOP; branch `advisor/107-activacion-lanzamiento`) |
+| 108 | [Gate "Check build-synced files" bloquea el publish diario (deadlock README)](108-build-synced-stale.md) | P1 | S | MED | — | IN REVIEW (2026-09-26 — implementado en branch `fix/108-build-synced-stale`, sin push: gate README→notice, guard de caída de record_count >20% en verify publication + override `--allow-record-drop` propagado vía provenance al release, ADR-022; requiere aprobación: edita workflows) |
+| 109 | [README sin datos volátiles + alerta de schedule roto](109-readme-sin-datos-volatiles-y-alerta-schedule.md) | P2 | M | MED | 108 | PROPOSED (2026-09-26) |
 
 ## Dependencias 086–100 (ver `ROADMAP.md` para el grafo completo)
 
