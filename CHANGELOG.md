@@ -12,6 +12,38 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.38.0 - 2026-09-26
+
+### Corregido
+
+- **landing**: Editor SQL a ancho completo y nav desktop en una línea
+  ([`4f89006`](https://github.com/cortega26/chile-hub/commit/4f890067ad2559d67227bd47c9e920097f5de94f))
+
+### Mantenimiento
+
+- **readme**: Sync test count (1123) tras el guardián de notebooks
+  ([`7ca5008`](https://github.com/cortega26/chile-hub/commit/7ca50081efed5627a888222f9bfbc7e66d5258b5))
+
+### Documentación
+
+- **distribution**: Causa del fallo del schedule en registro de adopción
+  ([`7f201b9`](https://github.com/cortega26/chile-hub/commit/7f201b92abb9f7a4056c95f7512b148b63cadaf2))
+
+- **distribution**: Registro de adopción 2026-09-26
+  ([`7fc1aaf`](https://github.com/cortega26/chile-hub/commit/7fc1aaf4c3fc9e90a4a5f179da305a166fd72e37))
+
+- **notebooks**: Ejecuta las recetas con outputs, gráficos y guardián
+  ([`2024dc1`](https://github.com/cortega26/chile-hub/commit/2024dc1bcfb84117ab8fb5b852d593949d4ea3ce))
+
+- **readme**: Capturas del sitio y clip WebP del explorador SQL
+  ([`811eaba`](https://github.com/cortega26/chile-hub/commit/811eaba6e5899fa750ad85185dbda39fdd062b41))
+
+### Agregado
+
+- **landing**: Nav móvil, nombres legibles, conteos honestos y sin emojis
+  ([`05362ac`](https://github.com/cortega26/chile-hub/commit/05362ac26c70bd2c1e6281b0fd953191a44ced28))
+
+
 ## 1.37.8 - 2026-09-26
 
 ### Corregido
