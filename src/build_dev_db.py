@@ -93,6 +93,7 @@ from src.builders.metadata import (  # noqa: E402, F401
     load_schema_contract,
 )
 from src.builders.reports import (  # noqa: E402
+    MAPA_METRICAS_FILENAME,
     append_hub_health_history,
     build_dataset_changelog,
     build_dataset_quality,
@@ -110,6 +111,7 @@ from src.builders.reports import (  # noqa: E402
     write_drift_report_json,
     write_hub_health_json,
     write_hub_status_json,
+    write_mapa_metricas_json,
     write_overview_json,
     write_provenance_report_json,
     write_redistribution_report_json,
@@ -838,6 +840,15 @@ def _write_data_artifacts(dfs):
         df_electoral.to_dicts(),
         os.path.join(NORMALIZED_DIR, "distritos_electorales.json"),
         ensure_ascii=False,
+    )
+
+    # Asset del mapa del sitio: métricas ya resueltas por comuna (el año de
+    # permisos en curso se descarta a favor del último completo).
+    write_mapa_metricas_json(
+        df_perfil_territorial,
+        df_permisos_edificacion,
+        df_pobreza_comunal,
+        os.path.join(NORMALIZED_DIR, MAPA_METRICAS_FILENAME),
     )
 
 

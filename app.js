@@ -1501,43 +1501,38 @@ const MAP_VIEWS = {
 const MAP_METRICS = {
     poblacion_censada: {
         label: "Población censada (2024)",
-        source: "perfil",
         field: "poblacion_censada",
         format: "int",
     },
     pobreza_ingresos: {
         label: "Pobreza por ingresos (2022)",
-        source: "pobreza",
+        field: "pobreza_ingresos",
         format: "pct",
     },
     viviendas_autorizadas: {
-        label: "Viviendas autorizadas (último año completo)",
-        source: "perfil",
-        field: "viviendas_autorizadas_ultimo_anio",
+        label: "Viviendas autorizadas",
+        field: "viviendas_autorizadas",
+        yearField: "viviendas_autorizadas_anio",
         format: "int",
     },
     establecimientos_salud: {
         label: "Establecimientos de salud",
-        source: "perfil",
-        field: "establecimientos_salud_total",
+        field: "establecimientos_salud",
         format: "int",
     },
     establecimientos_educacionales: {
         label: "Establecimientos educacionales",
-        source: "perfil",
-        field: "establecimientos_educacionales_total",
+        field: "establecimientos_educacionales",
         format: "int",
     },
     personas_por_hogar: {
         label: "Personas por hogar",
-        source: "perfil",
-        field: "promedio_personas_por_hogar",
+        field: "personas_por_hogar",
         format: "dec",
     },
     mp25_promedio: {
         label: "MP2.5 promedio (µg/m³)",
-        source: "perfil",
-        field: "mp25_promedio_ultimo_anio",
+        field: "mp25_promedio",
         format: "dec",
     },
 };
@@ -1554,11 +1549,14 @@ function formatMapValue(value, format) {
 function mapMetricValue(entry, metricKey) {
     const metric = MAP_METRICS[metricKey];
     if (!entry || !metric) return null;
-    if (metric.source === "pobreza") {
-        return typeof entry.pobreza === "number" ? entry.pobreza : null;
-    }
-    const value = entry.perfil ? entry.perfil[metric.field] : null;
+    const value = entry[metric.field];
     return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function mapMetricLabel(metric, entry) {
+    if (!metric.yearField || !entry) return metric.label;
+    const year = entry[metric.yearField];
+    return year ? `${metric.label} (${year})` : metric.label;
 }
 
 function buildMapBreaks(values) {
@@ -1613,32 +1611,16 @@ async function loadMapEntries() {
             return response.json();
         });
 
-    const [geojson, perfil, pobreza] = await Promise.all([
+    // Un solo archivo chico (~30 KB) con las métricas ya resueltas por comuna;
+    // el build descarta el año de permisos en curso. Antes se descargaban el
+    // perfil completo (~550 KB) y la pobreza (~360 KB).
+    const [geojson, metricasPayload] = await Promise.all([
         fetchJson("data/normalized/mapa_comunal.geojson"),
-        fetchJson("data/normalized/perfil_territorial_comunal.json"),
-        fetchJson("data/normalized/pobreza_comunal.json"),
+        fetchJson("data/normalized/mapa_metricas.json"),
     ]);
 
-    const perfilByCut = new Map(perfil.map((row) => [row.codigo_comuna, row]));
-    const pobrezaIngresos = pobreza.filter((row) => row.dimension === "ingresos");
-    const anioReciente = pobrezaIngresos.reduce(
-        (max, row) => Math.max(max, row.anio || 0),
-        0
-    );
-    const pobrezaByCut = new Map(
-        pobrezaIngresos
-            .filter((row) => row.anio === anioReciente)
-            .map((row) => [row.codigo_comuna, row.tasa])
-    );
-
-    const entries = new Map();
-    geojson.features.forEach((feature) => {
-        const cut = feature.properties.codigo_comuna;
-        entries.set(cut, {
-            perfil: perfilByCut.get(cut) || null,
-            pobreza: pobrezaByCut.get(cut) ?? null,
-        });
-    });
+    const metricas = metricasPayload.metricas || {};
+    const entries = new Map(Object.entries(metricas));
     return { geojson, entries };
 }
 
@@ -1705,10 +1687,11 @@ function applyMapMetric(metricKey) {
         style: styleFor,
         onEachFeature: (feature, layer) => {
             const properties = feature.properties;
-            const value = mapMetricValue(entries.get(properties.codigo_comuna), metricKey);
+            const entry = entries.get(properties.codigo_comuna);
+            const value = mapMetricValue(entry, metricKey);
             layer.bindTooltip(
                 `<strong>${escapeHtml(properties.nombre_comuna)}</strong><br>` +
-                    `${escapeHtml(metric.label)}: ${escapeHtml(formatMapValue(value, metric.format))}`,
+                    `${escapeHtml(mapMetricLabel(metric, entry))}: ${escapeHtml(formatMapValue(value, metric.format))}`,
                 { className: "map-tooltip", sticky: true, direction: "top", opacity: 1 }
             );
             layer.on("mouseover", () => layer.setStyle({ weight: 2.2, color: "#123d30" }));
