@@ -175,7 +175,7 @@ El mismo estado se publica en el sitio, con historial de builds y detalle por ca
 ### Respaldo adicional
 
 <!-- START_TEST_COUNT -->
-- **1123 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
+- **1125 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
 <!-- END_TEST_COUNT -->
 <!-- START_ADR_COUNT -->
 - **22 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
@@ -198,6 +198,11 @@ El mismo estado se publica en el sitio, con historial de builds y detalle por ca
 > junto al badge superior y en [`data/source_registry.json`](data/source_registry.json).
 
 ![Catálogo de capas publicado en el sitio](https://raw.githubusercontent.com/cortega26/chile-hub/main/docs/assets/landing-catalogo.png)
+
+Mapa territorial interactivo: las 346 comunas con 7 métricas seleccionables
+(población, pobreza, permisos, equipamiento, MP2.5) y ficha por comuna.
+
+![Mapa territorial interactivo de chile-hub](https://raw.githubusercontent.com/cortega26/chile-hub/main/docs/assets/landing-mapa.png)
 
 <!-- START_DATASET_TABLE -->
 

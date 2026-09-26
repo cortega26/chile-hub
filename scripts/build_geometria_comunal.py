@@ -22,7 +22,10 @@ if str(ROOT_DIR) not in sys.path:
 
 import polars as pl  # noqa: E402
 
-from src.builders.geo import write_geometria_comunal_parquet  # noqa: E402
+from src.builders.geo import (  # noqa: E402
+    write_geometria_comunal_parquet,
+    write_mapa_comunal_geojson,
+)
 from src.extractors.geometria_comunal_extractor import (  # noqa: E402
     STAGING_CSV_PATH,
     process_geometria_comunal,
@@ -31,6 +34,7 @@ from src.validation import validate_geometria_comunal  # noqa: E402
 
 NORMALIZED_DIR = ROOT_DIR / "data" / "normalized"
 OUTPUT_PATH = NORMALIZED_DIR / "geometria_comunal.parquet"
+OUTPUT_MAPA_PATH = NORMALIZED_DIR / "mapa_comunal.geojson"
 
 
 def main() -> None:
@@ -73,6 +77,12 @@ def main() -> None:
     NORMALIZED_DIR.mkdir(parents=True, exist_ok=True)
     write_geometria_comunal_parquet(df, str(OUTPUT_PATH))
     print(f"geometria_comunal: artefacto escrito en {OUTPUT_PATH} ({df.height} comunas)")
+
+    # Asset visual del mapa del sitio: mismo insumo, simplificación más fuerte
+    # y filtrado de islotes menores (ver src/builders/geo.py). No es el dataset.
+    write_mapa_comunal_geojson(df, str(OUTPUT_MAPA_PATH))
+    size_kb = OUTPUT_MAPA_PATH.stat().st_size // 1024
+    print(f"mapa_comunal: geojson visual escrito en {OUTPUT_MAPA_PATH} ({size_kb} KB)")
 
 
 if __name__ == "__main__":

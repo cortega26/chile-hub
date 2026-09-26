@@ -736,6 +736,40 @@ def verify_landing():
         if not sql_input_box or sql_input_box["width"] < 500:
             fail(f"El editor SQL debe ocupar el ancho en desktop: {sql_input_box}")
 
+        # Mapa territorial: Leaflet + GeoJSON simplificado + panel de lectura.
+        # El mapa se inicializa en diferido cuando entra al viewport.
+        # El flujo anterior deja el drawer abierto: ciérralo vía hash (mismo
+        # mecanismo de la app) antes de interactuar con el mapa.
+        if drawer.locator("#drawer-close").is_visible():
+            page.evaluate("() => { window.location.hash = ''; }")
+            drawer.wait_for(state="hidden")
+        page.locator("#mapa").scroll_into_view_if_needed()
+        try:
+            page.wait_for_selector("#map-comunal path.leaflet-interactive", timeout=15000)
+        except Exception:
+            fail("El mapa territorial no renderizó comunas (Leaflet o GeoJSON ausentes)")
+        map_paths = page.locator("#map-comunal path.leaflet-interactive").count()
+        if map_paths < 300:
+            fail(f"Se esperaban >=300 comunas en el mapa, hay {map_paths}")
+        map_options = page.locator("#map-metric option").count()
+        if map_options < 6:
+            fail(f"Se esperaban >=6 métricas en el mapa, hay {map_options}")
+        if page.locator("#map-ranking li").count() != 5:
+            fail("El ranking del mapa debe mostrar 5 comunas")
+        if page.locator("#map-legend .map-legend-item").count() < 5:
+            fail("La leyenda del mapa debe tener al menos 5 tramos")
+        legend_before = page.locator("#map-legend").inner_text()
+        page.select_option("#map-metric", "pobreza_ingresos")
+        page.wait_for_timeout(300)
+        if page.locator("#map-legend").inner_text() == legend_before:
+            fail("La leyenda no se recalculó al cambiar de métrica")
+        page.locator('[data-map-view="centro"]').click()
+        page.wait_for_timeout(300)
+        if page.locator('[data-map-view="centro"].is-active').count() != 1:
+            fail("La vista rápida 'Centro' no quedó activa")
+        if browser_errors:
+            fail(f"Errores de navegador al renderizar el mapa: {browser_errors}")
+
         # Móvil: el toggle reemplaza las 3 líneas de enlaces del nav
         mobile = browser.new_page(viewport={"width": 390, "height": 844})
         mobile.goto(url, wait_until="networkidle")

@@ -64,6 +64,12 @@ def capture_screenshots(assets_dir: Path) -> None:
         _scroll_below_header(page, "#explorador")
         page.screenshot(path=str(assets_dir / "landing-sql.png"))
 
+        _scroll_below_header(page, "#mapa")
+        page.wait_for_selector("#map-comunal path.leaflet-interactive", timeout=20000)
+        page.locator('[data-map-view="centro"]').click()
+        page.wait_for_timeout(700)
+        page.screenshot(path=str(assets_dir / "landing-mapa.png"))
+
         mobile = browser.new_page(viewport={"width": 390, "height": 844}, device_scale_factor=3)
         mobile.goto(url, wait_until="networkidle")
         mobile.wait_for_selector("#catalog-grid .dataset-card")
@@ -159,6 +165,7 @@ def main(argv: list[str] | None = None) -> int:
         "landing-catalogo.png",
         "landing-health.png",
         "landing-sql.png",
+        "landing-mapa.png",
         "landing-mobile.png",
     ):
         size_kb = (ASSETS_DIR / name).stat().st_size // 1024
