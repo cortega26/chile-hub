@@ -3993,6 +3993,29 @@ class DocSyncTests(unittest.TestCase):
 
             self.assertIn("**17 de 19 capas**", readme.read_text(encoding="utf-8"))
 
+    def test_datasets_index_lists_every_catalog_dataset(self):
+        """El índice de capas de docs/datasets/README.md sale del catálogo.
+
+        Regresión a evitar: una capa nueva sin fila en el índice. Antes era una
+        tabla manual y ya había quedado desactualizada (16 filas para 25 capas).
+        """
+        from src.builders import doc_sync
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            index = Path(tmpdir) / "README.md"
+            index.write_text(
+                "<!-- START_DATASETS_INDEX -->\n\nviejo\n\n<!-- END_DATASETS_INDEX -->",
+                encoding="utf-8",
+            )
+            with patch.object(doc_sync, "DATASETS_INDEX_PATH", str(index)):
+                changed = doc_sync.sync_datasets_index()
+            content = index.read_text(encoding="utf-8")
+
+        self.assertTrue(changed)
+        for key in doc_sync.DATASET_CATALOG_CONFIG:
+            with self.subTest(dataset=key):
+                self.assertIn(f"[`{key}`]", content)
+
     def test_sync_all_docs_runs_every_function_without_error(self):
         """Smoke test contra el README real: confirma que las 8 funciones
         corren sin lanzar excepciones y que check_only nunca escribe."""

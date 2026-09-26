@@ -646,6 +646,32 @@ def sync_readme_schema_details(check_only=False):
     )
 
 
+DATASETS_INDEX_PATH = os.path.join(DATASET_DOCS_DIR, "README.md")
+
+
+def sync_datasets_index(check_only=False):
+    """Regenera el índice de capas de `docs/datasets/index.md` desde el catálogo.
+
+    El catálogo (`data/dataset_catalog_config.json`) es la fuente de qué capas
+    existen; sus descripciones alimentan la tabla y cada capa enlaza a su doc.
+    Agregar una capa sin regenerar el bloque rompe `sync_docs --check`.
+    """
+    filas = []
+    for key in sorted(DATASET_CATALOG_CONFIG):
+        config = DATASET_CATALOG_CONFIG[key]
+        description = str(config.get("description", "")).strip()
+        doc_name = os.path.basename(str(config.get("documentation", "")))
+        if doc_name and os.path.exists(os.path.join(DATASET_DOCS_DIR, doc_name)):
+            capa = f"[`{key}`]({doc_name})"
+        else:
+            capa = f"`{key}`"
+        filas.append(f"| {capa} | {description} |")
+    body = "| Capa | Qué contiene |\n|:---|:---|\n" + "\n".join(filas)
+    return replace_delimited_block(
+        DATASETS_INDEX_PATH, "DATASETS_INDEX", body, check_only=check_only, separator="\n\n"
+    )
+
+
 SYNC_FUNCS = [
     sync_readme_test_count,
     sync_readme_adr_count,
@@ -661,6 +687,7 @@ SYNC_FUNCS = [
     sync_agents_extractor_list,
     sync_readme_schema_details,
     sync_readme_extractor_table,
+    sync_datasets_index,
     sync_docs_schema_blocks,
 ]
 

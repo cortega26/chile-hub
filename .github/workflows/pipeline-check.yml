@@ -546,6 +546,20 @@ jobs:
       - name: Verify landing page
         run: python scripts/verify_landing.py
 
+      - name: Lighthouse (accesibilidad, SEO, buenas prácticas)
+        run: |
+          python -m http.server 8765 --bind 127.0.0.1 &
+          SERVER_PID=$!
+          trap "kill $SERVER_PID" EXIT
+          sleep 1
+          CHROME_PATH="$(ls ~/.cache/ms-playwright/chromium-*/chrome-linux/chrome 2>/dev/null | head -1)"
+          if [ -n "$CHROME_PATH" ]; then export CHROME_PATH; fi
+          npx --yes lighthouse@12.8.2 http://127.0.0.1:8765/ \
+            --quiet --chrome-flags="--headless=new --no-sandbox --disable-gpu" \
+            --output=json --output-path=/tmp/lighthouse.json \
+            --only-categories=accessibility,seo,best-practices
+          python scripts/check_lighthouse.py /tmp/lighthouse.json
+
   publish:
     concurrency:
       group: bot-writes-main

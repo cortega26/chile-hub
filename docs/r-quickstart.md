@@ -38,7 +38,7 @@ head(comunas)
 ```
 
 Reemplaza `comunas.parquet` por el nombre del dataset que necesitas (ver la
-[documentación de datasets](docs/datasets/) para la lista completa).
+[documentación de datasets](datasets/README.md) para la lista completa).
 
 ## Opción C — DuckDB (cruces SQL)
 

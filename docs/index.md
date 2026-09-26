@@ -39,6 +39,15 @@ comunas = hub.load_polars("comunas")
 print(comunas.head())
 ```
 
+## Elige tu ruta
+
+| Si eres… | Empieza por |
+|---|---|
+| **Analista de datos** | [Instalación](installation.md) → [Elige y carga una capa](datasets/README.md) → [Uso desde R](r-quickstart.md) |
+| **Desarrollador** | [Acceso HTTP estático](http-access.md) → [Referencia de API](api.md) → [Compatibilidad de datasets](dataset-compatibility-policy.md) |
+| **Agentes de IA** | [Servidor MCP](mcp.md) → [Acceso HTTP estático](http-access.md) |
+| **Auditoría o reúso** | [Procedencia y licencias](https://tooltician.com/chile-hub/data/normalized/redistribution_report.md) → [Criterios de inclusión](dataset-inclusion-criteria.md) |
+
 ## Dónde ir
 
 | Necesitas | Ir a |

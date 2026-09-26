@@ -1,7 +1,7 @@
 PYTHON ?= $(if $(wildcard .venv/bin/python),.venv/bin/python,python3)
 VENV_DIR ?= .venv
 
-.PHONY: help bootstrap install-browsers doctor bump-version release extract build verify verify-readiness verify-publication verify-landing test coverage lint lint-fix format format-check typecheck audit sec docs-coverage package package-check package-smoke check refresh sync-docs status catalog hub-list hub-summary hub-summary-table hub-example hub-artifacts hub-shared-artifacts hub-shared-artifacts-table hub-reports hub-reports-table hub-report hub-inventory hub-inventory-table hub-snapshot hub-snapshot-table hub-overview hub-overview-table hub-status hub-status-table hub-health hub-health-table hub-bundle hub-freshness-audit hub-freshness-audit-table hub-runtime-status hub-runtime-status-table hub-top-issue hub-top-issue-text hub-top-issue-table hub-packages hub-packages-table hub-package hub-package-verify hub-redistribution hub-redistribution-table hub-provenance hub-provenance-table hub-drift hub-drift-table hub-source-readiness hub-dataset-quality package-bundle clean-publishable docs-build docs-serve notebooks
+.PHONY: help bootstrap install-browsers doctor bump-version release extract build verify verify-readiness verify-publication verify-landing test coverage lint lint-fix format format-check typecheck audit sec docs-coverage package package-check package-smoke check refresh sync-docs status catalog hub-list hub-summary hub-summary-table hub-example hub-artifacts hub-shared-artifacts hub-shared-artifacts-table hub-reports hub-reports-table hub-report hub-inventory hub-inventory-table hub-snapshot hub-snapshot-table hub-overview hub-overview-table hub-status hub-status-table hub-health hub-health-table hub-bundle hub-freshness-audit hub-freshness-audit-table hub-runtime-status hub-runtime-status-table hub-top-issue hub-top-issue-text hub-top-issue-table hub-packages hub-packages-table hub-package hub-package-verify hub-redistribution hub-redistribution-table hub-provenance hub-provenance-table hub-drift hub-drift-table hub-source-readiness hub-dataset-quality package-bundle clean-publishable docs-build docs-serve notebooks lighthouse
 
 help:
 	@printf "Targets disponibles:\n"
@@ -16,6 +16,7 @@ help:
 	@printf "  make verify-readiness Valida registry, contratos, source_readiness y dataset_quality\n"
 	@printf "  make verify-publication Exige datos live y frescos aptos para publicación\n"
 	@printf "  make verify-landing   Corre smoke check de la landing en navegador\n"
+	@printf "  make lighthouse       Audita accesibilidad, SEO y buenas prácticas (npx)\n"
 	@printf "  make test             Corre la suite pytest completa (requiere `make build` previo)\n"
 	@printf "  make coverage         Corre tests con reporte de cobertura\n"
 	@printf "  make freshness-badge  Genera el badge de frescura de datos\n"
@@ -152,6 +153,20 @@ verify-publication:
 
 verify-landing:
 	$(PYTHON) scripts/verify_landing.py
+
+# Lighthouse local (requiere npx; misma versión que CI). Sirve el repo con
+# http.server porque Lighthouse audita una URL http, no file://.
+lighthouse:
+	@port=8765; \
+	$(PYTHON) -m http.server $$port --bind 127.0.0.1 >/dev/null 2>&1 & \
+	server_pid=$$!; \
+	trap "kill $$server_pid" EXIT; \
+	sleep 1; \
+	npx --yes lighthouse@12.8.2 http://127.0.0.1:$$port/ --quiet \
+		--chrome-flags="--headless=new --no-sandbox --disable-gpu" \
+		--output=json --output-path=/tmp/chile-hub-lighthouse.json \
+		--only-categories=accessibility,seo,best-practices && \
+	$(PYTHON) scripts/check_lighthouse.py /tmp/chile-hub-lighthouse.json
 
 # xdist fijado en el Plan 080: -n auto baja la suite de ~66s a ~18s y
 # pasa la suite completa sin romper fixtures compartidos (verificado).

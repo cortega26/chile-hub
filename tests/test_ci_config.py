@@ -8,6 +8,7 @@ comprobaciones de texto simples y suficientes para el guardrail específico.
 
 import json
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -18,6 +19,7 @@ SCRIPTS_DIR = ROOT_DIR / "scripts"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
+import check_lighthouse
 from check_companion_paths import check_companions
 
 PIPELINE_CHECK_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "pipeline-check.yml"
@@ -1223,6 +1225,11 @@ class CitationFileGuardrailTests(unittest.TestCase):
         self.assertIn("citation.md", nav)
         self.assertTrue((DOCS_DIR / "citation.md").is_file())
 
+    def test_datasets_index_is_in_mkdocs_nav(self):
+        nav = MKDOCS_CONFIG.read_text(encoding="utf-8")
+        self.assertIn("datasets/README.md", nav)
+        self.assertTrue((DOCS_DIR / "datasets" / "README.md").is_file())
+
     def test_notebooks_readme_has_colab_badges(self):
         content = (ROOT_DIR / "examples" / "notebooks" / "README.md").read_text(encoding="utf-8")
         # Un enlace "Open in Colab" por notebook (el badge SVG también contiene
@@ -1473,6 +1480,60 @@ class BuildSyncedGateGuardrailTests(unittest.TestCase):
         content = PYPI_RELEASE_WORKFLOW.read_text(encoding="utf-8")
         self.assertIn('p.get("allow_record_drop", "")', content)
         self.assertIn('--allow-record-drop "$record_drop"', content)
+
+
+class LighthouseGuardrailTests(unittest.TestCase):
+    """Plan Fase 4: Lighthouse en CI con umbrales (a11y/SEO/best practices 100).
+
+    Regresión a evitar: que el paso desaparezca o se despine la versión de
+    Lighthouse (resultados no comparables entre runs), que el job audite otra
+    URL que no sea la landing local, o que el chequeo de umbrales deje de
+    ejecutarse después del audit.
+    """
+
+    def test_workflow_runs_pinned_lighthouse_and_threshold_check(self):
+        content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("lighthouse@12.8.2", content)
+        self.assertIn("--only-categories=accessibility,seo,best-practices", content)
+        self.assertIn("check_lighthouse.py /tmp/lighthouse.json", content)
+        self.assertIn("http://127.0.0.1:8765/", content)
+
+    def test_makefile_exposes_lighthouse_target(self):
+        content = MAKEFILE.read_text(encoding="utf-8")
+        self.assertIn("\nlighthouse:", content)
+        self.assertIn("make lighthouse", content)
+
+
+class CheckLighthouseScriptTests(unittest.TestCase):
+    """El chequeo de umbrales es stdlib puro: se testea con reportes sintéticos."""
+
+    def _report(self, accessibility, seo, best_practices):
+        def category(score):
+            return {"score": score / 100, "auditRefs": []}
+
+        return {
+            "categories": {
+                "accessibility": category(accessibility),
+                "seo": category(seo),
+                "best-practices": category(best_practices),
+            },
+            "audits": {},
+        }
+
+    def _run(self, report):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "lh.json"
+            path.write_text(json.dumps(report), encoding="utf-8")
+            return check_lighthouse.main([str(path)])
+
+    def test_all_thresholds_pass(self):
+        self.assertEqual(self._run(self._report(100, 100, 100)), 0)
+
+    def test_low_accessibility_fails(self):
+        self.assertEqual(self._run(self._report(90, 100, 100)), 1)
+
+    def test_missing_category_fails(self):
+        self.assertEqual(self._run({"categories": {}, "audits": {}}), 1)
 
 
 if __name__ == "__main__":

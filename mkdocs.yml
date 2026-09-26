@@ -52,6 +52,7 @@ nav:
   - Sitio público: https://tooltician.com/chile-hub/
   - Inicio: index.md
   - Instalación: installation.md
+  - Capas de datos: datasets/README.md
   - Acceso HTTP estático: http-access.md
   - Servidor MCP: mcp.md
   - Carriles de extracción: extraction-lanes.md
