@@ -37,6 +37,14 @@
   <a href="#fuentes-licencias-y-reúso">Licencias</a>
 </p>
 
+<a href="https://tooltician.com/chile-hub/">
+  <img
+    src="https://raw.githubusercontent.com/cortega26/chile-hub/main/docs/assets/landing-hero.png"
+    alt="Landing de chile-hub: capas de datos de Chile listas para consumir"
+    width="860"
+  >
+</a>
+
 </div>
 
 ---
@@ -80,6 +88,11 @@ shape: (5, 4)
 │ 13110         ┆ La Florida    ┆ Región Metropolitana de Santia… ┆ 374836            │
 └───────────────┴───────────────┴─────────────────────────────────┴───────────────────┘
 ```
+
+En el sitio puedes consultar los mismos Parquet con SQL en el navegador (motor
+DuckDB-WASM, sin instalar nada):
+
+![Demo del explorador SQL de chile-hub](https://raw.githubusercontent.com/cortega26/chile-hub/main/docs/assets/demo-sql.webp)
 
 La primera ejecución descarga el bundle validado desde GitHub Releases, verifica su
 integridad SHA256 y lo deja en cache local; a partir de ahí todo corre contra el cache.
@@ -155,10 +168,14 @@ chile-hub provenance   # fuente, modo y timestamp por dataset
 chile-hub health       # severidad, frescura, drift y cobertura
 ```
 
+El mismo estado se publica en el sitio, con historial de builds y detalle por capa:
+
+![Estado operativo del hub](https://raw.githubusercontent.com/cortega26/chile-hub/main/docs/assets/landing-health.png)
+
 ### Respaldo adicional
 
 <!-- START_TEST_COUNT -->
-- **1121 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
+- **1123 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
 <!-- END_TEST_COUNT -->
 <!-- START_ADR_COUNT -->
 - **22 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
@@ -179,6 +196,8 @@ chile-hub health       # severidad, frescura, drift y cobertura
 > `candidate`) · 21 publicables (bundle ZIP) · 25 registradas en el catálogo (3 filas sin
 > datos aún: geometría, delincuencia, autoridades locales). La convención completa vive
 > junto al badge superior y en [`data/source_registry.json`](data/source_registry.json).
+
+![Catálogo de capas publicado en el sitio](https://raw.githubusercontent.com/cortega26/chile-hub/main/docs/assets/landing-catalogo.png)
 
 <!-- START_DATASET_TABLE -->
 
@@ -240,6 +259,10 @@ Cada ejecución del pipeline genera en `data/normalized/`:
 ---
 
 ## Recetas de uso
+
+¿Prefieres notebooks? Las cuatro recetas están en
+[`examples/notebooks/`](examples/notebooks/) con botón de Colab, o ejecutables
+en el explorador SQL del sitio.
 
 **1. Últimos indicadores económicos disponibles**
 
@@ -316,6 +339,10 @@ WHERE c.nombre_region = 'Valparaíso';
 | `hub.redistribution()` | Expone estado legal de reúso y atribución por dataset. |
 | `hub.provenance()` | Muestra fuente, URL, modo de extracción y timestamps. |
 | `chile-hub cache update/status/clear` | Administra el cache local del bundle publicado. |
+
+> **¿Construyes agentes?** El proyecto incluye un servidor MCP con catálogo,
+> consultas y salud para que tu agente consuma los datos sin integraciones
+> propias: [`docs/mcp.md`](docs/mcp.md).
 
 ### CLI: los comandos más usados
 

@@ -1232,6 +1232,49 @@ class CitationFileGuardrailTests(unittest.TestCase):
             4,
         )
 
+    def test_notebooks_are_committed_with_outputs(self):
+        """Los notebooks se commitean ejecutados (GitHub/Colab muestran resultados).
+
+        Regresión a evitar: el bug original donde los 4 notebooks viajaban con
+        0 outputs y la portada del repo no mostraba ni una tabla ni un gráfico.
+        Se refrescan con `make notebooks` (scripts/refresh_notebooks.py).
+        """
+        notebook_paths = sorted((ROOT_DIR / "examples" / "notebooks").glob("*.ipynb"))
+        self.assertEqual(len(notebook_paths), 4)
+        for path in notebook_paths:
+            with self.subTest(notebook=path.name):
+                notebook = json.loads(path.read_text(encoding="utf-8"))
+                code_cells = [c for c in notebook["cells"] if c["cell_type"] == "code"]
+                cells_with_output = [c for c in code_cells if c.get("outputs")]
+                self.assertTrue(cells_with_output, f"{path.name} no tiene celdas con output")
+                for cell in code_cells:
+                    for output in cell.get("outputs", []):
+                        self.assertNotEqual(
+                            output.get("output_type"),
+                            "error",
+                            f"{path.name} contiene un output de error",
+                        )
+                sources = "\n".join("".join(c["source"]) for c in code_cells)
+                self.assertIn(
+                    "%pip install -q chile-hub",
+                    sources,
+                    f"{path.name} perdió la celda de instalación para Colab",
+                )
+
+    def test_notebook_charts_are_committed(self):
+        """Las recetas territoriales incluyen un gráfico como prueba visual."""
+        for name in ("01_comunas_censo.ipynb", "04_perfil_territorial_pobreza.ipynb"):
+            with self.subTest(notebook=name):
+                notebook = json.loads(
+                    (ROOT_DIR / "examples" / "notebooks" / name).read_text(encoding="utf-8")
+                )
+                has_png = any(
+                    "image/png" in (output.get("data") or {})
+                    for cell in notebook["cells"]
+                    for output in cell.get("outputs", [])
+                )
+                self.assertTrue(has_png, f"{name} no tiene gráfico (image/png)")
+
 
 class McpPackagingGuardrailTests(unittest.TestCase):
     """Plan 104: el servidor MCP debe quedar opcional y no romper el import base.
