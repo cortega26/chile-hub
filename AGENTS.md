@@ -247,7 +247,9 @@ codegraph impact validate_comunas                   # Qué se rompe si cambio es
              (entorno efímero), porque scrapling no puede coexistir con el extra
              `dev` en el venv del job (conflicto de `click` — ver `pyproject.toml`).
              Sin scrapling el extractor degrada a 155 registros (0 senadores) y el
-             guard "Check build-synced files" aborta el publish diario (regresión
+             guard de caída de `record_count` de `verify_pipeline.py --profile
+             publication` aborta el publish diario (antes lo detectaba el diff de
+             README.md en "Check build-synced files"; plan 108). Regresión
              2026-07-19/20; ver
              `tests/test_ci_config.py::AutoridadesElectasScraplingGuardrailTests`).
 
@@ -989,8 +991,16 @@ regeneran el texto exacto dentro de un bloque delimitado por comentarios HTML
   `pyproject.toml`). Si los datos cambian sin que ningún PR toque código (p. ej.
   `hub_health.json` se regenera con nuevos valores en el `schedule` diario), el
   paso "Check build-synced files" del job `build-and-test` (solo
-  `schedule`/`workflow_dispatch`, después de un build real) compara
-  `index.html`, `app.js` **y `README.md`** contra el build recién generado.
+  `schedule`/`workflow_dispatch`, después de un build real) compara `index.html`
+  y `app.js` contra el build recién generado y **falla** si difieren. El diff de
+  `README.md` solo se informa (`::notice::`): sus bloques de datos cambian con
+  cada extracción y los commitea el job `publish`. Exigirlos commiteados antes
+  bloqueaba el publish que los actualiza (deadlock 2026-08-13 → 2026-09-26, plan
+  108). Las regresiones de datos las atrapa `verify_pipeline.py --profile
+  publication`: `source_mode` fallback y caída de `record_count` > 20% contra el
+  último publicado, con override auditable `--allow-record-drop <dataset>`
+  (input `allow_record_drop` del `workflow_dispatch`, que se registra en la
+  provenance y el release reutiliza).
 
 **Qué NO usa este mecanismo:** las tablas de prosa de `AGENTS.md` (§1 capas,
 §2/§3 extractores, §8 archivos de test) no se regeneran — son descripciones
