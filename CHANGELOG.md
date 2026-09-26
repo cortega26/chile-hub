@@ -12,6 +12,25 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.42.0 - 2026-09-26
+
+### Corregido
+
+- **ci**: Resuelve CHROME_PATH en make lighthouse vía script compartido
+  ([#118](https://github.com/cortega26/chile-hub/pull/118),
+  [`7e958ce`](https://github.com/cortega26/chile-hub/commit/7e958cef05bdc7151968de227e4b856cc70e1def))
+
+### Agregado
+
+- **docs+ci**: Índice de capas en la doc, rutas por perfil y Lighthouse en CI
+  ([#118](https://github.com/cortega26/chile-hub/pull/118),
+  [`7e958ce`](https://github.com/cortega26/chile-hub/commit/7e958cef05bdc7151968de227e4b856cc70e1def))
+
+- **docs+ci**: Índice de capas, rutas por perfil y Lighthouse en CI (Fase 3+4)
+  ([#118](https://github.com/cortega26/chile-hub/pull/118),
+  [`7e958ce`](https://github.com/cortega26/chile-hub/commit/7e958cef05bdc7151968de227e4b856cc70e1def))
+
+
 ## 1.41.0 - 2026-09-26
 
 ### Agregado
