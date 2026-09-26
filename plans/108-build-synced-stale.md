@@ -1,7 +1,13 @@
 # Plan 108: el gate "Check build-synced files" bloquea el publish diario con datos del día
 
-> **Requiere aprobación del operador**: toca `.github/workflows/pipeline-check.yml`
-> y `scripts/verify_pipeline.py`. No se editó ningún workflow.
+> **Estado: IN REVIEW** — implementado en `fix/108-build-synced-stale` (sin push).
+> Requiere aprobación del operador: edita `pipeline-check.yml` y `pypi-release.yml`.
+> Decisión registrada en ADR-022; seguimiento en plan 109.
+>
+> **Desvíos respecto de esta propuesta**: el guard lee `record_count_delta` del
+> `dataset_changelog.json` del build (no `git show HEAD:`); el override se
+> registra en la provenance y el release lo reutiliza; los inputs del dispatch
+> pasan por `env` (anti inyección de shell).
 >
 > **Drift check**: `git log -1 --format=%h origin/main` en `aeb2c0f` o un
 > descendiente, y `grep -n "Build-synced files are stale" .github/workflows/pipeline-check.yml`
