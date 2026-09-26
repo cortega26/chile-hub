@@ -1684,16 +1684,25 @@ function applyMapMetric(metricKey) {
         map.removeLayer(mapState.layer);
     }
 
+    // El borde usa el mismo color que el relleno: la fuente BCN no es una
+    // cobertura perfecta (bordes de comunas vecinas con desajustes) y un
+    // borde blanco haría visibles huecos y solapamientos.
+    const styleFor = (feature) => {
+        const fillColor = mapColorForValue(
+            mapMetricValue(entries.get(feature.properties.codigo_comuna), metricKey),
+            breaks
+        );
+        return {
+            fillColor,
+            fillOpacity: 0.9,
+            color: fillColor,
+            weight: 1.2,
+            lineJoin: "round",
+        };
+    };
+
     mapState.layer = L.geoJSON(geojson, {
-        style: (feature) => ({
-            fillColor: mapColorForValue(
-                mapMetricValue(entries.get(feature.properties.codigo_comuna), metricKey),
-                breaks
-            ),
-            fillOpacity: 0.88,
-            color: "#ffffff",
-            weight: 0.6,
-        }),
+        style: styleFor,
         onEachFeature: (feature, layer) => {
             const properties = feature.properties;
             const value = mapMetricValue(entries.get(properties.codigo_comuna), metricKey);
@@ -1702,8 +1711,8 @@ function applyMapMetric(metricKey) {
                     `${escapeHtml(metric.label)}: ${escapeHtml(formatMapValue(value, metric.format))}`,
                 { className: "map-tooltip", sticky: true, direction: "top", opacity: 1 }
             );
-            layer.on("mouseover", () => layer.setStyle({ weight: 1.6, color: "#123d30" }));
-            layer.on("mouseout", () => layer.setStyle({ weight: 0.6, color: "#ffffff" }));
+            layer.on("mouseover", () => layer.setStyle({ weight: 2.2, color: "#123d30" }));
+            layer.on("mouseout", () => layer.setStyle(styleFor(feature)));
             layer.on("click", () => {
                 const slug = comunaSlug({ nombre_comuna_clean: properties.nombre_comuna_clean });
                 if (slug) window.location.href = `comunas/${slug}/`;
@@ -1722,7 +1731,7 @@ async function initMap(container) {
         zoomControl: true,
         attributionControl: false,
         minZoom: 3,
-        maxZoom: 11,
+        maxZoom: 10,
         // Permite zooms fraccionarios para que fitBounds aproveche el alto del
         // contenedor: Chile es largo y angosto, con zoom entero sobraba espacio.
         zoomSnap: 0.25,
