@@ -1485,22 +1485,33 @@ class BuildSyncedGateGuardrailTests(unittest.TestCase):
 class LighthouseGuardrailTests(unittest.TestCase):
     """Plan Fase 4: Lighthouse en CI con umbrales (a11y/SEO/best practices 100).
 
-    Regresión a evitar: que el paso desaparezca o se despine la versión de
-    Lighthouse (resultados no comparables entre runs), que el job audite otra
-    URL que no sea la landing local, o que el chequeo de umbrales deje de
-    ejecutarse después del audit.
+    Regresión a evitar: que el paso desaparezca, que se despine la versión de
+    Lighthouse (resultados no comparables), que no se resuelva el Chromium de
+    Playwright (`make bootstrap` no instala Chrome del sistema: Lighthouse no
+    encontraría navegador en un entorno limpio), o que el chequeo de umbrales
+    deje de ejecutarse después del audit. CI y `make lighthouse` comparten
+    `scripts/run_lighthouse.sh`.
     """
 
-    def test_workflow_runs_pinned_lighthouse_and_threshold_check(self):
+    RUN_LIGHTHOUSE = ROOT_DIR / "scripts" / "run_lighthouse.sh"
+
+    def test_workflow_delegates_to_the_shared_script(self):
         content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("run: bash scripts/run_lighthouse.sh", content)
+
+    def test_script_pins_lighthouse_resolves_chrome_and_checks_thresholds(self):
+        self.assertTrue(self.RUN_LIGHTHOUSE.is_file())
+        content = self.RUN_LIGHTHOUSE.read_text(encoding="utf-8")
         self.assertIn("lighthouse@12.8.2", content)
         self.assertIn("--only-categories=accessibility,seo,best-practices", content)
-        self.assertIn("check_lighthouse.py /tmp/lighthouse.json", content)
-        self.assertIn("http://127.0.0.1:8765/", content)
+        self.assertIn("CHROME_PATH", content)
+        self.assertIn("ms-playwright/chromium-*/chrome-linux/chrome", content)
+        self.assertIn("check_lighthouse.py", content)
 
-    def test_makefile_exposes_lighthouse_target(self):
+    def test_makefile_exposes_lighthouse_target_with_shared_script(self):
         content = MAKEFILE.read_text(encoding="utf-8")
         self.assertIn("\nlighthouse:", content)
+        self.assertIn("bash scripts/run_lighthouse.sh", content)
         self.assertIn("make lighthouse", content)
 
 

@@ -154,19 +154,10 @@ verify-publication:
 verify-landing:
 	$(PYTHON) scripts/verify_landing.py
 
-# Lighthouse local (requiere npx; misma versión que CI). Sirve el repo con
-# http.server porque Lighthouse audita una URL http, no file://.
+# Lighthouse local: mismo script que el job `landing` de CI (resuelve el
+# Chromium de Playwright si no hay Chrome del sistema; requiere npx).
 lighthouse:
-	@port=8765; \
-	$(PYTHON) -m http.server $$port --bind 127.0.0.1 >/dev/null 2>&1 & \
-	server_pid=$$!; \
-	trap "kill $$server_pid" EXIT; \
-	sleep 1; \
-	npx --yes lighthouse@12.8.2 http://127.0.0.1:$$port/ --quiet \
-		--chrome-flags="--headless=new --no-sandbox --disable-gpu" \
-		--output=json --output-path=/tmp/chile-hub-lighthouse.json \
-		--only-categories=accessibility,seo,best-practices && \
-	$(PYTHON) scripts/check_lighthouse.py /tmp/chile-hub-lighthouse.json
+	PYTHON="$(PYTHON)" bash scripts/run_lighthouse.sh
 
 # xdist fijado en el Plan 080: -n auto baja la suite de ~66s a ~18s y
 # pasa la suite completa sin romper fixtures compartidos (verificado).
