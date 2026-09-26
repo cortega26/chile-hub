@@ -1,7 +1,7 @@
 # ADR-022: Las regresiones de datos se bloquean en `verify_pipeline`, no con el diff de la documentación
 
 **Fecha:** 2026-09-26
-**Estado:** accepted
+**Estado:** proposed (pasa a accepted al mergear el plan 108)
 **Decisión:**
 - El gate "Check build-synced files" solo falla si `index.html` o `app.js` quedaron desactualizados.
 - Si cambia `README.md`, el gate solo lo informa, porque los bloques de datos del README los commitea el job `publish`.

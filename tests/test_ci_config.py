@@ -377,7 +377,7 @@ class AdoptionBadgeGuardrailTests(unittest.TestCase):
             encoding="utf-8"
         )
         self.assertIn(
-            '"allow_stale_backfills": "${{ inputs.allow_stale_backfills }}"',
+            '"allow_stale_backfills": os.environ.get("ALLOW_STALE_BACKFILLS", "")',
             pipeline_content,
         )
         release_content = (ROOT_DIR / ".github" / "workflows" / "pypi-release.yml").read_text(
@@ -1415,6 +1415,16 @@ class BuildSyncedGateGuardrailTests(unittest.TestCase):
         self.assertIn('--allow-record-drop "$ALLOW_RECORD_DROP"', content)
         self.assertNotIn('--allow-record-drop "${{', content)
         self.assertIn('"allow_record_drop": os.environ.get("ALLOW_RECORD_DROP", "")', content)
+
+    def test_free_text_dispatch_inputs_are_never_interpolated_in_scripts(self):
+        """Los inputs de texto libre del dispatch solo pueden aparecer como
+        valor de una variable `env:`, nunca dentro de un `run:` (inyección de
+        shell o de código Python en el heredoc de provenance)."""
+        content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        for name in ("allow_stale_backfills", "allow_record_drop"):
+            for line in content.splitlines():
+                if "${{ inputs." + name + " }}" in line:
+                    self.assertRegex(line.strip(), r"^[A-Z_]+: \$\{\{ inputs\." + name)
 
     def test_release_replays_record_drop_override(self):
         content = PYPI_RELEASE_WORKFLOW.read_text(encoding="utf-8")

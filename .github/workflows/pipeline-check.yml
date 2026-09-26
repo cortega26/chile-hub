@@ -391,7 +391,7 @@ jobs:
               # release re-verifica con --require-live; sin este campo el
               # override aplicado al publicar (p. ej. --allow-stale-backfills ipc)
               # se perderia y el release rechazaria un artefacto ya verificado.
-              "allow_stale_backfills": "${{ inputs.allow_stale_backfills }}",
+              "allow_stale_backfills": os.environ.get("ALLOW_STALE_BACKFILLS", ""),
               # Idem para el guard de caída de record_count (plan 108): el
               # release re-verifica con el mismo dataset_changelog.json.
               "allow_record_drop": os.environ.get("ALLOW_RECORD_DROP", ""),
@@ -403,6 +403,7 @@ jobs:
           PY
         env:
           PUBLISH_INPUT: ${{ inputs.publish || 'false' }}
+          ALLOW_STALE_BACKFILLS: ${{ inputs.allow_stale_backfills }}
           ALLOW_RECORD_DROP: ${{ inputs.allow_record_drop }}
 
       - name: Run unit and contract tests
