@@ -339,6 +339,54 @@ def verify_landing():
         if region_label != "Filtrar comunas por región":
             fail(f"Unexpected or missing aria-label for #region-filter: {region_label}")
 
+        # Navegación móvil declarada: toggle con ARIA y panel colapsable por CSS
+        nav_toggle = page.locator("#nav-toggle")
+        if nav_toggle.count() != 1:
+            fail("Expected exactly one #nav-toggle button")
+        if nav_toggle.get_attribute("aria-controls") != "site-nav":
+            fail("Unexpected nav-toggle aria-controls")
+        if nav_toggle.get_attribute("aria-expanded") != "false":
+            fail("Expected nav-toggle to start collapsed")
+        if nav_toggle.is_visible():
+            fail("Expected #nav-toggle to be hidden on desktop viewport")
+
+        # Nombres legibles: la tarjeta muestra el nombre curado, no la clave canónica
+        display_name = page.locator(
+            "#dataset-establecimientos_educacionales .dataset-name"
+        ).inner_text()
+        if display_name != "Establecimientos Educacionales":
+            fail(f"Unexpected dataset display name: {display_name}")
+
+        # Enlaces a las páginas por comuna (SEO programático)
+        comuna_links = page.locator("#comunas-table .comuna-link")
+        if comuna_links.count() == 0:
+            fail("Expected comuna links in the explorer table")
+        first_comuna_href = comuna_links.first.get_attribute("href")
+        if not first_comuna_href or not first_comuna_href.startswith("comunas/"):
+            fail(f"Unexpected comuna link href: {first_comuna_href}")
+
+        # Sin emojis en la landing (consistencia con el README)
+        health_summary_text = page.locator("#health-summary").inner_text()
+        for emoji in ("✅", "⚠️", "❌"):
+            if emoji in health_summary_text:
+                fail(f"Unexpected emoji {emoji!r} in #health-summary")
+
+        # Conteos honestos en el hero: 21 publicadas + 1 en evaluación
+        hero_signals = page.locator(".hero-signals").inner_text()
+        if "21" not in hero_signals or "evaluación" not in hero_signals:
+            fail(f"Unexpected hero signals copy: {hero_signals}")
+        hero_copy = page.locator(".intro-copy > p").last.inner_text()
+        if "Veintidós" in hero_copy:
+            fail(f"Hero copy still claims 22 published layers: {hero_copy}")
+
+        # Geometría declarada como candidata, no como disponible
+        geometry_card = page.locator(".capability-card", has_text="Geometría comunal")
+        if geometry_card.count() != 1:
+            fail("Expected exactly one geometry capability card")
+        geometry_text = geometry_card.inner_text()
+        if "candidato" not in geometry_text.lower() or "bundle público" not in geometry_text:
+            fail(f"Geometry capability must disclose candidate lane: {geometry_text}")
+
         # Validate catalog search filtering logic (CSS specificity and visibility)
         page.fill("#catalog-search-input", "censo")
         page.wait_for_timeout(200)
@@ -684,6 +732,23 @@ def verify_landing():
             fail("Falta el botón del explorador SQL (#sql-run-btn)")
         if page.locator("#sql-input").count() != 1:
             fail("Falta el textarea del explorador SQL (#sql-input)")
+
+        # Móvil: el toggle reemplaza las 3 líneas de enlaces del nav
+        mobile = browser.new_page(viewport={"width": 390, "height": 844})
+        mobile.goto(url, wait_until="networkidle")
+        mobile_toggle = mobile.locator("#nav-toggle")
+        mobile_nav = mobile.locator("#site-nav")
+        if not mobile_toggle.is_visible():
+            fail("Expected #nav-toggle to be visible on mobile viewport")
+        if mobile_nav.is_visible():
+            fail("Expected nav panel collapsed on mobile viewport")
+        mobile_toggle.click()
+        mobile_nav.wait_for(state="visible")
+        if mobile_toggle.get_attribute("aria-expanded") != "true":
+            fail("Expected nav-toggle aria-expanded=true after click")
+        mobile_nav.locator("a", has_text="Datos").click()
+        mobile_nav.wait_for(state="hidden")
+        mobile.close()
 
         browser.close()
 

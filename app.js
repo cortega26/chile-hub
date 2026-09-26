@@ -126,6 +126,53 @@ const SOURCE_MODE_LABELS = {
     monthly: "mensual",
 };
 
+// Nombres legibles por dataset (capa de presentación). El catálogo publica la
+// clave canónica; la UI muestra este nombre. Espeja los nombres curados del
+// README (src/builders/reports.py::_DISPLAY_NAMES).
+const DATASET_DISPLAY_NAMES = {
+    regiones: "Regiones",
+    provincias: "Provincias",
+    comunas: "Comunas",
+    comunas_enriquecidas: "Comunas Enriquecidas",
+    indicadores: "Indicadores Económicos",
+    censo_comunal: "Censo Comunal 2024",
+    censo_hogares_viviendas: "Censo Hogares y Viviendas",
+    establecimientos_salud: "Establecimientos de Salud",
+    distritos_electorales: "Distritos Electorales",
+    establecimientos_educacionales: "Establecimientos Educacionales",
+    finanzas_municipales: "Finanzas Municipales",
+    resultados_educacionales: "Resultados Educacionales",
+    indicadores_urbanos_siedu: "Indicadores Urbanos SIEDU",
+    perfil_territorial_comunal: "Perfil Territorial Comunal",
+    empresas: "Empresas (RES)",
+    pobreza_comunal: "Pobreza Comunal (SAE)",
+    consumo_electrico_comunal: "Consumo Eléctrico Comunal",
+    partidos_politicos: "Partidos Políticos",
+    autoridades_electas: "Autoridades Electas",
+    estadisticas_vitales: "Estadísticas Vitales",
+    permisos_edificacion: "Permisos de Edificación",
+    calidad_aire: "Calidad del Aire",
+    geometria_comunal: "Geometría Comunal",
+    delincuencia_comunal: "Delincuencia Comunal",
+    autoridades_locales: "Autoridades Locales",
+};
+
+function datasetDisplayName(name) {
+    const key = String(name || "");
+    if (DATASET_DISPLAY_NAMES[key]) return DATASET_DISPLAY_NAMES[key];
+    return key
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (char) => char.toUpperCase())
+        .trim();
+}
+
+function comunaSlug(comuna) {
+    const clean = String(comuna?.nombre_comuna_clean || comuna?.nombre_comuna || "").toLowerCase();
+    return clean
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+}
+
 function formatFreshness(freshness) {
     if (!freshness) return "N/D";
     const status = freshness.status || "unknown";
@@ -405,7 +452,7 @@ function renderCandidateSection(bundle, grid, artifactManifestByPath) {
             <article class="dataset-card candidate-card" id="candidate-${escapeHtml(candidate.dataset)}" data-search="${escapeHtml(searchable)}">
                 <div class="dataset-card-top">
                     <div>
-                        <h4 class="dataset-name">${escapeHtml(candidate.dataset)}</h4>
+                        <h4 class="dataset-name">${escapeHtml(datasetDisplayName(candidate.dataset))}</h4>
                         <div class="dataset-desc">Evaluado, no incluido en el bundle público.</div>
                     </div>
                     <span class="dataset-badge candidate">candidate</span>
@@ -584,7 +631,7 @@ function showDatasetDrawer(dataset) {
     const runtimeFreshness = computeRuntimeFreshness(dataset);
     currentActiveDatasetInDrawer = dataset;
 
-    drawerTitle.textContent = dataset.dataset;
+    drawerTitle.textContent = datasetDisplayName(dataset.dataset);
     drawerDesc.textContent = dataset.description || "";
 
     // Switch tabs to "Ficha Técnica" by default
@@ -1062,7 +1109,7 @@ function renderCatalog(bundle) {
                 <article class="dataset-card" id="dataset-${escapeHtml(dataset.dataset)}" data-search="${escapeHtml([dataset.dataset, dataset.description, dataset.source_name, ...(dataset.join_keys || []), ...Object.keys(dataset.outputs || {})].filter(Boolean).join(" "))}">
                     <div class="dataset-card-top">
                         <div>
-                            <h4 class="dataset-name">${escapeHtml(dataset.dataset)}</h4>
+                            <h4 class="dataset-name">${escapeHtml(datasetDisplayName(dataset.dataset))}</h4>
                             <div class="dataset-desc">${escapeHtml(dataset.description || "")}</div>
                         </div>
                         <span class="dataset-badge ${escapeHtml(dataset.source_mode || "fallback")}">${escapeHtml(SOURCE_MODE_LABELS[dataset.source_mode] || dataset.source_mode || "desconocido")}</span>
@@ -1299,9 +1346,13 @@ function renderTable() {
         const tr = document.createElement("tr");
         const lat = c.latitud_cabecera?.toFixed(4) ?? "N/D";
         const lon = c.longitud_cabecera?.toFixed(4) ?? "N/D";
+        const slug = comunaSlug(c);
+        const comunaCell = slug
+            ? `<a class="comuna-link" href="comunas/${encodeURIComponent(slug)}/">${escapeHtml(c.nombre_comuna)}</a>`
+            : escapeHtml(c.nombre_comuna);
         tr.innerHTML = `
             <td><span class="comuna-code">${escapeHtml(c.codigo_comuna)}</span></td>
-            <td style="font-weight: 500; color: var(--text-primary);">${escapeHtml(c.nombre_comuna)}</td>
+            <td style="font-weight: 500;">${comunaCell}</td>
             <td>${escapeHtml(c.nombre_provincia)}</td>
             <td>${escapeHtml(c.nombre_region)}</td>
             <td>${formatNum.format(c.poblacion_estimada)}</td>
@@ -1396,9 +1447,41 @@ quickstartCopyButtons.forEach(button => {
     });
 });
 
+// Navegación móvil: el toggle muestra/oculta el panel de enlaces bajo el
+// header. En desktop el botón está oculto por CSS y el nav se comporta igual.
+function initNavToggle() {
+    const toggle = document.getElementById("nav-toggle");
+    const nav = document.getElementById("site-nav");
+    if (!toggle || !nav) return;
+
+    const setOpen = (open) => {
+        nav.classList.toggle("is-open", open);
+        toggle.setAttribute("aria-expanded", open ? "true" : "false");
+        toggle.setAttribute(
+            "aria-label",
+            open ? "Cerrar menú de navegación" : "Abrir menú de navegación"
+        );
+    };
+
+    toggle.addEventListener("click", () => setOpen(!nav.classList.contains("is-open")));
+    nav.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", () => setOpen(false));
+    });
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && nav.classList.contains("is-open")) {
+            setOpen(false);
+            toggle.focus();
+        }
+    });
+    window.addEventListener("resize", () => {
+        if (window.innerWidth > 900) setOpen(false);
+    });
+}
+
 // Inicialización
 window.addEventListener("DOMContentLoaded", () => {
     renderSupportLinks();
+    initNavToggle();
     loadKPIs();
     loadHubHealth();
     renderHealthHistory();

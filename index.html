@@ -507,6 +507,11 @@
             padding-bottom: 2px;
         }
 
+        /* Toggle de navegación móvil: oculto en desktop, ver @media (max-width: 900px) */
+        .nav-toggle {
+            display: none;
+        }
+
         .site-nav .nav-github {
             color: var(--text-primary);
             font-weight: 600;
@@ -629,6 +634,11 @@
             font-weight: 600;
             color: var(--text-primary);
             margin-right: 0.25rem;
+        }
+
+        .hero-signal-note {
+            opacity: 0.75;
+            font-style: italic;
         }
 
         /* Capacidades: tarjetas de capacidades de producto */
@@ -1842,6 +1852,19 @@
             border-radius: 4px;
         }
 
+        .comuna-link {
+            color: var(--text-primary);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: var(--transition);
+        }
+
+        .comuna-link:hover,
+        .comuna-link:focus-visible {
+            color: var(--accent-green);
+            border-bottom-color: var(--accent-green);
+        }
+
         /* Comunas Paginator styling */
         .pagination {
             display: flex;
@@ -2086,16 +2109,84 @@
             }
         }
 
-        @media (max-width: 580px) {
+        /* Navegación móvil: panel desplegable bajo el header en vez de 3 líneas de enlaces */
+        @media (max-width: 900px) {
             header {
+                padding: 1rem 1.25rem;
+            }
+            .nav-toggle {
+                display: inline-flex;
                 flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
-                padding: 1.25rem 1rem;
+                justify-content: center;
+                align-items: center;
+                gap: 4px;
+                width: 44px;
+                height: 44px;
+                padding: 10px;
+                background: transparent;
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                cursor: pointer;
+                transition: var(--transition);
+            }
+            .nav-toggle:hover {
+                border-color: var(--border-color-dark);
+            }
+            .nav-toggle-bar {
+                display: block;
+                width: 100%;
+                height: 2px;
+                border-radius: 2px;
+                background: var(--text-primary);
+                transition: var(--transition);
+            }
+            .nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(1) {
+                transform: translateY(6px) rotate(45deg);
+            }
+            .nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(2) {
+                opacity: 0;
+            }
+            .nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(3) {
+                transform: translateY(-6px) rotate(-45deg);
             }
             .site-nav {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0;
+                padding: 0.5rem 1.25rem 0.9rem;
+                background: var(--panel-bg);
+                border-bottom: 1px solid var(--border-color);
+                box-shadow: 0 14px 28px rgba(18, 61, 48, 0.08);
+            }
+            .site-nav.is-open {
+                display: flex;
+            }
+            .site-nav a {
                 width: 100%;
-                gap: 0.75rem 1rem;
+                font-size: 1rem;
+                padding: 0.6rem 0;
+                border-bottom: 1px solid var(--border-color);
+            }
+            .site-nav a:last-child {
+                border-bottom: 0;
+            }
+            .site-nav a.is-active {
+                border-bottom-color: var(--accent-green);
+            }
+        }
+
+        @media (max-width: 580px) {
+            .intro h2 {
+                font-size: clamp(1.9rem, 8.5vw, 2.6rem);
+            }
+            .intro p {
+                margin-top: 1rem;
+                font-size: 1rem;
             }
             .intro-links {
                 flex-wrap: wrap;
@@ -2353,7 +2444,7 @@
 
         .console-panel .keyword { color: #f43f5e; }
         .console-panel .string { color: #10b981; }
-        .console-panel .comment { color: #64748b; }
+        .console-panel .comment { color: #94a3b8; }
 
         /* Drawer styles */
         .drawer {
@@ -2911,9 +3002,9 @@
         .pill.ok, .pill.live, .pill.fresh { background: #d1fae5; color: #065f46; }
         .pill.warn, .pill.fallback, .pill.stale { background: #fef3c7; color: #92400e; }
         .pill.error, .pill.drifted { background: #fee2e2; color: #991b1b; }
-        .pill.unknown { background: #f3f4f6; color: #6b7280; }
+        .pill.unknown { background: #f3f4f6; color: #4b5563; }
         .pill.partial { background: #e0e7ff; color: #3730a3; }
-        .pill.not_applicable { background: #f3f4f6; color: #6b7280; }
+        .pill.not_applicable { background: #f3f4f6; color: #4b5563; }
 
         .health-hidden { display: none; }
 
@@ -2929,7 +3020,19 @@
         <div class="logo-section">
             <h1>chile-hub <span class="badge-alpha"></span></h1>
         </div>
-        <nav class="site-nav" aria-label="Navegación principal">
+        <button
+            class="nav-toggle"
+            id="nav-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="site-nav"
+            aria-label="Abrir menú de navegación"
+        >
+            <span class="nav-toggle-bar" aria-hidden="true"></span>
+            <span class="nav-toggle-bar" aria-hidden="true"></span>
+            <span class="nav-toggle-bar" aria-hidden="true"></span>
+        </button>
+        <nav class="site-nav" id="site-nav" aria-label="Navegación principal">
             <a href="#catalogo">Datos</a>
             <a href="#capacidades">Capacidades</a>
             <a href="#cobertura">Cobertura</a>
@@ -2947,7 +3050,7 @@
             <div class="intro-copy">
                 <p class="intro-eyebrow">Datos oficiales de Chile, curados y reproducibles</p>
                 <h2>Un punto de partida curado para datos abiertos de Chile.</h2>
-                <p>Veintidós capas publicadas y normalizadas — geografía, demografía, economía, salud, educación, gobierno y más — listas para consumir en una línea de código. Con resolución de entidades por nombre y por coordenadas.</p>
+                <p>Veintiuna capas publicadas y una en evaluación, todas normalizadas — geografía, demografía, economía, salud, educación y más — listas para consumir en una línea de código. Con resolución de entidades por nombre y por coordenadas.</p>
                 <div class="intro-links">
                     <a class="btn btn-primary" href="#catalogo">Explorar datos</a>
                     <a class="btn btn-secondary" href="reference/">Ver documentación</a>
@@ -2998,7 +3101,7 @@ curl -s <span class="string">"https://tooltician.com/chile-hub/data/normalized/h
             </aside>
         </section>
         <div class="hero-signals" aria-label="Señales del hub">
-            <span class="hero-signal"><strong>22</strong> capas publicadas</span>
+            <span class="hero-signal"><strong>21</strong> capas publicadas <span class="hero-signal-note">+ 1 en evaluación</span></span>
             <span class="hero-signal"><strong>346</strong> comunas en el catálogo</span>
             <span class="hero-signal"><strong>100%</strong> códigos CUT normalizados</span>
             <span class="hero-signal"><strong>Diaria</strong> actualización automática</span>
@@ -3073,7 +3176,7 @@ hub.resolve_comunas(["santiago", "nunoa"])</pre>
                         <h3>Geometría comunal</h3>
                         <span class="capability-code">GeoParquet</span>
                     </div>
-                    <p>Límites poligonales de 345 de las 346 comunas en GeoParquet (Antártica es un gap upstream documentado), listos para QGIS, geopandas o deck.gl.</p>
+                    <p>Límites poligonales de 345 de las 346 comunas en GeoParquet (Antártica es un gap upstream documentado). Capa en carril candidato con revisión en curso: disponible para evaluación local, aún no incluida en el bundle público ni en el catálogo. <a href="reference/extraction-lanes/">Ver carriles de publicación</a>.</p>
                     <pre class="capability-example">gdf = gpd.read_parquet(
   "…/geometria_comunal.parquet")</pre>
                 </article>
@@ -3264,7 +3367,7 @@ LIMIT 10;</pre>
             <h2>Menos tiempo buscando y limpiando datos. Más tiempo construyendo.</h2>
             <div>
                 <p>chile-hub no reemplaza a las fuentes oficiales. Las vuelve consistentes, comparables y utilizables en flujos modernos de datos.</p>
-                <p style="margin-top: 1rem;">Hecho con <span style="color: #f87171;">&hearts;</span> en Chile ·
+                <p style="margin-top: 1rem;">Hecho en Chile ·
                 <a href="https://github.com/cortega26/chile-hub" target="_blank" rel="noopener noreferrer">GitHub</a> ·
                 <a href="https://github.com/sponsors/cortega26" target="_blank" rel="noopener noreferrer">GitHub Sponsors</a> ·
                 <a href="https://www.buymeacoffee.com/cortega26" target="_blank" rel="noopener noreferrer">Buy Me a Coffee</a> ·
@@ -3274,7 +3377,7 @@ LIMIT 10;</pre>
 
         <div class="explorer-heading">
             <h2>Explorador de comunas</h2>
-            <p>Busca por nombre, código CUT, provincia o región.</p>
+            <p>Busca por nombre, código CUT, provincia o región. Cada comuna enlaza a su ficha pública.</p>
         </div>
 
         <!-- Search Bar and Controls -->
@@ -3353,13 +3456,13 @@ LIMIT 10;</pre>
                     Datasets: <strong id="health-dataset-count">—</strong>
                 </span>
                 <span class="health-summary-item ok">
-                    ✅ <strong id="health-ok-count">—</strong> ok
+                    <strong id="health-ok-count">—</strong> ok
                 </span>
                 <span class="health-summary-item warn">
-                    ⚠️ <strong id="health-warn-count">—</strong> warn
+                    <strong id="health-warn-count">—</strong> warn
                 </span>
                 <span class="health-summary-item error">
-                    ❌ <strong id="health-error-count">—</strong> error
+                    <strong id="health-error-count">—</strong> error
                 </span>
                 <span class="health-summary-item">·</span>
                 <span class="health-summary-item">
@@ -3406,6 +3509,7 @@ LIMIT 10;</pre>
             <h3>chile-hub</h3>
             <p>Construido con Python, Polars y DuckDB.</p>
             <p>Licencia del Consolidado: <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener noreferrer">CC-BY-4.0</a></p>
+            <p><a href="comunas/">Las 346 comunas de Chile</a></p>
         </div>
         <div class="footer-col">
             <h3>Fuentes</h3>
