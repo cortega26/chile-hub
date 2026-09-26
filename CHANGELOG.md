@@ -12,6 +12,14 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.39.0 - 2026-09-26
+
+### Agregado
+
+- **mapa**: Choropleth interactivo de comunas con GeoJSON simplificado
+  ([`4b19fdb`](https://github.com/cortega26/chile-hub/commit/4b19fdbe3f5ce8715f85c69c98a1c762458bc36b))
+
+
 ## 1.38.0 - 2026-09-26
 
 ### Corregido
