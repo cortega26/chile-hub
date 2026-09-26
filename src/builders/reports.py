@@ -1092,3 +1092,72 @@ def sync_readme_layers_table(check_only=False):
     else:
         print("README sync: tabla de capas sin cambios")
     return changed
+
+
+MAPA_METRICAS_FILENAME = "mapa_metricas.json"
+MAPA_METRICAS_ATRIBUCION = "BCN/INE/MINSAL/MINEDUC/MINVU/MDS — vía chile-hub (CC-BY/CC0)"
+
+
+def _permisos_ultimo_anio_completo(permisos):
+    """``cut -> {viviendas, superficie, anio}`` descartando el año en curso.
+
+    El último año del extracto suele estar parcial (p. ej. 2026 con 1 permiso
+    en Santiago). Si cae a <20% del promedio de los 3 años previos se reporta
+    el año anterior: el mapa no debe mostrar una caída falsa.
+    """
+    por_cut: dict[str, list[dict]] = {}
+    for row in permisos.select(
+        "codigo_comuna", "anio", "unidades_total", "superficie_m2_total"
+    ).iter_rows(named=True):
+        por_cut.setdefault(row["codigo_comuna"], []).append(row)
+    resultado: dict[str, dict] = {}
+    for cut, serie in por_cut.items():
+        serie.sort(key=lambda item: item["anio"])
+        elegido = serie[-1]
+        previos = [item["unidades_total"] for item in serie[:-1]][-3:]
+        if previos and elegido["unidades_total"] < 0.2 * (sum(previos) / len(previos)):
+            elegido = serie[-2]
+        resultado[cut] = {
+            "viviendas_autorizadas": elegido["unidades_total"],
+            "superficie_autorizada_m2": elegido["superficie_m2_total"],
+            "viviendas_autorizadas_anio": elegido["anio"],
+        }
+    return resultado
+
+
+def _pobreza_ingresos_ultimo_anio(pobreza):
+    ingresos = [row for row in pobreza.iter_rows(named=True) if row.get("dimension") == "ingresos"]
+    if not ingresos:
+        return {}
+    anio = max(row["anio"] for row in ingresos)
+    return {row["codigo_comuna"]: round(row["tasa"], 1) for row in ingresos if row["anio"] == anio}
+
+
+def write_mapa_metricas_json(perfil, permisos, pobreza, path):
+    """Escribe las métricas del mapa del sitio (``mapa_metricas.json``).
+
+    Archivo chico (~30 KB) con las métricas ya resueltas por comuna, para que
+    el mapa no descargue el perfil completo (~550 KB) ni la pobreza (~360 KB).
+    No es un dataset: es un asset del sitio, no entra al bundle ni al catálogo.
+    """
+    metricas = {}
+    for row in perfil.iter_rows(named=True):
+        personas = row.get("promedio_personas_por_hogar")
+        mp25 = row.get("mp25_promedio_ultimo_anio")
+        metricas[row["codigo_comuna"]] = {
+            "poblacion_censada": row.get("poblacion_censada"),
+            "personas_por_hogar": round(personas, 2) if personas is not None else None,
+            "establecimientos_salud": row.get("establecimientos_salud_total"),
+            "establecimientos_educacionales": row.get("establecimientos_educacionales_total"),
+            "mp25_promedio": round(mp25, 1) if mp25 is not None else None,
+        }
+    if permisos is not None and not permisos.is_empty():
+        for cut, valores in _permisos_ultimo_anio_completo(permisos).items():
+            metricas.setdefault(cut, {}).update(valores)
+    if pobreza is not None and not pobreza.is_empty():
+        for cut, tasa in _pobreza_ingresos_ultimo_anio(pobreza).items():
+            metricas.setdefault(cut, {})["pobreza_ingresos"] = tasa
+
+    payload = {"atribucion": MAPA_METRICAS_ATRIBUCION, "metricas": metricas}
+    write_json_atomic(payload, path, ensure_ascii=False, separators=(",", ":"))
+    return path

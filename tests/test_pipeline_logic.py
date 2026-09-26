@@ -5476,6 +5476,70 @@ class MapaComunalGeojsonTests(unittest.TestCase):
         self.assertNotIn(", ", text)
 
 
+class MapaMetricasTests(unittest.TestCase):
+    """Asset `mapa_metricas.json`: métricas resueltas para el mapa del sitio.
+
+    Regresión a evitar: reportar el año de permisos en curso (parcial) como
+    "último año" — mostraba caídas falsas (p. ej. Santiago con 1 vivienda) — o
+    incluir la dimensión equivocada de pobreza.
+    """
+
+    def _frames(self, ultimo_anio_unidades=1):
+        perfil = pl.DataFrame(
+            {
+                "codigo_comuna": ["13101"],
+                "poblacion_censada": [438856],
+                "promedio_personas_por_hogar": [2.1],
+                "establecimientos_salud_total": [111],
+                "establecimientos_educacionales_total": [157],
+                "mp25_promedio_ultimo_anio": [29.14],
+            }
+        )
+        permisos = pl.DataFrame(
+            {
+                "codigo_comuna": ["13101", "13101", "13101", "13101"],
+                "anio": [2022, 2023, 2024, 2025],
+                "unidades_total": [1000, 1100, 1200, ultimo_anio_unidades],
+                "superficie_m2_total": [100000, 110000, 120000, 157],
+            }
+        )
+        pobreza = pl.DataFrame(
+            {
+                "codigo_comuna": ["13101", "13101"],
+                "anio": [2022, 2022],
+                "dimension": ["ingresos", "multidimensional"],
+                "tasa": [3.94, 12.5],
+            }
+        )
+        return perfil, permisos, pobreza
+
+    def _write(self, perfil, permisos, pobreza):
+        import json
+
+        from src.builders.reports import write_mapa_metricas_json
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = str(Path(tmpdir) / "mapa_metricas.json")
+            write_mapa_metricas_json(perfil, permisos, pobreza, path)
+            return json.loads(Path(path).read_text(encoding="utf-8"))
+
+    def test_partial_year_is_replaced_by_last_complete(self):
+        payload = self._write(*self._frames(ultimo_anio_unidades=1))
+        metricas = payload["metricas"]["13101"]
+        self.assertEqual(metricas["viviendas_autorizadas"], 1200)
+        self.assertEqual(metricas["viviendas_autorizadas_anio"], 2024)
+        self.assertEqual(metricas["pobreza_ingresos"], 3.9)
+        self.assertEqual(metricas["mp25_promedio"], 29.1)
+        self.assertEqual(metricas["personas_por_hogar"], 2.1)
+        self.assertIn("atribucion", payload)
+
+    def test_complete_year_is_kept(self):
+        payload = self._write(*self._frames(ultimo_anio_unidades=1300))
+        metricas = payload["metricas"]["13101"]
+        self.assertEqual(metricas["viviendas_autorizadas"], 1300)
+        self.assertEqual(metricas["viviendas_autorizadas_anio"], 2025)
+
+
 if __name__ == "__main__":
     import pytest
 
