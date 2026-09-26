@@ -11,6 +11,9 @@ data/normalized/*
 !data/normalized/*.md
 !data/dataset_specs/
 !data/dataset_specs/*.json
+# Asset visual del mapa del sitio (derivado de geometria_comunal, no un
+# dataset): se versiona y publica junto al resto de los artefactos.
+!data/normalized/*.geojson
 !data/normalized/*.parquet
 !data/normalized/*.zip
 !data/normalized/*.sha256

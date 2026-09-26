@@ -1478,10 +1478,321 @@ function initNavToggle() {
     });
 }
 
+// ---------------------------------------------------------------------------
+// Mapa territorial (Leaflet sobre mapa_comunal.geojson)
+//
+// Leaflet se carga en diferido y el mapa se inicializa solo cuando la sección
+// entra al viewport. Sin tiles externos: los polígonos vienen de un GeoJSON
+// simplificado (asset visual de geometría BCN, no el dataset) y las métricas
+// del perfil territorial ya publicado. Si algo falta, la sección se degrada
+// con un mensaje y el resto de la página sigue funcionando.
+// ---------------------------------------------------------------------------
+const MAP_COLORS = ["#e8f1ec", "#c3ddd1", "#8fc0ac", "#4f8f78", "#123d30"];
+const MAP_NO_DATA_COLOR = "#e3e3dd";
+const MAP_CHILE_BOUNDS = [
+    [-56.2, -76.2],
+    [-17.4, -66.2],
+];
+const MAP_VIEWS = {
+    norte: { center: [-23.5, -69.5], zoom: 6 },
+    centro: { center: [-34.5, -71.0], zoom: 6.25 },
+    sur: { center: [-41.5, -73.0], zoom: 6 },
+};
+const MAP_METRICS = {
+    poblacion_censada: {
+        label: "Población censada (2024)",
+        source: "perfil",
+        field: "poblacion_censada",
+        format: "int",
+    },
+    pobreza_ingresos: {
+        label: "Pobreza por ingresos (2022)",
+        source: "pobreza",
+        format: "pct",
+    },
+    viviendas_autorizadas: {
+        label: "Viviendas autorizadas (último año completo)",
+        source: "perfil",
+        field: "viviendas_autorizadas_ultimo_anio",
+        format: "int",
+    },
+    establecimientos_salud: {
+        label: "Establecimientos de salud",
+        source: "perfil",
+        field: "establecimientos_salud_total",
+        format: "int",
+    },
+    establecimientos_educacionales: {
+        label: "Establecimientos educacionales",
+        source: "perfil",
+        field: "establecimientos_educacionales_total",
+        format: "int",
+    },
+    personas_por_hogar: {
+        label: "Personas por hogar",
+        source: "perfil",
+        field: "promedio_personas_por_hogar",
+        format: "dec",
+    },
+    mp25_promedio: {
+        label: "MP2.5 promedio (µg/m³)",
+        source: "perfil",
+        field: "mp25_promedio_ultimo_anio",
+        format: "dec",
+    },
+};
+
+let mapState = null;
+
+function formatMapValue(value, format) {
+    if (value === null || value === undefined || !Number.isFinite(value)) return "Sin dato";
+    if (format === "pct") return `${value.toFixed(1)}%`;
+    if (format === "dec") return value.toFixed(1);
+    return formatNum.format(Math.round(value));
+}
+
+function mapMetricValue(entry, metricKey) {
+    const metric = MAP_METRICS[metricKey];
+    if (!entry || !metric) return null;
+    if (metric.source === "pobreza") {
+        return typeof entry.pobreza === "number" ? entry.pobreza : null;
+    }
+    const value = entry.perfil ? entry.perfil[metric.field] : null;
+    return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function buildMapBreaks(values) {
+    const sorted = values
+        .filter((value) => typeof value === "number" && Number.isFinite(value))
+        .sort((a, b) => a - b);
+    if (sorted.length === 0) return [];
+    const breaks = [];
+    for (let index = 1; index < MAP_COLORS.length; index += 1) {
+        const position = Math.min(
+            sorted.length - 1,
+            Math.floor((index / MAP_COLORS.length) * sorted.length)
+        );
+        breaks.push(sorted[position]);
+    }
+    return breaks;
+}
+
+function mapColorForValue(value, breaks) {
+    if (value === null || value === undefined || !Number.isFinite(value)) return MAP_NO_DATA_COLOR;
+    let index = 0;
+    while (index < breaks.length && value > breaks[index]) index += 1;
+    return MAP_COLORS[Math.min(index, MAP_COLORS.length - 1)];
+}
+
+function renderMapLegend(breaks, metric) {
+    const legend = document.getElementById("map-legend");
+    if (!legend) return;
+    const items = [];
+    let previous = null;
+    for (let index = 0; index < MAP_COLORS.length; index += 1) {
+        const upper = index < breaks.length ? breaks[index] : null;
+        let label;
+        if (previous === null) label = `≤ ${formatMapValue(upper, metric.format)}`;
+        else if (upper === null) label = `> ${formatMapValue(previous, metric.format)}`;
+        else label = `${formatMapValue(previous, metric.format)} – ${formatMapValue(upper, metric.format)}`;
+        items.push(
+            `<span class="map-legend-item"><span class="map-legend-swatch" style="background:${MAP_COLORS[index]}"></span>${escapeHtml(label)}</span>`
+        );
+        previous = upper === null ? previous : upper;
+    }
+    items.push(
+        `<span class="map-legend-item"><span class="map-legend-swatch" style="background:${MAP_NO_DATA_COLOR}"></span>Sin dato</span>`
+    );
+    legend.innerHTML = items.join("");
+}
+
+async function loadMapEntries() {
+    const fetchJson = (path) =>
+        fetch(dataUrl(path), { cache: "no-store" }).then((response) => {
+            if (!response.ok) throw new Error(`${path} respondió ${response.status}`);
+            return response.json();
+        });
+
+    const [geojson, perfil, pobreza] = await Promise.all([
+        fetchJson("data/normalized/mapa_comunal.geojson"),
+        fetchJson("data/normalized/perfil_territorial_comunal.json"),
+        fetchJson("data/normalized/pobreza_comunal.json"),
+    ]);
+
+    const perfilByCut = new Map(perfil.map((row) => [row.codigo_comuna, row]));
+    const pobrezaIngresos = pobreza.filter((row) => row.dimension === "ingresos");
+    const anioReciente = pobrezaIngresos.reduce(
+        (max, row) => Math.max(max, row.anio || 0),
+        0
+    );
+    const pobrezaByCut = new Map(
+        pobrezaIngresos
+            .filter((row) => row.anio === anioReciente)
+            .map((row) => [row.codigo_comuna, row.tasa])
+    );
+
+    const entries = new Map();
+    geojson.features.forEach((feature) => {
+        const cut = feature.properties.codigo_comuna;
+        entries.set(cut, {
+            perfil: perfilByCut.get(cut) || null,
+            pobreza: pobrezaByCut.get(cut) ?? null,
+        });
+    });
+    return { geojson, entries };
+}
+
+function renderMapRanking(geojson, entries, metricKey, metric) {
+    const ranking = document.getElementById("map-ranking");
+    if (!ranking) return;
+    const rows = geojson.features
+        .map((feature) => ({
+            properties: feature.properties,
+            value: mapMetricValue(entries.get(feature.properties.codigo_comuna), metricKey),
+        }))
+        .filter((row) => Number.isFinite(row.value))
+        .sort((a, b) => b.value - a.value)
+        .slice(0, 5);
+    ranking.innerHTML = rows
+        .map((row) => {
+            const slug = comunaSlug({ nombre_comuna_clean: row.properties.nombre_comuna_clean });
+            const label = escapeHtml(row.properties.nombre_comuna);
+            const link = slug
+                ? `<a href="comunas/${encodeURIComponent(slug)}/">${label}</a>`
+                : label;
+            return (
+                `<li>${link}` +
+                `<span class="map-ranking-value">${escapeHtml(formatMapValue(row.value, metric.format))}</span></li>`
+            );
+        })
+        .join("");
+}
+
+function applyMapMetric(metricKey) {
+    if (!mapState || !window.L) return;
+    const metric = MAP_METRICS[metricKey] || MAP_METRICS.poblacion_censada;
+    const { map, geojson, entries } = mapState;
+
+    const values = geojson.features.map((feature) =>
+        mapMetricValue(entries.get(feature.properties.codigo_comuna), metricKey)
+    );
+    const breaks = buildMapBreaks(values);
+    renderMapLegend(breaks, metric);
+    renderMapRanking(geojson, entries, metricKey, metric);
+
+    if (mapState.layer) {
+        map.removeLayer(mapState.layer);
+    }
+
+    mapState.layer = L.geoJSON(geojson, {
+        style: (feature) => ({
+            fillColor: mapColorForValue(
+                mapMetricValue(entries.get(feature.properties.codigo_comuna), metricKey),
+                breaks
+            ),
+            fillOpacity: 0.88,
+            color: "#ffffff",
+            weight: 0.6,
+        }),
+        onEachFeature: (feature, layer) => {
+            const properties = feature.properties;
+            const value = mapMetricValue(entries.get(properties.codigo_comuna), metricKey);
+            layer.bindTooltip(
+                `<strong>${escapeHtml(properties.nombre_comuna)}</strong><br>` +
+                    `${escapeHtml(metric.label)}: ${escapeHtml(formatMapValue(value, metric.format))}`,
+                { className: "map-tooltip", sticky: true, direction: "top", opacity: 1 }
+            );
+            layer.on("mouseover", () => layer.setStyle({ weight: 1.6, color: "#123d30" }));
+            layer.on("mouseout", () => layer.setStyle({ weight: 0.6, color: "#ffffff" }));
+            layer.on("click", () => {
+                const slug = comunaSlug({ nombre_comuna_clean: properties.nombre_comuna_clean });
+                if (slug) window.location.href = `comunas/${slug}/`;
+            });
+        },
+    }).addTo(map);
+
+    mapState.metric = metricKey;
+}
+
+async function initMap(container) {
+    const { geojson, entries } = await loadMapEntries();
+    container.innerHTML = "";
+
+    const map = L.map(container, {
+        zoomControl: true,
+        attributionControl: false,
+        minZoom: 3,
+        maxZoom: 11,
+        // Permite zooms fraccionarios para que fitBounds aproveche el alto del
+        // contenedor: Chile es largo y angosto, con zoom entero sobraba espacio.
+        zoomSnap: 0.25,
+        maxBounds: [
+            [-60, -114],
+            [-14, -58],
+        ],
+        maxBoundsViscosity: 0.6,
+    });
+    const chileBounds = L.latLngBounds(MAP_CHILE_BOUNDS);
+    map.fitBounds(chileBounds);
+    // El contenedor puede no tener su tamaño final cuando corre el observer;
+    // un invalidateSize en el siguiente frame asegura el encuadre correcto.
+    window.requestAnimationFrame(() => {
+        map.invalidateSize();
+        map.fitBounds(chileBounds);
+    });
+
+    document.querySelectorAll("[data-map-view]").forEach((button) => {
+        button.addEventListener("click", () => {
+            document
+                .querySelectorAll("[data-map-view]")
+                .forEach((other) => other.classList.toggle("is-active", other === button));
+            const view = button.dataset.mapView;
+            if (view === "todo") {
+                map.fitBounds(chileBounds);
+                return;
+            }
+            const config = MAP_VIEWS[view];
+            if (config) map.setView(config.center, config.zoom);
+        });
+    });
+
+    mapState = { map, geojson, entries, layer: null, metric: null };
+    const select = document.getElementById("map-metric");
+    const initialMetric = select && MAP_METRICS[select.value] ? select.value : "poblacion_censada";
+    applyMapMetric(initialMetric);
+    if (select) {
+        select.addEventListener("change", () => applyMapMetric(select.value));
+    }
+}
+
+function initMapLazy() {
+    const container = document.getElementById("map-comunal");
+    if (!container) return;
+    if (!window.L) {
+        container.innerHTML = '<div class="map-loading">Mapa no disponible.</div>';
+        return;
+    }
+    const observer = new IntersectionObserver(
+        (entries, obs) => {
+            if (!entries.some((entry) => entry.isIntersecting)) return;
+            obs.disconnect();
+            initMap(container).catch((error) => {
+                console.warn("Mapa territorial no disponible:", error);
+                container.innerHTML =
+                    '<div class="map-loading">Mapa no disponible por ahora. ' +
+                    'Puedes explorar las comunas en la <a href="comunas/">ficha por comuna</a>.</div>';
+            });
+        },
+        { rootMargin: "240px 0px" }
+    );
+    observer.observe(container);
+}
+
 // Inicialización
 window.addEventListener("DOMContentLoaded", () => {
     renderSupportLinks();
     initNavToggle();
+    initMapLazy();
     loadKPIs();
     loadHubHealth();
     renderHealthHistory();

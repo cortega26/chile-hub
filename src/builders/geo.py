@@ -9,11 +9,13 @@ footer correctamente; por eso este writer no reutiliza
 Polars sin metadata geo.
 """
 
+import json
 import os
 
 import geopandas as gpd
 import polars as pl
-from shapely import wkt
+from shapely import set_precision, wkt
+from shapely.geometry import MultiPolygon, mapping
 
 # Tolerancia de simplificación en grados (~100 m en la latitud de Chile).
 # La geometría BCN ya es "generalizada"; sin simplificar el artefacto pesa
@@ -21,6 +23,81 @@ from shapely import wkt
 # tol=0.001 baja a ~5 MB preservando la forma reconocible de cada comuna;
 # decisión y comparativa de tolerancias documentadas en ADR-012.
 GEOMETRIA_SIMPLIFY_TOLERANCE_DEG = 0.001
+
+# Asset visual del mapa coroplético del sitio (Leaflet): no es el dataset.
+# El GeoParquet pesa ~5 MB porque conserva la forma reconocible de cada
+# comuna; para un mapa nacional se simplifica más fuerte, se descartan islotes
+# menores a ~1 km² y se hace snap a una grilla de 0.001° (~100 m). Resultado:
+# ~390 KB (≈60 KB comprimido en la CDN) con las 345 comunas y sus islas
+# principales. La regla y su porqué viven en ADR-012; el dataset en carril
+# candidate sigue intacto.
+MAPA_WEB_SIMPLIFY_TOLERANCE_DEG = 0.02
+MAPA_WEB_MIN_PART_AREA_DEG2 = 1e-4
+MAPA_WEB_PRECISION_DEG = 0.001
+
+
+def _keep_main_parts(geometry, min_part_area: float):
+    """Conserva el polígono mayor de cada comuna y sus islas sobre el umbral."""
+    if not isinstance(geometry, MultiPolygon):
+        return geometry
+    parts = sorted(geometry.geoms, key=lambda part: part.area, reverse=True)
+    keep = [parts[0]] + [part for part in parts[1:] if part.area >= min_part_area]
+    return MultiPolygon(keep)
+
+
+def _round_coords(value, digits: int = 3):
+    if isinstance(value, (list, tuple)):
+        return [_round_coords(item, digits) for item in value]
+    if isinstance(value, float):
+        return round(value, digits)
+    return value
+
+
+def write_mapa_comunal_geojson(
+    df: pl.DataFrame,
+    path: str,
+    simplify_tolerance: float = MAPA_WEB_SIMPLIFY_TOLERANCE_DEG,
+    min_part_area: float = MAPA_WEB_MIN_PART_AREA_DEG2,
+    precision_deg: float = MAPA_WEB_PRECISION_DEG,
+) -> None:
+    """Escribe el GeoJSON simplificado que consume el mapa del sitio.
+
+    Derivado **visual** de ``geometria_comunal`` (carril candidate): no entra
+    al bundle ZIP ni al catálogo de datasets. Determinista: features ordenadas
+    por CUT, coordenadas redondeadas y JSON compacto, para que el build
+    programado no genere diffs espurios.
+    """
+    features = []
+    for row in df.sort("codigo_comuna").iter_rows(named=True):
+        geometry = wkt.loads(row["geometry_wkt"])
+        geometry = _keep_main_parts(geometry, min_part_area)
+        if simplify_tolerance > 0:
+            geometry = geometry.simplify(simplify_tolerance, preserve_topology=True)
+        geometry = set_precision(geometry, precision_deg)
+        features.append(
+            {
+                "type": "Feature",
+                "properties": {
+                    "codigo_region": row["codigo_region"],
+                    "codigo_comuna": row["codigo_comuna"],
+                    "nombre_comuna": row["nombre_comuna"],
+                    "nombre_comuna_clean": row["nombre_comuna_clean"],
+                    "nombre_region": row["nombre_region"],
+                },
+                "geometry": _round_coords(mapping(geometry)),
+            }
+        )
+
+    payload = {
+        "type": "FeatureCollection",
+        "atribucion": "Límites: BCN ArcGIS (geometría generalizada) — asset visual de chile-hub",
+        "features": features,
+    }
+    tmp_path = path + ".tmp"
+    with open(tmp_path, "w", encoding="utf-8") as handle:
+        json.dump(payload, handle, ensure_ascii=False, separators=(",", ":"))
+        handle.write("\n")
+    os.replace(tmp_path, path)
 
 
 def write_geometria_comunal_parquet(

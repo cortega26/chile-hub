@@ -335,6 +335,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400;1,14..32,600&family=JetBrains+Mono:ital,wght@0,400;0,600;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
 
     <style>
         :root {
@@ -1412,6 +1413,180 @@
             font-size: 0.92rem;
             color: var(--text-secondary);
             line-height: 1.6;
+        }
+
+        /* Mapa territorial (Leaflet sobre geometría simplificada) */
+        .map-section {
+            scroll-margin-top: 5rem;
+        }
+        .map-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr);
+            gap: 1.25rem;
+            align-items: start;
+        }
+        .map-comunal {
+            height: 560px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #eef2ef;
+            background-image:
+                linear-gradient(rgba(18, 61, 48, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(18, 61, 48, 0.05) 1px, transparent 1px);
+            background-size: 44px 44px;
+        }
+        .map-comunal .leaflet-container {
+            background: transparent;
+            font-family: var(--font-sans);
+        }
+        .map-comunal .leaflet-interactive:focus {
+            outline: 2px solid var(--accent-green);
+        }
+        .map-comunal .map-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+            text-align: center;
+            padding: 1rem;
+        }
+        .map-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+        .map-views {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+        }
+        .map-view-btn {
+            font-family: var(--font-sans);
+            font-size: 0.78rem;
+            font-weight: 550;
+            color: var(--text-secondary);
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 999px;
+            padding: 0.3rem 0.7rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .map-view-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--border-color-dark);
+        }
+        .map-view-btn.is-active {
+            color: #ffffff;
+            background: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+        .map-toolbar {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.4rem;
+        }
+        .map-toolbar label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-secondary);
+        }
+        #map-metric {
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+            padding: 0.55rem 0.7rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            width: 100%;
+        }
+        .map-legend {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.35rem;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+        }
+        .map-legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+        }
+        .map-legend-swatch {
+            width: 16px;
+            height: 12px;
+            border-radius: 2px;
+            border: 1px solid rgba(18, 61, 48, 0.15);
+            flex-shrink: 0;
+        }
+        .map-ranking h3 {
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        .map-ranking ol {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        .map-ranking li {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 0.5rem;
+            font-size: 0.88rem;
+        }
+        .map-ranking a {
+            color: var(--text-primary);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+        }
+        .map-ranking a:hover {
+            color: var(--accent-green);
+            border-bottom-color: var(--accent-green);
+        }
+        .map-ranking .map-ranking-value {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+        .map-attribution {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        .map-attribution a {
+            color: var(--accent-green);
+        }
+        .map-tooltip {
+            font-family: var(--font-sans);
+            font-size: 0.82rem;
+            line-height: 1.45;
+        }
+        @media (max-width: 900px) {
+            .map-layout {
+                grid-template-columns: 1fr;
+            }
+            .map-comunal {
+                height: 420px;
+            }
         }
 
         .domain-list {
@@ -3044,6 +3219,7 @@
         </button>
         <nav class="site-nav" id="site-nav" aria-label="Navegación principal">
             <a href="#catalogo">Datos</a>
+            <a href="#mapa">Mapa</a>
             <a href="#capacidades">Capacidades</a>
             <a href="#cobertura">Cobertura</a>
             <a href="#confianza">Metodología</a>
@@ -3151,6 +3327,49 @@ curl -s <span class="string">"https://tooltician.com/chile-hub/data/normalized/h
                 <div class="status-pills" id="status-pills"><span class="status-pill">Cargando...</span></div>
                 <div class="status-actions" id="status-actions"></div>
             </details>
+        </section>
+
+        <section class="section-shell map-section" id="mapa" aria-labelledby="mapa-title">
+            <div class="catalog-header">
+                <div>
+                    <h2 id="mapa-title" class="catalog-title">Mapa territorial</h2>
+                    <div class="catalog-meta">345 de las 346 comunas con geometría publicada (Antártica es un gap upstream). Haz clic en una comuna para ver su ficha.</div>
+                </div>
+            </div>
+            <div class="map-layout">
+                <div id="map-comunal" class="map-comunal" role="region" aria-label="Mapa coroplético de las comunas de Chile">
+                    <div class="map-loading">Cargando mapa…</div>
+                </div>
+                <aside class="map-panel" aria-label="Controles y lectura del mapa">
+                    <div class="map-views" role="group" aria-label="Vistas rápidas del mapa">
+                        <button type="button" class="map-view-btn is-active" data-map-view="todo">Todo Chile</button>
+                        <button type="button" class="map-view-btn" data-map-view="norte">Norte</button>
+                        <button type="button" class="map-view-btn" data-map-view="centro">Centro</button>
+                        <button type="button" class="map-view-btn" data-map-view="sur">Sur</button>
+                    </div>
+                    <div class="map-toolbar">
+                        <label for="map-metric">Métrica</label>
+                        <select id="map-metric">
+                            <option value="poblacion_censada">Población censada (2024)</option>
+                            <option value="pobreza_ingresos">Pobreza por ingresos (2022)</option>
+                            <option value="viviendas_autorizadas">Viviendas autorizadas (último año completo)</option>
+                            <option value="establecimientos_salud">Establecimientos de salud</option>
+                            <option value="establecimientos_educacionales">Establecimientos educacionales</option>
+                            <option value="personas_por_hogar">Personas por hogar</option>
+                            <option value="mp25_promedio">MP2.5 promedio (µg/m³)</option>
+                        </select>
+                    </div>
+                    <div class="map-legend" id="map-legend"></div>
+                    <div class="map-ranking">
+                        <h3>Top 5</h3>
+                        <ol id="map-ranking"></ol>
+                    </div>
+                    <p class="map-attribution">
+                        Límites: BCN ArcGIS (geometría generalizada, no apta para precisión geodésica) ·
+                        Datos: chile-hub CC-BY · <a href="comunas/">Explorar las 346 comunas</a>
+                    </p>
+                </aside>
+            </div>
         </section>
 
         <section class="capabilities-section" id="capacidades" aria-labelledby="capabilities-title">
@@ -3574,6 +3793,7 @@ LIMIT 10;</pre>
         }
     }
     </script>
+    <script src="vendor/leaflet/leaflet.js" defer></script>
     <script src="app.js?v=1.38.0" defer></script>
     <script type="module" src="playground.js"></script>
 </body>

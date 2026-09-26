@@ -5403,6 +5403,79 @@ class ComunaPagesTests(unittest.TestCase):
                 load_rows(perfil_path, pobreza_path)
 
 
+class MapaComunalGeojsonTests(unittest.TestCase):
+    """Asset visual del mapa: GeoJSON simplificado, no el dataset.
+
+    Regresión a evitar: publicar el GeoParquet de 5 MB al navegador (imposible
+    para un mapa nacional), perder islas principales, coordenadas con ruido
+    flotante (diffs espurios) o features fuera de orden (build no determinista).
+    """
+
+    def _frame(self):
+        # Dos comunas: una con islote minúsculo (debe descartarse) y una simple.
+        poligono = "POLYGON ((-70.6 -33.4, -70.5 -33.4, -70.5 -33.5, -70.6 -33.5, -70.6 -33.4))"
+        con_islote = (
+            "MULTIPOLYGON (((-70.7 -33.4, -70.6 -33.4, -70.6 -33.5, -70.7 -33.5, -70.7 -33.4)),"
+            " ((-70.7001 -33.4001, -70.7002 -33.4001, -70.7002 -33.4002, -70.7001 -33.4002,"
+            " -70.7001 -33.4001)))"
+        )
+        return pl.DataFrame(
+            {
+                "codigo_region": ["13", "13"],
+                "codigo_comuna": ["13102", "13101"],
+                "nombre_comuna": ["Con islote", "Simple"],
+                "nombre_comuna_clean": ["con islote", "simple"],
+                "nombre_region": ["Metropolitana", "Metropolitana"],
+                "geometry_wkt": [con_islote, poligono],
+            }
+        )
+
+    def test_geojson_is_compact_ordered_and_filters_islets(self):
+        import json
+
+        from src.builders.geo import write_mapa_comunal_geojson
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = str(Path(tmpdir) / "mapa_comunal.geojson")
+            write_mapa_comunal_geojson(self._frame(), path)
+            payload = json.loads(Path(path).read_text(encoding="utf-8"))
+
+        self.assertEqual(payload["type"], "FeatureCollection")
+        self.assertEqual(len(payload["features"]), 2)
+        # Ordenado por CUT: 13101 antes que 13102 (determinismo del build).
+        self.assertEqual(
+            [feature["properties"]["codigo_comuna"] for feature in payload["features"]],
+            ["13101", "13102"],
+        )
+        props = payload["features"][1]["properties"]
+        self.assertEqual(props["nombre_region"], "Metropolitana")
+        self.assertIn("atribucion", payload)
+        # El islote de ~1e-8°² cae bajo el umbral: solo queda el polígono mayor.
+        geometry = payload["features"][1]["geometry"]
+        if geometry["type"] == "MultiPolygon":
+            self.assertEqual(len(geometry["coordinates"]), 1)
+        else:
+            self.assertEqual(geometry["type"], "Polygon")
+
+    def test_coordinates_have_no_float_noise(self):
+        import json
+
+        from src.builders.geo import write_mapa_comunal_geojson
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = str(Path(tmpdir) / "mapa_comunal.geojson")
+            write_mapa_comunal_geojson(self._frame(), path)
+            text = Path(path).read_text(encoding="utf-8")
+            payload = json.loads(text)
+
+        coords = payload["features"][0]["geometry"]["coordinates"][0]
+        for lon, lat in coords:
+            self.assertEqual(lon, round(lon, 3))
+            self.assertEqual(lat, round(lat, 3))
+        # JSON compacto: sin espacios tras separadores (build no ruidoso).
+        self.assertNotIn(", ", text)
+
+
 if __name__ == "__main__":
     import pytest
 
