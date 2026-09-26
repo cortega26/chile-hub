@@ -12,6 +12,31 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.37.8 - 2026-09-26
+
+### Corregido
+
+- **ci**: Desarma el deadlock del gate build-synced y mueve la señal a verify
+  ([`7652568`](https://github.com/cortega26/chile-hub/commit/76525685442ef09ecd94b27b8c15b0633dd9aa48))
+
+- **ci**: Inputs del dispatch fuera del heredoc de provenance
+  ([`d429a69`](https://github.com/cortega26/chile-hub/commit/d429a6945a13a9b6ba9bca7dfa88a4bcbbcb414d))
+
+### Documentación
+
+- **adr**: ADR-022 + plan 109 (README sin datos volátiles, alerta de schedule)
+  ([`d4fc5aa`](https://github.com/cortega26/chile-hub/commit/d4fc5aa0a8326dc9fc0e96141452654b1f8d018e))
+
+- **citation**: Agrega el DOI de Zenodo (concept 10.5281/zenodo.22968698)
+  ([`6b0307f`](https://github.com/cortega26/chile-hub/commit/6b0307f5e6bfabc6fb047f097bb044ef908cfb03))
+
+- **distribution**: Activación post-lanzamiento — caso de estudio, launch pack y adoption review
+  ([`52d41dd`](https://github.com/cortega26/chile-hub/commit/52d41dd1cf4b5b227a51a3e25e80f3d0f4008806))
+
+- **distribution**: Handoff de activación para agente + issues de leads
+  ([`056baf7`](https://github.com/cortega26/chile-hub/commit/056baf7f0149e345c4bcf7cc82afc8706bcb70e2))
+
+
 ## 1.37.7 - 2026-09-25
 
 ### Corregido
