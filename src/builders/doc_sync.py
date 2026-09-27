@@ -246,6 +246,10 @@ _AGENTS_TEST_DESCRIPTIONS = {
         "compatibilidad contra catálogo/registry/contrato legacy, overlay y "
         "fallos cerrados (22 specs: complete)"
     ),
+    "test_phase4_extraction.py": (
+        "ExtractionResult Phase 4: modelo tipado, 3 extractores piloto "
+        "(ordinary/fallback/multi-source) y adapters legacy"
+    ),
 }
 
 # Estas pruebas crean todo ``data/normalized/`` bajo un directorio temporal;
@@ -254,6 +258,7 @@ _AGENTS_TEST_DESCRIPTIONS = {
 _TEST_FILES_WITHOUT_REPOSITORY_NORMALIZED = {
     "test_phase1_characterization.py",
     "test_phase2_datasetspec.py",
+    "test_phase4_extraction.py",
 }
 
 
@@ -311,6 +316,7 @@ _AGENTS_EXTRACTOR_DESCRIPTIONS = {
     "http_utils.py": "Reintentos/backoff HTTP compartidos",
     "region_utils.py": "Normalización de nombres de región compartida",
     "source_adapter.py": "Adaptador de fuente compartido",
+    "result.py": "ExtractionResult tipado (Phase 4) — provenance/tiempo final",
     "ine_ipc.py": "Override de IPC desde el INE (fuente autoritativa; Plan 069)",
     "_sinim_shared.py": "Normalización/metadata compartida stub+scraper (Plan 099)",
     "subdere_extractor.py": (
@@ -370,6 +376,7 @@ _SHARED_MODULES = {
     "http_utils.py",
     "region_utils.py",
     "source_adapter.py",
+    "result.py",
     # ine_ipc.py no sigue la convención *_extractor (es un override de
     # último recurso, no un extractor por dataset) pero es parte del carril
     # diario de indicadores — sin esto, el inventario decía 19 extractores

@@ -35,6 +35,11 @@ try:
 except ModuleNotFoundError:
     from http_utils import fetch_with_retry
 
+try:
+    from src.extractors.result import ExtractionResult
+except ModuleNotFoundError:
+    from result import ExtractionResult
+
 DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data"))
 RAW_DIR = os.path.join(DATA_DIR, "raw")
 STAGING_DIR = os.path.join(DATA_DIR, "staging")
@@ -303,18 +308,64 @@ def build_metadata(mode: str, source_url: str, notes: list[str], row_count: int)
     }
 
 
-def process_pobreza_comunal() -> dict:
-    """Ejecuta el flujo completo de extracción y staging."""
+def _build_extraction_result(
+    df: pl.DataFrame, mode: str, source_url: str, notes: list[str], retrieved_at: datetime.datetime
+) -> ExtractionResult:
+    """Construye ExtractionResult para pobreza (fallback, observado 2022)."""
+    # Snapshot: último XLSX descargado (ingresos o multidimensional)
+    snapshots = sorted(Path(RAW_DIR).glob("mds_pobreza_comunal_*.xlsx"))
+    raw_path = snapshots[-1] if snapshots else None
+    snapshot_hash = ExtractionResult.compute_hash(raw_path)
+    try:
+        snapshot_reference = (
+            str(raw_path.relative_to(ROOT_DIR)) if raw_path and raw_path.is_file() else None
+        )
+    except ValueError:
+        snapshot_reference = str(raw_path) if raw_path else None
+    observed_period = {"start": "2022-01-01", "end": "2022-12-31"}
+    return ExtractionResult(
+        dataset="pobreza_comunal",
+        dataframe=df,
+        raw_snapshot_path=raw_path,
+        snapshot_hash=snapshot_hash,
+        snapshot_reference=snapshot_reference,
+        source_mode=mode,
+        retrieved_at=retrieved_at,
+        source_published_at=None,
+        observed_period=observed_period,
+        reuse_policy=REUSE_POLICY,
+        source_detail="Estimaciones de Pobreza Comunal vía SAE desde encuesta CASEN",
+        notes=tuple(notes),
+        record_count=df.height,
+        fields=tuple(REQUIRED_COLUMNS),
+    )
+
+
+def extract_pobreza_comunal() -> ExtractionResult:
+    """Entry point tipado Phase 4: retorna ExtractionResult sin escribir staging."""
+    retrieved_at = datetime.datetime.now(UTC)
     rows, mode, source_url, notes = fetch_data()
     df = normalize_rows(rows)
+    result = _build_extraction_result(df, mode, source_url, notes, retrieved_at)
+    validation = PobrezaComunalExtractor().validate(df, {"source_mode": mode})
+    if validation["status"] == "error":
+        raise SystemExit(f"Validacion fallida: {validation['errors']}")
+    return result
 
-    metadata = build_metadata(mode, source_url, notes, df.height)
 
+def process_pobreza_comunal() -> dict:
+    """Ejecuta el flujo completo de extracción y staging."""
+    result = extract_pobreza_comunal()
     ensure_staging_directories()
-    df.write_csv(STAGING_CSV_PATH)
+    result.dataframe.write_csv(STAGING_CSV_PATH)
+    metadata = result.to_staging_metadata(
+        source_name="Observatorio Social — Ministerio de Desarrollo Social y Familia",
+        source_url="https://observatorio.ministeriodesarrollosocial.gob.cl/pobreza-comunal-2022",
+    )
     write_staging_metadata(METADATA_PATH, metadata)
-    print(f"pobreza_comunal: {df.height} filas escritas en staging (mode={mode})")
-
+    print(
+        f"pobreza_comunal: {result.dataframe.height} filas escritas en staging (mode={result.source_mode})"
+    )
     return metadata
 
 

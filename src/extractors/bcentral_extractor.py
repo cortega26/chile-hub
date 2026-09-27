@@ -14,6 +14,7 @@ Estrategia de actualización:
 
 import concurrent.futures
 import datetime
+import hashlib
 import json
 import os
 import sys
@@ -52,6 +53,11 @@ try:
     from src.extractors.ine_ipc import fetch_ine_ipc
 except ModuleNotFoundError:
     from ine_ipc import fetch_ine_ipc
+
+try:
+    from src.extractors.result import ExtractionResult
+except ModuleNotFoundError:
+    from result import ExtractionResult
 
 # ── Rutas ─────────────────────────────────────────────────────────────────────
 DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data"))
@@ -459,6 +465,124 @@ def generate_fallback_indicators() -> pl.DataFrame:
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
+
+
+def _build_extraction_result(
+    df: pl.DataFrame,
+    source_mode: str,
+    source_detail: str,
+    notes: list,
+    diagnostics: dict,
+    retrieved_at: datetime.datetime,
+) -> ExtractionResult:
+    """Construye ExtractionResult para indicadores (multi-source, observado 2010-hoy)."""
+    # Snapshot multi-fuente: hash del DataFrame normalizado como proxy
+    # (múltiples JSON en data/raw + override INE — no hay un único archivo)
+    raw_snapshot_path = None
+    snapshot_hash = (
+        hashlib.sha256(df.write_csv().encode("utf-8")).hexdigest()
+        if df is not None and df.height > 0
+        else None
+    )
+    snapshot_reference = None
+    # Periodo observado: del historial al último dato del DataFrame
+    observed_period = None
+    if df is not None and df.height > 0 and "fecha" in df.columns:
+        try:
+            min_fecha = df["fecha"].min()
+            max_fecha = df["fecha"].max()
+            # Normalizar a string YYYY-MM-DD
+            if isinstance(min_fecha, (datetime.date, datetime.datetime)):
+                min_fecha = min_fecha.isoformat()[:10]
+            if isinstance(max_fecha, (datetime.date, datetime.datetime)):
+                max_fecha = max_fecha.isoformat()[:10]
+            observed_period = {"start": str(min_fecha), "end": str(max_fecha)}
+        except Exception:
+            observed_period = {
+                "start": f"{HISTORY_START_YEAR}-01-01",
+                "end": datetime.date.today().isoformat(),
+            }
+    else:
+        observed_period = {
+            "start": f"{HISTORY_START_YEAR}-01-01",
+            "end": datetime.date.today().isoformat(),
+        }
+
+    return ExtractionResult(
+        dataset="indicadores",
+        dataframe=df,
+        raw_snapshot_path=raw_snapshot_path,
+        snapshot_hash=snapshot_hash,
+        snapshot_reference=snapshot_reference,
+        source_mode=source_mode,
+        retrieved_at=retrieved_at,
+        source_published_at=None,
+        observed_period=observed_period,
+        reuse_policy=REUSE_POLICY,
+        source_detail=source_detail,
+        notes=tuple(notes),
+        record_count=df.height if df is not None else 0,
+        fields=tuple(df.columns) if df is not None else tuple(),
+    )
+
+
+def extract_indicadores() -> ExtractionResult:
+    """Entry point tipado Phase 4: retorna ExtractionResult sin escribir staging."""
+    retrieved_at = datetime.datetime.now(UTC)
+    source_mode = "live"
+    notes: list = []
+    source_detail = "public_api"
+    df, diagnostics = fetch_all_history()
+    if df is None:
+        df = generate_fallback_indicators()
+        source_mode = "fallback"
+        source_detail = "generated_fallback"
+        notes.append("fallback_due_to_live_fetch_failure")
+        diagnostics = diagnostics or {
+            "fetch_failures": [],
+            "raw_recoveries": [],
+            "preserved_existing_pairs": [],
+            "empty_live_pairs": [],
+        }
+    if (
+        source_mode == "live"
+        and diagnostics.get("raw_recoveries")
+        and diagnostics.get("preserved_existing_pairs")
+    ):
+        source_detail = "public_api_with_raw_recovery_partial"
+    elif source_mode == "live" and diagnostics.get("raw_recoveries"):
+        source_detail = "public_api_with_raw_recovery"
+    if source_mode == "live" and diagnostics.get("raw_recoveries"):
+        notes.append("raw_recovery_used_for_pairs: " + ", ".join(diagnostics["raw_recoveries"]))
+    if (
+        source_mode == "live"
+        and diagnostics.get("preserved_existing_pairs")
+        and not diagnostics.get("raw_recoveries")
+    ):
+        source_detail = "public_api_partial"
+    if source_mode == "live" and diagnostics.get("preserved_existing_pairs"):
+        notes.append(
+            "preserved_existing_pairs_due_to_fetch_failure: "
+            + ", ".join(diagnostics["preserved_existing_pairs"])
+        )
+    if source_mode == "live" and diagnostics.get("empty_live_pairs"):
+        notes.append("empty_live_pairs: " + ", ".join(diagnostics["empty_live_pairs"]))
+    if source_mode == "live" and diagnostics.get("published_backfills"):
+        source_detail = "public_api_with_published_backfill"
+        notes.append(
+            "published_backfills_used_for_codes: " + ", ".join(diagnostics["published_backfills"])
+        )
+    if source_mode == "live" and diagnostics.get("ine_override_pairs"):
+        notes.append("ine_override_used_for_pairs: " + ", ".join(diagnostics["ine_override_pairs"]))
+
+    result = _build_extraction_result(
+        df, source_mode, source_detail, notes, diagnostics, retrieved_at
+    )
+    # Validar
+    validation = BCentralExtractor().validate(df, {"source_mode": source_mode})
+    if validation["status"] == "error":
+        raise SystemExit(f"Validacion fallida: {validation['errors']}")
+    return result
 
 
 def process_indicators() -> str:
