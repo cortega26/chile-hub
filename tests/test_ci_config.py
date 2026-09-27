@@ -1589,6 +1589,27 @@ class CheckLighthouseScriptTests(unittest.TestCase):
         self.assertEqual(self._run({"categories": {}, "audits": {}}), 1)
 
 
+class SourceUrlsWorkflowGuardrailTests(unittest.TestCase):
+    """Regresión: source-urls.yml corría `uv run python scripts/check_source_urls.py`
+    sin extras. El script importa src/extractors/http_utils (tenacity, extra
+    `pipeline`), así que el monitor semanal de URLs muertas moría en el import
+    sin revisar ninguna URL (fallos 2026-09-07/14/21).
+    """
+
+    def test_source_url_check_installs_pipeline_extra(self):
+        content = (ROOT_DIR / ".github" / "workflows" / "source-urls.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("uv run --extra pipeline python scripts/check_source_urls.py", content)
+
+    def test_check_script_still_depends_on_pipeline_extra_module(self):
+        script = (ROOT_DIR / "scripts" / "check_source_urls.py").read_text(encoding="utf-8")
+        pyproject = (ROOT_DIR / "pyproject.toml").read_text(encoding="utf-8")
+        pipeline_extra = pyproject.split("pipeline = [", 1)[1].split("]", 1)[0]
+        self.assertIn("http_utils", script)
+        self.assertIn("tenacity", pipeline_extra)
+
+
 if __name__ == "__main__":
     import pytest
 
