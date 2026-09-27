@@ -53,6 +53,7 @@ nav:
   - Inicio: index.md
   - Instalación: installation.md
   - Capas de datos: datasets/README.md
+  - Aportar un dataset: contribuir-datasets.md
   - Acceso HTTP estático: http-access.md
   - Servidor MCP: mcp.md
   - Carriles de extracción: extraction-lanes.md

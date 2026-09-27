@@ -46,6 +46,8 @@ print(comunas.head())
 | **Analista de datos** | [Instalación](installation.md) → [Elige y carga una capa](datasets/README.md) → [Uso desde R](r-quickstart.md) |
 | **Desarrollador** | [Acceso HTTP estático](http-access.md) → [Referencia de API](api.md) → [Compatibilidad de datasets](dataset-compatibility-policy.md) |
 | **Agentes de IA** | [Servidor MCP](mcp.md) → [Acceso HTTP estático](http-access.md) |
+| **Quiero aportar un dataset** | [Aportar un dataset](contribuir-datasets.md) → [Criterios de inclusión](dataset-inclusion-criteria.md) |
+| **Necesito un dato que no existe** | [Solicitar un dataset](contribuir-datasets.md) → [Criterios de inclusión](dataset-inclusion-criteria.md) |
 | **Auditoría o reúso** | [Procedencia y licencias](https://tooltician.com/chile-hub/data/normalized/redistribution_report.md) → [Criterios de inclusión](dataset-inclusion-criteria.md) |
 
 ## Dónde ir

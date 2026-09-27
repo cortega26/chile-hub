@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Dataset source question
+  - name: Guía para aportar o solicitar un dataset
+    url: https://tooltician.com/chile-hub/reference/contribuir-datasets/
+    about: Requisitos, qué no entra y cómo se evalúa cada propuesta.
+  - name: Pregunta exploratoria sobre una fuente
     url: https://github.com/cortega26/chile-hub/discussions
-    about: Ask exploratory questions before proposing a new maintained dataset.
+    about: Conversa antes de proponer una capa mantenida.

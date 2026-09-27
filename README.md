@@ -175,7 +175,7 @@ El mismo estado se publica en el sitio, con historial de builds y detalle por ca
 ### Respaldo adicional
 
 <!-- START_TEST_COUNT -->
-- **1137 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
+- **1141 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
 <!-- END_TEST_COUNT -->
 <!-- START_ADR_COUNT -->
 - **22 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
@@ -536,6 +536,16 @@ El roadmap actual prioriza crecer en usabilidad y confianza antes que agregar m�
 ---
 
 ## Desarrollo y contribución
+
+### ¿Quieres aportar o pedir un dataset?
+
+No necesitas saber programar ni traer los datos limpios: basta con la fuente y
+para qué sirve (o la necesidad, si solo quieres pedirlo). La guía de 2 minutos y
+los dos formularios están en
+**[Aportar o solicitar un dataset](https://tooltician.com/chile-hub/reference/contribuir-datasets/)**
+([criterios completos](docs/dataset-inclusion-criteria.md)).
+
+### Desarrollar el pipeline
 
 Esta sección es para contribuidores que ejecutan el pipeline de extracción, build y
 verificación en su máquina. Si solo necesitas consumir los datos, usa
