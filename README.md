@@ -229,7 +229,7 @@ Mapa territorial interactivo: las 346 comunas con 7 métricas seleccionables
 | 19 | **Autoridades Electas** | 205 | live | Cámara de Diputados + Senado | CC BY | Bajo_demanda |
 | 20 | **Estadísticas Vitales** | 13 840 | live | INE | CC BY 4.0 | Anual |
 | 21 | **Permisos de Edificación** | 8 650 | monthly | MINVU / CEDOC | Uso c/cita | Mensual |
-| 22 | **Calidad del Aire** | 1 885 | live | MMA / SINCA | Revisión términos | Diaria |
+| 22 | **Calidad del Aire** | 2 264 | live | MMA / SINCA | Revisión términos | Diaria |
 | 23 | **geometria_comunal** | — | candidato | — | — | — |
 | 24 | **Delincuencia Comunal** | — | deprecated | CEAD / SPD | Revisión términos | — |
 | 25 | **Autoridades Locales** | — | candidato | BCN SIIT + Wikipedia | CC BY / CC BY-SA | — |
