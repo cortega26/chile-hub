@@ -12,6 +12,14 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.43.1 - 2026-09-27
+
+### Corregido
+
+- **ci**: Source-urls instala el extra pipeline
+  ([`cde52b6`](https://github.com/cortega26/chile-hub/commit/cde52b68c174da8b255282a55221d458a150ac4c))
+
+
 ## 1.43.0 - 2026-09-27
 
 ### Mantenimiento
