@@ -12,6 +12,43 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.43.0 - 2026-09-27
+
+### Mantenimiento
+
+- **deps**: Bump anyio in the uv group across 1 directory
+  ([#100](https://github.com/cortega26/chile-hub/pull/100),
+  [`c6fa487`](https://github.com/cortega26/chile-hub/commit/c6fa48785fc8817ab4b04651ce535b1dffafbd18))
+
+- **deps**: Bump the codeql-action group with 2 updates
+  ([#106](https://github.com/cortega26/chile-hub/pull/106),
+  [`c0352fa`](https://github.com/cortega26/chile-hub/commit/c0352fae061757abf39ea3393a98051202d62818))
+
+- **deps**: Sync uv.lock [skip ci] ([#105](https://github.com/cortega26/chile-hub/pull/105),
+  [`b5f31e8`](https://github.com/cortega26/chile-hub/commit/b5f31e8a5ac699fa6daeff0212eb3597452cc53d))
+
+- **deps**: Sync uv.lock [skip ci] ([#104](https://github.com/cortega26/chile-hub/pull/104),
+  [`3b1b059`](https://github.com/cortega26/chile-hub/commit/3b1b059dd89090ea678271f96ee1fb98483455b4))
+
+- **deps-dev**: Bump pandas from 3.0.3 to 3.0.6 in the python-pipeline group
+  ([#104](https://github.com/cortega26/chile-hub/pull/104),
+  [`3b1b059`](https://github.com/cortega26/chile-hub/commit/3b1b059dd89090ea678271f96ee1fb98483455b4))
+
+- **deps-dev**: Bump pandas in the python-pipeline group
+  ([#104](https://github.com/cortega26/chile-hub/pull/104),
+  [`3b1b059`](https://github.com/cortega26/chile-hub/commit/3b1b059dd89090ea678271f96ee1fb98483455b4))
+
+- **deps-dev**: Bump the python-dev group with 2 updates
+  ([#105](https://github.com/cortega26/chile-hub/pull/105),
+  [`b5f31e8`](https://github.com/cortega26/chile-hub/commit/b5f31e8a5ac699fa6daeff0212eb3597452cc53d))
+
+### Agregado
+
+- **docs**: Separa solicitar/aportar datasets con guía de 2 minutos
+  ([#119](https://github.com/cortega26/chile-hub/pull/119),
+  [`5b0e439`](https://github.com/cortega26/chile-hub/commit/5b0e4393e9809302f24e41028bb3d5e26ddbccc1))
+
+
 ## 1.42.0 - 2026-09-26
 
 ### Corregido
