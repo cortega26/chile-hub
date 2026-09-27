@@ -43,7 +43,10 @@ jobs:
           enable-cache: true
 
       - name: Check source URLs
-        run: uv run python scripts/check_source_urls.py
+        # --extra pipeline: check_source_urls importa src/extractors/http_utils
+        # (tenacity). Sin el extra, `uv run` instala solo las dependencias base
+        # y el chequeo moría en el import (fallos silenciosos 2026-09-07/14/21).
+        run: uv run --extra pipeline python scripts/check_source_urls.py
 
       - name: Summary
         if: always()
