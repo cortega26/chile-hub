@@ -59,9 +59,12 @@ agrega pruebas, actualiza CI y documenta el conjunto de datos.
 
 Los datasets nuevos entran por el carril `candidate`, se evalúan contra
 `docs/dataset-inclusion-criteria.md` y el mantenedor decide la promoción a
-`stable_publishable`. **Antes de escribir código, abre un issue** con el
-template [Dataset request](.github/ISSUE_TEMPLATE/dataset_request.yml) —
-un PR de extractor sin issue previo aprobado probablemente se cierre.
+`stable_publishable`. **Antes de escribir código, abre un issue** con la
+plantilla [Aportar un dataset](.github/ISSUE_TEMPLATE/dataset_contribution.yml)
+(para fuentes nuevas que quieras implementar o mantener) o
+[Solicitar un dataset](.github/ISSUE_TEMPLATE/dataset_request.yml) (para pedir un
+dato sin comprometer trabajo). Un PR de extractor sin issue previo aprobado
+probablemente se cierre.
 
 Una vez que el mantenedor responde positivamente a los criterios bloqueantes
 de `docs/dataset-inclusion-criteria.md` (la única fuente normativa; `AGENTS.md

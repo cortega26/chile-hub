@@ -1,0 +1,94 @@
+name: Aportar un dataset
+description: Ofrece una fuente oficial para implementarla (o mantener una capa) en el hub.
+title: "aporte: "
+labels: ["enhancement", "dataset"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Guía rápida: https://tooltician.com/chile-hub/reference/contribuir-datasets/
+
+        No necesitas traer los datos ni saber programar: basta con la fuente y para qué sirve.
+        Si quieres implementar el extractor, revisa `CONTRIBUTING.md`:
+        https://github.com/cortega26/chile-hub/blob/main/CONTRIBUTING.md
+  - type: dropdown
+    id: aporte
+    attributes:
+      label: Tipo de aporte
+      options:
+        - Traigo una fuente nueva
+        - Aporto datos ya descargados de una fuente oficial
+        - Quiero implementar el extractor
+        - Quiero mantener una capa existente
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: URL de la fuente oficial
+      description: Prefiere una API JSON o una descarga estable (CSV/XLSX/ZIP).
+      placeholder: https://...
+    validations:
+      required: true
+  - type: dropdown
+    id: license
+    attributes:
+      label: Licencia o términos de reúso
+      description: Si no estás seguro, elige la opción más conservadora.
+      options:
+        - Abierta con atribución (CC BY, CC0 u equivalente)
+        - API pública, términos por revisar
+        - Restringida o ambigua
+    validations:
+      required: true
+  - type: dropdown
+    id: source_format
+    attributes:
+      label: Formato de la fuente
+      description: Las fuentes que solo se pueden raspar (HTML) normalmente no entran.
+      options:
+        - API JSON
+        - Descarga estable (CSV/XLSX/ZIP)
+        - Portal de datos abiertos
+        - HTML o PDF (solo referencia)
+    validations:
+      required: true
+  - type: textarea
+    id: value
+    attributes:
+      label: ¿Qué permite hacer?
+      description: Describe la decisión o el análisis que desbloquea, con un caso concreto.
+      placeholder: "Ej: analizar sequía por comuna cruzando caudales con población rural."
+    validations:
+      required: true
+  - type: textarea
+    id: keys
+    attributes:
+      label: ¿Con qué se cruza?
+      description: Comuna/región (código CUT), código de estación, RUT u otra llave estable.
+    validations:
+      required: true
+  - type: textarea
+    id: expected_schema
+    attributes:
+      label: Columnas que conoces (opcional)
+      placeholder: |
+        llave: codigo_comuna + anio
+        columnas: codigo_comuna, anio, valor, fuente
+  - type: textarea
+    id: maintenance
+    attributes:
+      label: Notas de mantención
+      description: Cada cuánto se actualiza, si el esquema cambia seguido, si la fuente es frágil y si puedes mantenerla tú.
+    validations:
+      required: true
+  - type: checkboxes
+    id: criteria
+    attributes:
+      label: Checklist mínimo
+      options:
+        - label: La fuente es oficial o claramente autoritativa.
+        - label: Tiene descarga estable (no solo scraping HTML).
+        - label: La licencia parece permitir reutilizar con atribución.
+        - label: Tiene una llave de cruce estable (CUT u otra).
+        - label: Describí un caso de uso concreto.

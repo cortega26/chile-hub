@@ -1515,6 +1515,48 @@ class LighthouseGuardrailTests(unittest.TestCase):
         self.assertIn("make lighthouse", content)
 
 
+class DatasetContributionGuideGuardrailTests(unittest.TestCase):
+    """La puerta pública para aportar o pedir datasets debe existir y estar conectada.
+
+    Contexto: los leads llegan desde LinkedIn con fuentes y licencias por aclarar.
+    La guía convierte los criterios en una lectura de 2 minutos y separa dos
+    intenciones: **solicitar** (señal de demanda) y **aportar** (oferta de fuente o
+    trabajo). Regresión a evitar: perder el link en el nav, dejar una de las dos
+    plantillas sin enlace cruzado, o que los formularios vuelvan al inglés.
+    `dataset_request.yml` conserva su nombre porque es la señal de demanda que mide
+    `docs/adoption-review.md`.
+    """
+
+    TEMPLATES = ROOT_DIR / ".github" / "ISSUE_TEMPLATE"
+    GUIDE_PATH = DOCS_DIR / "contribuir-datasets.md"
+
+    def test_guide_is_in_mkdocs_nav_and_links_both_forms_and_criteria(self):
+        nav = MKDOCS_CONFIG.read_text(encoding="utf-8")
+        self.assertIn("contribuir-datasets.md", nav)
+        guide = self.GUIDE_PATH.read_text(encoding="utf-8")
+        self.assertIn("template=dataset_request.yml", guide)
+        self.assertIn("template=dataset_contribution.yml", guide)
+        self.assertIn("dataset-inclusion-criteria.md", guide)
+        index = (DOCS_DIR / "index.md").read_text(encoding="utf-8")
+        self.assertIn("contribuir-datasets.md", index)
+
+    def test_request_template_is_spanish_and_points_to_contribution(self):
+        template = (self.TEMPLATES / "dataset_request.yml").read_text(encoding="utf-8")
+        self.assertIn("name: Solicitar un dataset", template)
+        self.assertIn("template=dataset_contribution.yml", template)
+        self.assertIn("reference/contribuir-datasets/", template)
+
+    def test_contribution_template_is_spanish_and_links_guide_and_contributing(self):
+        template = (self.TEMPLATES / "dataset_contribution.yml").read_text(encoding="utf-8")
+        self.assertIn("name: Aportar un dataset", template)
+        self.assertIn("reference/contribuir-datasets/", template)
+        self.assertIn("CONTRIBUTING.md", template)
+
+    def test_issue_template_chooser_links_the_guide(self):
+        config = (self.TEMPLATES / "config.yml").read_text(encoding="utf-8")
+        self.assertIn("reference/contribuir-datasets/", config)
+
+
 class CheckLighthouseScriptTests(unittest.TestCase):
     """El chequeo de umbrales es stdlib puro: se testea con reportes sintéticos."""
 

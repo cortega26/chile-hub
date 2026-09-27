@@ -1,79 +1,50 @@
-name: Dataset request
-description: Propose a new official Chile dataset for the curated hub.
-title: "dataset: "
+name: Solicitar un dataset
+description: Pide que se agregue una fuente de datos públicos de Chile al hub.
+title: "solicitud: "
 labels: ["enhancement", "dataset"]
 body:
   - type: markdown
     attributes:
       value: |
-        Before proposing a maintained layer, review `docs/dataset-inclusion-criteria.md`.
-        chile-hub prioritizes stable, legally reusable, structured sources with clear join value.
-  - type: input
-    id: source
+        Guía rápida: https://tooltician.com/chile-hub/reference/contribuir-datasets/
+
+        Esta plantilla es para **pedir** un dato (señal de demanda). Si ya tienes la
+        fuente y quieres implementarla o mantenerla, usa la plantilla
+        [Aportar un dataset](https://github.com/cortega26/chile-hub/issues/new?template=dataset_contribution.yml).
+  - type: textarea
+    id: need
     attributes:
-      label: Official source URL
-      description: Prefer a JSON API or stable CSV/XLSX/ZIP download URL.
-    validations:
-      required: true
-  - type: dropdown
-    id: license
-    attributes:
-      label: Reuse/licensing status
-      description: Choose the most conservative option if the terms are unclear.
-      options:
-        - Open attribution
-        - Public API, terms need review
-        - Restricted or unclear
-    validations:
-      required: true
-  - type: dropdown
-    id: source_format
-    attributes:
-      label: Source format
-      description: HTML-only sources usually stay in research unless there is a stable download.
-      options:
-        - API JSON
-        - Stable CSV/XLSX/ZIP download
-        - Official bulk file or open data portal
-        - HTML/PDF or unclear
+      label: ¿Qué dato necesitas?
+      description: Descríbelo con tus palabras, como si lo pidieras en una conversación.
+      placeholder: "Ej: caudales de ríos por comuna y mes."
     validations:
       required: true
   - type: textarea
     id: value
     attributes:
-      label: Use case
-      description: What user workflow or analysis does this unlock?
+      label: ¿Para qué lo usarías?
+      description: El caso de uso concreto es lo que permite priorizar la solicitud.
+      placeholder: "Ej: evaluar riesgo de sequía para proyectos agrícolas en la zona central."
     validations:
       required: true
-  - type: textarea
-    id: keys
+  - type: input
+    id: source
     attributes:
-      label: Join keys
-      description: Does it join to DPA by codigo_comuna, codigo_region, or another stable identifier?
-    validations:
-      required: true
-  - type: textarea
-    id: expected_schema
+      label: ¿Conoces una fuente oficial? (opcional)
+      description: Si sabes dónde está publicado, pega la URL. Si no, no hay problema.
+      placeholder: https://...
+  - type: dropdown
+    id: help
     attributes:
-      label: Expected schema
-      description: List known columns, primary key candidates, and any CUT code fields.
-      placeholder: |
-        primary key: codigo_comuna + anio
-        columns: codigo_comuna, anio, valor, fuente
-  - type: textarea
-    id: maintenance
-    attributes:
-      label: Maintenance notes
-      description: Known update cadence, schema changes, or source reliability concerns.
-    validations:
-      required: true
-  - type: checkboxes
-    id: criteria
-    attributes:
-      label: Inclusion criteria check
+      label: ¿Puedes ayudar?
       options:
-        - label: The source is official or clearly authoritative.
-        - label: The source has structured access, not only fragile HTML scraping.
-        - label: The data appears legally reusable or worth formal review.
-        - label: The dataset has clear join value with DPA or another stable identifier.
-        - label: The request describes a concrete user workflow.
+        - Solo lo solicito
+        - Puedo ayudar a evaluar la fuente
+        - Puedo aportar datos o implementar (usaré la plantilla "Aportar un dataset")
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Contexto extra (opcional)
+      description: Quién más lo necesita, cada cuánto se actualiza, si lo viste en otro proyecto, etc.
