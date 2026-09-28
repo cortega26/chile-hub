@@ -1,6 +1,6 @@
 {
-  "generated_at_utc": "2026-09-27T14:58:48.537317+00:00",
-  "previous_generated_at_utc": "2026-09-26T14:01:02.246604+00:00",
+  "generated_at_utc": "2026-09-28T17:58:27.501618+00:00",
+  "previous_generated_at_utc": "2026-09-27T14:58:48.537317+00:00",
   "dataset_count": 22,
   "datasets": [
     {
@@ -25,9 +25,9 @@
     },
     {
       "dataset": "calidad_aire",
-      "previous_record_count": 1885,
-      "current_record_count": 2264,
-      "record_count_delta": 379,
+      "previous_record_count": 2264,
+      "current_record_count": 2642,
+      "record_count_delta": 378,
       "added_fields": [],
       "removed_fields": [],
       "previous_source_mode": "live",
@@ -166,8 +166,8 @@
     {
       "dataset": "empresas",
       "previous_record_count": 1609373,
-      "current_record_count": 1609373,
-      "record_count_delta": 0,
+      "current_record_count": 1628433,
+      "record_count_delta": 19060,
       "added_fields": [],
       "removed_fields": [],
       "previous_source_mode": "live",
@@ -176,7 +176,7 @@
       "current_freshness_status": "fresh",
       "previous_validation_status": "ok",
       "current_validation_status": "ok",
-      "change_severity": "none",
+      "change_severity": "patch",
       "breaking_changes": [],
       "new_columns": [],
       "removed_columns": [],
