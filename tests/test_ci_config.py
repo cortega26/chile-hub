@@ -15,6 +15,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
@@ -24,7 +25,12 @@ if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
 import check_lighthouse
-from check_companion_paths import check_companions
+import check_source_urls
+from check_companion_paths import (
+    COMPANION_RULES,
+    EXTRACTOR_RULE_EXCLUDED_PATHS,
+    check_companions,
+)
 
 PIPELINE_CHECK_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "pipeline-check.yml"
 PYPROJECT_TOML = ROOT_DIR / "pyproject.toml"
@@ -348,6 +354,83 @@ class DependabotWorkflowGuardrailTests(unittest.TestCase):
             ".github/workflows/testpypi.yml",
         ]
         self.assertEqual(check_companions(changed_workflows), [])
+
+
+class CompanionPathsRuleTests(unittest.TestCase):
+    """Caracteriza `check_companions` regla por regla.
+
+    El test de Dependabot pasa paths que no disparan ninguna regla, así que
+    una regresión de `COMPANION_RULES` (p. ej. un prefijo borrado o mal
+    escrito) apagaría el gate anti-drift de AGENTS §12 en silencio. La tabla
+    se deriva de `COMPANION_RULES` para fallar ruidosamente si entra una
+    regla sin representante.
+    """
+
+    # Path representativo por prefijo disparador (debe cubrir COMPANION_RULES).
+    TRIGGER_REPRESENTATIVES = {
+        "data/dataset_catalog_config.json": "data/dataset_catalog_config.json",
+        "data/source_registry.json": "data/source_registry.json",
+        "contracts/datasets/": "contracts/datasets/comunas.schema.json",
+        "src/validation.py": "src/validation.py",
+        "src/extractors/": "src/extractors/calidad_aire_extractor.py",
+        "src/build_dev_db.py": "src/build_dev_db.py",
+        "Makefile": "Makefile",
+        "scripts/check_agents_sync.py": "scripts/check_agents_sync.py",
+        "scripts/check_source_urls.py": "scripts/check_source_urls.py",
+        "src/builders/doc_sync.py": "src/builders/doc_sync.py",
+        "data/dataset_specs/": "data/dataset_specs/comunas.json",
+    }
+
+    @staticmethod
+    def _errors_for_rule(errors, trigger_prefix):
+        return [e for e in errors if e.startswith(f"'{trigger_prefix}' cambió")]
+
+    def test_representatives_cover_every_rule(self):
+        self.assertEqual(set(self.TRIGGER_REPRESENTATIVES), set(COMPANION_RULES))
+
+    def test_rule_without_companion_fails_and_names_expected_routes(self):
+        for trigger_prefix, companions in COMPANION_RULES.items():
+            trigger = self.TRIGGER_REPRESENTATIVES[trigger_prefix]
+            with self.subTest(trigger=trigger):
+                errors = check_companions([trigger])
+                self.assertEqual(len(errors), 1, errors)
+                # El mensaje debe nombrar tanto el trigger como las rutas
+                # compañeras esperadas (para que el PR sepa qué tocar).
+                self.assertIn(trigger, errors[0])
+                for companion in companions:
+                    self.assertIn(companion, errors[0])
+
+    def test_rule_with_each_companion_passes(self):
+        for trigger_prefix, companions in COMPANION_RULES.items():
+            trigger = self.TRIGGER_REPRESENTATIVES[trigger_prefix]
+            for companion in companions:
+                with self.subTest(trigger=trigger, companion=companion):
+                    # El compañero puede disparar a su vez su propia regla
+                    # (p. ej. data/source_registry.json): solo se exige que
+                    # esta regla quede satisfecha.
+                    errors = check_companions([trigger, companion])
+                    self.assertEqual(self._errors_for_rule(errors, trigger_prefix), [])
+
+    def test_extractor_shared_modules_do_not_trigger_the_rule(self):
+        """`base.py`/`http_utils.py`/etc. no representan un dataset propio."""
+        for excluded in sorted(EXTRACTOR_RULE_EXCLUDED_PATHS):
+            with self.subTest(excluded=excluded):
+                self.assertTrue(excluded.startswith("src/extractors/"))
+                self.assertEqual(check_companions([excluded]), [])
+
+    def test_catalog_change_with_agents_md_passes(self):
+        changed = ["data/dataset_catalog_config.json", "AGENTS.md"]
+        self.assertEqual(check_companions(changed), [])
+
+    def test_path_without_any_rule_passes(self):
+        for changed in (
+            ["README.md"],
+            ["docs/product-spec.md"],
+            ["tests/test_ci_config.py"],
+            ["src/chile_hub/core.py"],
+        ):
+            with self.subTest(changed=changed):
+                self.assertEqual(check_companions(changed), [])
 
 
 class AdoptionBadgeGuardrailTests(unittest.TestCase):
@@ -1916,6 +1999,88 @@ class SourceUrlsWorkflowGuardrailTests(unittest.TestCase):
         pipeline_extra = pyproject.split("pipeline = [", 1)[1].split("]", 1)[0]
         self.assertIn("http_utils", script)
         self.assertIn("tenacity", pipeline_extra)
+
+
+class SourceUrlsCheckerTests(unittest.TestCase):
+    """Caracteriza la clasificación del liveness checker de fuentes.
+
+    El protocolo §6 ("fuente permanentemente caída") depende de que el
+    workflow semanal falle con DEAD y no con WARN; si la clasificación o los
+    códigos de salida de main() se rompen, las fuentes muertas dejan de
+    avisar (solo había guardrails de texto).
+    """
+
+    @staticmethod
+    def _response(status_code: int):
+        response = MagicMock()
+        response.status_code = status_code
+        return response
+
+    def test_source_urls_load_urls_keeps_unique_http_urls(self):
+        registry = [
+            {"official_url": "https://a.example"},
+            {"official_url": "http://b.example"},
+            {"official_url": "https://a.example"},
+            {"official_url": "ftp://c.example"},
+            {"official_url": "https://d.example "},
+            {"official_url": ""},
+            {"official_url": None},
+            {},
+        ]
+        with tempfile.TemporaryDirectory() as tmpdir:
+            registry_path = Path(tmpdir) / "source_registry.json"
+            registry_path.write_text(json.dumps(registry), encoding="utf-8")
+            with patch.object(check_source_urls, "SOURCE_REGISTRY_PATH", str(registry_path)):
+                urls = check_source_urls.load_urls()
+        self.assertEqual(urls, ["http://b.example", "https://a.example", "https://d.example"])
+
+    def test_source_urls_check_url_classifies_status_codes(self):
+        cases = {
+            200: "OK",
+            301: "OK",
+            399: "OK",
+            403: "WARN",
+            404: "WARN",
+            499: "WARN",
+            500: "DEAD",
+            503: "DEAD",
+        }
+        for status_code, expected in cases.items():
+            with self.subTest(status_code=status_code):
+                with patch.object(
+                    check_source_urls,
+                    "fetch_with_retry",
+                    return_value=self._response(status_code),
+                ):
+                    self.assertEqual(check_source_urls.check_url("https://x.example"), expected)
+
+    def test_source_urls_check_url_network_error_is_dead(self):
+        import requests
+
+        with patch.object(
+            check_source_urls,
+            "fetch_with_retry",
+            side_effect=requests.RequestException("timeout"),
+        ):
+            self.assertEqual(check_source_urls.check_url("https://x.example"), "DEAD")
+
+    def _run_main(self, urls: list[str], statuses: list[str]) -> int:
+        with (
+            patch.object(check_source_urls, "load_urls", return_value=urls),
+            patch.object(check_source_urls, "check_url", side_effect=statuses),
+            patch.object(check_source_urls.time, "sleep"),
+        ):
+            return check_source_urls.main()
+
+    def test_source_urls_main_without_urls_fails(self):
+        self.assertEqual(self._run_main([], []), 1)
+
+    def test_source_urls_main_with_dead_url_fails(self):
+        self.assertEqual(self._run_main(["https://dead.example"], ["DEAD"]), 1)
+
+    def test_source_urls_main_with_warn_only_passes(self):
+        urls = ["https://ok.example", "https://warn.example"]
+        self.assertEqual(self._run_main(urls, ["OK", "WARN"]), 0)
 
 
 class TestSignalIntegrityGuardrailTests(unittest.TestCase):
