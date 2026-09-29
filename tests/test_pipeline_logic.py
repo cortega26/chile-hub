@@ -30,6 +30,7 @@ from scripts.fetch_adoption_stats import (
     load_offline_fixture as load_adoption_offline_fixture,
 )
 from scripts.fetch_adoption_stats import (
+    parse_huggingface_stats,
     parse_pypi_stats,
     sum_github_downloads,
 )
@@ -4289,17 +4290,99 @@ class AdoptionStatsTests(unittest.TestCase):
         self.assertIn("label", badge)
         self.assertIn("color", badge)
 
-    def test_adoption_payload_contains_pypi_and_github_releases_keys(self):
+    def test_adoption_parse_huggingface_stats_from_fixture(self):
+        fixture = self._load_fixture()
+        stats = parse_huggingface_stats(fixture["huggingface"])
+        self.assertEqual(
+            stats,
+            {
+                "downloads": 274,
+                "likes": 3,
+                "lastModified": "2026-09-29T17:01:35.000Z",
+            },
+        )
+
+    def test_adoption_parse_huggingface_degrades_to_none_without_payload(self):
+        """404/red caída se representan como null, nunca como ceros medidos."""
+        self.assertIsNone(parse_huggingface_stats(None))
+        self.assertIsNone(parse_huggingface_stats([]))
+
+    def test_adoption_fetch_huggingface_degrades_to_none_on_404(self):
+        """Un 404 del API HF no debe tumbar el job (la señal HF degrada sola)."""
+        import urllib.error
+        import urllib.request
+
+        import scripts.fetch_adoption_stats as adoption_mod
+
+        error = urllib.error.HTTPError(adoption_mod.HUGGINGFACE_URL, 404, "Not Found", {}, None)
+        with (
+            patch.object(adoption_mod, "REQUEST_MAX_ATTEMPTS", 1),
+            patch.object(urllib.request, "urlopen", side_effect=error),
+        ):
+            self.assertIsNone(adoption_mod.fetch_huggingface())
+
+    def test_adoption_fetch_huggingface_degrades_to_none_on_network_error(self):
+        """Una caída de red del API HF tampoco debe tumbar el job."""
+        import urllib.error
+        import urllib.request
+
+        import scripts.fetch_adoption_stats as adoption_mod
+
+        error = urllib.error.URLError("dns failure")
+        with (
+            patch.object(adoption_mod, "REQUEST_MAX_ATTEMPTS", 1),
+            patch.object(urllib.request, "urlopen", side_effect=error),
+        ):
+            self.assertIsNone(adoption_mod.fetch_huggingface())
+
+    def test_adoption_fetch_huggingface_parses_mocked_public_response(self):
+        """Con respuesta viva, fetch_huggingface devuelve el payload crudo de HF."""
+        import urllib.request
+
+        import scripts.fetch_adoption_stats as adoption_mod
+
+        class FakeResponse:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                return False
+
+            def read(self):
+                return b'{"downloads": 274, "likes": 0, "lastModified": "2026-09-29T17:01:35.000Z"}'
+
+        with patch.object(urllib.request, "urlopen", return_value=FakeResponse()):
+            payload = adoption_mod.fetch_huggingface()
+        self.assertEqual(
+            parse_huggingface_stats(payload),
+            {
+                "downloads": 274,
+                "likes": 0,
+                "lastModified": "2026-09-29T17:01:35.000Z",
+            },
+        )
+
+    def test_adoption_payload_contains_pypi_github_and_huggingface_keys(self):
         fixture = self._load_fixture()
         pypi_stats = parse_pypi_stats(fixture["pypi_recent"])
         github_total = sum_github_downloads(fixture["github_releases"])
-        payload = build_adoption_payload(pypi_stats, github_total)
+        huggingface_stats = parse_huggingface_stats(fixture["huggingface"])
+        payload = build_adoption_payload(pypi_stats, github_total, huggingface_stats)
         self.assertIn("generated_at_utc", payload)
         self.assertEqual(payload["pypi"], pypi_stats)
         self.assertEqual(payload["github_releases"], {"total_downloads": 567})
+        self.assertEqual(payload["huggingface"], huggingface_stats)
+
+    def test_adoption_payload_huggingface_is_null_without_signal(self):
+        payload = build_adoption_payload(
+            {"last_day": None, "last_week": None, "last_month": None}, 0
+        )
+        self.assertIsNone(payload["huggingface"])
 
     def test_adoption_offline_fixture_end_to_end_matches_shields_contract(self):
-        pypi_recent, github_releases = load_adoption_offline_fixture(self.FIXTURE_PATH)
+        pypi_recent, github_releases, huggingface_payload = load_adoption_offline_fixture(
+            self.FIXTURE_PATH
+        )
         pypi_stats = parse_pypi_stats(pypi_recent)
         github_total = sum_github_downloads(github_releases)
         badge = build_adoption_badge(pypi_stats["last_month"])
@@ -4316,11 +4399,32 @@ class AdoptionStatsTests(unittest.TestCase):
             },
         )
         self.assertEqual(github_total, 567)
+        self.assertEqual(parse_huggingface_stats(huggingface_payload)["downloads"], 274)
+
+    def test_adoption_offline_file_writes_payload_with_huggingface_key(self):
+        """`--offline <fixture>` escribe un payload con la clave `huggingface`."""
+        import scripts.fetch_adoption_stats as adoption_mod
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            adoption_path = Path(tmpdir) / "adoption.json"
+            badge_path = Path(tmpdir) / "adoption_badge.json"
+            with (
+                patch.object(adoption_mod, "ADOPTION_PATH", adoption_path),
+                patch.object(adoption_mod, "BADGE_PATH", badge_path),
+            ):
+                self.assertEqual(
+                    adoption_mod.main(["--offline", str(self.FIXTURE_PATH)]),
+                    0,
+                )
+            payload = json.loads(adoption_path.read_text(encoding="utf-8"))
+            self.assertEqual(payload["huggingface"]["downloads"], 274)
+            self.assertEqual(payload["pypi"]["last_month"], 1234)
 
     def test_adoption_main_fails_closed_without_writing_when_both_sources_fail(self):
-        """Si ambas fuentes fallan no se escribe nada (exit 1): commitear
+        """Si PyPI y GitHub fallan no se escribe nada (exit 1): commitear
         nulls sobre datos reales pierde la señal en silencio — el modo en que
-        el job semanal produjo nulls semana tras semana."""
+        el job semanal produjo nulls semana tras semana. La regla se mantiene
+        anclada a las dos fuentes originales: HF degrada sola (Plan 129)."""
         import scripts.fetch_adoption_stats as adoption_mod
 
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -4331,14 +4435,31 @@ class AdoptionStatsTests(unittest.TestCase):
                 patch.object(adoption_mod, "BADGE_PATH", badge_path),
                 patch.object(adoption_mod, "fetch_pypi_recent", return_value=None),
                 patch.object(adoption_mod, "fetch_github_releases", return_value=None),
+                patch.object(adoption_mod, "fetch_huggingface", return_value=None),
             ):
                 self.assertEqual(adoption_mod.main([]), 1)
             self.assertFalse(adoption_path.exists())
             self.assertFalse(badge_path.exists())
 
+    def test_adoption_main_fails_closed_even_when_huggingface_is_alive(self):
+        """HF viva no rescata el exit 1: el gate sigue anclado a PyPI+GitHub."""
+        import scripts.fetch_adoption_stats as adoption_mod
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with (
+                patch.object(adoption_mod, "ADOPTION_PATH", Path(tmpdir) / "adoption.json"),
+                patch.object(adoption_mod, "BADGE_PATH", Path(tmpdir) / "adoption_badge.json"),
+                patch.object(adoption_mod, "fetch_pypi_recent", return_value=None),
+                patch.object(adoption_mod, "fetch_github_releases", return_value=None),
+                patch.object(
+                    adoption_mod, "fetch_huggingface", return_value={"downloads": 274, "likes": 0}
+                ),
+            ):
+                self.assertEqual(adoption_mod.main([]), 1)
+
     def test_adoption_main_writes_partial_signal_when_one_source_fails(self):
         """Con una fuente viva se escribe igual (exit 0): la degradación
-        parcial sigue siendo informativa."""
+        parcial sigue siendo informativa. HF ausente se registra como null."""
         import scripts.fetch_adoption_stats as adoption_mod
 
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -4348,6 +4469,7 @@ class AdoptionStatsTests(unittest.TestCase):
                 patch.object(adoption_mod, "ADOPTION_PATH", adoption_path),
                 patch.object(adoption_mod, "BADGE_PATH", badge_path),
                 patch.object(adoption_mod, "fetch_pypi_recent", return_value=None),
+                patch.object(adoption_mod, "fetch_huggingface", return_value=None),
                 patch.object(
                     adoption_mod,
                     "fetch_github_releases",
@@ -4358,6 +4480,7 @@ class AdoptionStatsTests(unittest.TestCase):
             payload = json.loads(adoption_path.read_text(encoding="utf-8"))
             self.assertIsNone(payload["pypi"]["last_month"])
             self.assertEqual(payload["github_releases"], {"total_downloads": 7})
+            self.assertIsNone(payload["huggingface"])
 
     def test_adoption_http_sends_identifiable_user_agent(self):
         """Varios WAFs bloquean el default 'Python-urllib/3.x' (causa raíz de

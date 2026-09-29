@@ -47,6 +47,18 @@ gh api repos/cortega26/chile-hub --jq '{stars: .stargazers_count, forks: .forks_
 
 ## Registro
 
+### 2026-09-29 — cierre Plan 129
+
+- `data/normalized/adoption.json` ahora incluye la señal de Hugging Face
+  (`huggingface`: `downloads`, `likes`, `lastModified`) leída de la API
+  pública del dataset espejo (`https://huggingface.co/api/datasets/cortega26/chile-hub`),
+  sin auth y bajo la misma política sin telemetría que el resto del script.
+  El umbral de Kaggle de la tabla de arriba (HF ≥ 2× baseline) deja de depender
+  de registro manual.
+- HF **degrada sola**: si la API falla, la clave queda `null` y el job no
+  aborta (el exit 1 sigue anclado a PyPI + GitHub Releases, las fuentes que
+  alimentan el badge y la señal base).
+
 ### 2026-09-26 — baseline post-lanzamiento
 
 - Se completó la wave de distribución (planes 101–105): HF con 21 subsets,
