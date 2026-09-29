@@ -22,7 +22,11 @@ if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
 import check_lighthouse
-from check_companion_paths import check_companions
+from check_companion_paths import (
+    COMPANION_RULES,
+    EXTRACTOR_RULE_EXCLUDED_PATHS,
+    check_companions,
+)
 
 PIPELINE_CHECK_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "pipeline-check.yml"
 PYPROJECT_TOML = ROOT_DIR / "pyproject.toml"
@@ -346,6 +350,83 @@ class DependabotWorkflowGuardrailTests(unittest.TestCase):
             ".github/workflows/testpypi.yml",
         ]
         self.assertEqual(check_companions(changed_workflows), [])
+
+
+class CompanionPathsRuleTests(unittest.TestCase):
+    """Caracteriza `check_companions` regla por regla.
+
+    El test de Dependabot pasa paths que no disparan ninguna regla, así que
+    una regresión de `COMPANION_RULES` (p. ej. un prefijo borrado o mal
+    escrito) apagaría el gate anti-drift de AGENTS §12 en silencio. La tabla
+    se deriva de `COMPANION_RULES` para fallar ruidosamente si entra una
+    regla sin representante.
+    """
+
+    # Path representativo por prefijo disparador (debe cubrir COMPANION_RULES).
+    TRIGGER_REPRESENTATIVES = {
+        "data/dataset_catalog_config.json": "data/dataset_catalog_config.json",
+        "data/source_registry.json": "data/source_registry.json",
+        "contracts/datasets/": "contracts/datasets/comunas.schema.json",
+        "src/validation.py": "src/validation.py",
+        "src/extractors/": "src/extractors/calidad_aire_extractor.py",
+        "src/build_dev_db.py": "src/build_dev_db.py",
+        "Makefile": "Makefile",
+        "scripts/check_agents_sync.py": "scripts/check_agents_sync.py",
+        "scripts/check_source_urls.py": "scripts/check_source_urls.py",
+        "src/builders/doc_sync.py": "src/builders/doc_sync.py",
+        "data/dataset_specs/": "data/dataset_specs/comunas.json",
+    }
+
+    @staticmethod
+    def _errors_for_rule(errors, trigger_prefix):
+        return [e for e in errors if e.startswith(f"'{trigger_prefix}' cambió")]
+
+    def test_representatives_cover_every_rule(self):
+        self.assertEqual(set(self.TRIGGER_REPRESENTATIVES), set(COMPANION_RULES))
+
+    def test_rule_without_companion_fails_and_names_expected_routes(self):
+        for trigger_prefix, companions in COMPANION_RULES.items():
+            trigger = self.TRIGGER_REPRESENTATIVES[trigger_prefix]
+            with self.subTest(trigger=trigger):
+                errors = check_companions([trigger])
+                self.assertEqual(len(errors), 1, errors)
+                # El mensaje debe nombrar tanto el trigger como las rutas
+                # compañeras esperadas (para que el PR sepa qué tocar).
+                self.assertIn(trigger, errors[0])
+                for companion in companions:
+                    self.assertIn(companion, errors[0])
+
+    def test_rule_with_each_companion_passes(self):
+        for trigger_prefix, companions in COMPANION_RULES.items():
+            trigger = self.TRIGGER_REPRESENTATIVES[trigger_prefix]
+            for companion in companions:
+                with self.subTest(trigger=trigger, companion=companion):
+                    # El compañero puede disparar a su vez su propia regla
+                    # (p. ej. data/source_registry.json): solo se exige que
+                    # esta regla quede satisfecha.
+                    errors = check_companions([trigger, companion])
+                    self.assertEqual(self._errors_for_rule(errors, trigger_prefix), [])
+
+    def test_extractor_shared_modules_do_not_trigger_the_rule(self):
+        """`base.py`/`http_utils.py`/etc. no representan un dataset propio."""
+        for excluded in sorted(EXTRACTOR_RULE_EXCLUDED_PATHS):
+            with self.subTest(excluded=excluded):
+                self.assertTrue(excluded.startswith("src/extractors/"))
+                self.assertEqual(check_companions([excluded]), [])
+
+    def test_catalog_change_with_agents_md_passes(self):
+        changed = ["data/dataset_catalog_config.json", "AGENTS.md"]
+        self.assertEqual(check_companions(changed), [])
+
+    def test_path_without_any_rule_passes(self):
+        for changed in (
+            ["README.md"],
+            ["docs/product-spec.md"],
+            ["tests/test_ci_config.py"],
+            ["src/chile_hub/core.py"],
+        ):
+            with self.subTest(changed=changed):
+                self.assertEqual(check_companions(changed), [])
 
 
 class AdoptionBadgeGuardrailTests(unittest.TestCase):
