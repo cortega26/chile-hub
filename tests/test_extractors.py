@@ -3508,6 +3508,280 @@ class EstadisticasVitalesExtractorTests(unittest.TestCase):
         self.assertTrue(any(r["codigo_comuna"] == "13101" for r in rows))
         self.assertTrue(any("snapshots locales" in n for n in notes))
 
+    # ── Plan 118: fetch incremental (solo anuarios ausentes + el último) ──
+
+    @staticmethod
+    def _write_staging_vitales(path: Path, years: list[int]) -> None:
+        """Escribe un staging sintético canónico (ambos eventos por año)."""
+        rows = []
+        for year in years:
+            for evento in ("nacimiento", "defuncion"):
+                rows.append(
+                    {
+                        "anio": year,
+                        "codigo_region": "13",
+                        "codigo_comuna": "13101",
+                        "nombre_comuna": "Santiago",
+                        "evento": evento,
+                        "sexo": "total",
+                        "cantidad": 0,
+                        "estado_dato": "definitivo",
+                        "fuente": "test",
+                        "url_fuente": "test",
+                        "fecha_fuente": "2020-01-01",
+                    }
+                )
+        estadisticas_vitales_extractor.normalize_rows(rows).write_csv(path)
+
+    @staticmethod
+    def _write_fake_anuario(path: Path) -> None:
+        """Mini XLSX layout 2015 con una comuna que reconcilia con su TOTAL."""
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.append(["volver"])
+        ws.append(["1.2.2-04: NACIDOS VIVOS"])
+        ws.append([])
+        ws.append(
+            [
+                "REGIÓN, PROVINCIA Y COMUNA DE RESIDENCIA",
+                "Nacidos vivos",
+                "Matrimonios",
+                "DEFUNCIONES",
+            ]
+        )
+        ws.append([None, None, None, "Generales"])
+        ws.append(["TOTAL", 60, 30, 40])
+        ws.append(["METROPOLITANA", 60, 30, 40])
+        ws.append(["Provincia Santiago", 60, 30, 40])
+        ws.append(["Santiago", 60, 30, 40])
+        wb.save(path)
+
+    @staticmethod
+    def _fake_anuario_rows(nuevos_years: list[int], cantidad: int) -> list[dict]:
+        return [
+            {
+                "anio": year,
+                "codigo_region": "13",
+                "codigo_comuna": "13101",
+                "nombre_comuna": "Santiago",
+                "evento": evento,
+                "sexo": "total",
+                "cantidad": cantidad,
+                "estado_dato": "definitivo",
+                "fuente": "test",
+                "url_fuente": "test",
+                "fecha_fuente": "2026-09-29",
+            }
+            for year in nuevos_years
+            for evento in ("nacimiento", "defuncion")
+        ]
+
+    def _downloads_recorder(self, tmpdir: str) -> tuple[list[int], object]:
+        descargados: list[int] = []
+
+        def fake_download(_url, year):
+            descargados.append(year)
+            path = Path(tmpdir) / f"anuario_{year}.xlsx"
+            self._write_fake_anuario(path)
+            return path
+
+        return descargados, fake_download
+
+    def test_fetch_incremental_descarga_solo_faltantes_y_ultimo(self):
+        """Plan 118: con staging legible solo se descargan los anuarios
+        ausentes + el más reciente (aunque ya esté en el staging)."""
+        from src.extractors import estadisticas_vitales_extractor as ev
+
+        anuarios = [
+            (year, f"Anuario de estadísticas vitales {year}", f"https://x/{year}.xlsx")
+            for year in (2020, 2021, 2022, 2023)
+        ]
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            staging_csv = Path(tmpdir) / "estadisticas_vitales.csv"
+            self._write_staging_vitales(staging_csv, [2020, 2022])
+            descargados, fake_download = self._downloads_recorder(tmpdir)
+
+            with (
+                patch.object(ev, "_discover_anuario_docs", return_value=anuarios),
+                patch.object(ev, "_download_xlsx", side_effect=fake_download),
+                patch.object(
+                    ev,
+                    "_load_comunas_lookup",
+                    return_value=({"santiago": ("13101", "13", "Santiago")}, set()),
+                ),
+                patch.object(ev, "STAGING_CSV_PATH", str(staging_csv)),
+            ):
+                rows, mode, _url, notes = ev.fetch_data()
+
+        # 2021 falta del staging; 2023 es el máximo (se re-descarga siempre).
+        self.assertEqual(sorted(descargados), [2021, 2023])
+        self.assertEqual(mode, "live")
+        self.assertEqual(ev._LAST_FETCH_MODE, "incremental")
+        self.assertEqual({r["anio"] for r in rows}, {2021, 2023})
+        self.assertTrue(any("fetch incremental: 2 de 4" in n for n in notes))
+
+    def test_process_merge_preserva_años_no_fetcheados(self):
+        """Plan 118: el merge conserva los años históricos del staging y
+        agrega el año recién descargado, con metadata recalculada."""
+        from src.extractors import estadisticas_vitales_extractor as ev
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            staging_csv = Path(tmpdir) / "estadisticas_vitales.csv"
+            metadata_path = Path(tmpdir) / "estadisticas_vitales.metadata.json"
+            self._write_staging_vitales(staging_csv, [2020, 2021])
+            nuevos = self._fake_anuario_rows([2022], cantidad=7)
+
+            with (
+                patch.object(ev, "STAGING_CSV_PATH", str(staging_csv)),
+                patch.object(ev, "METADATA_PATH", str(metadata_path)),
+                patch.object(ev, "_LAST_FETCH_MODE", "incremental"),
+                patch.object(
+                    ev, "fetch_data", return_value=(nuevos, "live", ev.EEVV_PAGE, ["test"])
+                ),
+            ):
+                metadata = ev.process_estadisticas_vitales()
+
+            df = pl.read_csv(
+                staging_csv,
+                schema_overrides={"codigo_comuna": pl.String, "codigo_region": pl.String},
+            )
+            metadata_json = json.loads(metadata_path.read_text(encoding="utf-8"))
+
+        self.assertEqual(sorted(df["anio"].unique().to_list()), [2020, 2021, 2022])
+        self.assertEqual(df.height, 6)
+        # El merge no degrada los tipos canónicos exigidos por el validador.
+        self.assertEqual(df["anio"].dtype, pl.Int64)
+        self.assertEqual(df["cantidad"].dtype, pl.Int64)
+        self.assertEqual(df["codigo_comuna"].dtype, pl.String)
+        self.assertEqual(metadata["record_count"], 6)
+        self.assertEqual(metadata_json["record_count"], 6)
+
+    def test_process_merge_reemplaza_año_refetcheado(self):
+        """Plan 118: un año re-descargado reemplaza su versión previa del
+        staging en vez de duplicar la clave primaria (anio, comuna, evento, sexo)."""
+        from src.extractors import estadisticas_vitales_extractor as ev
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            staging_csv = Path(tmpdir) / "estadisticas_vitales.csv"
+            metadata_path = Path(tmpdir) / "estadisticas_vitales.metadata.json"
+            self._write_staging_vitales(staging_csv, [2020, 2021])
+            nuevos = self._fake_anuario_rows([2021], cantidad=7)
+
+            with (
+                patch.object(ev, "STAGING_CSV_PATH", str(staging_csv)),
+                patch.object(ev, "METADATA_PATH", str(metadata_path)),
+                patch.object(ev, "_LAST_FETCH_MODE", "incremental"),
+                patch.object(
+                    ev, "fetch_data", return_value=(nuevos, "live", ev.EEVV_PAGE, ["test"])
+                ),
+            ):
+                ev.process_estadisticas_vitales()
+
+            df = pl.read_csv(
+                staging_csv,
+                schema_overrides={"codigo_comuna": pl.String, "codigo_region": pl.String},
+            )
+
+        self.assertEqual(df.height, 4)
+        filas_2021 = df.filter(pl.col("anio") == 2021)
+        self.assertEqual(filas_2021.height, 2)
+        self.assertEqual(set(filas_2021["cantidad"].to_list()), {7})
+
+    def test_force_full_por_env_ignora_staging(self):
+        """Plan 118: el refresh total forzado ignora el staging legible."""
+        from src.extractors import estadisticas_vitales_extractor as ev
+
+        anuarios = [
+            (year, f"Anuario de estadísticas vitales {year}", f"https://x/{year}.xlsx")
+            for year in (2020, 2021, 2022, 2023)
+        ]
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            staging_csv = Path(tmpdir) / "estadisticas_vitales.csv"
+            self._write_staging_vitales(staging_csv, [2020, 2021, 2022])
+            descargados, fake_download = self._downloads_recorder(tmpdir)
+
+            with (
+                patch.dict("os.environ", {"CHILE_HUB_VITALES_FULL": "1"}),
+                patch.object(ev, "_discover_anuario_docs", return_value=anuarios),
+                patch.object(ev, "_download_xlsx", side_effect=fake_download),
+                patch.object(
+                    ev,
+                    "_load_comunas_lookup",
+                    return_value=({"santiago": ("13101", "13", "Santiago")}, set()),
+                ),
+                patch.object(ev, "STAGING_CSV_PATH", str(staging_csv)),
+            ):
+                rows, _mode, _url, notes = ev.fetch_data()
+
+        # Sin el override, con staging 2020-2022 solo se bajaría 2023.
+        self.assertEqual(sorted(descargados), [2020, 2021, 2022, 2023])
+        self.assertEqual(ev._LAST_FETCH_MODE, "full")
+        self.assertFalse(any("incremental" in n for n in notes))
+        self.assertEqual({r["anio"] for r in rows}, {2020, 2021, 2022, 2023})
+
+    def test_sin_staging_fetch_completo(self):
+        """Plan 118 (no regresión): sin staging legible se descarga todo."""
+        from src.extractors import estadisticas_vitales_extractor as ev
+
+        anuarios = [
+            (year, f"Anuario de estadísticas vitales {year}", f"https://x/{year}.xlsx")
+            for year in (2020, 2021, 2022, 2023)
+        ]
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            staging_csv = Path(tmpdir) / "estadisticas_vitales.csv"
+            descargados, fake_download = self._downloads_recorder(tmpdir)
+
+            with (
+                patch.object(ev, "_discover_anuario_docs", return_value=anuarios),
+                patch.object(ev, "_download_xlsx", side_effect=fake_download),
+                patch.object(
+                    ev,
+                    "_load_comunas_lookup",
+                    return_value=({"santiago": ("13101", "13", "Santiago")}, set()),
+                ),
+                patch.object(ev, "STAGING_CSV_PATH", str(staging_csv)),
+            ):
+                rows, _mode, _url, notes = ev.fetch_data()
+
+        self.assertEqual(sorted(descargados), [2020, 2021, 2022, 2023])
+        self.assertEqual(ev._LAST_FETCH_MODE, "full")
+        self.assertFalse(any("incremental" in n for n in notes))
+        self.assertEqual({r["anio"] for r in rows}, {2020, 2021, 2022, 2023})
+
+    def test_staging_corrupto_degrada_a_full(self):
+        """Plan 118: un staging ilegible (sin columna anio) degrada a full."""
+        from src.extractors import estadisticas_vitales_extractor as ev
+
+        anuarios = [
+            (year, f"Anuario de estadísticas vitales {year}", f"https://x/{year}.xlsx")
+            for year in (2020, 2021, 2022, 2023)
+        ]
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            staging_csv = Path(tmpdir) / "estadisticas_vitales.csv"
+            staging_csv.write_text("esto no es un csv de vitales\n", encoding="utf-8")
+            descargados, fake_download = self._downloads_recorder(tmpdir)
+
+            with (
+                patch.object(ev, "_discover_anuario_docs", return_value=anuarios),
+                patch.object(ev, "_download_xlsx", side_effect=fake_download),
+                patch.object(
+                    ev,
+                    "_load_comunas_lookup",
+                    return_value=({"santiago": ("13101", "13", "Santiago")}, set()),
+                ),
+                patch.object(ev, "STAGING_CSV_PATH", str(staging_csv)),
+            ):
+                self.assertIsNone(ev._staging_years_present())
+                _rows, _mode, _url, notes = ev.fetch_data()
+
+        self.assertEqual(sorted(descargados), [2020, 2021, 2022, 2023])
+        self.assertEqual(ev._LAST_FETCH_MODE, "full")
+        self.assertFalse(any("incremental" in n for n in notes))
+
     def test_run_dry_run_returns_validation_without_writing(self):
         """Dry run ejecuta fetch + normalize + validate sin persistir."""
         with tempfile.TemporaryDirectory() as tmpdir:
