@@ -74,6 +74,10 @@ Actualmente registra veinticinco (<!-- START_AGENTS_DATASET_COUNT -->25<!-- END_
 **El objetivo no es tener todos los datos de Chile. Es entregar un número pequeño de datasets
 limpios, versionados, validados y consumibles en una línea de código.**
 
+chile-hub no es un portal ni una fuente oficial: es la última milla aguas abajo de datos.gob.cl
+y de las instituciones fuente, y nunca se describe como "oficial". Misión, visión y principios
+viven en `docs/product-spec.md` (ADR-023); no los dupliques aquí.
+
 > **Carriles de publicación:** no todos los datasets listados arriba están en el bundle
 > público. Algunos viven en el carril `candidate` (evaluados, implementados, pero fuera
 > del ZIP publicable por fragilidad de fuente o licencia) con una fecha `review_by` de

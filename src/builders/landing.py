@@ -92,7 +92,7 @@ def build_catalog_json_ld(public_site_url):
         "@type": "DataCatalog",
         "name": "chile-hub",
         "url": public_site_url,
-        "description": "Capa de datos oficial, curada y reproducible sobre Chile. Datasets limpios en Parquet, JSON, DuckDB y Excel.",
+        "description": "Capa curada y reproducible sobre datos oficiales de Chile. Datasets limpios en Parquet, JSON, DuckDB y Excel.",
         "publisher": {"@type": "Organization", "name": "chile-hub"},
         "dataset": datasets_json_ld,
     }

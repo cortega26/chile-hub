@@ -51,6 +51,7 @@ plugins:
 nav:
   - Sitio público: https://tooltician.com/chile-hub/
   - Inicio: index.md
+  - Misión y alcance: product-spec.md
   - Instalación: installation.md
   - Capas de datos: datasets/README.md
   - Aportar un dataset: contribuir-datasets.md

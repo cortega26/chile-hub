@@ -11,7 +11,7 @@
 </h1>
 
 <p><strong>Datos públicos de Chile, curados y listos para análisis en una línea de código.</strong></p>
-<p><em>El hub de datos abiertos de Chile — parte del ecosistema Tooltician.</em></p>
+<p><em>La última milla de los datos oficiales de Chile — parte del ecosistema Tooltician.</em></p>
 
 [![CI/CD](https://github.com/cortega26/chile-hub/actions/workflows/pipeline-check.yml/badge.svg)](https://github.com/cortega26/chile-hub/actions)
 [![PyPI version](https://img.shields.io/pypi/v/chile-hub.svg)](https://pypi.org/project/chile-hub/)
@@ -115,6 +115,11 @@ chile-hub cache clear      # Liberar espacio
 > el costo técnico** de encontrar, limpiar, validar, cruzar y consumir datasets
 > geográficos, demográficos, electorales y económicos críticos de Chile.
 >
+> Tampoco es un portal ni una fuente oficial: trabaja aguas abajo de
+> [datos.gob.cl](https://datos.gob.cl/) y de las instituciones que publican cada dato,
+> y siempre enlaza a la fuente oficial. Es un proyecto independiente, sin afiliación con
+> esas instituciones. Misión y principios: [`docs/product-spec.md`](docs/product-spec.md).
+>
 > En la práctica, responde preguntas como:
 >
 > - ¿Cómo cruzo mi base de clientes, escuelas o centros de salud con comunas oficiales sin perder ceros en los códigos?
@@ -175,10 +180,10 @@ El mismo estado se publica en el sitio, con historial de builds y detalle por ca
 ### Respaldo adicional
 
 <!-- START_TEST_COUNT -->
-- **1143 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
+- **1147 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
 <!-- END_TEST_COUNT -->
 <!-- START_ADR_COUNT -->
-- **22 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
+- **23 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
 <!-- END_ADR_COUNT -->
 - **Drift monitoreado:** todos los datasets bajo vigilancia de deriva de esquema; cualquier
   cambio en la fuente se detecta y registra ([`drift_report.md`](data/normalized/drift_report.md)).
