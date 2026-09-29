@@ -36,7 +36,9 @@ PARQUET_BASE = "https://tooltician.com/chile-hub/data/normalized"
 # Fuentes oficiales que se enlazan en cada ficha (ADR-023: la fuente oficial
 # manda). Lista explícita a propósito: en el registro, algunas `official_url`
 # apuntan a descargas directas (.rar, .xlsm) o al propio repo (capas derivadas
-# como `perfil_territorial_comunal`), y eso no es una fuente oficial.
+# como `perfil_territorial_comunal`), y eso no es una fuente oficial. Si la ficha
+# empieza a mostrar un campo de otra capa, agrega aquí su organismo: la lista
+# alimenta el footer y el `isBasedOn`, y varias licencias exigen la cita.
 SOURCE_AGENCIES = [
     ("INE", "censo_comunal"),
     ("BCN", "comunas"),
@@ -44,9 +46,10 @@ SOURCE_AGENCIES = [
     ("MINEDUC", "establecimientos_educacionales"),
     ("MDS", "pobreza_comunal"),
     ("SINIM/SUBDERE", "finanzas_municipales"),
+    ("MINVU", "permisos_edificacion"),
     ("MMA", "calidad_aire"),
 ]
-SOURCES_PLAIN_TEXT = "INE, BCN, MINSAL, MINEDUC, MDS, SINIM/SUBDERE y MMA"
+SOURCES_PLAIN_TEXT = "INE, BCN, MINSAL, MINEDUC, MDS, SINIM/SUBDERE, MINVU y MMA"
 
 REQUIRED_PERFIL_COLUMNS = {
     "codigo_region",
