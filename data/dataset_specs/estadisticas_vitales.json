@@ -1,0 +1,64 @@
+{
+  "spec_version": "1.0",
+  "dataset": "estadisticas_vitales",
+  "kind": "direct",
+  "publication_track": "stable_publishable",
+  "public_bundle_eligible": true,
+  "maturity_status": "stable",
+  "confidence_tier": "Tier A",
+  "extraction_lane": "anual",
+  "extractor": "src/extractors/estadisticas_vitales_extractor.py",
+  "contract_path": "contracts/datasets/estadisticas_vitales.schema.json",
+  "validator": "validate_estadisticas_vitales",
+  "alias_for": null,
+  "dependencies": [],
+  "source": {
+    "source_id": "ine_estadisticas_vitales",
+    "source_name": "INE — Estadísticas Vitales",
+    "official_url": "https://www.ine.gob.cl/estadisticas-por-tema/demografia-y-poblacion/estadisticas-vitales",
+    "access_method": "xlsx",
+    "license_status": "open-attribution",
+    "live_extractor_status": "implemented",
+    "fallback_policy": "allowed_for_dev_blocked_for_publication",
+    "live_ready": true,
+    "fallback_allowed": true,
+    "publish_blocking": true,
+    "review_by": "2026-12-31",
+    "stalled_after_days": 180,
+    "owner": "core",
+    "next_action": "Monitorear publicación del anuario 2024 (el extractor lo incorpora solo).",
+    "source_notes": "Un XLSX de anuario definitivo por año (2010 en adelante), tabla 1.2.2-04 por comuna de residencia. Descubrimiento vía endpoints JSON propios del sitio INE (hijosCarpeta/getArchivos). Layouts heterogéneos por año (totales 2010-2020, split por sexo desde 2021; 2016 en archivos separados). Los boletines provisionales no traen grano comunal: solo definitivos."
+  },
+  "reuse_policy": {
+    "status": "open-attribution",
+    "license": "CC BY 4.0",
+    "license_url": "https://www.ine.gob.cl/terminos-de-uso",
+    "attribution_required": true,
+    "redistribution_ok": true,
+    "summary": "Anuarios de Estadísticas Vitales del INE (nacimientos y defunciones por comuna). Datos abiertos con atribución requerida."
+  },
+  "freshness_policy": {
+    "max_age_hours": 8760,
+    "label": "anual"
+  },
+  "documentation": {
+    "description": "Nacimientos y defunciones por comuna de residencia y sexo, desde los Anuarios de Estadísticas Vitales del INE (definitivos, 2010 en adelante).",
+    "path": "docs/datasets/estadisticas_vitales.md",
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars(\"estadisticas_vitales\")\n# Nacimientos por comuna 2023\nnac_2023 = df.filter((pl.col(\"anio\") == 2023) & (pl.col(\"evento\") == \"nacimiento\"))",
+      "duckdb": "SELECT anio, codigo_comuna, sum(cantidad) AS hechos\nFROM 'data/normalized/estadisticas_vitales.parquet'\nWHERE evento = 'nacimiento'\nGROUP BY 1, 2 ORDER BY 1, 3 DESC;",
+      "cli": "chile-hub show estadisticas_vitales"
+    }
+  },
+  "outputs": {
+    "parquet": "data/normalized/estadisticas_vitales.parquet",
+    "json": "data/normalized/estadisticas_vitales.json",
+    "duckdb_table": "estadisticas_vitales",
+    "sqlite_table": "estadisticas_vitales",
+    "excel_sheet": "Estadísticas Vitales"
+  },
+  "join_keys": [
+    "anio",
+    "codigo_comuna"
+  ]
+}

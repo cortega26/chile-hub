@@ -84,10 +84,10 @@ src/
 │   └── pipeline_status_utils.py   Constructores de reportes (health, catalog, redistribution)
 ├── pipeline_status_utils.py       Shim de reexport — para scripts con PYTHONPATH=src.
 │   No dupliques logica aqui: la implementacion real es chile_hub/pipeline_status_utils.py (arriba)
-├── registry/                      DatasetSpec cohort Phase 2–3D, 22 specs (ADR-018)
+├── registry/                      DatasetSpec cohort Phase 2–3D, 25 specs (ADR-018)
 
 data/
-├── dataset_specs/  22 DatasetSpecs (sin spec: calidad_aire, estadisticas_vitales, permisos_edificacion)
+├── dataset_specs/  25 DatasetSpecs (cubre todo el catálogo)
 ├── raw/        Snapshots de auditoria — solo append, nunca editar
 ├── staging/    {dataset}.csv + {dataset}.metadata.json — entradas del pipeline
 └── normalized/ Artefactos generados — NUNCA editar manualmente; siempre regenerar

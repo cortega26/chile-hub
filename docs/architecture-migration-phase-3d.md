@@ -1,5 +1,9 @@
 # Architecture migration — Phase 3D cohort record
 
+> **Nota post-3D (2026-09-29):** el catálogo creció a 25 datasets; los 3 posteriores
+> (`calidad_aire`, `estadisticas_vitales`, `permisos_edificacion`) se sumaron al cohort
+> en el Plan 124.
+
 **Status:** executed — Phase 3D exceptional lifecycle cohort (7 datasets), compatibility
 backed by `DatasetSpec`, per the frozen [migration roadmap](architecture-migration-roadmap.md)
 and ratified decisions [ADR-018](adr/ADR-018-datasetspec-boundary-and-contract-authority.md) /

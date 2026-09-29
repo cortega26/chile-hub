@@ -1,0 +1,64 @@
+{
+  "spec_version": "1.0",
+  "dataset": "permisos_edificacion",
+  "kind": "direct",
+  "publication_track": "stable_publishable",
+  "public_bundle_eligible": true,
+  "maturity_status": "stable",
+  "confidence_tier": "Tier A",
+  "extraction_lane": "mensual",
+  "extractor": "src/extractors/permisos_edificacion_extractor.py",
+  "contract_path": "contracts/datasets/permisos_edificacion.schema.json",
+  "validator": "validate_permisos_edificacion",
+  "alias_for": null,
+  "dependencies": [],
+  "source": {
+    "source_id": "minvu_permisos_edificacion",
+    "source_name": "MINVU — Centro de Estudios de Ciudad y Territorio (CEDOC)",
+    "official_url": "https://centrodeestudios.minvu.gob.cl/repositorio/categoria/permisos-de-edificacion",
+    "access_method": "direct_file",
+    "license_status": "open-attribution",
+    "live_extractor_status": "implemented",
+    "fallback_policy": "allowed_for_dev_blocked_for_publication",
+    "live_ready": true,
+    "fallback_allowed": true,
+    "publish_blocking": true,
+    "review_by": "2026-12-31",
+    "stalled_after_days": 90,
+    "owner": "core",
+    "next_action": "Monitorear que el biblionumber 25583 siga resolviendo al XLSX anual vigente.",
+    "source_notes": "XLSX 'Viviendas unidades y superficie según año y comuna' (serie 2002 en adelante, 6 hojas: número/m2 × total/casas/departamentos). Descubrimiento vía biblionumber Koha 25583 en la página del repositorio CEDOC. Ñuble se lista bajo 'Biobío' y 'Ñuble (ex-Biobío)' con series complementarias: el extractor las fusiona. Años marcados (*) y el último de la serie van como provisionales."
+  },
+  "reuse_policy": {
+    "status": "open-attribution",
+    "license": "Uso autorizado con cita (MINVU CEDOC)",
+    "license_url": "https://centrodeestudios.minvu.gob.cl/repositorio/categoria/permisos-de-edificacion",
+    "attribution_required": true,
+    "redistribution_ok": true,
+    "summary": "Estadísticas de permisos de edificación del CEDOC (MINVU). El Centro autoriza el uso de la información citando la fuente."
+  },
+  "freshness_policy": {
+    "max_age_hours": 1080,
+    "label": "mensual"
+  },
+  "documentation": {
+    "description": "Viviendas en unidades y superficie (m2) por comuna y año —casas y departamentos— desde las estadísticas de permisos de edificación del CEDOC (MINVU), serie desde 2002.",
+    "path": "docs/datasets/permisos_edificacion.md",
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars(\"permisos_edificacion\")\n# Unidades autorizadas por comuna 2023\nunid_2023 = df.filter(pl.col(\"anio\") == 2023).sort(\"unidades_total\", descending=True)",
+      "duckdb": "SELECT anio, codigo_comuna, unidades_total, superficie_m2_total\nFROM 'data/normalized/permisos_edificacion.parquet'\nWHERE anio = 2023 ORDER BY unidades_total DESC LIMIT 10;",
+      "cli": "chile-hub show permisos_edificacion"
+    }
+  },
+  "outputs": {
+    "parquet": "data/normalized/permisos_edificacion.parquet",
+    "json": "data/normalized/permisos_edificacion.json",
+    "duckdb_table": "permisos_edificacion",
+    "sqlite_table": "permisos_edificacion",
+    "excel_sheet": "Permisos Edificación"
+  },
+  "join_keys": [
+    "anio",
+    "codigo_comuna"
+  ]
+}
