@@ -5354,6 +5354,83 @@ class ComunaPagesTests(unittest.TestCase):
         self.assertIn('href="https://tooltician.com/chile-hub/comunas/valparaiso/"', page)
         self.assertIn("Licencias", page)
 
+    def _dataset_json_ld(self, page: str) -> dict:
+        blocks = re.findall(
+            r'<script type="application/ld\+json">\n(.*?)\n</script>', page, flags=re.DOTALL
+        )
+        datasets = [json.loads(block) for block in blocks]
+        return next(block for block in datasets if block["@type"] == "Dataset")
+
+    def test_render_comuna_page_links_official_sources(self):
+        """ADR-023: la ficha enlaza a la fuente oficial y declara `isBasedOn`."""
+        from scripts.build_comuna_pages import render_comuna_page
+
+        sources = [
+            ("INE", "https://www.ine.gob.cl/"),
+            ("MINSAL vía datos.gob.cl", "https://datos.gob.cl/"),
+        ]
+        page = render_comuna_page(
+            self.PERFIL_ROW,
+            {"ingresos": 5.4},
+            "nunoa",
+            "https://tooltician.com/chile-hub",
+            "2026-09-25",
+            sources=sources,
+        )
+        self.assertIn('<a href="https://www.ine.gob.cl/">INE</a>', page)
+        self.assertIn('<a href="https://datos.gob.cl/">MINSAL vía datos.gob.cl</a>', page)
+        self.assertIn("proyecto independiente", page)
+        self.assertNotIn("Indicadores oficiales", page)
+        self.assertEqual(page.count("application/ld+json"), 2, "Dataset + BreadcrumbList")
+        self.assertEqual(
+            self._dataset_json_ld(page)["isBasedOn"],
+            ["https://www.ine.gob.cl/", "https://datos.gob.cl/"],
+        )
+
+    def test_render_comuna_page_without_sources_uses_plain_text(self):
+        from scripts.build_comuna_pages import SOURCES_PLAIN_TEXT, render_comuna_page
+
+        page = render_comuna_page(
+            self.PERFIL_ROW,
+            {},
+            "nunoa",
+            "https://tooltician.com/chile-hub",
+            "2026-09-25",
+        )
+        self.assertIn(SOURCES_PLAIN_TEXT, page)
+        self.assertNotIn("isBasedOn", self._dataset_json_ld(page))
+
+    def test_load_sources_from_registry_are_official_landing_pages(self):
+        """Las fuentes enlazadas deben ser páginas oficiales, no descargas ni el repo.
+
+        Regresión a evitar: leer todo el registro a ciegas enlazaría el propio
+        GitHub (capa derivada) o archivos `.rar`/`.xlsm` como "fuente oficial".
+        """
+        from scripts.build_comuna_pages import SOURCE_AGENCIES, load_sources
+
+        sources = load_sources()
+        self.assertEqual([label for label, _ in sources], [label for label, _ in SOURCE_AGENCIES])
+        for label, url in sources:
+            self.assertTrue(url.startswith("https://"), f"{label}: {url}")
+            self.assertNotIn("github.com/cortega26", url, label)
+            self.assertFalse(
+                url.lower().endswith((".rar", ".zip", ".xls", ".xlsx", ".xlsm", ".csv")),
+                f"{label} apunta a una descarga directa: {url}",
+            )
+
+    def test_load_sources_fails_loud_on_missing_dataset(self):
+        from scripts.build_comuna_pages import load_sources
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            registry = Path(tmpdir) / "source_registry.json"
+            registry.write_text(
+                json.dumps([{"dataset": "censo_comunal", "official_url": "https://x.cl/"}]),
+                encoding="utf-8",
+            )
+            with self.assertRaises(SystemExit):
+                load_sources(registry)
+            self.assertEqual(load_sources(Path(tmpdir) / "no-existe.json"), [])
+
     def test_main_uses_complete_permit_year_from_metrics(self):
         import json as json_module
 

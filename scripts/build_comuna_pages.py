@@ -29,8 +29,24 @@ POBREZA_PATH = ROOT_DIR / "data" / "normalized" / "pobreza_comunal.parquet"
 # Asset del mapa (build diario): trae los permisos del último año completo y su
 # año; el perfil publica el año en curso, que suele estar parcial.
 METRICAS_PATH = ROOT_DIR / "data" / "normalized" / "mapa_metricas.json"
+REGISTRY_PATH = ROOT_DIR / "data" / "source_registry.json"
 PUBLIC_SITE_URL = "https://tooltician.com/chile-hub/"
 PARQUET_BASE = "https://tooltician.com/chile-hub/data/normalized"
+
+# Fuentes oficiales que se enlazan en cada ficha (ADR-023: la fuente oficial
+# manda). Lista explícita a propósito: en el registro, algunas `official_url`
+# apuntan a descargas directas (.rar, .xlsm) o al propio repo (capas derivadas
+# como `perfil_territorial_comunal`), y eso no es una fuente oficial.
+SOURCE_AGENCIES = [
+    ("INE", "censo_comunal"),
+    ("BCN", "comunas"),
+    ("MINSAL vía datos.gob.cl", "establecimientos_salud"),
+    ("MINEDUC", "establecimientos_educacionales"),
+    ("MDS", "pobreza_comunal"),
+    ("SINIM/SUBDERE", "finanzas_municipales"),
+    ("MMA", "calidad_aire"),
+]
+SOURCES_PLAIN_TEXT = "INE, BCN, MINSAL, MINEDUC, MDS, SINIM/SUBDERE y MMA"
 
 REQUIRED_PERFIL_COLUMNS = {
     "codigo_region",
@@ -167,12 +183,26 @@ def _shell_header(site_url: str) -> str:
     )
 
 
-def _shell_footer(site_url: str, generated_at: str) -> str:
+def _sources_html(sources: list[tuple[str, str]] | None) -> str:
+    """Organismos fuente enlazados a su `official_url`; texto plano sin registro."""
+    if not sources:
+        return SOURCES_PLAIN_TEXT
+    links = [f'<a href="{html.escape(url)}">{html.escape(label)}</a>' for label, url in sources]
+    if len(links) == 1:
+        return links[0]
+    return ", ".join(links[:-1]) + " y " + links[-1]
+
+
+def _shell_footer(
+    site_url: str, generated_at: str, sources: list[tuple[str, str]] | None = None
+) -> str:
     base = site_url.rstrip("/")
     return (
         "<footer>"
-        "Fuentes: INE, BCN, MINSAL, MINEDUC, MDS, SINIM/SUBDERE y MMA, curados y "
-        f'validados por <a href="{base}/">chile-hub</a>. '
+        f"Fuentes oficiales: {_sources_html(sources)}. Datos curados y validados por "
+        f'<a href="{base}/">chile-hub</a>, un proyecto independiente sin afiliación con el '
+        "Estado ni con esas instituciones; ante cualquier diferencia, prevalece la fuente "
+        "oficial. "
         f'<a href="{base}/comunas/">Explorar todas las comunas</a> · '
         f'<a href="{base}/reference/">Documentación</a> · '
         '<a href="https://github.com/cortega26/chile-hub/blob/main/DATA_LICENSES.md">Licencias</a>. '
@@ -282,16 +312,18 @@ def _pairs(row: dict, spec: list[tuple[str, str]]) -> list[tuple[str, str]]:
     return [(label, _fmt(row.get(field), field)) for label, field in spec if field in row]
 
 
-def _dataset_json_ld(row: dict, page_url: str, site_url: str) -> dict:
+def _dataset_json_ld(
+    row: dict, page_url: str, site_url: str, sources: list[tuple[str, str]] | None = None
+) -> dict:
     nombre = row["nombre_comuna"]
-    return {
+    json_ld = {
         "@context": "https://schema.org",
         "@type": "Dataset",
         "name": f"Perfil territorial de {nombre}",
         "description": (
             f"Indicadores consolidados de la comuna de {nombre} (población, "
             "vivienda, pobreza, salud, educación, finanzas municipales y "
-            "territorio) a partir de fuentes oficiales de Chile."
+            "territorio), curados por chile-hub a partir de fuentes oficiales de Chile."
         ),
         "url": page_url,
         "creator": {"@type": "Organization", "name": "chile-hub"},
@@ -304,6 +336,9 @@ def _dataset_json_ld(row: dict, page_url: str, site_url: str) -> dict:
         "inLanguage": "es",
         "license": "https://github.com/cortega26/chile-hub/blob/main/DATA_LICENSES.md",
     }
+    if sources:
+        json_ld["isBasedOn"] = [url for _, url in sources]
+    return json_ld
 
 
 def _json_for_html(obj: dict) -> str:
@@ -323,17 +358,22 @@ def render_comuna_page(
     site_url: str,
     generated_at: str,
     related: list[tuple[str, str]] | None = None,
+    sources: list[tuple[str, str]] | None = None,
 ) -> str:
-    """HTML completo de una comuna. Todos los textos se escapan."""
+    """HTML completo de una comuna. Todos los textos se escapan.
+
+    `sources` son pares (organismo, official_url) de `load_sources()`; sin ellos,
+    el footer nombra las fuentes en texto plano y el JSON-LD omite `isBasedOn`.
+    """
     nombre = str(row["nombre_comuna"])
     base = site_url.rstrip("/")
     cut = str(row["codigo_comuna"])
     page_url = f"{base}/comunas/{slug}/"
-    title = f"Comuna de {nombre}: población, pobreza y datos oficiales"
+    title = f"Comuna de {nombre}: población, pobreza e indicadores"
     description = (
-        f"Indicadores oficiales de {nombre} ({row['nombre_region']}): población "
-        f"censada, pobreza, vivienda, salud, educación y finanzas municipales. "
-        "Datos curados por chile-hub."
+        f"Indicadores de {nombre} ({row['nombre_region']}) desde fuentes oficiales: "
+        "población censada, pobreza, vivienda, salud, educación y finanzas municipales. "
+        "Curados por chile-hub."
     )
     poverty_pairs = []
     if poverty.get("ingresos") is not None:
@@ -345,7 +385,7 @@ def render_comuna_page(
     if not poverty_pairs:
         poverty_pairs.append(("Pobreza comunal (SAE)", "s/d"))
 
-    dataset_ld = _json_for_html(_dataset_json_ld(row, page_url, site_url))
+    dataset_ld = _json_for_html(_dataset_json_ld(row, page_url, site_url, sources))
     breadcrumb_ld = _json_for_html(
         {
             "@context": "https://schema.org",
@@ -417,7 +457,7 @@ comunas = hub.load_polars("comunas")
 mi_comuna = comunas.filter(pl.col("codigo_comuna") == "{html.escape(cut)}")</pre>
 </section>
 {_related_card(related or [], site_url)}
-{_shell_footer(site_url, generated_at)}
+{_shell_footer(site_url, generated_at, sources)}
 </main>
 </body>
 </html>
@@ -425,7 +465,11 @@ mi_comuna = comunas.filter(pl.col("codigo_comuna") == "{html.escape(cut)}")</pre
 
 
 def render_index(
-    rows: list[dict], slugs: dict[str, str], site_url: str, generated_at: str = "hoy"
+    rows: list[dict],
+    slugs: dict[str, str],
+    site_url: str,
+    generated_at: str = "hoy",
+    sources: list[tuple[str, str]] | None = None,
 ) -> str:
     by_region: dict[str, list[dict]] = {}
     for row in rows:
@@ -444,8 +488,8 @@ def render_index(
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Comunas de Chile: indicadores oficiales por comuna | chile-hub</title>
-<meta name="description" content="Las 346 comunas de Chile con población censada, pobreza, vivienda, salud, educación y finanzas municipales. Datos oficiales curados por chile-hub.">
+<title>Comunas de Chile: indicadores por comuna desde fuentes oficiales | chile-hub</title>
+<meta name="description" content="Las 346 comunas de Chile con población censada, pobreza, vivienda, salud, educación y finanzas municipales, desde fuentes oficiales y curadas por chile-hub.">
 <link rel="canonical" href="{site_url.rstrip("/")}/comunas/">
 <style>{PAGE_CSS}</style>
 </head>
@@ -454,11 +498,11 @@ def render_index(
 <main>
 <nav class="crumbs"><a href="{site_url.rstrip("/")}/">chile-hub</a> › Comunas</nav>
 <h1>Comunas de Chile</h1>
-<p class="sub">Indicadores oficiales por comuna, generados desde el perfil territorial de chile-hub.</p>
+<p class="sub">Indicadores por comuna desde fuentes oficiales, consolidados en el perfil territorial de chile-hub.</p>
 <div class="grid">
 {"".join(sections)}
 </div>
-{_shell_footer(site_url, generated_at)}
+{_shell_footer(site_url, generated_at, sources)}
 </main>
 </body>
 </html>
@@ -494,6 +538,32 @@ def load_rows(perfil_path: Path, pobreza_path: Path) -> tuple[list[dict], dict[s
     return rows, poverty
 
 
+def load_sources(registry_path: Path = REGISTRY_PATH) -> list[tuple[str, str]]:
+    """Pares (organismo, official_url) de `SOURCE_AGENCIES`, sin URLs repetidas.
+
+    Devuelve una lista vacía si el registro no existe, y la ficha vuelve a nombrar
+    las fuentes en texto plano. Si el registro existe pero le falta una clave o su
+    `official_url`, falla con estridencia: es deriva del catálogo (AGENTS.md §4.2).
+    """
+    if not registry_path.exists():
+        return []
+    entries = json.loads(registry_path.read_text(encoding="utf-8"))
+    urls = {entry.get("dataset"): entry.get("official_url") for entry in entries}
+    sources: list[tuple[str, str]] = []
+    seen: set[str] = set()
+    for label, dataset in SOURCE_AGENCIES:
+        url = urls.get(dataset)
+        if not url:
+            raise SystemExit(
+                f"ERROR: {registry_path} no tiene official_url para '{dataset}' "
+                "(fuente de las fichas comunales, ver SOURCE_AGENCIES)."
+            )
+        if url not in seen:
+            seen.add(url)
+            sources.append((label, url))
+    return sources
+
+
 def _load_metricas(path: Path = METRICAS_PATH) -> dict[str, dict]:
     """Métricas del mapa (build diario); vacío si el asset aún no existe."""
     if not path.exists():
@@ -518,6 +588,11 @@ def main(argv: list[str] | None = None) -> int:
         help="Asset del mapa con permisos del último año completo (opcional).",
     )
     parser.add_argument(
+        "--registry",
+        default=str(REGISTRY_PATH),
+        help="Registro de fuentes con la official_url de cada dataset.",
+    )
+    parser.add_argument(
         "--generated-at",
         default=datetime.datetime.now(datetime.UTC).date().isoformat(),
         help="Fecha ISO para lastmod/atribución (default: hoy UTC).",
@@ -526,6 +601,7 @@ def main(argv: list[str] | None = None) -> int:
 
     rows, poverty = load_rows(Path(args.perfil), Path(args.pobreza))
     metricas = _load_metricas(Path(args.metricas))
+    sources = load_sources(Path(args.registry))
     for row in rows:
         valores = metricas.get(str(row["codigo_comuna"]), {})
         if "viviendas_autorizadas" in valores:
@@ -563,12 +639,14 @@ def main(argv: list[str] | None = None) -> int:
                 args.site_url,
                 args.generated_at,
                 related=related,
+                sources=sources,
             ),
             encoding="utf-8",
         )
 
     (out_dir / "index.html").write_text(
-        render_index(rows, slugs, args.site_url, args.generated_at), encoding="utf-8"
+        render_index(rows, slugs, args.site_url, args.generated_at, sources=sources),
+        encoding="utf-8",
     )
     urls = [f"{args.site_url.rstrip('/')}/comunas/"] + [
         f"{args.site_url.rstrip('/')}/comunas/{slugs[str(row['codigo_comuna'])]}/" for row in rows
