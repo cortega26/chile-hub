@@ -1,7 +1,7 @@
 # ADR-023: chile-hub es la última milla de los datos oficiales, no un portal
 
 **Fecha:** 2026-09-29
-**Estado:** proposed (pasa a accepted al mergear el PR que lo introduce)
+**Estado:** accepted (ratificado por el mantenedor al aprobar el plan, 2026-09-29)
 **Decisión:**
 - chile-hub se posiciona como una capa de reutilización que trabaja aguas abajo de las fuentes oficiales y de datos.gob.cl. No es un portal ni una fuente oficial.
 - La misión, la visión y los principios tienen un solo dueño: la sección "Misión, visión y relación con el ecosistema oficial" de `docs/product-spec.md`.
