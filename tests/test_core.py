@@ -8,6 +8,7 @@ No cubren el CLI (argparse + _main) — eso corresponde a tests de integración.
 """
 
 import datetime
+import os
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -16,6 +17,7 @@ import polars as pl
 
 from chile_hub import ChileHub
 from chile_hub.exceptions import ChileHubDataError, ChileHubDatasetError
+from chile_hub.geo import clear_geometry_cache
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 NORMALIZED_DIR = ROOT_DIR / "data" / "normalized"
@@ -407,6 +409,35 @@ class ChileHubEdgeCaseTests(unittest.TestCase):
             self.assertIn("status", r)
             self.assertEqual(r["status"], "online")
 
+    def test_check_sources_preserves_catalog_order_and_completeness(self):
+        """El pool paralelo preserva orden y cardinalidad del catálogo (Plan 120).
+
+        Un dict por entrada del catálogo, en el mismo orden: ``pool.map``
+        garantiza el orden de ``entries`` sin indexar.
+        """
+        hub = _hub()
+        entries = list(hub.catalog.get("datasets", []))
+        self.assertGreater(len(entries), 0)
+
+        def fake_head(*_args, **_kwargs):
+            # Respuesta nueva por llamada: el mismo MagicMock compartido entre
+            # threads acumularía estado de mock de forma no determinista.
+            response = mock.MagicMock(status_code=200, elapsed=datetime.timedelta(milliseconds=5))
+            response.close = lambda: None
+            return response
+
+        with mock.patch("chile_hub.core.requests.head", side_effect=fake_head):
+            results = hub.check_sources(timeout=3)
+
+        self.assertEqual(len(results), len(entries))
+        self.assertEqual(
+            [r["dataset"] for r in results],
+            [entry.get("dataset") for entry in entries],
+        )
+        for r in results:
+            self.assertEqual(r["status"], "online")
+            self.assertIsNotNone(r["latency_ms"])
+
 
 class ChileHubInternalHelpersTests(unittest.TestCase):
     """Tests para funciones internas de core.py no cubiertas por tests existentes."""
@@ -649,6 +680,12 @@ class ChileHubResolveByCoordsTests(unittest.TestCase):
     def setUpClass(cls):
         cls.hub = _hub()
 
+    def setUp(self):
+        clear_geometry_cache()
+
+    def tearDown(self):
+        clear_geometry_cache()
+
     @staticmethod
     def _fixture_path(comunas=None):
         import tempfile
@@ -736,6 +773,46 @@ class ChileHubResolveByCoordsTests(unittest.TestCase):
             with self.assertRaises(ImportError) as ctx:
                 hub.resolve_by_coords([(-19.5, -70.0)], geometry_path=fixture)
             self.assertIn("pip install chile-hub[geo]", str(ctx.exception))
+
+    def test_geometry_read_once_across_calls(self):
+        """Dos resolve_by_coords con el mismo fixture leen el parquet una sola
+        vez: la segunda llamada reutiliza la caché de ``load_geometry`` (Plan 120)."""
+        import geopandas as gpd
+
+        fixture = self._fixture_path()
+        real_read_parquet = gpd.read_parquet
+        reads = []
+
+        def counting_read_parquet(*args, **kwargs):
+            reads.append(args[0] if args else kwargs.get("path"))
+            return real_read_parquet(*args, **kwargs)
+
+        with mock.patch("chile_hub.geo.MIN_NON_EMPTY_GEOMETRIES", 3):
+            with mock.patch("geopandas.read_parquet", side_effect=counting_read_parquet):
+                first = self.hub.resolve_by_coords([(-19.5, -70.0)], geometry_path=fixture)
+                second = self.hub.resolve_by_coords([(-19.5, -70.0)], geometry_path=fixture)
+
+        self.assertEqual(len(reads), 1)
+        self.assertEqual(first.to_dicts(), second.to_dicts())
+
+    def test_geometry_cache_invalidated_by_mtime_and_clear(self):
+        """Un mtime distinto invalida la caché (refresh reemplaza el archivo) y
+        ``clear_geometry_cache()`` la vacía explícitamente (Plan 120)."""
+        from chile_hub.geo import load_geometry
+
+        fixture = self._fixture_path()
+        with mock.patch("chile_hub.geo.MIN_NON_EMPTY_GEOMETRIES", 3):
+            first = load_geometry(fixture)
+            self.assertIs(load_geometry(fixture), first)
+
+            new_mtime_ns = fixture.stat().st_mtime_ns + 1_000_000_000
+            os.utime(fixture, ns=(new_mtime_ns, new_mtime_ns))
+            after_touch = load_geometry(fixture)
+            self.assertIsNot(after_touch, first)
+
+            clear_geometry_cache()
+            after_clear = load_geometry(fixture)
+        self.assertIsNot(after_clear, after_touch)
 
 
 if __name__ == "__main__":

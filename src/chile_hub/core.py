@@ -1,6 +1,7 @@
 import functools
 import importlib.resources
 import json
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from difflib import get_close_matches
 from pathlib import Path
@@ -1487,24 +1488,21 @@ class ChileHub:
 
     def check_sources(self, timeout: int = 5) -> list[dict[str, Any]]:
         """Verifica la conectividad de red con las fuentes de datos oficiales."""
-        results = []
-        for entry in self.catalog.get("datasets", []):
+
+        def _probe(entry: dict[str, Any]) -> dict[str, Any]:
             dataset = entry.get("dataset")
             url = entry.get("source_url")
             source_name = entry.get("source_name")
             if not url:
-                results.append(
-                    {
-                        "dataset": dataset,
-                        "source_name": source_name,
-                        "url": "N/A",
-                        "status": "offline",
-                        "status_code": None,
-                        "latency_ms": None,
-                        "error": "No source URL defined",
-                    }
-                )
-                continue
+                return {
+                    "dataset": dataset,
+                    "source_name": source_name,
+                    "url": "N/A",
+                    "status": "offline",
+                    "status_code": None,
+                    "latency_ms": None,
+                    "error": "No source URL defined",
+                }
 
             try:
                 # Intenta HEAD primero
@@ -1524,18 +1522,20 @@ class ChileHub:
                 latency_ms = None
                 error = type(e).__name__
 
-            results.append(
-                {
-                    "dataset": dataset,
-                    "source_name": source_name,
-                    "url": url,
-                    "status": status,
-                    "status_code": status_code,
-                    "latency_ms": latency_ms,
-                    "error": error,
-                }
-            )
-        return results
+            return {
+                "dataset": dataset,
+                "source_name": source_name,
+                "url": url,
+                "status": status,
+                "status_code": status_code,
+                "latency_ms": latency_ms,
+                "error": error,
+            }
+
+        entries = list(self.catalog.get("datasets", []))
+        workers = min(8, max(1, len(entries)))
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            return list(pool.map(_probe, entries))
 
     def check_sources_table(self, results: list[dict[str, Any]]) -> str:
         """Formatea el resultado de check_sources como una tabla amigable para terminal."""
