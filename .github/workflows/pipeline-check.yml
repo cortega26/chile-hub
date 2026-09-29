@@ -286,7 +286,7 @@ jobs:
             # en un entorno efímero de uv en vez del venv del proyecto. Sin esto, un
             # cache-miss produce 155 registros (0 senadores) y el paso
             # "Check build-synced files" aborta el publish diario (2026-07-19/20).
-            PYTHONPATH=src uv run --no-project --with "scrapling[fetchers]" --with polars --with requests --with structlog --with tenacity --with curl_cffi --with defusedxml python src/extractors/autoridades_electas_extractor.py
+            PYTHONPATH=src uv run --no-project --with "scrapling[fetchers]==0.4.10" --with polars==1.44.2 --with requests==2.34.2 --with structlog==26.1.0 --with tenacity==9.1.4 --with curl_cffi==0.16.3 --with defusedxml==0.7.1 python src/extractors/autoridades_electas_extractor.py
           fi
 
       - name: Sanity-check versioned MINVU snapshot

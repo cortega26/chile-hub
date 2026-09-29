@@ -29,6 +29,7 @@ MONTHLY_SCRAPE_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "monthly-scrape.y
 ADOPTION_STATS_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "adoption-stats.yml"
 GEOMETRIA_COMUNAL_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "geometria-comunal.yml"
 PYPI_RELEASE_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "pypi-release.yml"
+HF_PUBLISH_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "hf-publish.yml"
 PAGES_DEPLOY_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "pages-deploy.yml"
 MAKEFILE = ROOT_DIR / "Makefile"
 MKDOCS_CONFIG = ROOT_DIR / "mkdocs.yml"
@@ -158,6 +159,56 @@ class AutoridadesElectasScraplingGuardrailTests(unittest.TestCase):
             "autoridades_electas_extractor.py — sin scrapling degrada a "
             "155 registros (0 senadores) y rompe el publish diario.",
         )
+
+
+class EphemeralInstallPinGuardrailTests(unittest.TestCase):
+    """Supply-chain: los entornos efímeros de CI instalaban paquetes
+    resolviendo "la última versión" en cada corrida, fuera de uv.lock.
+
+    Tres rutas: `uv pip install --system huggingface_hub` en el job
+    `hf-publish` de pypi-release.yml y `uv run --no-project --with
+    huggingface_hub` en hf-publish.yml (ambos con HF_TOKEN), y los siete
+    `--with` sin versión del fetch de autoridades_electas en
+    pipeline-check.yml (alimenta datos publicados: sin scrapling el
+    extractor degrada a 155 registros y el publish diario se aborta). Una
+    release upstream comprometida o rompedora cambiaba el resultado de un
+    job privilegiado sin ningún diff en el repo. Fix (Plan 112): extra
+    `publish` pinneado + lock, y `==` en cada `--with`.
+    """
+
+    def test_ephemeral_scrapling_fetch_pins_every_with_flag(self):
+        content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        fetch_lines = [
+            line
+            for line in content.splitlines()
+            if "autoridades_electas_extractor.py" in line and "uv run --no-project" in line
+        ]
+        self.assertTrue(fetch_lines, "No se encontró el fetch efímero de autoridades_electas.")
+        tokens = re.findall(r"--with\s+(\"[^\"]+\"|\S+)", fetch_lines[0])
+        self.assertTrue(tokens, "El fetch efímero no declara ningún --with.")
+        unpinned = [token for token in tokens if "==" not in token]
+        self.assertEqual(
+            unpinned,
+            [],
+            "Todo `--with` del entorno efímero debe fijar versión exacta "
+            "(sin pin, uv resuelve latest en cada corrida fuera del lock): "
+            f"{unpinned}",
+        )
+
+    def test_pypi_release_uses_locked_publish_extra_for_hf(self):
+        content = PYPI_RELEASE_WORKFLOW.read_text(encoding="utf-8")
+        self.assertNotIn(
+            "uv pip install --system huggingface_hub",
+            content,
+            "El job hf-publish no debe instalar huggingface_hub sin pin: "
+            "debe usar el extra `publish` desde uv.lock.",
+        )
+        self.assertIn("--extra publish", content)
+
+    def test_hf_publish_dispatch_uses_locked_publish_extra(self):
+        content = HF_PUBLISH_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("--extra publish", content)
+        self.assertNotIn("--with huggingface_hub", content)
 
 
 class MkDocsReferenceSlugGuardrailTests(unittest.TestCase):

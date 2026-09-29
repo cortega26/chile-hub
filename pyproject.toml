@@ -80,6 +80,12 @@ validation = [
 mcp = [
     "mcp>=2.2,<3",
 ]
+# Cliente de Hugging Face usado por scripts/publish_hf_dataset.py y por los
+# jobs de publicación (pypi-release, hf-publish). Pin exacto + lock: el job
+# corre con HF_TOKEN, no puede resolver "latest" desde PyPI (Plan 112).
+publish = [
+    "huggingface_hub==1.16.1",
+]
 dev = [
     "build==1.6.1",
     "twine==7.0.0",

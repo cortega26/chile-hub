@@ -69,7 +69,7 @@ jobs:
         # artefacto publication-grade murió con
         # "ModuleNotFoundError: No module named 'duckdb'" en la verificacion
         # --require-live.
-        run: uv sync --extra dev --extra pipeline
+        run: uv sync --extra dev --extra pipeline --extra publish
 
       - name: Add .venv to PATH
         run: echo "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"
@@ -464,5 +464,5 @@ jobs:
             echo "::error::secret HF_TOKEN no configurado; omitiendo publicacion a Hugging Face Hub."
             exit 1
           fi
-          uv pip install --system huggingface_hub
-          python scripts/publish_hf_dataset.py --repo-id cortega26/chile-hub
+          uv run --extra publish \
+            python scripts/publish_hf_dataset.py --repo-id cortega26/chile-hub
