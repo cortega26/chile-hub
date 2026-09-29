@@ -578,6 +578,10 @@ make coverage           # pytest + cobertura de src/ (term-missing + coverage.xm
 make verify-landing     # Pruebas de humo de landing page con Playwright
 ```
 
+> `autoridades_electas` requiere scrapling para no degradar a 155 registros
+> (0 senadores); el comando local está en
+> [Carriles de extracción](docs/extraction-lanes.md).
+
 Para entender la arquitectura, las reglas no negociables y el flujo de trabajo, revisa
 [`AGENTS.md`](./AGENTS.md); el punto de partida rápido es
 [`SOURCE_OF_TRUTH.md`](./SOURCE_OF_TRUTH.md).

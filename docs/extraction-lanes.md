@@ -32,6 +32,15 @@ operativa son los workflows, esta página es la vista de referencia.
    conflicto de `click` con el extra `dev` — ver `pyproject.toml`). Sin scrapling
    degrada a 155 registros (0 senadores) y el guard de caída de `record_count` de
    `verify_pipeline.py --profile publication` bloquea el publish (plan 108).
+   Para reproducir la extracción completa en local (mismas versiones pinneadas
+   que CI, Plan 112):
+
+   ```bash
+   PYTHONPATH=src uv run --no-project --with "scrapling[fetchers]==0.4.10" \
+     --with polars==1.44.2 --with requests==2.34.2 --with structlog==26.1.0 \
+     --with tenacity==9.1.4 --with curl_cffi==0.16.3 --with defusedxml==0.7.1 \
+     python src/extractors/autoridades_electas_extractor.py
+   ```
 5. **`perfil_territorial_comunal` no tiene extractor**: es derivado en
    `build_dev_db.py` a partir de otros datasets.
 6. **`geometria_comunal` es candidate (ADR-012)**: su artefacto se publica desde
