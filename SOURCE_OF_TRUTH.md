@@ -109,7 +109,7 @@ tests/                      15 archivos — inventario completo en AGENTS.md §8
 
 | Tarea | Ir a |
 |---|---|
-| Ejecutar pipeline completo | `CLAUDE.md` → **Comandos esenciales** → `make refresh` |
+| Ejecutar pipeline completo | **`AGENTS.md §11`** → `make refresh` |
 | Ejecutar un paso | `CLAUDE.md` → `make extract` / `make build` / `make test` |
 | Agregar un nuevo dataset | **`AGENTS.md §5`** — lista de verificacion de 7 pasos |
 | Escribir una funcion `validate_*()` | `src/validation.py` — luego importar en `build_dev_db.py` |
@@ -117,8 +117,8 @@ tests/                      15 archivos — inventario completo en AGENTS.md §8
 | Verificar estado legal de redistribucion de una fuente | **`AGENTS.md §6`** |
 | Revisar que antipatrones evitar | **`AGENTS.md §10`** |
 | CI marca un documento/test desincronizado del codigo | **`AGENTS.md §12`** — `scripts/check_companion_paths.py` |
-| Navegar archivos grandes sin leerlos en frio | `CLAUDE.md` → seccion **CodeGraph** |
-| Encontrar donde esta definido un simbolo | `codegraph find <name>` o `grep -n "def <name>" src/` |
+| Navegar archivos grandes sin leerlos en frio | **`AGENTS.md §2½`** → CodeGraph |
+| Encontrar donde esta definido un simbolo | `codegraph query <name>` o `grep -n "def <name>" src/` |
 | Leer API publica de ChileHub | `src/chile_hub/core.py` (clase ChileHub, todos los metodos publicos) |
 | Leer toda la logica de validacion | `src/validation.py` (leer por validador) |
 | Leer contrato de extractors | `src/extractors/base.py` (breve — seguro de leer completo) |

@@ -59,7 +59,7 @@ Actualmente registra veinticinco (<!-- START_AGENTS_DATASET_COUNT -->25<!-- END_
 | **Finanzas Municipales** | SINIM / SUBDERE | Indicadores financieros municipales anuales por comuna |
 | **Resultados Educacionales** | MINEDUC | Métricas educacionales agregadas por comuna y año, sin registros personales |
 | **Indicadores Urbanos SIEDU** | INE / SIEDU | Indicadores urbanos en formato largo con cobertura parcial esperada |
-| **Perfil Territorial Comunal** | chile-hub derivado | Una fila por comuna con métricas territoriales consolidadas (carril `candidate`, `review_by` 2026-09-18) |
+| **Perfil Territorial Comunal** | chile-hub derivado | Una fila por comuna con métricas territoriales consolidadas (carril `stable_publishable`, `review_by` 2026-12-31) |
 | **Empresas (RES)** | Ministerio de Economía / datos.gob.cl | Registro de constituciones de empresas bajo Ley 20.659 con RUT, razón social, tipo societario y comuna |
 | **Pobreza Comunal (SAE)** | MDS / Observatorio Social | Estimaciones de pobreza por ingresos y multidimensional por comuna |
 | **Consumo Eléctrico Comunal** | CNE / Energía Abierta | Consumo eléctrico anual por comuna y tipo de cliente (carril `candidate` — fuente CNE descontinuada, `maturity_status: deprecated`) |
@@ -194,7 +194,7 @@ JSON no coinciden, confía en el JSON y actualiza esta lista.
 > preguntas de "dónde está X" y "qué llama a Y" en una sola llamada, sin abrir archivos.
 
 ```bash
-codegraph search "<query>"                         # Buscar símbolo, función o concepto
+codegraph query "<query>"                          # Buscar símbolo, función o concepto
 codegraph callers src/build_dev_db.py::validate_comunas  # Qué llama a esta función
 codegraph callees src/build_dev_db.py::main         # Qué llama esta función
 codegraph explore "validación de comunas"           # Contexto completo de un área
@@ -231,6 +231,9 @@ codegraph impact validate_comunas                   # Qué se rompe si cambio es
              src/extractors/consumo_electrico_extractor.py
              src/extractors/partidos_politicos_extractor.py
              src/extractors/autoridades_electas_extractor.py
+             src/extractors/estadisticas_vitales_extractor.py
+             src/extractors/permisos_edificacion_extractor.py
+             src/extractors/calidad_aire_extractor.py
              (los 17 que corre `make extract` / el job diario de CI — ver §11)
              → Produce: data/staging/{dataset}.csv + data/staging/{dataset}.metadata.json
              → Produce: data/raw/{source}_{timestamp}.json  (snapshot crudo)
@@ -758,7 +761,7 @@ Corre tras un `Pipeline Check` exitoso en `main` (`workflow_run`) o
 verificado, corre `python-semantic-release` (§7), publica el paquete en PyPI y
 adjunta los artefactos de datos al GitHub Release cuando son
 publication-grade. Tras cada release, el job `hf-publish` de
-`pypi-release.yml` replica las 17 capas publicables (Parquet + catálogo, las
+`pypi-release.yml` replica las 21 capas publicables (Parquet + catálogo, las
 estables por `publication_track` del registry — Plan 070) a
 Hugging Face Hub (`cortega26/chile-hub`, requiere secret `HF_TOKEN`); nunca
 incluye el carril `candidate` y no bloquea el release si falla.
