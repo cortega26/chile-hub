@@ -180,7 +180,7 @@ El mismo estado se publica en el sitio, con historial de builds y detalle por ca
 ### Respaldo adicional
 
 <!-- START_TEST_COUNT -->
-- **1221 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
+- **1239 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
 <!-- END_TEST_COUNT -->
 <!-- START_ADR_COUNT -->
 - **23 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
@@ -351,8 +351,10 @@ WHERE c.nombre_region = 'Valparaíso';
 | `chile-hub cache update/status/clear` | Administra el cache local del bundle publicado. |
 
 > **¿Construyes agentes?** El proyecto incluye un servidor MCP con catálogo,
-> consultas y salud para que tu agente consuma los datos sin integraciones
-> propias: [`docs/mcp.md`](docs/mcp.md).
+> consultas y resolución de comunas para que tu agente consuma los datos sin
+> integraciones propias: [`docs/mcp.md`](docs/mcp.md).
+
+<!-- mcp-name: io.github.cortega26/chile-hub -->
 
 ### CLI: los comandos más usados
 

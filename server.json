@@ -1,0 +1,22 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.cortega26/chile-hub",
+  "title": "chile-hub",
+  "description": "MCP de solo lectura: catálogo, consultas y resolución de comunas sobre datos públicos de Chile.",
+  "repository": {
+    "url": "https://github.com/cortega26/chile-hub",
+    "source": "github",
+    "id": "1254613303"
+  },
+  "version": "1.45.0",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "chile-hub",
+      "version": "1.45.0",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}
