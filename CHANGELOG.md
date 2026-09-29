@@ -12,6 +12,21 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.44.0 - 2026-09-29
+
+### Documentación
+
+- **adr**: ADR-023 — chile-hub es la última milla de los datos oficiales, no un portal
+  ([#124](https://github.com/cortega26/chile-hub/pull/124),
+  [`1464109`](https://github.com/cortega26/chile-hub/commit/1464109969428b856c10797fa0f1704dd060b998))
+
+### Agregado
+
+- Reposiciona chile-hub como la última milla de los datos oficiales (ADR-023)
+  ([#124](https://github.com/cortega26/chile-hub/pull/124),
+  [`1464109`](https://github.com/cortega26/chile-hub/commit/1464109969428b856c10797fa0f1704dd060b998))
+
+
 ## 1.43.1 - 2026-09-27
 
 ### Corregido
