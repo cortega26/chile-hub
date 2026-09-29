@@ -7,6 +7,7 @@ comprobaciones de texto simples y suficientes para el guardrail específico.
 """
 
 import json
+import re
 import sys
 import tempfile
 import unittest
@@ -1394,6 +1395,36 @@ class HttpAccessDocsGuardrailTests(unittest.TestCase):
         self.assertGreaterEqual(content.count("io.BytesIO(requests.get(url"), 2)
         self.assertNotIn("pl.read_parquet(url)", content)
         self.assertNotRegex(content, r'pl\.read_parquet\(\s*<span class="string">"https://')
+
+
+class PlanLinkGuardrailTests(unittest.TestCase):
+    """Todo enlace a un plan desde docs/ debe resolver a un archivo real.
+
+    Regresión real (2026-09-29): cinco documentos citaban `plans/NNN-…md`
+    después de que los planes 008/011/021/022/023 se archivaran en
+    `plans/archive/`, dejando 404s en el sitio MkDocs. Se acepta `plans/` o
+    `plans/archive/` para no fallar por planes aún activos.
+    """
+
+    PLAN_LINK_PATTERN = re.compile(r"plans/(\d{3}-[a-z0-9-]+\.md)")
+
+    def test_plan_links_resolve_to_plans_or_archive(self):
+        files = sorted(DOCS_DIR.rglob("*.md")) + [ROOT_DIR / "plans" / "README.md"]
+        broken = []
+        for path in files:
+            content = path.read_text(encoding="utf-8")
+            for match in self.PLAN_LINK_PATTERN.finditer(content):
+                name = match.group(1)
+                in_plans = (ROOT_DIR / "plans" / name).is_file()
+                in_archive = (ROOT_DIR / "plans" / "archive" / name).is_file()
+                if not in_plans and not in_archive:
+                    broken.append(f"{path.relative_to(ROOT_DIR)} → plans/{name}")
+        self.assertEqual(
+            broken,
+            [],
+            "Enlaces a planes inexistentes (deben apuntar a plans/ o plans/archive/): "
+            + ", ".join(broken),
+        )
 
 
 class ReleaseArtifactLayoutGuardrailTests(unittest.TestCase):
