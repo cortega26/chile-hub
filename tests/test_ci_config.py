@@ -260,6 +260,58 @@ class RuffPinSingleSourceTests(unittest.TestCase):
         )
 
 
+class SyncDocsHookTriggerTests(unittest.TestCase):
+    """Regresión: el hook local `sync-docs` declaraba `files:` con directorios
+    anclados por `$` (`tests/|docs/adr/|...`), que matchean el nombre literal
+    del directorio pero jamás un archivo dentro (`tests/test_x.py`). El hook
+    nunca disparaba en la práctica. El patrón debe matchear archivos de cada
+    superficie que `make sync-docs` puede regenerar.
+    """
+
+    def _hook_files_pattern(self) -> str:
+        content = PRECOMMIT_CONFIG.read_text(encoding="utf-8")
+        hook_pos = content.find("id: sync-docs")
+        self.assertNotEqual(hook_pos, -1, "No se encontró el hook sync-docs.")
+        match = re.search(r"files:\s*(\^.*)$", content[hook_pos:], re.MULTILINE)
+        self.assertIsNotNone(match, "El hook sync-docs no declara `files:`.")
+        return match.group(1).strip()
+
+    def test_files_pattern_matches_hook_surfaces(self):
+        pattern = self._hook_files_pattern()
+
+        def matches(path: str) -> bool:
+            return re.fullmatch(pattern, path) is not None
+
+        for path in (
+            "pyproject.toml",
+            "README.md",
+            "AGENTS.md",
+            "src/chile_hub/datasets.py",
+            "src/builders/landing.py",
+            "scripts/sync_docs.py",
+            "docs/adr/ADR-001-x.md",
+            "tests/test_x.py",
+            "data/dataset_catalog_config.json",
+            "contracts/datasets/comunas.schema.json",
+        ):
+            self.assertTrue(matches(path), f"El patrón del hook sync-docs no matchea {path!r}.")
+
+    def test_files_pattern_ignores_unrelated_paths(self):
+        pattern = self._hook_files_pattern()
+
+        def matches(path: str) -> bool:
+            return re.fullmatch(pattern, path) is not None
+
+        for path in (
+            "data/normalized/foo.parquet",
+            "src/chile_hub/core.py",
+            "docs/datasets/comunas.md",
+        ):
+            self.assertFalse(
+                matches(path), f"El patrón del hook sync-docs no debe matchear {path!r}."
+            )
+
+
 class MkDocsReferenceSlugGuardrailTests(unittest.TestCase):
     """Regresión: la documentación se publica bajo /reference/ y la página de
     API también se llamaba reference.md, por lo que los enlaces generados desde
