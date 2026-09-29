@@ -20,6 +20,8 @@ BUNDLE_PATH = ROOT_DIR / "data" / "normalized" / "hub_bundle.json"
 # (static.cloudflareinsights.com, cloudflareinsights.com); the other paths (e.g. /polla/)
 # keep the base policy. ADR-020 (2026-09-21) retiró el GoatCounter no autorizado:
 # ningún origen de terceros de analítica debe volver a este espejo.
+# Plan 114 (2026-09-29): las tipografías se auto-hospedan en vendor/fonts/;
+# style-src y font-src ya no permiten orígenes de fuentes de terceros.
 # Keep in sync with platform/tooltician-site/docs/cloudflare-security-headers.md.
 PRODUCTION_CSP = (
     "default-src 'self'; base-uri 'self'; form-action 'self' https://formspree.io; "
@@ -32,8 +34,8 @@ PRODUCTION_CSP = (
     "'sha256-4IyZhVv+RWju+1/qJEKCsZqtEjlfkQeg7lwN85qT6Y8=' "
     "https://www.googletagmanager.com https://www.google-analytics.com "
     "https://static.cloudflareinsights.com; "
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-    "img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; "
+    "style-src 'self' 'unsafe-inline'; "
+    "img-src 'self' data: https:; font-src 'self'; "
     "connect-src 'self' blob: https://formspree.io "
     "https://extensions.duckdb.org https://www.google-analytics.com "
     "https://region1.google-analytics.com https://www.googletagmanager.com "
@@ -219,10 +221,59 @@ def verify_landing():
             ),
         )
         page.on("pageerror", lambda error: browser_errors.append(str(error)))
+        font_requests = []
+        page.on(
+            "request",
+            lambda request: (
+                font_requests.append(request.url) if request.resource_type == "font" else None
+            ),
+        )
         page.goto(url, wait_until="networkidle")
 
         if browser_errors:
             fail(f"Browser errors while rendering landing: {browser_errors}")
+
+        # Plan 114: las tipografías se sirven desde vendor/fonts (mismo origen)
+        # y las tres familias deben cargar. Ninguna petición de fuente puede
+        # salir del sitio (el CSP solo permite font-src 'self').
+        external_font_requests = [
+            request_url for request_url in font_requests if not request_url.startswith(url)
+        ]
+        if external_font_requests:
+            fail(f"La landing solicita tipografías fuera del origen: {external_font_requests}")
+        font_state = page.evaluate(
+            """async () => {
+                await document.fonts.ready;
+                const loaded = (family) =>
+                    Array.from(document.fonts).some(
+                        (face) =>
+                            face.family.replace(/['"]/g, "") === family &&
+                            face.status === "loaded"
+                    );
+                return {
+                    sansLoaded: loaded("Inter"),
+                    serifLoaded: loaded("Source Serif 4"),
+                    monoLoaded: loaded("JetBrains Mono"),
+                    serifComputed: getComputedStyle(
+                        document.querySelector(".intro h2")
+                    ).fontFamily,
+                    monoComputed: getComputedStyle(
+                        document.querySelector(".intro .intro-eyebrow")
+                    ).fontFamily,
+                };
+            }"""
+        )
+        if not (
+            font_state["sansLoaded"] and font_state["serifLoaded"] and font_state["monoLoaded"]
+        ):
+            fail(f"Las tipografías auto-hospedadas no cargaron: {font_state}")
+        if "Source Serif 4" not in font_state["serifComputed"]:
+            fail(f"El titular .intro h2 no usa Source Serif 4: {font_state['serifComputed']}")
+        if "JetBrains Mono" not in font_state["monoComputed"]:
+            fail(
+                "El eyebrow .intro .intro-eyebrow no usa JetBrains Mono: "
+                f"{font_state['monoComputed']}"
+            )
 
         # Analítica: la landing no carga ningún contador de terceros
         # (ADR-020: se retiró el GoatCounter no autorizado el 2026-09-21).
