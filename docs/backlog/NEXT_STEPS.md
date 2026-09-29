@@ -48,7 +48,9 @@ Todas las mejoras del backlog están implementadas y en producción:
   comunidad.
 - **Estrategia de sostenibilidad** — el proyecto es mantenido por una
   persona. Evaluar financiamiento o adopción institucional si el uso
-  crece.
+  crece. Diseño del programa de patrocinios en
+  [`plans/110-programa-de-patrocinios.md`](../../plans/110-programa-de-patrocinios.md)
+  (tiers, plan de ataque por segmento, gobernanza).
 
 ---
 
