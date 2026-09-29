@@ -5224,9 +5224,41 @@ class McpToolsTests(unittest.TestCase):
     cuando el extra `mcp` no está instalado.
     """
 
+    def setUp(self):
+        from chile_hub.mcp_tools import _read_parquet_cached
+
+        _read_parquet_cached.cache_clear()
+
     def _write_parquet(self, tmpdir: str, name: str, df) -> str:
         df.write_parquet(Path(tmpdir) / f"{name}.parquet")
         return tmpdir
+
+    def _serve_parquet_http(self, payload: bytes):
+        """Servidor HTTP local que cuenta descargas (Plan 119).
+
+        HTTP/1.0 sin `Content-Length`, igual que el hosting estático real.
+        Retorna `(server, downloads)`; el test debe hacer `shutdown()` y
+        `server_close()` en un `finally`.
+        """
+        import threading
+        from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+        downloads: list[str] = []
+
+        class _CountingHandler(BaseHTTPRequestHandler):
+            def do_GET(self):  # noqa: N802
+                downloads.append(self.path)
+                self.send_response(200)
+                self.send_header("Content-Type", "application/octet-stream")
+                self.end_headers()
+                self.wfile.write(payload)
+
+            def log_message(self, *args):  # pragma: no cover - silencio
+                pass
+
+        server = ThreadingHTTPServer(("127.0.0.1", 0), _CountingHandler)
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+        return server, downloads
 
     def test_list_datasets_covers_enum(self):
         from chile_hub.datasets import Dataset
@@ -5354,6 +5386,75 @@ class McpToolsTests(unittest.TestCase):
                 result = get_dataset("comunas", limite=1, base_url=base)
                 self.assertEqual(result["filas_totales"], 1)
                 self.assertEqual(result["registros"][0]["codigo_comuna"], "01101")
+            finally:
+                server.shutdown()
+                server.server_close()
+
+    def test_read_dataset_uses_cache(self):
+        """Dos tool calls al mismo Parquet HTTP descargan una sola vez (Plan 119)."""
+        from chile_hub.mcp_tools import get_dataset
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "comunas.parquet"
+            pl.DataFrame(
+                {"codigo_comuna": ["01101", "13101"], "nombre_comuna": ["Iquique", "Santiago"]}
+            ).write_parquet(path)
+            server, downloads = self._serve_parquet_http(path.read_bytes())
+            try:
+                base = f"http://127.0.0.1:{server.server_port}"
+                first = get_dataset("comunas", limite=1, base_url=base)
+                second = get_dataset("comunas", limite=1, base_url=base)
+            finally:
+                server.shutdown()
+                server.server_close()
+
+            self.assertEqual(first["filas_totales"], 2)
+            self.assertEqual(second["registros"][0]["codigo_comuna"], "01101")
+            self.assertEqual(len(downloads), 1, "el mismo Parquet no debe descargarse dos veces")
+
+    def test_cache_key_includes_base_url(self):
+        """Dos `base_url` distintos no comparten entrada de caché (Plan 119)."""
+        from chile_hub.mcp_tools import get_dataset
+
+        with (
+            tempfile.TemporaryDirectory() as tmpdir_a,
+            tempfile.TemporaryDirectory() as tmpdir_b,
+        ):
+            pl.DataFrame({"codigo_comuna": ["01101"], "nombre_comuna": ["Iquique"]}).write_parquet(
+                Path(tmpdir_a) / "comunas.parquet"
+            )
+            pl.DataFrame({"codigo_comuna": ["13120"], "nombre_comuna": ["Ñuñoa"]}).write_parquet(
+                Path(tmpdir_b) / "comunas.parquet"
+            )
+
+            first = get_dataset("comunas", limite=1, base_url=tmpdir_a)
+            second = get_dataset("comunas", limite=1, base_url=tmpdir_b)
+
+            self.assertEqual(first["registros"][0]["codigo_comuna"], "01101")
+            self.assertEqual(
+                second["registros"][0]["codigo_comuna"],
+                "13120",
+                "cada base_url debe tener su propia entrada de caché",
+            )
+
+    def test_cache_clear_resets(self):
+        """`cache_clear()` fuerza una nueva descarga del Parquet (Plan 119)."""
+        from chile_hub.mcp_tools import _read_parquet_cached, get_dataset
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "comunas.parquet"
+            pl.DataFrame({"codigo_comuna": ["01101"], "nombre_comuna": ["Iquique"]}).write_parquet(
+                path
+            )
+            server, downloads = self._serve_parquet_http(path.read_bytes())
+            try:
+                base = f"http://127.0.0.1:{server.server_port}"
+                get_dataset("comunas", limite=1, base_url=base)
+                self.assertEqual(len(downloads), 1)
+
+                _read_parquet_cached.cache_clear()
+                get_dataset("comunas", limite=1, base_url=base)
+                self.assertEqual(len(downloads), 2, "tras cache_clear se vuelve a descargar")
             finally:
                 server.shutdown()
                 server.server_close()
