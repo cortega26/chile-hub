@@ -76,7 +76,6 @@ src/
 ├── builders/                      Modulos del pipeline (extraidos de build_dev_db.py):
 │   _shared, io_utils, formats, metadata, reports, artifacts, datasets, catalog, landing,
 │   dcat_catalog, data_package, doc_sync, geo, _logging, staging_schema
-├── chile_hub.py                   Shim de compatibilidad — delega al paquete inferior
 ├── chile_hub/
 │   ├── core.py                    Clase ChileHub + API publica completa
 │   ├── cli.py                     Entry points de CLI (extraido de core.py)

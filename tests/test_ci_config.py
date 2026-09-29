@@ -1174,7 +1174,7 @@ class SysPathIdiomTests(unittest.TestCase):
     (`make extract`) y como paquete (tests/build), y los imports absolutos
     `src.*` solo resuelven con ROOT_DIR en `sys.path`. Este gate congela el
     idiom — falla ante cualquier OTRA manipulación de `sys.path` en
-    `src/extractors/`, no ante el idiom en sí (los shims `src/chile_hub.py`,
+    `src/extractors/`, no ante el idiom en sí (los shims
     `src/pipeline_status_utils.py` y `src/build_dev_db.py` viven fuera de
     `src/extractors/` y tienen su propio propósito documentado)."""
 

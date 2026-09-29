@@ -145,7 +145,6 @@ packages = ["src/chile_hub"]
 [tool.hatch.build.targets.sdist]
 include = [
     "/src/chile_hub",
-    "/src/chile_hub.py",
     "/README.md",
     "/LICENSE",
     "/DATA_LICENSES.md",
@@ -217,7 +216,6 @@ omit = [
     "src/chile_hub/__main__.py",
     "src/chile_hub/cli.py",
     "src/chile_hub/pipeline_status_utils.py",
-    "src/chile_hub.py",
 ]
 
 [tool.coverage.report]
@@ -242,10 +240,6 @@ warn_unused_configs = true
 warn_unused_ignores = true
 check_untyped_defs = true
 ignore_missing_imports = true
-# El shim src/chile_hub.py (21 líneas) colisiona con el paquete src/chile_hub/;
-# mypy lo detecta como módulo duplicado. Lo excluimos porque solo delega al
-# paquete y no contiene lógica que requiera verificación de tipos.
-exclude = ["src/chile_hub\\.py"]
 explicit_package_bases = true
 
 [[tool.mypy.overrides]]

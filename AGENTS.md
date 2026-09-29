@@ -131,7 +131,6 @@ chile-hub/
 │   ├── validation.py              Todas las funciones validate_*() — módulo independiente (1 960 líneas)
 │   ├── build_dev_db.py            Orquestador (965 líneas): main() + fases (_load_inputs, _compute_validations, _write_data_artifacts, _generate_reports)
 │   ├── builders/                  Módulos del pipeline extraídos de build_dev_db.py (formats, metadata, reports, artifacts, datasets, catalog, landing, io_utils, _shared, dcat_catalog, data_package, doc_sync, geo, _logging)
-│   ├── chile_hub.py               Compatibility shim (21 líneas) — delega al paquete
 │   ├── chile_hub/                 Paquete Python instalable (ChileHub API + CLI + data manager)
 │   │   ├── core.py                ChileHub class + API pública (2 018 líneas)
 │   │   ├── cli.py                 CLI entry points (build_parser/_main/main — TECHDEBT-02, movido de core.py)
