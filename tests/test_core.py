@@ -636,6 +636,136 @@ class ChileHubResolveComunasTests(unittest.TestCase):
             )
 
 
+class ChileHubResolveRegionesTests(unittest.TestCase):
+    """Tests para ChileHub.resolve_regiones() (Plan 129, cierra ADR-009 #2)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.hub = _hub()
+
+    def test_resolve_regiones_exact_name(self):
+        """Un nombre oficial de región resuelve a su código CUT de 2 caracteres."""
+        result = self.hub.resolve_regiones(["Tarapacá"])
+        row = result.to_dicts()[0]
+        self.assertTrue(row["matched"])
+        self.assertEqual(row["codigo_region"], "01")
+        self.assertEqual(row["nombre_region"], "Región de Tarapacá")
+
+    def test_resolve_regiones_alias_rm_and_metropolitana(self):
+        """Los alias "RM" y "Metropolitana" resuelven al código 13."""
+        result = self.hub.resolve_regiones(["RM", "Metropolitana"])
+        rows = result.to_dicts()
+        self.assertTrue(rows[0]["matched"])
+        self.assertEqual(rows[0]["codigo_region"], "13")
+        self.assertEqual(rows[1]["codigo_region"], "13")
+        self.assertEqual(rows[0]["nombre_region"], "Región Metropolitana de Santiago")
+
+    def test_resolve_regiones_strips_accents_and_prefix(self):
+        """Tildes y prefijo "Región de/del" no afectan el match."""
+        result = self.hub.resolve_regiones(["Ñuble", "Región del Bío-Bío", "Aysén"])
+        rows = result.to_dicts()
+        self.assertEqual([row["codigo_region"] for row in rows], ["16", "08", "11"])
+        self.assertTrue(all(row["matched"] for row in rows))
+
+    def test_resolve_regiones_no_match_returns_null_without_raising(self):
+        """Un nombre inexistente devuelve matched=False y códigos null, sin excepción."""
+        result = self.hub.resolve_regiones(["No Existe Como Región"])
+        row = result.to_dicts()[0]
+        self.assertFalse(row["matched"])
+        self.assertIsNone(row["codigo_region"])
+        self.assertIsNone(row["nombre_region"])
+
+    def test_resolve_regiones_preserves_order_and_duplicates(self):
+        """El orden y los duplicados del input se preservan fila a fila."""
+        result = self.hub.resolve_regiones(["Ñuble", "Ñuble", "RM"])
+        self.assertEqual(result.height, 3)
+        rows = result.to_dicts()
+        self.assertEqual([row["input"] for row in rows], ["Ñuble", "Ñuble", "RM"])
+        self.assertEqual(rows[0]["codigo_region"], rows[1]["codigo_region"])
+
+    def test_resolve_regiones_codigo_region_is_pl_string(self):
+        """Invariante CUT: codigo_region nunca es int, siempre pl.String."""
+        result = self.hub.resolve_regiones(["Ñuble"])
+        self.assertEqual(result.schema["codigo_region"], pl.String)
+
+
+class RegionAliasParityTests(unittest.TestCase):
+    """Guardrail anti-divergencia entre la tabla del paquete (fuente única) y
+    la copia de fallback de `region_utils` (Plan 129).
+
+    El fallback existe porque `autoridades_electas_extractor` corre en CI en un
+    entorno efímero de `uv --no-project` sin las dependencias del paquete
+    `chile_hub` (rich, platformdirs), donde `import chile_hub` falla. El test
+    carga esa rama a propósito (bloqueando `chile_hub` en el import) y congela
+    la equivalencia: 16 nombres oficiales + todos los alias.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from chile_hub.regions import REGION_ALIASES
+
+        cls.region_aliases = REGION_ALIASES
+        cls.hub = _hub()
+        cls.nombres_oficiales = [
+            row["nombre_region"] for row in cls.hub.load_polars("regiones").iter_rows(named=True)
+        ]
+
+    @staticmethod
+    def _load_region_utils_without_package():
+        """Carga `region_utils` con `import chile_hub*` bloqueado (rama fallback)."""
+        import builtins
+        import importlib.util
+
+        real_import = builtins.__import__
+
+        def blocked(name, *args, **kwargs):
+            if name == "chile_hub" or name.startswith("chile_hub."):
+                raise ModuleNotFoundError(f"No module named {name!r}", name=name)
+            return real_import(name, *args, **kwargs)
+
+        path = ROOT_DIR / "src" / "extractors" / "region_utils.py"
+        spec = importlib.util.spec_from_file_location("region_utils_fallback", path)
+        module = importlib.util.module_from_spec(spec)
+        with mock.patch("builtins.__import__", side_effect=blocked):
+            spec.loader.exec_module(module)
+        return module
+
+    def test_region_utils_delegates_to_package_table(self):
+        """En el entorno normal, region_utils re-exporta la tabla del paquete."""
+        from src.extractors import region_utils
+
+        self.assertIs(region_utils.REGION_A_CODIGO, self.region_aliases)
+
+    def test_fallback_table_matches_package_table(self):
+        """La copia de fallback debe ser idéntica a la tabla del paquete."""
+        fallback = self._load_region_utils_without_package()
+        self.assertEqual(fallback.REGION_A_CODIGO, dict(self.region_aliases))
+
+    def test_both_routes_resolve_official_names_and_aliases(self):
+        """Ambas rutas devuelven lo mismo para los 16 nombres oficiales + alias."""
+        from chile_hub.regions import region_name_to_code
+
+        fallback = self._load_region_utils_without_package()
+        for nombre in [*self.nombres_oficiales, *self.region_aliases]:
+            with self.subTest(nombre=nombre):
+                expected = region_name_to_code(nombre)
+                self.assertIsNotNone(expected, f"sin match en el paquete: {nombre!r}")
+                self.assertEqual(fallback.region_nombre_a_codigo(nombre), expected)
+
+    def test_both_routes_cover_all_sixteen_regions(self):
+        """Los 16 códigos del dataset quedan alcanzables por ambas rutas."""
+        from chile_hub.regions import region_name_to_code
+
+        fallback = self._load_region_utils_without_package()
+        codigos = {region_name_to_code(nombre) for nombre in self.nombres_oficiales}
+        self.assertEqual(codigos, {f"{n:02d}" for n in range(1, 17)})
+        for nombre in self.nombres_oficiales:
+            self.assertEqual(
+                fallback.region_nombre_a_codigo(nombre),
+                region_name_to_code(nombre),
+            )
+
+
 class FromDatapackageUrlTests(unittest.TestCase):
     """Tests para from_datapackage(url) (Plan 051, ADR-010).
 
