@@ -4379,9 +4379,7 @@ class CalidadAireExtractorTests(unittest.TestCase):
             self.assertIn("historial: fusionado con staging existente", metadata["notes"])
             df = self._read_staging_csv(staging_csv)
             self.assertEqual(df.height, 3)
-            self.assertEqual(
-                df["fecha"].to_list(), ["2026-09-13", "2026-09-14", "2026-09-15"]
-            )
+            self.assertEqual(df["fecha"].to_list(), ["2026-09-13", "2026-09-14", "2026-09-15"])
             self.assertEqual(df["fecha"].dtype, pl.String)
             self.assertEqual(df["valor_promedio_diario"].dtype, pl.Float64)
 
@@ -4434,9 +4432,9 @@ class CalidadAireExtractorTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             staging_csv = Path(tmpdir) / "calidad_aire.csv"
             metadata_path = Path(tmpdir) / "calidad_aire.metadata.json"
-            calidad_aire_extractor.normalize_rows(
-                [self._row("2026-09-14", valor=10.0)]
-            ).write_csv(str(staging_csv))
+            calidad_aire_extractor.normalize_rows([self._row("2026-09-14", valor=10.0)]).write_csv(
+                str(staging_csv)
+            )
             with (
                 patch.object(calidad_aire_extractor, "STAGING_CSV_PATH", str(staging_csv)),
                 patch.object(calidad_aire_extractor, "METADATA_PATH", str(metadata_path)),
