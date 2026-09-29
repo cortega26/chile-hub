@@ -31,8 +31,8 @@ Todas las mejoras del backlog están implementadas y en producción:
   nuevas APIs públicas y backlog completo.
 - **Adopción y métricas** — monitorear descargas PyPI, abrir issues de
   feedback, medir qué datasets se usan realmente para priorizar mejoras.
-- **Documentación de API con MkDocs** — existe un plan (`plans/021-mkdocs-api-docs.md`)
-  para generar docs desde docstrings. Pendiente de priorización.
+- **Documentación de API con MkDocs** — **completada** (Plan 021 archivado); el
+  sitio se publica en `/reference/`.
 
 ### Mediano plazo
 - **Mejora continua de extractores** — monitorear fuentes upstream,

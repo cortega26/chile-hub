@@ -251,4 +251,4 @@ ZIP](https://github.com/cortega26/chile-hub/releases) sin instalar nada.
 
 ---
 
-*Este caso de estudio es parte del [Plan 022](https://github.com/cortega26/chile-hub/blob/main/plans/022-plan-avance-narrativa-confiabilidad.md) — Fase 2: Narrativa técnica visible.*
+*Este caso de estudio es parte del [Plan 022](https://github.com/cortega26/chile-hub/blob/main/plans/archive/022-plan-avance-narrativa-confiabilidad.md) — Fase 2: Narrativa técnica visible.*

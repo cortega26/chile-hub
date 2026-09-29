@@ -78,7 +78,7 @@ def select_publishable_files() -> tuple[list[tuple[str, Path]], list[Path]]:
     porque ``comunas_enriquecidas`` es un alias intencional que apunta al
     mismo Parquet que ``comunas`` (ver Plan 014/PERF-08): sin este renombre,
     ambas claves colapsarían al mismo archivo de destino y el mirror de HF
-    tendría 18 archivos en vez de las 17 capas publicables reales.
+    tendría 20 archivos en vez de las 21 capas publicables reales.
     """
     catalog = _read_catalog()
     registry = _read_source_registry()

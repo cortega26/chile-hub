@@ -3928,6 +3928,36 @@ class DocSyncTests(unittest.TestCase):
 
             self.assertIn("chile-hub==9.9.9", readme.read_text(encoding="utf-8"))
 
+    def test_installation_pins_sync_from_pyproject(self):
+        """Los pines de versión de docs/installation.md salen de pyproject.toml.
+
+        Regresión: la página de instalación seguía recomendando 1.15.0 cuando
+        el paquete iba en 1.44.x (Plan 127).
+        """
+        from src.builders import doc_sync
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            (Path(tmpdir) / "pyproject.toml").write_text(
+                '[project]\nname = "x"\nversion = "9.9.9"\n', encoding="utf-8"
+            )
+            installation = Path(tmpdir) / "installation.md"
+            installation.write_text(
+                "<!-- START_INSTALLATION_PIN -->\n\nviejo\n\n<!-- END_INSTALLATION_PIN -->",
+                encoding="utf-8",
+            )
+
+            with (
+                patch.object(doc_sync, "ROOT_DIR", tmpdir),
+                patch.object(doc_sync, "INSTALLATION_PATH", str(installation)),
+            ):
+                changed = doc_sync.sync_installation_pins()
+
+            content = installation.read_text(encoding="utf-8")
+            self.assertTrue(changed)
+            self.assertIn("pip install chile-hub==9.9.9", content)
+            self.assertIn("cache update --data-version v9.9.9", content)
+            self.assertNotIn("viejo", content)
+
     def test_dataset_badge_counts_only_datasets_with_outputs(self):
         from src.builders import doc_sync
 
