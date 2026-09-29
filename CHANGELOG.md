@@ -12,6 +12,73 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.46.0 - 2026-09-29
+
+### Corregido
+
+- **types**: Mypy verde en region_utils y _resolve_names_to_frame
+  ([`62b1ff1`](https://github.com/cortega26/chile-hub/commit/62b1ff1763cbeb9c207e06040796f1dc30e7fabb))
+
+### Mantenimiento
+
+- **ci**: Mide performance en Lighthouse y sube el reporte
+  ([`9c26728`](https://github.com/cortega26/chile-hub/commit/9c2672850cc89e538e05a69fab5bb76054d4293d))
+
+### Code Style
+
+- **tests**: Aplica ruff format a los tests de calidad_aire
+  ([`3f0105a`](https://github.com/cortega26/chile-hub/commit/3f0105a975f94efca9487d4d243716487e5bf6c2))
+
+- **tests**: Ordena el import de sync_release_artifact_version (ruff I001)
+  ([`81f98ff`](https://github.com/cortega26/chile-hub/commit/81f98ff48c1ed3a07a3674c70b5218465cbb0816))
+
+### Documentación
+
+- **agents**: Alinea el protocolo de fuente caída con el código
+  ([`7fc72b0`](https://github.com/cortega26/chile-hub/commit/7fc72b097b3f903dde0c23f6ddf58860a68390ab))
+
+- **mcp**: Registry oficial + claim del README
+  ([`5203d3a`](https://github.com/cortega26/chile-hub/commit/5203d3a59d3ccb506293483e958109bebf7a111b))
+
+- **readme**: Sincroniza conteo de tests tras el backfill de gates (1181 -> 1211)
+  ([`81701a6`](https://github.com/cortega26/chile-hub/commit/81701a68b7c5b482444e6a68231cdab3340f08e0))
+
+### Agregado
+
+- **core**: Resolve_regiones()
+  ([`d64def0`](https://github.com/cortega26/chile-hub/commit/d64def03f0738a8fbae886f3b7692403e6a427a6))
+
+- **dist**: Mide HF en adoption.json
+  ([`e2ef696`](https://github.com/cortega26/chile-hub/commit/e2ef6964d8377dd255eeabeeffa9cbbb336ccf92))
+
+### Mejorado
+
+- **core**: Paraleliza check_sources y cachea el GeoParquet de resolve_by_coords
+  ([`da4be85`](https://github.com/cortega26/chile-hub/commit/da4be859b3bbbcfaf1a6c661f7a352fdff2bae1e))
+
+### Refactorizado
+
+- **extractors**: Consolida write_staging en BaseExtractor
+  ([`9ff7255`](https://github.com/cortega26/chile-hub/commit/9ff725592ec71c3c058b3feef28c1408ff6069f0))
+
+### Tests
+
+- **calidad-aire**: Cubre merge incremental de process_calidad_aire
+  ([`0b1473f`](https://github.com/cortega26/chile-hub/commit/0b1473fe3c6b7d9c355074a125b687d7b37a941f))
+
+- **ci**: Cubre check_companions regla por regla
+  ([`98e90e0`](https://github.com/cortega26/chile-hub/commit/98e90e0bdab9eccc4b9baa654df5371b6c1ab2b2))
+
+- **ci**: Cubre check_source_urls (clasificación y códigos de salida)
+  ([`34d921c`](https://github.com/cortega26/chile-hub/commit/34d921cf45673788ed8f4e83f8c82ccf111d8f48))
+
+- **release**: Cubre sync_release_artifact_version.main()
+  ([`73cf443`](https://github.com/cortega26/chile-hub/commit/73cf44338c11737b414b66431075dbd8c53f8347))
+
+- **verify**: Cubre ramas de fallo de indicadores diagnostics y top_issue
+  ([`fcdc082`](https://github.com/cortega26/chile-hub/commit/fcdc082b12756adc22d103c420b40862fb5ce955))
+
+
 ## 1.45.0 - 2026-09-29
 
 ### Corregido
