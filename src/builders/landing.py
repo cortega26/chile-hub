@@ -146,6 +146,18 @@ def build_dataset_json_ld(key, public_site_url, catalog=None):
     return entry
 
 
+def json_for_html(obj) -> str:
+    """Serializa JSON listo para embeber en un ``<script>`` inline.
+
+    Un valor con ``</script>`` cerraría el tag antes de tiempo; los escapes
+    unicode mantienen el JSON válido (``json.loads`` los decodifica) y el
+    documento seguro. Fuente única para el bloque JSON-LD de ``index.html`` y
+    para el inyector de páginas de dataset (Plan 113).
+    """
+    text = json.dumps(obj, indent=2, ensure_ascii=False)
+    return text.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
+
+
 def render_catalog_json_ld_block(public_site_url):
     """Renderiza el bloque HTML completo (marcadores incluidos) del JSON-LD.
 
@@ -153,7 +165,7 @@ def render_catalog_json_ld_block(public_site_url):
     lo escribe y `scripts/check_landing_sync.py` lo compara byte a byte.
     """
     catalog_json_ld = build_catalog_json_ld(public_site_url)
-    json_ld_string = json.dumps(catalog_json_ld, indent=2, ensure_ascii=False)
+    json_ld_string = json_for_html(catalog_json_ld)
     indented_json_ld = "\n".join(
         "    " + line if line.strip() else "" for line in json_ld_string.splitlines()
     )
