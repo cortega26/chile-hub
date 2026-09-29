@@ -26,7 +26,7 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from src.builders.landing import build_dataset_json_ld  # noqa: E402
+from src.builders.landing import build_dataset_json_ld, json_for_html  # noqa: E402
 
 JSON_LD_ID = "chile-hub-dataset-json-ld"
 _MARKER = f'id="{JSON_LD_ID}"'
@@ -53,7 +53,7 @@ def default_site_url() -> str:
 
 def inject_page(html: str, json_ld: dict) -> str:
     """Inserta (o reemplaza) el bloque JSON-LD del dataset en una página HTML."""
-    body = json.dumps(json_ld, indent=2, ensure_ascii=False)
+    body = json_for_html(json_ld)
     block = f'<script type="application/ld+json" id="{JSON_LD_ID}">\n{body}\n</script>\n'
     if _MARKER in html:
         return _BLOCK_PATTERN.sub(lambda _: block, html, count=1)

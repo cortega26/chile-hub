@@ -3570,6 +3570,31 @@ class SyncLandingMetadataTests(unittest.TestCase):
                 with self.assertRaises(OSError):
                     landing.sync_landing_metadata("https://example.cl/chile-hub/")
 
+    def test_render_catalog_json_ld_block_escapes_script_sequence(self):
+        """Plan 113: un `</script>` en la metadata no puede cerrar el tag.
+
+        Regresión a evitar: `json.dumps` crudo dentro del `<script>` inline de
+        `index.html` — una descripción con `</script><script>...` rompería el
+        documento (o inyectaría markup).
+        """
+        from src.builders import landing
+
+        description = "cierre </script><script>alert(1)</script> y & <x>"
+        with patch.object(landing, "DATASET_CATALOG_CONFIG", {"x": {"description": description}}):
+            block = landing.render_catalog_json_ld_block("https://example.cl/")
+
+        self.assertNotIn("</script><script>", block)
+        self.assertIn("\\u003c/script\\u003e", block)
+        self.assertIn("\\u0026", block)
+        # El payload sigue siendo JSON válido: los escapes unicode se decodifican.
+        match = re.search(
+            r'<script type="application/ld\+json">\s*(.*?)\s*</script>',
+            block,
+            flags=re.DOTALL,
+        )
+        self.assertIsNotNone(match)
+        self.assertEqual(json.loads(match.group(1))["dataset"][0]["description"], description)
+
 
 class CheckAgentsSyncTests(unittest.TestCase):
     """Tests para scripts/check_agents_sync.py (Plan 098): el gate anti-drift
@@ -5085,6 +5110,21 @@ class HfDatasetCardTests(unittest.TestCase):
                 sorted(cfg["config_name"] for cfg in configs), ["censo_comunal", "comunas"]
             )
 
+    def test_main_aborts_when_publishable_selection_is_empty(self):
+        """Plan 113: con 0 capas publicables no se debe borrar el espejo HF.
+
+        Regresión a evitar: un rename de `publication_track` deja la selección
+        vacía y `upload_folder(delete_patterns=["data/*.parquet"])` borraría
+        todos los Parquet remotos sin subir ninguno."""
+        from scripts import publish_hf_dataset
+
+        with (
+            patch.object(publish_hf_dataset, "select_publishable_files", return_value=([], [])),
+            patch.object(sys, "argv", ["publish_hf_dataset.py", "--repo-id", "x/y"]),
+            self.assertRaisesRegex(SystemExit, "quedó vacía"),
+        ):
+            publish_hf_dataset.main()
+
 
 class DatasetSeoTests(unittest.TestCase):
     """Plan 102: páginas de dataset elegibles para Google Dataset Search.
@@ -5160,6 +5200,21 @@ class DatasetSeoTests(unittest.TestCase):
         )
         self.assertIsNotNone(match)
         self.assertEqual(json.loads(match.group(1))["name"], "Comunas")
+
+    def test_inject_page_escapes_script_sequence_in_json_ld(self):
+        """Plan 113: el inyector de mkdocs usa el mismo escape que la landing."""
+        from scripts.inject_dataset_json_ld import inject_page
+
+        name = "x </script><script>alert(1)</script> & <b>"
+        html = "<html><head><title>x</title></head><body></body></html>"
+        injected = inject_page(html, {"@type": "Dataset", "name": name})
+        self.assertNotIn("</script><script>", injected)
+        self.assertIn("\\u003c/script\\u003e", injected)
+        match = re.search(
+            r'id="chile-hub-dataset-json-ld">\n(.*?)\n</script>', injected, flags=re.DOTALL
+        )
+        self.assertIsNotNone(match)
+        self.assertEqual(json.loads(match.group(1))["name"], name)
 
     def test_main_fails_loud_without_dataset_pages(self):
         from scripts.inject_dataset_json_ld import main
