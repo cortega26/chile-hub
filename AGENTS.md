@@ -532,13 +532,17 @@ disuelta), aplicar este protocolo:
    menos 3 ciclos de `schedule`, ~3 días).
 2. **Congelar** el dataset en su última versión publicada. El snapshot en `data/raw/`
    y los artefactos en `data/normalized/` sirven como respaldo histórico.
-3. **Marcar** el metadata con `source_mode: "archived"` y `notes: ["Fuente original
-   dejó de existir el YYYY-MM-DD. Dataset congelado en su última actualización."]`.
+3. **Marcar** el dataset como retirado en `data/source_registry.json`
+   (`maturity_status: "deprecated"`, ver ADR-015) y agregar la nota de congelamiento en
+   `notes` del metadata. `source_mode` conserva el modo del último fetch exitoso; **no
+   existe un modo `archived`** (el state machine válido es `live|fallback|monthly`).
 4. **Evaluar** si el dataset sigue siendo útil sin actualizaciones. Si la respuesta es sí,
-   mantenerlo como dataset histórico (solo lectura, sin fetch). Si es no, aplicar el
-   procedimiento de depreciación de §5.
-5. **Notificar** en el reporte de salud (`make hub-health-table`) que la fuente está
-   caída, para que los consumidores sepan que el dataset no recibirá actualizaciones.
+   mantenerlo como dataset histórico (solo lectura, sin fetch): el retiro se deriva del
+   registry y `hub_health.json` lo marca `retired: true`, fuera de los contadores de salud
+   (ADR-015). Si es no, aplicar el procedimiento de depreciación de §5.
+5. **Verificar** el retiro en el reporte de salud (`make hub-health-table`): el dataset
+   aparece con `retired: true` y fuera de los contadores, para que los consumidores sepan
+   que no recibirá actualizaciones.
 
 ---
 

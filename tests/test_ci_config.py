@@ -797,6 +797,30 @@ class AgentsSyncGateGuardrailTests(unittest.TestCase):
             "`make doctor` debe correr el gate de AGENTS.md antes de commit.",
         )
 
+    def test_agents_do_not_reintroduce_an_archived_source_mode(self):
+        """Regresión (Plan 117): AGENTS.md §6 instruía `source_mode: "archived"`
+        para congelar un dataset, pero el state machine válido es
+        `VALID_SOURCE_MODES = {"live", "fallback", "monthly"}` y
+        `verify_pipeline.py` rechaza cualquier otro modo — seguir el protocolo
+        documentado abortaba el build/verify. El retiro se expresa en
+        `data/source_registry.json` (`maturity_status: "deprecated"`, ADR-015),
+        nunca dentro de `source_mode`."""
+        agents = (ROOT_DIR / "AGENTS.md").read_text(encoding="utf-8")
+        self.assertNotIn(
+            'source_mode: "archived"',
+            agents,
+            "AGENTS.md no debe documentar un modo `archived` inexistente: el "
+            "congelamiento se marca en el registry (ADR-015).",
+        )
+        from src.builders._shared import VALID_SOURCE_MODES
+
+        self.assertEqual(
+            VALID_SOURCE_MODES,
+            {"live", "fallback", "monthly"},
+            "Cambiar VALID_SOURCE_MODES exige actualizar AGENTS.md §6 y este "
+            "guardrail en el mismo cambio (Plan 117).",
+        )
+
 
 class GeometriaCandidateWorkflowGuardrailTests(unittest.TestCase):
     """La geometría comunal es candidate y supera el límite local de 500 KB.
