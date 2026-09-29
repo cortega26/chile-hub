@@ -42,7 +42,7 @@ try:
         BaseExtractor,
         ensure_staging_directories,
         write_raw_snapshot_atomic,
-        write_staging_metadata,
+        write_staging_csv_atomic,
     )
     from src.extractors.http_utils import fetch_with_retry
     from src.extractors.region_utils import region_nombre_a_codigo
@@ -51,7 +51,7 @@ except ModuleNotFoundError:
         BaseExtractor,
         ensure_staging_directories,
         write_raw_snapshot_atomic,
-        write_staging_metadata,
+        write_staging_csv_atomic,
     )
     from http_utils import fetch_with_retry
     from region_utils import region_nombre_a_codigo
@@ -383,10 +383,7 @@ class AutoridadesElectasExtractor(BaseExtractor):
 
     def write_staging(self, df: pl.DataFrame, metadata: dict) -> Path:
         ensure_staging_directories()
-        output = Path(STAGING_CSV_PATH)
-        df.write_csv(output)
-        write_staging_metadata(METADATA_PATH, metadata)
-        return output
+        return write_staging_csv_atomic(df, STAGING_CSV_PATH, METADATA_PATH, metadata)
 
 
 def process_autoridades_electas() -> str:

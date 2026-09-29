@@ -1,3 +1,4 @@
+import ast
 import datetime
 import json
 import sys
@@ -36,7 +37,11 @@ from src.extractors import (
     sinim_finanzas_extractor,
     subdere_extractor,
 )
-from src.extractors.base import BaseExtractor, write_raw_snapshot_atomic
+from src.extractors.base import (
+    BaseExtractor,
+    write_raw_snapshot_atomic,
+    write_staging_csv_atomic,
+)
 from src.extractors.ine_ipc import IneIpcReading
 
 # ROOT_DIR is defined above
@@ -1100,6 +1105,65 @@ class BaseExtractorContractTests(unittest.TestCase):
             self.assertTrue(csv_path.exists())
             self.assertEqual(metadata["dataset"], "indicadores")
             self.assertEqual(metadata["record_count"], df.height)
+
+
+class WriteStagingConsolidationTests(unittest.TestCase):
+    """Guardrails de la consolidación de `write_staging` (Plan 125)."""
+
+    def test_write_staging_csv_atomic_writes_atomic_and_canonical(self):
+        df = pl.DataFrame({"codigo_comuna": ["01101"], "valor": [1.5]})
+        with tempfile.TemporaryDirectory() as tmpdir:
+            csv_path = Path(tmpdir) / "demo.csv"
+            metadata_path = Path(tmpdir) / "demo.metadata.json"
+
+            result = write_staging_csv_atomic(
+                df, csv_path, metadata_path, {"dataset": "demo", "source_mode": "live"}
+            )
+
+            self.assertEqual(result, csv_path)
+            self.assertTrue(csv_path.exists())
+            self.assertEqual(pl.read_csv(csv_path).height, df.height)
+            # Sin temporales huérfanos: CSV y metadata se escribieron con
+            # tmp + os.replace.
+            self.assertEqual(list(Path(tmpdir).glob("*.tmp")), [])
+            metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+            self.assertEqual(metadata["dataset"], "demo")
+            self.assertEqual(metadata["record_count"], df.height)
+            self.assertEqual(metadata["fields"], df.columns)
+            self.assertEqual(metadata["source_mode"], "live")
+            # refreshed_at_utc se completa cuando el caller no lo provee.
+            datetime.datetime.fromisoformat(metadata["refreshed_at_utc"])
+
+    def test_all_write_staging_overrides_use_helper(self):
+        """Todo override concreto de `write_staging` delega en el helper único.
+
+        Excepciones documentadas: `base.py` define el contrato abstracto (sin
+        escritura) y `cead_delincuencia_live_extractor.py` está neutralizado
+        (`raise NotImplementedError`, dataset deprecated 2026-09-15).
+        """
+        extractors_dir = ROOT_DIR / "src" / "extractors"
+        exceptions = {"base.py", "cead_delincuencia_live_extractor.py"}
+        overrides_checked = 0
+        without_helper = []
+        for path in sorted(extractors_dir.glob("*.py")):
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+            for node in ast.walk(tree):
+                if not (isinstance(node, ast.FunctionDef) and node.name == "write_staging"):
+                    continue
+                if path.name in exceptions:
+                    continue
+                overrides_checked += 1
+                calls_helper = any(
+                    isinstance(call, ast.Call)
+                    and isinstance(call.func, ast.Name)
+                    and call.func.id == "write_staging_csv_atomic"
+                    for call in ast.walk(node)
+                )
+                if not calls_helper:
+                    without_helper.append(f"{path.name}:{node.lineno}")
+        # Los 21 overrides concretos listados en el Plan 125 deben usar el helper.
+        self.assertGreaterEqual(overrides_checked, 21)
+        self.assertEqual(without_helper, [])
 
 
 class ResExtractorTests(unittest.TestCase):

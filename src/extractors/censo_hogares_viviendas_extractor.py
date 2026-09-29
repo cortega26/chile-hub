@@ -18,10 +18,10 @@ try:
     from src.extractors.base import (
         BaseExtractor,
         ensure_staging_directories,
-        write_staging_metadata,
+        write_staging_csv_atomic,
     )
 except ModuleNotFoundError:
-    from base import BaseExtractor, ensure_staging_directories, write_staging_metadata
+    from base import BaseExtractor, ensure_staging_directories, write_staging_csv_atomic
 
 try:
     from src.extractors.http_utils import fetch_with_retry
@@ -73,17 +73,8 @@ class CensoHogaresViviendasExtractor(BaseExtractor):
 
     def write_staging(self, df, metadata: dict) -> Path:
         ensure_staging_directories()
-        output = Path(STAGING_CSV_PATH)
-        df.write_csv(output)
-        full_metadata = {
-            **metadata,
-            "dataset": self.dataset_name,
-            "record_count": df.height,
-            "fields": df.columns,
-            "reuse_policy": REUSE_POLICY,
-        }
-        write_staging_metadata(str(METADATA_PATH), full_metadata)
-        return output
+        merged = {**metadata, "dataset": self.dataset_name, "reuse_policy": REUSE_POLICY}
+        return write_staging_csv_atomic(df, STAGING_CSV_PATH, METADATA_PATH, merged)
 
 
 def fetch_workbook():
