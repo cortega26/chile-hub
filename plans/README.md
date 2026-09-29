@@ -795,13 +795,7 @@ ya no aplique.
 
 | # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de / solapa | Estado |
 |---|------|----------|----------|--------|---------------------|--------|
-| 117 | [Alinear `source_mode: archived` (drift §6)](117-archived-source-mode-alignment.md) | P2 | S-M | LOW-MED | — | TODO |
-| 120 | [`check_sources` paralelo + caché de geometría](120-core-perf-diagnostics-cache.md) | P3 | S | LOW | — | TODO |
-| 121 | [Lighthouse: performance + artefacto](121-lighthouse-performance-baseline.md) | P3 | S | LOW | — | TODO |
-| 123 | [Backfill de tests de gates](123-gate-test-backfill.md) | P2 | M | LOW-MED | soft de 122; antes de 125 (merge calidad_aire) | TODO |
-| 125 | [Consolidar `write_staging`](125-consolidate-write-staging.md) | P2 | M | LOW-MED | soft de 123 | TODO |
 | 128 | [Python 3.15 + DuckDB-Wasm al día](128-deps-forward-compat.md) | P1/P3 | S/M | LOW-MED | — | PARTIAL (2026-09-29: Step 2 DONE commit 915ee8c; Step 1 BLOCKED hasta 2026-10-01) |
-| 129 | [Cierres de distribución: HF metric, registry MCP, `resolve_regiones`](129-direction-distribution-closes.md) | P2 | S/M | LOW | — | TODO |
 | 130 | [Dejar de versionar el ZIP publicable](130-stop-committing-bundle-zip.md) | P3 | S-M | MED | Step 0 = decisión de mantenedor | TODO (decisión pendiente) |
 
 ### Planes archivados (auditoría `/improve deep` 2026-09-29 — Wave 1)
@@ -837,6 +831,21 @@ Ejecutados en worktrees `advisor/*` y revisados por el advisor.
 | 124 | [DatasetSpec: 3 specs + gate catálogo↔spec](archive/124-datasetspec-gate.md) | M | LOW | DONE — `1121cdc` (merge `3fc0381`): 25/25 specs, gate en `registry`, test dinámico, docs alineados |
 | 126 | [Higiene tooling/onboarding](archive/126-tooling-onboarding-hygiene.md) | S-M | LOW | DONE — `5ec16bb`…`8b2a634` (FF): ruff único 0.16.8, hook sync-docs arreglado, shim eliminado, uv documentado, doctor lock, package-smoke |
 | 128 | [Python 3.15 + DuckDB-Wasm](128-deps-forward-compat.md) | S/M | LOW-MED | PARTIAL — `915ee8c` (merge `d8f7d7a`): DuckDB-Wasm 1.32.0 (motor 1.4.3) + smoke SQL real; Step 1 al 2026-10-01 |
+
+### Planes archivados (auditoría `/improve deep` 2026-09-29 — Wave 3)
+
+La Wave 3 quedó DONE y mergeada el 2026-09-29 (6/6). Ejecutada en worktrees
+`advisor/*`, revisada por el advisor; el 129 requirió una ronda de revisión
+(mypy: import duplicado `chile_hub.regions` + anotación `SchemaDefinition`).
+
+| # | Plan | Esfuerzo | Riesgo | Estado |
+|---|------|----------|--------|--------|
+| 117 | [Alinear `source_mode: archived`](archive/117-archived-source-mode-alignment.md) | S-M | LOW-MED | DONE — `7fc72b0` (FF; Rama A): AGENTS §6 alineado con ADR-015 + guardrail |
+| 120 | [`check_sources` paralelo + caché de geometría](archive/120-core-perf-diagnostics-cache.md) | S | LOW | DONE — `da4be85` (FF): `ThreadPoolExecutor(8)` con orden preservado + caché por mtime |
+| 121 | [Lighthouse: performance + artefacto](archive/121-lighthouse-performance-baseline.md) | S | LOW | DONE — `9c26728` (merge `2942668`): `performance` medido sin umbral + reporte como artifact |
+| 123 | [Backfill de tests de gates](archive/123-gate-test-backfill.md) | M | LOW-MED | DONE — `81701a6` (merge `057ebf4`): +30 tests en 5 gates (calidad_aire, diagnostics, companions, release, source_urls) |
+| 125 | [Consolidar `write_staging`](archive/125-consolidate-write-staging.md) | M | LOW-MED | DONE — `9ff7255` (merge `19d7af0`): helper atómico en `base.py`, 21 overrides convertidos (y corrigió la premisa: sí está en la ruta diaria) |
+| 129 | [Cierres de distribución](archive/129-direction-distribution-closes.md) | S/M | LOW | DONE — `e2ef696`+`d64def0`+`5203d3a`+`62b1ff1` (FF): métrica HF (274 descargas), `server.json` validado en el registry, `resolve_regiones()` |
 
 ### Orden de ejecución recomendado (waves)
 

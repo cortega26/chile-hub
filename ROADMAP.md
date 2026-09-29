@@ -97,9 +97,9 @@
 |------|--------|-----------|------|--------|
 | **W1** | 111, 115, 116, 118, 122, 127 | P1: seguridad de release, superficie pública, CI/tests, docs | 6/6 | **DONE (2026-09-29, mergeada a `main`; suite 1167 + gates verdes)** |
 | **W2** | 112, 113, 114, 119, 124, 126, 128 | P2: pins/hardening, fuente/MCP, DatasetSpec, tooling, deps | 6/7 + 128 parcial | **DONE (2026-09-29)**; 128 Step 2 DONE, Step 1 BLOCKED al 2026-10-01 |
-| **W3** | 117, 120, 121, 123, 125, 129 | P2/P3: decisión archived, perf, tests de gates, dirección | 0/6 | TODO |
+| **W3** | 117, 120, 121, 123, 125, 129 | P2/P3: decisión archived, perf, tests de gates, dirección | 6/6 | **DONE (2026-09-29, mergeada a `main`; suite 1239 + gates verdes)** |
 | **W4** | 130 | P3: dejar de versionar el ZIP (requiere decisión) | 0/1 | BLOCKED (Step 0 = decisión del operador) |
-| **Total** | 111–130 | | **12/20 + 128 parcial** | W1+W2 cerradas; 128 Step 1 al 2026-10-01; W3–W4 TODO |
+| **Total** | 111–130 | | **18/20 + 128 parcial** | W1–W3 cerradas; 128 Step 1 al 2026-10-01; W4 (130) decisión |
 
 ### Backlog por wave (orden de ejecución)
 
@@ -124,12 +124,12 @@
 
 **Wave 3 — P2/P3:**
 
-- [ ] **117** [Alinear `source_mode: archived`](plans/117-archived-source-mode-alignment.md) — P2/S-M/LOW-MED — el protocolo de fuente caída deja de romper el build.
-- [ ] **120** [`check_sources` paralelo + caché de geometría](plans/120-core-perf-diagnostics-cache.md) — P3/S/LOW.
-- [ ] **121** [Lighthouse: performance + artefacto](plans/121-lighthouse-performance-baseline.md) — P3/S/LOW.
-- [ ] **123** [Backfill de tests de gates](plans/123-gate-test-backfill.md) — P2/M/LOW-MED.
-- [ ] **125** [Consolidar `write_staging`](plans/125-consolidate-write-staging.md) — P2/M/LOW-MED — (después de 123).
-- [ ] **129** [Cierres de distribución: HF metric, registry MCP, `resolve_regiones`](plans/129-direction-distribution-closes.md) — P2/S-M/LOW.
+- [x] **117** [Alinear `source_mode: archived`](plans/archive/117-archived-source-mode-alignment.md) — P2/S-M/LOW-MED — ✅ mergeado en `main` (`7fc72b0`; FF, Rama A).
+- [x] **120** [`check_sources` paralelo + caché de geometría](plans/archive/120-core-perf-diagnostics-cache.md) — P3/S/LOW — ✅ mergeado en `main` (`da4be85`; FF).
+- [x] **121** [Lighthouse: performance + artefacto](plans/archive/121-lighthouse-performance-baseline.md) — P3/S/LOW — ✅ mergeado en `main` (`9c26728`; merge `2942668`).
+- [x] **123** [Backfill de tests de gates](plans/archive/123-gate-test-backfill.md) — P2/M/LOW-MED — ✅ mergeado en `main` (`81701a6`; merge `057ebf4`).
+- [x] **125** [Consolidar `write_staging`](plans/archive/125-consolidate-write-staging.md) — P2/M/LOW-MED — ✅ mergeado en `main` (`9ff7255`; merge `19d7af0`).
+- [x] **129** [Cierres de distribución: HF metric, registry MCP, `resolve_regiones`](plans/archive/129-direction-distribution-closes.md) — P2/S-M/LOW — ✅ mergeado en `main` (`e2ef696`+`d64def0`+`5203d3a`+`62b1ff1`; FF, con 1 revisión de mypy).
 
 **Wave 4 — decisión:**
 
