@@ -4260,6 +4260,206 @@ class CalidadAireExtractorTests(unittest.TestCase):
                 self.assertEqual(result["status"], "ok")
                 self.assertFalse(staging_csv.exists())
 
+    # ── process_calidad_aire: merge incremental de la serie ────────────────
+
+    def _row(self, fecha, valor=10.0, codigo_contaminante="mp25", id_estacion="271"):
+        """Fila canónica de una estación/contaminante para un día."""
+        return {
+            "fecha": fecha,
+            "id_estacion": id_estacion,
+            "nombre_estacion": "Quilicura",
+            "codigo_region": "13",
+            "codigo_comuna": "13144",
+            "nombre_comuna": "Quilicura",
+            "latitud": -33.36,
+            "longitud": -70.73,
+            "codigo_contaminante": codigo_contaminante,
+            "nombre_contaminante": "MP2.5",
+            "unidad": "µg/m³",
+            "valor_promedio_diario": valor,
+            "valor_max_horario": valor * 2,
+            "horas_validas": 24,
+            "estado_dato": "definitivo",
+            "fuente": "SINCA",
+            "url_fuente": "http://ejemplo",
+            "fecha_fuente": fecha,
+        }
+
+    def _read_staging_csv(self, path):
+        """Lee el staging escrito por process_calidad_aire preservando CUTs."""
+        return pl.read_csv(
+            str(path),
+            schema_overrides={
+                "codigo_region": pl.String,
+                "codigo_comuna": pl.String,
+                "id_estacion": pl.String,
+                "horas_validas": pl.Int64,
+            },
+        )
+
+    def test_process_calidad_aire_seeds_history_from_parquet(self):
+        """Sin staging, la serie se siembra desde el Parquet publicado.
+
+        Sin esta siembra un cache-miss de CI reiniciaría la serie en
+        silencio (excepción documentada en el docstring del extractor).
+        """
+        with tempfile.TemporaryDirectory() as tmpdir:
+            staging_csv = Path(tmpdir) / "calidad_aire.csv"
+            metadata_path = Path(tmpdir) / "calidad_aire.metadata.json"
+            seeded = calidad_aire_extractor.normalize_rows([self._row("2026-09-13", valor=7.0)])
+            seed_mock = MagicMock(return_value=seeded)
+            with (
+                patch.object(calidad_aire_extractor, "STAGING_CSV_PATH", str(staging_csv)),
+                patch.object(calidad_aire_extractor, "METADATA_PATH", str(metadata_path)),
+                patch.object(calidad_aire_extractor, "ensure_staging_directories"),
+                patch.object(
+                    calidad_aire_extractor,
+                    "fetch_data",
+                    return_value=(
+                        [self._row("2026-09-14", valor=15.0)],
+                        "live",
+                        calidad_aire_extractor.LISTADO_URL,
+                        [],
+                    ),
+                ),
+                patch.object(calidad_aire_extractor, "_seed_history_from_parquet", seed_mock),
+            ):
+                metadata = calidad_aire_extractor.process_calidad_aire()
+
+            seed_mock.assert_called_once()
+            self.assertEqual(metadata["record_count"], 2)
+            self.assertIn(
+                "historial: sembrado desde Parquet publicado (1 filas)",
+                metadata["notes"],
+            )
+            df = self._read_staging_csv(staging_csv)
+            self.assertEqual(df.height, 2)
+            self.assertEqual(df["fecha"].to_list(), ["2026-09-13", "2026-09-14"])
+            self.assertEqual(df["fecha"].dtype, pl.String)
+            self.assertEqual(df["valor_promedio_diario"].dtype, pl.Float64)
+            self.assertEqual(df["id_estacion"].dtype, pl.String)
+            # El metadata persistido refleja el frame fusionado, no solo lo nuevo.
+            written = json.loads(metadata_path.read_text(encoding="utf-8"))
+            self.assertEqual(written["record_count"], 2)
+            self.assertEqual(written["source_mode"], "live")
+
+    def test_process_calidad_aire_merges_existing_staging(self):
+        """Con staging existente: concat diagonal + dedup y sort final."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            staging_csv = Path(tmpdir) / "calidad_aire.csv"
+            metadata_path = Path(tmpdir) / "calidad_aire.metadata.json"
+            # Staging en orden inverso al canónico: el sort final debe reordenar.
+            calidad_aire_extractor.normalize_rows(
+                [
+                    self._row("2026-09-14", valor=8.0),
+                    self._row("2026-09-13", valor=7.0),
+                ]
+            ).write_csv(str(staging_csv))
+            seed_mock = MagicMock()
+            with (
+                patch.object(calidad_aire_extractor, "STAGING_CSV_PATH", str(staging_csv)),
+                patch.object(calidad_aire_extractor, "METADATA_PATH", str(metadata_path)),
+                patch.object(calidad_aire_extractor, "ensure_staging_directories"),
+                patch.object(
+                    calidad_aire_extractor,
+                    "fetch_data",
+                    return_value=(
+                        [self._row("2026-09-15", valor=9.0)],
+                        "live",
+                        calidad_aire_extractor.LISTADO_URL,
+                        [],
+                    ),
+                ),
+                patch.object(calidad_aire_extractor, "_seed_history_from_parquet", seed_mock),
+            ):
+                metadata = calidad_aire_extractor.process_calidad_aire()
+
+            # El Parquet solo se consulta cuando staging no existe.
+            seed_mock.assert_not_called()
+            self.assertIn("historial: fusionado con staging existente", metadata["notes"])
+            df = self._read_staging_csv(staging_csv)
+            self.assertEqual(df.height, 3)
+            self.assertEqual(
+                df["fecha"].to_list(), ["2026-09-13", "2026-09-14", "2026-09-15"]
+            )
+            self.assertEqual(df["fecha"].dtype, pl.String)
+            self.assertEqual(df["valor_promedio_diario"].dtype, pl.Float64)
+
+    def test_process_calidad_aire_corrupt_staging_starts_from_new(self):
+        """Staging ilegible: se parte de lo nuevo y se anota el motivo."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            staging_csv = Path(tmpdir) / "calidad_aire.csv"
+            metadata_path = Path(tmpdir) / "calidad_aire.metadata.json"
+            # CSV bien formado cuyo valor de horas_validas no castea a Int64
+            # (schema_override del merge): dispara la rama except.
+            staging_csv.write_text(
+                "fecha,id_estacion,horas_validas,valor_promedio_diario\n"
+                "2026-09-14,271,no-numero,NaN\n",
+                encoding="utf-8",
+            )
+            seed_mock = MagicMock()
+            with (
+                patch.object(calidad_aire_extractor, "STAGING_CSV_PATH", str(staging_csv)),
+                patch.object(calidad_aire_extractor, "METADATA_PATH", str(metadata_path)),
+                patch.object(calidad_aire_extractor, "ensure_staging_directories"),
+                patch.object(
+                    calidad_aire_extractor,
+                    "fetch_data",
+                    return_value=(
+                        [self._row("2026-09-15", valor=9.0)],
+                        "live",
+                        calidad_aire_extractor.LISTADO_URL,
+                        [],
+                    ),
+                ),
+                patch.object(calidad_aire_extractor, "_seed_history_from_parquet", seed_mock),
+            ):
+                metadata = calidad_aire_extractor.process_calidad_aire()
+
+            # Staging corrupto no cae a la siembra del Parquet: parte de lo nuevo.
+            seed_mock.assert_not_called()
+            notes = [n for n in metadata["notes"] if n.startswith("historial: staging ilegible")]
+            self.assertEqual(len(notes), 1, metadata["notes"])
+            self.assertIn("se parte de lo nuevo", notes[0])
+            df = self._read_staging_csv(staging_csv)
+            self.assertEqual(df.height, 1)
+            self.assertEqual(df["fecha"].to_list(), ["2026-09-15"])
+
+    def test_process_calidad_aire_reseed_same_key_keeps_new_row(self):
+        """Re-cosecha del mismo día: keep='last' deja el valor más fresco.
+
+        El JSON de SINCA solo trae 24 h; una re-cosecha del mismo día debe
+        actualizar (no duplicar) la fila ya presente en staging.
+        """
+        with tempfile.TemporaryDirectory() as tmpdir:
+            staging_csv = Path(tmpdir) / "calidad_aire.csv"
+            metadata_path = Path(tmpdir) / "calidad_aire.metadata.json"
+            calidad_aire_extractor.normalize_rows(
+                [self._row("2026-09-14", valor=10.0)]
+            ).write_csv(str(staging_csv))
+            with (
+                patch.object(calidad_aire_extractor, "STAGING_CSV_PATH", str(staging_csv)),
+                patch.object(calidad_aire_extractor, "METADATA_PATH", str(metadata_path)),
+                patch.object(calidad_aire_extractor, "ensure_staging_directories"),
+                patch.object(
+                    calidad_aire_extractor,
+                    "fetch_data",
+                    return_value=(
+                        [self._row("2026-09-14", valor=99.0)],
+                        "live",
+                        calidad_aire_extractor.LISTADO_URL,
+                        [],
+                    ),
+                ),
+            ):
+                metadata = calidad_aire_extractor.process_calidad_aire()
+
+            df = self._read_staging_csv(staging_csv)
+            self.assertEqual(df.height, 1)
+            self.assertEqual(df["valor_promedio_diario"].to_list(), [99.0])
+            self.assertEqual(df["valor_max_horario"].to_list(), [198.0])
+            self.assertEqual(metadata["record_count"], 1)
+
 
 if __name__ == "__main__":
     import sys
