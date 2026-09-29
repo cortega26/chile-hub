@@ -1613,6 +1613,57 @@ class SourceUrlsWorkflowGuardrailTests(unittest.TestCase):
         self.assertIn("tenacity", pipeline_extra)
 
 
+class TestSignalIntegrityGuardrailTests(unittest.TestCase):
+    """Regresión doble (Plan 122): la señal de tests de CI mentía en dos frentes.
+
+    1. `[tool.coverage.run] source = ["src", "scripts"]` declara `scripts/`,
+       pero `Makefile` y `pipeline-check.yml` corrían `--cov=src`, y `--cov`
+       REEMPLAZA el `source` de config: ~2.8k statements de `scripts/`
+       (incluido `verify_pipeline.py`, 1 940 líneas y el gate diario de
+       publicación) no se medían nunca — el badge de cobertura era vanidoso.
+    2. El extra `mcp` no se sincronizaba en CI (`uv sync --extra pipeline
+       --extra dev`), así que `build_server()` jamás se construía en el runner
+       y el test MCP tomaba siempre la rama ImportError (rama muerta).
+
+    Además, el pytest de CI corría serial aunque el Plan 080 ya verificó que
+    `-n auto` baja la suite completa de ~66s a ~18s en `make test`.
+    """
+
+    def _step(self, name: str) -> str:
+        """Cuerpo del step de `pipeline-check.yml` (steps a 6 espacios)."""
+        content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        start = content.index(f"- name: {name}")
+        end = content.index("\n      - name:", start + 1)
+        return content[start:end]
+
+    def test_makefile_coverage_target_measures_scripts(self):
+        body = _extract_make_target(MAKEFILE.read_text(encoding="utf-8"), "coverage")
+        self.assertIn(
+            "--cov=src --cov=scripts",
+            body,
+            "`make coverage` sin --cov=scripts deja scripts/ fuera del badge "
+            "(el --cov explícito reemplaza el source de pyproject.toml).",
+        )
+
+    def test_ci_test_step_measures_scripts(self):
+        step = self._step("Run unit and contract tests")
+        self.assertIn("--cov=src --cov=scripts", step)
+
+    def test_ci_test_step_uses_xdist(self):
+        step = self._step("Run unit and contract tests")
+        self.assertIn(
+            "-n auto",
+            step,
+            "el pytest de CI debe correr con xdist (Plan 080): sin -n auto el "
+            "feedback loop de PR es 3-4x más lento que `make test`.",
+        )
+
+    def test_ci_smokes_mcp_extra(self):
+        step = self._step("MCP server smoke (extra [mcp])")
+        self.assertIn("--extra mcp", step)
+        self.assertIn("build_server", step)
+
+
 if __name__ == "__main__":
     import pytest
 

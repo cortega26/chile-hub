@@ -407,7 +407,23 @@ jobs:
           ALLOW_RECORD_DROP: ${{ inputs.allow_record_drop }}
 
       - name: Run unit and contract tests
-        run: python -m pytest -v --cov=src --cov-report=term-missing --cov-report=xml
+        run: python -m pytest -n auto -v --cov=src --cov=scripts --cov-report=term-missing --cov-report=xml
+
+      - name: MCP server smoke (extra [mcp])
+        run: |
+          # El extra `mcp` no esta en el sync base del job (pipeline+dev), asi
+          # que sin este paso `build_server()` nunca se construye en CI y el
+          # test correspondiente siempre toma la rama ImportError (rama muerta
+          # en el runner). El `uv run` de abajo agrega el extra al venv del job
+          # sin desinstalar pipeline/dev (verificado); costo: un sync
+          # incremental, una vez por run.
+          uv run --extra mcp python - <<'PY'
+          from chile_hub.mcp_server import build_server
+
+          server = build_server()
+          assert server.name == "chile-hub", server.name
+          print(f"OK: MCP server {server.name}")
+          PY
 
       - name: Upload coverage to Codecov
         if: false  # Deshabilitado: migrado a badge autogenerado (coverage_badge.json)
