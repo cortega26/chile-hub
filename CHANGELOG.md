@@ -12,6 +12,55 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.44.1 - 2026-09-29
+
+### Corregido
+
+- **ci**: Commitea el geojson del mapa junto al parquet candidate
+  ([`4afef66`](https://github.com/cortega26/chile-hub/commit/4afef66fc29ee4cd084d294144e1fcc44dd0de95))
+
+- **security**: Gatea release y pages por repo y evento del run disparador
+  ([`661d77c`](https://github.com/cortega26/chile-hub/commit/661d77c96264a95ccfa6ecfa0dcfd50a44eb5e37))
+
+- **seo**: Corrige año de finanzas, descargas por site-url y explorador SQL
+  ([`832bd6f`](https://github.com/cortega26/chile-hub/commit/832bd6f95ea5545ccaddec8ecee04775186c816c))
+
+- **tests**: Mide scripts/ en cobertura y corre MCP en CI
+  ([`023c437`](https://github.com/cortega26/chile-hub/commit/023c4370450c5554606440eff3fd10c32a79de3c))
+
+### Mantenimiento
+
+- **docs**: Sincroniza conteo de tests de README (1147 -> 1151)
+  ([`4a40723`](https://github.com/cortega26/chile-hub/commit/4a40723cf054ec62c49da63171852b9eff6e9dfe))
+
+### Documentación
+
+- Sincroniza pin de instalación, repunta planes archivados y agrega guardrails
+  ([`7d172a3`](https://github.com/cortega26/chile-hub/commit/7d172a3b74222f437c551117e70edf814b2831fd))
+
+- **agents**: Corrige hechos falsos del carril, capas y comandos CodeGraph
+  ([`b1df764`](https://github.com/cortega26/chile-hub/commit/b1df76478ea265361a1aa482dec4c01fde110519))
+
+- **readme**: Regenera conteo de tests tras plan 118
+  ([`3526884`](https://github.com/cortega26/chile-hub/commit/3526884b407ba6dc18a5b2d5e1885008c0f91ba9))
+
+- **readme**: Sincroniza el conteo de tests (1151) tras los guardrails del Plan 122
+  ([`8ace7fc`](https://github.com/cortega26/chile-hub/commit/8ace7fc3f28e35c40e07400ce66af5876c6c72ad))
+
+- **readme**: Sincroniza el conteo de tests tras Plan 115
+  ([`96a24f8`](https://github.com/cortega26/chile-hub/commit/96a24f8f6307e1d57ba790a1a1424cfc5434a10a))
+
+### Mejorado
+
+- **vitales**: Descarga incremental de anuarios
+  ([`14ec4ff`](https://github.com/cortega26/chile-hub/commit/14ec4fff2aa7cf4a73a24b52a970138760260fb3))
+
+### Tests
+
+- **ci**: Guardrail del gate de identidad de workflow_run
+  ([`3a6f49d`](https://github.com/cortega26/chile-hub/commit/3a6f49d9eeef7cf080b6dd53f9c4408723192de7))
+
+
 ## 1.44.0 - 2026-09-29
 
 ### Documentación
