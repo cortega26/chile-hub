@@ -95,22 +95,22 @@
 
 | Wave | Planes | Contenido | Done | Estado |
 |------|--------|-----------|------|--------|
-| **W1** | 111, 115, 116, 118, 122, 127 | P1: seguridad de release, superficie pública, CI/tests, docs | 0/6 | TODO |
+| **W1** | 111, 115, 116, 118, 122, 127 | P1: seguridad de release, superficie pública, CI/tests, docs | 6/6 | **DONE (2026-09-29, mergeada a `main`; suite 1167 + gates verdes)** |
 | **W2** | 112, 113, 114, 119, 124, 126, 128 | P2: pins/hardening, fuente/MCP, DatasetSpec, tooling, deps | 0/7 | TODO |
 | **W3** | 117, 120, 121, 123, 125, 129 | P2/P3: decisión archived, perf, tests de gates, dirección | 0/6 | TODO |
 | **W4** | 130 | P3: dejar de versionar el ZIP (requiere decisión) | 0/1 | BLOCKED (Step 0 = decisión del operador) |
-| **Total** | 111–130 | | **0/20** | |
+| **Total** | 111–130 | | **6/20 (W1)** | W1 DONE; W2–W4 TODO |
 
 ### Backlog por wave (orden de ejecución)
 
 **Wave 1 — P1, planes disjuntos (paralelizable en worktrees):**
 
-- [ ] **111** [Gate de identidad `workflow_run` + ancestría de artifacts](plans/111-workflow-run-identity-gate.md) — P1/S-M/MED — un artifact de PR de fork no puede entrar al Release/HF.
-- [ ] **115** [Superficie generada: año "2.024", playground, URL base](plans/115-generated-surface-fixes.md) — P1/S/LOW — fix visible en 346 fichas + SQL Explorer.
-- [ ] **116** [Commitear `mapa_comunal.geojson` en el refresh de geometría](plans/116-mapa-comunal-geojson-commit.md) — P1/S/LOW — el mapa deja de divergir del parquet.
-- [ ] **118** [Vitales: fetch incremental](plans/118-vitales-incremental-fetch.md) — P1/S-M/MED — ~89 s/día y ~28 MB/día menos.
-- [ ] **122** [Cobertura `scripts/`, smoke MCP, xdist en CI](plans/122-ci-test-integrity.md) — P1/S-M/LOW-MED — la señal de tests deja de mentir.
-- [ ] **127** [Correcciones de docs canónicos (7)](plans/127-docs-corrections-batch.md) — P1/S/LOW — AGENTS/installation/NEXT_STEPS/links.
+- [x] **111** [Gate de identidad `workflow_run` + ancestría de artifacts](plans/archive/111-workflow-run-identity-gate.md) — P1/S-M/MED — un artifact de PR de fork no puede entrar al Release/HF. — ✅ mergeado en `main` (661d77c+3a6f49d+4a40723; merge `ae1e12c`).
+- [x] **115** [Superficie generada: año "2.024", playground, URL base](plans/archive/115-generated-surface-fixes.md) — P1/S/LOW — fix visible en 346 fichas + SQL Explorer. — ✅ mergeado en `main` (832bd6f+96a24f8; merge `b007cac`).
+- [x] **116** [Commitear `mapa_comunal.geojson` en el refresh de geometría](plans/archive/116-mapa-comunal-geojson-commit.md) — P1/S/LOW — el mapa deja de divergir del parquet. — ✅ mergeado en `main` (4afef66; fast-forward).
+- [x] **118** [Vitales: fetch incremental](plans/archive/118-vitales-incremental-fetch.md) — P1/S-M/MED — ~89 s/día y ~28 MB/día menos. — ✅ mergeado en `main` (14ec4ff+3526884; merge `18adc2d`).
+- [x] **122** [Cobertura `scripts/`, smoke MCP, xdist en CI](plans/archive/122-ci-test-integrity.md) — P1/S-M/LOW-MED — la señal de tests deja de mentir. — ✅ mergeado en `main` (023c437+8ace7fc; merge `70453c9`).
+- [x] **127** [Correcciones de docs canónicos (7)](plans/archive/127-docs-corrections-batch.md) — P1/S/LOW — AGENTS/installation/NEXT_STEPS/links. — ✅ mergeado en `main` (b1df764+7d172a3; merge `5f6a855`).
 
 **Wave 2 — P2 (114 → 113 secuencial; el resto paralelo; 126 después de 122):**
 
