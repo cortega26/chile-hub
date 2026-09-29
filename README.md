@@ -11,7 +11,7 @@
 </h1>
 
 <p><strong>Datos públicos de Chile, curados y listos para análisis en una línea de código.</strong></p>
-<p><em>El hub de datos abiertos de Chile — parte del ecosistema Tooltician.</em></p>
+<p><em>La última milla de los datos oficiales de Chile — parte del ecosistema Tooltician.</em></p>
 
 [![CI/CD](https://github.com/cortega26/chile-hub/actions/workflows/pipeline-check.yml/badge.svg)](https://github.com/cortega26/chile-hub/actions)
 [![PyPI version](https://img.shields.io/pypi/v/chile-hub.svg)](https://pypi.org/project/chile-hub/)
@@ -114,6 +114,11 @@ chile-hub cache clear      # Liberar espacio
 > **chile-hub** no busca "tener todos los datos de Chile". Busca **reducir drásticamente
 > el costo técnico** de encontrar, limpiar, validar, cruzar y consumir datasets
 > geográficos, demográficos, electorales y económicos críticos de Chile.
+>
+> Tampoco es un portal ni una fuente oficial: trabaja aguas abajo de
+> [datos.gob.cl](https://datos.gob.cl/) y de las instituciones que publican cada dato,
+> y siempre enlaza a la fuente oficial. Es un proyecto independiente, sin afiliación con
+> esas instituciones. Misión y principios: [`docs/product-spec.md`](docs/product-spec.md).
 >
 > En la práctica, responde preguntas como:
 >

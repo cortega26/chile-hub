@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>chile-hub — Capas de Datos de Chile</title>
-    <meta name="description" content="chile-hub es una capa de datos oficial y curada de Chile. Accede a datasets listos de la DPA, economía, salud, educación y más en Parquet, JSON y DuckDB.">
+    <meta name="description" content="chile-hub normaliza y valida datos oficiales de Chile y los deja listos para cruzar: DPA, economía, salud, educación y más en Parquet, JSON y DuckDB.">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://tooltician.com/chile-hub/">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b0f19'/%3E%3Cpath d='M18 20h11c9 0 14 5 14 12 0 9-6 14-15 14H18V20zm9 20c6 0 9-3 9-8 0-4-3-7-8-7h-3v15h2z' fill='%2322d3ee'/%3E%3Cpath d='M45 18l4 7 7 4-7 4-4 7-4-7-7-4 7-4 4-7z' fill='%23818cf8'/%3E%3C/svg%3E">
@@ -13,14 +13,14 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://tooltician.com/chile-hub/">
     <meta property="og:title" content="chile-hub — Capas de Datos de Chile">
-    <meta property="og:description" content="Capa de datos oficial, curada y reproducible sobre Chile. Accede a datasets listos para producción en Parquet, JSON y DuckDB.">
+    <meta property="og:description" content="La última milla de los datos oficiales de Chile: capas curadas, validadas y listas para cruzar en Parquet, JSON y DuckDB.">
     <meta property="og:image" content="https://tooltician.com/chile-hub/social-card.png">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://tooltician.com/chile-hub/">
     <meta name="twitter:title" content="chile-hub — Capas de Datos de Chile">
-    <meta name="twitter:description" content="Capa de datos oficial, curada y reproducible sobre Chile. Accede a datasets listos para producción en Parquet, JSON y DuckDB.">
+    <meta name="twitter:description" content="La última milla de los datos oficiales de Chile: capas curadas, validadas y listas para cruzar en Parquet, JSON y DuckDB.">
     <meta name="twitter:image" content="https://tooltician.com/chile-hub/social-card.png">
 
     <!-- Structured Data (JSON-LD) -->
@@ -30,7 +30,7 @@
       "@type": "WebSite",
       "name": "chile-hub",
       "url": "https://tooltician.com/chile-hub/",
-      "description": "Capa de datos oficial, curada y reproducible sobre Chile. Datasets limpios en Parquet, JSON, DuckDB y Excel.",
+      "description": "Capa curada y reproducible sobre datos oficiales de Chile. Datasets limpios en Parquet, JSON, DuckDB y Excel.",
       "publisher": {
         "@type": "Organization",
         "name": "chile-hub"
@@ -44,7 +44,7 @@
       "@type": "DataCatalog",
       "name": "chile-hub",
       "url": "https://tooltician.com/chile-hub/",
-      "description": "Capa de datos oficial, curada y reproducible sobre Chile. Datasets limpios en Parquet, JSON, DuckDB y Excel.",
+      "description": "Capa curada y reproducible sobre datos oficiales de Chile. Datasets limpios en Parquet, JSON, DuckDB y Excel.",
       "publisher": {
         "@type": "Organization",
         "name": "chile-hub"
@@ -3278,9 +3278,9 @@
     <main id="main-content" tabindex="-1">
         <section class="intro">
             <div class="intro-copy">
-                <p class="intro-eyebrow">Datos oficiales de Chile, curados y reproducibles</p>
-                <h2>Un punto de partida curado para datos abiertos de Chile.</h2>
-                <p>Veintiuna capas publicadas y una en evaluación, todas normalizadas — geografía, demografía, economía, salud, educación y más — listas para consumir en una línea de código. Con resolución de entidades por nombre y por coordenadas.</p>
+                <p class="intro-eyebrow">Complementa a datos.gob.cl y a las fuentes oficiales</p>
+                <h2>La última milla de los datos oficiales de Chile.</h2>
+                <p>Veintiuna capas publicadas y una en evaluación, todas normalizadas — geografía, demografía, economía, salud, educación y más — listas para consumir en una línea de código. Con resolución de entidades por nombre y por coordenadas. No reemplaza a las fuentes oficiales: las vuelve cruzables.</p>
                 <div class="intro-links">
                     <a class="btn btn-primary" href="#catalogo">Explorar datos</a>
                     <a class="btn btn-secondary" href="reference/">Ver documentación</a>
@@ -3797,10 +3797,11 @@ LIMIT 10;</pre>
             <p>Construido con Python, Polars y DuckDB.</p>
             <p>Licencia del Consolidado: <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener noreferrer">CC-BY-4.0</a></p>
             <p><a href="comunas/">Las 346 comunas de Chile</a></p>
+            <p>Proyecto independiente: no es un servicio del Estado ni está afiliado a datos.gob.cl ni a las instituciones fuente.</p>
         </div>
         <div class="footer-col">
             <h3>Fuentes</h3>
-            <p>BCN ArcGIS, INE, MINSAL, MINEDUC, mindicador.cl y SERVEL — atribución individual en el catálogo.</p>
+            <p>BCN ArcGIS, INE, MINSAL, MINEDUC, mindicador.cl, SERVEL y <a href="https://datos.gob.cl/" target="_blank" rel="noopener noreferrer">datos.gob.cl</a> — atribución individual en el catálogo. La fuente oficial siempre prevalece.</p>
         </div>
         <div class="footer-col">
             <h3>Comunidad</h3>

@@ -13,8 +13,8 @@ size_categories: [1M<n<10M]
 
 Datos públicos de Chile curados, normalizados y validados — {{DATASET_COUNT}} capas
 (DPA, Censo 2024, indicadores económicos, salud, educación, finanzas
-municipales, electoral y más). Espejo en Hugging Face Hub del bundle oficial
-publicado en GitHub Releases: https://github.com/cortega26/chile-hub
+municipales, electoral y más). Espejo en Hugging Face Hub del bundle canónico de
+chile-hub, publicado en GitHub Releases: https://github.com/cortega26/chile-hub
 
 Cada capa es una **configuración** independiente del dataset (selector "Subset"
 en el visor): `comunas`, `censo_comunal`, `establecimientos_salud`,

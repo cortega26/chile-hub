@@ -151,7 +151,7 @@ en `tooltician.com/chile-hub/` se regenera con cada build.
 paquete: el bundle publicable se replica en Hugging Face Hub con un subset por
 capa, existe un servidor MCP (`chile-hub[mcp]`) para agentes de código, cada
 capa tiene su página de documentación con JSON-LD schema.org, hay 347 páginas
-estáticas por comuna con indicadores oficiales, `llms.txt` guía a los agentes
+estáticas por comuna con indicadores de fuentes oficiales, `llms.txt` guía a los agentes
 que navegan el sitio, y Zenodo emite un DOI por release (concept DOI estable
 para citar). Todo se publica desde CI, sin intervención manual.
 
