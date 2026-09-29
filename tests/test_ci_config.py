@@ -8,6 +8,7 @@ comprobaciones de texto simples y suficientes para el guardrail específico.
 
 import json
 import re
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -331,6 +332,12 @@ class AdoptionBadgeGuardrailTests(unittest.TestCase):
         --version-only` (fix/write-races: el sync COMPLETO regeneraria bloques
         de datos desde un artifact potencialmente viejo) e incluye README.md
         en el git add — sin data/normalized ni index/app.
+
+        Regresion release 1.44.1 (2026-09-29): el bloque de pines de
+        docs/installation.md (Plan 127) tambien deriva de la version, pero
+        `--version-only` solo sincronizaba el pin del README y el git add del
+        release no incluia installation.md; main quedo con `sync_docs --check`
+        rojo tras cada release. Ambas mitades se cubren aqui.
         """
         content = (ROOT_DIR / ".github" / "workflows" / "pypi-release.yml").read_text(
             encoding="utf-8"
@@ -338,7 +345,20 @@ class AdoptionBadgeGuardrailTests(unittest.TestCase):
         self.assertIn("python scripts/sync_docs.py --version-only", content)
         self.assertIn("python scripts/check_landing_sync.py", content)
         self.assertIn(
-            "git add CHANGELOG.md pyproject.toml uv.lock README.md index.html app.js", content
+            "git add CHANGELOG.md pyproject.toml uv.lock README.md index.html app.js docs/installation.md",
+            content,
+        )
+        sync_script = (ROOT_DIR / "scripts" / "sync_docs.py").read_text(encoding="utf-8")
+        version_only_block = sync_script.split("if args.version_only:", 1)[1].split("else:", 1)[0]
+        self.assertIn("sync_installation_pins(check_only=args.check)", version_only_block)
+        # Guardrail de comportamiento: el modo release debe EJECUTARSE de verdad.
+        # Un import faltante en sync_docs.py pasaba el chequeo textual y moria
+        # con NameError en el job de release (detectado al preparar 1.44.1).
+        subprocess.run(
+            [sys.executable, "scripts/sync_docs.py", "--version-only", "--check"],
+            cwd=ROOT_DIR,
+            check=True,
+            capture_output=True,
         )
         # El commit del release ya NO incluye data/normalized (fix/write-races):
         # la data de main la escribe solo el publish diario. index/app sí van
