@@ -168,7 +168,7 @@ e2e:
 	bash tests/e2e/run_all.sh
 
 coverage:
-	$(PYTHON) -m pytest --cov=src --cov-report=term-missing --cov-report=xml
+	$(PYTHON) -m pytest --cov=src --cov=scripts --cov-report=term-missing --cov-report=xml
 
 lint:
 	$(PYTHON) -m ruff check src/ tests/ scripts/
