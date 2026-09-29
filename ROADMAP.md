@@ -1,169 +1,303 @@
 # Roadmap — chile-hub
 
-> **Auditoría activa (2026-09-25): distribución.** Planes **101–105** —
-> canales de tráfico/adopción sin presupuesto, ejecutados en el branch
-> `advisor/distribution-wave-1` (precedente: `advisor/wave-1`). Misma rutina de
-> cierre que abajo. La sección "Auditoría 2026-09-15" de más abajo queda como
-> **historial cerrado** (todas sus waves DONE).
-> **No duplicar contenido de planes aquí** — solo estado y links.
-
-## Posicionamiento 2026-09-29 (activa)
-
-> chile-hub como última milla de los datos oficiales, no como portal
-> (`docs/adr/ADR-023-posicionamiento-ultima-milla-no-portal.md`; canon en
-> `docs/product-spec.md`). Los cambios de repo van en el PR que introduce ADR-023;
-> lo que sigue son acciones hacia afuera que requieren la cuenta del mantenedor.
-
-- [ ] Registrar chile-hub en "Reutilización" de datos.gob.cl. Probablemente requiere
-  iniciar sesión (el portal ofrece ingreso con ClaveÚnica).
-- [ ] Pedir la delincuencia comunal estructurada del CEAD por "Sugerencias" de
-  datos.gob.cl o por la Ley 20.285, en vez de scrapearla.
-- [ ] Reportar con "Notifica un error" el bulk 2015 de delincuencia en datos.gob.cl,
-  que tiene enlaces muertos.
-- [ ] Opcional: presentar el proyecto a la mesa de ayuda de la Secretaría de Gobierno
-  Digital y preguntar por el estado de la norma técnica de datos abiertos.
-
----
-
-## Auditoría distribución 2026-09-25 (activa)
-
-### Scoreboard
-
-| Wave | Planes | Done | Estado |
-|------|--------|------|--------|
-| D1 HF + SEO | 101–102 | 2/2 | DONE (2026-09-25, branch advisor/distribution-wave-1; suite 1083) |
-| D2 Citación + MCP | 103–104 | 2/2 | DONE (2026-09-25) |
-| D3 Comunas | 105 | 1/1 | DONE (2026-09-25) |
-
-### Backlog (orden de ejecución)
-
-- [x] 101 Subsets HF + `hf://` (P2/S, 5c3fd32) — visor por capa + acceso cero-instalación
-- [x] 102 JSON-LD por dataset + sitemap index + `llms.txt` (P2/M, 528220f)
-- [x] 103 `CITATION.cff` + docs citación + DOI Zenodo (P3/S, edd41a3; **pendiente operador**: activar Zenodo y pegar DOI)
-- [x] 104 Servidor MCP extra `[mcp]` + lock (P2/M, 25b00ed)
-- [x] 105 Páginas por comuna generadas en deploy (P2/M, 330786e)
-
-### Goto por síntoma (distribución)
-
-| Quiero… | Ir a |
-|---|---|
-| ejecutar lo siguiente | primer `[ ]` del Backlog (ninguno: wave cerrada 2026-09-25) |
-| detalle ejecutor (pasos, verifies, STOP) | `plans/README.md` + `plans/archive/1NN-*.md` |
-| canales evaluados y descartados | `plans/README.md` (nota de la auditoría 2026-09-25) |
-
-### Dependencias
-
-- `105` tras `102`: comparte el contrato del `sitemap.xml` index y la
-  convención de JSON-LD (`src/builders/landing.py`).
-- `104` no depende de `101`, pero el visor HF corregido es el canal
-  complementario para agentes (HF tiene MCP oficial); no bloquear por eso.
-- `103` es independiente; el checkbox de Zenodo requiere acción del operador
-  (activar la integración GitHub↔Zenodo), no código.
-
----
-
-## Infra 2026-09-25 (activa)
-
-### Scoreboard
-
-| Wave | Planes | Done | Estado |
-|------|--------|------|--------|
-| Infra release | 106 | 1/1 | DONE (2026-09-25 — árbol 412→140 MB; ADR-021) |
-
-### Backlog
-
-- [x] 106 Snapshot liviano: geometría cruda fuera de git (prerelease `geometry-audit`) + `duckdb-eh.wasm` eliminado; guardrail de presupuesto (<160 MB)
-- [x] 107 Handoff de activación para agente (GSC, sitemap, schedule, adopción); issues de leads #107/#108/#109 creados
-
-### Goto por síntoma
-
-| Quiero… | Ir a |
-|---|---|
-| detalle ejecutor | `plans/106-slim-release-snapshot.md` + `docs/adr/ADR-021-snapshot-release-liviano.md` |
-
----
-
-## Auditoría 2026-09-15 (historial, cerrada — commit `3315eb6`)
-
-> **Qué es esta sección:** goto de tracking de la auditoría 2026-09-15.
-> Waves → scoreboard → backlog → dependencias. El detalle ejecutable vive en
-> `plans/086-*.md…100-*.md` (self-contained, estilo `plans/080-*` + template
-> improve); el índice ejecutor sigue siendo `plans/README.md`; la métrica
-> semanal sigue en `docs/backlog/scorecard.md` + `NEXT_STEPS.md`.
-> **No duplicar contenido de planes aquí** — solo estado y links.
+> **Qué es este archivo**: el tracking vivo del trabajo de mejora. Contiene
+> **instrucciones de ejecución**, el **orden en waves**, el **scoreboard** y el
+> **goto por síntoma**. **No duplica contenido de planes** — el detalle
+> ejecutable (pasos, verifies, STOP conditions) vive en `plans/1NN-*.md`; el
+> índice ejecutor y las filas de estado por plan viven en `plans/README.md`; la
+> métrica semanal en `docs/backlog/scorecard.md` y `NEXT_STEPS.md`.
 >
-> **Rutina tras cada cierre** (misma que `plans/README.md:77-99`): 1) marcar la
-> casilla del backlog y la fila del scoreboard; 2) actualizar `plans/README.md`
-> + `docs/backlog/scorecard.md` + `NEXT_STEPS.md`; 3) mover el `.md` a
-> `archive/` y sacar su fila de activos; 4) revalidar el grafo de dependencias.
+> **Fuente de verdad del qué está en cada carril**: `data/dataset_catalog_config.json`
+> y `data/source_registry.json`. **Fuente de verdad de las reglas de ingeniería**:
+> `AGENTS.md`. Ante cualquier discrepancia con este roadmap, mandan esos archivos.
 >
-> **Decisiones del mantenedor (2026-09-15):** alcance todos los net-positive;
-> dropear Python 3.10; spike Polars 2.0 RC solo en rama; consolidación agresiva
-> de docs de agentes.
+> Última reescritura: **2026-09-29** (auditoría `/improve deep`, planes 111–130).
 
-## Scoreboard (única tabla viva — actualizar en cada cierre)
+---
 
-| Wave | Planes | Done | Estado |
-|------|--------|------|--------|
-| 0 Baseline | — | 1/1 | DONE (2026-09-15) |
-| 1 Correctness S | 086–090 | 5/5 | DONE (2026-09-15, branch advisor/wave-1; suite 1027 passed) |
-| 2 Correctness/Perf M | 091–093 | 2/3 | 092, 093 DONE; 091 REVERTED (ver backlog) |
-| 3 Deps/Tooling/Sec | 094–096 | 3/3 | DONE (2026-09-15, branch advisor/wave-3; bandit 0 issues, suite 1032 passed) |
-| 4 Docs agentes | 097–098 | 2/2 | DONE (2026-09-15, branch advisor/wave-4; doctor+lint+format verdes) |
-| 5 Deuda+spikes | 099–100 | 2/2 | DONE (2026-09-15, branch advisor/wave-5; suite 1037 passed) |
-| 6 Verificación pre-existente | 077–079 | 3/3 | DONE (2026-09-15: 077 ya en 90%, 078 cerrado con evidencia, 079 con test geo; branch advisor/wave-6) |
+## Estado actual (2026-09-29)
 
-## Backlog (orden de ejecución)
+- **Batch activo**: auditoría `/improve deep` 2026-09-29 (commit `1464109`) →
+  **20 planes (111–130)** organizados en **4 waves**. Todos `TODO`; la wave 1
+  está lista para arrancar.
+- **Planes previos aún abiertos** (no de este batch): 107 `READY`, 108
+  `IN REVIEW`, 109 `PROPOSED`, 110 `PROPOSED`, y **091** pendiente de decisión
+  del mantenedor (reverted; ver Decisiones pendientes).
+- **Tracción de referencia**: ~2.2k instalaciones/mes PyPI (2026-09-25); espejo
+  HF con 274 descargas (2026-09-29, registrado a mano hasta que aterrice el
+  Plan 129); 21 capas publicables; DOI Zenodo aplicado
+  (`10.5281/zenodo.22968698`); ~100 estrellas GitHub.
+- **Posicionamiento**: chile-hub como última milla de los datos oficiales
+  (ADR-023; canon en `docs/product-spec.md`). Las acciones hacia afuera están
+  en "Acciones de operador" más abajo.
 
-- [x] Wave 0: SHA + `make doctor` en lectura + confirmar 077/078/079 TODO
-- [x] 086 Snapshot SINCA viejo → `fallback` + nota con snapshot (P1/S, 2522d7d)
-- [x] 087 `sync_landing_metadata` con raise tras print (P1/S, b751717)
-- [x] 088 Cobertura catálogo→validación + 3 exenciones explícitas (P1/S, 48a60be)
-- [x] 089 bcentral UTC×3 + submits espaciados (P1/S, fbddeaa)
-- [x] 090 Frames pandas compartidos + skip pre-conversión (P1/S, 62143ac)
-- [ ] 091 Opcionales ausentes ruidosos + fallback sintético strict (P1/M) — REVERTED 2026-09-15 (79b41fa): el abort en build rompe la garantía Phase-1 de core-build sin opcionales (7+1 tests); el gate publication ya rechaza missing/non-live/stale. Devuelto al backlog para decisión del mantenedor (alternativa: cerrar como cubierto por el gate).
-- [x] 092 Payload hoy por código + no-paralelizar con números (P2/M, c9d8c2a)
-- [x] 093 partition_by + allowlist única + cache LRU (P2/M, 3a155bd)
-- [x] 094 Toolchain única + targets locales (P1/S, 972ffbb + 238bc10 isort)
-- [x] 095 Floor py311 + despineo pandas (P1/M, 79fde6a)
-- [x] 096 duckdb acotado + pip-audit expiry + bandit extractors + fix B314 (P1/S-M, 7beda93)
-- [x] 097 Docs quirúrgicos + convención de conteos (P1/S, de12198)
-- [x] 098 Docs arquitectura + gate ×3 + regex fix (P2/M, 4fdc4ce) + fix regex `check_agents_sync.py:54` (aceptar `\d{4}` sin espacio; hoy `1034` pelado no matchea y atribuye el número vecino — hallado en Wave 2, workaround: formato `1 034`)
-- [x] 099 Deuda media: `_sinim_shared` + salud documentada-sin-churn + sys.path congelado (P2/M)
-- [x] 100 Spike Polars `2.0rc1`: 22/22 parquet idénticos, suite verde, cero cambios a prod (P2/M; re-correr en GA; follow-ups: bump 1.44.1 dentro de `<2` — HECHO en pendientes; geoarrow: sin path de producto vía polars —solo geopandas/DuckDB—, reverificar en GA; mismo trato a DuckDB 2.0 en su RC)
-- [x] Wave 6: 077 verificado (90%), 078 cerrado con evidencia, 079 con test geo. Splits de god objects: sin plan activo (requerirían 077 como red + decisión de alcance; no se abren aquí).
+---
 
-## Goto por síntoma
+## 1. Instrucciones — cómo se ejecuta esto
+
+### Rutina obligatoria por plan
+
+1. **Elegir**: el primer `[ ]` de la wave activa (o el que indique el goto por
+   síntoma), respetando la lista de solapes de archivos de §4.
+2. **Leer el plan completo** antes de tocar nada. Correr su **drift check**
+   (`git diff --stat 1464109..HEAD -- <in-scope>`): si algún archivo in-scope
+   cambió y el código no coincide con los extractos de "Current state", es
+   **STOP** (no improvisar).
+3. **Branch**: `advisor/NNN-slug` (un plan = un branch). Commits por paso
+   lógico, estilo del repo (`tipo(scope): mensaje`). **No push ni PR** salvo
+   instrucción explícita del operador.
+4. **Verificar**: los comandos del plan + los gates estándar de §3. Cada paso
+   del plan tiene su propio verify; no se avanza con un verify en rojo.
+5. **Cerrar con la rutina de `plans/README.md:77-99`**:
+   1) actualizar la fila del plan en `plans/README.md`
+   (`TODO → IN PROGRESS → DONE`),
+   2) actualizar este ROADMAP (scoreboard + casilla del backlog) y, si aplica,
+   `docs/backlog/scorecard.md` / `NEXT_STEPS.md`,
+   3) **archivar** el `.md` en `plans/archive/` y sacar su fila de activos,
+   4) revalidar dependencias y orden de la wave siguiente.
+
+### Rutina por wave (para batchear y no perder el hilo)
+
+- Una wave se abre cuando la anterior está **cerrada**: todos sus planes `DONE`
+  o cerrados con razón escrita (BLOCKED/SKIP + motivo).
+- **Cierre de wave**: `make doctor` + suite completa verdes, scoreboard en
+  `X/X`, filas archivadas, y la lista de solapes de la wave siguiente
+  revalidada (los planes pueden haber movido archivos).
+- **Sesión típica**: 3–4 planes de la wave en worktrees paralelos (solo los
+  disjuntos), revisar diffs, mergear cuando el operador lo confirme, actualizar
+  el board, y recién entonces abrir la wave siguiente.
+
+### Eficiencia — por qué waves y no una cola lineal
+
+- Los planes están agrupados por **archivos disjuntos dentro de cada wave**, que
+  es lo único que permite paralelizar sin conflictos de merge.
+- Los planes de una wave comparten el mismo tipo de riesgo (P1 correctness,
+  luego P2 seguridad/datos/deuda, luego P3), así que una revisión enfocada
+  alcanza para todo el lote.
+- Un plan de una wave posterior que dependa de otro (p. ej. 125 necesita la red
+  de tests de 123) nunca se adelanta: la dependencia está escrita en §4.
+
+---
+
+## 2. Auditoría `/improve deep` 2026-09-29 — planes 111–130
+
+> **Qué es**: re-auditoría profunda (9 subagentes read-only, una categoría del
+> playbook cada uno) + vet del advisor contra el código en vivo. El mantenedor
+> pidió planes para **todos los hallazgos net-positivos** → 20 planes.
+> **Qué no es**: no agrega datasets (ADR-011/anti-patrón #10), no toca
+> carriles, no re-litiga los rechazos listados en §8.
+>
+> Los hallazgos ya rechazados en auditorías previas no se repitieron; el único
+> dato corregido del reporte de subagentes fue MkDocs Material (EOL extendido a
+> may-2027; watch item, §8).
+
+### Scoreboard — única tabla viva (actualizar en cada cierre)
+
+| Wave | Planes | Contenido | Done | Estado |
+|------|--------|-----------|------|--------|
+| **W1** | 111, 115, 116, 118, 122, 127 | P1: seguridad de release, superficie pública, CI/tests, docs | 0/6 | TODO |
+| **W2** | 112, 113, 114, 119, 124, 126, 128 | P2: pins/hardening, fuente/MCP, DatasetSpec, tooling, deps | 0/7 | TODO |
+| **W3** | 117, 120, 121, 123, 125, 129 | P2/P3: decisión archived, perf, tests de gates, dirección | 0/6 | TODO |
+| **W4** | 130 | P3: dejar de versionar el ZIP (requiere decisión) | 0/1 | BLOCKED (Step 0 = decisión del operador) |
+| **Total** | 111–130 | | **0/20** | |
+
+### Backlog por wave (orden de ejecución)
+
+**Wave 1 — P1, planes disjuntos (paralelizable en worktrees):**
+
+- [ ] **111** [Gate de identidad `workflow_run` + ancestría de artifacts](plans/111-workflow-run-identity-gate.md) — P1/S-M/MED — un artifact de PR de fork no puede entrar al Release/HF.
+- [ ] **115** [Superficie generada: año "2.024", playground, URL base](plans/115-generated-surface-fixes.md) — P1/S/LOW — fix visible en 346 fichas + SQL Explorer.
+- [ ] **116** [Commitear `mapa_comunal.geojson` en el refresh de geometría](plans/116-mapa-comunal-geojson-commit.md) — P1/S/LOW — el mapa deja de divergir del parquet.
+- [ ] **118** [Vitales: fetch incremental](plans/118-vitales-incremental-fetch.md) — P1/S-M/MED — ~89 s/día y ~28 MB/día menos.
+- [ ] **122** [Cobertura `scripts/`, smoke MCP, xdist en CI](plans/122-ci-test-integrity.md) — P1/S-M/LOW-MED — la señal de tests deja de mentir.
+- [ ] **127** [Correcciones de docs canónicos (7)](plans/127-docs-corrections-batch.md) — P1/S/LOW — AGENTS/installation/NEXT_STEPS/links.
+
+**Wave 2 — P2 (114 → 113 secuencial; el resto paralelo; 126 después de 122):**
+
+- [ ] **112** [Pinnea entornos efímeros de CI](plans/112-pin-ephemeral-ci-installs.md) — P1/S/LOW — `huggingface_hub` y scrapling con lock.
+- [ ] **114** [Fuentes self-hosted + privacidad](plans/114-self-host-fonts-privacy.md) — P2/S-M/LOW — sin Google Fonts.
+- [ ] **113** [Hardening batch: unrar, vaciado HF, JSON-LD, quoting](plans/113-security-hardening-batch.md) — P2/S/LOW — (después de 114).
+- [ ] **119** [Caché Parquet en el servidor MCP](plans/119-mcp-parquet-cache.md) — P2/S/LOW — no descargar 29 MB por tool call.
+- [ ] **124** [DatasetSpec: 3 specs + gate catálogo↔spec](plans/124-datasetspec-gate.md) — P2/M/LOW — el cohort vuelve a cubrir el catálogo.
+- [ ] **126** [Higiene tooling/onboarding](plans/126-tooling-onboarding-hygiene.md) — P1-P2/S-M/LOW — (después de 122).
+- [ ] **128** [Python 3.15 + DuckDB-Wasm](plans/128-deps-forward-compat.md) — P1/P3/S/M/LOW-MED — Step 1 desde 2026-10-01.
+
+**Wave 3 — P2/P3:**
+
+- [ ] **117** [Alinear `source_mode: archived`](plans/117-archived-source-mode-alignment.md) — P2/S-M/LOW-MED — el protocolo de fuente caída deja de romper el build.
+- [ ] **120** [`check_sources` paralelo + caché de geometría](plans/120-core-perf-diagnostics-cache.md) — P3/S/LOW.
+- [ ] **121** [Lighthouse: performance + artefacto](plans/121-lighthouse-performance-baseline.md) — P3/S/LOW.
+- [ ] **123** [Backfill de tests de gates](plans/123-gate-test-backfill.md) — P2/M/LOW-MED.
+- [ ] **125** [Consolidar `write_staging`](plans/125-consolidate-write-staging.md) — P2/M/LOW-MED — (después de 123).
+- [ ] **129** [Cierres de distribución: HF metric, registry MCP, `resolve_regiones`](plans/129-direction-distribution-closes.md) — P2/S-M/LOW.
+
+**Wave 4 — decisión:**
+
+- [ ] **130** [Dejar de versionar el ZIP publicable](plans/130-stop-committing-bundle-zip.md) — P3/S-M/MED — Step 0: confirmar que la descarga apunta al asset de Release; si no, cerrar sin cambios.
+
+### Decisiones pendientes (operador)
+
+| # | Decisión | Default del advisor | Efecto si no llega |
+|---|----------|---------------------|--------------------|
+| 130 | ¿La descarga del ZIP en la landing apunta al asset de Release/HF? | Sí (el ZIP de repo deja de actualizarse; Release sí) | El plan se cierra sin cambios |
+| 117 | Rama A (alinear docs con ADR-015) vs Rama B (implementar `archived`) | Rama A (refleja el código) | Se ejecuta Rama A y se deja constancia |
+| 128 | Step 1 (3.15) después del 2026-10-01 | Sí | Step 1 queda BLOCKED; Step 2 corre igual |
+| 111 | Edita workflows privilegiados (release/HF) | Requiere revisión del mantenedor antes del merge | El plan queda implementado en branch |
+| 091 | Opcionales estrictos: ¿rediseñar el contrato Phase-1 o cerrar como cubierto por el gate `publication`? | Cerrar como cubierto (ya lo rechaza el gate) | Sigue en backlog sin bloquear nada |
+| — | MkDocs Material → Zensical | Watch item; decidir antes de may-2027 | Ninguno hoy |
+
+---
+
+## 3. Gates estándar (obligatorios antes de cerrar cualquier plan)
+
+```bash
+make lint && make format-check     # estilo
+make doctor                        # dependencias + gates anti-drift
+./.venv/bin/pytest <tests del plan> -v   # verificación focal
+```
+
+Para planes que tocan pipeline/datos (`build_dev_db.py`, validaciones,
+extractores, catálogo) agregar además `make build` y `make verify` cuando el
+plan lo pida. Para la landing: `make verify-landing`. Nunca commitear con un
+gate en rojo: el plan que falla se marca `BLOCKED` con el error exacto y se
+sigue con el próximo de la wave.
+
+---
+
+## 4. Dependencias y solapes de archivos (no correr en worktrees simultáneos)
+
+**Dependencias duras (orden obligatorio):**
+
+- `122 → 126`: ambos editan `.github/workflows/pipeline-check.yml`.
+- `122 → 123`: la cobertura de `scripts/` (122) es la señal que hace visible el
+  backfill (123).
+- `123 → 125`: los tests del merge de `calidad_aire` son la red antes de tocar
+  los overrides de `write_staging`.
+- `128 Step 1` requiere Python 3.15 final (2026-10-01). Step 2 es independiente.
+- `130` requiere la decisión de Step 0 (y va después de 114: ambas tocan
+  `index.html`).
+
+**Solapes de archivos (secuenciar, aunque estén en la misma wave):**
+
+| Archivo | Planes | Regla |
+|---------|--------|-------|
+| `pipeline-check.yml` | 122, 126 | 122 primero |
+| `index.html` / `landing.py` / `inject_dataset_json_ld.py` | 114, 115, 113, 130 | 114 → 115 → 113 → 130 |
+| `AGENTS.md` | 124, 127 | 124 primero |
+| `src/chile_hub/core.py` | 120, 129 | 120 primero (ambos son aditivos, pero secuenciar evita conflictos) |
+
+El resto de cada wave es disjunto y puede correr en paralelo (un worktree por
+plan, branch `advisor/NNN-slug`).
+
+### Grafo resumido
+
+```
+W1:  111  115  116  118  122  127          (6 planes disjuntos)
+                       │
+                       ▼
+W2:  122→126 ; 114→113 ; 112  119  124  128
+                              │
+                              ▼
+W3:  117  120  121  123→125  129
+                              │
+                              ▼
+W4:  130 (decisión)
+```
+
+---
+
+## 5. Planes previos activos (no pertenecen a esta auditoría)
+
+| # | Plan | Estado | Nota |
+|---|------|--------|------|
+| 107 | Handoff de activación de lanzamiento | READY | Issues de leads #107/#108/#109 creados; ejecución por agente externo |
+| 108 | Gate "Check build-synced files" bloquea el publish diario | IN REVIEW | Implementado en branch `fix/108-build-synced-stale`, sin push; requiere aprobación (edita workflows) |
+| 109 | README sin datos volátiles + alerta de schedule roto | PROPOSED | Depende de 108 |
+| 110 | Programa de patrocinios | PROPOSED | No toca código; acciones del operador |
+| 091 | Opcionales estrictos + fallback sintético strict | REVERTED | Pendiente decisión (ver §2) |
+
+Detalle execrable de estos en `plans/README.md` y sus `.md`.
+
+---
+
+## 6. Goto por síntoma
 
 | Quiero… | Ir a |
-|---|---|
-| ejecutar lo siguiente | primer `[ ]` del Backlog + su `plans/0NN-*.md` |
-| saber el estado | Scoreboard ↑ |
+|---------|------|
+| ejecutar lo siguiente | primer `[ ]` del backlog de la wave activa (§2) + su `plans/1NN-*.md` |
+| saber el estado | Scoreboard (§2) |
+| entender cómo batchear / cerrar | Instrucciones (§1) |
+| detalle ejecutor de un plan | `plans/1NN-*.md` (self-contained) + `plans/README.md` |
+| ver filas de estado por plan | `plans/README.md` ("Planes activos") |
+| métrica semanal / avance | `docs/backlog/scorecard.md` + `NEXT_STEPS.md` |
 | contexto rápido del repo | `SOURCE_OF_TRUTH.md` → `AGENTS.md` |
-| detalle ejecutor (pasos, verifies, STOP) | `plans/README.md` + `plans/0NN-*.md` |
-| métrica semanal | `docs/backlog/scorecard.md` |
 | agregar un dataset | `AGENTS.md §5` + `docs/dataset-inclusion-criteria.md` (normativo) |
 | entender carriles/estados | `docs/dataset-inclusion-criteria.md` + `data/source_registry.json` |
+| seguridad/release CI | Planes 111, 112, 113 |
+| canales de distribución previos (HF/SEO/MCP/DOI) | Historial cerrado (§7) |
+| por qué NO se hace algo | Rechazados (§8) |
 
-## Dependencias
+---
 
-- `092` tras `090` (mismo `src/builders/formats.py` + `build_dev_db.py:744-796`).
-- `098` tras `097` (misma prosa; evita conflictos).
-- `099` tras `091` (la parte de salud canónica toca `hub_health.json`).
-- `100` tras `092` (necesita el baseline de perf/payloads estable).
-- Wave 6 tras Wave 2 (caracterización 077 antes de cualquier refactor).
-- `079` tras `077` (pre-existente, ver `plans/README.md`).
+## 7. Acciones de operador (hacia afuera, sin código)
 
-## Follow-ups detectados durante waves (no re-auditar, sí trackear)
+Del posicionamiento 2026-09-29 (ADR-023); requieren la cuenta del mantenedor:
 
-- [x] Ficha `delincuencia_comunal` con campos stales → RESUELTO en pendientes: `maturity_status: deprecated` + `live_extractor_status: fallback_only` (enum-válidos, gates verdes) + spec sincronizado + retired-set actualizado. Contadores intactos (sin staging, ni entra al health).
-- [ ] 091 (dos reverts): cerrada como "cubierta por el gate publication". Reabrir solo con rediseño del contrato Phase-1 (decisión del mantenedor).
+- [ ] Registrar chile-hub en "Reutilización" de datos.gob.cl (ingreso con ClaveÚnica).
+- [ ] Pedir la delincuencia comunal estructurada del CEAD por "Sugerencias" de
+  datos.gob.cl o por la Ley 20.285, en vez de scrapearla.
+- [ ] Reportar con "Notifica un error" el bulk 2015 de delincuencia en datos.gob.cl
+  (tiene enlaces muertos).
+- [ ] Opcional: presentar el proyecto a la mesa de ayuda de la Secretaría de
+  Gobierno Digital y preguntar por el estado de la norma técnica de datos abiertos.
+- [x] Zenodo: concept DOI `10.5281/zenodo.22968698` aplicado en `CITATION.cff`,
+  `docs/citation.md` y badge del README (2026-09-26).
 
-## Rechazados en esta auditoría (no re-auditar)
+---
 
-- Conflicto `click` dev-vs-scraping: by-design (`pyproject.toml:94-107` + `conflicts` + entorno efímero en CI).
-- Duplicado `shapely`/`geopandas` en extras `pipeline`+`geo`: intencional (expone `resolve_by_coords()` al consumidor).
-- Lock drift: limpio (`uv lock --check` pasa + gate `--locked` en CI).
-- `validate_puntos_interes` "huérfana": by-design — fuera del catálogo, exención documentada en `scripts/check_validation_registration.py:8-10`.
-- Deps abandonadas / APIs deprecadas de polars/pandas en uso: sin evidencia (grep sin hits fuera de `def fetch`).
-- `build_freshness` duplicado: ya delega en `compute_freshness` (`src/builders/metadata.py:88-89`); el resto va en 099.
+## 8. Historial cerrado (no re-ejecutar)
+
+> Las waves cerradas quedan acá como registro; sus planes viven en
+> `plans/archive/`. No se actualizan.
+
+- **Distribución 2026-09-25 (101–105)** — DONE: subsets HF + `hf://` (`5c3fd32`),
+  JSON-LD/sitemap/`llms.txt` (`528220f`), citación + DOI (`edd41a3`), servidor
+  MCP (`25b00ed`), páginas por comuna (`330786e`). Branch
+  `advisor/distribution-wave-1`.
+- **Infra 2026-09-25 (106–107)** — 106 DONE (snapshot de release 412→140 MB,
+  ADR-021); 107 READY (ver §5).
+- **Auditoría 2026-09-15 (086–100)** — DONE salvo 091 (REVERTED, §5): Wave 1
+  086–090, Wave 2 092/093, Wave 3 094–096, Wave 4 097/098, Wave 5 099/100,
+  Wave 6 077–079. Bandit 0 issues; suite ~1037 tests verdes.
+- **Auditorías 2026-06 a 2026-08 (024–085)** — DONE/archivadas en su totalidad;
+  ver secciones "Planes archivados" en `plans/README.md`.
+- **CI**: el deadlock del gate "Check build-synced files" quedó resuelto
+  (ADR-022) y su plan 108 está en revisión (§5).
+
+---
+
+## 9. Rechazados (no re-auditar)
+
+| Hallazgo | Motivo |
+|----------|--------|
+| **MkDocs Material → Zensical (migración)** | El EOL se extendió a **2027-05-05** (anuncio 2026-09-29); mantención crítica vigente. Watch item: reabrir solo si se acerca la fecha sin decisión. |
+| Conflicto `click` dev-vs-scraping | By-design (`pyproject.toml` + `conflicts` + entorno efímero en CI). El Plan 112 pinea ese entorno, no lo elimina. |
+| Duplicado `shapely`/`geopandas` (pipeline+geo) | Intencional: expone `resolve_by_coords()` al consumidor. |
+| Lock drift | Limpio (`uv lock --locked` + gate en CI). |
+| `validate_puntos_interes` huérfana | Exención documentada en `check_validation_registration.py`. |
+| Deps abandonadas / APIs deprecadas | Sin evidencia (auditorías 2026-09-15 y 2026-09-29). |
+| `build_freshness` duplicado | Ya delega en `compute_freshness`. |
+| Kaggle / conda-forge | Diferidos: el Plan 129 habilita medir HF ("≥270/mes sostenido"); sin esa señal no se reabre. |
+| Telemetría en el paquete | Rechazado por ética de apertura; la adopción se mide solo por APIs públicas. |
+| API premium / paywall | Rechazado (el dato es CC-BY y pequeño). |
+| README/docs en inglés | Rechazado: producto y audiencia primaria chilenos. |
+| Datasets nuevos sobre fuentes frágiles | Gated por ADR-011/anti-patrón #10; los leads viven como issues `dataset_request`. |
+| Builds incrementales / build paralelo (PERF-01/04) | Diferidos: sin telemetría de duración y timeout de CI <45 min. Reconsiderar con medición. |
+| PERF-05/06/07/08, SEC-02/03 antiguos | Micro-optimizaciones o riesgo acotado; documentados en auditorías previas. El ZIP (PERF-16) sí quedó en el Plan 130. |
+| Firma/atestación de artifacts (sigstore) | Deferred en el Plan 111; reabrir si entra un segundo publicador. |
+
+---
+
+*Este archivo se actualiza en cada cierre de plan/wave (ver §1), no en una
+fecha fija. Para la fecha real de la última modificación:
+`git log -1 --format=%ad -- ROADMAP.md`.*

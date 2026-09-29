@@ -1,6 +1,6 @@
 # Plans — chile-hub
 
-Planes de implementación generados por auditoría `/improve deep` en commits `ba2f434` (2026-06-13), `a2cd288` (2026-06-19) y `c486e7c` (2026-07-07), y por `/improve plan` (mejoras de librerías/dependencias) en commit `140c8ea` (2026-06-29).
+Planes de implementación generados por auditoría `/improve deep` en commits `ba2f434` (2026-06-13), `a2cd288` (2026-06-19), `c486e7c` (2026-07-07) y `1464109` (2026-09-29 — planes 111–130, ver sección al final), y por `/improve plan` (mejoras de librerías/dependencias) en commit `140c8ea` (2026-06-29).
 
 > **Auditoría `/improve next` — dirección/roadmap (2026-07-26, commit `63cc106`)**:
 > se revalidaron los cinco hallazgos con mayor palanca: resolución nombres→CUT
@@ -213,6 +213,22 @@ Los 5 planes quedaron **DONE y archivados** el mismo día (2026-09-25) — ver
 | 107 | [Handoff de activación de lanzamiento (agente autónomo)](107-activacion-lanzamiento-handoff.md) | P2 | S | LOW | — | READY (2026-09-26 — handoff para Cowork: GSC meta tag, sitemap, schedule, adopción; fallbacks + STOP; branch `advisor/107-activacion-lanzamiento`) |
 | 108 | [Gate "Check build-synced files" bloquea el publish diario (deadlock README)](108-build-synced-stale.md) | P1 | S | MED | — | IN REVIEW (2026-09-26 — implementado en branch `fix/108-build-synced-stale`, sin push: gate README→notice, guard de caída de record_count >20% en verify publication + override `--allow-record-drop` propagado vía provenance al release, ADR-022; requiere aprobación: edita workflows) |
 | 109 | [README sin datos volátiles + alerta de schedule roto](109-readme-sin-datos-volatiles-y-alerta-schedule.md) | P2 | M | MED | 108 | PROPOSED (2026-09-26) |
+
+## Plan 110 — sostenibilidad y patrocinios (2026-09-29)
+
+> **Sostenibilidad post-lanzamiento (2026-09-29)**: el proyecto tiene producto,
+> distribución y audiencia (~2.2k instalaciones/mes PyPI, DOI, 21 capas
+> publicables) pero no capa de financiamiento; `FUNDING.yml` solo cubre
+> donación individual y el bus factor es 1. El plan diseña el programa de
+> patrocinios: tiers y beneficios, reglas de independencia (ADR-023 y
+> principio 4 del product-spec), plan de ataque por segmento con doctrina
+> Dale Carnegie, priorización con la tracción actual (~100 estrellas),
+> play para CAF vía contacto cálido, activos de Wave 0, gobernanza, riesgos
+> y plantillas de outreach. No toca código, datos ni workflows.
+
+| # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
+|---|------|----------|----------|--------|-----------|--------|
+| 110 | [Programa de patrocinios — sostenibilidad y plan de ataque](110-programa-de-patrocinios.md) | P2 | M + continuo | MED | — | PROPOSED (2026-09-29) |
 
 ## Dependencias 086–100 (ver `ROADMAP.md` para el grafo completo)
 
@@ -757,3 +773,80 @@ ya no aplique.
 - `BLOCKED` — bloqueado (indicar por qué)
 - `BACKLOG` — diferido a backlog (ver `docs/backlog/`)
 - `SKIP` — descartado después de análisis adicional
+
+---
+
+## Auditoría `/improve deep` 2026-09-29 (commit `1464109`) — planes 111–130
+
+> **Contexto**: re-auditoría profunda tras la auditoría de distribución
+> (101–105, 2026-09-25) y el reposicionamiento ADR-023. Método: 9 subagentes
+> read-only (una categoría del playbook cada uno) + vet del advisor contra el
+> código en vivo (líneas, workflow YAML, datasets, registry, ADRs). Todo
+> hallazgo de la tabla fue confirmado por el advisor; se corrigió un dato de
+> los subagentes (MkDocs Material: su EOL no es nov-2026 — la extensión a
+> **may-2027** se anunció el 2026-09-29; queda como watch item, no plan).
+>
+> **Selección**: el mantenedor pidió planes para todos los hallazgos
+> net-positivos → 20 planes (111–130). Los hallazgos ya rechazados en
+> auditorías previas no se repitieron (INR/ADR-017, CEAD/ADR-015, PERF-01/04,
+> pandera/typer/orjson/httpx, Kaggle/conda-forge diferidos, telemetría, etc.).
+
+### Planes activos
+
+| # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de / solapa | Estado |
+|---|------|----------|----------|--------|---------------------|--------|
+| 111 | [Gate de identidad `workflow_run` + ancestría de artifacts](111-workflow-run-identity-gate.md) | P1 | S-M | MED | — | TODO |
+| 112 | [Pinnea entornos efímeros de CI (HF/scrapling)](112-pin-ephemeral-ci-installs.md) | P1 | S | LOW | — | TODO |
+| 113 | [Hardening batch: unrar, vaciado HF, JSON-LD, quoting](113-security-hardening-batch.md) | P2 | S | LOW | secuencia con 114/115 (index.html) | TODO |
+| 114 | [Fuentes self-hosted + privacidad](114-self-host-fonts-privacy.md) | P2 | S-M | LOW | secuencia con 113/130 | TODO |
+| 115 | [Superficie generada: año 2.024, playground, URL base](115-generated-surface-fixes.md) | P1 | S | LOW | secuencia con 113 (landing.py/inject) | TODO |
+| 116 | [Commitear `mapa_comunal.geojson`](116-mapa-comunal-geojson-commit.md) | P1 | S | LOW | — | TODO |
+| 117 | [Alinear `source_mode: archived` (drift §6)](117-archived-source-mode-alignment.md) | P2 | S-M | LOW-MED | — | TODO |
+| 118 | [Vitales: fetch incremental](118-vitales-incremental-fetch.md) | P1 | S-M | MED | — | TODO |
+| 119 | [Caché Parquet en el servidor MCP](119-mcp-parquet-cache.md) | P2 | S | LOW | — | TODO |
+| 120 | [`check_sources` paralelo + caché de geometría](120-core-perf-diagnostics-cache.md) | P3 | S | LOW | — | TODO |
+| 121 | [Lighthouse: performance + artefacto](121-lighthouse-performance-baseline.md) | P3 | S | LOW | — | TODO |
+| 122 | [Cobertura scripts/, smoke MCP, xdist en CI](122-ci-test-integrity.md) | P1 | S-M | LOW-MED | antes de 123 (señal) y de 126 (mismo workflow) | TODO |
+| 123 | [Backfill de tests de gates](123-gate-test-backfill.md) | P2 | M | LOW-MED | soft de 122; antes de 125 (merge calidad_aire) | TODO |
+| 124 | [DatasetSpec: 3 specs + gate catálogo↔spec](124-datasetspec-gate.md) | P2 | M | LOW | antes de 127 (AGENTS.md) | TODO |
+| 125 | [Consolidar `write_staging`](125-consolidate-write-staging.md) | P2 | M | LOW-MED | soft de 123 | TODO |
+| 126 | [Higiene tooling/onboarding (ruff, hook, shim, uv, doctor, smoke, stealth)](126-tooling-onboarding-hygiene.md) | P1-P2 | S-M | LOW | después de 122 (pipeline-check.yml) | TODO |
+| 127 | [Correcciones de docs canónicos (7)](127-docs-corrections-batch.md) | P1 | S | LOW | después de 124 (AGENTS.md) | TODO |
+| 128 | [Python 3.15 + DuckDB-Wasm al día](128-deps-forward-compat.md) | P1/P3 | S/M | LOW-MED | Step 1 tras 2026-10-01 | TODO (Step 1: BLOCKED hasta 2026-10-01) |
+| 129 | [Cierres de distribución: HF metric, registry MCP, `resolve_regiones`](129-direction-distribution-closes.md) | P2 | S/M | LOW | — | TODO |
+| 130 | [Dejar de versionar el ZIP publicable](130-stop-committing-bundle-zip.md) | P3 | S-M | MED | Step 0 = decisión de mantenedor | TODO (decisión pendiente) |
+
+### Orden de ejecución recomendado (waves)
+
+- **Wave 1 (P1, sin solapes)**: 111, 115, 116, 118, 122, 127.
+- **Wave 2 (P2, tras resolver solapes de archivos)**: 112, 113, 114, 119, 124,
+  126, 128.
+- **Wave 3 (P2/P3)**: 117, 120, 121, 123, 125, 129.
+- **Wave 4 (decisión)**: 130.
+
+### Dependencias y solapes de archivos (no correr en worktrees simultáneos)
+
+- **111 ∩ 122 ∩ 126**: `pipeline-check.yml` (111: no lo toca; 122 sí; 126 sí).
+  Secuencia 122 → 126.
+- **113 ∩ 114 ∩ 115 ∩ 130**: `index.html` / `landing.py` /
+  `inject_dataset_json_ld.py`. Secuencia 114 → 115 → 113 → 130.
+- **124 ∩ 127**: `AGENTS.md`. Secuencia 124 → 127.
+- **122 → 123** (la cobertura de `scripts/` es la señal que hace visible el
+  backfill) y **123 → 125** (test de `process_calidad_aire` antes de tocar
+  overrides).
+- **128 Step 1**: requiere Python 3.15 final (2026-10-01); Step 2
+  (DuckDB-Wasm) es independiente.
+- **130**: requiere decisión de mantenedor (Step 0); si la respuesta es
+  "mantener la ruta relativa", el plan se cierra sin cambios.
+
+### Hallazgos considerados y rechazados en esta auditoría
+
+- **MkDocs Material EOL**: el subagente reportó "EOL 2026-11-05"; verificado en
+  vivo (anuncio Zensical 2026-09-29): la mantención crítica se extendió a
+  **2027-05-05** y Zensical 0.1.0 abre su línea el 2026-11-05. No hay urgencia;
+  se registra como watch item — reabrir un plan de migración solo si la fecha
+  se acerca sin decisión.
+- **`--cov` override** (hallazgo TESTS-01): incluido en 122, no rechazado.
+- Todo lo demás listado por los subagentes quedó en plan o ya estaba en las
+  listas de rechazados de auditorías previas (guardrails y §"Hallazgos
+  considerados y rechazados" de arriba).
