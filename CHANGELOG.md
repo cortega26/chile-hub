@@ -12,6 +12,73 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.45.0 - 2026-09-29
+
+### Corregido
+
+- **ci**: Pasa github.head_ref por env en dependabot-lock
+  ([`d614467`](https://github.com/cortega26/chile-hub/commit/d614467a4ce1b2e4967d21e12cbe67130be478c6))
+
+- **ci**: Pinnea entornos efímeros de publicación
+  ([`f0e8746`](https://github.com/cortega26/chile-hub/commit/f0e8746f9864026ad6ad7beea4043431ae75e311))
+
+- **dx**: Package-smoke prueba el CLI del venv, no el binario global
+  ([`ee5becf`](https://github.com/cortega26/chile-hub/commit/ee5becfb346fb994e2d6b69589996bacd4afc86c))
+
+- **landing**: Escapa HTML en los emisores JSON-LD
+  ([`223dfe1`](https://github.com/cortega26/chile-hub/commit/223dfe1e272897afd2a2f40a1cf9f3ab10306d4a))
+
+- **landing**: Sirve las fuentes localmente
+  ([`d51f721`](https://github.com/cortega26/chile-hub/commit/d51f7218c164f21bb6d3de0432a57a83acccd748))
+
+- **security**: Aborta la publicacion HF si la seleccion publicable queda vacia
+  ([`6ddb705`](https://github.com/cortega26/chile-hub/commit/6ddb705a8bbdac4c9552484ac08ca75399ee138c))
+
+- **security**: Extrae el RAR de MINEDUC en directorio temporal con unrar e
+  ([`ba85f3c`](https://github.com/cortega26/chile-hub/commit/ba85f3cd1fb5d2dfe90a970cbc3783b3bb87f39b))
+
+- **tooling**: Hace disparar el hook sync-docs con patrones de archivo
+  ([`5ec16bb`](https://github.com/cortega26/chile-hub/commit/5ec16bbd57f25f5c5f0c03b7777ad1ef955a2161))
+
+- **tooling**: Sincroniza ruff 0.16.8 en pre-commit y CI con pyproject
+  ([`94fddf6`](https://github.com/cortega26/chile-hub/commit/94fddf6eecbc3dedc4efd107eb05e09c8108b95e))
+
+### Mantenimiento
+
+- **dx**: Doctor verifica uv.lock con --locked como CI
+  ([`206f828`](https://github.com/cortega26/chile-hub/commit/206f82875ca03df5431f4e478c0c970db2c536ac))
+
+- **tooling**: Elimina el shim inalcanzable src/chile_hub.py
+  ([`6ee17e0`](https://github.com/cortega26/chile-hub/commit/6ee17e075f0822c507bb8af9ad84ab967c7c79c6))
+
+- **vendor**: Actualiza DuckDB-Wasm del playground
+  ([`915ee8c`](https://github.com/cortega26/chile-hub/commit/915ee8c8119027e23eea0cc98ce343d9389f2322))
+
+### Documentación
+
+- **dx**: Documenta la extraccion local stealth de autoridades_electas
+  ([`8b2a634`](https://github.com/cortega26/chile-hub/commit/8b2a6349158ac4bf674927c7cc178e8566baa014))
+
+- **dx**: Documenta uv como prerrequisito y falla claro en bootstrap
+  ([`41367c5`](https://github.com/cortega26/chile-hub/commit/41367c5809767cbaf4ba1ebfbf17dcdb87d3ca65))
+
+- **readme**: Sincroniza el conteo de tests tras la Wave 2 R1 (114/119/124)
+  ([`f7636a6`](https://github.com/cortega26/chile-hub/commit/f7636a6c1fe9801057d5bf476ff29c522502878e))
+
+- **readme**: Sincroniza el conteo de tests tras la Wave 2 R2 (112/113)
+  ([`2085a07`](https://github.com/cortega26/chile-hub/commit/2085a07dfcefc3f14b9e64a5a1a87cca2972ee88))
+
+### Agregado
+
+- **registry**: Cierra cohort DatasetSpec con 3 specs y gate
+  ([`1121cdc`](https://github.com/cortega26/chile-hub/commit/1121cdc948ca49b8c913edf16f7f890027613953))
+
+### Mejorado
+
+- **mcp**: Cachea parquet por proceso en las tools
+  ([`3e766b3`](https://github.com/cortega26/chile-hub/commit/3e766b3062ba24796f1c999228e78bad9b8dda7f))
+
+
 ## 1.44.2 - 2026-09-29
 
 ### Corregido
