@@ -217,7 +217,7 @@ package-check: package
 package-smoke: package-check
 	uv pip install --force-reinstall dist/*.whl
 	$(PYTHON) -c "from chile_hub import ChileHub; print(ChileHub)"
-	chile-hub --help
+	$(PYTHON) -m chile_hub --help
 
 check: build verify test verify-landing lint format-check typecheck audit sec
 
