@@ -27,6 +27,7 @@ MONTHLY_SCRAPE_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "monthly-scrape.y
 ADOPTION_STATS_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "adoption-stats.yml"
 GEOMETRIA_COMUNAL_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "geometria-comunal.yml"
 PYPI_RELEASE_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "pypi-release.yml"
+PAGES_DEPLOY_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "pages-deploy.yml"
 MAKEFILE = ROOT_DIR / "Makefile"
 MKDOCS_CONFIG = ROOT_DIR / "mkdocs.yml"
 DOCS_DIR = ROOT_DIR / "docs"
@@ -1427,6 +1428,44 @@ class ReleaseArtifactLayoutGuardrailTests(unittest.TestCase):
         publish_block = content.split("Commit refreshed artifacts")[1].split("git commit")[0]
         self.assertIn("sync_release_artifact_version.py", publish_block)
         self.assertIn("sync_docs.py --version-only", publish_block)
+
+
+class WorkflowRunTrustGuardrailTests(unittest.TestCase):
+    """Riesgo: PyPI Release y Pages Deploy se disparan con `workflow_run` de
+    Pipeline Check filtrando solo por nombre de branch (`branches: [main]`).
+
+    Un run de un PR de fork tambien sube el artefacto (pipeline-check.yml no
+    lo gatea por evento), el filtro `branches` evalua la branch head del run
+    disparador (la del fork) y nada miraba `head_repository`: un artifact
+    producido fuera del repo podia entrar al release, al espejo HF y disparar
+    un deploy del sitio. El gate de identidad exige repo + branch + evento y,
+    en defensa en profundidad, revalida el run descargado via la API REST
+    (`.head_repository`, que `gh run view --json` no expone) y exige ancestria
+    real del SHA del artifact respecto de main, en vez de solo avisar.
+    """
+
+    def test_release_job_gates_on_repository_and_event(self):
+        content = PYPI_RELEASE_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("head_repository.full_name == github.repository", content)
+        self.assertIn("head_branch == 'main'", content)
+        self.assertIn("event != 'pull_request'", content)
+
+    def test_pages_deploy_job_gates_on_repository_and_event(self):
+        content = PAGES_DEPLOY_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("head_repository.full_name == github.repository", content)
+        self.assertIn("head_branch == 'main'", content)
+        self.assertIn("event != 'pull_request'", content)
+
+    def test_release_revalidates_downloaded_run_via_rest_api(self):
+        content = PYPI_RELEASE_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("is_trusted_run", content)
+        self.assertIn('gh api "repos/$GITHUB_REPOSITORY/actions/runs/$rid"', content)
+        self.assertIn(".head_repository.full_name", content)
+        self.assertIn('is_trusted_run "$candidate" || continue', content)
+
+    def test_release_rejects_non_ancestor_artifact_sha(self):
+        content = PYPI_RELEASE_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("git merge-base --is-ancestor", content)
 
 
 class BuildSyncedGateGuardrailTests(unittest.TestCase):
