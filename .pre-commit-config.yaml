@@ -16,12 +16,12 @@ repos:
         args: ['--maxkb=500']
       - id: check-json
 
-  # Versiones single-source con CI y el lock (Plan 094): ruff == 0.16.7
+  # Versiones single-source con CI y el lock (Plan 094): ruff == 0.16.8
   # (pyproject dev-pin), mypy == 2.3.1 con deps pineadas a uv.lock. Un pin
   # distinto por superficie hacía que el mismo código pasara en un lado y
-  # fallara en otro.
+  # fallara en otro. Guardrail: tests/test_ci_config.py::RuffPinSingleSourceTests.
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.16.7
+    rev: v0.16.8
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]

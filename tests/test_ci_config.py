@@ -25,6 +25,8 @@ import check_lighthouse
 from check_companion_paths import check_companions
 
 PIPELINE_CHECK_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "pipeline-check.yml"
+PYPROJECT_TOML = ROOT_DIR / "pyproject.toml"
+PRECOMMIT_CONFIG = ROOT_DIR / ".pre-commit-config.yaml"
 MONTHLY_SCRAPE_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "monthly-scrape.yml"
 ADOPTION_STATS_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "adoption-stats.yml"
 GEOMETRIA_COMUNAL_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "geometria-comunal.yml"
@@ -209,6 +211,53 @@ class EphemeralInstallPinGuardrailTests(unittest.TestCase):
         content = HF_PUBLISH_WORKFLOW.read_text(encoding="utf-8")
         self.assertIn("--extra publish", content)
         self.assertNotIn("--with huggingface_hub", content)
+
+
+class RuffPinSingleSourceTests(unittest.TestCase):
+    """Regresión: Dependabot bumpeó el pin de ruff solo en `pyproject.toml`
+    (`ruff==0.16.8`, commit b5f31e8) y dejó atrás pre-commit y CI (ambos
+    `0.16.7`). Resultado: `make lint` local (usa el pin de pyproject) pasaba
+    y CI (`uvx ruff@0.16.7`) fallaba — la discrepancia exacta que Plan 094
+    eliminó. Las tres superficies deben moverse juntas.
+    """
+
+    def _ruff_pin_pyproject(self) -> str:
+        match = re.search(r"ruff==([\d.]+)", PYPROJECT_TOML.read_text(encoding="utf-8"))
+        self.assertIsNotNone(match, "No se encontró el pin ruff==X.Y.Z en pyproject.toml.")
+        return match.group(1)
+
+    def _ruff_pin_precommit(self) -> str:
+        content = PRECOMMIT_CONFIG.read_text(encoding="utf-8")
+        repo_pos = content.find("https://github.com/astral-sh/ruff-pre-commit")
+        self.assertNotEqual(repo_pos, -1, "No se encontró el repo ruff-pre-commit.")
+        match = re.search(r"rev:\s*v([\d.]+)", content[repo_pos:])
+        self.assertIsNotNone(match, "No se encontró el rev de ruff-pre-commit.")
+        return match.group(1)
+
+    def _ruff_pins_workflow(self) -> list[str]:
+        content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        pins = re.findall(r"uvx ruff@([\d.]+)", content)
+        self.assertEqual(
+            len(pins), 2, "Se esperaban dos invocaciones uvx ruff@X.Y.Z (check y format)."
+        )
+        return pins
+
+    def test_pyproject_precommit_and_ci_pins_match(self):
+        pyproject_pin = self._ruff_pin_pyproject()
+        precommit_pin = self._ruff_pin_precommit()
+        workflow_pins = self._ruff_pins_workflow()
+        self.assertEqual(
+            precommit_pin,
+            pyproject_pin,
+            "El rev de ruff-pre-commit no coincide con el pin de pyproject.toml "
+            f"(pre-commit={precommit_pin}, pyproject={pyproject_pin}).",
+        )
+        self.assertEqual(
+            workflow_pins,
+            [pyproject_pin] * 2,
+            "Las invocaciones uvx ruff@ del workflow no coinciden con el pin de "
+            f"pyproject.toml (ci={workflow_pins}, pyproject={pyproject_pin}).",
+        )
 
 
 class MkDocsReferenceSlugGuardrailTests(unittest.TestCase):
