@@ -1,5 +1,9 @@
 """Verifica umbrales de Lighthouse (a11y, SEO, best practices) desde su JSON.
 
+`performance` se mide y se imprime, pero por defecto sin umbral: los runners
+compartidos de CI tienen varianza alta y un gate de score sería ruidoso. Con
+`--min-performance N` se vuelve exigible.
+
 Pensado para CI y para `make lighthouse`: separa el "correr Lighthouse" (npx)
 del "decidir si pasa" (stdlib puro), de modo que el umbral sea auditable y
 testeable sin navegador.
@@ -7,6 +11,7 @@ testeable sin navegador.
 Uso:
   python scripts/check_lighthouse.py /tmp/lighthouse.json
   python scripts/check_lighthouse.py /tmp/lighthouse.json --min-accessibility 100
+  python scripts/check_lighthouse.py /tmp/lighthouse.json --min-performance 90
 """
 
 from __future__ import annotations
@@ -25,8 +30,12 @@ DEFAULT_MIN_SCORES = {
     "best-practices": 100,
 }
 
+# `performance` se observa sin umbral (varianza del runner); `--min-performance`
+# lo vuelve bloqueante si se quiere.
+DEFAULT_MIN_PERFORMANCE: int | None = None
 
-def check(report_path: Path, min_scores: dict[str, int]) -> list[str]:
+
+def check(report_path: Path, min_scores: dict[str, int | None]) -> list[str]:
     report = json.loads(report_path.read_text(encoding="utf-8"))
     categories = report.get("categories", {})
     errors = []
@@ -36,6 +45,9 @@ def check(report_path: Path, min_scores: dict[str, int]) -> list[str]:
             errors.append(f"Lighthouse no reportó la categoría '{name}'")
             continue
         score = round((category.get("score") or 0) * 100)
+        if minimum is None:
+            print(f"lighthouse {name}: {score}/100 (sin umbral, observación)")
+            continue
         status = "ok" if score >= minimum else "FALLA"
         print(f"lighthouse {name}: {score}/100 (mínimo {minimum}) [{status}]")
         if score < minimum:
@@ -62,6 +74,15 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--min-best-practices", type=int, default=DEFAULT_MIN_SCORES["best-practices"]
     )
+    parser.add_argument(
+        "--min-performance",
+        type=int,
+        default=DEFAULT_MIN_PERFORMANCE,
+        help=(
+            "Umbral opcional para performance; sin valor solo se reporta "
+            "(la varianza del runner compartido lo hace ruidoso como gate)"
+        ),
+    )
     args = parser.parse_args(argv)
 
     errors = check(
@@ -70,6 +91,7 @@ def main(argv: list[str] | None = None) -> int:
             "accessibility": args.min_accessibility,
             "seo": args.min_seo,
             "best-practices": args.min_best_practices,
+            "performance": args.min_performance,
         },
     )
     if errors:
