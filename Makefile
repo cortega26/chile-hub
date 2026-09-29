@@ -77,6 +77,7 @@ help:
 	@printf "  make notebooks        Ejecuta examples/notebooks/ con el bundle publicado\n"
 
 bootstrap:
+	@command -v uv >/dev/null 2>&1 || { printf "ERROR: uv no está instalado. Ver https://docs.astral.sh/uv/getting-started/installation/\n"; exit 1; }
 	uv sync --extra pipeline --extra dev
 	$(PYTHON) -m playwright install chromium
 	$(PYTHON) -m pre_commit install

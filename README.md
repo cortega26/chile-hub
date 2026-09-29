@@ -556,6 +556,9 @@ Esta sección es para contribuidores que ejecutan el pipeline de extracción, bu
 verificación en su máquina. Si solo necesitas consumir los datos, usa
 `pip install chile-hub` (ver [Instalación](#instalar-y-usar-en-30-segundos)).
 
+Requiere [uv](https://docs.astral.sh/uv/getting-started/installation/) y Git.
+Python lo gestiona uv (`make bootstrap`).
+
 ```bash
 # Entorno
 git clone https://github.com/cortega26/chile-hub.git

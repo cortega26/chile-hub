@@ -21,9 +21,12 @@ Gracias por ayudar a mantener chile-hub confiable.
 
 ## Verificaciones locales
 
-Ejecuta las verificaciones útiles más pequeñas antes de abrir un pull request:
+Requiere [uv](https://docs.astral.sh/uv/getting-started/installation/) y Git.
+Prepara el entorno una vez con `make bootstrap`; luego ejecuta las
+verificaciones útiles más pequeñas antes de abrir un pull request:
 
 ```bash
+make bootstrap
 make lint
 make format-check
 make test
