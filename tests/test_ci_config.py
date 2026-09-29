@@ -665,15 +665,18 @@ class GeometriaCandidateWorkflowGuardrailTests(unittest.TestCase):
         self.assertIn('metadata.get("source_mode") == "live"', self.content)
 
     def test_commit_stages_only_durable_geometry_artifacts(self):
-        """ADR-021: el commit sólo lleva parquet + metadata + checksum.
+        """ADR-021: el commit lleva parquet + metadata + checksum + geojson del mapa.
 
         Raw (JSON de BCN) y CSV intermedio salen a los assets del prerelease
         `geometry-audit`: en git inflaban el tarball de cada tag (~240 MB).
+        El GeoJSON del mapa es un asset derivado *versionado* que consume la
+        landing (coropleto): ADR-021 excluye raw e imágenes, no este archivo.
         """
         expected_paths = [
             "data/normalized/geometria_comunal.parquet",
             "data/staging/geometria_comunal.metadata.json",
             "data/normalized/geometria_comunal.parquet.sha256",
+            "data/normalized/mapa_comunal.geojson",
         ]
         self.assertIn("sha256sum -c geometria_comunal.parquet.sha256", self.content)
         self.assertIn('git add -f "$path"', self.content)
