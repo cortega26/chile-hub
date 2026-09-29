@@ -13,6 +13,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
@@ -22,6 +23,7 @@ if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
 import check_lighthouse
+import check_source_urls
 from check_companion_paths import (
     COMPANION_RULES,
     EXTRACTOR_RULE_EXCLUDED_PATHS,
@@ -1934,6 +1936,88 @@ class SourceUrlsWorkflowGuardrailTests(unittest.TestCase):
         pipeline_extra = pyproject.split("pipeline = [", 1)[1].split("]", 1)[0]
         self.assertIn("http_utils", script)
         self.assertIn("tenacity", pipeline_extra)
+
+
+class SourceUrlsCheckerTests(unittest.TestCase):
+    """Caracteriza la clasificación del liveness checker de fuentes.
+
+    El protocolo §6 ("fuente permanentemente caída") depende de que el
+    workflow semanal falle con DEAD y no con WARN; si la clasificación o los
+    códigos de salida de main() se rompen, las fuentes muertas dejan de
+    avisar (solo había guardrails de texto).
+    """
+
+    @staticmethod
+    def _response(status_code: int):
+        response = MagicMock()
+        response.status_code = status_code
+        return response
+
+    def test_source_urls_load_urls_keeps_unique_http_urls(self):
+        registry = [
+            {"official_url": "https://a.example"},
+            {"official_url": "http://b.example"},
+            {"official_url": "https://a.example"},
+            {"official_url": "ftp://c.example"},
+            {"official_url": "https://d.example "},
+            {"official_url": ""},
+            {"official_url": None},
+            {},
+        ]
+        with tempfile.TemporaryDirectory() as tmpdir:
+            registry_path = Path(tmpdir) / "source_registry.json"
+            registry_path.write_text(json.dumps(registry), encoding="utf-8")
+            with patch.object(check_source_urls, "SOURCE_REGISTRY_PATH", str(registry_path)):
+                urls = check_source_urls.load_urls()
+        self.assertEqual(urls, ["http://b.example", "https://a.example", "https://d.example"])
+
+    def test_source_urls_check_url_classifies_status_codes(self):
+        cases = {
+            200: "OK",
+            301: "OK",
+            399: "OK",
+            403: "WARN",
+            404: "WARN",
+            499: "WARN",
+            500: "DEAD",
+            503: "DEAD",
+        }
+        for status_code, expected in cases.items():
+            with self.subTest(status_code=status_code):
+                with patch.object(
+                    check_source_urls,
+                    "fetch_with_retry",
+                    return_value=self._response(status_code),
+                ):
+                    self.assertEqual(check_source_urls.check_url("https://x.example"), expected)
+
+    def test_source_urls_check_url_network_error_is_dead(self):
+        import requests
+
+        with patch.object(
+            check_source_urls,
+            "fetch_with_retry",
+            side_effect=requests.RequestException("timeout"),
+        ):
+            self.assertEqual(check_source_urls.check_url("https://x.example"), "DEAD")
+
+    def _run_main(self, urls: list[str], statuses: list[str]) -> int:
+        with (
+            patch.object(check_source_urls, "load_urls", return_value=urls),
+            patch.object(check_source_urls, "check_url", side_effect=statuses),
+            patch.object(check_source_urls.time, "sleep"),
+        ):
+            return check_source_urls.main()
+
+    def test_source_urls_main_without_urls_fails(self):
+        self.assertEqual(self._run_main([], []), 1)
+
+    def test_source_urls_main_with_dead_url_fails(self):
+        self.assertEqual(self._run_main(["https://dead.example"], ["DEAD"]), 1)
+
+    def test_source_urls_main_with_warn_only_passes(self):
+        urls = ["https://ok.example", "https://warn.example"]
+        self.assertEqual(self._run_main(urls, ["OK", "WARN"]), 0)
 
 
 class TestSignalIntegrityGuardrailTests(unittest.TestCase):
