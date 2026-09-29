@@ -803,6 +803,38 @@ def verify_landing():
         if "Ctrl" not in page.locator(".sql-hint").inner_text():
             fail("Falta la pista de teclado (Ctrl + Enter) del explorador SQL")
 
+        # Plan 128: además de la presencia de la UI, ejecuta una consulta real
+        # contra un Parquet publicado. Cubre de punta a punta el bundle
+        # DuckDB-Wasm vendorizado (loader ESM, worker MVP, wasm y registro de
+        # archivos). El drawer de la ficha sigue abierto: su overlay intercepta
+        # el clic, ciérralo primero vía hash (mismo mecanismo que la app).
+        if drawer.locator("#drawer-close").is_visible():
+            page.evaluate("() => { window.location.hash = ''; }")
+            drawer.wait_for(state="hidden")
+        page.fill(
+            "#sql-input",
+            "SELECT count(*) AS n FROM read_parquet('data/normalized/comunas.parquet');",
+        )
+        page.click("#sql-run-btn")
+        try:
+            page.wait_for_function(
+                """() => {
+                    const el = document.querySelector('#sql-status');
+                    if (!el) return false;
+                    const text = el.textContent || '';
+                    return text.includes('filas') || text.startsWith('Error');
+                }""",
+                timeout=120000,
+            )
+        except Exception:
+            fail("El explorador SQL no terminó la consulta dentro de 120 s")
+        sql_status = page.locator("#sql-status").inner_text()
+        if "filas" not in sql_status:
+            fail(f"La consulta de smoke del explorador SQL falló: {sql_status}")
+        sql_count = page.locator("#sql-result tbody td").first.inner_text().strip()
+        if sql_count != "346":
+            fail(f"COUNT(*) inesperado del explorador SQL: {sql_count} (esperado 346)")
+
         # Mapa territorial: Leaflet + GeoJSON simplificado + panel de lectura.
         # El mapa se inicializa en diferido cuando entra al viewport.
         # El flujo anterior deja el drawer abierto: ciérralo vía hash (mismo
