@@ -5085,6 +5085,21 @@ class HfDatasetCardTests(unittest.TestCase):
                 sorted(cfg["config_name"] for cfg in configs), ["censo_comunal", "comunas"]
             )
 
+    def test_main_aborts_when_publishable_selection_is_empty(self):
+        """Plan 113: con 0 capas publicables no se debe borrar el espejo HF.
+
+        Regresión a evitar: un rename de `publication_track` deja la selección
+        vacía y `upload_folder(delete_patterns=["data/*.parquet"])` borraría
+        todos los Parquet remotos sin subir ninguno."""
+        from scripts import publish_hf_dataset
+
+        with (
+            patch.object(publish_hf_dataset, "select_publishable_files", return_value=([], [])),
+            patch.object(sys, "argv", ["publish_hf_dataset.py", "--repo-id", "x/y"]),
+            self.assertRaisesRegex(SystemExit, "quedó vacía"),
+        ):
+            publish_hf_dataset.main()
+
 
 class DatasetSeoTests(unittest.TestCase):
     """Plan 102: páginas de dataset elegibles para Google Dataset Search.

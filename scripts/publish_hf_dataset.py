@@ -207,6 +207,13 @@ def main(argv: list[str] | None = None) -> None:
 
     parquet_entries, catalog_json_files = select_publishable_files()
 
+    if not parquet_entries:
+        raise SystemExit(
+            "ERROR: la selección de capas publicables quedó vacía — se aborta "
+            "para no borrar el espejo HF con delete_patterns. Revisa "
+            "publication_track en data/source_registry.json."
+        )
+
     import tempfile
 
     with tempfile.TemporaryDirectory() as tmpdir:
