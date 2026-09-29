@@ -6,6 +6,8 @@ transitivo como pyyaml que no es dependencia directa del proyecto); usan
 comprobaciones de texto simples y suficientes para el guardrail específico.
 """
 
+import contextlib
+import io
 import json
 import re
 import subprocess
@@ -1736,6 +1738,9 @@ class LighthouseGuardrailTests(unittest.TestCase):
     encontraría navegador en un entorno limpio), o que el chequeo de umbrales
     deje de ejecutarse después del audit. CI y `make lighthouse` comparten
     `scripts/run_lighthouse.sh`.
+
+    Plan 121: `performance` se mide y se sube como artefacto, pero SIN umbral
+    bloqueante — la varianza de un runner compartido haría ruidoso el gate.
     """
 
     RUN_LIGHTHOUSE = ROOT_DIR / "scripts" / "run_lighthouse.sh"
@@ -1748,10 +1753,21 @@ class LighthouseGuardrailTests(unittest.TestCase):
         self.assertTrue(self.RUN_LIGHTHOUSE.is_file())
         content = self.RUN_LIGHTHOUSE.read_text(encoding="utf-8")
         self.assertIn("lighthouse@12.8.2", content)
-        self.assertIn("--only-categories=accessibility,seo,best-practices", content)
+        self.assertIn("--only-categories=accessibility,seo,best-practices,performance", content)
         self.assertIn("CHROME_PATH", content)
         self.assertIn("ms-playwright/chromium-*/chrome-linux/chrome", content)
         self.assertIn("check_lighthouse.py", content)
+
+    def test_workflow_uploads_lighthouse_report_always(self):
+        content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        start = content.index("- name: Upload Lighthouse report")
+        end = content.index("- name:", start + 1)
+        step = content[start:end]
+        # `if: always()`: el reporte interesa justo cuando el audit falla.
+        self.assertIn("if: always()", step)
+        self.assertIn("actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a", step)
+        self.assertIn("name: lighthouse-report", step)
+        self.assertIn("path: /tmp/chile-hub-lighthouse.json", step)
 
     def test_makefile_exposes_lighthouse_target_with_shared_script(self):
         content = MAKEFILE.read_text(encoding="utf-8")
@@ -1803,26 +1819,36 @@ class DatasetContributionGuideGuardrailTests(unittest.TestCase):
 
 
 class CheckLighthouseScriptTests(unittest.TestCase):
-    """El chequeo de umbrales es stdlib puro: se testea con reportes sintéticos."""
+    """El chequeo de umbrales es stdlib puro: se testea con reportes sintéticos.
 
-    def _report(self, accessibility, seo, best_practices):
+    Plan 121: `performance` se imprime siempre como observación; solo falla si
+    se pasa `--min-performance` y queda bajo el umbral.
+    """
+
+    def _report(self, accessibility, seo, best_practices, performance=100):
         def category(score):
             return {"score": score / 100, "auditRefs": []}
 
-        return {
-            "categories": {
-                "accessibility": category(accessibility),
-                "seo": category(seo),
-                "best-practices": category(best_practices),
-            },
-            "audits": {},
+        categories = {
+            "accessibility": category(accessibility),
+            "seo": category(seo),
+            "best-practices": category(best_practices),
         }
+        if performance is not None:
+            categories["performance"] = category(performance)
+        return {"categories": categories, "audits": {}}
 
-    def _run(self, report):
+    def _run(self, report, *extra_args):
         with tempfile.TemporaryDirectory() as tmpdir:
             path = Path(tmpdir) / "lh.json"
             path.write_text(json.dumps(report), encoding="utf-8")
-            return check_lighthouse.main([str(path)])
+            return check_lighthouse.main([str(path), *extra_args])
+
+    def _run_capture(self, report, *extra_args):
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            code = self._run(report, *extra_args)
+        return code, buffer.getvalue()
 
     def test_all_thresholds_pass(self):
         self.assertEqual(self._run(self._report(100, 100, 100)), 0)
@@ -1832,6 +1858,19 @@ class CheckLighthouseScriptTests(unittest.TestCase):
 
     def test_missing_category_fails(self):
         self.assertEqual(self._run({"categories": {}, "audits": {}}), 1)
+
+    def test_performance_is_reported_without_threshold(self):
+        code, output = self._run_capture(self._report(100, 100, 100, performance=42))
+        self.assertEqual(code, 0)
+        self.assertIn("lighthouse performance: 42/100 (sin umbral", output)
+
+    def test_min_performance_enforces_threshold(self):
+        report = self._report(100, 100, 100, performance=42)
+        self.assertEqual(self._run(report, "--min-performance", "90"), 1)
+        self.assertEqual(self._run(report, "--min-performance", "40"), 0)
+
+    def test_missing_performance_category_fails(self):
+        self.assertEqual(self._run(self._report(100, 100, 100, performance=None)), 1)
 
 
 class SourceUrlsWorkflowGuardrailTests(unittest.TestCase):
