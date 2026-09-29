@@ -8,12 +8,19 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 DATASET_CATALOG_PATH = ROOT_DIR / "data" / "dataset_catalog_config.json"
 CONTRACTS_DIR = ROOT_DIR / "contracts" / "datasets"
 DOCS_DIR = ROOT_DIR / "docs" / "datasets"
+SPECS_DIR = ROOT_DIR / "data" / "dataset_specs"
 EXTRACTORS_DIR = ROOT_DIR / "src" / "extractors"
 
 # Excepciones documentadas: datasets sin contrato o doc dedicado todavía.
 # Vacío hoy — agregar aquí solo con una razón explícita si aparece un caso legítimo.
 ALLOWED_MISSING_CONTRACT: set[str] = set()
 ALLOWED_MISSING_DOC: set[str] = set()
+
+# Excepciones documentadas: datasets del catálogo sin DatasetSpec (ADR-018).
+# Vacío hoy — una exención solo entra con razón escrita (p. ej. "dataset
+# agregado durante un freeze de migración decidido en <fecha>"), nunca como
+# hueco silencioso. Plan 124.
+ALLOWED_MISSING_SPEC: set[str] = set()
 
 # Rutas que disparan una regla de co-cambio -> al menos una de sus rutas
 # compañeras debe aparecer también en el diff. Si agregas una ruta nueva con
@@ -81,6 +88,10 @@ def check_registry() -> list[str]:
             doc_path = DOCS_DIR / f"{key}.md"
             if not doc_path.is_file():
                 errors.append(f"falta documentación de dataset para '{key}': {doc_path}")
+        if key not in ALLOWED_MISSING_SPEC:
+            spec_path = SPECS_DIR / f"{key}.json"
+            if not spec_path.is_file():
+                errors.append(f"falta DatasetSpec para '{key}': {spec_path}")
     return errors
 
 
@@ -167,8 +178,9 @@ def main() -> None:
     subparsers.add_parser(
         "registry",
         help="Verifica que cada dataset de data/dataset_catalog_config.json tenga "
-        "su contrato de esquema, su doc en docs/datasets/ y su campo 'extractor' "
-        "apuntando a un archivo existente en src/extractors/ (sin extractores huérfanos).",
+        "su contrato de esquema, su doc en docs/datasets/, su DatasetSpec en "
+        "data/dataset_specs/ y su campo 'extractor' apuntando a un archivo "
+        "existente en src/extractors/ (sin extractores huérfanos).",
     )
 
     companions_parser = subparsers.add_parser(

@@ -272,7 +272,7 @@ _AGENTS_TEST_DESCRIPTIONS = {
     "test_phase2_datasetspec.py": (
         "DatasetSpec piloto Phase 2–3D: modelo tipado, proyecciones de "
         "compatibilidad contra catálogo/registry/contrato legacy, overlay y "
-        "fallos cerrados (22 specs: complete)"
+        "fallos cerrados (25 specs: complete — cubre todo el catálogo)"
     ),
 }
 

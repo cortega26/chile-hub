@@ -258,7 +258,8 @@ artifact policy are made registry-driven.
 Every dataset has one DatasetSpec that defines identity, source/reuse/fallback/
 freshness policy, track, public eligibility, lane, contract reference, semantic
 validator registration, outputs, aliases, dependencies, and documentation
-metadata.
+metadata. Since Plan 124 this invariant is enforced by the
+`check_companion_paths.py registry` gate (25/25 catalog datasets covered).
 
 Existing catalog, source registry, and documentation remain at their present
 paths and may become compatibility projections as their ownership is proven.
