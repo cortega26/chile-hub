@@ -1,6 +1,6 @@
 {
-  "generated_at_utc": "2026-09-28T17:58:27.501618+00:00",
-  "previous_generated_at_utc": "2026-09-27T14:58:48.537317+00:00",
+  "generated_at_utc": "2026-09-29T16:20:41.265786+00:00",
+  "previous_generated_at_utc": "2026-09-28T17:58:27.501618+00:00",
   "dataset_count": 22,
   "datasets": [
     {
@@ -25,8 +25,8 @@
     },
     {
       "dataset": "calidad_aire",
-      "previous_record_count": 2264,
-      "current_record_count": 2642,
+      "previous_record_count": 2642,
+      "current_record_count": 3020,
       "record_count_delta": 378,
       "added_fields": [],
       "removed_fields": [],
@@ -165,9 +165,9 @@
     },
     {
       "dataset": "empresas",
-      "previous_record_count": 1609373,
+      "previous_record_count": 1628433,
       "current_record_count": 1628433,
-      "record_count_delta": 19060,
+      "record_count_delta": 0,
       "added_fields": [],
       "removed_fields": [],
       "previous_source_mode": "live",
@@ -176,7 +176,7 @@
       "current_freshness_status": "fresh",
       "previous_validation_status": "ok",
       "current_validation_status": "ok",
-      "change_severity": "patch",
+      "change_severity": "none",
       "breaking_changes": [],
       "new_columns": [],
       "removed_columns": [],
@@ -266,8 +266,8 @@
     {
       "dataset": "indicadores",
       "previous_record_count": 667,
-      "current_record_count": 667,
-      "record_count_delta": 0,
+      "current_record_count": 669,
+      "record_count_delta": 2,
       "added_fields": [],
       "removed_fields": [],
       "previous_source_mode": "live",
@@ -276,7 +276,7 @@
       "current_freshness_status": "fresh",
       "previous_validation_status": "ok",
       "current_validation_status": "ok",
-      "change_severity": "none",
+      "change_severity": "patch",
       "breaking_changes": [],
       "new_columns": [],
       "removed_columns": [],

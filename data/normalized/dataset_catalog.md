@@ -1,6 +1,6 @@
 # chile-hub dataset catalog
 
-- `generated_at_utc`: `2026-09-28T17:58:27.501618+00:00`
+- `generated_at_utc`: `2026-09-29T16:20:41.265786+00:00`
 - `dataset_count`: `22`
 
 | Dataset | Source | Mode | Freshness | Reuse | Records | Confidence | Join Keys | Validation |
@@ -9,24 +9,24 @@
 | `provincias` | BCN ArcGIS | `live` | `fresh (0.05h / 2160h)` | `open-attribution (CC BY)` | 56 | `Tier B` | `codigo_provincia, codigo_region` | `ok` |
 | `comunas` | BCN ArcGIS | `live` | `fresh (0.05h / 2160h)` | `open-attribution (CC BY)` | 346 | `Tier B` | `codigo_comuna, codigo_region` | `ok` |
 | `comunas_enriquecidas` | BCN ArcGIS | `live` | `fresh (0.05h / 2160h)` | `open-attribution (CC BY)` | 346 | `Tier B` | `codigo_comuna` | `ok` |
-| `indicadores` | Banco Central de Chile (via mindicador.cl) | `live` | `fresh (0.05h / 72h)` | `open-attribution (Reproducción libre con citación (BCCh / INE))` | 667 | `Tier A/B` | `fecha, codigo_indicador` | `ok` |
-| `censo_comunal` | Instituto Nacional de Estadisticas - Censo 2024 | `live` | `fresh (0.05h / 87600h)` | `open-attribution (CC BY 4.0)` | 346 | `Tier A` | `codigo_comuna, codigo_region` | `ok` |
-| `establecimientos_salud` | Ministerio de Salud - Establecimientos de Salud | `live` | `fresh (0.05h / 1080h)` | `open-attribution (CC0)` | 5743 | `Tier A` | `codigo_establecimiento, codigo_comuna` | `ok` |
-| `establecimientos_educacionales` | Ministerio de Educación - Directorio Oficial de Establecimientos | `live` | `fresh (0.05h / 8760h)` | `open-attribution (CC-BY-3.0)` | 12898 | `Tier A` | `codigo_comuna` | `ok` |
-| `censo_hogares_viviendas` | Instituto Nacional de Estadisticas - Censo 2024 | `live` | `fresh (0.05h / 87600h)` | `open-attribution (CC BY 4.0)` | 346 | `Tier A` | `codigo_comuna, codigo_region` | `ok` |
-| `distritos_electorales` | BCN / Biblioteca del Congreso Nacional de Chile | `live` | `fresh (0.05h / 87600h)` | `open-attribution (CC0)` | 346 | `Tier A` | `codigo_comuna` | `ok` |
-| `finanzas_municipales` | SINIM - SUBDERE | `monthly` | `fresh (662.9h / 8760h)` | `public-api-review-terms (Datos públicos municipales; términos de reutilización sujetos a revisión)` | 345 | `Tier B` | `anio, codigo_comuna` | `ok` |
+| `indicadores` | Banco Central de Chile (via mindicador.cl) | `live` | `fresh (0.05h / 72h)` | `open-attribution (Reproducción libre con citación (BCCh / INE))` | 669 | `Tier A/B` | `fecha, codigo_indicador` | `ok` |
+| `censo_comunal` | Instituto Nacional de Estadisticas - Censo 2024 | `live` | `fresh (0.04h / 87600h)` | `open-attribution (CC BY 4.0)` | 346 | `Tier A` | `codigo_comuna, codigo_region` | `ok` |
+| `establecimientos_salud` | Ministerio de Salud - Establecimientos de Salud | `live` | `fresh (0.04h / 1080h)` | `open-attribution (CC0)` | 5743 | `Tier A` | `codigo_establecimiento, codigo_comuna` | `ok` |
+| `establecimientos_educacionales` | Ministerio de Educación - Directorio Oficial de Establecimientos | `live` | `fresh (0.04h / 8760h)` | `open-attribution (CC-BY-3.0)` | 12898 | `Tier A` | `codigo_comuna` | `ok` |
+| `censo_hogares_viviendas` | Instituto Nacional de Estadisticas - Censo 2024 | `live` | `fresh (0.04h / 87600h)` | `open-attribution (CC BY 4.0)` | 346 | `Tier A` | `codigo_comuna, codigo_region` | `ok` |
+| `distritos_electorales` | BCN / Biblioteca del Congreso Nacional de Chile | `live` | `fresh (0.04h / 87600h)` | `open-attribution (CC0)` | 346 | `Tier A` | `codigo_comuna` | `ok` |
+| `finanzas_municipales` | SINIM - SUBDERE | `monthly` | `fresh (685.27h / 8760h)` | `public-api-review-terms (Datos públicos municipales; términos de reutilización sujetos a revisión)` | 345 | `Tier B` | `anio, codigo_comuna` | `ok` |
 | `resultados_educacionales` | Centro de Estudios MINEDUC - Rendimiento 2024 | `live` | `fresh (0.04h / 8760h)` | `open-attribution (CC-BY-3.0)` | 345 | `Tier B` | `anio, codigo_comuna` | `ok` |
 | `indicadores_urbanos_siedu` | INE - Sistema de Indicadores y Estándares de Desarrollo Urbano | `live` | `fresh (0.04h / 8760h)` | `open-attribution (Licencia de Datos Abiertos INE)` | 6701 | `Tier B` | `anio, codigo_comuna, codigo_indicador` | `ok` |
 | `perfil_territorial_comunal` | chile-hub | `live` | `fresh (0.0h / 1080h)` | `open-attribution (Derivada de fuentes abiertas con atribución)` | 346 | `Tier B` | `codigo_comuna` | `ok` |
 | `empresas` | Ministerio de Economia, Fomento y Turismo - Registro de Empresas y Sociedades (RES) | `live` | `fresh (0.04h / 1080h)` | `open-attribution (CC-BY)` | 1628433 | `Tier B` | `rut` | `ok` |
 | `pobreza_comunal` | Observatorio Social — Ministerio de Desarrollo Social y Familia | `live` | `fresh (0.04h / 175200h)` | `open-attribution (Datos abiertos MDS)` | 690 | `Tier A` | `codigo_comuna, codigo_region` | `ok` |
-| `consumo_electrico_comunal` | CNE — Energía Abierta | `fallback` | `fresh (0.04h / 17520h)` | `open-attribution (CC BY)` | 3 | `Tier C` | `codigo_comuna, codigo_region` | `ok` |
-| `partidos_politicos` | Cámara de Diputadas y Diputados (datos abiertos) + SERVEL | `live` | `fresh (0.04h / 87600h)` | `open-attribution (CC-BY)` | 37 | `Tier B` | `id_partido` | `ok` |
+| `consumo_electrico_comunal` | CNE — Energía Abierta | `fallback` | `fresh (0.03h / 17520h)` | `open-attribution (CC BY)` | 3 | `Tier C` | `codigo_comuna, codigo_region` | `ok` |
+| `partidos_politicos` | Cámara de Diputadas y Diputados (datos abiertos) + SERVEL | `live` | `fresh (0.03h / 87600h)` | `open-attribution (CC-BY)` | 37 | `Tier B` | `id_partido` | `ok` |
 | `autoridades_electas` | Cámara de Diputadas y Diputados + Senado de Chile | `live` | `fresh (0.0h / 87600h)` | `open-attribution (CC-BY)` | 205 | `Tier B` | `distrito_electoral, circunscripcion_senatorial, codigo_region` | `ok` |
 | `estadisticas_vitales` | Instituto Nacional de Estadísticas (INE) — Estadísticas Vitales | `live` | `fresh (0.01h / 8760h)` | `open-attribution (CC BY 4.0)` | 13840 | `Tier A` | `anio, codigo_comuna` | `ok` |
-| `permisos_edificacion` | MINVU — Centro de Estudios de Ciudad y Territorio (CEDOC) | `monthly` | `fresh (70.83h / 1080h)` | `open-attribution (Uso autorizado con cita (MINVU CEDOC))` | 8650 | `Tier A` | `anio, codigo_comuna` | `ok` |
-| `calidad_aire` | SINCA — Ministerio del Medio Ambiente | `live` | `fresh (0.01h / 72h)` | `public-api-review-terms (Datos públicos MMA; sin licencia explícita, citar fuente oficial)` | 2642 | `Tier B` | `fecha, codigo_comuna, codigo_contaminante` | `ok` |
+| `permisos_edificacion` | MINVU — Centro de Estudios de Ciudad y Territorio (CEDOC) | `monthly` | `fresh (93.2h / 1080h)` | `open-attribution (Uso autorizado con cita (MINVU CEDOC))` | 8650 | `Tier A` | `anio, codigo_comuna` | `ok` |
+| `calidad_aire` | SINCA — Ministerio del Medio Ambiente | `live` | `fresh (0.01h / 72h)` | `public-api-review-terms (Datos públicos MMA; sin licencia explícita, citar fuente oficial)` | 3020 | `Tier B` | `fecha, codigo_comuna, codigo_contaminante` | `ok` |
 
 ## regiones
 
@@ -111,7 +111,7 @@ Perfil demografico comunal del Censo 2024 con sexo y grandes grupos de edad.
 
 - `source_url`: https://censo2024.ine.gob.cl/wp-content/uploads/2025/03/D1_Poblacion-censada-por-sexo-y-edad-en-grupos-quinquenales.xlsx
 - `documentation`: `docs/datasets/censo_comunal.md`
-- `freshness`: `fresh (0.05h / 87600h)`
+- `freshness`: `fresh (0.04h / 87600h)`
 - `reuse_policy`: `{"status": "open-attribution", "license": "CC BY 4.0", "license_url": "https://www.ine.gob.cl/terminos-de-uso", "attribution_required": true, "redistribution_ok": true, "summary": "Resultados oficiales del Censo 2024 publicados por el INE."}`
 - `fields`: `codigo_region, nombre_region, codigo_provincia, nombre_provincia, codigo_comuna, nombre_comuna, poblacion_censada, hombres, mujeres, razon_hombre_mujer, poblacion_0_14, poblacion_15_29, poblacion_30_44, poblacion_45_64, poblacion_65_mas`
 - `join_keys`: `codigo_comuna, codigo_region`
@@ -126,7 +126,7 @@ Directorio vigente de establecimientos de salud con tipo, dependencia, urgencia 
 
 - `source_url`: https://datos.gob.cl/dataset/3bf4cf7c-f638-4735-9a01-f65faae4beca/resource/2c44d782-3365-44e3-aefb-2c8b8363a1bc/download/establecimientos_20260922.csv
 - `documentation`: `docs/datasets/establecimientos_salud.md`
-- `freshness`: `fresh (0.05h / 1080h)`
+- `freshness`: `fresh (0.04h / 1080h)`
 - `reuse_policy`: `{"status": "open-attribution", "license": "CC0", "license_url": "http://www.opendefinition.org/licenses/cc-zero", "attribution_required": false, "redistribution_ok": true, "summary": "Directorio oficial MINSAL publicado en datos.gob.cl bajo CC0."}`
 - `fields`: `codigo_establecimiento, nombre_establecimiento, tipo_establecimiento, dependencia_administrativa, nivel_atencion, codigo_region, nombre_region, codigo_comuna, nombre_comuna, tiene_servicio_urgencia, tipo_urgencia, latitud, longitud, estado_funcionamiento`
 - `join_keys`: `codigo_establecimiento, codigo_comuna`
@@ -140,7 +140,7 @@ Directorio oficial del Ministerio de Educación (MINEDUC) con Rol Base de Datos 
 
 - `source_url`: https://datosabiertos.mineduc.cl/wp-content/uploads/2025/11/Directorio-Oficial-EE-2025.rar
 - `documentation`: `docs/datasets/establecimientos_educacionales.md`
-- `freshness`: `fresh (0.05h / 8760h)`
+- `freshness`: `fresh (0.04h / 8760h)`
 - `reuse_policy`: `{"status": "open-attribution", "license": "CC-BY-3.0", "license_url": "https://creativecommons.org/licenses/by/3.0/cl/", "attribution_required": true, "redistribution_ok": true, "summary": "Directorio oficial MINEDUC publicado por el Centro de Estudios del Ministerio de Educación de Chile bajo licencia CC BY."}`
 - `fields`: `rbd, dv_rbd, nombre_establecimiento, codigo_region, codigo_comuna, dependencia_administrativa, latitud, longitud, estado_funcionamiento`
 - `join_keys`: `codigo_comuna`
@@ -154,7 +154,7 @@ Viviendas y hogares censados por comuna, ocupacion y tamano medio del hogar.
 
 - `source_url`: https://censo2024.ine.gob.cl/wp-content/uploads/2025/03/V1_Viviendas-y-hogares-censados.xlsx
 - `documentation`: `docs/datasets/censo_hogares_viviendas.md`
-- `freshness`: `fresh (0.05h / 87600h)`
+- `freshness`: `fresh (0.04h / 87600h)`
 - `reuse_policy`: `{"status": "open-attribution", "license": "CC BY 4.0", "license_url": "https://www.ine.gob.cl/terminos-de-uso", "attribution_required": true, "redistribution_ok": true, "summary": "Resultados oficiales del Censo 2024 publicados por el INE."}`
 - `fields`: `codigo_region, nombre_region, codigo_provincia, nombre_provincia, codigo_comuna, nombre_comuna, viviendas_censadas, viviendas_particulares_ocupadas, viviendas_particulares_desocupadas, viviendas_colectivas, hogares_censados, promedio_personas_hogar`
 - `join_keys`: `codigo_comuna, codigo_region`
@@ -168,7 +168,7 @@ Asociación de comunas a distritos electorales (diputados) y circunscripciones s
 
 - `source_url`: https://www.bcn.cl/siit/observatorio/ley20840
 - `documentation`: `docs/datasets/distritos_electorales.md`
-- `freshness`: `fresh (0.05h / 87600h)`
+- `freshness`: `fresh (0.04h / 87600h)`
 - `reuse_policy`: `{"status": "open-attribution", "license": "CC0", "license_url": "http://www.opendefinition.org/licenses/cc-zero", "attribution_required": false, "redistribution_ok": true, "summary": "Asociación comunal a distritos y circunscripciones electorales basada en Ley N° 20.840."}`
 - `fields`: `codigo_comuna, nombre_comuna, distrito_electoral, circunscripcion_senatorial`
 - `join_keys`: `codigo_comuna`
@@ -182,7 +182,7 @@ Indicadores financieros municipales anuales desde SINIM/SUBDERE. CAPA PARCIAL/CA
 
 - `source_url`: https://datos.sinim.gov.cl/datos_municipales.php
 - `documentation`: `docs/datasets/finanzas_municipales.md`
-- `freshness`: `fresh (662.9h / 8760h)`
+- `freshness`: `fresh (685.27h / 8760h)`
 - `reuse_policy`: `{"status": "public-api-review-terms", "license": "Datos públicos municipales; términos de reutilización sujetos a revisión", "license_url": "https://datos.sinim.gov.cl/", "attribution_required": true, "redistribution_ok": true, "summary": "Información municipal pública publicada por SINIM/SUBDERE; citar fuente oficial."}`
 - `fields`: `anio, codigo_comuna, nombre_comuna, ingresos_totales, gastos_totales, ingresos_propios_permanentes, fondo_comun_municipal, gasto_personal, gasto_inversion`
 - `join_keys`: `anio, codigo_comuna`
@@ -272,7 +272,7 @@ Consumo eléctrico anual por comuna y tipo de cliente (Residencial, Comercial, I
 
 - `source_url`: http://datos.energiaabierta.cl/dataviews/241686/consumo-electrico-anual-por-comuna-y-tipo-de-cliente/
 - `documentation`: `docs/datasets/consumo_electrico_comunal.md`
-- `freshness`: `fresh (0.04h / 17520h)`
+- `freshness`: `fresh (0.03h / 17520h)`
 - `reuse_policy`: `{"status": "open-attribution", "license": "CC BY", "license_url": "http://energiaabierta.cl/", "attribution_required": true, "redistribution_ok": true, "summary": "Consumo eléctrico anual por comuna publicado por la CNE en Energía Abierta. Atribución requerida."}`
 - `fields`: `codigo_region, codigo_comuna, nombre_comuna, anio, tipo_cliente, consumo_kwh, numero_clientes, fuente, url_fuente, fecha_fuente`
 - `join_keys`: `codigo_comuna, codigo_region`
@@ -287,7 +287,7 @@ Roster de partidos políticos de Chile (Cámara de Diputadas y Diputados), con e
 
 - `source_url`: https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos
 - `documentation`: `docs/datasets/partidos_politicos.md`
-- `freshness`: `fresh (0.04h / 87600h)`
+- `freshness`: `fresh (0.03h / 87600h)`
 - `reuse_policy`: `{"status": "open-attribution", "license": "CC-BY", "license_url": "https://creativecommons.org/licenses/by/4.0/", "attribution_required": true, "redistribution_ok": true, "summary": "Roster institucional de partidos políticos (Cámara de Diputadas y Diputados), enriquecido con estado legal y fecha de constitución desde SERVEL. ambito (nacional/regional) queda nullable: no se encontró esa señal en ninguna fuente."}`
 - `fields`: `id_partido, nombre, sigla, estado_legal, fecha_constitucion, ambito, fuente, url_fuente, fecha_consulta`
 - `join_keys`: `id_partido`
@@ -309,7 +309,7 @@ Autoridades electas en ejercicio de Chile (diputados y senadores): partido, dist
 - `outputs`: `{"parquet": "data/normalized/autoridades_electas.parquet", "json": "data/normalized/autoridades_electas.json"}`
 - `usage_examples`: `{"python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars(\"autoridades_electas\")\n# Senadores por región\nsenadores = df.filter(pl.col(\"cargo\") == \"senador\")", "duckdb": "SELECT nombre, cargo, partido, codigo_region\nFROM 'data/normalized/autoridades_electas.parquet'\nWHERE cargo = 'senador'\nORDER BY codigo_region;", "cli": "chile-hub show autoridades_electas"}`
 - `warnings`: none
-- `notes`: v1: diputados (155) + senadores (50). Gobernador_regional/alcalde viven en el dataset segregado autoridades_locales (licencia CC-BY-SA).; distrito_electoral vía Scrapling: 154/155 diputados.; codigo_region/periodo de senadores: 50/50 poblados desde senado.cl (REGION/PERIODOS).; RUT (Cámara) y email/teléfono (Senado) descartados (línea roja de datos personales).
+- `notes`: v1: diputados (155) + senadores (50). Gobernador_regional/alcalde viven en el dataset segregado autoridades_locales (licencia CC-BY-SA).; distrito_electoral vía Scrapling: 155/155 diputados.; codigo_region/periodo de senadores: 50/50 poblados desde senado.cl (REGION/PERIODOS).; RUT (Cámara) y email/teléfono (Senado) descartados (línea roja de datos personales).
 
 ## estadisticas_vitales
 
@@ -332,14 +332,14 @@ Viviendas en unidades y superficie (m2) por comuna y año —casas y departament
 
 - `source_url`: https://centrodeestudios.minvu.gob.cl/repositorio/categoria/permisos-de-edificacion
 - `documentation`: `docs/datasets/permisos_edificacion.md`
-- `freshness`: `fresh (70.83h / 1080h)`
+- `freshness`: `fresh (93.2h / 1080h)`
 - `reuse_policy`: `{"status": "open-attribution", "license": "Uso autorizado con cita (MINVU CEDOC)", "license_url": "https://centrodeestudios.minvu.gob.cl/repositorio/categoria/permisos-de-edificacion", "attribution_required": true, "redistribution_ok": true, "summary": "Estadísticas de permisos de edificación del CEDOC (MINVU). El Centro autoriza el uso de la información citando la fuente."}`
 - `fields`: `anio, codigo_region, codigo_comuna, nombre_comuna, unidades_total, superficie_m2_total, unidades_casas, superficie_m2_casas, unidades_departamentos, superficie_m2_departamentos, estado_dato, fuente, url_fuente, fecha_fuente`
 - `join_keys`: `anio, codigo_comuna`
 - `outputs`: `{"parquet": "data/normalized/permisos_edificacion.parquet", "json": "data/normalized/permisos_edificacion.json", "duckdb_table": "permisos_edificacion", "sqlite_table": "permisos_edificacion", "excel_sheet": "Permisos Edificación"}`
 - `usage_examples`: `{"python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars(\"permisos_edificacion\")\n# Unidades autorizadas por comuna 2023\nunid_2023 = df.filter(pl.col(\"anio\") == 2023).sort(\"unidades_total\", descending=True)", "duckdb": "SELECT anio, codigo_comuna, unidades_total, superficie_m2_total\nFROM 'data/normalized/permisos_edificacion.parquet'\nWHERE anio = 2023 ORDER BY unidades_total DESC LIMIT 10;", "cli": "chile-hub show permisos_edificacion"}`
 - `warnings`: none
-- `notes`: descubrimiento: repositorio-biblionumber; descarga falló, usando snapshot versionado minvu_permisos_edificacion_anual_20260925T190842Z.xlsx (Failed to perform, curl: (35) BoringSSL SSL_connect: Connection closed abruptly (SSL_ERROR_SYSCALL; error queue empty) in connection to catalogo.minvu.cl:443. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.); 8650 filas desde 'minvu_permisos_edificacion_anual_20260925T190842Z.xlsx' (hojas: número_total, m2_total, número_departamentos, m2_departamentos, número_casas, m2_casas; años provisionales: [2024, 2025, 2026])
+- `notes`: descubrimiento: repositorio-biblionumber; descarga falló, usando snapshot versionado minvu_permisos_edificacion_anual_20260925T190842Z.xlsx (Failed to perform, curl: (56) BoringSSL SSL_read: BoringSSL: error:100000d7:SSL routines:OPENSSL_internal:SSL_HANDSHAKE_FAILURE, errno 0. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.); 8650 filas desde 'minvu_permisos_edificacion_anual_20260925T190842Z.xlsx' (hojas: número_total, m2_total, número_departamentos, m2_departamentos, número_casas, m2_casas; años provisionales: [2024, 2025, 2026])
 
 ## calidad_aire
 
@@ -354,4 +354,4 @@ Promedios diarios de contaminantes atmosféricos (MP2.5, MP10, SO2, NO2, CO, O3)
 - `outputs`: `{"parquet": "data/normalized/calidad_aire.parquet", "json": "data/normalized/calidad_aire.json", "duckdb_table": "calidad_aire", "sqlite_table": "calidad_aire", "excel_sheet": "Calidad Aire"}`
 - `usage_examples`: `{"python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars(\"calidad_aire\")\n# Promedio diario de MP2.5 por comuna\ndf.filter(pl.col(\"codigo_contaminante\") == \"mp25\").sort(\"valor_promedio_diario\", descending=True)", "duckdb": "SELECT fecha, codigo_comuna, avg(valor_promedio_diario) AS mp25\nFROM 'data/normalized/calidad_aire.parquet'\nWHERE codigo_contaminante = 'mp25'\nGROUP BY 1, 2 ORDER BY 1 DESC, 3 DESC;", "cli": "chile-hub show calidad_aire"}`
 - `warnings`: cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación
-- `notes`: inventario: 127 estaciones en el listado; 127 con filas emitidas; 754 filas diarias nuevas desde 'sinca_listadomapa_20260928T175805Z.json'; historial: fusionado con staging existente
+- `notes`: inventario: 126 estaciones en el listado; 126 con filas emitidas; 754 filas diarias nuevas desde 'sinca_listadomapa_20260929T162020Z.json'; historial: fusionado con staging existente
