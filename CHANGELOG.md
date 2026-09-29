@@ -12,6 +12,14 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.44.2 - 2026-09-29
+
+### Corregido
+
+- **release**: --version-only sincroniza los pines de installation.md
+  ([`def1086`](https://github.com/cortega26/chile-hub/commit/def10866c6690c3be602fc454a57ee32b96a222e))
+
+
 ## 1.44.1 - 2026-09-29
 
 ### Corregido
