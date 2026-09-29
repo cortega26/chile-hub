@@ -7,6 +7,24 @@
 > **historial cerrado** (todas sus waves DONE).
 > **No duplicar contenido de planes aquí** — solo estado y links.
 
+## Posicionamiento 2026-09-29 (activa)
+
+> chile-hub como última milla de los datos oficiales, no como portal
+> (`docs/adr/ADR-023-posicionamiento-ultima-milla-no-portal.md`; canon en
+> `docs/product-spec.md`). Los cambios de repo van en el PR que introduce ADR-023;
+> lo que sigue son acciones hacia afuera que requieren la cuenta del mantenedor.
+
+- [ ] Registrar chile-hub en "Reutilización" de datos.gob.cl. Probablemente requiere
+  iniciar sesión (el portal ofrece ingreso con ClaveÚnica).
+- [ ] Pedir la delincuencia comunal estructurada del CEAD por "Sugerencias" de
+  datos.gob.cl o por la Ley 20.285, en vez de scrapearla.
+- [ ] Reportar con "Notifica un error" el bulk 2015 de delincuencia en datos.gob.cl,
+  que tiene enlaces muertos.
+- [ ] Opcional: presentar el proyecto a la mesa de ayuda de la Secretaría de Gobierno
+  Digital y preguntar por el estado de la norma técnica de datos abiertos.
+
+---
+
 ## Auditoría distribución 2026-09-25 (activa)
 
 ### Scoreboard

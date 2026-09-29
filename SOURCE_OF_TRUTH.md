@@ -15,7 +15,7 @@ related_docs:
   - CLAUDE.md              # Punto de entrada para sesiones Claude Code
   - CONTRIBUTING.md        # Verificaciones locales y flujo de PR
   - docs/dataset-inclusion-criteria.md  # Criterios de aceptación/deprecación
-last_updated: 2026-09-15
+last_updated: 2026-09-29
 ---
 
 # SOURCE_OF_TRUTH.md — Índice Maestro de Navegación
@@ -33,6 +33,9 @@ Parquet, DuckDB, JSON y ZIP consumibles en una sola línea de código, además d
 estática y una CLI/API de Python (`ChileHub`). El objetivo es tener **menos datasets, más limpios y
 confiables** — no una cobertura exhaustiva.
 
+No es un portal ni una fuente oficial: trabaja aguas abajo de datos.gob.cl y de las instituciones
+que publican cada dato. Misión, visión y principios: **`docs/product-spec.md`** (ADR-023).
+
 ---
 
 ## Document ownership
@@ -43,6 +46,7 @@ confiables** — no una cobertura exhaustiva.
 | **`AGENTS.md`** | Reglas completas del pipeline, politica legal, flujo de 7 pasos para agregar datasets, jobs de CI/CD, antipatrones, convenciones de codigo | Al agregar un dataset · depurar el pipeline · preguntas legales · cambios en CI |
 | **`CLAUDE.md`** | Redirige a AGENTS.md + SOURCE_OF_TRUTH.md; punto de entrada del proyecto para sesiones de Claude Code | Primera visita al repositorio · orientacion |
 | **`docs/dataset-inclusion-criteria.md`** | Criterios de aceptacion/deprecacion de datasets, carriles `candidate`/`stable_publishable` | Al evaluar si un dataset nuevo entra al MVP · al reevaluar un `candidate` |
+| **`docs/product-spec.md`** | Mision, vision, principios y relacion con datos.gob.cl y las fuentes oficiales (ADR-023) | Al redactar textos publicos (README, landing, fichas) · al decidir el alcance del hub |
 
 ---
 
