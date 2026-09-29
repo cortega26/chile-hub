@@ -87,7 +87,7 @@ def _resolve_names_to_frame(
             row[column] = hit[column] if hit else None
         row["matched"] = hit is not None
         rows.append(row)
-    schema: dict[str, pl.DataType] = {
+    schema = {
         "input": pl.String,
         **{column: pl.String for column in value_columns},
         "matched": pl.Boolean,

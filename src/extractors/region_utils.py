@@ -5,8 +5,11 @@ Extraído de `autoridades_locales_extractor.py` (Plan 023) para reutilizarse tam
 
 Desde Plan 129 este módulo **delega en el paquete** `chile_hub` (fuente única):
 `chile_hub.regions` para la tabla y el mapeo, `chile_hub.text.norm_text` para la
-normalización. Conserva su API pública (`norm_text`, `REGION_A_CODIGO`,
-`region_nombre_a_codigo`) para no tocar a los extractores que la importan.
+normalización. El import usa la forma `src.chile_hub.*` (el patrón establecido
+de los extractores) para que mypy no resuelva el mismo archivo dos veces, como
+`src.chile_hub.regions` y `chile_hub.regions`. Conserva su API pública
+(`norm_text`, `REGION_A_CODIGO`, `region_nombre_a_codigo`) para no tocar a los
+extractores que la importan.
 
 Fallback: `autoridades_electas_extractor` corre en CI dentro de un entorno efímero
 de `uv` (`uv run --no-project --with "scrapling[fetchers]"`, ver
@@ -21,9 +24,9 @@ import re
 import unicodedata
 
 try:
-    from chile_hub.regions import REGION_ALIASES as REGION_A_CODIGO
-    from chile_hub.regions import region_name_to_code
-    from chile_hub.text import norm_text
+    from src.chile_hub.regions import REGION_ALIASES as REGION_A_CODIGO
+    from src.chile_hub.regions import region_name_to_code
+    from src.chile_hub.text import norm_text
 except ModuleNotFoundError:
     REGION_A_CODIGO = {
         "arica y parinacota": "15",

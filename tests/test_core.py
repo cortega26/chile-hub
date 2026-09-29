@@ -731,10 +731,18 @@ class RegionAliasParityTests(unittest.TestCase):
         return module
 
     def test_region_utils_delegates_to_package_table(self):
-        """En el entorno normal, region_utils re-exporta la tabla del paquete."""
+        """En el entorno normal, region_utils re-exporta la tabla del paquete.
+
+        Misma forma de import (`src.chile_hub`) que usa `region_utils`: mypy
+        exige que el paquete se referencie como `src.chile_hub.*` y no como
+        `chile_hub.*` (fuente encontrada dos veces). Son módulos distintos para
+        Python si en el proceso también se importó `chile_hub.*` (Path distinto
+        en `sys.modules`), por eso la identidad se compara contra la ruta `src.`.
+        """
+        from src.chile_hub.regions import REGION_ALIASES
         from src.extractors import region_utils
 
-        self.assertIs(region_utils.REGION_A_CODIGO, self.region_aliases)
+        self.assertIs(region_utils.REGION_A_CODIGO, REGION_ALIASES)
 
     def test_fallback_table_matches_package_table(self):
         """La copia de fallback debe ser idéntica a la tabla del paquete."""
