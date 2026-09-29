@@ -19,6 +19,7 @@ import argparse
 import json
 import re
 import sys
+import tomllib
 from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
@@ -33,6 +34,21 @@ _BLOCK_PATTERN = re.compile(
     rf'<script type="application/ld\+json" id="{JSON_LD_ID}">.*?</script>\n?',
     re.DOTALL,
 )
+
+
+def default_site_url() -> str:
+    """URL pública canónica desde `[tool.chile_hub] public_site_url`.
+
+    Fuente única (pyproject.toml), igual que `check_landing_sync.py` y
+    `verify_landing.py`: el script corre desde el repo en `pages-deploy`.
+    """
+    with open(ROOT_DIR / "pyproject.toml", "rb") as f:
+        pyproject_data = tomllib.load(f)
+    return (
+        pyproject_data.get("tool", {})
+        .get("chile_hub", {})
+        .get("public_site_url", "https://tooltician.com/chile-hub/")
+    )
 
 
 def inject_page(html: str, json_ld: dict) -> str:
@@ -53,8 +69,8 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument(
         "--site-url",
-        default="https://tooltician.com/chile-hub/",
-        help="URL pública canónica del sitio.",
+        default=default_site_url(),
+        help="URL pública canónica del sitio (default: %(default)s).",
     )
     parser.add_argument(
         "--catalog",

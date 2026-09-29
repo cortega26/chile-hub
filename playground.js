@@ -104,7 +104,7 @@ async function runQuery(sql, statusEl, resultEl) {
     const db = await getDb();
     const base = new URL(".", window.location.href).href;
 
-    const parquetRegex = /read_parquet\s*\(\s*'([^']+)'\s*\)/g;
+    const parquetRegex = /read_parquet\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
     let modifiedSql = sql;
     let match;
     while ((match = parquetRegex.exec(sql)) !== null) {
@@ -122,7 +122,7 @@ async function runQuery(sql, statusEl, resultEl) {
         }
         const buffer = await response.arrayBuffer();
         await db.registerFileBuffer(basename, new Uint8Array(buffer));
-        modifiedSql = modifiedSql.replace(path, basename);
+        modifiedSql = modifiedSql.replaceAll(path, basename);
       }
     }
 

@@ -5079,6 +5079,43 @@ class DatasetSeoTests(unittest.TestCase):
             entry["distribution"]["contentUrl"].endswith("data/normalized/comunas.parquet")
         )
 
+    def test_default_site_url_reads_pyproject(self):
+        """Plan 115: el default del inyector sale de `[tool.chile_hub] public_site_url`."""
+        import tomllib
+
+        from scripts.inject_dataset_json_ld import default_site_url
+
+        with open(ROOT_DIR / "pyproject.toml", "rb") as f:
+            pyproject_data = tomllib.load(f)
+        expected = pyproject_data["tool"]["chile_hub"]["public_site_url"]
+        self.assertEqual(default_site_url(), expected)
+
+    def test_main_honors_explicit_site_url(self):
+        """Plan 115: `--site-url` debe mandar sobre el default de pyproject."""
+        from scripts.inject_dataset_json_ld import main
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            page_dir = Path(tmpdir) / "datasets" / "comunas"
+            page_dir.mkdir(parents=True)
+            (page_dir / "index.html").write_text(
+                "<html><head><title>Comunas</title></head><body></body></html>",
+                encoding="utf-8",
+            )
+            rc = main(
+                [
+                    "--site-dir",
+                    tmpdir,
+                    "--site-url",
+                    "https://example.test/x",
+                    "--catalog",
+                    str(ROOT_DIR / "data" / "dataset_catalog_config.json"),
+                ]
+            )
+            self.assertEqual(rc, 0)
+            injected = (page_dir / "index.html").read_text(encoding="utf-8")
+            self.assertIn("https://example.test/x/reference/datasets/comunas/", injected)
+            self.assertNotIn("tooltician.com", injected)
+
     def test_inject_page_is_idempotent_and_parseable(self):
         from scripts.inject_dataset_json_ld import inject_page
 
@@ -5123,6 +5160,30 @@ class DatasetSeoTests(unittest.TestCase):
             injected = (page_dir / "index.html").read_text(encoding="utf-8")
             self.assertIn("chile-hub-dataset-json-ld", injected)
             self.assertIn("reference/datasets/comunas/", injected)
+
+
+class PlaygroundSqlRewriteTests(unittest.TestCase):
+    """Plan 115: el explorador SQL debe reescribir todas las rutas Parquet.
+
+    Regresión a evitar: `replace` reemplazaba solo la primera aparición (un
+    self-join contra el mismo Parquet fallaba) y la regex solo aceptaba
+    comillas simples (`read_parquet("...")` nunca se registraba). El smoke de
+    Playwright no ejecuta SQL a propósito (evita instanciar el WASM en CI), así
+    que este guardrail textual fija el contrato mínimo del archivo; la
+    ejecución real se verificó en navegador (self-join con comillas dobles).
+    """
+
+    PLAYGROUND_JS = ROOT_DIR / "playground.js"
+
+    def test_rewrites_every_parquet_path_with_both_quote_styles(self):
+        source = self.PLAYGROUND_JS.read_text(encoding="utf-8")
+        self.assertIn(
+            r"""/read_parquet\s*\(\s*['"]([^'"]+)['"]\s*\)/g""",
+            source,
+            "la regex debe aceptar comillas simples y dobles",
+        )
+        self.assertIn("modifiedSql = modifiedSql.replaceAll(path, basename);", source)
+        self.assertNotIn("modifiedSql = modifiedSql.replace(path, basename);", source)
 
 
 class McpToolsTests(unittest.TestCase):
@@ -5308,8 +5369,9 @@ class ComunaPagesTests(unittest.TestCase):
     def test_render_comuna_page_escapes_text_and_has_json_ld(self):
         from scripts.build_comuna_pages import render_comuna_page
 
+        row = {**self.PERFIL_ROW, "anio_finanzas": 2024}
         page = render_comuna_page(
-            self.PERFIL_ROW,
+            row,
             {"ingresos": 5.4, "multidimensional": 8.1},
             "nunoa",
             "https://tooltician.com/chile-hub",
@@ -5319,12 +5381,39 @@ class ComunaPagesTests(unittest.TestCase):
         self.assertNotIn("<norte>", page)
         self.assertIn("13120", page, "el CUT debe aparecer como texto")
         self.assertIn("5.4%", page)
+        self.assertIn(
+            "<tr><td>Año de finanzas</td><td>2024</td></tr>",
+            page,
+            "anio_finanzas debe formatearse como año, no con separador de miles",
+        )
+        self.assertNotIn("2.024", page)
         self.assertEqual(page.count("application/ld+json"), 2, "Dataset + BreadcrumbList")
         blocks = re.findall(
             r'<script type="application/ld\+json">\n(.*?)\n</script>', page, flags=re.DOTALL
         )
         for block in blocks:
             json.loads(block)
+
+    def test_render_comuna_page_download_links_use_site_url(self):
+        """Plan 115: los botones de descarga deben derivar del `site_url` recibido.
+
+        Regresión a evitar: `PARQUET_BASE` hardcodeado ignoraba `--site-url`, así
+        que un cambio de dominio dejaba cientos de fichas apuntando al host viejo.
+        """
+        from scripts.build_comuna_pages import render_comuna_page
+
+        page = render_comuna_page(
+            self.PERFIL_ROW, {}, "nunoa", "https://example.test/chile-hub", "2026-09-25"
+        )
+        self.assertIn(
+            'href="https://example.test/chile-hub/data/normalized/perfil_territorial_comunal.parquet"',
+            page,
+        )
+        self.assertIn(
+            'href="https://example.test/chile-hub/data/normalized/perfil_territorial_comunal.json"',
+            page,
+        )
+        self.assertNotIn("tooltician.com", page)
 
     def test_render_comuna_page_has_shell_chart_and_related(self):
         from scripts.build_comuna_pages import render_comuna_page

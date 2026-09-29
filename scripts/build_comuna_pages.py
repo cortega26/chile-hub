@@ -31,7 +31,6 @@ POBREZA_PATH = ROOT_DIR / "data" / "normalized" / "pobreza_comunal.parquet"
 METRICAS_PATH = ROOT_DIR / "data" / "normalized" / "mapa_metricas.json"
 REGISTRY_PATH = ROOT_DIR / "data" / "source_registry.json"
 PUBLIC_SITE_URL = "https://tooltician.com/chile-hub/"
-PARQUET_BASE = "https://tooltician.com/chile-hub/data/normalized"
 
 # Fuentes oficiales que se enlazan en cada ficha (ADR-023: la fuente oficial
 # manda). Lista explícita a propósito: en el registro, algunas `official_url`
@@ -126,7 +125,7 @@ MONEY_FIELDS = {
 }
 FLOAT_FIELDS = {"promedio_personas_por_hogar", "mp25_promedio_ultimo_anio", "valor_promedio_siedu"}
 PERCENT_FIELDS = {"asistencia_promedio", "tasa_aprobacion", "tasa_reprobacion", "tasa_retiro"}
-YEAR_FIELDS = {"anio_permisos_edificacion"}
+YEAR_FIELDS = {"anio_permisos_edificacion", "anio_finanzas"}
 
 PAGE_CSS = """
 :root { --bg:#f7f6f0; --ink:#1a221f; --muted:#5b6b64; --brand:#123d30; --line:#dcd9cc; }
@@ -370,6 +369,7 @@ def render_comuna_page(
     """
     nombre = str(row["nombre_comuna"])
     base = site_url.rstrip("/")
+    parquet_base = f"{base}/data/normalized"
     cut = str(row["codigo_comuna"])
     page_url = f"{base}/comunas/{slug}/"
     title = f"Comuna de {nombre}: población, pobreza e indicadores"
@@ -444,8 +444,8 @@ def render_comuna_page(
 </div>
 <div class="actions">
 <a href="{base}/#mapa">Ver en el mapa</a>
-<a class="secondary" href="{PARQUET_BASE}/perfil_territorial_comunal.parquet">Descargar Parquet</a>
-<a class="secondary" href="{PARQUET_BASE}/perfil_territorial_comunal.json">Descargar JSON</a>
+<a class="secondary" href="{parquet_base}/perfil_territorial_comunal.parquet">Descargar Parquet</a>
+<a class="secondary" href="{parquet_base}/perfil_territorial_comunal.json">Descargar JSON</a>
 <a class="secondary" href="{base}/reference/datasets/perfil_territorial_comunal/">Documentación de la capa</a>
 </div>
 <section class="card">
