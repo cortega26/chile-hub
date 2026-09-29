@@ -26,6 +26,7 @@ if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
 import sync_release_artifact_version
+
 from src.builders._shared import (
     PUBLISHABLE_BUNDLE_SHA256_NAME,
     PUBLISHABLE_BUNDLE_ZIP_NAME,
