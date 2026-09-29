@@ -795,18 +795,12 @@ ya no aplique.
 
 | # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de / solapa | Estado |
 |---|------|----------|----------|--------|---------------------|--------|
-| 112 | [Pinnea entornos efímeros de CI (HF/scrapling)](112-pin-ephemeral-ci-installs.md) | P1 | S | LOW | — | TODO |
-| 113 | [Hardening batch: unrar, vaciado HF, JSON-LD, quoting](113-security-hardening-batch.md) | P2 | S | LOW | secuencia con 114/115 (index.html) | TODO |
-| 114 | [Fuentes self-hosted + privacidad](114-self-host-fonts-privacy.md) | P2 | S-M | LOW | secuencia con 113/130 | TODO |
 | 117 | [Alinear `source_mode: archived` (drift §6)](117-archived-source-mode-alignment.md) | P2 | S-M | LOW-MED | — | TODO |
-| 119 | [Caché Parquet en el servidor MCP](119-mcp-parquet-cache.md) | P2 | S | LOW | — | TODO |
 | 120 | [`check_sources` paralelo + caché de geometría](120-core-perf-diagnostics-cache.md) | P3 | S | LOW | — | TODO |
 | 121 | [Lighthouse: performance + artefacto](121-lighthouse-performance-baseline.md) | P3 | S | LOW | — | TODO |
 | 123 | [Backfill de tests de gates](123-gate-test-backfill.md) | P2 | M | LOW-MED | soft de 122; antes de 125 (merge calidad_aire) | TODO |
-| 124 | [DatasetSpec: 3 specs + gate catálogo↔spec](124-datasetspec-gate.md) | P2 | M | LOW | antes de 127 (AGENTS.md) | TODO |
 | 125 | [Consolidar `write_staging`](125-consolidate-write-staging.md) | P2 | M | LOW-MED | soft de 123 | TODO |
-| 126 | [Higiene tooling/onboarding (ruff, hook, shim, uv, doctor, smoke, stealth)](126-tooling-onboarding-hygiene.md) | P1-P2 | S-M | LOW | después de 122 (pipeline-check.yml) | TODO |
-| 128 | [Python 3.15 + DuckDB-Wasm al día](128-deps-forward-compat.md) | P1/P3 | S/M | LOW-MED | Step 1 tras 2026-10-01 | TODO (Step 1: BLOCKED hasta 2026-10-01) |
+| 128 | [Python 3.15 + DuckDB-Wasm al día](128-deps-forward-compat.md) | P1/P3 | S/M | LOW-MED | — | PARTIAL (2026-09-29: Step 2 DONE commit 915ee8c; Step 1 BLOCKED hasta 2026-10-01) |
 | 129 | [Cierres de distribución: HF metric, registry MCP, `resolve_regiones`](129-direction-distribution-closes.md) | P2 | S/M | LOW | — | TODO |
 | 130 | [Dejar de versionar el ZIP publicable](130-stop-committing-bundle-zip.md) | P3 | S-M | MED | Step 0 = decisión de mantenedor | TODO (decisión pendiente) |
 
@@ -826,6 +820,23 @@ orden 116 → 122 → 111 → 115 → 118 → 127). El conteo final de tests que
 | 118 | [Vitales: fetch incremental](archive/118-vitales-incremental-fetch.md) | S-M | MED | DONE — `14ec4ff`+`3526884` (merge `18adc2d`): solo anuarios faltantes + último; merge determinista |
 | 122 | [Cobertura scripts/, smoke MCP, xdist en CI](archive/122-ci-test-integrity.md) | S-M | LOW-MED | DONE — `023c437`+`8ace7fc` (merge `70453c9`): `--cov=scripts` (badge 70.6%), smoke MCP, `-n auto` |
 | 127 | [Correcciones de docs canónicos (7)](archive/127-docs-corrections-batch.md) | S | LOW | DONE — `b1df764`+`7d172a3` (merge `5f6a855`): AGENTS/SOURCE_OF_TRUTH/installation (sync)/links + guardrails |
+
+### Planes archivados (auditoría `/improve deep` 2026-09-29 — Wave 2)
+
+La Wave 2 queda cerrada el 2026-09-29 con **6 de 7 planes mergeados**; el 128
+tiene su Step 2 (DuckDB-Wasm) mergeado y su Step 1 (Python 3.15) bloqueado
+hasta el 2026-10-01 (final de 3.15), por eso sigue activo con estado PARTIAL.
+Ejecutados en worktrees `advisor/*` y revisados por el advisor.
+
+| # | Plan | Esfuerzo | Riesgo | Estado |
+|---|------|----------|--------|--------|
+| 112 | [Pinnea entornos efímeros de CI](archive/112-pin-ephemeral-ci-installs.md) | S | LOW | DONE — `f0e8746` (FF): extra `publish` (`huggingface_hub==1.16.1`), `uv run --extra publish` en HF, `--with` pinneados |
+| 113 | [Hardening batch: unrar, vaciado HF, JSON-LD, quoting](archive/113-security-hardening-batch.md) | S | LOW | DONE — `ba85f3c`+`6ddb705`+`223dfe1`+`d614467` (merge `4f78d0a`): `unrar e`+tmpdir, guard de selección vacía, `json_for_html`, `HEAD_REF` |
+| 114 | [Fuentes self-hosted + privacidad](archive/114-self-host-fonts-privacy.md) | S-M | LOW | DONE — `d51f721` (FF): 15 woff2 en `vendor/fonts/`, CSP self, smoke de fuentes |
+| 119 | [Caché Parquet en el servidor MCP](archive/119-mcp-parquet-cache.md) | S | LOW | DONE — `3e766b3` (merge `11aa716`): LazyFrame cacheado por proceso, `head()` sin materializar |
+| 124 | [DatasetSpec: 3 specs + gate catálogo↔spec](archive/124-datasetspec-gate.md) | M | LOW | DONE — `1121cdc` (merge `3fc0381`): 25/25 specs, gate en `registry`, test dinámico, docs alineados |
+| 126 | [Higiene tooling/onboarding](archive/126-tooling-onboarding-hygiene.md) | S-M | LOW | DONE — `5ec16bb`…`8b2a634` (FF): ruff único 0.16.8, hook sync-docs arreglado, shim eliminado, uv documentado, doctor lock, package-smoke |
+| 128 | [Python 3.15 + DuckDB-Wasm](128-deps-forward-compat.md) | S/M | LOW-MED | PARTIAL — `915ee8c` (merge `d8f7d7a`): DuckDB-Wasm 1.32.0 (motor 1.4.3) + smoke SQL real; Step 1 al 2026-10-01 |
 
 ### Orden de ejecución recomendado (waves)
 

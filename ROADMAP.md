@@ -96,10 +96,10 @@
 | Wave | Planes | Contenido | Done | Estado |
 |------|--------|-----------|------|--------|
 | **W1** | 111, 115, 116, 118, 122, 127 | P1: seguridad de release, superficie pública, CI/tests, docs | 6/6 | **DONE (2026-09-29, mergeada a `main`; suite 1167 + gates verdes)** |
-| **W2** | 112, 113, 114, 119, 124, 126, 128 | P2: pins/hardening, fuente/MCP, DatasetSpec, tooling, deps | 0/7 | TODO |
+| **W2** | 112, 113, 114, 119, 124, 126, 128 | P2: pins/hardening, fuente/MCP, DatasetSpec, tooling, deps | 6/7 + 128 parcial | **DONE (2026-09-29)**; 128 Step 2 DONE, Step 1 BLOCKED al 2026-10-01 |
 | **W3** | 117, 120, 121, 123, 125, 129 | P2/P3: decisión archived, perf, tests de gates, dirección | 0/6 | TODO |
 | **W4** | 130 | P3: dejar de versionar el ZIP (requiere decisión) | 0/1 | BLOCKED (Step 0 = decisión del operador) |
-| **Total** | 111–130 | | **6/20 (W1)** | W1 DONE; W2–W4 TODO |
+| **Total** | 111–130 | | **12/20 + 128 parcial** | W1+W2 cerradas; 128 Step 1 al 2026-10-01; W3–W4 TODO |
 
 ### Backlog por wave (orden de ejecución)
 
@@ -114,13 +114,13 @@
 
 **Wave 2 — P2 (114 → 113 secuencial; el resto paralelo; 126 después de 122):**
 
-- [ ] **112** [Pinnea entornos efímeros de CI](plans/112-pin-ephemeral-ci-installs.md) — P1/S/LOW — `huggingface_hub` y scrapling con lock.
-- [ ] **114** [Fuentes self-hosted + privacidad](plans/114-self-host-fonts-privacy.md) — P2/S-M/LOW — sin Google Fonts.
-- [ ] **113** [Hardening batch: unrar, vaciado HF, JSON-LD, quoting](plans/113-security-hardening-batch.md) — P2/S/LOW — (después de 114).
-- [ ] **119** [Caché Parquet en el servidor MCP](plans/119-mcp-parquet-cache.md) — P2/S/LOW — no descargar 29 MB por tool call.
-- [ ] **124** [DatasetSpec: 3 specs + gate catálogo↔spec](plans/124-datasetspec-gate.md) — P2/M/LOW — el cohort vuelve a cubrir el catálogo.
-- [ ] **126** [Higiene tooling/onboarding](plans/126-tooling-onboarding-hygiene.md) — P1-P2/S-M/LOW — (después de 122).
-- [ ] **128** [Python 3.15 + DuckDB-Wasm](plans/128-deps-forward-compat.md) — P1/P3/S/M/LOW-MED — Step 1 desde 2026-10-01.
+- [x] **112** [Pinnea entornos efímeros de CI](plans/archive/112-pin-ephemeral-ci-installs.md) — P1/S/LOW — ✅ mergeado en `main` (`f0e8746`; FF).
+- [x] **114** [Fuentes self-hosted + privacidad](plans/archive/114-self-host-fonts-privacy.md) — P2/S-M/LOW — ✅ mergeado en `main` (`d51f721`; FF).
+- [x] **113** [Hardening batch: unrar, vaciado HF, JSON-LD, quoting](plans/archive/113-security-hardening-batch.md) — P2/S/LOW — ✅ mergeado en `main` (`ba85f3c`+`6ddb705`+`223dfe1`+`d614467`; merge `4f78d0a`).
+- [x] **119** [Caché Parquet en el servidor MCP](plans/archive/119-mcp-parquet-cache.md) — P2/S/LOW — ✅ mergeado en `main` (`3e766b3`; merge `11aa716`).
+- [x] **124** [DatasetSpec: 3 specs + gate catálogo↔spec](plans/archive/124-datasetspec-gate.md) — P2/M/LOW — ✅ mergeado en `main` (`1121cdc`; merge `3fc0381`).
+- [x] **126** [Higiene tooling/onboarding](plans/archive/126-tooling-onboarding-hygiene.md) — P1-P2/S-M/LOW — ✅ mergeado en `main` (`5ec16bb`…`8b2a634`; FF).
+- [~] **128** [Python 3.15 + DuckDB-Wasm](plans/128-deps-forward-compat.md) — P1/P3/S/M/LOW-MED — ◐ Step 2 (DuckDB-Wasm 1.32.0) mergeado (`915ee8c`; merge `d8f7d7a`); Step 1 (3.15) BLOCKED hasta 2026-10-01.
 
 **Wave 3 — P2/P3:**
 
