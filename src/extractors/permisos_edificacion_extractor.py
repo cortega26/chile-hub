@@ -52,10 +52,16 @@ try:
     from src.extractors.base import (
         BaseExtractor,
         ensure_staging_directories,
+        write_staging_csv_atomic,
         write_staging_metadata,
     )
 except ModuleNotFoundError:
-    from base import BaseExtractor, ensure_staging_directories, write_staging_metadata
+    from base import (
+        BaseExtractor,
+        ensure_staging_directories,
+        write_staging_csv_atomic,
+        write_staging_metadata,
+    )
 
 try:
     from src.extractors.http_utils import stealth_get as _stealth_get
@@ -640,16 +646,8 @@ class PermisosEdificacionExtractor(BaseExtractor):
 
     def write_staging(self, df, metadata: dict) -> Path:
         ensure_staging_directories()
-        output = Path(STAGING_CSV_PATH)
-        df.write_csv(str(output))
-        merged = {
-            **metadata,
-            "dataset": self.dataset_name,
-            "refreshed_at_utc": datetime.datetime.now(UTC).isoformat(),
-            "record_count": df.height,
-        }
-        write_staging_metadata(METADATA_PATH, merged)
-        return output
+        merged = {**metadata, "dataset": self.dataset_name}
+        return write_staging_csv_atomic(df, STAGING_CSV_PATH, METADATA_PATH, merged)
 
 
 if __name__ == "__main__":

@@ -37,12 +37,12 @@ try:
     from src.extractors.base import (
         BaseExtractor,
         ensure_staging_directories,
-        write_staging_metadata,
+        write_staging_csv_atomic,
     )
     from src.extractors.http_utils import fetch_with_retry
     from src.extractors.region_utils import REGION_A_CODIGO, norm_text
 except ModuleNotFoundError:
-    from base import BaseExtractor, ensure_staging_directories, write_staging_metadata
+    from base import BaseExtractor, ensure_staging_directories, write_staging_csv_atomic
     from http_utils import fetch_with_retry
     from region_utils import REGION_A_CODIGO, norm_text
 
@@ -625,10 +625,7 @@ class AutoridadesLocalesExtractor(BaseExtractor):
 
     def write_staging(self, df: pl.DataFrame, metadata: dict) -> Path:
         ensure_staging_directories()
-        output = Path(STAGING_CSV_PATH)
-        df.write_csv(output)
-        write_staging_metadata(METADATA_PATH, metadata)
-        return output
+        return write_staging_csv_atomic(df, STAGING_CSV_PATH, METADATA_PATH, metadata)
 
 
 def process_autoridades_locales() -> str:

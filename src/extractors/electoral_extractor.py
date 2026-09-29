@@ -18,14 +18,14 @@ try:
         BaseExtractor,
         ensure_staging_directories,
         write_raw_snapshot_atomic,
-        write_staging_metadata,
+        write_staging_csv_atomic,
     )
 except ModuleNotFoundError:
     from base import (
         BaseExtractor,
         ensure_staging_directories,
         write_raw_snapshot_atomic,
-        write_staging_metadata,
+        write_staging_csv_atomic,
     )
 
 DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data"))
@@ -355,10 +355,7 @@ class ElectoralExtractor(BaseExtractor):
 
     def write_staging(self, df, metadata: dict) -> Path:
         ensure_staging_directories()
-        output = Path(STAGING_CSV_PATH)
-        df.write_csv(output)
-        write_staging_metadata(METADATA_PATH, metadata)
-        return output
+        return write_staging_csv_atomic(df, STAGING_CSV_PATH, METADATA_PATH, metadata)
 
 
 if __name__ == "__main__":

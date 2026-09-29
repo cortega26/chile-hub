@@ -26,11 +26,11 @@ try:
     from src.extractors.base import (
         BaseExtractor,
         ensure_staging_directories,
-        write_staging_metadata,
+        write_staging_csv_atomic,
     )
     from src.extractors.source_adapter import build_standard_metadata
 except ModuleNotFoundError:
-    from base import BaseExtractor, ensure_staging_directories, write_staging_metadata
+    from base import BaseExtractor, ensure_staging_directories, write_staging_csv_atomic
     from source_adapter import build_standard_metadata
 
 try:
@@ -356,9 +356,7 @@ class SieduExtractor(BaseExtractor):
 
     def write_staging(self, df, metadata: dict) -> Path:
         ensure_staging_directories()
-        df.write_csv(STAGING_CSV_PATH)
-        write_staging_metadata(str(METADATA_PATH), metadata)
-        return STAGING_CSV_PATH
+        return write_staging_csv_atomic(df, STAGING_CSV_PATH, METADATA_PATH, metadata)
 
 
 if __name__ == "__main__":
