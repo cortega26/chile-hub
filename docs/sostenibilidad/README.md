@@ -9,18 +9,18 @@
 
 ## Estado vigente (2026-09-30)
 
-**HOLD. Veredicto D de la [Auditoría 3](auditoria-3-2026-09-29.md): todavía no se ejecuta sponsorship institucional.**
+**HOLD / sin búsqueda activa.** Veredicto D de la [Auditoría 3](auditoria-3-2026-09-29.md), aceptado por el mantenedor el 2026-09-30: no se busca sponsorship institucional por ahora (0 evidencia de adopción). **Revisión del tema: 2026-11-01.**
 
 | Permitido | No permitido hasta cumplir el gate (§G de la Auditoría 3) |
 |:---|:---|
 | Mantener sin cambios `FUNDING.yml` y el pedido de apoyo que muestra la CLI (carril 1) | Crear tiers, `SPONSORS.md` o una sección de patrocinios en la landing o el README |
-| Ejecutar el experimento de discovery (§E): máximo 15 h y sin pedir dinero | Pedir dinero a organizaciones, contactar vendors o financiadores, o presentar propuestas de grant |
+| Ejecutar el experimento de discovery (§E) — no iniciado (decisión 2026-09-30); si se retoma: máximo 15 h y sin pedir dinero | Pedir dinero a organizaciones, contactar vendors o financiadores, o presentar propuestas de grant |
 | Consultar a un contador sobre el vehículo de cobro (no implica contacto externo) | Ejecutar [`plans/110-programa-de-patrocinios.md`](../../plans/110-programa-de-patrocinios.md), que está en HOLD |
 | Atender la demanda de servicios que llegue sola (Tooltician, carril 5) | Lanzar pilotos de servicios por iniciativa propia sin cumplir las condiciones 2, 3 y 5 del gate |
 | Tener una conversación de escucha con CAF, sin pedir nada, **solo si** §E encuentra al menos 3 organizaciones con uso verificable | Presentar las descargas de PyPI como "instalaciones", "usuarios" o "audiencia" ([`AGENTS.md` §10](../../AGENTS.md)) |
 
-- **Próxima acción:** completar el Paso 0 de §E y luego enviar hasta 15 mensajes de discovery. La decisión se toma entre el día 30 y el 45.
-- **Revisión obligatoria:** abril de 2027, si §E termina en Stop.
+- **Próxima acción:** revisar el tema el **2026-11-01** (decisión del mantenedor, 2026-09-30). El experimento §E queda sin iniciar por ahora; si se retoma, aplican sus topes (15 h, sin pedir dinero) y la decisión se toma entre el día 30 y el 45.
+- **Revisión obligatoria de la Auditoría 3:** abril de 2027, solo si §E se ejecuta y termina en Stop.
 
 ## Cronología
 
@@ -33,7 +33,8 @@
 | **2** | 2026-09-29 | [Issue #125, §4 a §8 del cuerpo](https://github.com/cortega26/chile-hub/issues/125) | **Auditoría 2 / Propuesta B:** reconstrucción adversarial | 5 carriles; el sponsor no compra tiempo; Wave −1 de discovery | Revisada en la Auditoría 3 y adoptada como contabilidad |
 | **3** | 2026-09-29, con adenda del 30-sep | [`auditoria-3-2026-09-29.md`](auditoria-3-2026-09-29.md) · [comentario en #125](https://github.com/cortega26/chile-hub/issues/125#issuecomment-5895632160) | **Auditoría 3:** auditoría del caso más revisión de las Auditorías 1 y 2 | **D:** no ejecutar todavía; experimento §E; gate §G | **Vigente** |
 | **3a** | 2026-09-30 | [Adenda de la Auditoría 3, puntos 6–7](auditoria-3-2026-09-29.md) | **Anexo de evidencia externa:** comparables (QGIS, MapLibre, OSMF, Tidelift, Datasette) y riesgo de contraparte del fiscal host (OCF) + opción SPI | D se mantiene; insumos para el futuro diseño del carril 2 | Vigente |
-| 4 | por definir | Resultado del experimento §E | Decisión entre Avanzar, Servicios, Pivotear o Stop | — | Pendiente |
+| 4 | por definir | Resultado del experimento §E | Decisión entre Avanzar, Servicios, Pivotear o Stop | — | **Diferido** (no iniciado; revisión 2026-11-01) |
+| 5 | 2026-09-30 | Decisión del mantenedor (issue #125) | **No se busca sponsorship por ahora** (0 evidencia de adopción); §E no se inicia; revisión del tema el 2026-11-01 | Cierra la fase de decisión de la Auditoría 3 (D aceptado) | Vigente |
 
 ## Conclusiones de la Auditoría 3 (resumen)
 

@@ -216,7 +216,7 @@ W4:  130 (decisión)
 | 107 | Handoff de activación de lanzamiento | READY | Issues de leads #107/#108/#109 creados; ejecución por agente externo |
 | 108 | Gate "Check build-synced files" bloquea el publish diario | DONE | Mergeado en PR #110 (`7652568`, merge `4528872`); ADR-022 |
 | 109 | README sin datos volátiles + alerta de schedule roto | DONE | `efad585`+`cbeb572` (revisión), merge `509a123`; Parte C descartada sin caso concreto |
-| 110 | Programa de patrocinios | HOLD | Veredicto D (Auditoría 3, 2026-09-29): no ejecutar; índice en `docs/sostenibilidad/README.md` |
+| 110 | Programa de patrocinios | HOLD | Decisión del mantenedor (2026-09-30): sin búsqueda activa por 0 evidencia de adopción; **revisión 2026-11-01**; índice en `docs/sostenibilidad/README.md` |
 | 091 | Opcionales estrictos + fallback sintético strict | REJECTED | Cerrada 2026-09-30: cubierta por el gate `publication` |
 
 Detalle execrable de estos en `plans/README.md` y sus `.md`.
@@ -245,6 +245,8 @@ Detalle execrable de estos en `plans/README.md` y sus `.md`.
 ## 7. Acciones de operador (hacia afuera, sin código)
 
 Del posicionamiento 2026-09-29 (ADR-023); requieren la cuenta del mantenedor:
+
+- [ ] **2026-11-01** — Revisar el tema de sostenibilidad/sponsors (decisión 2026-09-30: sin búsqueda activa por 0 evidencia de adopción; ver `docs/sostenibilidad/README.md`).
 
 - [ ] Registrar chile-hub en "Reutilización" de datos.gob.cl (ingreso con ClaveÚnica).
 - [ ] Pedir la delincuencia comunal estructurada del CEAD por "Sugerencias" de

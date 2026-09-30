@@ -9,6 +9,9 @@
 > El texto se conserva sin cambios como registro. Cualquier reescritura parte del
 > delta §F de la Auditoría 3 y solo después de pasar su gate §G. Índice y cronología:
 > [`docs/sostenibilidad/README.md`](../docs/sostenibilidad/README.md).
+>
+> **Decisión del mantenedor (2026-09-30): no se busca sponsorship por ahora
+> (0 evidencia de adopción); revisión del tema el 2026-11-01.**
 
 > **Qué es:** el diseño operativo del programa de patrocinios de chile-hub:
 > tiers, beneficios, reglas de independencia, plan de ataque por segmento

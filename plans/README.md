@@ -230,7 +230,7 @@ Los 5 planes quedaron **DONE y archivados** el mismo día (2026-09-25) — ver
 
 | # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
 |---|------|----------|----------|--------|-----------|--------|
-| 110 | [Programa de patrocinios — sostenibilidad y plan de ataque](110-programa-de-patrocinios.md) | P2 | M + continuo | MED | Gate §G de la Auditoría 3 | HOLD (2026-09-30 — veredicto D, [Auditoría 3](../docs/sostenibilidad/README.md); no ejecutar) |
+| 110 | [Programa de patrocinios — sostenibilidad y plan de ataque](110-programa-de-patrocinios.md) | P2 | M + continuo | MED | Gate §G de la Auditoría 3 | HOLD (2026-09-30 — veredicto D; decisión del mantenedor: sin búsqueda activa por 0 evidencia de adopción; revisión 2026-11-01; [Auditoría 3](../docs/sostenibilidad/README.md)) |
 
 ### Planes 108 y 109 — archivados (2026-09-30)
 
