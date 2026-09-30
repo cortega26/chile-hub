@@ -251,8 +251,9 @@ codegraph impact validate_comunas                   # Qué se rompe si cambio es
 
              Nota CI — `autoridades_electas`: en `pipeline-check.yml` este extractor
              se invoca vía `uv run --no-project --with "scrapling[fetchers]" …`
-             (entorno efímero), porque scrapling no puede coexistir con el extra
-             `dev` en el venv del job (conflicto de `click` — ver `pyproject.toml`).
+             (entorno efímero; el extra `scraping` se mantiene aislado del venv del
+             job — el conflicto histórico de `click` quedó resuelto con
+             python-semantic-release 10.7.0, ver `pyproject.toml`).
              Sin scrapling el extractor degrada a 155 registros (0 senadores) y el
              guard de caída de `record_count` de `verify_pipeline.py --profile
              publication` aborta el publish diario (antes lo detectaba el diff de

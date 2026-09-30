@@ -186,7 +186,7 @@ typecheck:
 	$(PYTHON) -m mypy
 
 audit:
-	$(PYTHON) -m pip_audit --ignore-vuln PYSEC-2026-2132
+	$(PYTHON) -m pip_audit
 
 sec:
 	$(PYTHON) -m bandit -c pyproject.toml -r src/
