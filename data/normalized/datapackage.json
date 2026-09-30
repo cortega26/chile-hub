@@ -2,9 +2,9 @@
   "name": "chile-hub",
   "title": "chile-hub -- Datos publicos de Chile curados",
   "description": "Capa de datos reproducible y curada sobre datasets publicos oficiales de Chile: geografia, demografia, salud, educacion, finanzas municipales e indicadores.",
-  "version": "1.43.1",
+  "version": "1.47.0",
   "homepage": "https://tooltician.com/chile-hub/",
-  "created": "2026-09-29T16:20:41.273931+00:00",
+  "created": "2026-09-30T01:23:37.829138+00:00",
   "resources": [
     {
       "name": "regiones",
@@ -1494,7 +1494,7 @@
       "sources": [
         {
           "title": "Observatorio Social — Ministerio de Desarrollo Social y Familia",
-          "path": "https://observatorio.ministeriodesarrollosocial.gob.cl/storage/docs/pobreza-comunal/2022/Estimaciones_Tasa_Pobreza_Ingresos_Comunas_2022.xlsx"
+          "path": "https://observatorio.ministeriodesarrollosocial.gob.cl/pobreza-comunal-2022"
         }
       ],
       "licenses": [
