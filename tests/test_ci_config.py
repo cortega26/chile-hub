@@ -7,6 +7,7 @@ comprobaciones de texto simples y suficientes para el guardrail específico.
 """
 
 import contextlib
+import datetime
 import io
 import json
 import re
@@ -25,6 +26,7 @@ if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
 import check_lighthouse
+import check_pipeline_freshness
 import check_source_urls
 from check_companion_paths import (
     COMPANION_RULES,
@@ -1260,9 +1262,14 @@ class BotWriteRaceGuardrailTests(unittest.TestCase):
     R3. Los bots escribían main sin serialización: dos pull --rebase
         concurrentes podían colisionar sin retry.
 
-    Solución: el release solo versiona (nunca data), el publish commitea
-    README, y todos los bots comparten el grupo de concurrency
+    Solución original: el release solo versiona (nunca data), el publish
+    commiteaba README, y todos los bots comparten el grupo de concurrency
     `bot-writes-main`.
+
+    Plan 109 (2026-09-29): README.md dejó de llevar datos volátiles, así que
+    el publish ya no lo commitea y el archivo compartido entre bots
+    desaparece — estos guardrails ahora fijan la AUSENCIA de README.md en el
+    add del publish.
     """
 
     def test_release_never_commits_data_or_derived_assets(self):
@@ -1286,9 +1293,20 @@ class BotWriteRaceGuardrailTests(unittest.TestCase):
         # el artifact potencialmente viejo).
         self.assertNotIn("python scripts/sync_docs.py\n", content)
 
-    def test_publish_commits_readme(self):
+    def test_publish_does_not_commit_readme(self):
+        """Plan 109: README.md sin datos volátiles sale del add del publish.
+
+        La tabla de capas y los resúmenes de salud/calidad ya no dependen de
+        data/normalized, así que commitearlo cada día solo agregaba ruido al
+        historial y mantenía el archivo compartido con el release (carreras
+        R1/R2 de esta clase).
+        """
         content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
-        self.assertIn("git add --all data/normalized/ index.html app.js README.md", content)
+        publish_block = content.split("Commit refreshed artifacts")[1].split(
+            "Close schedule failure issue"
+        )[0]
+        add_lines = [line.strip() for line in publish_block.splitlines() if "git add" in line]
+        self.assertEqual(add_lines, ["git add --all data/normalized/ index.html app.js"])
 
     def test_all_bot_writers_share_concurrency_group(self):
         for path in (
@@ -1817,12 +1835,14 @@ class WorkflowRunTrustGuardrailTests(unittest.TestCase):
 
 
 class BuildSyncedGateGuardrailTests(unittest.TestCase):
-    """Plan 108: README.md lleva datos del día y lo commitea el job publish.
+    """Plan 109: README.md ya no lleva datos del día, así que vuelve al gate duro.
 
-    Con README.md dentro del `exit 1` de "Check build-synced files", cada cambio
-    legítimo de conteo abortaba el publish que lo habría commiteado: el schedule
-    no publicó del 2026-08-13 al 2026-09-26. Estos guardrails evitan reintroducir
-    el deadlock sin su reemplazo (guard de record_count en verify_pipeline).
+    El plan 108 lo sacó del `exit 1` de "Check build-synced files" porque cada
+    cambio legítimo de conteo abortaba el publish que lo habría commiteado
+    (deadlock 2026-08-13 -> 2026-09-26). El plan 109 ataca la causa: la tabla de
+    capas y los resúmenes de salud/calidad son estables y el publish no commitea
+    README.md. Estos guardrails fijan que la deriva de README vuelva a ser un
+    error, que index/app sigan fallando ruidoso y que el publish no lo agregue.
     """
 
     def _gate_step(self) -> str:
@@ -1831,20 +1851,17 @@ class BuildSyncedGateGuardrailTests(unittest.TestCase):
         end = content.index("- name:", start + 1)
         return content[start:end]
 
-    def test_readme_diff_is_notice_not_failure(self):
+    def test_readme_diff_fails_loud_again(self):
         step = self._gate_step()
-        self.assertIn("git diff --quiet -- README.md", step)
-        self.assertIn("::notice::", step)
-        self.assertNotIn("index.html app.js README.md", step)
-
-    def test_landing_files_still_fail_loud(self):
-        step = self._gate_step()
-        self.assertIn("git diff --quiet -- index.html app.js", step)
+        self.assertIn("git diff --quiet -- README.md index.html app.js", step)
+        self.assertIn("::error::", step)
         self.assertIn("exit 1", step)
+        self.assertNotIn("::notice::", step)
 
-    def test_publish_still_commits_readme(self):
+    def test_publish_no_longer_commits_readme(self):
         content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
-        self.assertIn("git add --all data/normalized/ index.html app.js README.md", content)
+        self.assertIn("git add --all data/normalized/ index.html app.js", content)
+        self.assertNotIn("git add --all data/normalized/ index.html app.js README.md", content)
 
     def test_record_drop_override_is_wired_and_not_interpolated(self):
         content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
@@ -1867,6 +1884,128 @@ class BuildSyncedGateGuardrailTests(unittest.TestCase):
         content = PYPI_RELEASE_WORKFLOW.read_text(encoding="utf-8")
         self.assertIn('p.get("allow_record_drop", "")', content)
         self.assertIn('--allow-record-drop "$record_drop"', content)
+
+
+class ScheduleFailureAlertGuardrailTests(unittest.TestCase):
+    """Plan 109: una falla del schedule debe avisar a alguien.
+
+    El schedule falló seis semanas seguidas (2026-08-13 -> 2026-09-26) sin que
+    nadie lo notara. El job `notify-schedule-failure` abre/actualiza un issue
+    fijo ("Schedule diario roto", label `ci-schedule`) con el link al run y las
+    anotaciones de error, y el publish exitoso lo cierra. Regresiones a evitar:
+    que la alerta corra fuera de la vía schedule, que el permiso de issues se
+    amplíe al workflow completo, o que el issue pierda su título/label fijos.
+    """
+
+    def _notify_job(self) -> str:
+        content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        return content[content.index("\n  notify-schedule-failure:") :]
+
+    def _publish_job(self) -> str:
+        content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        return content[
+            content.index("\n  publish:") : content.index("\n  notify-schedule-failure:")
+        ]
+
+    def test_workflow_yaml_parses_with_the_new_job(self):
+        import yaml
+
+        data = yaml.safe_load(PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8"))
+        job = data["jobs"]["notify-schedule-failure"]
+        self.assertEqual(job["if"], "failure() && github.event_name == 'schedule'")
+        self.assertEqual(job["needs"], ["build-and-test", "publish"])
+        self.assertEqual(job["permissions"], {"checks": "read", "issues": "write"})
+
+    def test_notify_job_only_runs_on_schedule_failure(self):
+        job = self._notify_job()
+        self.assertIn("if: failure() && github.event_name == 'schedule'", job)
+        self.assertIn("needs: [build-and-test, publish]", job)
+        self.assertIn("timeout-minutes: 10", job)
+
+    def test_issue_permission_is_job_scoped_not_workflow_wide(self):
+        content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        workflow_permissions = content.split("permissions:", 1)[1].split("env:", 1)[0]
+        self.assertEqual(workflow_permissions.strip(), "contents: read")
+        # Solo los dos jobs que tocan issues (notify abre/actualiza, publish
+        # cierra) declaran el scope; el resto del workflow queda read-only.
+        self.assertEqual(content.count("issues: write"), 2)
+        self.assertIn("issues: write", self._notify_job())
+        self.assertIn("issues: write", self._publish_job())
+
+    def test_tracking_issue_has_fixed_title_and_label(self):
+        job = self._notify_job()
+        self.assertIn('gh issue create --title "Schedule diario roto" --label ci-schedule', job)
+        self.assertIn('gh issue comment "$issue" --body "$body"', job)
+        self.assertIn("gh issue list --label ci-schedule --state open", job)
+
+    def test_issue_body_includes_run_link_and_annotations(self):
+        job = self._notify_job()
+        self.assertIn("actions/runs/${GITHUB_RUN_ID}", job)
+        self.assertIn("$run_url", job)
+        self.assertIn("/check-runs/${job_id}/annotations", job)
+        self.assertIn('annotation_level == "failure"', job)
+        self.assertIn('select(.conclusion == "failure")', job)
+
+    def test_publish_success_closes_the_issue(self):
+        job = self._publish_job()
+        self.assertIn('gh issue close "$number"', job)
+        self.assertIn("--label ci-schedule --state open", job)
+
+
+class PipelineFreshnessSloTests(unittest.TestCase):
+    """Plan 109: SLO de frescura de 48 h en `make doctor`.
+
+    Un schedule roto seis semanas (2026-08-13 -> 2026-09-26) no se notó; el
+    issue de `notify-schedule-failure` tapa el caso CI y este chequeo local
+    avisa cuando el `pipeline_metadata.json` publicado está viejo. Es un aviso
+    (exit 0), no un gate: un clon sin build no debe romper `make doctor`.
+    """
+
+    def _run(self, path, now=None):
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            code = check_pipeline_freshness.check(path=path, now=now)
+        return code, buffer.getvalue()
+
+    def test_doctor_runs_the_freshness_check(self):
+        body = _extract_make_target(MAKEFILE.read_text(encoding="utf-8"), "doctor")
+        self.assertIn("scripts/check_pipeline_freshness.py", body)
+
+    def test_stale_metadata_warns_without_failing(self):
+        now = datetime.datetime(2026, 9, 29, 12, 0, tzinfo=datetime.timezone.utc)
+        generated = (now - datetime.timedelta(hours=72)).isoformat()
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "pipeline_metadata.json"
+            path.write_text(json.dumps({"generated_at_utc": generated}), encoding="utf-8")
+            code, output = self._run(path, now=now)
+        self.assertEqual(code, 0)
+        self.assertIn("WARNING", output)
+        self.assertIn("72.0 h", output)
+        self.assertIn("Schedule diario roto", output)
+
+    def test_fresh_metadata_passes(self):
+        now = datetime.datetime(2026, 9, 29, 12, 0, tzinfo=datetime.timezone.utc)
+        generated = (now - datetime.timedelta(hours=1)).isoformat()
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "pipeline_metadata.json"
+            path.write_text(json.dumps({"generated_at_utc": generated}), encoding="utf-8")
+            code, output = self._run(path, now=now)
+        self.assertEqual(code, 0)
+        self.assertIn("Frescura: OK", output)
+        self.assertNotIn("WARNING", output)
+
+    def test_missing_or_malformed_metadata_warns_without_failing(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            missing = Path(tmpdir) / "pipeline_metadata.json"
+            code, output = self._run(missing)
+            self.assertEqual(code, 0)
+            self.assertIn("WARNING", output)
+
+            malformed = Path(tmpdir) / "malformed.json"
+            malformed.write_text("{no json", encoding="utf-8")
+            code, output = self._run(malformed)
+            self.assertEqual(code, 0)
+            self.assertIn("WARNING", output)
 
 
 class LighthouseGuardrailTests(unittest.TestCase):

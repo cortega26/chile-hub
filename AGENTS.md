@@ -841,7 +841,7 @@ No bypassear estas validaciones ni mover su lógica a otro módulo.
 ```bash
 # Entorno
 make bootstrap          # Crea .venv, instala deps + Playwright/Chromium
-make doctor             # Python efectivo, dependencias clave y gates anti-drift (§12)
+make doctor             # Python efectivo, gates anti-drift (§12) y SLO de frescura (>48 h)
 
 # Pipeline completo (lo más común)
 make refresh            # extract → build → verify → test → verify-landing → lint + format-check + gates estrictos
@@ -922,11 +922,13 @@ protegido por un chequeo automatizado en vez de depender solo de buena voluntad.
 | Conteo de tests en README | `tests/test_*.py` (AST, no pytest — ver caveat parametrize en `doc_sync.py`) | `scripts/sync_docs.py --check` |
 | Conteo de ADRs en README | `docs/adr/*.md` | `scripts/sync_docs.py --check` |
 | Conteo de contratos en README | `contracts/datasets/*.schema.json` | `scripts/sync_docs.py --check` |
-| Badge "N capas" y resumen de auditoría legal en README | `data/dataset_catalog_config.json` / `data/normalized/redistribution_report.json` | `scripts/sync_docs.py --check` |
+| Badge "N capas" en README | `data/dataset_catalog_config.json` | `scripts/sync_docs.py --check` |
+| Resumen de auditoría legal en README (texto estable + enlace) | prosa fija en `doc_sync.py::sync_readme_redistribution_summary()`; las cifras viven en `data/normalized/redistribution_report.json` | `scripts/sync_docs.py --check` |
 | Badge de versiones Python en README | `pyproject.toml` (`[project] requires-python`) vía `doc_sync.py::sync_readme_python_badge()` | `scripts/sync_docs.py --check` |
-| Resumen de salud (`ok`/`warn`/`error`) en README | `data/normalized/hub_health.json` | `scripts/sync_docs.py --check` |
+| Resumen de salud en README (texto estable + enlace) | prosa fija en `doc_sync.py::sync_readme_health_summary()`; las cifras viven en `data/normalized/hub_health.json` | `scripts/sync_docs.py --check` |
 | Historial de salud del hub (sparkline en landing) | `data/normalized/hub_health_history.jsonl` — append-only, una línea por build, cap 400 líneas (~13 meses), idempotente por `generated_at_utc` | `append_hub_health_history()` (`src/builders/reports.py`); registrado en `artifact_manifest.json` |
-| Score de calidad (A-F) en README | `data/normalized/dataset_quality.json` | `scripts/sync_docs.py --check` |
+| Resumen de calidad en README (texto estable + enlace) | prosa fija en `doc_sync.py::sync_readme_quality_summary()`; el scorecard vive en `data/normalized/dataset_quality.json` | `scripts/sync_docs.py --check` |
+| Tabla de capas del README (nombre/fuente/licencia/cadencia) | `data/dataset_catalog_config.json` + mapas curados en `src/builders/reports.py` (plan 109: sin datos de build) | `scripts/sync_docs.py --check` |
 | Ejemplo de pin de versión en README | `pyproject.toml` vía `read_project_version()` | `scripts/sync_docs.py --check` |
 | Bloque JSON-LD `DataCatalog` de `index.html` | `data/dataset_catalog_config.json` vía `render_catalog_json_ld_block()` | `scripts/check_landing_sync.py` |
 | `PUBLIC_DATA_BASE` de `app.js` y cache-buster `app.js?v=` | `pyproject.toml` (`[tool.chile_hub] public_site_url`, `[project] version`) | `scripts/check_landing_sync.py` |
@@ -1003,16 +1005,26 @@ regeneran el texto exacto dentro de un bloque delimitado por comentarios HTML
   `pyproject.toml`). Si los datos cambian sin que ningún PR toque código (p. ej.
   `hub_health.json` se regenera con nuevos valores en el `schedule` diario), el
   paso "Check build-synced files" del job `build-and-test` (solo
-  `schedule`/`workflow_dispatch`, después de un build real) compara `index.html`
-  y `app.js` contra el build recién generado y **falla** si difieren. El diff de
-  `README.md` solo se informa (`::notice::`): sus bloques de datos cambian con
-  cada extracción y los commitea el job `publish`. Exigirlos commiteados antes
-  bloqueaba el publish que los actualiza (deadlock 2026-08-13 → 2026-09-26, plan
-  108). Las regresiones de datos las atrapa `verify_pipeline.py --profile
-  publication`: `source_mode` fallback y caída de `record_count` > 20% contra el
-  último publicado, con override auditable `--allow-record-drop <dataset>`
-  (input `allow_record_drop` del `workflow_dispatch`, que se registra en la
-  provenance y el release reutiliza).
+  `schedule`/`workflow_dispatch`, después de un build real) compara `README.md`,
+  `index.html` y `app.js` contra el build recién generado y **falla** si
+  difieren. Desde el plan 109 eso es posible porque el README ya no lleva datos
+  del día: la tabla de capas y los resúmenes de salud, calidad y auditoría legal
+  son estables (sus cifras viven en los reportes enlazados) y el job `publish`
+  ya no lo commitea. Ningún bloque delimitado del README se genera ya desde
+  `data/normalized/`, así que `sync_docs --check` (job `quality`, sin build) lo
+  verifica por completo.
+  El plan 108 lo había sacado del `exit 1` porque cada cambio de conteo abortaba
+  el publish que lo habría commiteado (deadlock 2026-08-13 → 2026-09-26); ahora
+  la causa desapareció. Las regresiones de datos las atrapa `verify_pipeline.py
+  --profile publication`: `source_mode` fallback y caída de `record_count` > 20%
+  contra el último publicado, con override auditable `--allow-record-drop
+  <dataset>` (input `allow_record_drop` del `workflow_dispatch`, que se registra
+  en la provenance y el release reutiliza). Un schedule fallido ya no pasa
+  inadvertido: el job `notify-schedule-failure` abre/actualiza el issue
+  "Schedule diario roto" (label `ci-schedule`) con el link al run y sus
+  anotaciones de error, y un publish exitoso lo cierra; `make doctor` además
+  avisa (sin fallar) si el `pipeline_metadata.json` publicado supera las 48 h
+  (`scripts/check_pipeline_freshness.py`).
 
 **Qué NO usa este mecanismo:** las tablas de prosa de `AGENTS.md` (§1 capas,
 §2/§3 extractores, §8 archivos de test) no se regeneran — son descripciones

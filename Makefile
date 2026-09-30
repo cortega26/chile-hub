@@ -7,7 +7,7 @@ help:
 	@printf "Targets disponibles:\n"
 	@printf "  make bootstrap        Crea .venv e instala dependencias\n"
 	@printf "  make install-browsers Instala Chromium para smoke tests de la landing\n"
-	@printf "  make doctor           Muestra el Python efectivo y dependencias clave\n"
+	@printf "  make doctor           Python efectivo, gates anti-drift y frescura del pipeline\n"
 	@printf "  make bump-version     Bumpia versión en pyproject.toml + sync-docs + commit (VERSION=X.Y.Z)\n"
 	@printf "  make release          Detecta próxima versión (semantic-release) + sync-docs + commit\n"
 	@printf "  make extract          Ejecuta extractores\n"
@@ -95,6 +95,7 @@ doctor:
 	@$(PYTHON) scripts/sync_docs.py --check
 	@$(PYTHON) scripts/check_landing_sync.py
 	@$(PYTHON) scripts/check_agents_sync.py
+	@$(PYTHON) scripts/check_pipeline_freshness.py
 
 bump-version:
 	@if [ -z "$(VERSION)" ]; then \

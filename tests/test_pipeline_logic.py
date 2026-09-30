@@ -3800,8 +3800,9 @@ class ReplaceDelimitedBlockTests(unittest.TestCase):
 
 class DocSyncTests(unittest.TestCase):
     """Tests para src/builders/doc_sync.py: sincroniza hechos hardcodeados de
-    README.md (conteo de tests/ADRs/contratos, badge, pin de versión, salud,
-    calidad, redistribución) con su fuente de verdad. Ver AGENTS.md §12."""
+    README.md (conteo de tests/ADRs/contratos, badge, pin de versión,
+    redistribución) y resúmenes estables de salud/calidad (Plan 109) con su
+    fuente de verdad. Ver AGENTS.md §12."""
 
     def test_extractor_inventory_includes_ine_ipc(self):
         """El inventario de extractores de AGENTS.md debe incluir ine_ipc.py.
@@ -3888,54 +3889,50 @@ class DocSyncTests(unittest.TestCase):
             self.assertIn("**2 ADRs**", content)
             self.assertIn("1 contratos JSON Schema", content)
 
-    def test_health_and_quality_summary_from_fixtures(self):
+    def test_health_and_quality_summary_are_stable_text(self):
+        """Plan 109: los resúmenes de salud/calidad no dependen de los datos.
+
+        Antes interpolaban conteos ok/warn/error y promedio+distribución desde
+        ``data/normalized``, así que el build diario cambiaba README.md y el
+        publish tenía que commitearlo. Ahora el texto es fijo (con enlace) y el
+        módulo ni siquiera importa ``NORMALIZED_DIR`` para estos bloques.
+        """
         from src.builders import doc_sync
 
         with tempfile.TemporaryDirectory() as tmpdir:
-            normalized_dir = Path(tmpdir) / "normalized"
-            normalized_dir.mkdir()
-            (normalized_dir / "hub_health.json").write_text(
-                json.dumps({"ok_count": 5, "warn_count": 2, "error_count": 0}), encoding="utf-8"
-            )
-            (normalized_dir / "dataset_quality.json").write_text(
-                json.dumps(
-                    {
-                        "average_score": 91.0,
-                        "grade_distribution": {"A": 4, "B": 1, "C": 0, "D": 0, "F": 0},
-                    }
-                ),
-                encoding="utf-8",
-            )
             readme = self._readme(tmpdir, "HEALTH_SUMMARY", "QUALITY_SUMMARY")
 
-            with (
-                patch.object(doc_sync, "NORMALIZED_DIR", str(normalized_dir)),
-                patch.object(doc_sync, "README_PATH", str(readme)),
-            ):
+            with patch.object(doc_sync, "README_PATH", str(readme)):
                 doc_sync.sync_readme_health_summary()
                 doc_sync.sync_readme_quality_summary()
+                self.assertFalse(doc_sync.sync_readme_health_summary(check_only=True))
+                self.assertFalse(doc_sync.sync_readme_quality_summary(check_only=True))
 
             content = readme.read_text(encoding="utf-8")
-            self.assertIn("5 capas `ok`, 2 `warn`, 0 `error`", content)
-            self.assertIn("promedio 91.0/100", content)
-            self.assertIn("4 A, 1 B", content)
+            self.assertIn("hub_health.md", content)
+            self.assertIn("dataset_quality.md", content)
+            # Sin cifras volátiles: los conteos viven en los reportes enlazados.
+            self.assertNotIn("capas `ok`", content)
+            self.assertNotIn("promedio ", content)
 
-    def test_health_summary_returns_false_when_artifact_missing(self):
+    def test_health_summary_does_not_require_normalized_artifacts(self):
+        """Regresión Plan 109: sin data/normalized, el bloque se genera igual.
+
+        Antes devolvía False y ``sync_docs --check`` (job quality, que no corre
+        el build) no podía detectar la deriva del bloque.
+        """
         from src.builders import doc_sync
 
         with tempfile.TemporaryDirectory() as tmpdir:
-            normalized_dir = Path(tmpdir) / "normalized"
-            normalized_dir.mkdir()
             readme = self._readme(tmpdir, "HEALTH_SUMMARY")
 
-            with (
-                patch.object(doc_sync, "NORMALIZED_DIR", str(normalized_dir)),
-                patch.object(doc_sync, "README_PATH", str(readme)),
-            ):
+            with patch.object(doc_sync, "README_PATH", str(readme)):
                 changed = doc_sync.sync_readme_health_summary()
 
-            self.assertFalse(changed)
-            self.assertIn("placeholder", readme.read_text(encoding="utf-8"))
+            self.assertTrue(changed)
+            content = readme.read_text(encoding="utf-8")
+            self.assertNotIn("placeholder", content)
+            self.assertIn("hub_health.md", content)
 
     def test_version_pin_example_reads_pyproject(self):
         from src.builders import doc_sync
@@ -4030,24 +4027,31 @@ class DocSyncTests(unittest.TestCase):
         with self.assertRaises(SystemExit):
             supported_python_minors(">=3.11")
 
-    def test_redistribution_summary_from_fixture(self):
+    def test_redistribution_summary_is_stable_text(self):
+        """Revisión Plan 109: el resumen legal tampoco interpola ready/total.
+
+        Se generaba desde ``data/normalized/redistribution_report.json``
+        (regenerado en cada build del catálogo/registry): un cambio de licencia
+        mergeado sin rebuild producía diff de README en el schedule y el gate
+        "Check build-synced files" bloqueaba el publish diario. El contrato
+        nuevo es bloque constante con enlace al reporte.
+        """
         from src.builders import doc_sync
 
         with tempfile.TemporaryDirectory() as tmpdir:
-            normalized_dir = Path(tmpdir) / "normalized"
-            normalized_dir.mkdir()
-            (normalized_dir / "redistribution_report.json").write_text(
-                json.dumps({"ready_count": 17, "dataset_count": 19}), encoding="utf-8"
-            )
             readme = self._readme(tmpdir, "REDISTRIBUTION_SUMMARY")
 
-            with (
-                patch.object(doc_sync, "NORMALIZED_DIR", str(normalized_dir)),
-                patch.object(doc_sync, "README_PATH", str(readme)),
-            ):
-                doc_sync.sync_readme_redistribution_summary()
+            with patch.object(doc_sync, "README_PATH", str(readme)):
+                changed = doc_sync.sync_readme_redistribution_summary()
+                changed_again = doc_sync.sync_readme_redistribution_summary(check_only=True)
 
-            self.assertIn("**17 de 19 capas**", readme.read_text(encoding="utf-8"))
+            self.assertTrue(changed)
+            self.assertFalse(changed_again)
+            content = readme.read_text(encoding="utf-8")
+            self.assertNotIn("capas** pasan la auditoría", content)
+            self.assertIn(
+                "[`redistribution_report.md`](data/normalized/redistribution_report.md)", content
+            )
 
     def test_datasets_index_lists_every_catalog_dataset(self):
         """El índice de capas de docs/datasets/README.md sale del catálogo.
@@ -4125,6 +4129,65 @@ class DocSyncTests(unittest.TestCase):
             ):
                 with self.assertRaises(SystemExit):
                     doc_sync.sync_readme_extractor_table()
+
+
+class ReadmeLayersTableStabilityTests(unittest.TestCase):
+    """Plan 109: la tabla de capas del README no depende de data/normalized.
+
+    Antes leía ``hub_health.json`` (modo) y ``dataset_status.json`` (conteo),
+    así que cambiaba con cada build y el publish tenía que commitear README.md
+    todos los días. Ahora se genera solo del catálogo (nombre, fuente, licencia
+    y cadencia declarada) y ``sync_docs --check`` puede verificar el bloque sin
+    ejecutar el build.
+    """
+
+    def test_table_is_stable_and_ignores_build_artifacts(self):
+        from src.builders import reports
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            readme = Path(tmpdir) / "README.md"
+            readme.write_text(
+                "<!-- START_DATASET_TABLE -->\n\nplaceholder\n\n<!-- END_DATASET_TABLE -->",
+                encoding="utf-8",
+            )
+            normalized_dir = Path(tmpdir) / "normalized"  # vacío a propósito
+            normalized_dir.mkdir()
+
+            with (
+                patch.object(reports, "ROOT_DIR", tmpdir),
+                patch.object(reports, "NORMALIZED_DIR", str(normalized_dir)),
+            ):
+                changed = reports.sync_readme_layers_table()
+
+            self.assertTrue(changed)
+            content = readme.read_text(encoding="utf-8")
+            self.assertIn("| # | Capa | Fuente | Licencia | Actualización |", content)
+            # Las columnas volátiles (conteo y modo live/fallback) ya no existen.
+            self.assertNotIn("| Registros |", content)
+            self.assertNotIn("| Modo |", content)
+            self.assertIn("hub_health.md", content)
+            self.assertIn("dataset_quality.md", content)
+
+    def test_table_is_idempotent_without_reports(self):
+        from src.builders import reports
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            readme = Path(tmpdir) / "README.md"
+            readme.write_text(
+                "<!-- START_DATASET_TABLE -->\n\nplaceholder\n\n<!-- END_DATASET_TABLE -->",
+                encoding="utf-8",
+            )
+            empty_dir = Path(tmpdir) / "normalized"
+            empty_dir.mkdir()
+
+            with (
+                patch.object(reports, "ROOT_DIR", tmpdir),
+                patch.object(reports, "NORMALIZED_DIR", str(empty_dir)),
+            ):
+                reports.sync_readme_layers_table()
+                changed_again = reports.sync_readme_layers_table(check_only=True)
+
+            self.assertFalse(changed_again)
 
 
 class ExtractorRegistryTests(unittest.TestCase):
