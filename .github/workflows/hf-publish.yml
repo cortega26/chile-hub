@@ -37,7 +37,7 @@ jobs:
           python-version: "3.13"
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
 
       - name: Publish mirror
         env:
@@ -51,7 +51,8 @@ jobs:
           if [[ "${{ inputs.dry_run }}" == "true" ]]; then
             args="--dry-run"
           fi
-          # El script es stdlib-only (huggingface_hub se importa de forma
-          # perezosa): --no-project evita instalar el pipeline completo.
-          uv run --no-project --with huggingface_hub \
+          # El script importa huggingface_hub de forma perezosa; el extra
+          # `publish` lo instala desde uv.lock (pin exacto) en vez de resolver
+          # "latest" en un job con HF_TOKEN (Plan 112).
+          uv run --extra publish \
             python scripts/publish_hf_dataset.py --repo-id cortega26/chile-hub $args

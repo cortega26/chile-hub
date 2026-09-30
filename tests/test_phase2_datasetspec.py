@@ -80,35 +80,14 @@ class TestPilotSpecModel:
         assert hasattr(validation, spec.validator)
         assert (ROOT_DIR / spec.contract_path).is_file()
 
-    def test_only_one_spec_exists(self) -> None:
-        # Phase 2: solo pilot; Phase 3A: 10 specs; Phase 3B: 13 specs; Phase 3C: 15 specs; Phase 3D: 22 specs
+    def test_specs_cover_entire_catalog(self) -> None:
+        # Phase 2: solo pilot; Phase 3A: 10 specs; Phase 3B: 13 specs;
+        # Phase 3C: 15 specs; Phase 3D: 22 specs; Plan 124: 25 specs.
+        # Conteo dinámico contra el catálogo: un dataset nuevo sin spec
+        # rompe este test (y el gate de check_companion_paths registry).
         specs = list(iter_specs())
         assert _spec() in specs
-        assert len(specs) == 22
-        assert {s.dataset for s in specs} == {
-            "partidos_politicos",
-            "censo_comunal",
-            "censo_hogares_viviendas",
-            "distritos_electorales",
-            "empresas",
-            "establecimientos_educacionales",
-            "establecimientos_salud",
-            "indicadores_urbanos_siedu",
-            "pobreza_comunal",
-            "resultados_educacionales",
-            "regiones",
-            "provincias",
-            "comunas",
-            "comunas_enriquecidas",
-            "perfil_territorial_comunal",
-            "consumo_electrico_comunal",
-            "delincuencia_comunal",
-            "geometria_comunal",
-            "autoridades_locales",
-            "autoridades_electas",
-            "indicadores",
-            "finanzas_municipales",
-        }
+        assert {s.dataset for s in specs} == set(_legacy_catalog().keys())
 
     def test_spec_declares_no_structural_schema_facts(self) -> None:
         for spec_path in (ROOT_DIR / "data" / "dataset_specs").glob("*.json"):
@@ -290,6 +269,37 @@ class TestFailClosed:
         payload["contract_path"] = "contracts/datasets/inexistente.schema.json"
         with pytest.raises(DatasetSpecError, match="contrato referenciado"):
             parse_dataset_spec(payload, source_path=f"{PILOT}.json")
+
+
+class TestCatalogSpecCoverageGate:
+    """Plan 124: el gate registry exige un DatasetSpec por clave del catálogo.
+
+    Sin este chequeo, un dataset nuevo sin spec quedaba invisible (el overlay
+    conserva su entrada legacy en silencio) y el hueco solo se descubría al
+    migrar. El test copia los specs a un tmpdir, borra uno y verifica que
+    ``check_registry()`` reporte exactamente ese hueco.
+    """
+
+    def test_registry_gate_reports_missing_spec(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from scripts import check_companion_paths
+
+        specs_dir = tmp_path / "dataset_specs"
+        specs_dir.mkdir()
+        for spec_file in (ROOT_DIR / "data" / "dataset_specs").glob("*.json"):
+            (specs_dir / spec_file.name).write_bytes(spec_file.read_bytes())
+        removed = "comunas"
+        (specs_dir / f"{removed}.json").unlink()
+        monkeypatch.setattr(check_companion_paths, "SPECS_DIR", specs_dir)
+
+        errors = check_companion_paths.check_registry()
+        assert errors == [f"falta DatasetSpec para '{removed}': {specs_dir / f'{removed}.json'}"]
+
+    def test_registry_gate_is_green_on_repository_specs(self) -> None:
+        from scripts import check_companion_paths
+
+        assert check_companion_paths.check_registry() == []
 
 
 def _write_partidos_staging(staging: Path) -> None:

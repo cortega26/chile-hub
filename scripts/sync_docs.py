@@ -6,7 +6,11 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from src.builders.doc_sync import sync_all_docs, sync_readme_version_pin_example
+from src.builders.doc_sync import (
+    sync_all_docs,
+    sync_installation_pins,
+    sync_readme_version_pin_example,
+)
 from src.builders.reports import sync_readme_layers_table
 
 
@@ -23,11 +27,13 @@ def main():
         "--version-only",
         action="store_true",
         help=(
-            "Solo sincroniza el pin de versión (sync_readme_version_pin_example). "
-            "Uso exclusivo del release: los bloques derivados de data/normalized "
-            "(health, quality, layers) los escribe únicamente el publish diario — "
-            "el release no debe regenerarlos desde un artifact potencialmente viejo "
-            "(carrera release↔publish, ver fix/write-races)."
+            "Solo sincroniza los bloques derivados de la version "
+            "(sync_readme_version_pin_example + sync_installation_pins). "
+            "Uso exclusivo del release: mantiene el commit de release acotado "
+            "a los bloques que cambian con la version. Tras el plan 109 ningún "
+            "bloque del README se genera desde data/normalized, pero el release "
+            "sigue sin correr el sync completo para no reescribir bloques "
+            "ajenos al bump."
         ),
     )
     args = parser.parse_args()
@@ -36,6 +42,11 @@ def main():
     if args.version_only:
         if sync_readme_version_pin_example(check_only=args.check):
             changed.append("sync_readme_version_pin_example")
+        # Regresion release 1.44.1: el bloque de pines de installation.md
+        # (Plan 127) tambien deriva de la version y el release no lo
+        # sincronizaba, dejando el gate sync_docs --check rojo en main.
+        if sync_installation_pins(check_only=args.check):
+            changed.append("sync_installation_pins")
     else:
         if sync_readme_layers_table(check_only=args.check):
             changed.append("sync_readme_layers_table")

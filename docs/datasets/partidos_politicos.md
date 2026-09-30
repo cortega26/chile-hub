@@ -60,7 +60,7 @@ ver `docs/legal/b2-2-electoral-research.md`).
 - SERVEL — partidos constituidos: https://www.servel.cl/partidos-politicos/partidos-constituidos/
 - SERVEL — partidos en formación: https://www.servel.cl/partidos-politicos/partidos-en-formacion/
 - Research electoral: `docs/legal/b2-2-electoral-research.md`
-- Plan 023 — Ola B: `plans/023-autoridades-electas-partidos-politicos.md`
+- Plan 023 — Ola B: `plans/archive/023-autoridades-electas-partidos-politicos.md`
 
 ## Clasificación de salud (ADR-014)
 

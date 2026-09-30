@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Corre Lighthouse contra la landing local y verifica umbrales (a11y/SEO/best
-# practices). Lo usan `make lighthouse` y el job `landing` de pipeline-check.
+# practices); performance se mide sin umbral (varianza del runner) y queda en
+# el JSON para observación. Lo usan `make lighthouse` y el job `landing` de
+# pipeline-check.
 #
 # Resuelve CHROME_PATH priorizando el Chromium de Playwright (lo que instala
 # `make bootstrap`); si no existe, deja que Lighthouse busque Chrome del sistema.
@@ -25,6 +27,6 @@ sleep 1
 npx --yes lighthouse@12.8.2 "http://127.0.0.1:$PORT/" --quiet \
   --chrome-flags="--headless=new --no-sandbox --disable-gpu" \
   --output=json --output-path="$REPORT" \
-  --only-categories=accessibility,seo,best-practices
+  --only-categories=accessibility,seo,best-practices,performance
 
 "$PYTHON_BIN" scripts/check_lighthouse.py "$REPORT"

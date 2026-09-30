@@ -1,6 +1,6 @@
 # Plans — chile-hub
 
-Planes de implementación generados por auditoría `/improve deep` en commits `ba2f434` (2026-06-13), `a2cd288` (2026-06-19) y `c486e7c` (2026-07-07), y por `/improve plan` (mejoras de librerías/dependencias) en commit `140c8ea` (2026-06-29).
+Planes de implementación generados por auditoría `/improve deep` en commits `ba2f434` (2026-06-13), `a2cd288` (2026-06-19), `c486e7c` (2026-07-07) y `1464109` (2026-09-29 — planes 111–130, ver sección al final), y por `/improve plan` (mejoras de librerías/dependencias) en commit `140c8ea` (2026-06-29).
 
 > **Auditoría `/improve next` — dirección/roadmap (2026-07-26, commit `63cc106`)**:
 > se revalidaron los cinco hallazgos con mayor palanca: resolución nombres→CUT
@@ -163,7 +163,7 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 | 088 | [Cobertura catálogo→validación: gate + exenciones explícitas](088-catalog-validation-coverage.md) | P1 | S | LOW | — | DONE (2026-09-15, commit 48a60be — regla catálogo−registered + 3 exenciones; branch advisor/wave-1) |
 | 089 | [bcentral: fechas a UTC y throttle real](089-bcentral-tz-throttle.md) | P1 | S | LOW | — | DONE (2026-09-15, commit fbddeaa — UTC×3 + submits espaciados; branch advisor/wave-1) |
 | 090 | [Una sola conversión `to_pandas()` + descarte pre-conversión](090-single-pandas-conversion.md) | P1 | S | LOW | — | DONE (2026-09-15, commit 62143ac — frames compartidos, skip pre-conversión, equivalencia byte-probada; branch advisor/wave-1) |
-| 091 | [Opcionales ruidosos + fallback sintético strict](091-optional-datasets-strict.md) | P1 | M | MED | — | TODO (REVERTED 2026-09-15: bc3e02f→79b41fa — choca con garantía Phase-1 "omitted optional does not block core build"; el gate publication ya cubre los 3 casos. Requiere decisión del mantenedor o cierre como cubierto) |
+| 091 | [Opcionales ruidosos + fallback sintético strict](091-optional-datasets-strict.md) | P1 | M | MED | — | REJECTED (2026-09-30 — cerrada como cubierta por el gate `publication`: los 3 casos missing/non-live/stale ya se rechazan al publicar; el rediseño del contrato Phase-1 queda descartado. Reabrir solo con una decisión explícita del mantenedor) |
 | 092 | [Paralelizar formatos + `indicadores_hoy` = última fecha](092-parallel-formats-hoy-payload.md) | P2 | M | MED | 090 | DONE (2026-09-15, commit c9d8c2a — payload última-fecha-por-código + clamp hoy UTC; paralelización descartada con números; branch advisor/wave-2) |
 | 093 | [Scans O(K·N)→`partition_by` + allowlist única + cache acotado](093-validation-scans-cache.md) | P2 | M | LOW | — | DONE (2026-09-15, commit 3a155bd — partition_by idéntico, allowlist ×15→1, LRU cap 8; anio no persistido por costo-beneficio; branch advisor/wave-2) |
 | 094 | [Toolchain única + targets locales](094-dx-single-toolchain.md) | P1 | S | LOW | — | DONE (2026-09-15, commit 972ffbb — ruff 0.16.7 + mypy 2.3.1 single-source, hook pip-audit espeja CI, make typecheck/audit/sec; + 238bc10 isort canónico 0.16.7; branch advisor/wave-3) |
@@ -211,8 +211,31 @@ Los 5 planes quedaron **DONE y archivados** el mismo día (2026-09-25) — ver
 |---|------|----------|----------|--------|-----------|--------|
 | 106 | [Snapshot de release liviano (geometría fuera de git + wasm no usado)](106-slim-release-snapshot.md) | P2 | S-M | MED | — | DONE (2026-09-25 — árbol 412→140 MB, auditoría a prerelease `geometry-audit`, ADR-021, guardrails; branch `advisor/106-slim-release-snapshot`) |
 | 107 | [Handoff de activación de lanzamiento (agente autónomo)](107-activacion-lanzamiento-handoff.md) | P2 | S | LOW | — | READY (2026-09-26 — handoff para Cowork: GSC meta tag, sitemap, schedule, adopción; fallbacks + STOP; branch `advisor/107-activacion-lanzamiento`) |
-| 108 | [Gate "Check build-synced files" bloquea el publish diario (deadlock README)](108-build-synced-stale.md) | P1 | S | MED | — | IN REVIEW (2026-09-26 — implementado en branch `fix/108-build-synced-stale`, sin push: gate README→notice, guard de caída de record_count >20% en verify publication + override `--allow-record-drop` propagado vía provenance al release, ADR-022; requiere aprobación: edita workflows) |
-| 109 | [README sin datos volátiles + alerta de schedule roto](109-readme-sin-datos-volatiles-y-alerta-schedule.md) | P2 | M | MED | 108 | PROPOSED (2026-09-26) |
+
+## Plan 110 — sostenibilidad y patrocinios (2026-09-29) — HOLD
+
+> **Estado (2026-09-30): HOLD — no ejecutar.** La
+> [Auditoría 3](../docs/sostenibilidad/auditoria-3-2026-09-29.md) auditó el caso y
+> revisó este plan (Auditoría 1) junto con la reconstrucción adversarial del
+> issue #125 (Auditoría 2). Su veredicto fue **D**:
+> - no hay ninguna organización con uso verificable;
+> - las "~2.2k instalaciones/mes" son descargas de PyPI dominadas por la
+>   cadencia de releases;
+> - no existe un vehículo de cobro.
+>
+> El plan queda como registro de la Propuesta A. Solo se reescribirá a partir
+> del delta §F de la auditoría y después de pasar su gate §G. Índice,
+> cronología y reglas para agentes:
+> [`docs/sostenibilidad/README.md`](../docs/sostenibilidad/README.md).
+
+| # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
+|---|------|----------|----------|--------|-----------|--------|
+| 110 | [Programa de patrocinios — sostenibilidad y plan de ataque](110-programa-de-patrocinios.md) | P2 | M + continuo | MED | Gate §G de la Auditoría 3 | HOLD (2026-09-30 — veredicto D, [Auditoría 3](../docs/sostenibilidad/README.md); no ejecutar) |
+
+### Planes 108 y 109 — archivados (2026-09-30)
+
+- **108** [Gate "Check build-synced files" bloquea el publish diario](archive/108-build-synced-stale.md) — **DONE**: implementación mergeada en PR #110 (`7652568` + merge `4528872`): README→notice, guard de caída de `record_count` >20% en verify publication con override `--allow-record-drop` propagado vía provenance, ADR-022.
+- **109** [README sin datos volátiles + alerta de schedule roto](archive/109-readme-sin-datos-volatiles-y-alerta-schedule.md) — **DONE** (2026-09-30): tabla de capas y resúmenes de salud/calidad/auditoría legal estables (sin datos del día); README fuera del artifact/publish y de vuelta en el gate duro; job `notify-schedule-failure` (issue `ci-schedule`) + SLO de frescura 48 h en `make doctor`. Commits `efad585` + `cbeb572` (revisión), merge `509a123`. Parte C (expectativas por dataset) descartada: sin caso concreto.
 
 ## Dependencias 086–100 (ver `ROADMAP.md` para el grafo completo)
 
@@ -757,3 +780,120 @@ ya no aplique.
 - `BLOCKED` — bloqueado (indicar por qué)
 - `BACKLOG` — diferido a backlog (ver `docs/backlog/`)
 - `SKIP` — descartado después de análisis adicional
+
+---
+
+## Auditoría `/improve deep` 2026-09-29 (commit `1464109`) — planes 111–130
+
+> **Contexto**: re-auditoría profunda tras la auditoría de distribución
+> (101–105, 2026-09-25) y el reposicionamiento ADR-023. Método: 9 subagentes
+> read-only (una categoría del playbook cada uno) + vet del advisor contra el
+> código en vivo (líneas, workflow YAML, datasets, registry, ADRs). Todo
+> hallazgo de la tabla fue confirmado por el advisor; se corrigió un dato de
+> los subagentes (MkDocs Material: su EOL no es nov-2026 — la extensión a
+> **may-2027** se anunció el 2026-09-29; queda como watch item, no plan).
+>
+> **Selección**: el mantenedor pidió planes para todos los hallazgos
+> net-positivos → 20 planes (111–130). Los hallazgos ya rechazados en
+> auditorías previas no se repitieron (INR/ADR-017, CEAD/ADR-015, PERF-01/04,
+> pandera/typer/orjson/httpx, Kaggle/conda-forge diferidos, telemetría, etc.).
+
+### Planes activos
+
+| # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de / solapa | Estado |
+|---|------|----------|----------|--------|---------------------|--------|
+| 128 | [Python 3.15 + DuckDB-Wasm al día](128-deps-forward-compat.md) | P1/P3 | S/M | LOW-MED | — | PARTIAL (2026-09-29: Step 2 DONE commit 915ee8c; Step 1 BLOCKED hasta 2026-10-01) |
+
+### Planes archivados (auditoría `/improve deep` 2026-09-29 — Wave 1)
+
+Los 6 planes de la Wave 1 quedaron **DONE y mergeados a `main`** el 2026-09-29
+(ejecutados en worktrees `advisor/*`, revisados por el advisor y mergeados en
+orden 116 → 122 → 111 → 115 → 118 → 127). El conteo final de tests quedó en
+1167; suite completa + `make doctor`/`lint`/`format-check`/`typecheck`/`verify`/
+`verify-landing` verdes.
+
+| # | Plan | Esfuerzo | Riesgo | Estado |
+|---|------|----------|--------|--------|
+| 111 | [Gate de identidad `workflow_run` + ancestría de artifacts](archive/111-workflow-run-identity-gate.md) | S-M | MED | DONE — `661d77c`+`3a6f49d`+`4a40723` (merge `ae1e12c`): gate repo/evento + `gh api` + ancestría + 4 guardrails |
+| 115 | [Superficie generada: año 2.024, playground, URL base](archive/115-generated-surface-fixes.md) | S | LOW | DONE — `832bd6f`+`96a24f8` (merge `b007cac`): año formateado, `replaceAll`, URL base desde `site_url`/pyproject |
+| 116 | [Commitear `mapa_comunal.geojson`](archive/116-mapa-comunal-geojson-commit.md) | S | LOW | DONE — `4afef66` (FF): el refresh de geometría commitea el GeoJSON del mapa |
+| 118 | [Vitales: fetch incremental](archive/118-vitales-incremental-fetch.md) | S-M | MED | DONE — `14ec4ff`+`3526884` (merge `18adc2d`): solo anuarios faltantes + último; merge determinista |
+| 122 | [Cobertura scripts/, smoke MCP, xdist en CI](archive/122-ci-test-integrity.md) | S-M | LOW-MED | DONE — `023c437`+`8ace7fc` (merge `70453c9`): `--cov=scripts` (badge 70.6%), smoke MCP, `-n auto` |
+| 127 | [Correcciones de docs canónicos (7)](archive/127-docs-corrections-batch.md) | S | LOW | DONE — `b1df764`+`7d172a3` (merge `5f6a855`): AGENTS/SOURCE_OF_TRUTH/installation (sync)/links + guardrails |
+
+### Planes archivados (auditoría `/improve deep` 2026-09-29 — Wave 2)
+
+La Wave 2 queda cerrada el 2026-09-29 con **6 de 7 planes mergeados**; el 128
+tiene su Step 2 (DuckDB-Wasm) mergeado y su Step 1 (Python 3.15) bloqueado
+hasta el 2026-10-01 (final de 3.15), por eso sigue activo con estado PARTIAL.
+Ejecutados en worktrees `advisor/*` y revisados por el advisor.
+
+| # | Plan | Esfuerzo | Riesgo | Estado |
+|---|------|----------|--------|--------|
+| 112 | [Pinnea entornos efímeros de CI](archive/112-pin-ephemeral-ci-installs.md) | S | LOW | DONE — `f0e8746` (FF): extra `publish` (`huggingface_hub==1.16.1`), `uv run --extra publish` en HF, `--with` pinneados |
+| 113 | [Hardening batch: unrar, vaciado HF, JSON-LD, quoting](archive/113-security-hardening-batch.md) | S | LOW | DONE — `ba85f3c`+`6ddb705`+`223dfe1`+`d614467` (merge `4f78d0a`): `unrar e`+tmpdir, guard de selección vacía, `json_for_html`, `HEAD_REF` |
+| 114 | [Fuentes self-hosted + privacidad](archive/114-self-host-fonts-privacy.md) | S-M | LOW | DONE — `d51f721` (FF): 15 woff2 en `vendor/fonts/`, CSP self, smoke de fuentes |
+| 119 | [Caché Parquet en el servidor MCP](archive/119-mcp-parquet-cache.md) | S | LOW | DONE — `3e766b3` (merge `11aa716`): LazyFrame cacheado por proceso, `head()` sin materializar |
+| 124 | [DatasetSpec: 3 specs + gate catálogo↔spec](archive/124-datasetspec-gate.md) | M | LOW | DONE — `1121cdc` (merge `3fc0381`): 25/25 specs, gate en `registry`, test dinámico, docs alineados |
+| 126 | [Higiene tooling/onboarding](archive/126-tooling-onboarding-hygiene.md) | S-M | LOW | DONE — `5ec16bb`…`8b2a634` (FF): ruff único 0.16.8, hook sync-docs arreglado, shim eliminado, uv documentado, doctor lock, package-smoke |
+| 128 | [Python 3.15 + DuckDB-Wasm](128-deps-forward-compat.md) | S/M | LOW-MED | PARTIAL — `915ee8c` (merge `d8f7d7a`): DuckDB-Wasm 1.32.0 (motor 1.4.3) + smoke SQL real; Step 1 al 2026-10-01 |
+
+### Planes archivados (auditoría `/improve deep` 2026-09-29 — Wave 3)
+
+La Wave 3 quedó DONE y mergeada el 2026-09-29 (6/6). Ejecutada en worktrees
+`advisor/*`, revisada por el advisor; el 129 requirió una ronda de revisión
+(mypy: import duplicado `chile_hub.regions` + anotación `SchemaDefinition`).
+
+| # | Plan | Esfuerzo | Riesgo | Estado |
+|---|------|----------|--------|--------|
+| 117 | [Alinear `source_mode: archived`](archive/117-archived-source-mode-alignment.md) | S-M | LOW-MED | DONE — `7fc72b0` (FF; Rama A): AGENTS §6 alineado con ADR-015 + guardrail |
+| 120 | [`check_sources` paralelo + caché de geometría](archive/120-core-perf-diagnostics-cache.md) | S | LOW | DONE — `da4be85` (FF): `ThreadPoolExecutor(8)` con orden preservado + caché por mtime |
+| 121 | [Lighthouse: performance + artefacto](archive/121-lighthouse-performance-baseline.md) | S | LOW | DONE — `9c26728` (merge `2942668`): `performance` medido sin umbral + reporte como artifact |
+| 123 | [Backfill de tests de gates](archive/123-gate-test-backfill.md) | M | LOW-MED | DONE — `81701a6` (merge `057ebf4`): +30 tests en 5 gates (calidad_aire, diagnostics, companions, release, source_urls) |
+| 125 | [Consolidar `write_staging`](archive/125-consolidate-write-staging.md) | M | LOW-MED | DONE — `9ff7255` (merge `19d7af0`): helper atómico en `base.py`, 21 overrides convertidos (y corrigió la premisa: sí está en la ruta diaria) |
+| 129 | [Cierres de distribución](archive/129-direction-distribution-closes.md) | S/M | LOW | DONE — `e2ef696`+`d64def0`+`5203d3a`+`62b1ff1` (FF): métrica HF (274 descargas), `server.json` validado en el registry, `resolve_regiones()` |
+
+### Planes archivados (auditoría `/improve deep` 2026-09-29 — Wave 4)
+
+| # | Plan | Esfuerzo | Riesgo | Estado |
+|---|------|----------|--------|--------|
+| 130 | [Dejar de versionar el ZIP publicable](archive/130-stop-committing-bundle-zip.md) | S-M | MED | DONE — `2fb7d15` (merge FF): ZIP/sha fuera de git (`git rm --cached` + ignore), link y quickstart apuntan al asset del último Release (también `app.js` runtime y `verify_landing.py`), nota de clone parcial en README/CONTRIBUTING |
+
+Extra de la wave (no es un plan): el release ahora sincroniza `server.json` del
+registry MCP (`54c1691`; `sync_server_json_version` en
+`sync_release_artifact_version.py` + `server.json` en el `git add` del release).
+
+### Orden de ejecución recomendado (waves)
+
+- **Wave 1 (P1, sin solapes)**: 111, 115, 116, 118, 122, 127.
+- **Wave 2 (P2, tras resolver solapes de archivos)**: 112, 113, 114, 119, 124,
+  126, 128.
+- **Wave 3 (P2/P3)**: 117, 120, 121, 123, 125, 129.
+- **Wave 4 (decisión)**: 130.
+
+### Dependencias y solapes de archivos (no correr en worktrees simultáneos)
+
+- **111 ∩ 122 ∩ 126**: `pipeline-check.yml` (111: no lo toca; 122 sí; 126 sí).
+  Secuencia 122 → 126.
+- **113 ∩ 114 ∩ 115 ∩ 130**: `index.html` / `landing.py` /
+  `inject_dataset_json_ld.py`. Secuencia 114 → 115 → 113 → 130.
+- **124 ∩ 127**: `AGENTS.md`. Secuencia 124 → 127.
+- **122 → 123** (la cobertura de `scripts/` es la señal que hace visible el
+  backfill) y **123 → 125** (test de `process_calidad_aire` antes de tocar
+  overrides).
+- **128 Step 1**: requiere Python 3.15 final (2026-10-01); Step 2
+  (DuckDB-Wasm) es independiente.
+- **130**: requiere decisión de mantenedor (Step 0); si la respuesta es
+  "mantener la ruta relativa", el plan se cierra sin cambios.
+
+### Hallazgos considerados y rechazados en esta auditoría
+
+- **MkDocs Material EOL**: el subagente reportó "EOL 2026-11-05"; verificado en
+  vivo (anuncio Zensical 2026-09-29): la mantención crítica se extendió a
+  **2027-05-05** y Zensical 0.1.0 abre su línea el 2026-11-05. No hay urgencia;
+  se registra como watch item — reabrir un plan de migración solo si la fecha
+  se acerca sin decisión.
+- **`--cov` override** (hallazgo TESTS-01): incluido en 122, no rechazado.
+- Todo lo demás listado por los subagentes quedó en plan o ya estaba en las
+  listas de rechazados de auditorías previas (guardrails y §"Hallazgos
+  considerados y rechazados" de arriba).

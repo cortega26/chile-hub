@@ -62,7 +62,7 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
           enable-cache: true
           cache-suffix: quality
@@ -94,10 +94,10 @@ jobs:
 
       - name: Check Python lint
         # Pin single-source con pyproject dev + pre-commit (Plan 094).
-        run: uvx ruff@0.16.7 check src/ tests/ scripts/
+        run: uvx ruff@0.16.8 check src/ tests/ scripts/
 
       - name: Check Python format
-        run: uvx ruff@0.16.7 format --check src/ tests/ scripts/
+        run: uvx ruff@0.16.8 format --check src/ tests/ scripts/
 
       - name: Check dataset registry/docs/contracts sync
         run: python scripts/check_companion_paths.py registry
@@ -166,7 +166,7 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
           enable-cache: true
           cache-suffix: docs-autosync
@@ -213,7 +213,7 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
           enable-cache: true
           cache-suffix: build-and-test
@@ -286,7 +286,7 @@ jobs:
             # en un entorno efímero de uv en vez del venv del proyecto. Sin esto, un
             # cache-miss produce 155 registros (0 senadores) y el paso
             # "Check build-synced files" aborta el publish diario (2026-07-19/20).
-            PYTHONPATH=src uv run --no-project --with "scrapling[fetchers]" --with polars --with requests --with structlog --with tenacity --with curl_cffi --with defusedxml python src/extractors/autoridades_electas_extractor.py
+            PYTHONPATH=src uv run --no-project --with "scrapling[fetchers]==0.4.10" --with polars==1.44.2 --with requests==2.34.2 --with structlog==26.1.0 --with tenacity==9.1.4 --with curl_cffi==0.16.3 --with defusedxml==0.7.1 python src/extractors/autoridades_electas_extractor.py
           fi
 
       - name: Sanity-check versioned MINVU snapshot
@@ -317,20 +317,14 @@ jobs:
       - name: Check build-synced files
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: |
-          # README.md lleva bloques derivados de los datos del día (tabla de
-          # capas, health/quality) y los commitea el job publish ("Commit
-          # refreshed artifacts"). Exigir que ya estén commiteados bloqueaba el
-          # publish que los actualiza: deadlock 2026-08-13 -> 2026-09-26 (plan
-          # 108). Las regresiones de datos que este diff delataba las atrapa
-          # ahora verify_pipeline.py --profile publication (source_mode y
-          # caída de record_count).
-          if ! git diff --quiet -- README.md; then
-            git diff -- README.md
-            echo "::notice::README.md cambia con los datos del día; lo commitea el job publish."
-          fi
-          if ! git diff --quiet -- index.html app.js; then
-            git diff -- index.html app.js
-            echo "::error::Build-synced files are stale. Run python src/build_dev_db.py and commit index.html/app.js."
+          # Plan 109: README.md ya no lleva datos del día (tabla de capas y
+          # resúmenes de salud/calidad estables) y el publish no lo commitea;
+          # cualquier diff es deriva real. Las regresiones de datos que este
+          # diff delataba las atrapa verify_pipeline.py --profile publication
+          # (source_mode y caída de record_count).
+          if ! git diff --quiet -- README.md index.html app.js; then
+            git diff -- README.md index.html app.js
+            echo "::error::Build-synced files are stale. Run python src/build_dev_db.py and commit README.md/index.html/app.js."
             exit 1
           fi
 
@@ -407,7 +401,23 @@ jobs:
           ALLOW_RECORD_DROP: ${{ inputs.allow_record_drop }}
 
       - name: Run unit and contract tests
-        run: python -m pytest -v --cov=src --cov-report=term-missing --cov-report=xml
+        run: python -m pytest -n auto -v --cov=src --cov=scripts --cov-report=term-missing --cov-report=xml
+
+      - name: MCP server smoke (extra [mcp])
+        run: |
+          # El extra `mcp` no esta en el sync base del job (pipeline+dev), asi
+          # que sin este paso `build_server()` nunca se construye en CI y el
+          # test correspondiente siempre toma la rama ImportError (rama muerta
+          # en el runner). El `uv run` de abajo agrega el extra al venv del job
+          # sin desinstalar pipeline/dev (verificado); costo: un sync
+          # incremental, una vez por run.
+          uv run --extra mcp python - <<'PY'
+          from chile_hub.mcp_server import build_server
+
+          server = build_server()
+          assert server.name == "chile-hub", server.name
+          print(f"OK: MCP server {server.name}")
+          PY
 
       - name: Upload coverage to Codecov
         if: false  # Deshabilitado: migrado a badge autogenerado (coverage_badge.json)
@@ -446,14 +456,13 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ${{ env.PIPELINE_ARTIFACT }}
-          # P1 de la review del PR #77 (write-races): README/index/app viajan
-          # en el artifact porque el build los regenera con la version y los
-          # datos CORRECTOS del run — el publish los adopta. Antes solo subia
-          # data/normalized/ y el publish commitaba index/app del checkout de
-          # main (stale) y un README sin cambios.
+          # P1 de la review del PR #77 (write-races): index/app viajan en el
+          # artifact porque el build los regenera con la version y los datos
+          # CORRECTOS del run — el publish los adopta. README.md ya no viaja
+          # (plan 109): no depende de los datos y el publish no lo adopta, así
+          # que dejó de ser un archivo compartido entre los bots.
           path: |
             data/normalized/
-            README.md
             index.html
             app.js
           if-no-files-found: error
@@ -480,7 +489,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
           enable-cache: true
           cache-suffix: package-quality
@@ -512,7 +521,7 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
           enable-cache: true
           cache-suffix: landing
@@ -546,8 +555,17 @@ jobs:
       - name: Verify landing page
         run: python scripts/verify_landing.py
 
-      - name: Lighthouse (accesibilidad, SEO, buenas prácticas)
+      - name: Lighthouse (performance, accesibilidad, SEO, buenas prácticas)
         run: bash scripts/run_lighthouse.sh
+
+      - name: Upload Lighthouse report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: lighthouse-report
+          path: /tmp/chile-hub-lighthouse.json
+          if-no-files-found: warn
+          retention-days: 7
 
   publish:
     concurrency:
@@ -560,6 +578,9 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: write
+      # Solo para cerrar el issue de alerta del schedule (plan 109); sin este
+      # scope el token del job no puede tocar issues.
+      issues: write
     steps:
       - name: Checkout main
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -576,11 +597,11 @@ jobs:
       - name: Commit refreshed artifacts
         run: |
           # Adopta los archivos regenerados por el build del run (P1 de la
-          # review del PR #77): el artifact ahora incluye README/index/app
-          # junto con data/normalized/. Sin esta copia, el publish commitaba
-          # el README del checkout de main (stale) y el cache-buster viejo.
+          # review del PR #77): data/normalized + index/app. README.md ya no
+          # se adopta ni se commitea (plan 109): sus bloques son estables y
+          # dejó de ser un archivo compartido entre publish y release.
           cp -a .pipeline-output/data/normalized/. data/normalized/
-          cp .pipeline-output/README.md .pipeline-output/index.html .pipeline-output/app.js .
+          cp .pipeline-output/index.html .pipeline-output/app.js .
           # Re-estampa la versión de main (pyproject del checkout) sobre lo
           # adoptado: el artifact pudo construirse antes del release
           # (race release↔publish 2026-09-25: el publish pisó el cache-buster
@@ -590,11 +611,7 @@ jobs:
           python scripts/sync_docs.py --version-only
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # README.md incluido (fix/write-races): el build regenera los bloques
-          # de data (health/quality) y sin commitearlo el siguiente push o PR
-          # falla el gate sync_docs --check — la clase de carrera del
-          # 2026-08-13 (release piso el README con datos viejos).
-          git add --all data/normalized/ index.html app.js README.md
+          git add --all data/normalized/ index.html app.js
           if git diff --cached --quiet; then
             echo "No publishable data changes."
             exit 0
@@ -602,3 +619,59 @@ jobs:
           git commit -m "chore(data): daily refresh [skip ci]"
           git pull --rebase --autostash origin main
           git push origin HEAD:main
+
+      - name: Close schedule failure issue (if open)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Plan 109: un publish exitoso cierra el issue de alerta del
+          # schedule, si el job notify-schedule-failure lo abrió.
+          for number in $(gh issue list --label ci-schedule --state open --json number --jq '.[].number'); do
+            gh issue close "$number" \
+              --comment "Schedule diario recuperado: este run publicó datos verificados (${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})."
+          done
+
+  notify-schedule-failure:
+    name: Alert on schedule failure
+    if: failure() && github.event_name == 'schedule'
+    needs: [build-and-test, publish]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      checks: read
+      # El token solo puede escribir issues en este job; el workflow deja el
+      # resto en read-only (principio de menor privilegio, plan 109).
+      issues: write
+    steps:
+      - name: Ensure tracking label exists
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create ci-schedule \
+            --description "Falla del schedule diario de Pipeline Check (plan 109)" \
+            --color B60205 --force
+      - name: Open or update tracking issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          run_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          annotations=""
+          for job_id in $(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/jobs" \
+              --paginate --jq '.jobs[] | select(.conclusion == "failure") | .id'); do
+            annotations+=$(gh api "repos/${GITHUB_REPOSITORY}/check-runs/${job_id}/annotations" \
+              --paginate --jq '.[] | select(.annotation_level == "failure") | "- `\(.path):\(.start_line)` — \(.message)"' \
+              2>/dev/null || true)
+            annotations+=$'\n'
+          done
+          if [ -z "$(printf '%s' "$annotations" | tr -d '[:space:]')" ]; then
+            annotations="- Sin anotaciones de error; revisa el log del run."
+          fi
+          annotations=$(printf '%s' "$annotations" | head -n 20)
+          body=$(printf '## El schedule diario falló\n\nRun: %s\n\nAnotaciones de error:\n\n%s\n' \
+            "$run_url" "$annotations")
+          issue=$(gh issue list --label ci-schedule --state open --json number --jq '.[0].number')
+          if [ -n "$issue" ]; then
+            gh issue comment "$issue" --body "$body"
+          else
+            gh issue create --title "Schedule diario roto" --label ci-schedule --body "$body"
+          fi

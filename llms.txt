@@ -5,6 +5,11 @@
 > educación, pobreza, finanzas municipales, electoral y más) normalizadas,
 > validadas y listas para consumir en una línea de código.
 
+chile-hub no es un portal ni una fuente oficial. El repositorio de datos abiertos
+del Estado de Chile es https://datos.gob.cl/; chile-hub es un proyecto
+independiente que reutiliza esas fuentes y las deja listas para cruzar. Ante
+cualquier diferencia, prevalece la fuente oficial de cada capa.
+
 ## Datos
 
 - Catálogo DCAT: https://tooltician.com/chile-hub/data/normalized/data.json

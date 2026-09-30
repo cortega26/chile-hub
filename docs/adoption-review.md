@@ -47,6 +47,18 @@ gh api repos/cortega26/chile-hub --jq '{stars: .stargazers_count, forks: .forks_
 
 ## Registro
 
+### 2026-09-29 — cierre Plan 129
+
+- `data/normalized/adoption.json` ahora incluye la señal de Hugging Face
+  (`huggingface`: `downloads`, `likes`, `lastModified`) leída de la API
+  pública del dataset espejo (`https://huggingface.co/api/datasets/cortega26/chile-hub`),
+  sin auth y bajo la misma política sin telemetría que el resto del script.
+  El umbral de Kaggle de la tabla de arriba (HF ≥ 2× baseline) deja de depender
+  de registro manual.
+- HF **degrada sola**: si la API falla, la clave queda `null` y el job no
+  aborta (el exit 1 sigue anclado a PyPI + GitHub Releases, las fuentes que
+  alimentan el badge y la señal base).
+
 ### 2026-09-26 — baseline post-lanzamiento
 
 - Se completó la wave de distribución (planes 101–105): HF con 21 subsets,
@@ -69,3 +81,19 @@ gh api repos/cortega26/chile-hub --jq '{stars: .stargazers_count, forks: .forks_
 - Issues de leads: #107, #108, #109 — abiertos y etiquetados
 - Schedule diario: falló 23–25 sep (commit 039fc03) — "Build-synced files are stale" en Build and verify data; causa: el gate compara README.md, cuyos conteos cambian con los datos del día y solo los commitea el publish que el gate bloquea (deadlock; sin publish programado desde 2026-08-13; disparador puntual: permisos_edificacion en fallback, corregido en 8d30636). Fix propuesto en plan 108 (branch fix/108-build-synced-stale)
 - Notas: sitemap índice + 3 hijos verificados en vivo (200/200/200).
+
+### 2026-09-30 — corrección de la semántica de métricas (Auditoría 3 de sostenibilidad)
+
+- Las "instalaciones PyPI/mes" de este documento son **descargas** y siguen la
+  cadencia de releases: una regresión diaria da R²=0,937, con ~93 descargas por
+  release (n=101). Tras el cambio de conteo de PyPI del 2026-08-24, el R² sube
+  a 0,966. No sirven como medida de usuarios ni de audiencia.
+- Proxy de activación de la librería: las descargas de
+  `chile-hub-publishable-bundle.zip` en GitHub Releases, que pasaron de 36
+  (30-jun) a 119 (29-sep). Eso son ≈ 27 al mes; al 30-sep suman 132.
+- `adoption.json.github_releases.total_downloads` subcuenta porque el script no
+  pagina `/releases`: reporta 46 cuando el total real es 224 (30-sep).
+- 0 dependents (GitHub y deps.dev), 0 issues o discussions de terceros y 0 sponsors.
+- Detalle y método reproducible:
+  [`docs/sostenibilidad/auditoria-3-2026-09-29.md`](sostenibilidad/auditoria-3-2026-09-29.md)
+  (§0 y Anexo M).

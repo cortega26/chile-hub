@@ -15,7 +15,8 @@ related_docs:
   - CLAUDE.md              # Punto de entrada para sesiones Claude Code
   - CONTRIBUTING.md        # Verificaciones locales y flujo de PR
   - docs/dataset-inclusion-criteria.md  # Criterios de aceptación/deprecación
-last_updated: 2026-09-15
+  - docs/sostenibilidad/README.md       # Estado y cronología de sostenibilidad (auditorías 1–3)
+last_updated: 2026-09-30
 ---
 
 # SOURCE_OF_TRUTH.md — Índice Maestro de Navegación
@@ -33,6 +34,9 @@ Parquet, DuckDB, JSON y ZIP consumibles en una sola línea de código, además d
 estática y una CLI/API de Python (`ChileHub`). El objetivo es tener **menos datasets, más limpios y
 confiables** — no una cobertura exhaustiva.
 
+No es un portal ni una fuente oficial: trabaja aguas abajo de datos.gob.cl y de las instituciones
+que publican cada dato. Misión, visión y principios: **`docs/product-spec.md`** (ADR-023).
+
 ---
 
 ## Document ownership
@@ -43,6 +47,8 @@ confiables** — no una cobertura exhaustiva.
 | **`AGENTS.md`** | Reglas completas del pipeline, politica legal, flujo de 7 pasos para agregar datasets, jobs de CI/CD, antipatrones, convenciones de codigo | Al agregar un dataset · depurar el pipeline · preguntas legales · cambios en CI |
 | **`CLAUDE.md`** | Redirige a AGENTS.md + SOURCE_OF_TRUTH.md; punto de entrada del proyecto para sesiones de Claude Code | Primera visita al repositorio · orientacion |
 | **`docs/dataset-inclusion-criteria.md`** | Criterios de aceptacion/deprecacion de datasets, carriles `candidate`/`stable_publishable` | Al evaluar si un dataset nuevo entra al MVP · al reevaluar un `candidate` |
+| **`docs/product-spec.md`** | Mision, vision, principios y relacion con datos.gob.cl y las fuentes oficiales (ADR-023) | Al redactar textos publicos (README, landing, fichas) · al decidir el alcance del hub |
+| **`docs/sostenibilidad/README.md`** | Estado, cronologia y conclusiones de la estrategia de sostenibilidad (auditorias 1–3; vigente: veredicto D, HOLD) | Antes de cualquier trabajo de financiamiento, patrocinios o grants · antes de citar metricas de adopcion en material externo |
 
 ---
 
@@ -72,7 +78,6 @@ src/
 ├── builders/                      Modulos del pipeline (extraidos de build_dev_db.py):
 │   _shared, io_utils, formats, metadata, reports, artifacts, datasets, catalog, landing,
 │   dcat_catalog, data_package, doc_sync, geo, _logging, staging_schema
-├── chile_hub.py                   Shim de compatibilidad — delega al paquete inferior
 ├── chile_hub/
 │   ├── core.py                    Clase ChileHub + API publica completa
 │   ├── cli.py                     Entry points de CLI (extraido de core.py)
@@ -80,10 +85,10 @@ src/
 │   └── pipeline_status_utils.py   Constructores de reportes (health, catalog, redistribution)
 ├── pipeline_status_utils.py       Shim de reexport — para scripts con PYTHONPATH=src.
 │   No dupliques logica aqui: la implementacion real es chile_hub/pipeline_status_utils.py (arriba)
-├── registry/                      DatasetSpec cohort Phase 2–3D, 22 specs (ADR-018)
+├── registry/                      DatasetSpec cohort Phase 2–3D, 25 specs (ADR-018)
 
 data/
-├── dataset_specs/  22 DatasetSpecs (sin spec: calidad_aire, estadisticas_vitales, permisos_edificacion)
+├── dataset_specs/  25 DatasetSpecs (cubre todo el catálogo)
 ├── raw/        Snapshots de auditoria — solo append, nunca editar
 ├── staging/    {dataset}.csv + {dataset}.metadata.json — entradas del pipeline
 └── normalized/ Artefactos generados — NUNCA editar manualmente; siempre regenerar
@@ -105,16 +110,17 @@ tests/                      15 archivos — inventario completo en AGENTS.md §8
 
 | Tarea | Ir a |
 |---|---|
-| Ejecutar pipeline completo | `CLAUDE.md` → **Comandos esenciales** → `make refresh` |
+| Ejecutar pipeline completo | **`AGENTS.md §11`** → `make refresh` |
 | Ejecutar un paso | `CLAUDE.md` → `make extract` / `make build` / `make test` |
 | Agregar un nuevo dataset | **`AGENTS.md §5`** — lista de verificacion de 7 pasos |
 | Escribir una funcion `validate_*()` | `src/validation.py` — luego importar en `build_dev_db.py` |
 | Entender los jobs de CI/CD | **`AGENTS.md §9`** |
 | Verificar estado legal de redistribucion de una fuente | **`AGENTS.md §6`** |
 | Revisar que antipatrones evitar | **`AGENTS.md §10`** |
+| Financiamiento, patrocinios, grants o citar metricas de adopcion | **`docs/sostenibilidad/README.md`** — estado HOLD (veredicto D) + cronologia de auditorias |
 | CI marca un documento/test desincronizado del codigo | **`AGENTS.md §12`** — `scripts/check_companion_paths.py` |
-| Navegar archivos grandes sin leerlos en frio | `CLAUDE.md` → seccion **CodeGraph** |
-| Encontrar donde esta definido un simbolo | `codegraph find <name>` o `grep -n "def <name>" src/` |
+| Navegar archivos grandes sin leerlos en frio | **`AGENTS.md §2½`** → CodeGraph |
+| Encontrar donde esta definido un simbolo | `codegraph query <name>` o `grep -n "def <name>" src/` |
 | Leer API publica de ChileHub | `src/chile_hub/core.py` (clase ChileHub, todos los metodos publicos) |
 | Leer toda la logica de validacion | `src/validation.py` (leer por validador) |
 | Leer contrato de extractors | `src/extractors/base.py` (breve — seguro de leer completo) |

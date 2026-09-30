@@ -4,6 +4,64 @@
 
 `chile-hub` es una capa de acceso curada, versionada y fácil de consumir para datos chilenos de fuentes abiertas o legalmente reutilizables.
 
+## Misión, visión y relación con el ecosistema oficial
+
+> **Dueño canónico** de la misión, la visión y el posicionamiento de chile-hub. El
+> README, la landing, `llms.txt`, `SOURCE_OF_TRUTH.md` y `AGENTS.md` solo llevan una
+> línea y un puntero a esta sección. La decisión está registrada en
+> [ADR-023](adr/ADR-023-posicionamiento-ultima-milla-no-portal.md).
+
+**Eslogan:** La última milla de los datos oficiales de Chile.
+
+**Misión.** Tomar los datos que el Estado ya publica (en
+[datos.gob.cl](https://datos.gob.cl/) y en cada institución) y dejarlos listos para
+usar: normalizados sobre claves territoriales comunes (CUT), validados, versionados y
+con procedencia verificable, para cruzarlos en una línea de código.
+
+**Visión.** Que cruzar datos públicos de Chile sea trivial y confiable, y que cada
+cifra lleve de vuelta a su fuente oficial.
+
+### Quién hace qué
+
+| Actor | Rol | ¿Es la autoridad sobre el dato? |
+|:---|:---|:---|
+| Instituciones del Estado (INE, BCN, MINSAL, MINEDUC, MDS, SUBDERE, MMA, entre otras) | Producen y publican cada dataset | Sí: son la fuente oficial |
+| [datos.gob.cl](https://datos.gob.cl/) (Secretaría de Gobierno Digital) | Repositorio centralizado de datos abiertos del Estado: cataloga lo que publican las instituciones | Sí, como canal oficial de publicación |
+| chile-hub | Reutiliza esas fuentes: normaliza, cruza, valida, versiona y documenta la procedencia | No: es un proyecto independiente que trabaja aguas abajo |
+
+chile-hub no es un portal ni reemplaza a datos.gob.cl: lo complementa. Varias capas
+se extraen directamente de su API (`establecimientos_salud`, `empresas`).
+
+### Principios
+
+1. **La fuente oficial manda.** Cada capa enlaza a su fuente oficial, y la palabra
+   "oficial" nunca describe a chile-hub. Si un dato de chile-hub contradice a su
+   fuente, vale la fuente: la diferencia se investiga y se corrige o se documenta.
+2. **Profundidad antes que amplitud.** Una capa entra solo si agrega valor sobre su
+   fuente oficial (criterio de prioridad #7 de
+   [`dataset-inclusion-criteria.md`](dataset-inclusion-criteria.md)). Si la fuente ya
+   entrega el dato limpio y cruzable, se referencia en vez de replicarlo.
+3. **Buen vecino del ecosistema.** Lo que chile-hub detecta aguas arriba (enlaces
+   muertos, cambios de esquema, códigos inconsistentes) se reporta por los canales
+   oficiales. Los datos que faltan se piden por esos mismos canales en vez de
+   scrapearlos.
+4. **Lo abierto sigue abierto.** Las capas publicadas no quedan detrás de un muro de
+   pago (ver [`backlog/08-evaluacion-producto-comercial.md`](backlog/08-evaluacion-producto-comercial.md)).
+
+### Qué no es chile-hub
+
+- No es un portal ni un catálogo exhaustivo de datos chilenos.
+- No es una fuente oficial ni está afiliado al Estado de Chile, a datos.gob.cl ni a
+  las instituciones fuente.
+- No busca que datos.gob.cl lo coseche como publicador: en el portal publican las
+  entidades del Estado, y mezclar datos derivados con los oficiales enturbiaría la
+  procedencia. La relación es la de un reutilizador.
+
+### El nombre
+
+"Hub" nombra el punto donde las capas se cruzan por CUT, no un portal que concentre
+todos los datos del país.
+
 ## Principio
 
 El valor del producto no es "tener todos los datos chilenos".
@@ -91,7 +149,7 @@ Un conjunto de datos debería ingresar a `chile-hub` solo si obtiene una buena p
 4. Tiene condiciones de reutilización claras o manejables.
 5. Puede actualizarse a un costo razonable.
 6. Produce salidas útiles sin herramientas personalizadas.
-7. Ayuda a demostrar la diferenciación del producto.
+7. Agrega valor sobre su fuente oficial: no replica lo que la fuente ya entrega listo para cruzar (ver el principio *Profundidad antes que amplitud*).
 
 ## Prioridad de usuario inicial
 

@@ -31,8 +31,8 @@ Todas las mejoras del backlog están implementadas y en producción:
   nuevas APIs públicas y backlog completo.
 - **Adopción y métricas** — monitorear descargas PyPI, abrir issues de
   feedback, medir qué datasets se usan realmente para priorizar mejoras.
-- **Documentación de API con MkDocs** — existe un plan (`plans/021-mkdocs-api-docs.md`)
-  para generar docs desde docstrings. Pendiente de priorización.
+- **Documentación de API con MkDocs** — **completada** (Plan 021 archivado); el
+  sitio se publica en `/reference/`.
 
 ### Mediano plazo
 - **Mejora continua de extractores** — monitorear fuentes upstream,
@@ -46,9 +46,12 @@ Todas las mejoras del backlog están implementadas y en producción:
 ### Largo plazo
 - **Modelo de contribución** — definir cómo aceptar extractores de la
   comunidad.
-- **Estrategia de sostenibilidad** — el proyecto es mantenido por una
-  persona. Evaluar financiamiento o adopción institucional si el uso
-  crece.
+- **Estrategia de sostenibilidad** — el proyecto lo mantiene una sola
+  persona. El estado, la cronología y las conclusiones están en
+  [`docs/sostenibilidad/README.md`](../sostenibilidad/README.md). La Auditoría 3
+  (2026-09-29) dio veredicto **D**: todavía no se ejecuta sponsorship
+  institucional; primero va un experimento de discovery con su gate. El
+  [Plan 110](../../plans/110-programa-de-patrocinios.md) queda en HOLD.
 
 ---
 

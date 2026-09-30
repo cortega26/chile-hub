@@ -37,7 +37,7 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
           enable-cache: true
 
@@ -108,14 +108,18 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # Sólo artefactos durables: parquet + metadata + checksum. Los
-          # snapshots crudos (JSON de BCN, CSV intermedio) NO van al árbol de
-          # git — Zenodo archiva el tarball de cada tag y sumaban ~240 MB
-          # (ADR-021); se publican como assets del prerelease geometry-audit.
+          # Sólo artefactos durables: parquet + metadata + checksum + el
+          # GeoJSON visual del mapa. El GeoJSON es un asset derivado que
+          # consume la landing; sin él el mapa diverge del parquet publicado.
+          # Los snapshots crudos (JSON de BCN, CSV intermedio) NO van al
+          # árbol de git — Zenodo archiva el tarball de cada tag y sumaban
+          # ~240 MB (ADR-021); se publican como assets del prerelease
+          # geometry-audit.
           for path in \
             data/normalized/geometria_comunal.parquet \
             data/staging/geometria_comunal.metadata.json \
-            data/normalized/geometria_comunal.parquet.sha256
+            data/normalized/geometria_comunal.parquet.sha256 \
+            data/normalized/mapa_comunal.geojson
           do
             [ -e "$path" ] && git add -f "$path"
           done

@@ -8,6 +8,7 @@ No cubren el CLI (argparse + _main) — eso corresponde a tests de integración.
 """
 
 import datetime
+import os
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -16,6 +17,7 @@ import polars as pl
 
 from chile_hub import ChileHub
 from chile_hub.exceptions import ChileHubDataError, ChileHubDatasetError
+from chile_hub.geo import clear_geometry_cache
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 NORMALIZED_DIR = ROOT_DIR / "data" / "normalized"
@@ -407,6 +409,35 @@ class ChileHubEdgeCaseTests(unittest.TestCase):
             self.assertIn("status", r)
             self.assertEqual(r["status"], "online")
 
+    def test_check_sources_preserves_catalog_order_and_completeness(self):
+        """El pool paralelo preserva orden y cardinalidad del catálogo (Plan 120).
+
+        Un dict por entrada del catálogo, en el mismo orden: ``pool.map``
+        garantiza el orden de ``entries`` sin indexar.
+        """
+        hub = _hub()
+        entries = list(hub.catalog.get("datasets", []))
+        self.assertGreater(len(entries), 0)
+
+        def fake_head(*_args, **_kwargs):
+            # Respuesta nueva por llamada: el mismo MagicMock compartido entre
+            # threads acumularía estado de mock de forma no determinista.
+            response = mock.MagicMock(status_code=200, elapsed=datetime.timedelta(milliseconds=5))
+            response.close = lambda: None
+            return response
+
+        with mock.patch("chile_hub.core.requests.head", side_effect=fake_head):
+            results = hub.check_sources(timeout=3)
+
+        self.assertEqual(len(results), len(entries))
+        self.assertEqual(
+            [r["dataset"] for r in results],
+            [entry.get("dataset") for entry in entries],
+        )
+        for r in results:
+            self.assertEqual(r["status"], "online")
+            self.assertIsNotNone(r["latency_ms"])
+
 
 class ChileHubInternalHelpersTests(unittest.TestCase):
     """Tests para funciones internas de core.py no cubiertas por tests existentes."""
@@ -605,6 +636,144 @@ class ChileHubResolveComunasTests(unittest.TestCase):
             )
 
 
+class ChileHubResolveRegionesTests(unittest.TestCase):
+    """Tests para ChileHub.resolve_regiones() (Plan 129, cierra ADR-009 #2)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.hub = _hub()
+
+    def test_resolve_regiones_exact_name(self):
+        """Un nombre oficial de región resuelve a su código CUT de 2 caracteres."""
+        result = self.hub.resolve_regiones(["Tarapacá"])
+        row = result.to_dicts()[0]
+        self.assertTrue(row["matched"])
+        self.assertEqual(row["codigo_region"], "01")
+        self.assertEqual(row["nombre_region"], "Región de Tarapacá")
+
+    def test_resolve_regiones_alias_rm_and_metropolitana(self):
+        """Los alias "RM" y "Metropolitana" resuelven al código 13."""
+        result = self.hub.resolve_regiones(["RM", "Metropolitana"])
+        rows = result.to_dicts()
+        self.assertTrue(rows[0]["matched"])
+        self.assertEqual(rows[0]["codigo_region"], "13")
+        self.assertEqual(rows[1]["codigo_region"], "13")
+        self.assertEqual(rows[0]["nombre_region"], "Región Metropolitana de Santiago")
+
+    def test_resolve_regiones_strips_accents_and_prefix(self):
+        """Tildes y prefijo "Región de/del" no afectan el match."""
+        result = self.hub.resolve_regiones(["Ñuble", "Región del Bío-Bío", "Aysén"])
+        rows = result.to_dicts()
+        self.assertEqual([row["codigo_region"] for row in rows], ["16", "08", "11"])
+        self.assertTrue(all(row["matched"] for row in rows))
+
+    def test_resolve_regiones_no_match_returns_null_without_raising(self):
+        """Un nombre inexistente devuelve matched=False y códigos null, sin excepción."""
+        result = self.hub.resolve_regiones(["No Existe Como Región"])
+        row = result.to_dicts()[0]
+        self.assertFalse(row["matched"])
+        self.assertIsNone(row["codigo_region"])
+        self.assertIsNone(row["nombre_region"])
+
+    def test_resolve_regiones_preserves_order_and_duplicates(self):
+        """El orden y los duplicados del input se preservan fila a fila."""
+        result = self.hub.resolve_regiones(["Ñuble", "Ñuble", "RM"])
+        self.assertEqual(result.height, 3)
+        rows = result.to_dicts()
+        self.assertEqual([row["input"] for row in rows], ["Ñuble", "Ñuble", "RM"])
+        self.assertEqual(rows[0]["codigo_region"], rows[1]["codigo_region"])
+
+    def test_resolve_regiones_codigo_region_is_pl_string(self):
+        """Invariante CUT: codigo_region nunca es int, siempre pl.String."""
+        result = self.hub.resolve_regiones(["Ñuble"])
+        self.assertEqual(result.schema["codigo_region"], pl.String)
+
+
+class RegionAliasParityTests(unittest.TestCase):
+    """Guardrail anti-divergencia entre la tabla del paquete (fuente única) y
+    la copia de fallback de `region_utils` (Plan 129).
+
+    El fallback existe porque `autoridades_electas_extractor` corre en CI en un
+    entorno efímero de `uv --no-project` sin las dependencias del paquete
+    `chile_hub` (rich, platformdirs), donde `import chile_hub` falla. El test
+    carga esa rama a propósito (bloqueando `chile_hub` en el import) y congela
+    la equivalencia: 16 nombres oficiales + todos los alias.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from chile_hub.regions import REGION_ALIASES
+
+        cls.region_aliases = REGION_ALIASES
+        cls.hub = _hub()
+        cls.nombres_oficiales = [
+            row["nombre_region"] for row in cls.hub.load_polars("regiones").iter_rows(named=True)
+        ]
+
+    @staticmethod
+    def _load_region_utils_without_package():
+        """Carga `region_utils` con `import chile_hub*` bloqueado (rama fallback)."""
+        import builtins
+        import importlib.util
+
+        real_import = builtins.__import__
+
+        def blocked(name, *args, **kwargs):
+            if name == "chile_hub" or name.startswith("chile_hub."):
+                raise ModuleNotFoundError(f"No module named {name!r}", name=name)
+            return real_import(name, *args, **kwargs)
+
+        path = ROOT_DIR / "src" / "extractors" / "region_utils.py"
+        spec = importlib.util.spec_from_file_location("region_utils_fallback", path)
+        module = importlib.util.module_from_spec(spec)
+        with mock.patch("builtins.__import__", side_effect=blocked):
+            spec.loader.exec_module(module)
+        return module
+
+    def test_region_utils_delegates_to_package_table(self):
+        """En el entorno normal, region_utils re-exporta la tabla del paquete.
+
+        Misma forma de import (`src.chile_hub`) que usa `region_utils`: mypy
+        exige que el paquete se referencie como `src.chile_hub.*` y no como
+        `chile_hub.*` (fuente encontrada dos veces). Son módulos distintos para
+        Python si en el proceso también se importó `chile_hub.*` (Path distinto
+        en `sys.modules`), por eso la identidad se compara contra la ruta `src.`.
+        """
+        from src.chile_hub.regions import REGION_ALIASES
+        from src.extractors import region_utils
+
+        self.assertIs(region_utils.REGION_A_CODIGO, REGION_ALIASES)
+
+    def test_fallback_table_matches_package_table(self):
+        """La copia de fallback debe ser idéntica a la tabla del paquete."""
+        fallback = self._load_region_utils_without_package()
+        self.assertEqual(fallback.REGION_A_CODIGO, dict(self.region_aliases))
+
+    def test_both_routes_resolve_official_names_and_aliases(self):
+        """Ambas rutas devuelven lo mismo para los 16 nombres oficiales + alias."""
+        from chile_hub.regions import region_name_to_code
+
+        fallback = self._load_region_utils_without_package()
+        for nombre in [*self.nombres_oficiales, *self.region_aliases]:
+            with self.subTest(nombre=nombre):
+                expected = region_name_to_code(nombre)
+                self.assertIsNotNone(expected, f"sin match en el paquete: {nombre!r}")
+                self.assertEqual(fallback.region_nombre_a_codigo(nombre), expected)
+
+    def test_both_routes_cover_all_sixteen_regions(self):
+        """Los 16 códigos del dataset quedan alcanzables por ambas rutas."""
+        from chile_hub.regions import region_name_to_code
+
+        fallback = self._load_region_utils_without_package()
+        codigos = {region_name_to_code(nombre) for nombre in self.nombres_oficiales}
+        self.assertEqual(codigos, {f"{n:02d}" for n in range(1, 17)})
+        for nombre in self.nombres_oficiales:
+            self.assertEqual(
+                fallback.region_nombre_a_codigo(nombre),
+                region_name_to_code(nombre),
+            )
+
+
 class FromDatapackageUrlTests(unittest.TestCase):
     """Tests para from_datapackage(url) (Plan 051, ADR-010).
 
@@ -648,6 +817,12 @@ class ChileHubResolveByCoordsTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.hub = _hub()
+
+    def setUp(self):
+        clear_geometry_cache()
+
+    def tearDown(self):
+        clear_geometry_cache()
 
     @staticmethod
     def _fixture_path(comunas=None):
@@ -736,6 +911,46 @@ class ChileHubResolveByCoordsTests(unittest.TestCase):
             with self.assertRaises(ImportError) as ctx:
                 hub.resolve_by_coords([(-19.5, -70.0)], geometry_path=fixture)
             self.assertIn("pip install chile-hub[geo]", str(ctx.exception))
+
+    def test_geometry_read_once_across_calls(self):
+        """Dos resolve_by_coords con el mismo fixture leen el parquet una sola
+        vez: la segunda llamada reutiliza la caché de ``load_geometry`` (Plan 120)."""
+        import geopandas as gpd
+
+        fixture = self._fixture_path()
+        real_read_parquet = gpd.read_parquet
+        reads = []
+
+        def counting_read_parquet(*args, **kwargs):
+            reads.append(args[0] if args else kwargs.get("path"))
+            return real_read_parquet(*args, **kwargs)
+
+        with mock.patch("chile_hub.geo.MIN_NON_EMPTY_GEOMETRIES", 3):
+            with mock.patch("geopandas.read_parquet", side_effect=counting_read_parquet):
+                first = self.hub.resolve_by_coords([(-19.5, -70.0)], geometry_path=fixture)
+                second = self.hub.resolve_by_coords([(-19.5, -70.0)], geometry_path=fixture)
+
+        self.assertEqual(len(reads), 1)
+        self.assertEqual(first.to_dicts(), second.to_dicts())
+
+    def test_geometry_cache_invalidated_by_mtime_and_clear(self):
+        """Un mtime distinto invalida la caché (refresh reemplaza el archivo) y
+        ``clear_geometry_cache()`` la vacía explícitamente (Plan 120)."""
+        from chile_hub.geo import load_geometry
+
+        fixture = self._fixture_path()
+        with mock.patch("chile_hub.geo.MIN_NON_EMPTY_GEOMETRIES", 3):
+            first = load_geometry(fixture)
+            self.assertIs(load_geometry(fixture), first)
+
+            new_mtime_ns = fixture.stat().st_mtime_ns + 1_000_000_000
+            os.utime(fixture, ns=(new_mtime_ns, new_mtime_ns))
+            after_touch = load_geometry(fixture)
+            self.assertIsNot(after_touch, first)
+
+            clear_geometry_cache()
+            after_clear = load_geometry(fixture)
+        self.assertIsNot(after_clear, after_touch)
 
 
 if __name__ == "__main__":

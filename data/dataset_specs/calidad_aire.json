@@ -1,0 +1,65 @@
+{
+  "spec_version": "1.0",
+  "dataset": "calidad_aire",
+  "kind": "direct",
+  "publication_track": "stable_publishable",
+  "public_bundle_eligible": true,
+  "maturity_status": "stable",
+  "confidence_tier": "Tier B",
+  "extraction_lane": "diaria",
+  "extractor": "src/extractors/calidad_aire_extractor.py",
+  "contract_path": "contracts/datasets/calidad_aire.schema.json",
+  "validator": "validate_calidad_aire",
+  "alias_for": null,
+  "dependencies": [],
+  "source": {
+    "source_id": "mma_sinca_calidad_aire",
+    "source_name": "SINCA — Ministerio del Medio Ambiente",
+    "official_url": "https://sinca.mma.gob.cl/",
+    "access_method": "api",
+    "license_status": "public-api-review-terms",
+    "live_extractor_status": "implemented",
+    "fallback_policy": "allowed_for_dev_blocked_for_publication",
+    "live_ready": true,
+    "fallback_allowed": true,
+    "publish_blocking": true,
+    "review_by": "2026-12-31",
+    "stalled_after_days": 90,
+    "owner": "core",
+    "next_action": "Vigilar estabilidad del endpoint listadomapa2k19 y crecimiento de la serie incremental.",
+    "source_notes": "JSON listadomapa2k19: inventario de ~125 estaciones (código, comuna, lat/lon) + series horarias 24h por contaminante (MP2.5, MP10, SO2, NO2, CO, O3). El extractor agrega a promedios diarios. Serie incremental desde la primera cosecha (el JSON no da historia); staging se siembra desde el Parquet publicado. Cobertura parcial por diseño (~65 comunas)."
+  },
+  "reuse_policy": {
+    "status": "public-api-review-terms",
+    "license": "Datos públicos MMA; sin licencia explícita, citar fuente oficial",
+    "license_url": "https://sinca.mma.gob.cl/",
+    "attribution_required": true,
+    "redistribution_ok": true,
+    "summary": "Mediciones de calidad del aire del SINCA (MMA), API JSON pública. Organismo público chileno sin restricción explícita de reúso; citar fuente oficial."
+  },
+  "freshness_policy": {
+    "max_age_hours": 72,
+    "label": "diaria"
+  },
+  "documentation": {
+    "description": "Promedios diarios de contaminantes atmosféricos (MP2.5, MP10, SO2, NO2, CO, O3) por estación de monitoreo, desde el SINCA (MMA). Cobertura parcial: ~65 comunas con estación.",
+    "path": "docs/datasets/calidad_aire.md",
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars(\"calidad_aire\")\n# Promedio diario de MP2.5 por comuna\ndf.filter(pl.col(\"codigo_contaminante\") == \"mp25\").sort(\"valor_promedio_diario\", descending=True)",
+      "duckdb": "SELECT fecha, codigo_comuna, avg(valor_promedio_diario) AS mp25\nFROM 'data/normalized/calidad_aire.parquet'\nWHERE codigo_contaminante = 'mp25'\nGROUP BY 1, 2 ORDER BY 1 DESC, 3 DESC;",
+      "cli": "chile-hub show calidad_aire"
+    }
+  },
+  "outputs": {
+    "parquet": "data/normalized/calidad_aire.parquet",
+    "json": "data/normalized/calidad_aire.json",
+    "duckdb_table": "calidad_aire",
+    "sqlite_table": "calidad_aire",
+    "excel_sheet": "Calidad Aire"
+  },
+  "join_keys": [
+    "fecha",
+    "codigo_comuna",
+    "codigo_contaminante"
+  ]
+}

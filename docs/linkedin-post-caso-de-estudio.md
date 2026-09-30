@@ -6,6 +6,11 @@
 > reacciones, 16 comentarios). Este es el post **técnico de fondo** — el que
 > explica cómo está construido y por qué. El operador decide el momento.
 > **Basado en** `docs/case-study-construccion-chile-hub.md`.
+>
+> **⚠ Antes de publicar (2026-09-30):** la frase "~2.200 instalaciones al mes" no es
+> correcta. Esas son descargas de PyPI que siguen la cadencia de releases, no
+> instalaciones ni usuarios. Reemplázala por una cifra verificable. Ver
+> [`docs/sostenibilidad/README.md`](sostenibilidad/README.md).
 
 ---
 
@@ -77,7 +82,7 @@ no es total. La integridad de la narrativa vale más que el conteo de capas.
   modo declarado. El fail-loud funcionó exactamente como fue diseñado.
 - El bundle se replica en **Hugging Face Hub** (21 subsets, publicado por CI),
   hay un **servidor MCP** para agentes (`chile-hub[mcp]`), **347 páginas
-  estáticas por comuna** con indicadores oficiales, y cada release recibe un
+  estáticas por comuna** con indicadores de fuentes oficiales, y cada release recibe un
   **DOI de Zenodo** (concept DOI: 10.5281/zenodo.22968698).
 
 **Lo que aprendí:**

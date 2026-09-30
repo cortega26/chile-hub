@@ -38,10 +38,16 @@ try:
     from src.extractors.base import (
         BaseExtractor,
         ensure_staging_directories,
+        write_staging_csv_atomic,
         write_staging_metadata,
     )
 except ModuleNotFoundError:
-    from base import BaseExtractor, ensure_staging_directories, write_staging_metadata
+    from base import (
+        BaseExtractor,
+        ensure_staging_directories,
+        write_staging_csv_atomic,
+        write_staging_metadata,
+    )
 
 try:
     from src.extractors.http_utils import fetch_with_retry
@@ -195,8 +201,38 @@ REQUIRED_COLUMNS = [
     "fecha_fuente",
 ]
 
+# Modo del último fetch (Plan 118): "incremental" cuando solo se descargan los
+# anuarios ausentes del staging más el más reciente; "full" en primera carga,
+# staging ilegible, reconstrucción desde snapshots o refresh forzado por
+# variable de entorno. Mismo patrón de estado de módulo que RES (Plan 076).
+_LAST_FETCH_MODE = "full"
+
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
+
+
+def _staging_years_present() -> set[int] | None:
+    """Años en el staging consolidado (columna `anio`) o None si no se puede leer.
+
+    ``None`` (sin staging, staging de una generación distinta o archivo
+    ilegible) degrada a fetch completo. Solo proyecta la columna ``anio``
+    (lazy scan): el consolidado tiene ~14k filas, pero leer una sola columna
+    es barato.
+    """
+    if not os.path.exists(STAGING_CSV_PATH):
+        return None
+    try:
+        years = (
+            pl.scan_csv(STAGING_CSV_PATH, infer_schema_length=0)
+            .select("anio")
+            .unique()
+            .collect()["anio"]
+            .cast(pl.Int32, strict=False)
+            .to_list()
+        )
+    except Exception:
+        return None
+    return {y for y in years if y is not None}
 
 
 def _snapshot_path(year: int) -> Path:
@@ -557,8 +593,16 @@ def _gate_reconciliacion(rows: list[dict], totals: dict[str, int]) -> tuple[list
 def fetch_data() -> tuple[list[dict], str, str, list[str]]:
     """Obtiene estadísticas vitales comunales desde el INE.
 
+    Incremental (Plan 118): si el staging consolidado ya existe, solo se
+    descargan los anuarios ausentes + el más reciente (la fuente puede
+    republicar el último año); el merge con el staging previo lo hace
+    `process_estadisticas_vitales`. Sin staging legible, fetch completo.
+
     Retorna (rows, source_mode, source_url, notes).
     """
+    global _LAST_FETCH_MODE
+    _LAST_FETCH_MODE = "full"
+
     ensure_staging_directories()
     notes: list[str] = []
     all_rows: list[dict] = []
@@ -569,15 +613,38 @@ def fetch_data() -> tuple[list[dict], str, str, list[str]]:
     except FileNotFoundError as exc:
         return FALLBACK_ROWS, "fallback", EEVV_PAGE, [str(exc)]
 
+    force_full = os.environ.get("CHILE_HUB_VITALES_FULL") == "1"
     try:
         anuarios = _discover_anuario_docs()
         # (anio, titulo, url, path_prefijado). path None = descargar.
-        jobs: list[tuple[int, str, str, Path | None]] = [
-            (year, title, url, None) for (year, title, url) in anuarios
-        ]
+        present = None if force_full else _staging_years_present()
+        fetch_mode = "full"
+        if present is None:
+            jobs: list[tuple[int, str, str, Path | None]] = [
+                (year, title, url, None) for (year, title, url) in anuarios
+            ]
+        else:
+            latest = max((year for (year, _t, _u) in anuarios), default=None)
+            jobs = [
+                (year, title, url, None)
+                for (year, title, url) in anuarios
+                if year not in present or year == latest
+            ]
+            if not jobs:
+                # No debería ocurrir (el último año siempre entra), pero si
+                # la selección queda vacía se degrada a fetch completo.
+                jobs = [(year, title, url, None) for (year, title, url) in anuarios]
+                notes.append("selección incremental vacía; fetch completo")
+            else:
+                fetch_mode = "incremental"
+                notes.append(
+                    f"fetch incremental: {len(jobs)} de {len(anuarios)} anuarios "
+                    f"(faltantes + año más reciente {latest})"
+                )
     except (requests.RequestException, ValueError, KeyError) as exc:
         notes.append(f"descubrimiento de anuarios falló ({exc})")
         jobs = []
+        fetch_mode = "full"
 
     if not jobs:
         # Sitio no disponible: reconstruir desde snapshots crudos locales
@@ -663,6 +730,7 @@ def fetch_data() -> tuple[list[dict], str, str, list[str]]:
     if not all_rows:
         return FALLBACK_ROWS, "fallback", EEVV_PAGE, notes
 
+    _LAST_FETCH_MODE = fetch_mode
     mode = "live" if any_live else "fallback"
     return all_rows, mode, EEVV_PAGE, notes
 
@@ -729,7 +797,31 @@ def build_metadata(mode: str, source_url: str, notes: list[str], row_count: int)
 def process_estadisticas_vitales() -> dict:
     """Ejecuta el flujo completo de extracción y staging."""
     rows, mode, source_url, notes = fetch_data()
-    df = normalize_rows(rows)
+    df_new = normalize_rows(rows)
+
+    if _LAST_FETCH_MODE == "incremental" and os.path.exists(STAGING_CSV_PATH):
+        # Merge con el staging previo (Plan 118): el fetch incremental solo
+        # trae los anuarios ausentes + el más reciente. `anio` y `cantidad` se
+        # leen con su tipo canónico y el resto como string para no perder los
+        # ceros de los códigos CUT (mismo criterio que RES, Plan 076). Los
+        # años re-descargados reemplazan su versión previa; el resto se
+        # conserva. `maintain_order=True` mantiene determinista el orden de
+        # empates (la PK es anio+codigo_comuna+evento+sexo).
+        prev = pl.read_csv(
+            STAGING_CSV_PATH,
+            schema_overrides={
+                **{c: pl.String for c in REQUIRED_COLUMNS},
+                "anio": pl.Int64,
+                "cantidad": pl.Int64,
+            },
+        )
+        fetched_years = sorted(df_new["anio"].unique().to_list())
+        prev = prev.filter(~pl.col("anio").is_in(fetched_years))
+        df = pl.concat([prev, df_new], how="diagonal_relaxed").sort(
+            ["anio", "codigo_comuna", "sexo"], maintain_order=True
+        )
+    else:
+        df = df_new
 
     metadata = build_metadata(mode, source_url, notes, df.height)
 
@@ -765,16 +857,8 @@ class EstadisticasVitalesExtractor(BaseExtractor):
 
     def write_staging(self, df, metadata: dict) -> Path:
         ensure_staging_directories()
-        output = Path(STAGING_CSV_PATH)
-        df.write_csv(str(output))
-        merged = {
-            **metadata,
-            "dataset": self.dataset_name,
-            "refreshed_at_utc": datetime.datetime.now(UTC).isoformat(),
-            "record_count": df.height,
-        }
-        write_staging_metadata(METADATA_PATH, merged)
-        return output
+        merged = {**metadata, "dataset": self.dataset_name}
+        return write_staging_csv_atomic(df, STAGING_CSV_PATH, METADATA_PATH, merged)
 
 
 if __name__ == "__main__":

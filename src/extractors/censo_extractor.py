@@ -19,15 +19,20 @@ try:
     from src.extractors.base import (
         BaseExtractor,
         ensure_staging_directories,
-        write_staging_metadata,
+        write_staging_csv_atomic,
     )
 except ModuleNotFoundError:
-    from base import BaseExtractor, ensure_staging_directories, write_staging_metadata
+    from base import BaseExtractor, ensure_staging_directories, write_staging_csv_atomic
 
 try:
     from src.extractors.http_utils import fetch_with_retry
 except ModuleNotFoundError:
     from http_utils import fetch_with_retry
+
+try:
+    from src.extractors.result import ExtractionResult
+except ModuleNotFoundError:
+    from result import ExtractionResult
 
 DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data"))
 RAW_DIR = os.path.join(DATA_DIR, "raw")
@@ -126,26 +131,59 @@ def parse_workbook(path: Path) -> pl.DataFrame:
     return pl.DataFrame(list(totals.values())).sort("codigo_comuna")
 
 
-def process_censo() -> str:
+def _build_extraction_result(
+    df: pl.DataFrame, path: Path, source_mode: str, retrieved_at: datetime.datetime
+) -> ExtractionResult:
+    """Construye ExtractionResult para censo (ordinary, fuente única, sin published_at)."""
+    snapshot_hash = ExtractionResult.compute_hash(path)
+    try:
+        snapshot_reference = str(path.relative_to(ROOT_DIR)) if path.is_file() else str(path)
+    except ValueError:
+        snapshot_reference = str(path)
+    # Censo 2024: periodo observado es el año censal
+    observed_period = {"start": "2024-01-01", "end": "2024-12-31"}
+    return ExtractionResult(
+        dataset="censo_comunal",
+        dataframe=df,
+        raw_snapshot_path=path,
+        snapshot_hash=snapshot_hash,
+        snapshot_reference=snapshot_reference,
+        source_mode=source_mode,
+        retrieved_at=retrieved_at,
+        source_published_at=None,
+        observed_period=observed_period,
+        reuse_policy=REUSE_POLICY,
+        source_detail="official_xlsx" if source_mode == "live" else "raw_snapshot_recovery",
+        notes=("age_bands_derived_from_quinquennial_groups",),
+        record_count=df.height,
+        fields=tuple(df.columns),
+    )
+
+
+def extract_censo() -> ExtractionResult:
+    """Entry point tipado Phase 4: retorna ExtractionResult sin escribir staging."""
+    retrieved_at = datetime.datetime.now(UTC)
     path, source_mode = fetch_workbook()
     df = parse_workbook(path)
+    result = _build_extraction_result(df, path, source_mode, retrieved_at)
     validation = CensoExtractor().validate(df, {"source_mode": source_mode})
     if validation["status"] == "error":
         raise SystemExit(f"Validacion fallida: {validation['errors']}")
-    metadata = {
-        "dataset": "censo_comunal",
-        "source_name": "Instituto Nacional de Estadisticas - Censo 2024",
-        "source_url": CENSO_URL,
-        "source_mode": source_mode,
-        "source_detail": "official_xlsx" if source_mode == "live" else "raw_snapshot_recovery",
-        "refreshed_at_utc": datetime.datetime.now(UTC).isoformat(),
-        "record_count": df.height,
-        "fields": df.columns,
-        "notes": ["age_bands_derived_from_quinquennial_groups"],
-        "reuse_policy": REUSE_POLICY,
-    }
-    CensoExtractor().write_staging(df, metadata)
-    print(f"Censo comunal guardado en: {STAGING_CSV_PATH} ({df.height} registros, {source_mode})")
+    return result
+
+
+def process_censo() -> str:
+    result = extract_censo()
+    CensoExtractor().write_staging(
+        result.dataframe,
+        result.to_staging_metadata(
+            source_name="Instituto Nacional de Estadisticas - Censo 2024",
+            source_url=CENSO_URL,
+        ),
+    )
+    print(
+        f"Censo comunal guardado en: {STAGING_CSV_PATH} ({result.dataframe.height} registros, {result.source_mode})"
+    )
     return STAGING_CSV_PATH
 
 
@@ -167,10 +205,7 @@ class CensoExtractor(BaseExtractor):
 
     def write_staging(self, df, metadata: dict) -> Path:
         ensure_staging_directories()
-        output = Path(STAGING_CSV_PATH)
-        df.write_csv(output)
-        write_staging_metadata(METADATA_PATH, metadata)
-        return output
+        return write_staging_csv_atomic(df, STAGING_CSV_PATH, METADATA_PATH, metadata)
 
 
 if __name__ == "__main__":

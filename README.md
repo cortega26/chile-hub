@@ -11,7 +11,7 @@
 </h1>
 
 <p><strong>Datos públicos de Chile, curados y listos para análisis en una línea de código.</strong></p>
-<p><em>El hub de datos abiertos de Chile — parte del ecosistema Tooltician.</em></p>
+<p><em>La última milla de los datos oficiales de Chile — parte del ecosistema Tooltician.</em></p>
 
 [![CI/CD](https://github.com/cortega26/chile-hub/actions/workflows/pipeline-check.yml/badge.svg)](https://github.com/cortega26/chile-hub/actions)
 [![PyPI version](https://img.shields.io/pypi/v/chile-hub.svg)](https://pypi.org/project/chile-hub/)
@@ -115,6 +115,11 @@ chile-hub cache clear      # Liberar espacio
 > el costo técnico** de encontrar, limpiar, validar, cruzar y consumir datasets
 > geográficos, demográficos, electorales y económicos críticos de Chile.
 >
+> Tampoco es un portal ni una fuente oficial: trabaja aguas abajo de
+> [datos.gob.cl](https://datos.gob.cl/) y de las instituciones que publican cada dato,
+> y siempre enlaza a la fuente oficial. Es un proyecto independiente, sin afiliación con
+> esas instituciones. Misión y principios: [`docs/product-spec.md`](docs/product-spec.md).
+>
 > En la práctica, responde preguntas como:
 >
 > - ¿Cómo cruzo mi base de clientes, escuelas o centros de salud con comunas oficiales sin perder ceros en los códigos?
@@ -125,7 +130,7 @@ chile-hub cache clear      # Liberar espacio
 > **Versionado:** Para entornos productivos, fija la versión exacta en `requirements.txt`
 > (revisa el badge de PyPI al inicio de este README para la versión más reciente):
 > ```
-> chile-hub==1.43.1
+> chile-hub==1.47.1
 > ```
 > El bundle de datos se publica con cada release. La API del módulo `ChileHub` sigue
 > versionado semántico: cambios de interfaz pública solo en _major releases_.
@@ -153,11 +158,11 @@ Trabajar con datos públicos chilenos suele implicar los mismos obstáculos:
 | Pilar | Descripción | Artefacto auditable |
 |:---|:---|:---|
 | **Procedencia documentada** | Cada dataset declara su fuente oficial exacta con URL directa al organismo público emisor (BCN, INE, MINEDUC, BCCh, MINSAL, datos.gob.cl). | [`provenance_report.md`](data/normalized/provenance_report.md) — fuente, modo y timestamp por capa |
-| **Auditoría legal explícita** | <!-- START_REDISTRIBUTION_SUMMARY -->Licencia, atribución requerida y permiso de redistribución verificados dataset por dataset. **22 de 22 capas** pasan la auditoría (`ready`).<!-- END_REDISTRIBUTION_SUMMARY --> | [`redistribution_report.md`](data/normalized/redistribution_report.md) + [`AGENTS.md §6`](AGENTS.md) |
+| **Auditoría legal explícita** | <!-- START_REDISTRIBUTION_SUMMARY -->Licencia, atribución requerida y permiso de redistribución verificados dataset por dataset — reporte regenerado en cada build en [`redistribution_report.md`](data/normalized/redistribution_report.md).<!-- END_REDISTRIBUTION_SUMMARY --> | [`redistribution_report.md`](data/normalized/redistribution_report.md) + [`AGENTS.md §6`](AGENTS.md) |
 | **Pipeline fail-loud** | Si una validación falla, el pipeline **aborta** — no publica datos corruptos, no emite advertencias silenciosas. | [`ADR-001`](docs/adr/ADR-001-pipeline-lineal-determinista.md) — fail-loud como decisión de arquitectura |
 | **Contratos de esquema** | <!-- START_CONTRACT_COUNT -->25 contratos JSON Schema ([`contracts/datasets/`](contracts/datasets/)) definen columnas esperadas, tipos, claves primarias y cobertura. Se validan **en cada build** automáticamente.<!-- END_CONTRACT_COUNT --> | [`ADR-005`](docs/adr/ADR-005-contratos-esquema-json-schema.md) + `contracts/datasets/*.json` |
-| **Salud transparente** | <!-- START_HEALTH_SUMMARY -->Dashboard público con severidad, frescura, cobertura, drift y degradación por dataset. 20 capas `ok`, 1 `warn`, 0 `error`.<!-- END_HEALTH_SUMMARY --> | [`hub_health.md`](data/normalized/hub_health.md) — estado completo actualizado en cada build |
-| **Calidad medida** | <!-- START_QUALITY_SUMMARY -->Puntuación compuesta A-F por dataset: **promedio 94.0/100** (19 A, 3 B). Dimensiones: validación, contrato, madurez de fuente, frescura, cobertura, política de reúso.<!-- END_QUALITY_SUMMARY --> | [`dataset_quality.md`](data/normalized/dataset_quality.md) — scorecard completo |
+| **Salud transparente** | <!-- START_HEALTH_SUMMARY -->Dashboard público con severidad, frescura, cobertura, drift y degradación por dataset — regenerado en cada build en [`hub_health.md`](data/normalized/hub_health.md).<!-- END_HEALTH_SUMMARY --> | [`hub_health.md`](data/normalized/hub_health.md) — estado completo actualizado en cada build |
+| **Calidad medida** | <!-- START_QUALITY_SUMMARY -->Puntuación compuesta A-F por dataset (validación, contrato, madurez de fuente, frescura, cobertura y política de reúso); scorecard completo en [`dataset_quality.md`](data/normalized/dataset_quality.md).<!-- END_QUALITY_SUMMARY --> | [`dataset_quality.md`](data/normalized/dataset_quality.md) — scorecard completo |
 
 Cada pilar se audita automáticamente en cada ejecución del pipeline. Los reportes se
 regeneran en cada build — no son documentos estáticos mantenidos a mano. Para auditar
@@ -175,10 +180,10 @@ El mismo estado se publica en el sitio, con historial de builds y detalle por ca
 ### Respaldo adicional
 
 <!-- START_TEST_COUNT -->
-- **1143 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
+- **1263 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
 <!-- END_TEST_COUNT -->
 <!-- START_ADR_COUNT -->
-- **22 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
+- **23 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
 <!-- END_ADR_COUNT -->
 - **Drift monitoreado:** todos los datasets bajo vigilancia de deriva de esquema; cualquier
   cambio en la fuente se detecta y registra ([`drift_report.md`](data/normalized/drift_report.md)).
@@ -206,39 +211,42 @@ Mapa territorial interactivo: las 346 comunas con 7 métricas seleccionables
 
 <!-- START_DATASET_TABLE -->
 
-| # | Capa | Registros | Modo | Fuente | Licencia | Actualización |
-|:--:|:---|:---|:--:|:---|:---|:--:|
-| 1 | **Regiones** | 16 | live | BCN ArcGIS | CC BY | — |
-| 2 | **Provincias** | 56 | live | BCN ArcGIS | CC BY | — |
-| 3 | **Comunas** | 346 | live | BCN ArcGIS | CC BY | — |
-| 4 | **Comunas Enriquecidas** | 346 | live | BCN + INE | CC BY | — |
-| 5 | **Indicadores Económicos** | Serie histórica | live | BCCh / mindicador.cl | Libre c/cita | Diaria |
-| 6 | **Censo Comunal 2024** | 346 | live | INE | CC BY 4.0 | Decenal |
-| 7 | **Censo Hogares y Viviendas** | 346 | live | INE | CC BY 4.0 | Decenal |
-| 8 | **Establecimientos de Salud** | 5743 | live | MINSAL / datos.gob.cl | CC0 | Mensual |
-| 9 | **Distritos Electorales** | 346 | live | BCN / Ley 20.840 | CC0 | — |
-| 10 | **Establecimientos Educacionales** | ~12 898 | live | MINEDUC | CC BY 3.0 CL | Anual |
-| 11 | **Finanzas Municipales** | 345 (parcial) | parcial | SINIM / SUBDERE | Revisión términos | Anual |
-| 12 | **Resultados Educacionales** | 345 | live | MINEDUC | CC BY 3.0 CL | Anual |
-| 13 | **Indicadores Urbanos SIEDU** | 6 701 (parcial) | live | INE / SIEDU | Datos abiertos INE | Anual |
-| 14 | **Perfil Territorial Comunal** | 346 | live | chile-hub derivado | Fuentes abiertas | Derivada |
-| 15 | **Empresas (RES)** | ~1 609 373 | live | Min. Economía / datos.gob.cl | CC-BY 3.0 CL | Mensual |
-| 16 | **Pobreza Comunal (SAE)** | 690 | live | MDS / Observatorio Social | Datos abiertos MDS | Bienal/trienal |
-| 17 | **Consumo Eléctrico Comunal** | 3 | fallback | CNE / Energía Abierta | CC BY | Anual |
-| 18 | **Partidos Políticos** | 37 | live | Cámara de Diputados | CC BY | Bajo_demanda |
-| 19 | **Autoridades Electas** | 205 | live | Cámara de Diputados + Senado | CC BY | Bajo_demanda |
-| 20 | **Estadísticas Vitales** | 13 840 | live | INE | CC BY 4.0 | Anual |
-| 21 | **Permisos de Edificación** | 8 650 | monthly | MINVU / CEDOC | Uso c/cita | Mensual |
-| 22 | **Calidad del Aire** | 2 264 | live | MMA / SINCA | Revisión términos | Diaria |
-| 23 | **geometria_comunal** | — | candidato | — | — | — |
-| 24 | **Delincuencia Comunal** | — | deprecated | CEAD / SPD | Revisión términos | — |
-| 25 | **Autoridades Locales** | — | candidato | BCN SIIT + Wikipedia | CC BY / CC BY-SA | — |
+| # | Capa | Fuente | Licencia | Actualización |
+|:--:|:---|:---|:---|:--:|
+| 1 | **Regiones** | BCN ArcGIS | CC BY | — |
+| 2 | **Provincias** | BCN ArcGIS | CC BY | — |
+| 3 | **Comunas** | BCN ArcGIS | CC BY | — |
+| 4 | **Comunas Enriquecidas** | BCN + INE | CC BY | — |
+| 5 | **Indicadores Económicos** | BCCh / mindicador.cl | Libre c/cita | Diaria |
+| 6 | **Censo Comunal 2024** | INE | CC BY 4.0 | Decenal |
+| 7 | **Censo Hogares y Viviendas** | INE | CC BY 4.0 | Decenal |
+| 8 | **Establecimientos de Salud** | MINSAL / datos.gob.cl | CC0 | Mensual |
+| 9 | **Distritos Electorales** | BCN / Ley 20.840 | CC0 | — |
+| 10 | **Establecimientos Educacionales** | MINEDUC | CC BY 3.0 CL | Anual |
+| 11 | **Finanzas Municipales** | SINIM / SUBDERE | Revisión términos | Anual |
+| 12 | **Resultados Educacionales** | MINEDUC | CC BY 3.0 CL | Anual |
+| 13 | **Indicadores Urbanos SIEDU** | INE / SIEDU | Datos abiertos INE | Anual |
+| 14 | **Perfil Territorial Comunal** | chile-hub derivado | Fuentes abiertas | Derivada |
+| 15 | **Empresas (RES)** | Min. Economía / datos.gob.cl | CC-BY 3.0 CL | Mensual |
+| 16 | **Pobreza Comunal (SAE)** | MDS / Observatorio Social | Datos abiertos MDS | Bienal/trienal |
+| 17 | **Consumo Eléctrico Comunal** | CNE / Energía Abierta | CC BY | Anual |
+| 18 | **Partidos Políticos** | Cámara de Diputados | CC BY | Bajo_demanda |
+| 19 | **Autoridades Electas** | Cámara de Diputados + Senado | CC BY | Bajo_demanda |
+| 20 | **Estadísticas Vitales** | INE | CC BY 4.0 | Anual |
+| 21 | **Permisos de Edificación** | MINVU / CEDOC | Uso c/cita | Mensual |
+| 22 | **Calidad del Aire** | MMA / SINCA | Revisión términos | Diaria |
+| 23 | **geometria_comunal** | — | — | — |
+| 24 | **Delincuencia Comunal** | CEAD / SPD | Revisión términos | — |
+| 25 | **Autoridades Locales** | BCN SIIT + Wikipedia | CC BY / CC BY-SA | — |
 
-> **live**: datos extraídos directamente desde la fuente oficial en cada ejecución del pipeline.
-> **fallback**: datos servidos desde un respaldo curado mientras se completa la extracción en vivo.
-> **parcial**: cobertura inferior al 50% del universo esperado. Capa candidata, no completa.
-> **candidato**: capa en carril candidate — extractor implementado, datos no incluidos en el bundle público.
-> **deprecated**: capa degradada a rechazada — sin mantención ni bundle; su doc queda como referencia histórica.
+> **Métricas por build:** el modo de la última extracción, el conteo de
+> registros, la cobertura y la frescura viven en
+> [`hub_health.md`](data/normalized/hub_health.md),
+> [`dataset_status.json`](data/normalized/dataset_status.json) y
+> [`dataset_quality.md`](data/normalized/dataset_quality.md), regenerados en cada
+> build; los badges resumen frescura y estado:
+> [![Data](https://img.shields.io/endpoint?url=https://tooltician.com/chile-hub/data/normalized/freshness_badge.json)](https://tooltician.com/chile-hub/data/normalized/hub_health.json)
+> [![Coverage](https://img.shields.io/endpoint?url=https://tooltician.com/chile-hub/data/normalized/coverage_badge.json)](https://tooltician.com/chile-hub/data/normalized/hub_status.json)
 > Para auditar el estado exacto de cada capa: `chile-hub provenance` y `chile-hub health`.
 
 <!-- END_DATASET_TABLE -->
@@ -346,8 +354,10 @@ WHERE c.nombre_region = 'Valparaíso';
 | `chile-hub cache update/status/clear` | Administra el cache local del bundle publicado. |
 
 > **¿Construyes agentes?** El proyecto incluye un servidor MCP con catálogo,
-> consultas y salud para que tu agente consuma los datos sin integraciones
-> propias: [`docs/mcp.md`](docs/mcp.md).
+> consultas y resolución de comunas para que tu agente consuma los datos sin
+> integraciones propias: [`docs/mcp.md`](docs/mcp.md).
+
+<!-- mcp-name: io.github.cortega26/chile-hub -->
 
 ### CLI: los comandos más usados
 
@@ -551,6 +561,9 @@ Esta sección es para contribuidores que ejecutan el pipeline de extracción, bu
 verificación en su máquina. Si solo necesitas consumir los datos, usa
 `pip install chile-hub` (ver [Instalación](#instalar-y-usar-en-30-segundos)).
 
+Requiere [uv](https://docs.astral.sh/uv/getting-started/installation/) y Git.
+Python lo gestiona uv (`make bootstrap`).
+
 ```bash
 # Entorno
 git clone https://github.com/cortega26/chile-hub.git
@@ -569,6 +582,14 @@ make test               # pytest (lee data/normalized/, no corre el pipeline)
 make coverage           # pytest + cobertura de src/ (term-missing + coverage.xml)
 make verify-landing     # Pruebas de humo de landing page con Playwright
 ```
+
+> `autoridades_electas` requiere scrapling para no degradar a 155 registros
+> (0 senadores); el comando local está en
+> [Carriles de extracción](docs/extraction-lanes.md).
+
+> El ZIP publicable no se versiona: `make build` lo genera localmente y el
+> sitio lo descarga desde el asset del último GitHub Release. Para clones más
+> livianos: `git clone --filter=blob:none https://github.com/cortega26/chile-hub`.
 
 Para entender la arquitectura, las reglas no negociables y el flujo de trabajo, revisa
 [`AGENTS.md`](./AGENTS.md); el punto de partida rápido es

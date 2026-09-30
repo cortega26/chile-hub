@@ -1,10 +1,11 @@
 import functools
 import importlib.resources
 import json
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from difflib import get_close_matches
 from pathlib import Path
-from typing import Any, Literal, cast
+from typing import Any, Callable, Literal, cast
 
 import polars as pl
 import requests
@@ -24,6 +25,7 @@ from .pipeline_status_utils import (
     compute_top_issue,
     format_top_issue_summary,
 )
+from .regions import REGION_ALIASES, normalize_region_name
 from .text import normalize_comuna_name
 
 UTC = timezone.utc
@@ -63,6 +65,34 @@ def _format_available(values: list[str], requested: str | None = None) -> str:
     if matches:
         return f"Disponibles: {available}. Quizas quisiste decir '{matches[0]}'."
     return f"Disponibles: {available}"
+
+
+def _resolve_names_to_frame(
+    names: list[str],
+    lookup: dict[str, dict[str, str]],
+    normalizer: Callable[[str], str],
+    value_columns: tuple[str, ...],
+) -> pl.DataFrame:
+    """Fila por input (orden y duplicados preservados) con ``matched`` explícito.
+
+    Helper común de ``resolve_comunas`` y ``resolve_regiones``: normaliza cada
+    input con ``normalizer``, busca en ``lookup`` y devuelve códigos nulos (sin
+    excepción) para los no encontrados.
+    """
+    rows: list[dict[str, Any]] = []
+    for original in names:
+        hit = lookup.get(normalizer(str(original)))
+        row: dict[str, Any] = {"input": original}
+        for column in value_columns:
+            row[column] = hit[column] if hit else None
+        row["matched"] = hit is not None
+        rows.append(row)
+    schema = {
+        "input": pl.String,
+        **{column: pl.String for column in value_columns},
+        "matched": pl.Boolean,
+    }
+    return pl.DataFrame(rows, schema=schema)
 
 
 class ChileHub:
@@ -371,35 +401,66 @@ class ChileHub:
         """
         comunas = self.load_polars("comunas")
         lookup = {
-            row["nombre_comuna_clean"]: (
-                row["codigo_comuna"],
-                row["nombre_comuna"],
-                row["codigo_region"],
-            )
+            row["nombre_comuna_clean"]: {
+                "codigo_comuna": row["codigo_comuna"],
+                "nombre_comuna": row["nombre_comuna"],
+                "codigo_region": row["codigo_region"],
+            }
             for row in comunas.iter_rows(named=True)
         }
-        rows = []
-        for original in names:
-            key = normalize_comuna_name(str(original))
-            hit = lookup.get(key)
-            rows.append(
-                {
-                    "input": original,
-                    "codigo_comuna": hit[0] if hit else None,
-                    "nombre_comuna": hit[1] if hit else None,
-                    "codigo_region": hit[2] if hit else None,
-                    "matched": hit is not None,
-                }
-            )
-        return pl.DataFrame(
-            rows,
-            schema={
-                "input": pl.String,
-                "codigo_comuna": pl.String,
-                "nombre_comuna": pl.String,
-                "codigo_region": pl.String,
-                "matched": pl.Boolean,
-            },
+        return _resolve_names_to_frame(
+            names,
+            lookup,
+            normalize_comuna_name,
+            ("codigo_comuna", "nombre_comuna", "codigo_region"),
+        )
+
+    def resolve_regiones(self, names: list[str]) -> pl.DataFrame:
+        """Resuelve nombres de región (tipeados por humanos) a códigos CUT.
+
+        Match **determinista**: normaliza cada nombre (minúsculas, sin acentos,
+        sin el prefijo "Región de/del") y lo busca contra la tabla de alias
+        ``chile_hub.regions.REGION_ALIASES`` (que cubre los nombres oficiales
+        publicados en ``regiones`` y alias frecuentes como "RM", "Metropolitana"
+        u "O'Higgins") más los nombres oficiales del dataset. No corrige typos
+        (ver ``docs/adr/ADR-009-resolutor-nombres-comunales.md``).
+
+        Args:
+            names: Lista de nombres de región. Para resolver una columna de un
+                DataFrame, pásala como ``df["mi_columna"].to_list()``.
+
+        Returns:
+            DataFrame Polars con una fila por input (mismo orden, duplicados
+            preservados) y columnas: ``input``, ``codigo_region``,
+            ``nombre_region``, ``matched`` (bool). Los no encontrados tienen
+            ``matched=False`` y códigos nulos — sin lanzar excepción.
+
+        Examples:
+            >>> hub = ChileHub()
+            >>> hub.resolve_regiones(["Metropolitana", "Ñuble", "RM"])
+        """
+        regiones = self.load_polars("regiones")
+        nombre_por_codigo = {
+            row["codigo_region"]: row["nombre_region"] for row in regiones.iter_rows(named=True)
+        }
+        lookup: dict[str, dict[str, str]] = {}
+        for row in regiones.iter_rows(named=True):
+            lookup[normalize_region_name(row["nombre_region"])] = {
+                "codigo_region": row["codigo_region"],
+                "nombre_region": row["nombre_region"],
+            }
+        for alias, codigo in REGION_ALIASES.items():
+            nombre_oficial = nombre_por_codigo.get(codigo)
+            if nombre_oficial is not None:
+                lookup.setdefault(
+                    alias,
+                    {"codigo_region": codigo, "nombre_region": nombre_oficial},
+                )
+        return _resolve_names_to_frame(
+            names,
+            lookup,
+            normalize_region_name,
+            ("codigo_region", "nombre_region"),
         )
 
     def resolve_by_coords(
@@ -1487,24 +1548,21 @@ class ChileHub:
 
     def check_sources(self, timeout: int = 5) -> list[dict[str, Any]]:
         """Verifica la conectividad de red con las fuentes de datos oficiales."""
-        results = []
-        for entry in self.catalog.get("datasets", []):
+
+        def _probe(entry: dict[str, Any]) -> dict[str, Any]:
             dataset = entry.get("dataset")
             url = entry.get("source_url")
             source_name = entry.get("source_name")
             if not url:
-                results.append(
-                    {
-                        "dataset": dataset,
-                        "source_name": source_name,
-                        "url": "N/A",
-                        "status": "offline",
-                        "status_code": None,
-                        "latency_ms": None,
-                        "error": "No source URL defined",
-                    }
-                )
-                continue
+                return {
+                    "dataset": dataset,
+                    "source_name": source_name,
+                    "url": "N/A",
+                    "status": "offline",
+                    "status_code": None,
+                    "latency_ms": None,
+                    "error": "No source URL defined",
+                }
 
             try:
                 # Intenta HEAD primero
@@ -1524,18 +1582,20 @@ class ChileHub:
                 latency_ms = None
                 error = type(e).__name__
 
-            results.append(
-                {
-                    "dataset": dataset,
-                    "source_name": source_name,
-                    "url": url,
-                    "status": status,
-                    "status_code": status_code,
-                    "latency_ms": latency_ms,
-                    "error": error,
-                }
-            )
-        return results
+            return {
+                "dataset": dataset,
+                "source_name": source_name,
+                "url": url,
+                "status": status,
+                "status_code": status_code,
+                "latency_ms": latency_ms,
+                "error": error,
+            }
+
+        entries = list(self.catalog.get("datasets", []))
+        workers = min(8, max(1, len(entries)))
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            return list(pool.map(_probe, entries))
 
     def check_sources_table(self, results: list[dict[str, Any]]) -> str:
         """Formatea el resultado de check_sources como una tabla amigable para terminal."""

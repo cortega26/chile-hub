@@ -1,10 +1,11 @@
 """Sincroniza hechos "variables" hardcodeados en README.md y AGENTS.md con su fuente de verdad.
 
 Cada función lee un hecho derivado del estado real del proyecto (conteo de
-tests, de ADRs, de contratos, de datasets, versión del paquete, salud y
-calidad del hub) y reemplaza el bloque delimitado correspondiente vía
-``replace_delimited_block``. Ver AGENTS.md §12 para la tabla completa de
-propietarios canónicos y dónde corre la generación/verificación.
+tests, de ADRs, de contratos, de datasets, versión del paquete, enlaces
+estables de salud y calidad del hub) y reemplaza el bloque delimitado
+correspondiente vía ``replace_delimited_block``. Ver AGENTS.md §12 para la
+tabla completa de propietarios canónicos y dónde corre la
+generación/verificación.
 """
 
 import ast
@@ -12,17 +13,16 @@ import json
 import os
 import re
 
-from src.builders._shared import DATASET_CATALOG_CONFIG, NORMALIZED_DIR, ROOT_DIR
-from src.builders.io_utils import read_json_if_exists, read_project_version, replace_delimited_block
+from src.builders._shared import DATASET_CATALOG_CONFIG, ROOT_DIR
+from src.builders.io_utils import read_project_version, replace_delimited_block
 
 README_PATH = os.path.join(ROOT_DIR, "README.md")
 AGENTS_PATH = os.path.join(ROOT_DIR, "AGENTS.md")
+INSTALLATION_PATH = os.path.join(ROOT_DIR, "docs", "installation.md")
 TESTS_DIR = os.path.join(ROOT_DIR, "tests")
 ADR_DIR = os.path.join(ROOT_DIR, "docs", "adr")
 CONTRACTS_DIR = os.path.join(ROOT_DIR, "contracts", "datasets")
 DATASET_DOCS_DIR = os.path.join(ROOT_DIR, "docs", "datasets")
-
-GRADE_ORDER = ["A", "B", "C", "D", "F"]
 
 
 def _count_test_functions():
@@ -148,15 +148,46 @@ def sync_readme_version_pin_example(check_only=False):
     )
 
 
+def sync_installation_pins(check_only=False):
+    """Pines de versión (paquete y datos) en docs/installation.md desde pyproject.toml.
+
+    Sin esto, la página de instalación recomendaba una versión de decenas de
+    releases atrás (1.15.0 con el paquete en 1.44.x; Plan 127).
+    """
+    version = read_project_version(ROOT_DIR)
+    body = (
+        "Fija la versión del paquete con pip:\n\n"
+        "```bash\n"
+        f"pip install chile-hub=={version}\n"
+        "```\n\n"
+        "Fija los datos seleccionando el tag de release correspondiente al "
+        "actualizar la caché:\n\n"
+        "```bash\n"
+        f"chile-hub cache update --data-version v{version}\n"
+        "```"
+    )
+    return replace_delimited_block(
+        INSTALLATION_PATH,
+        "INSTALLATION_PIN",
+        body,
+        check_only=check_only,
+        separator="\n\n",
+    )
+
+
 def sync_readme_redistribution_summary(check_only=False):
-    report = read_json_if_exists(os.path.join(NORMALIZED_DIR, "redistribution_report.json"))
-    if report is None:
-        return False
-    ready = report.get("ready_count", 0)
-    total = report.get("dataset_count", 0)
+    """Resumen estable de auditoría legal (Plan 109, revisión): sin conteos.
+
+    Antes interpolaba ready/total desde ``data/normalized/redistribution_report.json``,
+    regenerado en cada build: un cambio de catálogo/registry mergeado sin
+    rebuild producía un diff de README en el schedule y el gate "Check
+    build-synced files" bloqueaba el publish diario. Las cifras viven en el
+    reporte enlazado.
+    """
     body = (
         "Licencia, atribución requerida y permiso de redistribución verificados dataset por "
-        f"dataset. **{ready} de {total} capas** pasan la auditoría (`ready`)."
+        "dataset — reporte regenerado en cada build en "
+        "[`redistribution_report.md`](data/normalized/redistribution_report.md)."
     )
     return replace_delimited_block(
         README_PATH, "REDISTRIBUTION_SUMMARY", body, check_only=check_only, separator=""
@@ -164,15 +195,15 @@ def sync_readme_redistribution_summary(check_only=False):
 
 
 def sync_readme_health_summary(check_only=False):
-    health = read_json_if_exists(os.path.join(NORMALIZED_DIR, "hub_health.json"))
-    if health is None:
-        return False
-    ok = health.get("ok_count", 0)
-    warn = health.get("warn_count", 0)
-    error = health.get("error_count", 0)
+    """Resumen estable de salud (Plan 109): sin conteos que cambien por build.
+
+    Las cifras (ok/warn/error) viven en ``hub_health.md``/``hub_health.json``;
+    el README solo conserva el enlace para no tener que commitearse cada día.
+    """
     body = (
-        "Dashboard público con severidad, frescura, cobertura, drift y degradación por dataset. "
-        f"{ok} capas `ok`, {warn} `warn`, {error} `error`."
+        "Dashboard público con severidad, frescura, cobertura, drift y degradación por "
+        "dataset — regenerado en cada build en "
+        "[`hub_health.md`](data/normalized/hub_health.md)."
     )
     return replace_delimited_block(
         README_PATH, "HEALTH_SUMMARY", body, check_only=check_only, separator=""
@@ -180,15 +211,14 @@ def sync_readme_health_summary(check_only=False):
 
 
 def sync_readme_quality_summary(check_only=False):
-    quality = read_json_if_exists(os.path.join(NORMALIZED_DIR, "dataset_quality.json"))
-    if quality is None:
-        return False
-    average = quality.get("average_score", 0)
-    distribution = quality.get("grade_distribution", {})
-    grades = ", ".join(f"{distribution[g]} {g}" for g in GRADE_ORDER if distribution.get(g, 0) > 0)
+    """Resumen estable de calidad (Plan 109): sin score ni distribución por build.
+
+    El scorecard A-F vive en ``dataset_quality.md``/``dataset_quality.json``.
+    """
     body = (
-        f"Puntuación compuesta A-F por dataset: **promedio {average}/100** ({grades}). "
-        "Dimensiones: validación, contrato, madurez de fuente, frescura, cobertura, política de reúso."
+        "Puntuación compuesta A-F por dataset (validación, contrato, madurez de fuente, "
+        "frescura, cobertura y política de reúso); scorecard completo en "
+        "[`dataset_quality.md`](data/normalized/dataset_quality.md)."
     )
     return replace_delimited_block(
         README_PATH, "QUALITY_SUMMARY", body, check_only=check_only, separator=""
@@ -244,7 +274,11 @@ _AGENTS_TEST_DESCRIPTIONS = {
     "test_phase2_datasetspec.py": (
         "DatasetSpec piloto Phase 2–3D: modelo tipado, proyecciones de "
         "compatibilidad contra catálogo/registry/contrato legacy, overlay y "
-        "fallos cerrados (22 specs: complete)"
+        "fallos cerrados (25 specs: complete — cubre todo el catálogo)"
+    ),
+    "test_phase4_extraction.py": (
+        "ExtractionResult Phase 4: modelo tipado, 3 extractores piloto "
+        "(ordinary/fallback/multi-source) y adapters legacy"
     ),
 }
 
@@ -254,6 +288,7 @@ _AGENTS_TEST_DESCRIPTIONS = {
 _TEST_FILES_WITHOUT_REPOSITORY_NORMALIZED = {
     "test_phase1_characterization.py",
     "test_phase2_datasetspec.py",
+    "test_phase4_extraction.py",
 }
 
 
@@ -311,6 +346,7 @@ _AGENTS_EXTRACTOR_DESCRIPTIONS = {
     "http_utils.py": "Reintentos/backoff HTTP compartidos",
     "region_utils.py": "Normalización de nombres de región compartida",
     "source_adapter.py": "Adaptador de fuente compartido",
+    "result.py": "ExtractionResult tipado (Phase 4) — provenance/tiempo final",
     "ine_ipc.py": "Override de IPC desde el INE (fuente autoritativa; Plan 069)",
     "_sinim_shared.py": "Normalización/metadata compartida stub+scraper (Plan 099)",
     "subdere_extractor.py": (
@@ -370,6 +406,7 @@ _SHARED_MODULES = {
     "http_utils.py",
     "region_utils.py",
     "source_adapter.py",
+    "result.py",
     # ine_ipc.py no sigue la convención *_extractor (es un override de
     # último recurso, no un extractor por dataset) pero es parte del carril
     # diario de indicadores — sin esto, el inventario decía 19 extractores
@@ -679,6 +716,7 @@ SYNC_FUNCS = [
     sync_readme_dataset_badge,
     sync_readme_python_badge,
     sync_readme_version_pin_example,
+    sync_installation_pins,
     sync_readme_redistribution_summary,
     sync_readme_health_summary,
     sync_readme_quality_summary,

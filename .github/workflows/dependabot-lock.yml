@@ -33,7 +33,7 @@ jobs:
           python-version: "3.13"
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
           enable-cache: true
 
@@ -54,6 +54,10 @@ jobs:
 
       - name: Commit updated lock
         if: steps.check.outputs.stale == 'true'
+        env:
+          # El ref del PR pasa por env (no interpolado en el shell): un branch
+          # con metacaracteres rompería/inyectaría el comando con `contents: write`.
+          HEAD_REF: ${{ github.head_ref }}
         run: |
           if git diff --quiet -- uv.lock; then
             echo "Sin cambios en uv.lock tras uv lock"
@@ -63,4 +67,4 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add uv.lock
           git commit -m "chore(deps): sync uv.lock [skip ci]"
-          git push origin HEAD:${{ github.head_ref }}
+          git push origin "HEAD:$HEAD_REF"
