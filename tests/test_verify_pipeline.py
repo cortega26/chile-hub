@@ -21,6 +21,7 @@ without the golden-copy machinery.
 from __future__ import annotations
 
 import contextlib
+import hashlib
 import io
 import json
 import os
@@ -28,6 +29,7 @@ import shutil
 import sys
 import tempfile
 import unittest
+import zipfile
 from pathlib import Path
 from unittest.mock import patch
 
@@ -73,6 +75,32 @@ class VerifyGoldenCopyTests(unittest.TestCase):
 
         # data/normalized/ — bulk of the files the gates inspect
         shutil.copytree(ROOT_DIR / "data" / "normalized", golden / "data" / "normalized")
+
+        # Plan 130: el ZIP publicable es artefacto de build y ya no se
+        # versiona, asi que en un checkout de CI push/PR no existe (el build
+        # solo corre en schedule/dispatch; `make build` lo reconstruye). Sin
+        # el, los tests golden de verify_publishable_zip fallarian por una
+        # ausencia esperada: sintetizamos un ZIP valido con las entradas que
+        # exige el gate, mas su sidecar SHA-256 en formato `shasum`. Si el ZIP
+        # real existe (build local corrido), se usa el copiado.
+        golden_zip = golden / "data" / "normalized" / "chile-hub-publishable-bundle.zip"
+        if not golden_zip.exists():
+            with zipfile.ZipFile(golden_zip, "w") as archive:
+                for name in (
+                    "hub_status.json",
+                    "hub_bundle.json",
+                    "artifact_manifest.json",
+                    "overview.json",
+                ):
+                    archive.write(
+                        golden / "data" / "normalized" / name,
+                        f"data/normalized/{name}",
+                    )
+            digest = hashlib.sha256(golden_zip.read_bytes()).hexdigest()
+            (golden / "data" / "normalized" / "chile-hub-publishable-bundle.zip.sha256").write_text(
+                f"{digest}  data/normalized/chile-hub-publishable-bundle.zip\n",
+                encoding="utf-8",
+            )
 
         # contracts/ — needed by verify_schema_contracts
         shutil.copytree(ROOT_DIR / "contracts" / "datasets", golden / "contracts" / "datasets")
@@ -215,12 +243,25 @@ class VerifyGoldenCopyTests(unittest.TestCase):
         (gitignored) y mataba TODO release con "Missing required files:
         data/staging/...". El perfil `release` usa solo los required files de
         normalized + publication policy, sin el anti-build-olvidado de staging.
+
+        Plan 130: el ZIP publicable dejo de versionarse, asi que `release` y
+        `readiness` ya no exigen lo mismo. `release` verifica el artefacto
+        publication-grade que SI trae el ZIP (el job lo adjunta al GitHub
+        Release) y debe exigirlo; `readiness` corre en push/PR sin build y no
+        puede exigirlo. La diferencia es exactamente el ZIP y su sidecar.
         """
         self.assertNotIn("data/staging", str(vp.required_files_for_profile("release")))
         self.assertNotIn("duckdb", str(vp.required_files_for_profile("release")))
         release_required = {p.name for p in vp.required_files_for_profile("release")}
         publishable_required = {p.name for p in vp.required_files_for_profile("readiness")}
-        self.assertEqual(release_required, publishable_required)
+        self.assertEqual(
+            release_required,
+            publishable_required
+            | {
+                "chile-hub-publishable-bundle.zip",
+                "chile-hub-publishable-bundle.zip.sha256",
+            },
+        )
 
         test_args = ["verify_pipeline.py", "--profile", "release"]
         with (
@@ -228,10 +269,18 @@ class VerifyGoldenCopyTests(unittest.TestCase):
             patch("builtins.print"),
             patch.object(vp, "verify_staging_not_newer_than_normalized") as staging_check,
             patch.object(vp, "verify_publication_policy") as policy_check,
+            # Los required files son constantes de modulo con paths reales del
+            # repo, mientras ROOT_DIR esta parcheado al golden copy: si el ZIP
+            # no existe en el checkout (CI push, Plan 130), verify_required_files
+            # intenta relative_to() contra el dir parcheado y no aplica. Se
+            # stubea igual que en test_main_dev_profile_passes; el contrato de
+            # required files se verifica con las aserciones de arriba.
+            patch.object(vp, "verify_required_files") as required_check,
         ):
             vp.main()
         staging_check.assert_not_called()
         policy_check.assert_called_once()
+        required_check.assert_called_once_with(vp.required_files_for_profile("release"))
 
     # -- corruption tests (isolated temp-dir per test) ---------------------
 
