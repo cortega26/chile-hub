@@ -12,6 +12,27 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.46.1 - 2026-09-30
+
+### Corregido
+
+- **release**: Sincroniza la version de server.json en el bump
+  ([`54c1691`](https://github.com/cortega26/chile-hub/commit/54c1691511c603a4e9a7b80fc2bfaf6bef061620))
+
+- **verify**: Readiness ya no exige el ZIP publicable no versionado
+  ([`8261c39`](https://github.com/cortega26/chile-hub/commit/8261c390e3d98c5da09de1ab2704140b2f3cef1f))
+
+### Mantenimiento
+
+- **repo**: Deja de versionar el ZIP publicable
+  ([`2fb7d15`](https://github.com/cortega26/chile-hub/commit/2fb7d15bb68df5362e03eea56dd073a3d0d1627d))
+
+### Documentación
+
+- **readme**: Sincroniza el conteo de tests tras W4 + server.json sync
+  ([`22a755d`](https://github.com/cortega26/chile-hub/commit/22a755dd837a8205bea418c4f55e17a1323c2664))
+
+
 ## 1.46.0 - 2026-09-29
 
 ### Corregido
