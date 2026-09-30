@@ -6,6 +6,11 @@
 > reacciones, 16 comentarios). Este es el post **técnico de fondo** — el que
 > explica cómo está construido y por qué. El operador decide el momento.
 > **Basado en** `docs/case-study-construccion-chile-hub.md`.
+>
+> **⚠ Antes de publicar (2026-09-30):** la frase "~2.200 instalaciones al mes" no es
+> correcta. Esas son descargas de PyPI que siguen la cadencia de releases, no
+> instalaciones ni usuarios. Reemplázala por una cifra verificable. Ver
+> [`docs/sostenibilidad/README.md`](sostenibilidad/README.md).
 
 ---
 

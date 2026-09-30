@@ -15,7 +15,8 @@ related_docs:
   - CLAUDE.md              # Punto de entrada para sesiones Claude Code
   - CONTRIBUTING.md        # Verificaciones locales y flujo de PR
   - docs/dataset-inclusion-criteria.md  # Criterios de aceptación/deprecación
-last_updated: 2026-09-29
+  - docs/sostenibilidad/README.md       # Estado y cronología de sostenibilidad (auditorías 1–3)
+last_updated: 2026-09-30
 ---
 
 # SOURCE_OF_TRUTH.md — Índice Maestro de Navegación
@@ -47,6 +48,7 @@ que publican cada dato. Misión, visión y principios: **`docs/product-spec.md`*
 | **`CLAUDE.md`** | Redirige a AGENTS.md + SOURCE_OF_TRUTH.md; punto de entrada del proyecto para sesiones de Claude Code | Primera visita al repositorio · orientacion |
 | **`docs/dataset-inclusion-criteria.md`** | Criterios de aceptacion/deprecacion de datasets, carriles `candidate`/`stable_publishable` | Al evaluar si un dataset nuevo entra al MVP · al reevaluar un `candidate` |
 | **`docs/product-spec.md`** | Mision, vision, principios y relacion con datos.gob.cl y las fuentes oficiales (ADR-023) | Al redactar textos publicos (README, landing, fichas) · al decidir el alcance del hub |
+| **`docs/sostenibilidad/README.md`** | Estado, cronologia y conclusiones de la estrategia de sostenibilidad (auditorias 1–3; vigente: veredicto D, HOLD) | Antes de cualquier trabajo de financiamiento, patrocinios o grants · antes de citar metricas de adopcion en material externo |
 
 ---
 
@@ -115,6 +117,7 @@ tests/                      15 archivos — inventario completo en AGENTS.md §8
 | Entender los jobs de CI/CD | **`AGENTS.md §9`** |
 | Verificar estado legal de redistribucion de una fuente | **`AGENTS.md §6`** |
 | Revisar que antipatrones evitar | **`AGENTS.md §10`** |
+| Financiamiento, patrocinios, grants o citar metricas de adopcion | **`docs/sostenibilidad/README.md`** — estado HOLD (veredicto D) + cronologia de auditorias |
 | CI marca un documento/test desincronizado del codigo | **`AGENTS.md §12`** — `scripts/check_companion_paths.py` |
 | Navegar archivos grandes sin leerlos en frio | **`AGENTS.md §2½`** → CodeGraph |
 | Encontrar donde esta definido un simbolo | `codegraph query <name>` o `grep -n "def <name>" src/` |

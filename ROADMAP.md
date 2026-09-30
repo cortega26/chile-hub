@@ -21,9 +21,12 @@
   **20 planes (111–130)** organizados en **4 waves**. Todos `TODO`; la wave 1
   está lista para arrancar.
 - **Planes previos aún abiertos** (no de este batch): 107 `READY` (handoff de
-  operador) y 110 `PROPOSED` (patrocinios, no toca código). **091 cerrada** como
+  operador) y 110 `HOLD` (patrocinios; veredicto D de la Auditoría 3, ver
+  `docs/sostenibilidad/README.md`). **091 cerrada** como
   cubierta por el gate `publication` (2026-09-30); **108 y 109 DONE**.
-- **Tracción de referencia**: ~2.2k instalaciones/mes PyPI (2026-09-25); espejo
+- **Tracción de referencia**: ~2.2k **descargas**/mes PyPI (2026-09-25). Las
+  domina la cadencia de releases: no son instalaciones ni usuarios (ver
+  `docs/sostenibilidad/README.md`). espejo
   HF con 274 descargas (2026-09-29, registrado a mano hasta que aterrice el
   Plan 129); 21 capas publicables; DOI Zenodo aplicado
   (`10.5281/zenodo.22968698`); ~100 estrellas GitHub.
@@ -213,7 +216,7 @@ W4:  130 (decisión)
 | 107 | Handoff de activación de lanzamiento | READY | Issues de leads #107/#108/#109 creados; ejecución por agente externo |
 | 108 | Gate "Check build-synced files" bloquea el publish diario | DONE | Mergeado en PR #110 (`7652568`, merge `4528872`); ADR-022 |
 | 109 | README sin datos volátiles + alerta de schedule roto | DONE | `efad585`+`cbeb572` (revisión), merge `509a123`; Parte C descartada sin caso concreto |
-| 110 | Programa de patrocinios | PROPOSED | No toca código; acciones del operador |
+| 110 | Programa de patrocinios | HOLD | Veredicto D (Auditoría 3, 2026-09-29): no ejecutar; índice en `docs/sostenibilidad/README.md` |
 | 091 | Opcionales estrictos + fallback sintético strict | REJECTED | Cerrada 2026-09-30: cubierta por el gate `publication` |
 
 Detalle execrable de estos en `plans/README.md` y sus `.md`.

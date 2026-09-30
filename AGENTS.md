@@ -834,6 +834,15 @@ Las funciones `validate_comunas()`, `validate_indicadores()`, etc. viven en `src
 y son importadas por `build_dev_db.py`. Son la última línea de defensa antes de publicar.
 No bypassear estas validaciones ni mover su lógica a otro módulo.
 
+### ❌ Presentar descargas de PyPI como instalaciones, usuarios o audiencia
+
+Las descargas diarias de PyPI de chile-hub siguen la cadencia de releases. La
+regresión contra la cantidad de releases por día da un R² de 0,94–0,97, con unas
+80–100 descargas por release, así que no miden uso. En material externo (pitch,
+README, posts, planes de financiamiento), usa las descargas del bundle, los
+dependents y los usuarios verificados. Detalle y método reproducible:
+[`docs/sostenibilidad/README.md`](docs/sostenibilidad/README.md) (Auditoría 3).
+
 ---
 
 ## 11. Referencia rápida de comandos
