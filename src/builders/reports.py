@@ -897,69 +897,20 @@ _LICENSE_LABELS = {
     "calidad_aire": "Revisión términos",
 }
 
-# Dataset cuyos registros varían entre builds (directorios vivos).
-# Se marcan con ~ para indicar que el número es aproximado al momento del build.
-_VARIABLE_COUNT_DATASETS = {
-    "establecimientos_salud",
-    "establecimientos_educacionales",
-    "empresas",
-    "autoridades_electas",
-    "autoridades_locales",
-    "partidos_politicos",
-}
-
-# Datasets con formato especial de registros (no numérico).
-_SPECIAL_RECORD_COUNTS = {
-    "indicadores": "Serie histórica",
-}
-
-
-def _format_record_count(record_count, expected_count, coverage_note):
-    """Formatea el conteo de registros para la tabla del README."""
-    if coverage_note and coverage_note.startswith("parcial"):
-        if record_count is not None and expected_count is not None:
-            return f"{record_count} (parcial, {record_count}/{expected_count})"
-        if record_count is not None:
-            return f"{record_count} (parcial)"
-        return "parcial"
-
-    if record_count is None:
-        return "—"
-
-    if record_count >= 10_000:
-        # Formato con separador de miles y ~ para directorios variables
-        s = f"{record_count:,}".replace(",", " ")
-        return f"~{s}"
-    return str(record_count)
-
 
 def sync_readme_layers_table(check_only=False):
-    """Regenera la tabla de capas del README desde los reportes máquina.
+    """Regenera la tabla de capas del README desde el catálogo (hechos estables).
 
-    Lee ``hub_health.json`` (modo, cobertura) y ``dataset_status.json``
-    (conteo de registros) y escribe el bloque delimitado por
-    ``<!-- START_DATASET_TABLE -->`` / ``<!-- END_DATASET_TABLE -->``
-    en ``README.md``.
+    Plan 109: la tabla ya no lee ``hub_health.json`` ni ``dataset_status.json``.
+    El modo (live/fallback) y el conteo de registros cambian con cada build y
+    obligaban al job publish a commitear README.md todos los días (archivo
+    compartido con el release); ahora solo conserva nombre, fuente, licencia y
+    cadencia declarada, y las métricas por build viven en los reportes
+    enlazados desde el propio bloque.
 
-    Si los reportes no existen (p. ej. build no ejecutado), no modifica nada.
     Con ``check_only=True`` no escribe — solo retorna si el bloque cambiaría
     (usado por ``scripts/sync_docs.py --check``).
     """
-    health_path = os.path.join(NORMALIZED_DIR, "hub_health.json")
-    status_path = os.path.join(NORMALIZED_DIR, "dataset_status.json")
-
-    if not os.path.exists(health_path) or not os.path.exists(status_path):
-        print("README sync: omitido (reportes no encontrados)")
-        return False
-
-    with open(health_path, "r", encoding="utf-8") as f:
-        health = json.load(f)
-    with open(status_path, "r", encoding="utf-8") as f:
-        status = json.load(f)
-
-    health_by_ds = {e["dataset"]: e for e in health.get("datasets", [])}
-    status_by_ds = {e["dataset"]: e for e in status.get("datasets", [])}
-
     # Ordenar: primero datasets con outputs (consumibles), luego placeholders (próximamente)
     all_names = list(DATASET_CATALOG_CONFIG.keys())
     built = [n for n in all_names if DATASET_CATALOG_CONFIG[n].get("outputs")]
@@ -968,8 +919,6 @@ def sync_readme_layers_table(check_only=False):
 
     rows = []
     for i, ds_name in enumerate(ordered_names, 1):
-        h = health_by_ds.get(ds_name, {})
-        s = status_by_ds.get(ds_name, {})
         cfg = DATASET_CATALOG_CONFIG.get(ds_name, {})
 
         display_name = _DISPLAY_NAMES.get(ds_name, ds_name)
@@ -981,70 +930,7 @@ def sync_readme_layers_table(check_only=False):
         # consumibles ni "próximamente" — estado terminal propio.
         is_deprecated = cfg.get("description", "").startswith("DEPRECATED")
 
-        source_mode = h.get("source_mode", "unknown")
-        coverage_note = cfg.get("coverage_note", "")
-        coverage_status = h.get("coverage_status", "unknown")
-
-        # Indicador de modo (texto plano: sin emojis, ver sync_readme_layers_table)
-        if is_deprecated:
-            mode_label = "deprecated"
-            registros = "—"
-        elif not has_outputs:
-            mode_label = "candidato"
-            registros = "—"
-        elif coverage_note.startswith("parcial"):
-            mode_label = "parcial"
-        elif source_mode == "live":
-            mode_label = "live"
-        elif source_mode == "fallback":
-            mode_label = "fallback"
-        else:
-            mode_label = source_mode
-
-        # Conteo de registros (solo para capas con outputs)
-        if has_outputs:
-            if ds_name in _SPECIAL_RECORD_COUNTS:
-                registros = _SPECIAL_RECORD_COUNTS[ds_name]
-            elif coverage_note.startswith("parcial"):
-                rc = s.get("record_count")
-                ec = cfg.get("expected_record_count")
-                if rc is not None and ec is not None:
-                    rc_fmt = f"{rc:,}".replace(",", " ")
-                    registros = f"{rc_fmt} (parcial, {rc}/{ec})"
-                elif rc is not None:
-                    rc_fmt = f"{rc:,}".replace(",", " ")
-                    registros = f"{rc_fmt} (parcial)"
-                else:
-                    registros = "parcial"
-            elif ds_name in _VARIABLE_COUNT_DATASETS:
-                rc = s.get("record_count")
-                registros = _format_record_count(
-                    rc, cfg.get("expected_record_count"), coverage_note
-                )
-            elif source_mode == "fallback":
-                rc = s.get("record_count")
-                if rc is not None and rc > 0:
-                    registros = f"{rc:,}".replace(",", " ")
-                else:
-                    registros = "fallback curado"
-            elif coverage_status == "partial":
-                rc = s.get("record_count")
-                ec = cfg.get("expected_record_count")
-                if rc is not None and ec is not None:
-                    pct = int(round(rc / ec * 100)) if ec > 0 else 0
-                    registros = f"{rc:,} (parcial, {pct}%)".replace(",", " ")
-                elif rc is not None:
-                    registros = f"{rc:,} (parcial)".replace(",", " ")
-                else:
-                    registros = "cobertura parcial"
-            else:
-                rc = s.get("record_count")
-                registros = f"{rc:,}".replace(",", " ") if rc is not None else "—"
-
-        # Nombre sin decoraciones: el estado ya vive en la columna Modo
-        name_display = f"**{display_name}**"
-
-        # Etiqueta de actualización
+        # Cadencia declarada (hecho estable del catálogo): sin estado live/fallback.
         if is_deprecated or not has_outputs:
             actualizacion = "—"
         else:
@@ -1055,31 +941,35 @@ def sync_readme_layers_table(check_only=False):
                 actualizacion = freshness_label.capitalize()
 
         rows.append(
-            f"| {i} | {name_display} | {registros} | {mode_label} | {source_name} | {license_label} | {actualizacion} |"
+            f"| {i} | **{display_name}** | {source_name} | {license_label} | {actualizacion} |"
         )
 
-    header = (
-        "| # | Capa | Registros | Modo | Fuente | Licencia | Actualización |\n"
-        "|:--:|:---|:---|:--:|:---|:---|:--:|"
-    )
-    table_lines = [header] + rows
+    header = "| # | Capa | Fuente | Licencia | Actualización |\n|:--:|:---|:---|:---|:--:|"
 
+    freshness_badge = (
+        "[![Data](https://img.shields.io/endpoint?url=https://tooltician.com/chile-hub/data/"
+        "normalized/freshness_badge.json)](https://tooltician.com/chile-hub/data/normalized/"
+        "hub_health.json)"
+    )
+    coverage_badge = (
+        "[![Coverage](https://img.shields.io/endpoint?url=https://tooltician.com/chile-hub/data/"
+        "normalized/coverage_badge.json)](https://tooltician.com/chile-hub/data/normalized/"
+        "hub_status.json)"
+    )
     legend = (
-        "> **live**: datos extraídos directamente desde la fuente oficial"
-        " en cada ejecución del pipeline.\n"
-        "> **fallback**: datos servidos desde un respaldo curado mientras"
-        " se completa la extracción en vivo.\n"
-        "> **parcial**: cobertura inferior al 50% del universo esperado."
-        " Capa candidata, no completa.\n"
-        "> **candidato**: capa en carril candidate — extractor implementado,"
-        " datos no incluidos en el bundle público.\n"
-        "> **deprecated**: capa degradada a rechazada — sin mantención ni"
-        " bundle; su doc queda como referencia histórica.\n"
+        "> **Métricas por build:** el modo de la última extracción, el conteo de\n"
+        "> registros, la cobertura y la frescura viven en\n"
+        "> [`hub_health.md`](data/normalized/hub_health.md),\n"
+        "> [`dataset_status.json`](data/normalized/dataset_status.json) y\n"
+        "> [`dataset_quality.md`](data/normalized/dataset_quality.md), regenerados en cada\n"
+        "> build; los badges resumen frescura y estado:\n"
+        f"> {freshness_badge}\n"
+        f"> {coverage_badge}\n"
         "> Para auditar el estado exacto de cada capa:"
         " `chile-hub provenance` y `chile-hub health`."
     )
 
-    table_block = "\n".join(table_lines) + "\n\n" + legend
+    table_block = "\n".join([header] + rows) + "\n\n" + legend
 
     readme_path = os.path.join(ROOT_DIR, "README.md")
     changed = replace_delimited_block(
@@ -1088,7 +978,7 @@ def sync_readme_layers_table(check_only=False):
 
     if changed:
         verb = "cambiaría" if check_only else "regenerada"
-        print(f"README sync: tabla de capas {verb} desde hub_health.json + dataset_status.json")
+        print(f"README sync: tabla de capas {verb} desde el catálogo (sin datos de build)")
     else:
         print("README sync: tabla de capas sin cambios")
     return changed

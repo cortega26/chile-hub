@@ -1,10 +1,11 @@
 """Sincroniza hechos "variables" hardcodeados en README.md y AGENTS.md con su fuente de verdad.
 
 Cada función lee un hecho derivado del estado real del proyecto (conteo de
-tests, de ADRs, de contratos, de datasets, versión del paquete, salud y
-calidad del hub) y reemplaza el bloque delimitado correspondiente vía
-``replace_delimited_block``. Ver AGENTS.md §12 para la tabla completa de
-propietarios canónicos y dónde corre la generación/verificación.
+tests, de ADRs, de contratos, de datasets, versión del paquete, enlaces
+estables de salud y calidad del hub) y reemplaza el bloque delimitado
+correspondiente vía ``replace_delimited_block``. Ver AGENTS.md §12 para la
+tabla completa de propietarios canónicos y dónde corre la
+generación/verificación.
 """
 
 import ast
@@ -22,8 +23,6 @@ TESTS_DIR = os.path.join(ROOT_DIR, "tests")
 ADR_DIR = os.path.join(ROOT_DIR, "docs", "adr")
 CONTRACTS_DIR = os.path.join(ROOT_DIR, "contracts", "datasets")
 DATASET_DOCS_DIR = os.path.join(ROOT_DIR, "docs", "datasets")
-
-GRADE_ORDER = ["A", "B", "C", "D", "F"]
 
 
 def _count_test_functions():
@@ -192,15 +191,15 @@ def sync_readme_redistribution_summary(check_only=False):
 
 
 def sync_readme_health_summary(check_only=False):
-    health = read_json_if_exists(os.path.join(NORMALIZED_DIR, "hub_health.json"))
-    if health is None:
-        return False
-    ok = health.get("ok_count", 0)
-    warn = health.get("warn_count", 0)
-    error = health.get("error_count", 0)
+    """Resumen estable de salud (Plan 109): sin conteos que cambien por build.
+
+    Las cifras (ok/warn/error) viven en ``hub_health.md``/``hub_health.json``;
+    el README solo conserva el enlace para no tener que commitearse cada día.
+    """
     body = (
-        "Dashboard público con severidad, frescura, cobertura, drift y degradación por dataset. "
-        f"{ok} capas `ok`, {warn} `warn`, {error} `error`."
+        "Dashboard público con severidad, frescura, cobertura, drift y degradación por "
+        "dataset — regenerado en cada build en "
+        "[`hub_health.md`](data/normalized/hub_health.md)."
     )
     return replace_delimited_block(
         README_PATH, "HEALTH_SUMMARY", body, check_only=check_only, separator=""
@@ -208,15 +207,14 @@ def sync_readme_health_summary(check_only=False):
 
 
 def sync_readme_quality_summary(check_only=False):
-    quality = read_json_if_exists(os.path.join(NORMALIZED_DIR, "dataset_quality.json"))
-    if quality is None:
-        return False
-    average = quality.get("average_score", 0)
-    distribution = quality.get("grade_distribution", {})
-    grades = ", ".join(f"{distribution[g]} {g}" for g in GRADE_ORDER if distribution.get(g, 0) > 0)
+    """Resumen estable de calidad (Plan 109): sin score ni distribución por build.
+
+    El scorecard A-F vive en ``dataset_quality.md``/``dataset_quality.json``.
+    """
     body = (
-        f"Puntuación compuesta A-F por dataset: **promedio {average}/100** ({grades}). "
-        "Dimensiones: validación, contrato, madurez de fuente, frescura, cobertura, política de reúso."
+        "Puntuación compuesta A-F por dataset (validación, contrato, madurez de fuente, "
+        "frescura, cobertura y política de reúso); scorecard completo en "
+        "[`dataset_quality.md`](data/normalized/dataset_quality.md)."
     )
     return replace_delimited_block(
         README_PATH, "QUALITY_SUMMARY", body, check_only=check_only, separator=""

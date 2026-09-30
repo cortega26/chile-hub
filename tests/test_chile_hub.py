@@ -1954,18 +1954,22 @@ class WorkflowContractTests(unittest.TestCase):
             "package-quality:",
             "landing:",
             "publish:",
+            # Plan 109: alerta de schedule roto (issue fijo + anotaciones).
+            "notify-schedule-failure:",
         ):
             self.assertIn(job, self.workflow_text)
-        self.assertEqual(self.workflow_text.count("timeout-minutes:"), 6)
+        self.assertEqual(self.workflow_text.count("timeout-minutes:"), 7)
         self.assertIn("concurrency:", self.workflow_text)
 
     def test_pipeline_check_workflow_uses_one_generated_output_artifact(self):
         self.assertIn("PIPELINE_ARTIFACT: pipeline-output-${{ github.run_id }}", self.workflow_text)
         # El artifact incluye data/normalized + los derivados del build
-        # (README/index/app) para que el publish los adopte frescos (P1 de la
-        # review del PR #77).
+        # (index/app) para que el publish los adopte frescos (P1 de la review
+        # del PR #77). README.md no viaja: no depende de los datos y el publish
+        # no lo adopta (plan 109).
         self.assertIn("data/normalized/", self.workflow_text)
-        self.assertIn("README.md\n            index.html\n            app.js", self.workflow_text)
+        self.assertIn("index.html\n            app.js", self.workflow_text)
+        self.assertNotIn("README.md\n            index.html", self.workflow_text)
         self.assertEqual(self.workflow_text.count("name: ${{ env.PIPELINE_ARTIFACT }}"), 3)
         self.assertNotIn("data/normalized/hub_status.json\n", self.workflow_text)
 

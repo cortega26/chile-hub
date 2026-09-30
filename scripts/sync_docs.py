@@ -30,9 +30,11 @@ def main():
             "Solo sincroniza los bloques derivados de la version "
             "(sync_readme_version_pin_example + sync_installation_pins). "
             "Uso exclusivo del release: los bloques derivados de data/normalized "
-            "(health, quality, layers) los escribe únicamente el publish diario — "
-            "el release no debe regenerarlos desde un artifact potencialmente viejo "
-            "(carrera release↔publish, ver fix/write-races)."
+            "(redistribución) los escribe únicamente el publish diario — el "
+            "release no debe regenerarlos desde un artifact potencialmente viejo "
+            "(carrera release↔publish, ver fix/write-races). Plan 109: la tabla "
+            "de capas y los resúmenes de salud/calidad ya no dependen de "
+            "data/normalized."
         ),
     )
     args = parser.parse_args()
