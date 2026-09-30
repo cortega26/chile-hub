@@ -13,8 +13,8 @@ import json
 import os
 import re
 
-from src.builders._shared import DATASET_CATALOG_CONFIG, NORMALIZED_DIR, ROOT_DIR
-from src.builders.io_utils import read_json_if_exists, read_project_version, replace_delimited_block
+from src.builders._shared import DATASET_CATALOG_CONFIG, ROOT_DIR
+from src.builders.io_utils import read_project_version, replace_delimited_block
 
 README_PATH = os.path.join(ROOT_DIR, "README.md")
 AGENTS_PATH = os.path.join(ROOT_DIR, "AGENTS.md")
@@ -176,14 +176,18 @@ def sync_installation_pins(check_only=False):
 
 
 def sync_readme_redistribution_summary(check_only=False):
-    report = read_json_if_exists(os.path.join(NORMALIZED_DIR, "redistribution_report.json"))
-    if report is None:
-        return False
-    ready = report.get("ready_count", 0)
-    total = report.get("dataset_count", 0)
+    """Resumen estable de auditoría legal (Plan 109, revisión): sin conteos.
+
+    Antes interpolaba ready/total desde ``data/normalized/redistribution_report.json``,
+    regenerado en cada build: un cambio de catálogo/registry mergeado sin
+    rebuild producía un diff de README en el schedule y el gate "Check
+    build-synced files" bloqueaba el publish diario. Las cifras viven en el
+    reporte enlazado.
+    """
     body = (
         "Licencia, atribución requerida y permiso de redistribución verificados dataset por "
-        f"dataset. **{ready} de {total} capas** pasan la auditoría (`ready`)."
+        "dataset — reporte regenerado en cada build en "
+        "[`redistribution_report.md`](data/normalized/redistribution_report.md)."
     )
     return replace_delimited_block(
         README_PATH, "REDISTRIBUTION_SUMMARY", body, check_only=check_only, separator=""

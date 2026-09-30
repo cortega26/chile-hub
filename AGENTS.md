@@ -920,7 +920,8 @@ protegido por un chequeo automatizado en vez de depender solo de buena voluntad.
 | Conteo de tests en README | `tests/test_*.py` (AST, no pytest — ver caveat parametrize en `doc_sync.py`) | `scripts/sync_docs.py --check` |
 | Conteo de ADRs en README | `docs/adr/*.md` | `scripts/sync_docs.py --check` |
 | Conteo de contratos en README | `contracts/datasets/*.schema.json` | `scripts/sync_docs.py --check` |
-| Badge "N capas" y resumen de auditoría legal en README | `data/dataset_catalog_config.json` / `data/normalized/redistribution_report.json` | `scripts/sync_docs.py --check` |
+| Badge "N capas" en README | `data/dataset_catalog_config.json` | `scripts/sync_docs.py --check` |
+| Resumen de auditoría legal en README (texto estable + enlace) | prosa fija en `doc_sync.py::sync_readme_redistribution_summary()`; las cifras viven en `data/normalized/redistribution_report.json` | `scripts/sync_docs.py --check` |
 | Badge de versiones Python en README | `pyproject.toml` (`[project] requires-python`) vía `doc_sync.py::sync_readme_python_badge()` | `scripts/sync_docs.py --check` |
 | Resumen de salud en README (texto estable + enlace) | prosa fija en `doc_sync.py::sync_readme_health_summary()`; las cifras viven en `data/normalized/hub_health.json` | `scripts/sync_docs.py --check` |
 | Historial de salud del hub (sparkline en landing) | `data/normalized/hub_health_history.jsonl` — append-only, una línea por build, cap 400 líneas (~13 meses), idempotente por `generated_at_utc` | `append_hub_health_history()` (`src/builders/reports.py`); registrado en `artifact_manifest.json` |
@@ -1005,8 +1006,11 @@ regeneran el texto exacto dentro de un bloque delimitado por comentarios HTML
   `schedule`/`workflow_dispatch`, después de un build real) compara `README.md`,
   `index.html` y `app.js` contra el build recién generado y **falla** si
   difieren. Desde el plan 109 eso es posible porque el README ya no lleva datos
-  del día: la tabla de capas y los resúmenes de salud/calidad son estables (sus
-  cifras viven en los reportes enlazados) y el job `publish` ya no lo commitea.
+  del día: la tabla de capas y los resúmenes de salud, calidad y auditoría legal
+  son estables (sus cifras viven en los reportes enlazados) y el job `publish`
+  ya no lo commitea. Ningún bloque delimitado del README se genera ya desde
+  `data/normalized/`, así que `sync_docs --check` (job `quality`, sin build) lo
+  verifica por completo.
   El plan 108 lo había sacado del `exit 1` porque cada cambio de conteo abortaba
   el publish que lo habría commiteado (deadlock 2026-08-13 → 2026-09-26); ahora
   la causa desapareció. Las regresiones de datos las atrapa `verify_pipeline.py

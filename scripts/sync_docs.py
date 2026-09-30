@@ -29,12 +29,11 @@ def main():
         help=(
             "Solo sincroniza los bloques derivados de la version "
             "(sync_readme_version_pin_example + sync_installation_pins). "
-            "Uso exclusivo del release: los bloques derivados de data/normalized "
-            "(redistribución) los escribe únicamente el publish diario — el "
-            "release no debe regenerarlos desde un artifact potencialmente viejo "
-            "(carrera release↔publish, ver fix/write-races). Plan 109: la tabla "
-            "de capas y los resúmenes de salud/calidad ya no dependen de "
-            "data/normalized."
+            "Uso exclusivo del release: mantiene el commit de release acotado "
+            "a los bloques que cambian con la version. Tras el plan 109 ningún "
+            "bloque del README se genera desde data/normalized, pero el release "
+            "sigue sin correr el sync completo para no reescribir bloques "
+            "ajenos al bump."
         ),
     )
     args = parser.parse_args()

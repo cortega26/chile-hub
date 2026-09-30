@@ -310,13 +310,11 @@ jobs:
               python scripts/sync_release_artifact_version.py
               python scripts/check_landing_sync.py
               # Sincroniza SOLO el pin de version del README (`chile-hub==X.Y.Z`,
-              # --version-only). El release NO regenera bloques derivados de
-              # data/normalized (health, quality, layers): ese artifact puede
-              # provenir de un commit anterior al de main (carrera
-              # release↔publish, fix/write-races) y escribirlos pisaria datos
-              # frescos. Los datos de main los escribe unicamente el publish
-              # diario; el release adjunta el artifact al GitHub Release sin
-              # commitearlo.
+              # --version-only): el commit de release queda acotado a los
+              # bloques que cambian con la version. Tras el plan 109 ningun
+              # bloque del README se genera desde data/normalized (los datos de
+              # main los escribe unicamente el publish diario; el release
+              # adjunta el artifact al GitHub Release sin commitearlo).
               python scripts/sync_docs.py --version-only
 
               git config user.name "github-actions[bot]"
