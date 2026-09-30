@@ -12,6 +12,24 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.47.0 - 2026-09-30
+
+### Corregido
+
+- **ci**: Resumen de auditoría legal estable en README (revisión plan 109)
+  ([`cbeb572`](https://github.com/cortega26/chile-hub/commit/cbeb57228996164bd5589cb6a721d9dfaa039d93))
+
+### Documentación
+
+- **readme**: Sincroniza bloques generados tras merge de 109 + phase4
+  ([`63f0848`](https://github.com/cortega26/chile-hub/commit/63f084801fd698bb39afba6fb7f41cab6aabedb8))
+
+### Agregado
+
+- **ci**: README sin datos volátiles y alerta de schedule roto
+  ([`efad585`](https://github.com/cortega26/chile-hub/commit/efad58555c96416997ce9a3abf228a101553f1dc))
+
+
 ## 1.46.1 - 2026-09-30
 
 ### Corregido
