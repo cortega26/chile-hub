@@ -327,7 +327,7 @@ jobs:
               # pyproject 1.28.4 e index.html con v1.28.3. Lo que el release
               # NO toca es data/normalized (bloques de datos) — eso es del
               # publish diario.
-              git add CHANGELOG.md pyproject.toml uv.lock README.md index.html app.js docs/installation.md
+              git add CHANGELOG.md pyproject.toml uv.lock README.md index.html app.js docs/installation.md server.json
               git commit -m "chore(release): ${after} [skip ci]"
               tag="v${after}"
               git tag "$tag"

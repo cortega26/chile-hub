@@ -584,6 +584,23 @@ class TestSyncReleaseArtifactVersion:
             pl.DataFrame({"codigo_comuna": ["01101"]}),
             str(normalized / "comunas.parquet"),
         )
+        # Manifest del registro MCP: version hardcodeada top-level y por paquete.
+        (root / "server.json").write_text(
+            json.dumps(
+                {
+                    "version": "1.0.0",
+                    "packages": [
+                        {
+                            "registryType": "pypi",
+                            "identifier": "chile-hub",
+                            "version": "1.0.0",
+                        }
+                    ],
+                },
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
         return normalized
 
     def _run_main(self, root: Path, normalized: Path):
@@ -603,6 +620,11 @@ class TestSyncReleaseArtifactVersion:
             data = json.loads((normalized / name).read_text(encoding="utf-8"))
             assert data["version"] == self.RELEASE_VERSION, f"{name}: {data['version']}"
 
+    def _assert_server_json_version(self, root: Path) -> None:
+        server = json.loads((root / "server.json").read_text(encoding="utf-8"))
+        assert server["version"] == self.RELEASE_VERSION, f"server.json: {server['version']}"
+        assert [pkg["version"] for pkg in server["packages"]] == [self.RELEASE_VERSION]
+
     def test_main_updates_versions_zip_sha_manifest_and_landing(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
@@ -611,6 +633,7 @@ class TestSyncReleaseArtifactVersion:
             landing_mock = self._run_main(root, normalized)
 
             self._assert_version_is_release(normalized)
+            self._assert_server_json_version(root)
 
             zip_path = normalized / PUBLISHABLE_BUNDLE_ZIP_NAME
             sha_path = normalized / PUBLISHABLE_BUNDLE_SHA256_NAME
@@ -650,9 +673,22 @@ class TestSyncReleaseArtifactVersion:
             self._run_main(root, normalized)
 
             self._assert_version_is_release(normalized)
+            self._assert_server_json_version(root)
             zip_path = normalized / PUBLISHABLE_BUNDLE_ZIP_NAME
             sha_path = normalized / PUBLISHABLE_BUNDLE_SHA256_NAME
             written_digest = sha_path.read_text(encoding="utf-8").strip().split("  ")[0]
             assert written_digest == hashlib.sha256(zip_path.read_bytes()).hexdigest()
             hub_bundle = json.loads((normalized / "hub_bundle.json").read_text(encoding="utf-8"))
             assert len(hub_bundle["packages"]) == 1
+
+    def test_main_without_server_json_does_not_fail(self):
+        """server.json ausente: el sync es best-effort y no debe romper el release."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            normalized = self._build_release_fixture(root)
+            (root / "server.json").unlink()
+
+            self._run_main(root, normalized)
+
+            self._assert_version_is_release(normalized)
+            assert not (root / "server.json").exists()

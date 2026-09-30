@@ -575,6 +575,10 @@ class AdoptionBadgeGuardrailTests(unittest.TestCase):
         `--version-only` solo sincronizaba el pin del README y el git add del
         release no incluia installation.md; main quedo con `sync_docs --check`
         rojo tras cada release. Ambas mitades se cubren aqui.
+
+        Desde 2026-09-29 el release tambien versiona server.json (manifest del
+        registro MCP: `version` top-level y de cada paquete) y lo incluye en el
+        git add; si no, el manifest queda atras en cada release.
         """
         content = (ROOT_DIR / ".github" / "workflows" / "pypi-release.yml").read_text(
             encoding="utf-8"
@@ -582,7 +586,7 @@ class AdoptionBadgeGuardrailTests(unittest.TestCase):
         self.assertIn("python scripts/sync_docs.py --version-only", content)
         self.assertIn("python scripts/check_landing_sync.py", content)
         self.assertIn(
-            "git add CHANGELOG.md pyproject.toml uv.lock README.md index.html app.js docs/installation.md",
+            "git add CHANGELOG.md pyproject.toml uv.lock README.md index.html app.js docs/installation.md server.json",
             content,
         )
         sync_script = (ROOT_DIR / "scripts" / "sync_docs.py").read_text(encoding="utf-8")
