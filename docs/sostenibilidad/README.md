@@ -32,6 +32,7 @@
 | **1** | 2026-09-29 | [`plans/110-programa-de-patrocinios.md`](../../plans/110-programa-de-patrocinios.md) (idéntico a [`e2fd831`](https://github.com/cortega26/chile-hub/blob/e2fd831/plans/110-programa-de-patrocinios.md)) | **Auditoría 1 / Propuesta A:** programa completo de patrocinio institucional | Tiers, beneficios, 5 olas y play de CAF | **HOLD**: no ejecutar |
 | **2** | 2026-09-29 | [Issue #125, §4 a §8 del cuerpo](https://github.com/cortega26/chile-hub/issues/125) | **Auditoría 2 / Propuesta B:** reconstrucción adversarial | 5 carriles; el sponsor no compra tiempo; Wave −1 de discovery | Revisada en la Auditoría 3 y adoptada como contabilidad |
 | **3** | 2026-09-29, con adenda del 30-sep | [`auditoria-3-2026-09-29.md`](auditoria-3-2026-09-29.md) · [comentario en #125](https://github.com/cortega26/chile-hub/issues/125#issuecomment-5895632160) | **Auditoría 3:** auditoría del caso más revisión de las Auditorías 1 y 2 | **D:** no ejecutar todavía; experimento §E; gate §G | **Vigente** |
+| **3a** | 2026-09-30 | [Adenda de la Auditoría 3, puntos 6–7](auditoria-3-2026-09-29.md) | **Anexo de evidencia externa:** comparables (QGIS, MapLibre, OSMF, Tidelift, Datasette) y riesgo de contraparte del fiscal host (OCF) + opción SPI | D se mantiene; insumos para el futuro diseño del carril 2 | Vigente |
 | 4 | por definir | Resultado del experimento §E | Decisión entre Avanzar, Servicios, Pivotear o Stop | — | Pendiente |
 
 ## Conclusiones de la Auditoría 3 (resumen)
