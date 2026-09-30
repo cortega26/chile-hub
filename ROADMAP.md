@@ -98,8 +98,8 @@
 | **W1** | 111, 115, 116, 118, 122, 127 | P1: seguridad de release, superficie pública, CI/tests, docs | 6/6 | **DONE (2026-09-29, mergeada a `main`; suite 1167 + gates verdes)** |
 | **W2** | 112, 113, 114, 119, 124, 126, 128 | P2: pins/hardening, fuente/MCP, DatasetSpec, tooling, deps | 6/7 + 128 parcial | **DONE (2026-09-29)**; 128 Step 2 DONE, Step 1 BLOCKED al 2026-10-01 |
 | **W3** | 117, 120, 121, 123, 125, 129 | P2/P3: decisión archived, perf, tests de gates, dirección | 6/6 | **DONE (2026-09-29, mergeada a `main`; suite 1239 + gates verdes)** |
-| **W4** | 130 | P3: dejar de versionar el ZIP (requiere decisión) | 0/1 | BLOCKED (Step 0 = decisión del operador) |
-| **Total** | 111–130 | | **18/20 + 128 parcial** | W1–W3 cerradas; 128 Step 1 al 2026-10-01; W4 (130) decisión |
+| **W4** | 130 | P3: dejar de versionar el ZIP (requiere decisión) | 1/1 | **DONE (2026-09-29, decisión del operador = asset de Release; mergeada)** |
+| **Total** | 111–130 | | **19/20 + 128 parcial** | W1–W4 cerradas; solo resta 128 Step 1 (Python 3.15) al 2026-10-01 |
 
 ### Backlog por wave (orden de ejecución)
 
@@ -133,7 +133,7 @@
 
 **Wave 4 — decisión:**
 
-- [ ] **130** [Dejar de versionar el ZIP publicable](plans/130-stop-committing-bundle-zip.md) — P3/S-M/MED — Step 0: confirmar que la descarga apunta al asset de Release; si no, cerrar sin cambios.
+- [x] **130** [Dejar de versionar el ZIP publicable](plans/archive/130-stop-committing-bundle-zip.md) — P3/S-M/MED — ✅ mergeado en `main` (`2fb7d15`; FF), decisión del operador = asset de Release; extra: sync de `server.json` en el release (`54c1691`).
 
 ### Decisiones pendientes (operador)
 

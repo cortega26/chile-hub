@@ -796,7 +796,6 @@ ya no aplique.
 | # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de / solapa | Estado |
 |---|------|----------|----------|--------|---------------------|--------|
 | 128 | [Python 3.15 + DuckDB-Wasm al día](128-deps-forward-compat.md) | P1/P3 | S/M | LOW-MED | — | PARTIAL (2026-09-29: Step 2 DONE commit 915ee8c; Step 1 BLOCKED hasta 2026-10-01) |
-| 130 | [Dejar de versionar el ZIP publicable](130-stop-committing-bundle-zip.md) | P3 | S-M | MED | Step 0 = decisión de mantenedor | TODO (decisión pendiente) |
 
 ### Planes archivados (auditoría `/improve deep` 2026-09-29 — Wave 1)
 
@@ -846,6 +845,16 @@ La Wave 3 quedó DONE y mergeada el 2026-09-29 (6/6). Ejecutada en worktrees
 | 123 | [Backfill de tests de gates](archive/123-gate-test-backfill.md) | M | LOW-MED | DONE — `81701a6` (merge `057ebf4`): +30 tests en 5 gates (calidad_aire, diagnostics, companions, release, source_urls) |
 | 125 | [Consolidar `write_staging`](archive/125-consolidate-write-staging.md) | M | LOW-MED | DONE — `9ff7255` (merge `19d7af0`): helper atómico en `base.py`, 21 overrides convertidos (y corrigió la premisa: sí está en la ruta diaria) |
 | 129 | [Cierres de distribución](archive/129-direction-distribution-closes.md) | S/M | LOW | DONE — `e2ef696`+`d64def0`+`5203d3a`+`62b1ff1` (FF): métrica HF (274 descargas), `server.json` validado en el registry, `resolve_regiones()` |
+
+### Planes archivados (auditoría `/improve deep` 2026-09-29 — Wave 4)
+
+| # | Plan | Esfuerzo | Riesgo | Estado |
+|---|------|----------|--------|--------|
+| 130 | [Dejar de versionar el ZIP publicable](archive/130-stop-committing-bundle-zip.md) | S-M | MED | DONE — `2fb7d15` (merge FF): ZIP/sha fuera de git (`git rm --cached` + ignore), link y quickstart apuntan al asset del último Release (también `app.js` runtime y `verify_landing.py`), nota de clone parcial en README/CONTRIBUTING |
+
+Extra de la wave (no es un plan): el release ahora sincroniza `server.json` del
+registry MCP (`54c1691`; `sync_server_json_version` en
+`sync_release_artifact_version.py` + `server.json` en el `git add` del release).
 
 ### Orden de ejecución recomendado (waves)
 
