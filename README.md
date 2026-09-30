@@ -180,7 +180,7 @@ El mismo estado se publica en el sitio, con historial de builds y detalle por ca
 ### Respaldo adicional
 
 <!-- START_TEST_COUNT -->
-- **1239 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
+- **1240 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
 <!-- END_TEST_COUNT -->
 <!-- START_ADR_COUNT -->
 - **23 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
@@ -583,6 +583,10 @@ make verify-landing     # Pruebas de humo de landing page con Playwright
 > `autoridades_electas` requiere scrapling para no degradar a 155 registros
 > (0 senadores); el comando local está en
 > [Carriles de extracción](docs/extraction-lanes.md).
+
+> El ZIP publicable no se versiona: `make build` lo genera localmente y el
+> sitio lo descarga desde el asset del último GitHub Release. Para clones más
+> livianos: `git clone --filter=blob:none https://github.com/cortega26/chile-hub`.
 
 Para entender la arquitectura, las reglas no negociables y el flujo de trabajo, revisa
 [`AGENTS.md`](./AGENTS.md); el punto de partida rápido es

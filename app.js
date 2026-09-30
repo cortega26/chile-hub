@@ -57,6 +57,9 @@ if (packageVersionBadge && CHILE_HUB_ASSET_VERSION !== "dev") {
 }
 
 const PUBLIC_DATA_BASE = "https://tooltician.com/chile-hub/data/normalized";
+// El ZIP publicable no se versiona (Plan 130): la descarga se sirve desde el
+// asset del último GitHub Release, que pypi-release.yml adjunta en cada release.
+const RELEASE_DOWNLOAD_BASE = "https://github.com/cortega26/chile-hub/releases/latest/download";
 const PREVIEW_ROW_LIMIT = 5;
 const SUPPORT_LINKS = [
     {
@@ -290,6 +293,22 @@ function buildSimpleLink(path, label) {
             ${escapeHtml(label)}
         </a>
     `;
+}
+
+function releaseAssetUrl(path) {
+    if (!path) return "";
+    return `${RELEASE_DOWNLOAD_BASE}/${path.split("/").pop()}`;
+}
+
+function buildBundleVerifyCommand(zipPackage) {
+    const zipPath = zipPackage?.path || "data/normalized/chile-hub-publishable-bundle.zip";
+    const checksumPath = zipPackage?.checksum_path || `${zipPath}.sha256`;
+    const verification = zipPackage?.verification_command || `shasum -a 256 -c ${checksumPath}`;
+    return [
+        `curl -L -o ${zipPath} ${releaseAssetUrl(zipPath)}`,
+        `curl -L -o ${checksumPath} ${releaseAssetUrl(checksumPath)}`,
+        verification,
+    ].join("\n");
 }
 
 function renderSupportLinks() {
@@ -927,7 +946,7 @@ function loadCatalog() {
             packageActions.innerHTML = `
                 <a class="dataset-action muted" href="data/normalized/hub_bundle.json" target="_blank" rel="noopener noreferrer">Bundle JSON</a>
             `;
-            document.getElementById("package-verify-code").textContent = "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256";
+            document.getElementById("package-verify-code").textContent = buildBundleVerifyCommand(null);
             catalogGeneratedAt.textContent = "";
             catalogGrid.innerHTML = `
                 <div class="dataset-card">
@@ -967,18 +986,16 @@ function renderCatalog(bundle) {
     const zipLabel = zipPackage
         ? `Bundle ZIP · ${formatBytes(zipPackage.size_bytes)}`
         : "Bundle ZIP";
-    const zipHash = zipPackage?.sha256 ? zipPackage.sha256.slice(0, 12) : "N/D";
-    const verifyCommand = zipPackage?.verification_command
-        || (zipPackage?.checksum_path ? `shasum -a 256 -c ${zipPackage.checksum_path}` : "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256");
+    const verifyCommand = buildBundleVerifyCommand(zipPackage);
 
     statusSubtitle.textContent = `${datasets.length} capas disponibles. Último build: ${formatTimestamp(bundle.generated_at_utc)}.`;
     packageMeta.textContent = zipPackage
-        ? `Tamaño: ${formatBytes(zipPackage.size_bytes)} · sha256: ${zipHash} · generado junto al último build`
+        ? `Tamaño: ${formatBytes(zipPackage.size_bytes)} · descarga servida desde el último GitHub Release`
         : "No hay package ZIP disponible en este build.";
     document.getElementById("package-verify-code").textContent = verifyCommand;
     packageActions.innerHTML = `
-        ${zipPackage ? buildSimpleLink(zipPackage.path, zipLabel) : ""}
-        ${zipPackage?.checksum_path ? buildSimpleLink(zipPackage.checksum_path, "SHA256") : ""}
+        ${zipPackage ? buildSimpleLink(releaseAssetUrl(zipPackage.path), zipLabel) : ""}
+        ${zipPackage?.checksum_path ? buildSimpleLink(releaseAssetUrl(zipPackage.checksum_path), "SHA256") : ""}
         ${buildSimpleLink(findReportPath(reports, "hub_bundle", "json", "data/normalized/hub_bundle.json"), "Bundle JSON")}
         ${buildSimpleLink(findReportPath(reports, "artifact_manifest", "json", "data/normalized/artifact_manifest.json"), "Manifest")}
     `;

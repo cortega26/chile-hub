@@ -12,6 +12,9 @@ from urllib.parse import urlparse
 ROOT_DIR = Path(__file__).resolve().parents[1]
 UTC = timezone.utc
 BUNDLE_PATH = ROOT_DIR / "data" / "normalized" / "hub_bundle.json"
+# El ZIP publicable no se versiona (Plan 130): la landing lo descarga desde el
+# asset del último GitHub Release. Mantener en sync con RELEASE_DOWNLOAD_BASE de app.js.
+RELEASE_DOWNLOAD_BASE = "https://github.com/cortega26/chile-hub/releases/latest/download"
 # Mirrors the confirmed host-wide Content-Security-Policy that Cloudflare serves for
 # tooltician.com. Owner-confirmed 2026-09-13: includes the GA4 inline-bootstrap hash and the
 # region1.google-analytics.com GA4 regional hit endpoint required by the site, plus
@@ -204,10 +207,19 @@ def verify_landing():
         (package for package in bundle.get("packages", []) if package.get("package_type") == "zip"),
         None,
     )
-    expected_verification_command = (
-        zip_package.get("verification_command")
-        if zip_package and zip_package.get("verification_command")
-        else "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256"
+    default_zip_path = "data/normalized/chile-hub-publishable-bundle.zip"
+    zip_path = (zip_package or {}).get("path") or default_zip_path
+    checksum_path = (zip_package or {}).get("checksum_path") or f"{default_zip_path}.sha256"
+    verification_command = (zip_package or {}).get("verification_command") or (
+        f"shasum -a 256 -c {checksum_path}"
+    )
+    expected_zip_href = f"{RELEASE_DOWNLOAD_BASE}/{zip_path.rsplit('/', 1)[-1]}"
+    expected_verification_command = "\n".join(
+        [
+            f"curl -L -o {zip_path} {expected_zip_href}",
+            f"curl -L -o {checksum_path} {RELEASE_DOWNLOAD_BASE}/{checksum_path.rsplit('/', 1)[-1]}",
+            verification_command,
+        ]
     )
 
     with local_server() as url, sync_playwright() as p:
@@ -602,12 +614,14 @@ def verify_landing():
         ):
             fail(f"Unexpected package actions: {package_actions}")
 
+        zip_action_href = page.locator("#package-actions .dataset-action").first.get_attribute(
+            "href"
+        )
+        if zip_action_href != expected_zip_href:
+            fail(f"Unexpected Bundle ZIP href: {zip_action_href}")
+
         package_meta = page.locator("#package-meta").inner_text()
-        if (
-            "Tamaño:" not in package_meta
-            or "sha256:" not in package_meta
-            or "generado junto al último build" not in package_meta
-        ):
+        if "Tamaño:" not in package_meta or "último GitHub Release" not in package_meta:
             fail(f"Unexpected package meta: {package_meta}")
 
         page.locator(".package-verify summary").click()
@@ -615,9 +629,9 @@ def verify_landing():
         if package_verify_title != "Verificar integridad":
             fail(f"Unexpected package verify title: {package_verify_title}")
 
-        package_verify_line = page.locator("#package-verify-code").inner_text().splitlines()[0]
-        if package_verify_line != expected_verification_command:
-            fail(f"Unexpected package verify command: {package_verify_line}")
+        package_verify_command = page.locator("#package-verify-code").inner_text()
+        if package_verify_command != expected_verification_command:
+            fail(f"Unexpected package verify command: {package_verify_command}")
 
         package_copy = page.locator("#package-verify-copy")
         package_copy.click()

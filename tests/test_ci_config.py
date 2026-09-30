@@ -1049,6 +1049,35 @@ class ReleaseSnapshotWeightGuardrailTests(unittest.TestCase):
             f"el árbol versionado pesa {total / 1024 / 1024:.1f} MB (>160 MB)",
         )
 
+    def test_publishable_bundle_zip_is_not_tracked(self):
+        """Plan 130: el ZIP publicable (~30 MB, regenerado a diario) se
+        re-commiteaba en cada publish y engordaba el pack y el tarball de cada
+        tag (ADR-021). Ahora viaja como asset del último GitHub Release y
+        espejo HF; el `.sha256` lo acompaña. No re-agregar las negaciones
+        `!data/normalized/*.zip` / `!data/normalized/*.sha256`."""
+        import subprocess
+
+        tracked = subprocess.run(
+            ["git", "ls-files", "data/normalized"],
+            cwd=ROOT_DIR,
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout
+        self.assertNotIn("chile-hub-publishable-bundle.zip", tracked)
+
+        ignored = subprocess.run(
+            ["git", "check-ignore", "data/normalized/chile-hub-publishable-bundle.zip"],
+            cwd=ROOT_DIR,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(
+            ignored.returncode,
+            0,
+            "el ZIP publicable debe quedar ignorado por .gitignore",
+        )
+
 
 def _extract_make_target(makefile_content: str, target_name: str) -> str:
     """Extrae el cuerpo (líneas con tab-indent) de un target de Makefile."""
