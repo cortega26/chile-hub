@@ -12,6 +12,24 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.47.1 - 2026-09-30
+
+### Corregido
+
+- **deps**: Sube urllib3 2.8.0 y virtualenv 21.14.1 por CVEs de pip-audit
+  ([`00aa568`](https://github.com/cortega26/chile-hub/commit/00aa5682275d184356826a7b9249a2891ffd3981))
+
+### Documentación
+
+- **sostenibilidad**: Anexa comparables y riesgo de host a la Auditoría 3
+  ([#125](https://github.com/cortega26/chile-hub/pull/125),
+  [`38e0abd`](https://github.com/cortega26/chile-hub/commit/38e0abd21a8fa4577e5f8a9d5a4cbd3f82f92c16))
+
+- **sostenibilidad**: Registra la Auditoría 3 (veredicto D) e índice de decisiones
+  ([#127](https://github.com/cortega26/chile-hub/pull/127),
+  [`da479b3`](https://github.com/cortega26/chile-hub/commit/da479b36d08220fc865495845d61c6ef8642fc94))
+
+
 ## 1.47.0 - 2026-09-30
 
 ### Corregido
