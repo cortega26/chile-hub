@@ -1,5 +1,15 @@
 # Plan 110: Programa de patrocinios — sostenibilidad y plan de ataque
 
+> **⛔ Estado: HOLD — no ejecutar (2026-09-30).** Este plan es la **Auditoría 1 /
+> Propuesta A** del proceso de sostenibilidad. La
+> [Auditoría 3](../docs/sostenibilidad/auditoria-3-2026-09-29.md) lo revisó y
+> emitió el **veredicto D**: todavía no se ejecuta sponsorship institucional.
+> Varias premisas del plan son incorrectas. Por ejemplo, §0.1 presenta como
+> "instalaciones PyPI" lo que en realidad son descargas que dependen de los releases.
+> El texto se conserva sin cambios como registro. Cualquier reescritura parte del
+> delta §F de la Auditoría 3 y solo después de pasar su gate §G. Índice y cronología:
+> [`docs/sostenibilidad/README.md`](../docs/sostenibilidad/README.md).
+
 > **Qué es:** el diseño operativo del programa de patrocinios de chile-hub:
 > tiers, beneficios, reglas de independencia, plan de ataque por segmento
 > (doctrina Carnegie), priorización con la tracción actual (~100 estrellas),

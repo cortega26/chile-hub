@@ -46,11 +46,12 @@ Todas las mejoras del backlog están implementadas y en producción:
 ### Largo plazo
 - **Modelo de contribución** — definir cómo aceptar extractores de la
   comunidad.
-- **Estrategia de sostenibilidad** — el proyecto es mantenido por una
-  persona. Evaluar financiamiento o adopción institucional si el uso
-  crece. Diseño del programa de patrocinios en
-  [`plans/110-programa-de-patrocinios.md`](../../plans/110-programa-de-patrocinios.md)
-  (tiers, plan de ataque por segmento, gobernanza).
+- **Estrategia de sostenibilidad** — el proyecto lo mantiene una sola
+  persona. El estado, la cronología y las conclusiones están en
+  [`docs/sostenibilidad/README.md`](../sostenibilidad/README.md). La Auditoría 3
+  (2026-09-29) dio veredicto **D**: todavía no se ejecuta sponsorship
+  institucional; primero va un experimento de discovery con su gate. El
+  [Plan 110](../../plans/110-programa-de-patrocinios.md) queda en HOLD.
 
 ---
 

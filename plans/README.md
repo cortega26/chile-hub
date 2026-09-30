@@ -212,21 +212,25 @@ Los 5 planes quedaron **DONE y archivados** el mismo día (2026-09-25) — ver
 | 106 | [Snapshot de release liviano (geometría fuera de git + wasm no usado)](106-slim-release-snapshot.md) | P2 | S-M | MED | — | DONE (2026-09-25 — árbol 412→140 MB, auditoría a prerelease `geometry-audit`, ADR-021, guardrails; branch `advisor/106-slim-release-snapshot`) |
 | 107 | [Handoff de activación de lanzamiento (agente autónomo)](107-activacion-lanzamiento-handoff.md) | P2 | S | LOW | — | READY (2026-09-26 — handoff para Cowork: GSC meta tag, sitemap, schedule, adopción; fallbacks + STOP; branch `advisor/107-activacion-lanzamiento`) |
 
-## Plan 110 — sostenibilidad y patrocinios (2026-09-29)
+## Plan 110 — sostenibilidad y patrocinios (2026-09-29) — HOLD
 
-> **Sostenibilidad post-lanzamiento (2026-09-29)**: el proyecto tiene producto,
-> distribución y audiencia (~2.2k instalaciones/mes PyPI, DOI, 21 capas
-> publicables) pero no capa de financiamiento; `FUNDING.yml` solo cubre
-> donación individual y el bus factor es 1. El plan diseña el programa de
-> patrocinios: tiers y beneficios, reglas de independencia (ADR-023 y
-> principio 4 del product-spec), plan de ataque por segmento con doctrina
-> Dale Carnegie, priorización con la tracción actual (~100 estrellas),
-> play para CAF vía contacto cálido, activos de Wave 0, gobernanza, riesgos
-> y plantillas de outreach. No toca código, datos ni workflows.
+> **Estado (2026-09-30): HOLD — no ejecutar.** La
+> [Auditoría 3](../docs/sostenibilidad/auditoria-3-2026-09-29.md) auditó el caso y
+> revisó este plan (Auditoría 1) junto con la reconstrucción adversarial del
+> issue #125 (Auditoría 2). Su veredicto fue **D**:
+> - no hay ninguna organización con uso verificable;
+> - las "~2.2k instalaciones/mes" son descargas de PyPI dominadas por la
+>   cadencia de releases;
+> - no existe un vehículo de cobro.
+>
+> El plan queda como registro de la Propuesta A. Solo se reescribirá a partir
+> del delta §F de la auditoría y después de pasar su gate §G. Índice,
+> cronología y reglas para agentes:
+> [`docs/sostenibilidad/README.md`](../docs/sostenibilidad/README.md).
 
 | # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
 |---|------|----------|----------|--------|-----------|--------|
-| 110 | [Programa de patrocinios — sostenibilidad y plan de ataque](110-programa-de-patrocinios.md) | P2 | M + continuo | MED | — | PROPOSED (2026-09-29) |
+| 110 | [Programa de patrocinios — sostenibilidad y plan de ataque](110-programa-de-patrocinios.md) | P2 | M + continuo | MED | Gate §G de la Auditoría 3 | HOLD (2026-09-30 — veredicto D, [Auditoría 3](../docs/sostenibilidad/README.md); no ejecutar) |
 
 ### Planes 108 y 109 — archivados (2026-09-30)
 

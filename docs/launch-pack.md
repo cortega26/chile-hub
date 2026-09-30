@@ -3,6 +3,11 @@
 > **Uso:** material listo para publicar y checklist de siembra. No es marketing:
 > es narrativa técnica con links verificables. El operador decide qué, cuándo y
 > dónde. **Regla de oro:** responder todos los comentarios y no pedir upvotes.
+>
+> **⚠ Nota (2026-09-30):** las "instalaciones PyPI/mes" de este pack son
+> **descargas** y siguen la cadencia de releases; no son instalaciones ni
+> usuarios. No reutilices esa cifra en material externo. Ver
+> [`docs/sostenibilidad/README.md`](sostenibilidad/README.md).
 
 ## Assets y links canónicos
 
