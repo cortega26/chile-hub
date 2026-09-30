@@ -33,6 +33,15 @@ body:
       label: ¿Conoces una fuente oficial? (opcional)
       description: Si sabes dónde está publicado, pega la URL. Si no, no hay problema.
       placeholder: https://...
+  - type: textarea
+    id: added_value
+    attributes:
+      label: ¿Qué falta en la fuente oficial? (opcional)
+      description: >-
+        chile-hub no replica lo que la fuente oficial o datos.gob.cl ya entregan listo
+        para usar. Cuéntanos qué te cuesta hoy: códigos CUT inconsistentes, archivos
+        dispersos, Excel o PDF, falta de historial, datos que no cruzan con otras capas.
+      placeholder: "Ej: publican un Excel por año con nombres de comuna escritos a mano, sin código CUT."
   - type: dropdown
     id: help
     attributes:

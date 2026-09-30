@@ -34,6 +34,7 @@ try:
         BaseExtractor,
         ensure_staging_directories,
         write_raw_snapshot_atomic,
+        write_staging_csv_atomic,
         write_staging_metadata,
     )
 except ModuleNotFoundError:
@@ -41,6 +42,7 @@ except ModuleNotFoundError:
         BaseExtractor,
         ensure_staging_directories,
         write_raw_snapshot_atomic,
+        write_staging_csv_atomic,
         write_staging_metadata,
     )
 
@@ -702,18 +704,8 @@ class BCentralExtractor(BaseExtractor):
 
     def write_staging(self, df, metadata: dict) -> Path:
         ensure_directories()
-        output_path = Path(STAGING_CSV_PATH)
-        df.write_csv(output_path)
-        write_metadata(
-            {
-                **metadata,
-                "dataset": self.dataset_name,
-                "record_count": df.height,
-                "fields": df.columns,
-                "reuse_policy": REUSE_POLICY,
-            }
-        )
-        return output_path
+        merged = {**metadata, "dataset": self.dataset_name, "reuse_policy": REUSE_POLICY}
+        return write_staging_csv_atomic(df, STAGING_CSV_PATH, METADATA_PATH, merged)
 
 
 if __name__ == "__main__":

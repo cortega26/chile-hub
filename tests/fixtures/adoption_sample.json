@@ -20,5 +20,11 @@
         {"name": "chile-hub-bundle.zip", "download_count": 444}
       ]
     }
-  ]
+  ],
+  "huggingface": {
+    "id": "cortega26/chile-hub",
+    "downloads": 274,
+    "likes": 3,
+    "lastModified": "2026-09-29T17:01:35.000Z"
+  }
 }

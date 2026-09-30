@@ -85,7 +85,7 @@ instalación del Congreso (11 de marzo → 10 de marzo) que ya se usaba para dip
 - Senado: https://www.senado.cl/senadoras-y-senadores/listado-de-senadoras-y-senadores
 - Dataset relacionado (cargos subnacionales, licencia mixta CC BY / CC BY-SA): `docs/datasets/autoridades_locales.md`
 - Research electoral: `docs/legal/b2-2-electoral-research.md`
-- Plan 023 — Ola A: `plans/023-autoridades-electas-partidos-politicos.md`
+- Plan 023 — Ola A: `plans/archive/023-autoridades-electas-partidos-politicos.md`
 
 <!-- START_DATASET_SCHEMA -->
 

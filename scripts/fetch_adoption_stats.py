@@ -1,5 +1,6 @@
 """Genera adoption.json y adoption_badge.json con señales públicas de adopción:
-descargas PyPI (pypistats.org) y descargas de assets en GitHub Releases.
+descargas PyPI (pypistats.org), descargas de assets en GitHub Releases y
+descargas/likes en Hugging Face Hub.
 
 Restricción ética dura: la señal se lee exclusivamente desde APIs públicas de
 plataforma, en CI. Este script NUNCA corre en la máquina del usuario ni se
@@ -8,10 +9,16 @@ distribuido.
 
 Parcialmente tolerante a fallos: si UNA fuente falla (red, rate-limit, 404
 porque el paquete aún no tiene descargas), usa None/0 para esa fuente y sigue.
-Pero si AMBAS fallan, sale con código 1 SIN escribir archivos — commitear
-nulls sobre datos reales sería perder la señal en silencio (el workflow
-semanal salta el commit cuando el step falla). La señal es informativa,
-no un gate; el silencio, en cambio, sí se reporta.
+Pero si PyPI y GitHub Releases fallan AMBAS, sale con código 1 SIN escribir
+archivos — commitear nulls sobre datos reales sería perder la señal en
+silencio (el workflow semanal salta el commit cuando el step falla). La señal
+es informativa, no un gate; el silencio, en cambio, sí se reporta.
+
+Decisión de alcance (Plan 129): la señal de Hugging Face degrada **sola**.
+Un fallo de HF no activa el exit 1 ni escribe nulls: el gate de fallo sigue
+anclado a las dos fuentes originales que alimentan el badge (PyPI) y la señal
+base del artefacto, para no acoplar el job semanal a la disponibilidad de un
+tercer endpoint.
 
 Uso:
   python scripts/fetch_adoption_stats.py                             # modo online
@@ -37,6 +44,7 @@ BADGE_PATH = ROOT_DIR / "data" / "normalized" / "adoption_badge.json"
 
 PYPI_STATS_URL = "https://pypistats.org/api/packages/chile-hub/recent"
 GITHUB_RELEASES_URL = "https://api.github.com/repos/cortega26/chile-hub/releases"
+HUGGINGFACE_URL = "https://huggingface.co/api/datasets/cortega26/chile-hub"
 REQUEST_TIMEOUT_SECONDS = 10
 REQUEST_MAX_ATTEMPTS = 3
 # User-Agent identificable con contacto: varios WAFs (incluido el de
@@ -90,6 +98,31 @@ def fetch_github_releases() -> list | None:
     return _http_get_json(GITHUB_RELEASES_URL, headers=headers)
 
 
+def fetch_huggingface() -> dict | None:
+    """Lee la señal pública del dataset espejo en Hugging Face Hub.
+
+    Endpoint público sin auth; devuelve `None` en cualquier fallo para que la
+    señal HF degrade sola (ver docstring del módulo).
+    """
+    return _http_get_json(HUGGINGFACE_URL)
+
+
+def parse_huggingface_stats(huggingface_payload: dict | None) -> dict | None:
+    """Extrae downloads/likes/lastModified del payload del API público de HF.
+
+    Devuelve `None` si la respuesta no es un dict (404, payload inesperado o
+    fuente caída): la ausencia de señal se representa como `null`, nunca como
+    ceros que se confundirían con una medición real.
+    """
+    if not isinstance(huggingface_payload, dict):
+        return None
+    return {
+        "downloads": huggingface_payload.get("downloads"),
+        "likes": huggingface_payload.get("likes"),
+        "lastModified": huggingface_payload.get("lastModified"),
+    }
+
+
 def parse_pypi_stats(pypi_recent: dict | None) -> dict:
     """Extrae last_day/last_week/last_month desde la respuesta cruda de pypistats.org."""
     data = pypi_recent.get("data", {}) if isinstance(pypi_recent, dict) else {}
@@ -114,12 +147,17 @@ def sum_github_downloads(releases: list | None) -> int:
     return total
 
 
-def build_payload(pypi_stats: dict, github_total: int) -> dict:
+def build_payload(
+    pypi_stats: dict,
+    github_total: int,
+    huggingface_stats: dict | None = None,
+) -> dict:
     """Construye el payload JSON completo de adopción (`adoption.json`)."""
     return {
         "generated_at_utc": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "pypi": pypi_stats,
         "github_releases": {"total_downloads": github_total},
+        "huggingface": huggingface_stats,
     }
 
 
@@ -135,10 +173,12 @@ def build_badge(pypi_last_month: int | None) -> dict:
     }
 
 
-def load_offline_fixture(path: Path) -> tuple[dict | None, list | None]:
-    """Lee un fixture con la forma `{"pypi_recent": {...}, "github_releases": [...]}`."""
+def load_offline_fixture(path: Path) -> tuple[dict | None, list | None, dict | None]:
+    """Lee un fixture con la forma
+    `{"pypi_recent": {...}, "github_releases": [...], "huggingface": {...}}`.
+    """
     fixture = json.loads(path.read_text(encoding="utf-8"))
-    return fixture.get("pypi_recent"), fixture.get("github_releases")
+    return fixture.get("pypi_recent"), fixture.get("github_releases"), fixture.get("huggingface")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -154,23 +194,26 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     if args.offline:
-        pypi_recent, github_releases = load_offline_fixture(Path(args.offline))
+        pypi_recent, github_releases, huggingface_payload = load_offline_fixture(Path(args.offline))
     else:
         pypi_recent = fetch_pypi_recent()
         github_releases = fetch_github_releases()
+        huggingface_payload = fetch_huggingface()
 
     if pypi_recent is None and github_releases is None:
         print(
-            "ERROR: ambas fuentes de adopción fallaron; no se escribe nada "
-            "(ver WARNs arriba). El workflow semanal salta el commit en este caso.",
+            "ERROR: ambas fuentes de adopción (PyPI y GitHub Releases) fallaron; "
+            "no se escribe nada (ver WARNs arriba). El workflow semanal salta el "
+            "commit en este caso.",
             file=sys.stderr,
         )
         return 1
 
     pypi_stats = parse_pypi_stats(pypi_recent)
     github_total = sum_github_downloads(github_releases)
+    huggingface_stats = parse_huggingface_stats(huggingface_payload)
 
-    payload = build_payload(pypi_stats, github_total)
+    payload = build_payload(pypi_stats, github_total, huggingface_stats)
     badge = build_badge(pypi_stats["last_month"])
 
     ADOPTION_PATH.parent.mkdir(parents=True, exist_ok=True)

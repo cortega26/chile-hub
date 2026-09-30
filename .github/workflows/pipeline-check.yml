@@ -94,10 +94,10 @@ jobs:
 
       - name: Check Python lint
         # Pin single-source con pyproject dev + pre-commit (Plan 094).
-        run: uvx ruff@0.16.7 check src/ tests/ scripts/
+        run: uvx ruff@0.16.8 check src/ tests/ scripts/
 
       - name: Check Python format
-        run: uvx ruff@0.16.7 format --check src/ tests/ scripts/
+        run: uvx ruff@0.16.8 format --check src/ tests/ scripts/
 
       - name: Check dataset registry/docs/contracts sync
         run: python scripts/check_companion_paths.py registry
@@ -286,7 +286,7 @@ jobs:
             # en un entorno efímero de uv en vez del venv del proyecto. Sin esto, un
             # cache-miss produce 155 registros (0 senadores) y el paso
             # "Check build-synced files" aborta el publish diario (2026-07-19/20).
-            PYTHONPATH=src uv run --no-project --with "scrapling[fetchers]" --with polars --with requests --with structlog --with tenacity --with curl_cffi --with defusedxml python src/extractors/autoridades_electas_extractor.py
+            PYTHONPATH=src uv run --no-project --with "scrapling[fetchers]==0.4.10" --with polars==1.44.2 --with requests==2.34.2 --with structlog==26.1.0 --with tenacity==9.1.4 --with curl_cffi==0.16.3 --with defusedxml==0.7.1 python src/extractors/autoridades_electas_extractor.py
           fi
 
       - name: Sanity-check versioned MINVU snapshot
@@ -407,7 +407,23 @@ jobs:
           ALLOW_RECORD_DROP: ${{ inputs.allow_record_drop }}
 
       - name: Run unit and contract tests
-        run: python -m pytest -v --cov=src --cov-report=term-missing --cov-report=xml
+        run: python -m pytest -n auto -v --cov=src --cov=scripts --cov-report=term-missing --cov-report=xml
+
+      - name: MCP server smoke (extra [mcp])
+        run: |
+          # El extra `mcp` no esta en el sync base del job (pipeline+dev), asi
+          # que sin este paso `build_server()` nunca se construye en CI y el
+          # test correspondiente siempre toma la rama ImportError (rama muerta
+          # en el runner). El `uv run` de abajo agrega el extra al venv del job
+          # sin desinstalar pipeline/dev (verificado); costo: un sync
+          # incremental, una vez por run.
+          uv run --extra mcp python - <<'PY'
+          from chile_hub.mcp_server import build_server
+
+          server = build_server()
+          assert server.name == "chile-hub", server.name
+          print(f"OK: MCP server {server.name}")
+          PY
 
       - name: Upload coverage to Codecov
         if: false  # Deshabilitado: migrado a badge autogenerado (coverage_badge.json)
@@ -546,8 +562,17 @@ jobs:
       - name: Verify landing page
         run: python scripts/verify_landing.py
 
-      - name: Lighthouse (accesibilidad, SEO, buenas prácticas)
+      - name: Lighthouse (performance, accesibilidad, SEO, buenas prácticas)
         run: bash scripts/run_lighthouse.sh
+
+      - name: Upload Lighthouse report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: lighthouse-report
+          path: /tmp/chile-hub-lighthouse.json
+          if-no-files-found: warn
+          retention-days: 7
 
   publish:
     concurrency:

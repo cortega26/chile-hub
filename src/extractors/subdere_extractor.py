@@ -16,6 +16,7 @@ try:
         BaseExtractor,
         ensure_staging_directories,
         write_raw_snapshot_atomic,
+        write_staging_csv_atomic,
         write_staging_metadata,
     )
     from src.extractors.http_utils import stealth_get as _stealth_get
@@ -24,6 +25,7 @@ except ModuleNotFoundError:
         BaseExtractor,
         ensure_staging_directories,
         write_raw_snapshot_atomic,
+        write_staging_csv_atomic,
         write_staging_metadata,
     )
     from http_utils import stealth_get as _stealth_get
@@ -666,18 +668,10 @@ class SubdereExtractor(BaseExtractor):
 
     def write_staging(self, df, metadata: dict) -> Path:
         ensure_directories()
-        output_path = Path(STAGING_DIR) / "comunas.csv"
-        df.write_csv(output_path)
-        write_metadata(
-            {
-                **metadata,
-                "dataset": self.dataset_name,
-                "record_count": df.height,
-                "fields": df.columns,
-                "reuse_policy": REUSE_POLICY,
-            }
+        merged = {**metadata, "dataset": self.dataset_name, "reuse_policy": REUSE_POLICY}
+        return write_staging_csv_atomic(
+            df, Path(STAGING_DIR) / "comunas.csv", METADATA_PATH, merged
         )
-        return output_path
 
 
 if __name__ == "__main__":

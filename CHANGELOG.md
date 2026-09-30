@@ -12,6 +12,278 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.46.1 - 2026-09-30
+
+### Corregido
+
+- **release**: Sincroniza la version de server.json en el bump
+  ([`54c1691`](https://github.com/cortega26/chile-hub/commit/54c1691511c603a4e9a7b80fc2bfaf6bef061620))
+
+- **verify**: Readiness ya no exige el ZIP publicable no versionado
+  ([`8261c39`](https://github.com/cortega26/chile-hub/commit/8261c390e3d98c5da09de1ab2704140b2f3cef1f))
+
+### Mantenimiento
+
+- **repo**: Deja de versionar el ZIP publicable
+  ([`2fb7d15`](https://github.com/cortega26/chile-hub/commit/2fb7d15bb68df5362e03eea56dd073a3d0d1627d))
+
+### Documentación
+
+- **readme**: Sincroniza el conteo de tests tras W4 + server.json sync
+  ([`22a755d`](https://github.com/cortega26/chile-hub/commit/22a755dd837a8205bea418c4f55e17a1323c2664))
+
+
+## 1.46.0 - 2026-09-29
+
+### Corregido
+
+- **types**: Mypy verde en region_utils y _resolve_names_to_frame
+  ([`62b1ff1`](https://github.com/cortega26/chile-hub/commit/62b1ff1763cbeb9c207e06040796f1dc30e7fabb))
+
+### Mantenimiento
+
+- **ci**: Mide performance en Lighthouse y sube el reporte
+  ([`9c26728`](https://github.com/cortega26/chile-hub/commit/9c2672850cc89e538e05a69fab5bb76054d4293d))
+
+### Code Style
+
+- **tests**: Aplica ruff format a los tests de calidad_aire
+  ([`3f0105a`](https://github.com/cortega26/chile-hub/commit/3f0105a975f94efca9487d4d243716487e5bf6c2))
+
+- **tests**: Ordena el import de sync_release_artifact_version (ruff I001)
+  ([`81f98ff`](https://github.com/cortega26/chile-hub/commit/81f98ff48c1ed3a07a3674c70b5218465cbb0816))
+
+### Documentación
+
+- **agents**: Alinea el protocolo de fuente caída con el código
+  ([`7fc72b0`](https://github.com/cortega26/chile-hub/commit/7fc72b097b3f903dde0c23f6ddf58860a68390ab))
+
+- **mcp**: Registry oficial + claim del README
+  ([`5203d3a`](https://github.com/cortega26/chile-hub/commit/5203d3a59d3ccb506293483e958109bebf7a111b))
+
+- **readme**: Sincroniza conteo de tests tras el backfill de gates (1181 -> 1211)
+  ([`81701a6`](https://github.com/cortega26/chile-hub/commit/81701a68b7c5b482444e6a68231cdab3340f08e0))
+
+### Agregado
+
+- **core**: Resolve_regiones()
+  ([`d64def0`](https://github.com/cortega26/chile-hub/commit/d64def03f0738a8fbae886f3b7692403e6a427a6))
+
+- **dist**: Mide HF en adoption.json
+  ([`e2ef696`](https://github.com/cortega26/chile-hub/commit/e2ef6964d8377dd255eeabeeffa9cbbb336ccf92))
+
+### Mejorado
+
+- **core**: Paraleliza check_sources y cachea el GeoParquet de resolve_by_coords
+  ([`da4be85`](https://github.com/cortega26/chile-hub/commit/da4be859b3bbbcfaf1a6c661f7a352fdff2bae1e))
+
+### Refactorizado
+
+- **extractors**: Consolida write_staging en BaseExtractor
+  ([`9ff7255`](https://github.com/cortega26/chile-hub/commit/9ff725592ec71c3c058b3feef28c1408ff6069f0))
+
+### Tests
+
+- **calidad-aire**: Cubre merge incremental de process_calidad_aire
+  ([`0b1473f`](https://github.com/cortega26/chile-hub/commit/0b1473fe3c6b7d9c355074a125b687d7b37a941f))
+
+- **ci**: Cubre check_companions regla por regla
+  ([`98e90e0`](https://github.com/cortega26/chile-hub/commit/98e90e0bdab9eccc4b9baa654df5371b6c1ab2b2))
+
+- **ci**: Cubre check_source_urls (clasificación y códigos de salida)
+  ([`34d921c`](https://github.com/cortega26/chile-hub/commit/34d921cf45673788ed8f4e83f8c82ccf111d8f48))
+
+- **release**: Cubre sync_release_artifact_version.main()
+  ([`73cf443`](https://github.com/cortega26/chile-hub/commit/73cf44338c11737b414b66431075dbd8c53f8347))
+
+- **verify**: Cubre ramas de fallo de indicadores diagnostics y top_issue
+  ([`fcdc082`](https://github.com/cortega26/chile-hub/commit/fcdc082b12756adc22d103c420b40862fb5ce955))
+
+
+## 1.45.0 - 2026-09-29
+
+### Corregido
+
+- **ci**: Pasa github.head_ref por env en dependabot-lock
+  ([`d614467`](https://github.com/cortega26/chile-hub/commit/d614467a4ce1b2e4967d21e12cbe67130be478c6))
+
+- **ci**: Pinnea entornos efímeros de publicación
+  ([`f0e8746`](https://github.com/cortega26/chile-hub/commit/f0e8746f9864026ad6ad7beea4043431ae75e311))
+
+- **dx**: Package-smoke prueba el CLI del venv, no el binario global
+  ([`ee5becf`](https://github.com/cortega26/chile-hub/commit/ee5becfb346fb994e2d6b69589996bacd4afc86c))
+
+- **landing**: Escapa HTML en los emisores JSON-LD
+  ([`223dfe1`](https://github.com/cortega26/chile-hub/commit/223dfe1e272897afd2a2f40a1cf9f3ab10306d4a))
+
+- **landing**: Sirve las fuentes localmente
+  ([`d51f721`](https://github.com/cortega26/chile-hub/commit/d51f7218c164f21bb6d3de0432a57a83acccd748))
+
+- **security**: Aborta la publicacion HF si la seleccion publicable queda vacia
+  ([`6ddb705`](https://github.com/cortega26/chile-hub/commit/6ddb705a8bbdac4c9552484ac08ca75399ee138c))
+
+- **security**: Extrae el RAR de MINEDUC en directorio temporal con unrar e
+  ([`ba85f3c`](https://github.com/cortega26/chile-hub/commit/ba85f3cd1fb5d2dfe90a970cbc3783b3bb87f39b))
+
+- **tooling**: Hace disparar el hook sync-docs con patrones de archivo
+  ([`5ec16bb`](https://github.com/cortega26/chile-hub/commit/5ec16bbd57f25f5c5f0c03b7777ad1ef955a2161))
+
+- **tooling**: Sincroniza ruff 0.16.8 en pre-commit y CI con pyproject
+  ([`94fddf6`](https://github.com/cortega26/chile-hub/commit/94fddf6eecbc3dedc4efd107eb05e09c8108b95e))
+
+### Mantenimiento
+
+- **dx**: Doctor verifica uv.lock con --locked como CI
+  ([`206f828`](https://github.com/cortega26/chile-hub/commit/206f82875ca03df5431f4e478c0c970db2c536ac))
+
+- **tooling**: Elimina el shim inalcanzable src/chile_hub.py
+  ([`6ee17e0`](https://github.com/cortega26/chile-hub/commit/6ee17e075f0822c507bb8af9ad84ab967c7c79c6))
+
+- **vendor**: Actualiza DuckDB-Wasm del playground
+  ([`915ee8c`](https://github.com/cortega26/chile-hub/commit/915ee8c8119027e23eea0cc98ce343d9389f2322))
+
+### Documentación
+
+- **dx**: Documenta la extraccion local stealth de autoridades_electas
+  ([`8b2a634`](https://github.com/cortega26/chile-hub/commit/8b2a6349158ac4bf674927c7cc178e8566baa014))
+
+- **dx**: Documenta uv como prerrequisito y falla claro en bootstrap
+  ([`41367c5`](https://github.com/cortega26/chile-hub/commit/41367c5809767cbaf4ba1ebfbf17dcdb87d3ca65))
+
+- **readme**: Sincroniza el conteo de tests tras la Wave 2 R1 (114/119/124)
+  ([`f7636a6`](https://github.com/cortega26/chile-hub/commit/f7636a6c1fe9801057d5bf476ff29c522502878e))
+
+- **readme**: Sincroniza el conteo de tests tras la Wave 2 R2 (112/113)
+  ([`2085a07`](https://github.com/cortega26/chile-hub/commit/2085a07dfcefc3f14b9e64a5a1a87cca2972ee88))
+
+### Agregado
+
+- **registry**: Cierra cohort DatasetSpec con 3 specs y gate
+  ([`1121cdc`](https://github.com/cortega26/chile-hub/commit/1121cdc948ca49b8c913edf16f7f890027613953))
+
+### Mejorado
+
+- **mcp**: Cachea parquet por proceso en las tools
+  ([`3e766b3`](https://github.com/cortega26/chile-hub/commit/3e766b3062ba24796f1c999228e78bad9b8dda7f))
+
+
+## 1.44.2 - 2026-09-29
+
+### Corregido
+
+- **release**: --version-only sincroniza los pines de installation.md
+  ([`def1086`](https://github.com/cortega26/chile-hub/commit/def10866c6690c3be602fc454a57ee32b96a222e))
+
+
+## 1.44.1 - 2026-09-29
+
+### Corregido
+
+- **ci**: Commitea el geojson del mapa junto al parquet candidate
+  ([`4afef66`](https://github.com/cortega26/chile-hub/commit/4afef66fc29ee4cd084d294144e1fcc44dd0de95))
+
+- **security**: Gatea release y pages por repo y evento del run disparador
+  ([`661d77c`](https://github.com/cortega26/chile-hub/commit/661d77c96264a95ccfa6ecfa0dcfd50a44eb5e37))
+
+- **seo**: Corrige año de finanzas, descargas por site-url y explorador SQL
+  ([`832bd6f`](https://github.com/cortega26/chile-hub/commit/832bd6f95ea5545ccaddec8ecee04775186c816c))
+
+- **tests**: Mide scripts/ en cobertura y corre MCP en CI
+  ([`023c437`](https://github.com/cortega26/chile-hub/commit/023c4370450c5554606440eff3fd10c32a79de3c))
+
+### Mantenimiento
+
+- **docs**: Sincroniza conteo de tests de README (1147 -> 1151)
+  ([`4a40723`](https://github.com/cortega26/chile-hub/commit/4a40723cf054ec62c49da63171852b9eff6e9dfe))
+
+### Documentación
+
+- Sincroniza pin de instalación, repunta planes archivados y agrega guardrails
+  ([`7d172a3`](https://github.com/cortega26/chile-hub/commit/7d172a3b74222f437c551117e70edf814b2831fd))
+
+- **agents**: Corrige hechos falsos del carril, capas y comandos CodeGraph
+  ([`b1df764`](https://github.com/cortega26/chile-hub/commit/b1df76478ea265361a1aa482dec4c01fde110519))
+
+- **readme**: Regenera conteo de tests tras plan 118
+  ([`3526884`](https://github.com/cortega26/chile-hub/commit/3526884b407ba6dc18a5b2d5e1885008c0f91ba9))
+
+- **readme**: Sincroniza el conteo de tests (1151) tras los guardrails del Plan 122
+  ([`8ace7fc`](https://github.com/cortega26/chile-hub/commit/8ace7fc3f28e35c40e07400ce66af5876c6c72ad))
+
+- **readme**: Sincroniza el conteo de tests tras Plan 115
+  ([`96a24f8`](https://github.com/cortega26/chile-hub/commit/96a24f8f6307e1d57ba790a1a1424cfc5434a10a))
+
+### Mejorado
+
+- **vitales**: Descarga incremental de anuarios
+  ([`14ec4ff`](https://github.com/cortega26/chile-hub/commit/14ec4fff2aa7cf4a73a24b52a970138760260fb3))
+
+### Tests
+
+- **ci**: Guardrail del gate de identidad de workflow_run
+  ([`3a6f49d`](https://github.com/cortega26/chile-hub/commit/3a6f49d9eeef7cf080b6dd53f9c4408723192de7))
+
+
+## 1.44.0 - 2026-09-29
+
+### Documentación
+
+- **adr**: ADR-023 — chile-hub es la última milla de los datos oficiales, no un portal
+  ([#124](https://github.com/cortega26/chile-hub/pull/124),
+  [`1464109`](https://github.com/cortega26/chile-hub/commit/1464109969428b856c10797fa0f1704dd060b998))
+
+### Agregado
+
+- Reposiciona chile-hub como la última milla de los datos oficiales (ADR-023)
+  ([#124](https://github.com/cortega26/chile-hub/pull/124),
+  [`1464109`](https://github.com/cortega26/chile-hub/commit/1464109969428b856c10797fa0f1704dd060b998))
+
+
+## 1.43.1 - 2026-09-27
+
+### Corregido
+
+- **ci**: Source-urls instala el extra pipeline
+  ([`cde52b6`](https://github.com/cortega26/chile-hub/commit/cde52b68c174da8b255282a55221d458a150ac4c))
+
+
+## 1.43.0 - 2026-09-27
+
+### Mantenimiento
+
+- **deps**: Bump anyio in the uv group across 1 directory
+  ([#100](https://github.com/cortega26/chile-hub/pull/100),
+  [`c6fa487`](https://github.com/cortega26/chile-hub/commit/c6fa48785fc8817ab4b04651ce535b1dffafbd18))
+
+- **deps**: Bump the codeql-action group with 2 updates
+  ([#106](https://github.com/cortega26/chile-hub/pull/106),
+  [`c0352fa`](https://github.com/cortega26/chile-hub/commit/c0352fae061757abf39ea3393a98051202d62818))
+
+- **deps**: Sync uv.lock [skip ci] ([#105](https://github.com/cortega26/chile-hub/pull/105),
+  [`b5f31e8`](https://github.com/cortega26/chile-hub/commit/b5f31e8a5ac699fa6daeff0212eb3597452cc53d))
+
+- **deps**: Sync uv.lock [skip ci] ([#104](https://github.com/cortega26/chile-hub/pull/104),
+  [`3b1b059`](https://github.com/cortega26/chile-hub/commit/3b1b059dd89090ea678271f96ee1fb98483455b4))
+
+- **deps-dev**: Bump pandas from 3.0.3 to 3.0.6 in the python-pipeline group
+  ([#104](https://github.com/cortega26/chile-hub/pull/104),
+  [`3b1b059`](https://github.com/cortega26/chile-hub/commit/3b1b059dd89090ea678271f96ee1fb98483455b4))
+
+- **deps-dev**: Bump pandas in the python-pipeline group
+  ([#104](https://github.com/cortega26/chile-hub/pull/104),
+  [`3b1b059`](https://github.com/cortega26/chile-hub/commit/3b1b059dd89090ea678271f96ee1fb98483455b4))
+
+- **deps-dev**: Bump the python-dev group with 2 updates
+  ([#105](https://github.com/cortega26/chile-hub/pull/105),
+  [`b5f31e8`](https://github.com/cortega26/chile-hub/commit/b5f31e8a5ac699fa6daeff0212eb3597452cc53d))
+
+### Agregado
+
+- **docs**: Separa solicitar/aportar datasets con guía de 2 minutos
+  ([#119](https://github.com/cortega26/chile-hub/pull/119),
+  [`5b0e439`](https://github.com/cortega26/chile-hub/commit/5b0e4393e9809302f24e41028bb3d5e26ddbccc1))
+
+
 ## 1.42.0 - 2026-09-26
 
 ### Corregido

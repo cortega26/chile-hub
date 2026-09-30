@@ -12,6 +12,9 @@ from urllib.parse import urlparse
 ROOT_DIR = Path(__file__).resolve().parents[1]
 UTC = timezone.utc
 BUNDLE_PATH = ROOT_DIR / "data" / "normalized" / "hub_bundle.json"
+# El ZIP publicable no se versiona (Plan 130): la landing lo descarga desde el
+# asset del último GitHub Release. Mantener en sync con RELEASE_DOWNLOAD_BASE de app.js.
+RELEASE_DOWNLOAD_BASE = "https://github.com/cortega26/chile-hub/releases/latest/download"
 # Mirrors the confirmed host-wide Content-Security-Policy that Cloudflare serves for
 # tooltician.com. Owner-confirmed 2026-09-13: includes the GA4 inline-bootstrap hash and the
 # region1.google-analytics.com GA4 regional hit endpoint required by the site, plus
@@ -20,6 +23,8 @@ BUNDLE_PATH = ROOT_DIR / "data" / "normalized" / "hub_bundle.json"
 # (static.cloudflareinsights.com, cloudflareinsights.com); the other paths (e.g. /polla/)
 # keep the base policy. ADR-020 (2026-09-21) retiró el GoatCounter no autorizado:
 # ningún origen de terceros de analítica debe volver a este espejo.
+# Plan 114 (2026-09-29): las tipografías se auto-hospedan en vendor/fonts/;
+# style-src y font-src ya no permiten orígenes de fuentes de terceros.
 # Keep in sync with platform/tooltician-site/docs/cloudflare-security-headers.md.
 PRODUCTION_CSP = (
     "default-src 'self'; base-uri 'self'; form-action 'self' https://formspree.io; "
@@ -32,8 +37,8 @@ PRODUCTION_CSP = (
     "'sha256-4IyZhVv+RWju+1/qJEKCsZqtEjlfkQeg7lwN85qT6Y8=' "
     "https://www.googletagmanager.com https://www.google-analytics.com "
     "https://static.cloudflareinsights.com; "
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-    "img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; "
+    "style-src 'self' 'unsafe-inline'; "
+    "img-src 'self' data: https:; font-src 'self'; "
     "connect-src 'self' blob: https://formspree.io "
     "https://extensions.duckdb.org https://www.google-analytics.com "
     "https://region1.google-analytics.com https://www.googletagmanager.com "
@@ -202,10 +207,19 @@ def verify_landing():
         (package for package in bundle.get("packages", []) if package.get("package_type") == "zip"),
         None,
     )
-    expected_verification_command = (
-        zip_package.get("verification_command")
-        if zip_package and zip_package.get("verification_command")
-        else "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256"
+    default_zip_path = "data/normalized/chile-hub-publishable-bundle.zip"
+    zip_path = (zip_package or {}).get("path") or default_zip_path
+    checksum_path = (zip_package or {}).get("checksum_path") or f"{default_zip_path}.sha256"
+    verification_command = (zip_package or {}).get("verification_command") or (
+        f"shasum -a 256 -c {checksum_path}"
+    )
+    expected_zip_href = f"{RELEASE_DOWNLOAD_BASE}/{zip_path.rsplit('/', 1)[-1]}"
+    expected_verification_command = "\n".join(
+        [
+            f"curl -L -o {zip_path} {expected_zip_href}",
+            f"curl -L -o {checksum_path} {RELEASE_DOWNLOAD_BASE}/{checksum_path.rsplit('/', 1)[-1]}",
+            verification_command,
+        ]
     )
 
     with local_server() as url, sync_playwright() as p:
@@ -219,10 +233,59 @@ def verify_landing():
             ),
         )
         page.on("pageerror", lambda error: browser_errors.append(str(error)))
+        font_requests = []
+        page.on(
+            "request",
+            lambda request: (
+                font_requests.append(request.url) if request.resource_type == "font" else None
+            ),
+        )
         page.goto(url, wait_until="networkidle")
 
         if browser_errors:
             fail(f"Browser errors while rendering landing: {browser_errors}")
+
+        # Plan 114: las tipografías se sirven desde vendor/fonts (mismo origen)
+        # y las tres familias deben cargar. Ninguna petición de fuente puede
+        # salir del sitio (el CSP solo permite font-src 'self').
+        external_font_requests = [
+            request_url for request_url in font_requests if not request_url.startswith(url)
+        ]
+        if external_font_requests:
+            fail(f"La landing solicita tipografías fuera del origen: {external_font_requests}")
+        font_state = page.evaluate(
+            """async () => {
+                await document.fonts.ready;
+                const loaded = (family) =>
+                    Array.from(document.fonts).some(
+                        (face) =>
+                            face.family.replace(/['"]/g, "") === family &&
+                            face.status === "loaded"
+                    );
+                return {
+                    sansLoaded: loaded("Inter"),
+                    serifLoaded: loaded("Source Serif 4"),
+                    monoLoaded: loaded("JetBrains Mono"),
+                    serifComputed: getComputedStyle(
+                        document.querySelector(".intro h2")
+                    ).fontFamily,
+                    monoComputed: getComputedStyle(
+                        document.querySelector(".intro .intro-eyebrow")
+                    ).fontFamily,
+                };
+            }"""
+        )
+        if not (
+            font_state["sansLoaded"] and font_state["serifLoaded"] and font_state["monoLoaded"]
+        ):
+            fail(f"Las tipografías auto-hospedadas no cargaron: {font_state}")
+        if "Source Serif 4" not in font_state["serifComputed"]:
+            fail(f"El titular .intro h2 no usa Source Serif 4: {font_state['serifComputed']}")
+        if "JetBrains Mono" not in font_state["monoComputed"]:
+            fail(
+                "El eyebrow .intro .intro-eyebrow no usa JetBrains Mono: "
+                f"{font_state['monoComputed']}"
+            )
 
         # Analítica: la landing no carga ningún contador de terceros
         # (ADR-020: se retiró el GoatCounter no autorizado el 2026-09-21).
@@ -551,12 +614,14 @@ def verify_landing():
         ):
             fail(f"Unexpected package actions: {package_actions}")
 
+        zip_action_href = page.locator("#package-actions .dataset-action").first.get_attribute(
+            "href"
+        )
+        if zip_action_href != expected_zip_href:
+            fail(f"Unexpected Bundle ZIP href: {zip_action_href}")
+
         package_meta = page.locator("#package-meta").inner_text()
-        if (
-            "Tamaño:" not in package_meta
-            or "sha256:" not in package_meta
-            or "generado junto al último build" not in package_meta
-        ):
+        if "Tamaño:" not in package_meta or "último GitHub Release" not in package_meta:
             fail(f"Unexpected package meta: {package_meta}")
 
         page.locator(".package-verify summary").click()
@@ -564,9 +629,9 @@ def verify_landing():
         if package_verify_title != "Verificar integridad":
             fail(f"Unexpected package verify title: {package_verify_title}")
 
-        package_verify_line = page.locator("#package-verify-code").inner_text().splitlines()[0]
-        if package_verify_line != expected_verification_command:
-            fail(f"Unexpected package verify command: {package_verify_line}")
+        package_verify_command = page.locator("#package-verify-code").inner_text()
+        if package_verify_command != expected_verification_command:
+            fail(f"Unexpected package verify command: {package_verify_command}")
 
         package_copy = page.locator("#package-verify-copy")
         package_copy.click()
@@ -751,6 +816,38 @@ def verify_landing():
             fail("El botón de exportar CSV debe existir y partir deshabilitado")
         if "Ctrl" not in page.locator(".sql-hint").inner_text():
             fail("Falta la pista de teclado (Ctrl + Enter) del explorador SQL")
+
+        # Plan 128: además de la presencia de la UI, ejecuta una consulta real
+        # contra un Parquet publicado. Cubre de punta a punta el bundle
+        # DuckDB-Wasm vendorizado (loader ESM, worker MVP, wasm y registro de
+        # archivos). El drawer de la ficha sigue abierto: su overlay intercepta
+        # el clic, ciérralo primero vía hash (mismo mecanismo que la app).
+        if drawer.locator("#drawer-close").is_visible():
+            page.evaluate("() => { window.location.hash = ''; }")
+            drawer.wait_for(state="hidden")
+        page.fill(
+            "#sql-input",
+            "SELECT count(*) AS n FROM read_parquet('data/normalized/comunas.parquet');",
+        )
+        page.click("#sql-run-btn")
+        try:
+            page.wait_for_function(
+                """() => {
+                    const el = document.querySelector('#sql-status');
+                    if (!el) return false;
+                    const text = el.textContent || '';
+                    return text.includes('filas') || text.startsWith('Error');
+                }""",
+                timeout=120000,
+            )
+        except Exception:
+            fail("El explorador SQL no terminó la consulta dentro de 120 s")
+        sql_status = page.locator("#sql-status").inner_text()
+        if "filas" not in sql_status:
+            fail(f"La consulta de smoke del explorador SQL falló: {sql_status}")
+        sql_count = page.locator("#sql-result tbody td").first.inner_text().strip()
+        if sql_count != "346":
+            fail(f"COUNT(*) inesperado del explorador SQL: {sql_count} (esperado 346)")
 
         # Mapa territorial: Leaflet + GeoJSON simplificado + panel de lectura.
         # El mapa se inicializa en diferido cuando entra al viewport.

@@ -77,6 +77,7 @@ help:
 	@printf "  make notebooks        Ejecuta examples/notebooks/ con el bundle publicado\n"
 
 bootstrap:
+	@command -v uv >/dev/null 2>&1 || { printf "ERROR: uv no está instalado. Ver https://docs.astral.sh/uv/getting-started/installation/\n"; exit 1; }
 	uv sync --extra pipeline --extra dev
 	$(PYTHON) -m playwright install chromium
 	$(PYTHON) -m pre_commit install
@@ -88,6 +89,7 @@ doctor:
 	@printf "PYTHON=%s\n" "$(PYTHON)"
 	@$(PYTHON) -c "import sys; print(sys.executable)"
 	@$(PYTHON) -c "import duckdb, polars, pyarrow; from importlib.metadata import version; print('duckdb=' + duckdb.__version__); print('polars=' + polars.__version__); print('pyarrow=' + pyarrow.__version__); print('playwright=' + version('playwright'))"
+	@uv lock --locked
 	@$(PYTHON) scripts/check_validation_registration.py
 	@$(PYTHON) scripts/check_companion_paths.py registry
 	@$(PYTHON) scripts/sync_docs.py --check
@@ -168,7 +170,7 @@ e2e:
 	bash tests/e2e/run_all.sh
 
 coverage:
-	$(PYTHON) -m pytest --cov=src --cov-report=term-missing --cov-report=xml
+	$(PYTHON) -m pytest --cov=src --cov=scripts --cov-report=term-missing --cov-report=xml
 
 lint:
 	$(PYTHON) -m ruff check src/ tests/ scripts/
@@ -215,7 +217,7 @@ package-check: package
 package-smoke: package-check
 	uv pip install --force-reinstall dist/*.whl
 	$(PYTHON) -c "from chile_hub import ChileHub; print(ChileHub)"
-	chile-hub --help
+	$(PYTHON) -m chile_hub --help
 
 check: build verify test verify-landing lint format-check typecheck audit sec
 

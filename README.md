@@ -11,7 +11,7 @@
 </h1>
 
 <p><strong>Datos públicos de Chile, curados y listos para análisis en una línea de código.</strong></p>
-<p><em>El hub de datos abiertos de Chile — parte del ecosistema Tooltician.</em></p>
+<p><em>La última milla de los datos oficiales de Chile — parte del ecosistema Tooltician.</em></p>
 
 [![CI/CD](https://github.com/cortega26/chile-hub/actions/workflows/pipeline-check.yml/badge.svg)](https://github.com/cortega26/chile-hub/actions)
 [![PyPI version](https://img.shields.io/pypi/v/chile-hub.svg)](https://pypi.org/project/chile-hub/)
@@ -115,6 +115,11 @@ chile-hub cache clear      # Liberar espacio
 > el costo técnico** de encontrar, limpiar, validar, cruzar y consumir datasets
 > geográficos, demográficos, electorales y económicos críticos de Chile.
 >
+> Tampoco es un portal ni una fuente oficial: trabaja aguas abajo de
+> [datos.gob.cl](https://datos.gob.cl/) y de las instituciones que publican cada dato,
+> y siempre enlaza a la fuente oficial. Es un proyecto independiente, sin afiliación con
+> esas instituciones. Misión y principios: [`docs/product-spec.md`](docs/product-spec.md).
+>
 > En la práctica, responde preguntas como:
 >
 > - ¿Cómo cruzo mi base de clientes, escuelas o centros de salud con comunas oficiales sin perder ceros en los códigos?
@@ -125,7 +130,7 @@ chile-hub cache clear      # Liberar espacio
 > **Versionado:** Para entornos productivos, fija la versión exacta en `requirements.txt`
 > (revisa el badge de PyPI al inicio de este README para la versión más reciente):
 > ```
-> chile-hub==1.42.0
+> chile-hub==1.46.1
 > ```
 > El bundle de datos se publica con cada release. La API del módulo `ChileHub` sigue
 > versionado semántico: cambios de interfaz pública solo en _major releases_.
@@ -175,10 +180,10 @@ El mismo estado se publica en el sitio, con historial de builds y detalle por ca
 ### Respaldo adicional
 
 <!-- START_TEST_COUNT -->
-- **1152 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
+- **1252 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
 <!-- END_TEST_COUNT -->
 <!-- START_ADR_COUNT -->
-- **22 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
+- **23 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
 <!-- END_ADR_COUNT -->
 - **Drift monitoreado:** todos los datasets bajo vigilancia de deriva de esquema; cualquier
   cambio en la fuente se detecta y registra ([`drift_report.md`](data/normalized/drift_report.md)).
@@ -222,14 +227,14 @@ Mapa territorial interactivo: las 346 comunas con 7 métricas seleccionables
 | 12 | **Resultados Educacionales** | 345 | live | MINEDUC | CC BY 3.0 CL | Anual |
 | 13 | **Indicadores Urbanos SIEDU** | 6 701 (parcial) | live | INE / SIEDU | Datos abiertos INE | Anual |
 | 14 | **Perfil Territorial Comunal** | 346 | live | chile-hub derivado | Fuentes abiertas | Derivada |
-| 15 | **Empresas (RES)** | ~1 609 373 | live | Min. Economía / datos.gob.cl | CC-BY 3.0 CL | Mensual |
+| 15 | **Empresas (RES)** | ~1 628 433 | live | Min. Economía / datos.gob.cl | CC-BY 3.0 CL | Mensual |
 | 16 | **Pobreza Comunal (SAE)** | 690 | live | MDS / Observatorio Social | Datos abiertos MDS | Bienal/trienal |
 | 17 | **Consumo Eléctrico Comunal** | 3 | fallback | CNE / Energía Abierta | CC BY | Anual |
 | 18 | **Partidos Políticos** | 37 | live | Cámara de Diputados | CC BY | Bajo_demanda |
 | 19 | **Autoridades Electas** | 205 | live | Cámara de Diputados + Senado | CC BY | Bajo_demanda |
 | 20 | **Estadísticas Vitales** | 13 840 | live | INE | CC BY 4.0 | Anual |
 | 21 | **Permisos de Edificación** | 8 650 | monthly | MINVU / CEDOC | Uso c/cita | Mensual |
-| 22 | **Calidad del Aire** | 1 885 | live | MMA / SINCA | Revisión términos | Diaria |
+| 22 | **Calidad del Aire** | 3 020 | live | MMA / SINCA | Revisión términos | Diaria |
 | 23 | **geometria_comunal** | — | candidato | — | — | — |
 | 24 | **Delincuencia Comunal** | — | deprecated | CEAD / SPD | Revisión términos | — |
 | 25 | **Autoridades Locales** | — | candidato | BCN SIIT + Wikipedia | CC BY / CC BY-SA | — |
@@ -346,8 +351,10 @@ WHERE c.nombre_region = 'Valparaíso';
 | `chile-hub cache update/status/clear` | Administra el cache local del bundle publicado. |
 
 > **¿Construyes agentes?** El proyecto incluye un servidor MCP con catálogo,
-> consultas y salud para que tu agente consuma los datos sin integraciones
-> propias: [`docs/mcp.md`](docs/mcp.md).
+> consultas y resolución de comunas para que tu agente consuma los datos sin
+> integraciones propias: [`docs/mcp.md`](docs/mcp.md).
+
+<!-- mcp-name: io.github.cortega26/chile-hub -->
 
 ### CLI: los comandos más usados
 
@@ -551,6 +558,9 @@ Esta sección es para contribuidores que ejecutan el pipeline de extracción, bu
 verificación en su máquina. Si solo necesitas consumir los datos, usa
 `pip install chile-hub` (ver [Instalación](#instalar-y-usar-en-30-segundos)).
 
+Requiere [uv](https://docs.astral.sh/uv/getting-started/installation/) y Git.
+Python lo gestiona uv (`make bootstrap`).
+
 ```bash
 # Entorno
 git clone https://github.com/cortega26/chile-hub.git
@@ -569,6 +579,14 @@ make test               # pytest (lee data/normalized/, no corre el pipeline)
 make coverage           # pytest + cobertura de src/ (term-missing + coverage.xml)
 make verify-landing     # Pruebas de humo de landing page con Playwright
 ```
+
+> `autoridades_electas` requiere scrapling para no degradar a 155 registros
+> (0 senadores); el comando local está en
+> [Carriles de extracción](docs/extraction-lanes.md).
+
+> El ZIP publicable no se versiona: `make build` lo genera localmente y el
+> sitio lo descarga desde el asset del último GitHub Release. Para clones más
+> livianos: `git clone --filter=blob:none https://github.com/cortega26/chile-hub`.
 
 Para entender la arquitectura, las reglas no negociables y el flujo de trabajo, revisa
 [`AGENTS.md`](./AGENTS.md); el punto de partida rápido es

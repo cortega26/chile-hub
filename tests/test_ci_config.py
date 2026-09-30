@@ -6,11 +6,16 @@ transitivo como pyyaml que no es dependencia directa del proyecto); usan
 comprobaciones de texto simples y suficientes para el guardrail específico.
 """
 
+import contextlib
+import io
 import json
+import re
+import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
@@ -20,13 +25,22 @@ if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
 import check_lighthouse
-from check_companion_paths import check_companions
+import check_source_urls
+from check_companion_paths import (
+    COMPANION_RULES,
+    EXTRACTOR_RULE_EXCLUDED_PATHS,
+    check_companions,
+)
 
 PIPELINE_CHECK_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "pipeline-check.yml"
+PYPROJECT_TOML = ROOT_DIR / "pyproject.toml"
+PRECOMMIT_CONFIG = ROOT_DIR / ".pre-commit-config.yaml"
 MONTHLY_SCRAPE_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "monthly-scrape.yml"
 ADOPTION_STATS_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "adoption-stats.yml"
 GEOMETRIA_COMUNAL_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "geometria-comunal.yml"
 PYPI_RELEASE_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "pypi-release.yml"
+HF_PUBLISH_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "hf-publish.yml"
+PAGES_DEPLOY_WORKFLOW = ROOT_DIR / ".github" / "workflows" / "pages-deploy.yml"
 MAKEFILE = ROOT_DIR / "Makefile"
 MKDOCS_CONFIG = ROOT_DIR / "mkdocs.yml"
 DOCS_DIR = ROOT_DIR / "docs"
@@ -157,6 +171,155 @@ class AutoridadesElectasScraplingGuardrailTests(unittest.TestCase):
         )
 
 
+class EphemeralInstallPinGuardrailTests(unittest.TestCase):
+    """Supply-chain: los entornos efímeros de CI instalaban paquetes
+    resolviendo "la última versión" en cada corrida, fuera de uv.lock.
+
+    Tres rutas: `uv pip install --system huggingface_hub` en el job
+    `hf-publish` de pypi-release.yml y `uv run --no-project --with
+    huggingface_hub` en hf-publish.yml (ambos con HF_TOKEN), y los siete
+    `--with` sin versión del fetch de autoridades_electas en
+    pipeline-check.yml (alimenta datos publicados: sin scrapling el
+    extractor degrada a 155 registros y el publish diario se aborta). Una
+    release upstream comprometida o rompedora cambiaba el resultado de un
+    job privilegiado sin ningún diff en el repo. Fix (Plan 112): extra
+    `publish` pinneado + lock, y `==` en cada `--with`.
+    """
+
+    def test_ephemeral_scrapling_fetch_pins_every_with_flag(self):
+        content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        fetch_lines = [
+            line
+            for line in content.splitlines()
+            if "autoridades_electas_extractor.py" in line and "uv run --no-project" in line
+        ]
+        self.assertTrue(fetch_lines, "No se encontró el fetch efímero de autoridades_electas.")
+        tokens = re.findall(r"--with\s+(\"[^\"]+\"|\S+)", fetch_lines[0])
+        self.assertTrue(tokens, "El fetch efímero no declara ningún --with.")
+        unpinned = [token for token in tokens if "==" not in token]
+        self.assertEqual(
+            unpinned,
+            [],
+            "Todo `--with` del entorno efímero debe fijar versión exacta "
+            "(sin pin, uv resuelve latest en cada corrida fuera del lock): "
+            f"{unpinned}",
+        )
+
+    def test_pypi_release_uses_locked_publish_extra_for_hf(self):
+        content = PYPI_RELEASE_WORKFLOW.read_text(encoding="utf-8")
+        self.assertNotIn(
+            "uv pip install --system huggingface_hub",
+            content,
+            "El job hf-publish no debe instalar huggingface_hub sin pin: "
+            "debe usar el extra `publish` desde uv.lock.",
+        )
+        self.assertIn("--extra publish", content)
+
+    def test_hf_publish_dispatch_uses_locked_publish_extra(self):
+        content = HF_PUBLISH_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("--extra publish", content)
+        self.assertNotIn("--with huggingface_hub", content)
+
+
+class RuffPinSingleSourceTests(unittest.TestCase):
+    """Regresión: Dependabot bumpeó el pin de ruff solo en `pyproject.toml`
+    (`ruff==0.16.8`, commit b5f31e8) y dejó atrás pre-commit y CI (ambos
+    `0.16.7`). Resultado: `make lint` local (usa el pin de pyproject) pasaba
+    y CI (`uvx ruff@0.16.7`) fallaba — la discrepancia exacta que Plan 094
+    eliminó. Las tres superficies deben moverse juntas.
+    """
+
+    def _ruff_pin_pyproject(self) -> str:
+        match = re.search(r"ruff==([\d.]+)", PYPROJECT_TOML.read_text(encoding="utf-8"))
+        self.assertIsNotNone(match, "No se encontró el pin ruff==X.Y.Z en pyproject.toml.")
+        return match.group(1)
+
+    def _ruff_pin_precommit(self) -> str:
+        content = PRECOMMIT_CONFIG.read_text(encoding="utf-8")
+        repo_pos = content.find("https://github.com/astral-sh/ruff-pre-commit")
+        self.assertNotEqual(repo_pos, -1, "No se encontró el repo ruff-pre-commit.")
+        match = re.search(r"rev:\s*v([\d.]+)", content[repo_pos:])
+        self.assertIsNotNone(match, "No se encontró el rev de ruff-pre-commit.")
+        return match.group(1)
+
+    def _ruff_pins_workflow(self) -> list[str]:
+        content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        pins = re.findall(r"uvx ruff@([\d.]+)", content)
+        self.assertEqual(
+            len(pins), 2, "Se esperaban dos invocaciones uvx ruff@X.Y.Z (check y format)."
+        )
+        return pins
+
+    def test_pyproject_precommit_and_ci_pins_match(self):
+        pyproject_pin = self._ruff_pin_pyproject()
+        precommit_pin = self._ruff_pin_precommit()
+        workflow_pins = self._ruff_pins_workflow()
+        self.assertEqual(
+            precommit_pin,
+            pyproject_pin,
+            "El rev de ruff-pre-commit no coincide con el pin de pyproject.toml "
+            f"(pre-commit={precommit_pin}, pyproject={pyproject_pin}).",
+        )
+        self.assertEqual(
+            workflow_pins,
+            [pyproject_pin] * 2,
+            "Las invocaciones uvx ruff@ del workflow no coinciden con el pin de "
+            f"pyproject.toml (ci={workflow_pins}, pyproject={pyproject_pin}).",
+        )
+
+
+class SyncDocsHookTriggerTests(unittest.TestCase):
+    """Regresión: el hook local `sync-docs` declaraba `files:` con directorios
+    anclados por `$` (`tests/|docs/adr/|...`), que matchean el nombre literal
+    del directorio pero jamás un archivo dentro (`tests/test_x.py`). El hook
+    nunca disparaba en la práctica. El patrón debe matchear archivos de cada
+    superficie que `make sync-docs` puede regenerar.
+    """
+
+    def _hook_files_pattern(self) -> str:
+        content = PRECOMMIT_CONFIG.read_text(encoding="utf-8")
+        hook_pos = content.find("id: sync-docs")
+        self.assertNotEqual(hook_pos, -1, "No se encontró el hook sync-docs.")
+        match = re.search(r"files:\s*(\^.*)$", content[hook_pos:], re.MULTILINE)
+        self.assertIsNotNone(match, "El hook sync-docs no declara `files:`.")
+        return match.group(1).strip()
+
+    def test_files_pattern_matches_hook_surfaces(self):
+        pattern = self._hook_files_pattern()
+
+        def matches(path: str) -> bool:
+            return re.fullmatch(pattern, path) is not None
+
+        for path in (
+            "pyproject.toml",
+            "README.md",
+            "AGENTS.md",
+            "src/chile_hub/datasets.py",
+            "src/builders/landing.py",
+            "scripts/sync_docs.py",
+            "docs/adr/ADR-001-x.md",
+            "tests/test_x.py",
+            "data/dataset_catalog_config.json",
+            "contracts/datasets/comunas.schema.json",
+        ):
+            self.assertTrue(matches(path), f"El patrón del hook sync-docs no matchea {path!r}.")
+
+    def test_files_pattern_ignores_unrelated_paths(self):
+        pattern = self._hook_files_pattern()
+
+        def matches(path: str) -> bool:
+            return re.fullmatch(pattern, path) is not None
+
+        for path in (
+            "data/normalized/foo.parquet",
+            "src/chile_hub/core.py",
+            "docs/datasets/comunas.md",
+        ):
+            self.assertFalse(
+                matches(path), f"El patrón del hook sync-docs no debe matchear {path!r}."
+            )
+
+
 class MkDocsReferenceSlugGuardrailTests(unittest.TestCase):
     """Regresión: la documentación se publica bajo /reference/ y la página de
     API también se llamaba reference.md, por lo que los enlaces generados desde
@@ -191,6 +354,83 @@ class DependabotWorkflowGuardrailTests(unittest.TestCase):
             ".github/workflows/testpypi.yml",
         ]
         self.assertEqual(check_companions(changed_workflows), [])
+
+
+class CompanionPathsRuleTests(unittest.TestCase):
+    """Caracteriza `check_companions` regla por regla.
+
+    El test de Dependabot pasa paths que no disparan ninguna regla, así que
+    una regresión de `COMPANION_RULES` (p. ej. un prefijo borrado o mal
+    escrito) apagaría el gate anti-drift de AGENTS §12 en silencio. La tabla
+    se deriva de `COMPANION_RULES` para fallar ruidosamente si entra una
+    regla sin representante.
+    """
+
+    # Path representativo por prefijo disparador (debe cubrir COMPANION_RULES).
+    TRIGGER_REPRESENTATIVES = {
+        "data/dataset_catalog_config.json": "data/dataset_catalog_config.json",
+        "data/source_registry.json": "data/source_registry.json",
+        "contracts/datasets/": "contracts/datasets/comunas.schema.json",
+        "src/validation.py": "src/validation.py",
+        "src/extractors/": "src/extractors/calidad_aire_extractor.py",
+        "src/build_dev_db.py": "src/build_dev_db.py",
+        "Makefile": "Makefile",
+        "scripts/check_agents_sync.py": "scripts/check_agents_sync.py",
+        "scripts/check_source_urls.py": "scripts/check_source_urls.py",
+        "src/builders/doc_sync.py": "src/builders/doc_sync.py",
+        "data/dataset_specs/": "data/dataset_specs/comunas.json",
+    }
+
+    @staticmethod
+    def _errors_for_rule(errors, trigger_prefix):
+        return [e for e in errors if e.startswith(f"'{trigger_prefix}' cambió")]
+
+    def test_representatives_cover_every_rule(self):
+        self.assertEqual(set(self.TRIGGER_REPRESENTATIVES), set(COMPANION_RULES))
+
+    def test_rule_without_companion_fails_and_names_expected_routes(self):
+        for trigger_prefix, companions in COMPANION_RULES.items():
+            trigger = self.TRIGGER_REPRESENTATIVES[trigger_prefix]
+            with self.subTest(trigger=trigger):
+                errors = check_companions([trigger])
+                self.assertEqual(len(errors), 1, errors)
+                # El mensaje debe nombrar tanto el trigger como las rutas
+                # compañeras esperadas (para que el PR sepa qué tocar).
+                self.assertIn(trigger, errors[0])
+                for companion in companions:
+                    self.assertIn(companion, errors[0])
+
+    def test_rule_with_each_companion_passes(self):
+        for trigger_prefix, companions in COMPANION_RULES.items():
+            trigger = self.TRIGGER_REPRESENTATIVES[trigger_prefix]
+            for companion in companions:
+                with self.subTest(trigger=trigger, companion=companion):
+                    # El compañero puede disparar a su vez su propia regla
+                    # (p. ej. data/source_registry.json): solo se exige que
+                    # esta regla quede satisfecha.
+                    errors = check_companions([trigger, companion])
+                    self.assertEqual(self._errors_for_rule(errors, trigger_prefix), [])
+
+    def test_extractor_shared_modules_do_not_trigger_the_rule(self):
+        """`base.py`/`http_utils.py`/etc. no representan un dataset propio."""
+        for excluded in sorted(EXTRACTOR_RULE_EXCLUDED_PATHS):
+            with self.subTest(excluded=excluded):
+                self.assertTrue(excluded.startswith("src/extractors/"))
+                self.assertEqual(check_companions([excluded]), [])
+
+    def test_catalog_change_with_agents_md_passes(self):
+        changed = ["data/dataset_catalog_config.json", "AGENTS.md"]
+        self.assertEqual(check_companions(changed), [])
+
+    def test_path_without_any_rule_passes(self):
+        for changed in (
+            ["README.md"],
+            ["docs/product-spec.md"],
+            ["tests/test_ci_config.py"],
+            ["src/chile_hub/core.py"],
+        ):
+            with self.subTest(changed=changed):
+                self.assertEqual(check_companions(changed), [])
 
 
 class AdoptionBadgeGuardrailTests(unittest.TestCase):
@@ -329,6 +569,16 @@ class AdoptionBadgeGuardrailTests(unittest.TestCase):
         --version-only` (fix/write-races: el sync COMPLETO regeneraria bloques
         de datos desde un artifact potencialmente viejo) e incluye README.md
         en el git add — sin data/normalized ni index/app.
+
+        Regresion release 1.44.1 (2026-09-29): el bloque de pines de
+        docs/installation.md (Plan 127) tambien deriva de la version, pero
+        `--version-only` solo sincronizaba el pin del README y el git add del
+        release no incluia installation.md; main quedo con `sync_docs --check`
+        rojo tras cada release. Ambas mitades se cubren aqui.
+
+        Desde 2026-09-29 el release tambien versiona server.json (manifest del
+        registro MCP: `version` top-level y de cada paquete) y lo incluye en el
+        git add; si no, el manifest queda atras en cada release.
         """
         content = (ROOT_DIR / ".github" / "workflows" / "pypi-release.yml").read_text(
             encoding="utf-8"
@@ -336,7 +586,20 @@ class AdoptionBadgeGuardrailTests(unittest.TestCase):
         self.assertIn("python scripts/sync_docs.py --version-only", content)
         self.assertIn("python scripts/check_landing_sync.py", content)
         self.assertIn(
-            "git add CHANGELOG.md pyproject.toml uv.lock README.md index.html app.js", content
+            "git add CHANGELOG.md pyproject.toml uv.lock README.md index.html app.js docs/installation.md server.json",
+            content,
+        )
+        sync_script = (ROOT_DIR / "scripts" / "sync_docs.py").read_text(encoding="utf-8")
+        version_only_block = sync_script.split("if args.version_only:", 1)[1].split("else:", 1)[0]
+        self.assertIn("sync_installation_pins(check_only=args.check)", version_only_block)
+        # Guardrail de comportamiento: el modo release debe EJECUTARSE de verdad.
+        # Un import faltante en sync_docs.py pasaba el chequeo textual y moria
+        # con NameError en el job de release (detectado al preparar 1.44.1).
+        subprocess.run(
+            [sys.executable, "scripts/sync_docs.py", "--version-only", "--check"],
+            cwd=ROOT_DIR,
+            check=True,
+            capture_output=True,
         )
         # El commit del release ya NO incluye data/normalized (fix/write-races):
         # la data de main la escribe solo el publish diario. index/app sí van
@@ -623,6 +886,30 @@ class AgentsSyncGateGuardrailTests(unittest.TestCase):
             "`make doctor` debe correr el gate de AGENTS.md antes de commit.",
         )
 
+    def test_agents_do_not_reintroduce_an_archived_source_mode(self):
+        """Regresión (Plan 117): AGENTS.md §6 instruía `source_mode: "archived"`
+        para congelar un dataset, pero el state machine válido es
+        `VALID_SOURCE_MODES = {"live", "fallback", "monthly"}` y
+        `verify_pipeline.py` rechaza cualquier otro modo — seguir el protocolo
+        documentado abortaba el build/verify. El retiro se expresa en
+        `data/source_registry.json` (`maturity_status: "deprecated"`, ADR-015),
+        nunca dentro de `source_mode`."""
+        agents = (ROOT_DIR / "AGENTS.md").read_text(encoding="utf-8")
+        self.assertNotIn(
+            'source_mode: "archived"',
+            agents,
+            "AGENTS.md no debe documentar un modo `archived` inexistente: el "
+            "congelamiento se marca en el registry (ADR-015).",
+        )
+        from src.builders._shared import VALID_SOURCE_MODES
+
+        self.assertEqual(
+            VALID_SOURCE_MODES,
+            {"live", "fallback", "monthly"},
+            "Cambiar VALID_SOURCE_MODES exige actualizar AGENTS.md §6 y este "
+            "guardrail en el mismo cambio (Plan 117).",
+        )
+
 
 class GeometriaCandidateWorkflowGuardrailTests(unittest.TestCase):
     """La geometría comunal es candidate y supera el límite local de 500 KB.
@@ -665,15 +952,18 @@ class GeometriaCandidateWorkflowGuardrailTests(unittest.TestCase):
         self.assertIn('metadata.get("source_mode") == "live"', self.content)
 
     def test_commit_stages_only_durable_geometry_artifacts(self):
-        """ADR-021: el commit sólo lleva parquet + metadata + checksum.
+        """ADR-021: el commit lleva parquet + metadata + checksum + geojson del mapa.
 
         Raw (JSON de BCN) y CSV intermedio salen a los assets del prerelease
         `geometry-audit`: en git inflaban el tarball de cada tag (~240 MB).
+        El GeoJSON del mapa es un asset derivado *versionado* que consume la
+        landing (coropleto): ADR-021 excluye raw e imágenes, no este archivo.
         """
         expected_paths = [
             "data/normalized/geometria_comunal.parquet",
             "data/staging/geometria_comunal.metadata.json",
             "data/normalized/geometria_comunal.parquet.sha256",
+            "data/normalized/mapa_comunal.geojson",
         ]
         self.assertIn("sha256sum -c geometria_comunal.parquet.sha256", self.content)
         self.assertIn('git add -f "$path"', self.content)
@@ -761,6 +1051,35 @@ class ReleaseSnapshotWeightGuardrailTests(unittest.TestCase):
             total,
             160 * 1024 * 1024,
             f"el árbol versionado pesa {total / 1024 / 1024:.1f} MB (>160 MB)",
+        )
+
+    def test_publishable_bundle_zip_is_not_tracked(self):
+        """Plan 130: el ZIP publicable (~30 MB, regenerado a diario) se
+        re-commiteaba en cada publish y engordaba el pack y el tarball de cada
+        tag (ADR-021). Ahora viaja como asset del último GitHub Release y
+        espejo HF; el `.sha256` lo acompaña. No re-agregar las negaciones
+        `!data/normalized/*.zip` / `!data/normalized/*.sha256`."""
+        import subprocess
+
+        tracked = subprocess.run(
+            ["git", "ls-files", "data/normalized"],
+            cwd=ROOT_DIR,
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout
+        self.assertNotIn("chile-hub-publishable-bundle.zip", tracked)
+
+        ignored = subprocess.run(
+            ["git", "check-ignore", "data/normalized/chile-hub-publishable-bundle.zip"],
+            cwd=ROOT_DIR,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(
+            ignored.returncode,
+            0,
+            "el ZIP publicable debe quedar ignorado por .gitignore",
         )
 
 
@@ -997,7 +1316,7 @@ class SysPathIdiomTests(unittest.TestCase):
     (`make extract`) y como paquete (tests/build), y los imports absolutos
     `src.*` solo resuelven con ROOT_DIR en `sys.path`. Este gate congela el
     idiom — falla ante cualquier OTRA manipulación de `sys.path` en
-    `src/extractors/`, no ante el idiom en sí (los shims `src/chile_hub.py`,
+    `src/extractors/`, no ante el idiom en sí (los shims
     `src/pipeline_status_utils.py` y `src/build_dev_db.py` viven fuera de
     `src/extractors/` y tienen su propio propósito documentado)."""
 
@@ -1396,6 +1715,36 @@ class HttpAccessDocsGuardrailTests(unittest.TestCase):
         self.assertNotRegex(content, r'pl\.read_parquet\(\s*<span class="string">"https://')
 
 
+class PlanLinkGuardrailTests(unittest.TestCase):
+    """Todo enlace a un plan desde docs/ debe resolver a un archivo real.
+
+    Regresión real (2026-09-29): cinco documentos citaban `plans/NNN-…md`
+    después de que los planes 008/011/021/022/023 se archivaran en
+    `plans/archive/`, dejando 404s en el sitio MkDocs. Se acepta `plans/` o
+    `plans/archive/` para no fallar por planes aún activos.
+    """
+
+    PLAN_LINK_PATTERN = re.compile(r"plans/(\d{3}-[a-z0-9-]+\.md)")
+
+    def test_plan_links_resolve_to_plans_or_archive(self):
+        files = sorted(DOCS_DIR.rglob("*.md")) + [ROOT_DIR / "plans" / "README.md"]
+        broken = []
+        for path in files:
+            content = path.read_text(encoding="utf-8")
+            for match in self.PLAN_LINK_PATTERN.finditer(content):
+                name = match.group(1)
+                in_plans = (ROOT_DIR / "plans" / name).is_file()
+                in_archive = (ROOT_DIR / "plans" / "archive" / name).is_file()
+                if not in_plans and not in_archive:
+                    broken.append(f"{path.relative_to(ROOT_DIR)} → plans/{name}")
+        self.assertEqual(
+            broken,
+            [],
+            "Enlaces a planes inexistentes (deben apuntar a plans/ o plans/archive/): "
+            + ", ".join(broken),
+        )
+
+
 class ReleaseArtifactLayoutGuardrailTests(unittest.TestCase):
     """El artifact de pipeline anida `data/normalized/` (PR #77).
 
@@ -1427,6 +1776,44 @@ class ReleaseArtifactLayoutGuardrailTests(unittest.TestCase):
         publish_block = content.split("Commit refreshed artifacts")[1].split("git commit")[0]
         self.assertIn("sync_release_artifact_version.py", publish_block)
         self.assertIn("sync_docs.py --version-only", publish_block)
+
+
+class WorkflowRunTrustGuardrailTests(unittest.TestCase):
+    """Riesgo: PyPI Release y Pages Deploy se disparan con `workflow_run` de
+    Pipeline Check filtrando solo por nombre de branch (`branches: [main]`).
+
+    Un run de un PR de fork tambien sube el artefacto (pipeline-check.yml no
+    lo gatea por evento), el filtro `branches` evalua la branch head del run
+    disparador (la del fork) y nada miraba `head_repository`: un artifact
+    producido fuera del repo podia entrar al release, al espejo HF y disparar
+    un deploy del sitio. El gate de identidad exige repo + branch + evento y,
+    en defensa en profundidad, revalida el run descargado via la API REST
+    (`.head_repository`, que `gh run view --json` no expone) y exige ancestria
+    real del SHA del artifact respecto de main, en vez de solo avisar.
+    """
+
+    def test_release_job_gates_on_repository_and_event(self):
+        content = PYPI_RELEASE_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("head_repository.full_name == github.repository", content)
+        self.assertIn("head_branch == 'main'", content)
+        self.assertIn("event != 'pull_request'", content)
+
+    def test_pages_deploy_job_gates_on_repository_and_event(self):
+        content = PAGES_DEPLOY_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("head_repository.full_name == github.repository", content)
+        self.assertIn("head_branch == 'main'", content)
+        self.assertIn("event != 'pull_request'", content)
+
+    def test_release_revalidates_downloaded_run_via_rest_api(self):
+        content = PYPI_RELEASE_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("is_trusted_run", content)
+        self.assertIn('gh api "repos/$GITHUB_REPOSITORY/actions/runs/$rid"', content)
+        self.assertIn(".head_repository.full_name", content)
+        self.assertIn('is_trusted_run "$candidate" || continue', content)
+
+    def test_release_rejects_non_ancestor_artifact_sha(self):
+        content = PYPI_RELEASE_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("git merge-base --is-ancestor", content)
 
 
 class BuildSyncedGateGuardrailTests(unittest.TestCase):
@@ -1491,6 +1878,9 @@ class LighthouseGuardrailTests(unittest.TestCase):
     encontraría navegador en un entorno limpio), o que el chequeo de umbrales
     deje de ejecutarse después del audit. CI y `make lighthouse` comparten
     `scripts/run_lighthouse.sh`.
+
+    Plan 121: `performance` se mide y se sube como artefacto, pero SIN umbral
+    bloqueante — la varianza de un runner compartido haría ruidoso el gate.
     """
 
     RUN_LIGHTHOUSE = ROOT_DIR / "scripts" / "run_lighthouse.sh"
@@ -1503,10 +1893,21 @@ class LighthouseGuardrailTests(unittest.TestCase):
         self.assertTrue(self.RUN_LIGHTHOUSE.is_file())
         content = self.RUN_LIGHTHOUSE.read_text(encoding="utf-8")
         self.assertIn("lighthouse@12.8.2", content)
-        self.assertIn("--only-categories=accessibility,seo,best-practices", content)
+        self.assertIn("--only-categories=accessibility,seo,best-practices,performance", content)
         self.assertIn("CHROME_PATH", content)
         self.assertIn("ms-playwright/chromium-*/chrome-linux/chrome", content)
         self.assertIn("check_lighthouse.py", content)
+
+    def test_workflow_uploads_lighthouse_report_always(self):
+        content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        start = content.index("- name: Upload Lighthouse report")
+        end = content.index("- name:", start + 1)
+        step = content[start:end]
+        # `if: always()`: el reporte interesa justo cuando el audit falla.
+        self.assertIn("if: always()", step)
+        self.assertIn("actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a", step)
+        self.assertIn("name: lighthouse-report", step)
+        self.assertIn("path: /tmp/chile-hub-lighthouse.json", step)
 
     def test_makefile_exposes_lighthouse_target_with_shared_script(self):
         content = MAKEFILE.read_text(encoding="utf-8")
@@ -1558,26 +1959,36 @@ class DatasetContributionGuideGuardrailTests(unittest.TestCase):
 
 
 class CheckLighthouseScriptTests(unittest.TestCase):
-    """El chequeo de umbrales es stdlib puro: se testea con reportes sintéticos."""
+    """El chequeo de umbrales es stdlib puro: se testea con reportes sintéticos.
 
-    def _report(self, accessibility, seo, best_practices):
+    Plan 121: `performance` se imprime siempre como observación; solo falla si
+    se pasa `--min-performance` y queda bajo el umbral.
+    """
+
+    def _report(self, accessibility, seo, best_practices, performance=100):
         def category(score):
             return {"score": score / 100, "auditRefs": []}
 
-        return {
-            "categories": {
-                "accessibility": category(accessibility),
-                "seo": category(seo),
-                "best-practices": category(best_practices),
-            },
-            "audits": {},
+        categories = {
+            "accessibility": category(accessibility),
+            "seo": category(seo),
+            "best-practices": category(best_practices),
         }
+        if performance is not None:
+            categories["performance"] = category(performance)
+        return {"categories": categories, "audits": {}}
 
-    def _run(self, report):
+    def _run(self, report, *extra_args):
         with tempfile.TemporaryDirectory() as tmpdir:
             path = Path(tmpdir) / "lh.json"
             path.write_text(json.dumps(report), encoding="utf-8")
-            return check_lighthouse.main([str(path)])
+            return check_lighthouse.main([str(path), *extra_args])
+
+    def _run_capture(self, report, *extra_args):
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            code = self._run(report, *extra_args)
+        return code, buffer.getvalue()
 
     def test_all_thresholds_pass(self):
         self.assertEqual(self._run(self._report(100, 100, 100)), 0)
@@ -1587,6 +1998,173 @@ class CheckLighthouseScriptTests(unittest.TestCase):
 
     def test_missing_category_fails(self):
         self.assertEqual(self._run({"categories": {}, "audits": {}}), 1)
+
+    def test_performance_is_reported_without_threshold(self):
+        code, output = self._run_capture(self._report(100, 100, 100, performance=42))
+        self.assertEqual(code, 0)
+        self.assertIn("lighthouse performance: 42/100 (sin umbral", output)
+
+    def test_min_performance_enforces_threshold(self):
+        report = self._report(100, 100, 100, performance=42)
+        self.assertEqual(self._run(report, "--min-performance", "90"), 1)
+        self.assertEqual(self._run(report, "--min-performance", "40"), 0)
+
+    def test_missing_performance_category_fails(self):
+        self.assertEqual(self._run(self._report(100, 100, 100, performance=None)), 1)
+
+
+class SourceUrlsWorkflowGuardrailTests(unittest.TestCase):
+    """Regresión: source-urls.yml corría `uv run python scripts/check_source_urls.py`
+    sin extras. El script importa src/extractors/http_utils (tenacity, extra
+    `pipeline`), así que el monitor semanal de URLs muertas moría en el import
+    sin revisar ninguna URL (fallos 2026-09-07/14/21).
+    """
+
+    def test_source_url_check_installs_pipeline_extra(self):
+        content = (ROOT_DIR / ".github" / "workflows" / "source-urls.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("uv run --extra pipeline python scripts/check_source_urls.py", content)
+
+    def test_check_script_still_depends_on_pipeline_extra_module(self):
+        script = (ROOT_DIR / "scripts" / "check_source_urls.py").read_text(encoding="utf-8")
+        pyproject = (ROOT_DIR / "pyproject.toml").read_text(encoding="utf-8")
+        pipeline_extra = pyproject.split("pipeline = [", 1)[1].split("]", 1)[0]
+        self.assertIn("http_utils", script)
+        self.assertIn("tenacity", pipeline_extra)
+
+
+class SourceUrlsCheckerTests(unittest.TestCase):
+    """Caracteriza la clasificación del liveness checker de fuentes.
+
+    El protocolo §6 ("fuente permanentemente caída") depende de que el
+    workflow semanal falle con DEAD y no con WARN; si la clasificación o los
+    códigos de salida de main() se rompen, las fuentes muertas dejan de
+    avisar (solo había guardrails de texto).
+    """
+
+    @staticmethod
+    def _response(status_code: int):
+        response = MagicMock()
+        response.status_code = status_code
+        return response
+
+    def test_source_urls_load_urls_keeps_unique_http_urls(self):
+        registry = [
+            {"official_url": "https://a.example"},
+            {"official_url": "http://b.example"},
+            {"official_url": "https://a.example"},
+            {"official_url": "ftp://c.example"},
+            {"official_url": "https://d.example "},
+            {"official_url": ""},
+            {"official_url": None},
+            {},
+        ]
+        with tempfile.TemporaryDirectory() as tmpdir:
+            registry_path = Path(tmpdir) / "source_registry.json"
+            registry_path.write_text(json.dumps(registry), encoding="utf-8")
+            with patch.object(check_source_urls, "SOURCE_REGISTRY_PATH", str(registry_path)):
+                urls = check_source_urls.load_urls()
+        self.assertEqual(urls, ["http://b.example", "https://a.example", "https://d.example"])
+
+    def test_source_urls_check_url_classifies_status_codes(self):
+        cases = {
+            200: "OK",
+            301: "OK",
+            399: "OK",
+            403: "WARN",
+            404: "WARN",
+            499: "WARN",
+            500: "DEAD",
+            503: "DEAD",
+        }
+        for status_code, expected in cases.items():
+            with self.subTest(status_code=status_code):
+                with patch.object(
+                    check_source_urls,
+                    "fetch_with_retry",
+                    return_value=self._response(status_code),
+                ):
+                    self.assertEqual(check_source_urls.check_url("https://x.example"), expected)
+
+    def test_source_urls_check_url_network_error_is_dead(self):
+        import requests
+
+        with patch.object(
+            check_source_urls,
+            "fetch_with_retry",
+            side_effect=requests.RequestException("timeout"),
+        ):
+            self.assertEqual(check_source_urls.check_url("https://x.example"), "DEAD")
+
+    def _run_main(self, urls: list[str], statuses: list[str]) -> int:
+        with (
+            patch.object(check_source_urls, "load_urls", return_value=urls),
+            patch.object(check_source_urls, "check_url", side_effect=statuses),
+            patch.object(check_source_urls.time, "sleep"),
+        ):
+            return check_source_urls.main()
+
+    def test_source_urls_main_without_urls_fails(self):
+        self.assertEqual(self._run_main([], []), 1)
+
+    def test_source_urls_main_with_dead_url_fails(self):
+        self.assertEqual(self._run_main(["https://dead.example"], ["DEAD"]), 1)
+
+    def test_source_urls_main_with_warn_only_passes(self):
+        urls = ["https://ok.example", "https://warn.example"]
+        self.assertEqual(self._run_main(urls, ["OK", "WARN"]), 0)
+
+
+class TestSignalIntegrityGuardrailTests(unittest.TestCase):
+    """Regresión doble (Plan 122): la señal de tests de CI mentía en dos frentes.
+
+    1. `[tool.coverage.run] source = ["src", "scripts"]` declara `scripts/`,
+       pero `Makefile` y `pipeline-check.yml` corrían `--cov=src`, y `--cov`
+       REEMPLAZA el `source` de config: ~2.8k statements de `scripts/`
+       (incluido `verify_pipeline.py`, 1 940 líneas y el gate diario de
+       publicación) no se medían nunca — el badge de cobertura era vanidoso.
+    2. El extra `mcp` no se sincronizaba en CI (`uv sync --extra pipeline
+       --extra dev`), así que `build_server()` jamás se construía en el runner
+       y el test MCP tomaba siempre la rama ImportError (rama muerta).
+
+    Además, el pytest de CI corría serial aunque el Plan 080 ya verificó que
+    `-n auto` baja la suite completa de ~66s a ~18s en `make test`.
+    """
+
+    def _step(self, name: str) -> str:
+        """Cuerpo del step de `pipeline-check.yml` (steps a 6 espacios)."""
+        content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        start = content.index(f"- name: {name}")
+        end = content.index("\n      - name:", start + 1)
+        return content[start:end]
+
+    def test_makefile_coverage_target_measures_scripts(self):
+        body = _extract_make_target(MAKEFILE.read_text(encoding="utf-8"), "coverage")
+        self.assertIn(
+            "--cov=src --cov=scripts",
+            body,
+            "`make coverage` sin --cov=scripts deja scripts/ fuera del badge "
+            "(el --cov explícito reemplaza el source de pyproject.toml).",
+        )
+
+    def test_ci_test_step_measures_scripts(self):
+        step = self._step("Run unit and contract tests")
+        self.assertIn("--cov=src --cov=scripts", step)
+
+    def test_ci_test_step_uses_xdist(self):
+        step = self._step("Run unit and contract tests")
+        self.assertIn(
+            "-n auto",
+            step,
+            "el pytest de CI debe correr con xdist (Plan 080): sin -n auto el "
+            "feedback loop de PR es 3-4x más lento que `make test`.",
+        )
+
+    def test_ci_smokes_mcp_extra(self):
+        step = self._step("MCP server smoke (extra [mcp])")
+        self.assertIn("--extra mcp", step)
+        self.assertIn("build_server", step)
 
 
 if __name__ == "__main__":

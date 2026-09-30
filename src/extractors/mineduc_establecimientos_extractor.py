@@ -5,6 +5,7 @@ import os
 import shutil
 import subprocess  # nosec B404 — solo invoca el binario unrar local (lista, sin shell)
 import sys
+import tempfile
 from pathlib import Path
 
 import polars as pl
@@ -19,10 +20,10 @@ try:
     from src.extractors.base import (
         BaseExtractor,
         ensure_staging_directories,
-        write_staging_metadata,
+        write_staging_csv_atomic,
     )
 except ModuleNotFoundError:
-    from base import BaseExtractor, ensure_staging_directories, write_staging_metadata
+    from base import BaseExtractor, ensure_staging_directories, write_staging_csv_atomic
 
 try:
     from src.extractors.http_utils import fetch_with_retry
@@ -79,24 +80,32 @@ def fetch_data() -> tuple[Path, str, str]:
             )
 
         print(f"Extrayendo {rar_path} con {unrar_bin}...")
-        cmd = [str(unrar_bin), "x", "-y", str(rar_path), RAW_DIR]
-        res = subprocess.run(cmd, capture_output=True, text=True, timeout=60)  # nosec B603  # cmd: lista con paths locales (unrar/rar/RAW_DIR), sin shell ni input externo
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            # `unrar e` (sin restaurar paths del archivo) extrae al temporal:
+            # un RAR con paths absolutos o `..` no puede escribir fuera de él.
+            cmd = [str(unrar_bin), "e", "-y", str(rar_path), tmp_dir + "/"]
+            res = subprocess.run(cmd, capture_output=True, text=True, timeout=60)  # nosec B603  # cmd: lista con paths locales (unrar/tmp), sin shell ni input externo
 
-        # Eliminar archivo RAR temporal para no ensuciar data/raw
-        if rar_path.exists():
-            rar_path.unlink()
+            # Eliminar archivo RAR temporal para no ensuciar data/raw
+            if rar_path.exists():
+                rar_path.unlink()
 
-        if res.returncode != 0:
-            print(f"Error en extracción (code {res.returncode}): {res.stderr}")
-            raise RuntimeError(f"Error al extraer el archivo RAR: {res.stderr}")
+            if res.returncode != 0:
+                print(f"Error en extracción (code {res.returncode}): {res.stderr}")
+                raise RuntimeError(f"Error al extraer el archivo RAR: {res.stderr}")
 
-        # Buscar el archivo CSV extraído
-        csv_files = sorted(Path(RAW_DIR).glob("*Directorio_Oficial_EE*.csv"))
-        if not csv_files:
-            raise FileNotFoundError("No se encontró el archivo CSV extraído en data/raw/")
+            # Buscar el archivo CSV extraído dentro del temporal
+            csv_files = sorted(Path(tmp_dir).glob("*Directorio_Oficial_EE*.csv"))
+            if not csv_files:
+                raise FileNotFoundError("No se encontró el archivo CSV extraído en el RAR")
+
+            # Persistir el snapshot crudo en data/raw/ (lo usa el fallback
+            # offline); el resto del temporal se elimina al salir del with.
+            raw_csv_path = Path(RAW_DIR) / csv_files[-1].name
+            shutil.copy2(csv_files[-1], raw_csv_path)
 
         # Retornamos el último encontrado
-        return csv_files[-1], "live", DOWNLOAD_URL
+        return raw_csv_path, "live", DOWNLOAD_URL
 
     except Exception as e:
         print(f"Error en fetch live: {e}. Activando estrategia de fallback...")
@@ -226,10 +235,7 @@ class MineducEstablecimientosExtractor(BaseExtractor):
 
     def write_staging(self, df, metadata: dict) -> Path:
         ensure_staging_directories()
-        output = Path(STAGING_CSV_PATH)
-        df.write_csv(output)
-        write_staging_metadata(METADATA_PATH, metadata)
-        return output
+        return write_staging_csv_atomic(df, STAGING_CSV_PATH, METADATA_PATH, metadata)
 
 
 if __name__ == "__main__":

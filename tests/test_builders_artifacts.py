@@ -21,7 +21,16 @@ if str(ROOT_DIR) not in sys.path:
 SRC_DIR = ROOT_DIR / "src"
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
+SCRIPTS_DIR = ROOT_DIR / "scripts"
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
 
+import sync_release_artifact_version
+
+from src.builders._shared import (
+    PUBLISHABLE_BUNDLE_SHA256_NAME,
+    PUBLISHABLE_BUNDLE_ZIP_NAME,
+)
 from src.builders.artifacts import (
     attach_publishable_package_to_manifest,
     write_publishable_bundle_sha256,
@@ -510,3 +519,176 @@ class TestFromNormalFlow:
                 # 7. Verificar que el archivo .sha256 existe en disco
                 assert os.path.exists(sha256_path), f"Archivo .sha256 no encontrado: {sha256_path}"
                 assert sha256_path.endswith(".sha256")
+
+
+class TestSyncReleaseArtifactVersion:
+    """sync_release_artifact_version.main(): versión, ZIP, sha e idempotencia.
+
+    El script corre en pypi-release.yml después del bump de semantic-release
+    para que los artefactos generados (3 JSON, bundle ZIP, landing) no
+    publiciten la versión anterior; ya causó una falla real de release
+    (pypi-release.yml:82-88) y no tenía ningún test que lo importara.
+    """
+
+    RELEASE_VERSION = "9.9.9"
+    SITE_URL = "https://example.invalid/chile-hub/"
+
+    def _build_release_fixture(self, root: Path) -> Path:
+        """normalized mínimo + pyproject con una versión "nueva"."""
+        normalized = root / "data" / "normalized"
+        normalized.mkdir(parents=True)
+        (root / "pyproject.toml").write_text(
+            "[project]\n"
+            'name = "chile-hub"\n'
+            f'version = "{self.RELEASE_VERSION}"\n'
+            "\n"
+            "[tool.chile_hub]\n"
+            f'public_site_url = "{self.SITE_URL}"\n',
+            encoding="utf-8",
+        )
+        for name in ("pipeline_metadata.json", "hub_bundle.json", "datapackage.json"):
+            (normalized / name).write_text(
+                json.dumps({"version": "1.0.0"}, indent=2), encoding="utf-8"
+            )
+        # Estado real post-build: el pipeline ya escribió un manifiesto, así
+        # que write_artifact_manifest() lo incluye como artefacto compartido.
+        (normalized / "artifact_manifest.json").write_text(
+            json.dumps(
+                {
+                    "generated_at_utc": "2026-01-01T00:00:00+00:00",
+                    "artifact_count": 0,
+                    "artifacts": [],
+                    "packages": [],
+                },
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+        # Catálogo con una capa cuyo parquet sí existe: el ZIP lo debe incluir.
+        (normalized / "dataset_catalog.json").write_text(
+            json.dumps(
+                {
+                    "dataset_count": 1,
+                    "datasets": [
+                        {
+                            "dataset": "comunas",
+                            "outputs": {"parquet": "data/normalized/comunas.parquet"},
+                        }
+                    ],
+                },
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+        write_parquet_atomic(
+            pl.DataFrame({"codigo_comuna": ["01101"]}),
+            str(normalized / "comunas.parquet"),
+        )
+        # Manifest del registro MCP: version hardcodeada top-level y por paquete.
+        (root / "server.json").write_text(
+            json.dumps(
+                {
+                    "version": "1.0.0",
+                    "packages": [
+                        {
+                            "registryType": "pypi",
+                            "identifier": "chile-hub",
+                            "version": "1.0.0",
+                        }
+                    ],
+                },
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+        return normalized
+
+    def _run_main(self, root: Path, normalized: Path):
+        """Corre main() con paths y landing aislados del repo real."""
+        with (
+            patch.object(sync_release_artifact_version, "ROOT_DIR", root),
+            patch.object(sync_release_artifact_version, "NORMALIZED_DIR", normalized),
+            patch("src.builders.artifacts.NORMALIZED_DIR", str(normalized)),
+            patch("src.builders.artifacts.DATA_DIR", str(root / "data")),
+            patch.object(sync_release_artifact_version, "sync_landing_metadata") as landing_mock,
+        ):
+            sync_release_artifact_version.main()
+        return landing_mock
+
+    def _assert_version_is_release(self, normalized: Path) -> None:
+        for name in ("pipeline_metadata.json", "hub_bundle.json", "datapackage.json"):
+            data = json.loads((normalized / name).read_text(encoding="utf-8"))
+            assert data["version"] == self.RELEASE_VERSION, f"{name}: {data['version']}"
+
+    def _assert_server_json_version(self, root: Path) -> None:
+        server = json.loads((root / "server.json").read_text(encoding="utf-8"))
+        assert server["version"] == self.RELEASE_VERSION, f"server.json: {server['version']}"
+        assert [pkg["version"] for pkg in server["packages"]] == [self.RELEASE_VERSION]
+
+    def test_main_updates_versions_zip_sha_manifest_and_landing(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            normalized = self._build_release_fixture(root)
+
+            landing_mock = self._run_main(root, normalized)
+
+            self._assert_version_is_release(normalized)
+            self._assert_server_json_version(root)
+
+            zip_path = normalized / PUBLISHABLE_BUNDLE_ZIP_NAME
+            sha_path = normalized / PUBLISHABLE_BUNDLE_SHA256_NAME
+            assert zip_path.is_file()
+            with zipfile.ZipFile(zip_path) as zf:
+                names = set(zf.namelist())
+            # El manifiesto viaja dentro del ZIP (reconstruido por el script).
+            assert "data/normalized/artifact_manifest.json" in names
+            assert "data/normalized/pipeline_metadata.json" in names
+            assert "data/normalized/dataset_catalog.json" in names
+            assert "data/normalized/comunas.parquet" in names
+
+            # El .sha256 coincide con el cómputo independiente del ZIP.
+            written_digest = sha_path.read_text(encoding="utf-8").strip().split("  ")[0]
+            assert written_digest == hashlib.sha256(zip_path.read_bytes()).hexdigest()
+
+            # El paquete re-adjuntado queda también en hub_bundle.json.
+            hub_bundle = json.loads((normalized / "hub_bundle.json").read_text(encoding="utf-8"))
+            assert [pkg["path"] for pkg in hub_bundle["packages"]] == [
+                f"data/normalized/{PUBLISHABLE_BUNDLE_ZIP_NAME}"
+            ]
+
+            landing_mock.assert_called_once_with(self.SITE_URL, self.RELEASE_VERSION)
+
+    def test_main_rerun_keeps_versions_and_sha_consistent(self):
+        """Segunda corrida: versiones estables y sha autoconsistente.
+
+        No se exige un digest byte a byte idéntico al de la primera corrida:
+        el manifiesto embebido en el ZIP lleva un `generated_at_utc` fresco en
+        cada `write_artifact_manifest()`.
+        """
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            normalized = self._build_release_fixture(root)
+            self._run_main(root, normalized)
+
+            self._run_main(root, normalized)
+
+            self._assert_version_is_release(normalized)
+            self._assert_server_json_version(root)
+            zip_path = normalized / PUBLISHABLE_BUNDLE_ZIP_NAME
+            sha_path = normalized / PUBLISHABLE_BUNDLE_SHA256_NAME
+            written_digest = sha_path.read_text(encoding="utf-8").strip().split("  ")[0]
+            assert written_digest == hashlib.sha256(zip_path.read_bytes()).hexdigest()
+            hub_bundle = json.loads((normalized / "hub_bundle.json").read_text(encoding="utf-8"))
+            assert len(hub_bundle["packages"]) == 1
+
+    def test_main_without_server_json_does_not_fail(self):
+        """server.json ausente: el sync es best-effort y no debe romper el release."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            normalized = self._build_release_fixture(root)
+            (root / "server.json").unlink()
+
+            self._run_main(root, normalized)
+
+            self._assert_version_is_release(normalized)
+            assert not (root / "server.json").exists()

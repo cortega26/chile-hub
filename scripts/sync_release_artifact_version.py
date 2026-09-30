@@ -47,6 +47,24 @@ def update_json_version(path: Path, version: str) -> dict:
     return data
 
 
+def sync_server_json_version(version: str) -> None:
+    """Best-effort sync of the MCP registry manifest (``server.json``).
+
+    The manifest hardcodes the package version both top-level and per package,
+    and it must not drift from the release (the registry would keep serving the
+    previous version).  A checkout without the manifest is valid: no-op.
+    """
+    path = ROOT_DIR / "server.json"
+    if not path.is_file():
+        return
+    data = json.loads(path.read_text(encoding="utf-8"))
+    data["version"] = version
+    for package in data.get("packages", []):
+        if isinstance(package, dict):
+            package["version"] = version
+    write_json_atomic(data, str(path), ensure_ascii=False, indent=2)
+
+
 def main() -> None:
     version, public_site_url = load_project_metadata()
 
@@ -62,6 +80,7 @@ def main() -> None:
     update_json_version(NORMALIZED_DIR / "pipeline_metadata.json", version)
     update_json_version(NORMALIZED_DIR / "datapackage.json", version)
     hub_bundle = update_json_version(NORMALIZED_DIR / "hub_bundle.json", version)
+    sync_server_json_version(version)
 
     _, manifest = write_artifact_manifest()
     zip_path = write_publishable_bundle_zip()

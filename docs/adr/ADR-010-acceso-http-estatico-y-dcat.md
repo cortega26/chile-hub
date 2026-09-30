@@ -132,6 +132,13 @@ fuera de alcance de este spike.
    No se pudo confirmar. Si un futuro contacto con el equipo de datos.gob.cl
    confirma el perfil real, ajustar `dcat_catalog.py` o agregar un segundo
    generador para el perfil correcto.
+   **Actualización 2026-09-29: cerrada por
+   [ADR-023](ADR-023-posicionamiento-ultima-milla-no-portal.md).** El
+   `status_show` de datos.gob.cl lista `dcat_rdf_harvester` y `ckan_harvester`,
+   pero ningún cosechador DCAT-JSON. Además, en el portal publican las entidades
+   del Estado integradas. chile-hub no buscará que lo cosechen como publicador,
+   y `data.json` se mantiene por su valor de descubribilidad para buscadores y
+   agentes.
 2. **¿Se implementa pinning de URLs por version/release?** Hoy `downloadURL`
    siempre apunta a la build mas reciente (mutable). Un consumidor que necesite
    reproducibilidad exacta debe usar el bundle ZIP versionado de GitHub Releases,

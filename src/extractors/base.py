@@ -18,6 +18,7 @@ test `SysPathIdiomTests` en `tests/test_ci_config.py` lo exige y falla ante
 cualquier otra manipulación de `sys.path` en `src/extractors/`.
 """
 
+import datetime
 import json
 import os
 from abc import ABC, abstractmethod
@@ -46,6 +47,34 @@ def write_staging_metadata(path: str, metadata: dict[str, Any]) -> None:
         # en cada corrida de pre-commit y el arbol nunca queda limpio.
         f.write("\n")
     os.replace(tmp_path, path)
+
+
+def write_staging_csv_atomic(
+    df: pl.DataFrame,
+    csv_path: str | Path,
+    metadata_path: str | Path,
+    metadata: dict[str, Any],
+) -> Path:
+    """Escribe CSV (tmp + os.replace) y metadata canónica en staging.
+
+    Campos canónicos que siempre se completan/sobrescriben:
+    dataset, refreshed_at_utc, record_count, fields (columnas del frame).
+    El resto del dict pasa intacto.
+    """
+    merged = {
+        **metadata,
+        "dataset": metadata.get("dataset"),
+        "refreshed_at_utc": metadata.get("refreshed_at_utc")
+        or datetime.datetime.now(datetime.UTC).isoformat(),
+        "record_count": df.height,
+        "fields": df.columns,
+    }
+    csv = Path(csv_path)
+    tmp = csv.with_suffix(csv.suffix + ".tmp")
+    df.write_csv(tmp)
+    os.replace(tmp, csv)
+    write_staging_metadata(str(metadata_path), merged)
+    return csv
 
 
 def write_raw_snapshot_atomic(path: str | Path, payload: Any) -> None:

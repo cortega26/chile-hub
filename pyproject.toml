@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "chile-hub"
-version = "1.42.0"
+version = "1.46.1"
 description = "Datos públicos de Chile curados, normalizados y validados: geografía, demografía, economía, salud, educación, finanzas municipales, indicadores urbanos y distritos electorales. Listos para consumir en una línea de código con Polars, DuckDB, SQLite y Excel."
 readme = "README.md"
 requires-python = ">=3.11,<3.15"
@@ -80,6 +80,12 @@ validation = [
 mcp = [
     "mcp>=2.2,<3",
 ]
+# Cliente de Hugging Face usado por scripts/publish_hf_dataset.py y por los
+# jobs de publicación (pypi-release, hf-publish). Pin exacto + lock: el job
+# corre con HF_TOKEN, no puede resolver "latest" desde PyPI (Plan 112).
+publish = [
+    "huggingface_hub==1.16.1",
+]
 dev = [
     "build==1.6.1",
     "twine==7.0.0",
@@ -139,7 +145,6 @@ packages = ["src/chile_hub"]
 [tool.hatch.build.targets.sdist]
 include = [
     "/src/chile_hub",
-    "/src/chile_hub.py",
     "/README.md",
     "/LICENSE",
     "/DATA_LICENSES.md",
@@ -211,7 +216,6 @@ omit = [
     "src/chile_hub/__main__.py",
     "src/chile_hub/cli.py",
     "src/chile_hub/pipeline_status_utils.py",
-    "src/chile_hub.py",
 ]
 
 [tool.coverage.report]
@@ -236,10 +240,6 @@ warn_unused_configs = true
 warn_unused_ignores = true
 check_untyped_defs = true
 ignore_missing_imports = true
-# El shim src/chile_hub.py (21 líneas) colisiona con el paquete src/chile_hub/;
-# mypy lo detecta como módulo duplicado. Lo excluimos porque solo delega al
-# paquete y no contiene lógica que requiera verificación de tipos.
-exclude = ["src/chile_hub\\.py"]
 explicit_package_bases = true
 
 [[tool.mypy.overrides]]

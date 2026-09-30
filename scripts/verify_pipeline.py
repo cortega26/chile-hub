@@ -93,12 +93,20 @@ _PUBLISHABLE_FILES = [
     NORMALIZED_DIR / "source_readiness.md",
     NORMALIZED_DIR / "dataset_quality.json",
     NORMALIZED_DIR / "dataset_quality.md",
+]
+
+# El ZIP publicable y su sidecar SHA-256 son artefactos de build/release desde
+# el Plan 130: ya no se versionan en git, `make build` los regenera y el job
+# release los adjunta. Viven en su propia lista porque el perfil readiness
+# (push/PR, sin build) no debe exigirlos — regresion CI 2026-09-29.
+_PUBLISHABLE_BUNDLE_FILES = [
     NORMALIZED_DIR / "chile-hub-publishable-bundle.zip",
     NORMALIZED_DIR / "chile-hub-publishable-bundle.zip.sha256",
 ]
 
 PUBLISHABLE_REQUIRED_FILES = _PUBLISHABLE_FILES + _derive_dataset_artifact_paths()
-REQUIRED_FILES = _LOCAL_BUILD_FILES + PUBLISHABLE_REQUIRED_FILES
+PUBLICATION_REQUIRED_FILES = PUBLISHABLE_REQUIRED_FILES + _PUBLISHABLE_BUNDLE_FILES
+REQUIRED_FILES = _LOCAL_BUILD_FILES + PUBLICATION_REQUIRED_FILES
 REQUIRED_DATASETS = {
     name for name, config in DATASET_CATALOG_CONFIG.items() if config.get("outputs")
 }
@@ -826,6 +834,10 @@ def verify_top_issue_summary(summary, top_issue, origin):
 
 def required_files_for_profile(profile):
     if profile == "readiness":
+        # Perfil de push/PR: corre sobre un checkout sin build, donde el ZIP
+        # publicable no existe (Plan 130: artefacto no versionado). Exigirlo
+        # aqui mantenia rojo todo push ("Missing required files:
+        # data/normalized/chile-hub-publishable-bundle.zip...", 2026-09-29).
         return PUBLISHABLE_REQUIRED_FILES
     if profile == "release":
         # Perfil del job PyPI Release: verifica el artefacto publication-grade
@@ -833,7 +845,9 @@ def required_files_for_profile(profile):
         # 298 MB) ni los outputs de build local (duckdb/db/xlsx). Exigirlos
         # aqui hacia fallar todo release: "Missing required files:
         # data/staging/..." (regresion 2026-08-11, run 31539295351).
-        return PUBLISHABLE_REQUIRED_FILES
+        # El artefacto del release SI incluye el ZIP publicable (lo adjunta al
+        # GitHub Release), asi que este perfil si lo exige.
+        return PUBLICATION_REQUIRED_FILES
     return REQUIRED_FILES
 
 
@@ -1909,7 +1923,8 @@ def main():
         # con staging ausente. La provenance del artefacto ya garantiza que
         # el pipeline lo verifico publication-grade antes de subirlo.
         verify_staging_not_newer_than_normalized()
-    verify_required_files(required_files_for_profile(profile))
+    required_files = required_files_for_profile(profile)
+    verify_required_files(required_files)
     verify_pipeline_metadata()
     verify_hub_health()
     verify_hub_status()
@@ -1923,7 +1938,13 @@ def main():
     verify_source_registry()
     verify_artifact_manifest()
     verify_data_package()
-    verify_publishable_zip()
+    # El ZIP publicable es artefacto de build/release desde Plan 130 (no
+    # versionado): solo se verifica cuando el perfil lo exige. readiness
+    # (push/PR) corre sin build y no lo tiene; dev/publication/release si
+    # (el schedule lo reconstruye y el release lo adjunta). Sin este guard,
+    # un perfil sin ZIP moria con FileNotFoundError/SystemExit.
+    if all(path in required_files for path in _PUBLISHABLE_BUNDLE_FILES):
+        verify_publishable_zip()
 
     if profile in ("readiness", "publication"):
         verify_readiness()

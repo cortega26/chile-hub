@@ -77,7 +77,7 @@ no es total. La integridad de la narrativa vale más que el conteo de capas.
   modo declarado. El fail-loud funcionó exactamente como fue diseñado.
 - El bundle se replica en **Hugging Face Hub** (21 subsets, publicado por CI),
   hay un **servidor MCP** para agentes (`chile-hub[mcp]`), **347 páginas
-  estáticas por comuna** con indicadores oficiales, y cada release recibe un
+  estáticas por comuna** con indicadores de fuentes oficiales, y cada release recibe un
   **DOI de Zenodo** (concept DOI: 10.5281/zenodo.22968698).
 
 **Lo que aprendí:**

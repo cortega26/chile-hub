@@ -20,12 +20,16 @@ without the golden-copy machinery.
 
 from __future__ import annotations
 
+import contextlib
+import hashlib
+import io
 import json
 import os
 import shutil
 import sys
 import tempfile
 import unittest
+import zipfile
 from pathlib import Path
 from unittest.mock import patch
 
@@ -71,6 +75,32 @@ class VerifyGoldenCopyTests(unittest.TestCase):
 
         # data/normalized/ — bulk of the files the gates inspect
         shutil.copytree(ROOT_DIR / "data" / "normalized", golden / "data" / "normalized")
+
+        # Plan 130: el ZIP publicable es artefacto de build y ya no se
+        # versiona, asi que en un checkout de CI push/PR no existe (el build
+        # solo corre en schedule/dispatch; `make build` lo reconstruye). Sin
+        # el, los tests golden de verify_publishable_zip fallarian por una
+        # ausencia esperada: sintetizamos un ZIP valido con las entradas que
+        # exige el gate, mas su sidecar SHA-256 en formato `shasum`. Si el ZIP
+        # real existe (build local corrido), se usa el copiado.
+        golden_zip = golden / "data" / "normalized" / "chile-hub-publishable-bundle.zip"
+        if not golden_zip.exists():
+            with zipfile.ZipFile(golden_zip, "w") as archive:
+                for name in (
+                    "hub_status.json",
+                    "hub_bundle.json",
+                    "artifact_manifest.json",
+                    "overview.json",
+                ):
+                    archive.write(
+                        golden / "data" / "normalized" / name,
+                        f"data/normalized/{name}",
+                    )
+            digest = hashlib.sha256(golden_zip.read_bytes()).hexdigest()
+            (golden / "data" / "normalized" / "chile-hub-publishable-bundle.zip.sha256").write_text(
+                f"{digest}  data/normalized/chile-hub-publishable-bundle.zip\n",
+                encoding="utf-8",
+            )
 
         # contracts/ — needed by verify_schema_contracts
         shutil.copytree(ROOT_DIR / "contracts" / "datasets", golden / "contracts" / "datasets")
@@ -213,12 +243,25 @@ class VerifyGoldenCopyTests(unittest.TestCase):
         (gitignored) y mataba TODO release con "Missing required files:
         data/staging/...". El perfil `release` usa solo los required files de
         normalized + publication policy, sin el anti-build-olvidado de staging.
+
+        Plan 130: el ZIP publicable dejo de versionarse, asi que `release` y
+        `readiness` ya no exigen lo mismo. `release` verifica el artefacto
+        publication-grade que SI trae el ZIP (el job lo adjunta al GitHub
+        Release) y debe exigirlo; `readiness` corre en push/PR sin build y no
+        puede exigirlo. La diferencia es exactamente el ZIP y su sidecar.
         """
         self.assertNotIn("data/staging", str(vp.required_files_for_profile("release")))
         self.assertNotIn("duckdb", str(vp.required_files_for_profile("release")))
         release_required = {p.name for p in vp.required_files_for_profile("release")}
         publishable_required = {p.name for p in vp.required_files_for_profile("readiness")}
-        self.assertEqual(release_required, publishable_required)
+        self.assertEqual(
+            release_required,
+            publishable_required
+            | {
+                "chile-hub-publishable-bundle.zip",
+                "chile-hub-publishable-bundle.zip.sha256",
+            },
+        )
 
         test_args = ["verify_pipeline.py", "--profile", "release"]
         with (
@@ -226,10 +269,18 @@ class VerifyGoldenCopyTests(unittest.TestCase):
             patch("builtins.print"),
             patch.object(vp, "verify_staging_not_newer_than_normalized") as staging_check,
             patch.object(vp, "verify_publication_policy") as policy_check,
+            # Los required files son constantes de modulo con paths reales del
+            # repo, mientras ROOT_DIR esta parcheado al golden copy: si el ZIP
+            # no existe en el checkout (CI push, Plan 130), verify_required_files
+            # intenta relative_to() contra el dir parcheado y no aplica. Se
+            # stubea igual que en test_main_dev_profile_passes; el contrato de
+            # required files se verifica con las aserciones de arriba.
+            patch.object(vp, "verify_required_files") as required_check,
         ):
             vp.main()
         staging_check.assert_not_called()
         policy_check.assert_called_once()
+        required_check.assert_called_once_with(vp.required_files_for_profile("release"))
 
     # -- corruption tests (isolated temp-dir per test) ---------------------
 
@@ -957,3 +1008,311 @@ class RecordDropGuardTests(unittest.TestCase):
     def test_cli_parses_allow_record_drop(self) -> None:
         args = vp.build_parser().parse_args(["--allow-record-drop", "a, b,"])
         self.assertEqual(args.allow_record_drop, "a, b,")
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+#  Indicadores diagnostics / top_issue
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+class IndicadoresDiagnosticsTests(unittest.TestCase):
+    """Caracteriza ``verify_indicadores_diagnostics`` y ``verify_top_issue*``.
+
+    En el pipeline real estas ramas solo corren contra el estado committeado;
+    una regresión que las afloje no se nota hasta un publish con anomalías.
+    Los tests las ejercitan con dicts sintéticos (mismo patrón que
+    ``VerifySyntheticTests``).
+    """
+
+    ORIGIN = "synthetic_indicadores"
+
+    def _metadata(self, **overrides) -> dict:
+        metadata = {
+            "source_detail": "public_api",
+            "source_mode": "live",
+            "notes": [],
+            "fetch_failures": [],
+            "raw_recoveries": [],
+            "preserved_existing_pairs": [],
+            "empty_live_pairs": [],
+            "published_backfills": [],
+        }
+        metadata.update(overrides)
+        return metadata
+
+    def _assert_fails(self, metadata: dict, validation=None, message: str = "") -> None:
+        # `fail()` imprime el detalle a stdout y levanta SystemExit(1): el
+        # mensaje no viaja en la excepción, hay que capturarlo de la salida.
+        captured = io.StringIO()
+        with self.assertRaises(SystemExit):
+            with contextlib.redirect_stdout(captured):
+                vp.verify_indicadores_diagnostics(metadata, validation or {}, self.ORIGIN)
+        if message:
+            self.assertIn(message, captured.getvalue())
+
+    def test_rejects_invalid_source_detail(self) -> None:
+        self._assert_fails(
+            self._metadata(source_detail="inventado"),
+            message="invalid indicadores source_detail",
+        )
+
+    def test_generated_fallback_requires_fallback_source_mode(self) -> None:
+        self._assert_fails(
+            self._metadata(source_detail="generated_fallback", source_mode="live"),
+            message="must use source_mode=fallback",
+        )
+        # El único source_detail que retorna temprano sin exigir source_mode=live.
+        vp.verify_indicadores_diagnostics(
+            self._metadata(source_detail="generated_fallback", source_mode="fallback"),
+            {},
+            self.ORIGIN,
+        )
+
+    def test_live_diagnostics_require_live_source_mode(self) -> None:
+        self._assert_fails(
+            self._metadata(source_mode="fallback"),
+            message="live indicadores diagnostics require source_mode=live",
+        )
+
+    def test_raw_recovery_coupling(self) -> None:
+        pairs = ["uf", "dolar"]
+        note = "raw_recovery_used_for_pairs: uf, dolar"
+        warning = "indicadores live refresh reused raw snapshots for: uf, dolar"
+        with self.subTest("wrong source_detail"):
+            self._assert_fails(
+                self._metadata(raw_recoveries=pairs),
+                {"warnings": [warning]},
+                "require a recovery-aware source_detail",
+            )
+        with self.subTest("missing note"):
+            self._assert_fails(
+                self._metadata(source_detail="public_api_with_raw_recovery", raw_recoveries=pairs),
+                {"warnings": [warning]},
+                "missing raw recovery note",
+            )
+        with self.subTest("missing warning"):
+            self._assert_fails(
+                self._metadata(
+                    source_detail="public_api_with_raw_recovery",
+                    raw_recoveries=pairs,
+                    notes=[note],
+                ),
+                message="missing raw recovery warning",
+            )
+        with self.subTest("complete"):
+            vp.verify_indicadores_diagnostics(
+                self._metadata(
+                    source_detail="public_api_with_raw_recovery",
+                    raw_recoveries=pairs,
+                    notes=[note],
+                ),
+                {"warnings": [warning]},
+                self.ORIGIN,
+            )
+
+    def test_preserved_existing_coupling(self) -> None:
+        pairs = ["ipc"]
+        note = "preserved_existing_pairs_due_to_fetch_failure: ipc"
+        warning = "indicadores live refresh preserved previous staging rows for: ipc"
+        with self.subTest("wrong source_detail"):
+            self._assert_fails(
+                self._metadata(preserved_existing_pairs=pairs),
+                {"warnings": [warning]},
+                "require a partial-aware source_detail",
+            )
+        with self.subTest("missing note"):
+            self._assert_fails(
+                self._metadata(source_detail="public_api_partial", preserved_existing_pairs=pairs),
+                {"warnings": [warning]},
+                "missing preserved-existing note",
+            )
+        with self.subTest("missing warning"):
+            self._assert_fails(
+                self._metadata(
+                    source_detail="public_api_partial",
+                    preserved_existing_pairs=pairs,
+                    notes=[note],
+                ),
+                message="missing preserved-existing warning",
+            )
+        with self.subTest("complete"):
+            vp.verify_indicadores_diagnostics(
+                self._metadata(
+                    source_detail="public_api_partial",
+                    preserved_existing_pairs=pairs,
+                    notes=[note],
+                ),
+                {"warnings": [warning]},
+                self.ORIGIN,
+            )
+
+    def test_empty_live_coupling(self) -> None:
+        pairs = ["utm"]
+        note = "empty_live_pairs: utm"
+        warning = "indicadores live refresh returned empty series for: utm"
+        with self.subTest("missing note"):
+            self._assert_fails(
+                self._metadata(empty_live_pairs=pairs),
+                {"warnings": [warning]},
+                "missing empty-live note",
+            )
+        with self.subTest("missing warning"):
+            self._assert_fails(
+                self._metadata(empty_live_pairs=pairs, notes=[note]),
+                message="missing empty-live warning",
+            )
+        with self.subTest("complete"):
+            vp.verify_indicadores_diagnostics(
+                self._metadata(empty_live_pairs=pairs, notes=[note]),
+                {"warnings": [warning]},
+                self.ORIGIN,
+            )
+
+    def test_published_backfill_coupling(self) -> None:
+        codes = ["euro"]
+        note = "published_backfills_used_for_codes: euro"
+        warning = "indicadores live refresh reused last published artifact for missing codes: euro"
+        with self.subTest("wrong source_detail"):
+            self._assert_fails(
+                self._metadata(published_backfills=codes, notes=[note]),
+                {"warnings": [warning]},
+                "published_backfills require source_detail=public_api_with_published_backfill",
+            )
+        with self.subTest("missing note"):
+            self._assert_fails(
+                self._metadata(
+                    source_detail="public_api_with_published_backfill",
+                    published_backfills=codes,
+                ),
+                {"warnings": [warning]},
+                "missing published-backfill note",
+            )
+        with self.subTest("missing warning"):
+            self._assert_fails(
+                self._metadata(
+                    source_detail="public_api_with_published_backfill",
+                    published_backfills=codes,
+                    notes=[note],
+                ),
+                message="missing published-backfill warning",
+            )
+        with self.subTest("complete"):
+            vp.verify_indicadores_diagnostics(
+                self._metadata(
+                    source_detail="public_api_with_published_backfill",
+                    published_backfills=codes,
+                    notes=[note],
+                ),
+                {"warnings": [warning]},
+                self.ORIGIN,
+            )
+
+    def test_fetch_failures_require_a_recovery_path(self) -> None:
+        with self.subTest("no recovery path"):
+            self._assert_fails(
+                self._metadata(fetch_failures=["uf"]),
+                message="recorded fetch_failures without any recovery path",
+            )
+        with self.subTest("recovered via raw snapshot"):
+            note = "raw_recovery_used_for_pairs: uf"
+            warning = "indicadores live refresh reused raw snapshots for: uf"
+            vp.verify_indicadores_diagnostics(
+                self._metadata(
+                    source_detail="public_api_with_raw_recovery",
+                    raw_recoveries=["uf"],
+                    fetch_failures=["uf"],
+                    notes=[note],
+                ),
+                {"warnings": [warning]},
+                self.ORIGIN,
+            )
+        with self.subTest("fallback mode returns early"):
+            vp.verify_indicadores_diagnostics(
+                self._metadata(
+                    source_detail="generated_fallback",
+                    source_mode="fallback",
+                    fetch_failures=["uf"],
+                ),
+                {},
+                self.ORIGIN,
+            )
+
+    def test_full_diagnostics_set_passes(self) -> None:
+        raw = ["uf"]
+        preserved = ["ipc"]
+        empty = ["utm"]
+        backfill = ["euro"]
+        notes = [
+            "raw_recovery_used_for_pairs: uf",
+            "preserved_existing_pairs_due_to_fetch_failure: ipc",
+            "empty_live_pairs: utm",
+            "published_backfills_used_for_codes: euro",
+        ]
+        warnings = [
+            "indicadores live refresh reused raw snapshots for: uf",
+            "indicadores live refresh preserved previous staging rows for: ipc",
+            "indicadores live refresh returned empty series for: utm",
+            "indicadores live refresh reused last published artifact for missing codes: euro",
+        ]
+        vp.verify_indicadores_diagnostics(
+            self._metadata(
+                source_detail="public_api_with_published_backfill",
+                raw_recoveries=raw,
+                preserved_existing_pairs=preserved,
+                empty_live_pairs=empty,
+                published_backfills=backfill,
+                fetch_failures=raw,
+                notes=notes,
+            ),
+            {"warnings": warnings},
+            self.ORIGIN,
+        )
+
+    # -- verify_top_issue / verify_top_issue_summary -----------------------
+
+    @staticmethod
+    def _valid_top_issue() -> dict:
+        return {
+            "dataset": sorted(vp.REQUIRED_DATASETS)[0],
+            "build_freshness_status": "fresh",
+            "drift_status": "healthy",
+            "degradation_status": "none",
+            "warning_count": 0,
+            "source_detail": "public_api",
+            "diagnostic_summary": "sin anomalías",
+            "recommended_action": "ninguna",
+        }
+
+    def test_top_issue_accepts_valid_payload(self) -> None:
+        vp.verify_top_issue(self._valid_top_issue(), self.ORIGIN)
+
+    def test_top_issue_rejects_invalid_payload(self) -> None:
+        valid = self._valid_top_issue()
+        invalid_payloads = {
+            "not a dict": "no soy un dict",
+            "unknown dataset": {**valid, "dataset": "comuna_que_no_existe"},
+            "invalid freshness": {**valid, "build_freshness_status": "fresco"},
+            "invalid drift": {**valid, "drift_status": "ok"},
+            "invalid degradation": {**valid, "degradation_status": "malo"},
+            "negative warning_count": {**valid, "warning_count": -1},
+            "missing source_detail": {**valid, "source_detail": ""},
+            "missing diagnostic_summary": {**valid, "diagnostic_summary": None},
+            "missing recommended_action": {**valid, "recommended_action": ""},
+        }
+        for label, payload in invalid_payloads.items():
+            with self.subTest(label):
+                with self.assertRaises(SystemExit):
+                    vp.verify_top_issue(payload, self.ORIGIN)
+
+    def test_top_issue_summary_requires_dataset_mention(self) -> None:
+        top_issue = self._valid_top_issue()
+        with self.subTest("non-string summary"):
+            with self.assertRaises(SystemExit):
+                vp.verify_top_issue_summary(None, top_issue, self.ORIGIN)
+        with self.subTest("summary does not mention dataset"):
+            with self.assertRaises(SystemExit):
+                vp.verify_top_issue_summary("todo en orden", top_issue, self.ORIGIN)
+        with self.subTest("valid"):
+            vp.verify_top_issue_summary(
+                f"prioridad: {top_issue['dataset']}", top_issue, self.ORIGIN
+            )

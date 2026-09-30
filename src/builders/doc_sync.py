@@ -17,6 +17,7 @@ from src.builders.io_utils import read_json_if_exists, read_project_version, rep
 
 README_PATH = os.path.join(ROOT_DIR, "README.md")
 AGENTS_PATH = os.path.join(ROOT_DIR, "AGENTS.md")
+INSTALLATION_PATH = os.path.join(ROOT_DIR, "docs", "installation.md")
 TESTS_DIR = os.path.join(ROOT_DIR, "tests")
 ADR_DIR = os.path.join(ROOT_DIR, "docs", "adr")
 CONTRACTS_DIR = os.path.join(ROOT_DIR, "contracts", "datasets")
@@ -148,6 +149,33 @@ def sync_readme_version_pin_example(check_only=False):
     )
 
 
+def sync_installation_pins(check_only=False):
+    """Pines de versión (paquete y datos) en docs/installation.md desde pyproject.toml.
+
+    Sin esto, la página de instalación recomendaba una versión de decenas de
+    releases atrás (1.15.0 con el paquete en 1.44.x; Plan 127).
+    """
+    version = read_project_version(ROOT_DIR)
+    body = (
+        "Fija la versión del paquete con pip:\n\n"
+        "```bash\n"
+        f"pip install chile-hub=={version}\n"
+        "```\n\n"
+        "Fija los datos seleccionando el tag de release correspondiente al "
+        "actualizar la caché:\n\n"
+        "```bash\n"
+        f"chile-hub cache update --data-version v{version}\n"
+        "```"
+    )
+    return replace_delimited_block(
+        INSTALLATION_PATH,
+        "INSTALLATION_PIN",
+        body,
+        check_only=check_only,
+        separator="\n\n",
+    )
+
+
 def sync_readme_redistribution_summary(check_only=False):
     report = read_json_if_exists(os.path.join(NORMALIZED_DIR, "redistribution_report.json"))
     if report is None:
@@ -244,7 +272,7 @@ _AGENTS_TEST_DESCRIPTIONS = {
     "test_phase2_datasetspec.py": (
         "DatasetSpec piloto Phase 2–3D: modelo tipado, proyecciones de "
         "compatibilidad contra catálogo/registry/contrato legacy, overlay y "
-        "fallos cerrados (22 specs: complete)"
+        "fallos cerrados (25 specs: complete — cubre todo el catálogo)"
     ),
     "test_phase4_extraction.py": (
         "ExtractionResult Phase 4: modelo tipado, 3 extractores piloto "
@@ -686,6 +714,7 @@ SYNC_FUNCS = [
     sync_readme_dataset_badge,
     sync_readme_python_badge,
     sync_readme_version_pin_example,
+    sync_installation_pins,
     sync_readme_redistribution_summary,
     sync_readme_health_summary,
     sync_readme_quality_summary,

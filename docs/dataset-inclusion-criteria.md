@@ -28,7 +28,13 @@ Los datasets que pasan los bloqueantes se ordenan por:
 4. Bajo costo operacional de refresco y monitoreo.
 5. Claridad de esquema, campos y frecuencia esperada.
 6. Capacidad de publicarse en formatos ya soportados: Parquet, DuckDB, SQLite, JSON o Excel.
-7. Diferenciación: reduce limpieza repetida que cada usuario haría por su cuenta.
+7. Valor agregado sobre la fuente oficial: la capa aporta algo que la fuente (o
+   [datos.gob.cl](https://datos.gob.cl/)) no entrega ya listo, como normalizar claves
+   territoriales (CUT), consolidar archivos dispersos, cruzar fuentes, mantener un
+   historial versionado o validar contra un contrato. Si la fuente ya publica el dato
+   limpio, con claves estables y en formato legible por máquina, se prefiere
+   referenciarlo (enlace más receta de cruce) antes que replicarlo. Ver la misión y los
+   principios en [`product-spec.md`](product-spec.md) (ADR-023).
 
 ## Estados de decisión
 
@@ -104,6 +110,7 @@ nombres por referencia, sin redefinirlos.
 Abre un issue usando la plantilla `Dataset request` e incluye:
 
 - URL oficial de la fuente.
+- Qué agrega chile-hub sobre la fuente oficial (criterio de prioridad #7).
 - Estado de licencia o términos de reúso.
 - Caso de uso concreto que desbloquea.
 - Claves de cruce esperadas.

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>chile-hub — Capas de Datos de Chile</title>
-    <meta name="description" content="chile-hub es una capa de datos oficial y curada de Chile. Accede a datasets listos de la DPA, economía, salud, educación y más en Parquet, JSON y DuckDB.">
+    <meta name="description" content="chile-hub normaliza y valida datos oficiales de Chile y los deja listos para cruzar: DPA, economía, salud, educación y más en Parquet, JSON y DuckDB.">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://tooltician.com/chile-hub/">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b0f19'/%3E%3Cpath d='M18 20h11c9 0 14 5 14 12 0 9-6 14-15 14H18V20zm9 20c6 0 9-3 9-8 0-4-3-7-8-7h-3v15h2z' fill='%2322d3ee'/%3E%3Cpath d='M45 18l4 7 7 4-7 4-4 7-4-7-7-4 7-4 4-7z' fill='%23818cf8'/%3E%3C/svg%3E">
@@ -13,14 +13,14 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://tooltician.com/chile-hub/">
     <meta property="og:title" content="chile-hub — Capas de Datos de Chile">
-    <meta property="og:description" content="Capa de datos oficial, curada y reproducible sobre Chile. Accede a datasets listos para producción en Parquet, JSON y DuckDB.">
+    <meta property="og:description" content="La última milla de los datos oficiales de Chile: capas curadas, validadas y listas para cruzar en Parquet, JSON y DuckDB.">
     <meta property="og:image" content="https://tooltician.com/chile-hub/social-card.png">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://tooltician.com/chile-hub/">
     <meta name="twitter:title" content="chile-hub — Capas de Datos de Chile">
-    <meta name="twitter:description" content="Capa de datos oficial, curada y reproducible sobre Chile. Accede a datasets listos para producción en Parquet, JSON y DuckDB.">
+    <meta name="twitter:description" content="La última milla de los datos oficiales de Chile: capas curadas, validadas y listas para cruzar en Parquet, JSON y DuckDB.">
     <meta name="twitter:image" content="https://tooltician.com/chile-hub/social-card.png">
 
     <!-- Structured Data (JSON-LD) -->
@@ -30,7 +30,7 @@
       "@type": "WebSite",
       "name": "chile-hub",
       "url": "https://tooltician.com/chile-hub/",
-      "description": "Capa de datos oficial, curada y reproducible sobre Chile. Datasets limpios en Parquet, JSON, DuckDB y Excel.",
+      "description": "Capa curada y reproducible sobre datos oficiales de Chile. Datasets limpios en Parquet, JSON, DuckDB y Excel.",
       "publisher": {
         "@type": "Organization",
         "name": "chile-hub"
@@ -44,7 +44,7 @@
       "@type": "DataCatalog",
       "name": "chile-hub",
       "url": "https://tooltician.com/chile-hub/",
-      "description": "Capa de datos oficial, curada y reproducible sobre Chile. Datasets limpios en Parquet, JSON, DuckDB y Excel.",
+      "description": "Capa curada y reproducible sobre datos oficiales de Chile. Datasets limpios en Parquet, JSON, DuckDB y Excel.",
       "publisher": {
         "@type": "Organization",
         "name": "chile-hub"
@@ -331,13 +331,133 @@
     <!-- END_DATA_CATALOG_JSON_LD -->
 
 
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400;1,14..32,600&family=JetBrains+Mono:ital,wght@0,400;0,600;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,600&display=swap" rel="stylesheet">
+    <!-- Tipografías auto-hospedadas: vendor/fonts/ (ver vendor/fonts/README.md) -->
     <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
 
     <style>
+        /* Tipografías auto-hospedadas — sin peticiones a Google Fonts.
+           Origen, licencias e inventario: vendor/fonts/README.md */
+        @font-face {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url("vendor/fonts/inter/inter-latin-400.woff2") format("woff2");
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 500;
+            font-display: swap;
+            src: url("vendor/fonts/inter/inter-latin-500.woff2") format("woff2");
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 600;
+            font-display: swap;
+            src: url("vendor/fonts/inter/inter-latin-600.woff2") format("woff2");
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 700;
+            font-display: swap;
+            src: url("vendor/fonts/inter/inter-latin-700.woff2") format("woff2");
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'Inter';
+            font-style: italic;
+            font-weight: 400;
+            font-display: swap;
+            src: url("vendor/fonts/inter/inter-latin-400-italic.woff2") format("woff2");
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'Inter';
+            font-style: italic;
+            font-weight: 600;
+            font-display: swap;
+            src: url("vendor/fonts/inter/inter-latin-600-italic.woff2") format("woff2");
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'JetBrains Mono';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url("vendor/fonts/jetbrains-mono/jetbrains-mono-latin-400.woff2") format("woff2");
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'JetBrains Mono';
+            font-style: normal;
+            font-weight: 600;
+            font-display: swap;
+            src: url("vendor/fonts/jetbrains-mono/jetbrains-mono-latin-600.woff2") format("woff2");
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'JetBrains Mono';
+            font-style: italic;
+            font-weight: 400;
+            font-display: swap;
+            src: url("vendor/fonts/jetbrains-mono/jetbrains-mono-latin-400-italic.woff2") format("woff2");
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'Source Serif 4';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url("vendor/fonts/source-serif-4/source-serif-4-latin-400.woff2") format("woff2");
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'Source Serif 4';
+            font-style: normal;
+            font-weight: 500;
+            font-display: swap;
+            src: url("vendor/fonts/source-serif-4/source-serif-4-latin-500.woff2") format("woff2");
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'Source Serif 4';
+            font-style: normal;
+            font-weight: 600;
+            font-display: swap;
+            src: url("vendor/fonts/source-serif-4/source-serif-4-latin-600.woff2") format("woff2");
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'Source Serif 4';
+            font-style: normal;
+            font-weight: 700;
+            font-display: swap;
+            src: url("vendor/fonts/source-serif-4/source-serif-4-latin-700.woff2") format("woff2");
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'Source Serif 4';
+            font-style: italic;
+            font-weight: 400;
+            font-display: swap;
+            src: url("vendor/fonts/source-serif-4/source-serif-4-latin-400-italic.woff2") format("woff2");
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'Source Serif 4';
+            font-style: italic;
+            font-weight: 600;
+            font-display: swap;
+            src: url("vendor/fonts/source-serif-4/source-serif-4-latin-600-italic.woff2") format("woff2");
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+
         :root {
             /* Palette: paperback cream & vintage ink, with warm ochre/terracotta highlights */
             --bg-color: #f7f6f0;
@@ -3278,9 +3398,9 @@
     <main id="main-content" tabindex="-1">
         <section class="intro">
             <div class="intro-copy">
-                <p class="intro-eyebrow">Datos oficiales de Chile, curados y reproducibles</p>
-                <h2>Un punto de partida curado para datos abiertos de Chile.</h2>
-                <p>Veintiuna capas publicadas y una en evaluación, todas normalizadas — geografía, demografía, economía, salud, educación y más — listas para consumir en una línea de código. Con resolución de entidades por nombre y por coordenadas.</p>
+                <p class="intro-eyebrow">Complementa a datos.gob.cl y a las fuentes oficiales</p>
+                <h2>La última milla de los datos oficiales de Chile.</h2>
+                <p>Veintiuna capas publicadas y una en evaluación, todas normalizadas — geografía, demografía, economía, salud, educación y más — listas para consumir en una línea de código. Con resolución de entidades por nombre y por coordenadas. No reemplaza a las fuentes oficiales: las vuelve cruzables.</p>
                 <div class="intro-links">
                     <a class="btn btn-primary" href="#catalogo">Explorar datos</a>
                     <a class="btn btn-secondary" href="reference/">Ver documentación</a>
@@ -3492,11 +3612,13 @@ hub.resolve_comunas(["santiago", "nunoa"])</pre>
                             <div class="package-verify-title">Verificar integridad</div>
                             <button class="quickstart-copy" id="package-verify-copy" data-copy-target="package-verify-code" aria-label="Copiar comando de verificación al portapapeles">Copiar</button>
                         </div>
-                        <pre class="quickstart-code" id="package-verify-code">shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256</pre>
+                        <pre class="quickstart-code" id="package-verify-code">curl -L -o data/normalized/chile-hub-publishable-bundle.zip https://github.com/cortega26/chile-hub/releases/latest/download/chile-hub-publishable-bundle.zip
+curl -L -o data/normalized/chile-hub-publishable-bundle.zip.sha256 https://github.com/cortega26/chile-hub/releases/latest/download/chile-hub-publishable-bundle.zip.sha256
+shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256</pre>
                     </details>
                 </div>
                 <div class="package-actions" id="package-actions">
-                    <a class="dataset-action" href="data/normalized/chile-hub-publishable-bundle.zip" target="_blank" rel="noopener noreferrer">Bundle ZIP</a>
+                    <a class="dataset-action" href="https://github.com/cortega26/chile-hub/releases/latest/download/chile-hub-publishable-bundle.zip" target="_blank" rel="noopener noreferrer">Bundle ZIP</a>
                     <a class="dataset-action muted" href="data/normalized/hub_bundle.json" target="_blank" rel="noopener noreferrer">Bundle JSON</a>
                 </div>
             </div>
@@ -3797,10 +3919,11 @@ LIMIT 10;</pre>
             <p>Construido con Python, Polars y DuckDB.</p>
             <p>Licencia del Consolidado: <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener noreferrer">CC-BY-4.0</a></p>
             <p><a href="comunas/">Las 346 comunas de Chile</a></p>
+            <p>Proyecto independiente: no es un servicio del Estado ni está afiliado a datos.gob.cl ni a las instituciones fuente.</p>
         </div>
         <div class="footer-col">
             <h3>Fuentes</h3>
-            <p>BCN ArcGIS, INE, MINSAL, MINEDUC, mindicador.cl y SERVEL — atribución individual en el catálogo.</p>
+            <p>BCN ArcGIS, INE, MINSAL, MINEDUC, mindicador.cl, SERVEL y <a href="https://datos.gob.cl/" target="_blank" rel="noopener noreferrer">datos.gob.cl</a> — atribución individual en el catálogo. La fuente oficial siempre prevalece.</p>
         </div>
         <div class="footer-col">
             <h3>Comunidad</h3>
@@ -3852,7 +3975,7 @@ LIMIT 10;</pre>
     }
     </script>
     <script src="vendor/leaflet/leaflet.js" defer></script>
-    <script src="app.js?v=1.42.0" defer></script>
+    <script src="app.js?v=1.46.1" defer></script>
     <script type="module" src="playground.js"></script>
 </body>
 </html>

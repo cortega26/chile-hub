@@ -217,14 +217,36 @@ def validate_geometry(gdf: "GeoDataFrame") -> None:
         )
 
 
+_GEOMETRY_CACHE: dict[tuple[str, int], "GeoDataFrame"] = {}
+
+
 def load_geometry(path: Path) -> "GeoDataFrame":
-    """Carga un GeoParquet local como GeoDataFrame, con validación estructural."""
+    """Carga un GeoParquet local como GeoDataFrame, con validación estructural.
+
+    Cachea el GeoDataFrame en memoria a nivel de módulo, con clave
+    ``(path, st_mtime_ns)``: el artefacto es inmutable (ADR-012) y un mtime
+    distinto — p. ej. tras ``refresh_geometry=True``, que reemplaza el archivo
+    atómicamente — invalida la entrada. La caché retiene solo la última lectura
+    (``clear()`` antes de asignar) para no acumular historiales.
+    """
     _require_geo()
     import geopandas as gpd
 
+    stat = Path(path).stat()
+    key = (str(path), stat.st_mtime_ns)
+    cached = _GEOMETRY_CACHE.get(key)
+    if cached is not None:
+        return cached
     gdf = gpd.read_parquet(path)
     validate_geometry(gdf)
+    _GEOMETRY_CACHE.clear()  # el path de caché es único; no acumular historiales
+    _GEOMETRY_CACHE[key] = gdf
     return gdf
+
+
+def clear_geometry_cache() -> None:
+    """Vacía la caché; usado por tests y tras un refresh explícito."""
+    _GEOMETRY_CACHE.clear()
 
 
 def resolve_points(

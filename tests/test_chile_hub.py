@@ -1309,6 +1309,12 @@ class ArtifactContractTests(unittest.TestCase):
     def test_publishable_zip_exists_and_contains_bundle(self):
         zip_path = self.normalized_dir / "chile-hub-publishable-bundle.zip"
         checksum_path = self.normalized_dir / "chile-hub-publishable-bundle.zip.sha256"
+        if not zip_path.exists():
+            # Plan 130: el ZIP es artefacto de build, ya no se versiona; en el
+            # checkout de push/PR (sin build) no existe y no es un fallo.
+            self.skipTest(
+                "el ZIP es artefacto de build (Plan 130); correr make build antes de make test"
+            )
         self.assertTrue(zip_path.exists())
         self.assertTrue(checksum_path.exists())
         with zipfile.ZipFile(zip_path) as archive:

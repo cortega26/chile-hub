@@ -59,7 +59,7 @@ Actualmente registra veinticinco (<!-- START_AGENTS_DATASET_COUNT -->25<!-- END_
 | **Finanzas Municipales** | SINIM / SUBDERE | Indicadores financieros municipales anuales por comuna |
 | **Resultados Educacionales** | MINEDUC | Métricas educacionales agregadas por comuna y año, sin registros personales |
 | **Indicadores Urbanos SIEDU** | INE / SIEDU | Indicadores urbanos en formato largo con cobertura parcial esperada |
-| **Perfil Territorial Comunal** | chile-hub derivado | Una fila por comuna con métricas territoriales consolidadas (carril `candidate`, `review_by` 2026-09-18) |
+| **Perfil Territorial Comunal** | chile-hub derivado | Una fila por comuna con métricas territoriales consolidadas (carril `stable_publishable`, `review_by` 2026-12-31) |
 | **Empresas (RES)** | Ministerio de Economía / datos.gob.cl | Registro de constituciones de empresas bajo Ley 20.659 con RUT, razón social, tipo societario y comuna |
 | **Pobreza Comunal (SAE)** | MDS / Observatorio Social | Estimaciones de pobreza por ingresos y multidimensional por comuna |
 | **Consumo Eléctrico Comunal** | CNE / Energía Abierta | Consumo eléctrico anual por comuna y tipo de cliente (carril `candidate` — fuente CNE descontinuada, `maturity_status: deprecated`) |
@@ -73,6 +73,10 @@ Actualmente registra veinticinco (<!-- START_AGENTS_DATASET_COUNT -->25<!-- END_
 
 **El objetivo no es tener todos los datos de Chile. Es entregar un número pequeño de datasets
 limpios, versionados, validados y consumibles en una línea de código.**
+
+chile-hub no es un portal ni una fuente oficial: es la última milla aguas abajo de datos.gob.cl
+y de las instituciones fuente, y nunca se describe como "oficial". Misión, visión y principios
+viven en `docs/product-spec.md` (ADR-023); no los dupliques aquí.
 
 > **Carriles de publicación:** no todos los datasets listados arriba están en el bundle
 > público. Algunos viven en el carril `candidate` (evaluados, implementados, pero fuera
@@ -128,9 +132,8 @@ chile-hub/
 │   ├── validation.py              Todas las funciones validate_*() — módulo independiente (1 960 líneas)
 │   ├── build_dev_db.py            Orquestador (965 líneas): main() + fases (_load_inputs, _compute_validations, _write_data_artifacts, _generate_reports)
 │   ├── builders/                  Módulos del pipeline extraídos de build_dev_db.py (formats, metadata, reports, artifacts, datasets, catalog, landing, io_utils, _shared, dcat_catalog, data_package, doc_sync, geo, _logging)
-│   ├── chile_hub.py               Compatibility shim (21 líneas) — delega al paquete
 │   ├── chile_hub/                 Paquete Python instalable (ChileHub API + CLI + data manager)
-│   │   ├── core.py                ChileHub class + API pública (2 018 líneas)
+│   │   ├── core.py                ChileHub class + API pública (2 078 líneas)
 │   │   ├── cli.py                 CLI entry points (build_parser/_main/main — TECHDEBT-02, movido de core.py)
 │   │   ├── contracts.py           Schemas de contrato runtime
 │   │   ├── datasets.py            Definición de Dataset(StrEnum) y tipos
@@ -145,7 +148,7 @@ chile-hub/
 ├── data/
 │   ├── dataset_catalog_config.json  Fuente de verdad de qué datasets existen (cargado por _shared.py)
 │   ├── source_registry.json         Registro de fuentes: maturity_status, confidence_tier, review_by
-│   ├── dataset_specs/               DatasetSpec cohort Phase 3A–3D (22 specs: complete) — proyección shadow en _shared.py/reports.py
+│   ├── dataset_specs/               DatasetSpec cohort Phase 3A–3D + Plan 124 (25 specs: complete — cubre todo el catálogo) — proyección shadow en _shared.py/reports.py
 │   ├── raw/          Snapshots crudos de cada respuesta de API (JSON). Solo lectura una vez guardados.
 │   ├── staging/      Datos parseados y cercanos a la fuente (CSV + metadata.json por dataset).
 │   └── normalized/   Artefactos finales publicables (Parquet, JSON, DuckDB, Excel, ZIP, reportes).
@@ -191,7 +194,7 @@ JSON no coinciden, confía en el JSON y actualiza esta lista.
 > preguntas de "dónde está X" y "qué llama a Y" en una sola llamada, sin abrir archivos.
 
 ```bash
-codegraph search "<query>"                         # Buscar símbolo, función o concepto
+codegraph query "<query>"                          # Buscar símbolo, función o concepto
 codegraph callers src/build_dev_db.py::validate_comunas  # Qué llama a esta función
 codegraph callees src/build_dev_db.py::main         # Qué llama esta función
 codegraph explore "validación de comunas"           # Contexto completo de un área
@@ -200,8 +203,8 @@ codegraph impact validate_comunas                   # Qué se rompe si cambio es
 
 **Reglas para acotar lecturas y ahorrar tokens:**
 - Usar `Read` con `offset`/`limit` — nunca leer archivos grandes enteros de golpe.
-- `base.py` (117 líneas) es seguro de leer completo. `validation.py` (1 960 líneas) — leer por validador individual.
-- `build_dev_db.py` (965 líneas) y `src/chile_hub/core.py` (2 018 líneas) — usar estas áncoras:
+- `base.py` (146 líneas) es seguro de leer completo. `validation.py` (1 960 líneas) — leer por validador individual.
+- `build_dev_db.py` (965 líneas) y `src/chile_hub/core.py` (2 078 líneas) — usar estas áncoras:
 
 | Archivo | Líneas de interés |
 |---|---|
@@ -228,6 +231,9 @@ codegraph impact validate_comunas                   # Qué se rompe si cambio es
              src/extractors/consumo_electrico_extractor.py
              src/extractors/partidos_politicos_extractor.py
              src/extractors/autoridades_electas_extractor.py
+             src/extractors/estadisticas_vitales_extractor.py
+             src/extractors/permisos_edificacion_extractor.py
+             src/extractors/calidad_aire_extractor.py
              (los 17 que corre `make extract` / el job diario de CI — ver §11)
              → Produce: data/staging/{dataset}.csv + data/staging/{dataset}.metadata.json
              → Produce: data/raw/{source}_{timestamp}.json  (snapshot crudo)
@@ -527,13 +533,17 @@ disuelta), aplicar este protocolo:
    menos 3 ciclos de `schedule`, ~3 días).
 2. **Congelar** el dataset en su última versión publicada. El snapshot en `data/raw/`
    y los artefactos en `data/normalized/` sirven como respaldo histórico.
-3. **Marcar** el metadata con `source_mode: "archived"` y `notes: ["Fuente original
-   dejó de existir el YYYY-MM-DD. Dataset congelado en su última actualización."]`.
+3. **Marcar** el dataset como retirado en `data/source_registry.json`
+   (`maturity_status: "deprecated"`, ver ADR-015) y agregar la nota de congelamiento en
+   `notes` del metadata. `source_mode` conserva el modo del último fetch exitoso; **no
+   existe un modo `archived`** (el state machine válido es `live|fallback|monthly`).
 4. **Evaluar** si el dataset sigue siendo útil sin actualizaciones. Si la respuesta es sí,
-   mantenerlo como dataset histórico (solo lectura, sin fetch). Si es no, aplicar el
-   procedimiento de depreciación de §5.
-5. **Notificar** en el reporte de salud (`make hub-health-table`) que la fuente está
-   caída, para que los consumidores sepan que el dataset no recibirá actualizaciones.
+   mantenerlo como dataset histórico (solo lectura, sin fetch): el retiro se deriva del
+   registry y `hub_health.json` lo marca `retired: true`, fuera de los contadores de salud
+   (ADR-015). Si es no, aplicar el procedimiento de depreciación de §5.
+5. **Verificar** el retiro en el reporte de salud (`make hub-health-table`): el dataset
+   aparece con `retired: true` y fuera de los contadores, para que los consumidores sepan
+   que no recibirá actualizaciones.
 
 ---
 
@@ -646,7 +656,7 @@ grep -n "^class " tests/*.py
 | `test_extractors.py` | No | Un test class por extractor (fetch, normalización, staging) + contrato ABC de `BaseExtractor` + reintentos HTTP |
 | `test_packaging_runtime.py` | Sí (`make build` antes) | Empaquetado del bundle publicable (ZIP, SHA256) en runtime |
 | `test_phase1_characterization.py` | No | Arnés de caracterización Phase 1: staging sintético offline, equivalencia de build completo, alias y políticas de publicación |
-| `test_phase2_datasetspec.py` | No | DatasetSpec piloto Phase 2–3D: modelo tipado, proyecciones de compatibilidad contra catálogo/registry/contrato legacy, overlay y fallos cerrados (22 specs: complete) |
+| `test_phase2_datasetspec.py` | No | DatasetSpec piloto Phase 2–3D: modelo tipado, proyecciones de compatibilidad contra catálogo/registry/contrato legacy, overlay y fallos cerrados (25 specs: complete — cubre todo el catálogo) |
 | `test_phase4_extraction.py` | No | ExtractionResult Phase 4: modelo tipado, 3 extractores piloto (ordinary/fallback/multi-source) y adapters legacy |
 | `test_pipeline_logic.py` | No | Lógica interna de `build_dev_db.py`, invariantes CUT, fallback de indicadores, severidad de `dataset_changelog.json`, builders (`reports`, `pipeline_status_utils`) |
 | `test_render.py` | No | Helper de renderizado de tablas (`_render.py`) |
@@ -756,7 +766,7 @@ Corre tras un `Pipeline Check` exitoso en `main` (`workflow_run`) o
 verificado, corre `python-semantic-release` (§7), publica el paquete en PyPI y
 adjunta los artefactos de datos al GitHub Release cuando son
 publication-grade. Tras cada release, el job `hf-publish` de
-`pypi-release.yml` replica las 17 capas publicables (Parquet + catálogo, las
+`pypi-release.yml` replica las 21 capas publicables (Parquet + catálogo, las
 estables por `publication_track` del registry — Plan 070) a
 Hugging Face Hub (`cortega26/chile-hub`, requiere secret `HF_TOKEN`); nunca
 incluye el carril `candidate` y no bloquea el release si falla.
@@ -923,7 +933,7 @@ protegido por un chequeo automatizado en vez de depender solo de buena voluntad.
 | Mapeo dataset ↔ extractor | `data/dataset_catalog_config.json` (campo `extractor`) | `check_companion_paths.py registry` |
 | Tabla de extractores por dominio en README | `data/dataset_catalog_config.json` vía `doc_sync.py::sync_readme_extractor_table()` | `scripts/sync_docs.py --check` |
 | Bloque Schema de cada `docs/datasets/{nombre}.md` | `contracts/datasets/{nombre}.schema.json` vía `doc_sync.py::sync_docs_schema_blocks()` | `scripts/sync_docs.py --check` |
-| Hechos operacionales del piloto DatasetSpec (Phase 2–3D cohort) | `data/dataset_specs/` (22 specs: complete) — proyección shadow en `_shared.py`/`reports.py` | `tests/test_phase2_datasetspec.py` (equivalencia vs. catálogo/registry/contrato legacy, 24 tests) |
+| Hechos operacionales del piloto DatasetSpec (Phase 2–3D cohort) | `data/dataset_specs/` (25 specs: complete — cubre todo el catálogo) — proyección shadow en `_shared.py`/`reports.py` | `tests/test_phase2_datasetspec.py` (equivalencia vs. catálogo/registry/contrato legacy, 26 tests) |
 | Hechos contables de docs de agentes (anclas de líneas y listas del §2 + tabla §1 de AGENTS.md; ausencia de conteos literales en CLAUDE.md/SOURCE_OF_TRUTH.md) | código (`wc -l`, `src/`, `data/dataset_catalog_config.json`) — prosa curada, no bloque regenerado | `scripts/check_agents_sync.py --docs AGENTS.md,CLAUDE.md,SOURCE_OF_TRUTH.md` |
 | Liveness de `official_url` de fuentes | `data/source_registry.json` | `.github/workflows/source-urls.yml` + `scripts/check_source_urls.py` (semanal, no bloquea publish) |
 

@@ -19,13 +19,14 @@ import argparse
 import json
 import re
 import sys
+import tomllib
 from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from src.builders.landing import build_dataset_json_ld  # noqa: E402
+from src.builders.landing import build_dataset_json_ld, json_for_html  # noqa: E402
 
 JSON_LD_ID = "chile-hub-dataset-json-ld"
 _MARKER = f'id="{JSON_LD_ID}"'
@@ -35,9 +36,24 @@ _BLOCK_PATTERN = re.compile(
 )
 
 
+def default_site_url() -> str:
+    """URL pública canónica desde `[tool.chile_hub] public_site_url`.
+
+    Fuente única (pyproject.toml), igual que `check_landing_sync.py` y
+    `verify_landing.py`: el script corre desde el repo en `pages-deploy`.
+    """
+    with open(ROOT_DIR / "pyproject.toml", "rb") as f:
+        pyproject_data = tomllib.load(f)
+    return (
+        pyproject_data.get("tool", {})
+        .get("chile_hub", {})
+        .get("public_site_url", "https://tooltician.com/chile-hub/")
+    )
+
+
 def inject_page(html: str, json_ld: dict) -> str:
     """Inserta (o reemplaza) el bloque JSON-LD del dataset en una página HTML."""
-    body = json.dumps(json_ld, indent=2, ensure_ascii=False)
+    body = json_for_html(json_ld)
     block = f'<script type="application/ld+json" id="{JSON_LD_ID}">\n{body}\n</script>\n'
     if _MARKER in html:
         return _BLOCK_PATTERN.sub(lambda _: block, html, count=1)
@@ -53,8 +69,8 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument(
         "--site-url",
-        default="https://tooltician.com/chile-hub/",
-        help="URL pública canónica del sitio.",
+        default=default_site_url(),
+        help="URL pública canónica del sitio (default: %(default)s).",
     )
     parser.add_argument(
         "--catalog",

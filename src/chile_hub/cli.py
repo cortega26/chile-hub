@@ -362,6 +362,21 @@ def build_parser():  # pragma: no cover — entry point de CLI, testeado vía in
         "--output", default=None, help="Archivo de salida (.csv, .parquet, o .json)"
     )
 
+    # Subcomando: resolve-regiones
+    resolve_regiones_parser = subparsers.add_parser(
+        "resolve-regiones", help="Resuelve nombres de región a códigos CUT (match determinista)"
+    )
+    resolve_regiones_parser.add_argument("names", nargs="+", help="Nombres de región a resolver")
+    resolve_regiones_parser.add_argument(
+        "--format",
+        choices=["json", "table"],
+        default="table",
+        help="Formato de salida (default: table)",
+    )
+    resolve_regiones_parser.add_argument(
+        "--output", default=None, help="Archivo de salida (.csv, .parquet, o .json)"
+    )
+
     # Subcomando: search
     search_parser = subparsers.add_parser(
         "search", help="Busca datasets por keyword, fuente o madurez"
@@ -656,6 +671,11 @@ def _main(argv=None):  # pragma: no cover — dispatch de CLI, testeado vía smo
 
     if args.command == "resolve":
         df = hub.resolve_comunas(args.names)
+        _output_dataframe(df, args.output, args.format)
+        return
+
+    if args.command == "resolve-regiones":
+        df = hub.resolve_regiones(args.names)
         _output_dataframe(df, args.output, args.format)
         return
 

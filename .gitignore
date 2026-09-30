@@ -15,8 +15,12 @@ data/normalized/*
 # dataset): se versiona y publica junto al resto de los artefactos.
 !data/normalized/*.geojson
 !data/normalized/*.parquet
-!data/normalized/*.zip
-!data/normalized/*.sha256
+
+# El bundle publicable (ZIP + .sha256) ya no se versiona: `make build` lo deja
+# en disco para el job publish, que lo adjunta al último GitHub Release
+# (pypi-release.yml) y el espejo HF. La landing lo descarga desde el Release.
+# No re-agregar `!data/normalized/*.zip` ni `!data/normalized/*.sha256`
+# (Plan 130; el sidecar de geometria_comunal se fuerza con `git add -f`).
 
 # Snapshot crudo versionado de MINVU CEDOC: los runners de GitHub no pueden
 # descargar catalogo.minvu.cl (bloqueo por IP), así que el extractor reutiliza

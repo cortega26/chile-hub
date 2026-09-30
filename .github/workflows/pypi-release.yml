@@ -31,7 +31,12 @@ concurrency:
 jobs:
   release:
     name: Semantic release and publish
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_repository.full_name == github.repository &&
+       github.event.workflow_run.head_branch == 'main' &&
+       github.event.workflow_run.event != 'pull_request')
     runs-on: ubuntu-latest
     timeout-minutes: 20
     outputs:
@@ -64,7 +69,7 @@ jobs:
         # artefacto publication-grade murió con
         # "ModuleNotFoundError: No module named 'duckdb'" en la verificacion
         # --require-live.
-        run: uv sync --extra dev --extra pipeline
+        run: uv sync --extra dev --extra pipeline --extra publish
 
       - name: Add .venv to PATH
         run: echo "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"
@@ -129,8 +134,22 @@ jobs:
             fi
           }
 
+          # Gate de identidad del run (defensa en profundidad): el filtro
+          # `branches` de workflow_run y el `if:` del job miran la branch head,
+          # que un fork puede nombrar igual. La API REST del run expone
+          # head_repository; `gh run view --json` no lo soporta (no esta en
+          # shared.RunFields de gh). Falla cerrado: si la consulta falla, el
+          # repo queda "unknown" y la funcion devuelve no-cero.
+          is_trusted_run() {
+            local rid="$1"
+            local repo
+            repo="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$rid" --jq '.head_repository.full_name' 2>/dev/null || echo unknown)"
+            [[ "$repo" == "$GITHUB_REPOSITORY" ]]
+          }
+
           if [[ "${{ github.event_name }}" == "workflow_run" ]]; then
             run_id="${{ github.event.workflow_run.id }}"
+            is_trusted_run "$run_id" || { echo "::error::Run $run_id no pertenece a $GITHUB_REPOSITORY"; exit 1; }
           else
             run_id=$(gh run list --workflow "Pipeline Check" --branch main --status success --limit 1 --json databaseId --jq '.[0].databaseId' || true)
           fi
@@ -156,6 +175,7 @@ jobs:
             for candidate in $(gh run list --workflow "Pipeline Check" --branch main \
                 --status success --limit 30 --json databaseId,event \
                 --jq '.[] | select(.event=="schedule" or .event=="workflow_dispatch") | .databaseId'); do
+              is_trusted_run "$candidate" || continue
               if try_download "$candidate"; then
                 found="$candidate"
                 break
@@ -172,17 +192,22 @@ jobs:
             echo "assets_run_id=$found" >> "$GITHUB_OUTPUT"
           fi
 
-          # Guarda de frescura (fix/write-races, Opcion B): si el artifact
-          # proviene de un commit anterior al HEAD de main, los datos que se
-          # adjuntaran al release NO son los del codigo actual. El release ya
-          # no los commitea a main (la data la escribe solo el publish), pero
-          # se avisa para que el mantenedor no trate los adjuntos como la
-          # version oficial de datos.
+          # Guarda de frescura (fix/write-races, Opcion B): el artifact puede
+          # venir del fallback (schedule/dispatch) y no coincidir con HEAD de
+          # main. Aceptar solo commits ancestros de main: un artifact de otro
+          # historial (fork) no puede entrar al release ni al espejo HF. Si el
+          # SHA no existe localmente, merge-base falla el if y aborta en el
+          # else (correcto: con fetch-depth: 0 el commit de un run de main esta).
           source_run="${found:-$run_id}"
           artifact_sha="$(gh run view "$source_run" --json headSha --jq .headSha 2>/dev/null || echo unknown)"
           main_sha="$(git rev-parse HEAD)"
           if [[ "$artifact_sha" != "unknown" && "$artifact_sha" != "$main_sha" ]]; then
-            echo "::warning::Artifact del run $source_run proviene de $artifact_sha, distinto del HEAD de main ($main_sha). Los datos adjuntos al release pueden no reflejar el ultimo codigo; la data oficial de main la actualiza el publish diario."
+            if git merge-base --is-ancestor "$artifact_sha" "$main_sha" 2>/dev/null; then
+              echo "::notice::Artifact del run $source_run ($artifact_sha) es un commit ancestro de main; se acepta como fallback publication-grade."
+            else
+              echo "::error::Artifact del run $source_run proviene de $artifact_sha, que NO es ancestro de main ($main_sha). Abortando."
+              exit 1
+            fi
           fi
 
           set +e
@@ -302,7 +327,7 @@ jobs:
               # pyproject 1.28.4 e index.html con v1.28.3. Lo que el release
               # NO toca es data/normalized (bloques de datos) — eso es del
               # publish diario.
-              git add CHANGELOG.md pyproject.toml uv.lock README.md index.html app.js
+              git add CHANGELOG.md pyproject.toml uv.lock README.md index.html app.js docs/installation.md server.json
               git commit -m "chore(release): ${after} [skip ci]"
               tag="v${after}"
               git tag "$tag"
@@ -439,5 +464,5 @@ jobs:
             echo "::error::secret HF_TOKEN no configurado; omitiendo publicacion a Hugging Face Hub."
             exit 1
           fi
-          uv pip install --system huggingface_hub
-          python scripts/publish_hf_dataset.py --repo-id cortega26/chile-hub
+          uv run --extra publish \
+            python scripts/publish_hf_dataset.py --repo-id cortega26/chile-hub

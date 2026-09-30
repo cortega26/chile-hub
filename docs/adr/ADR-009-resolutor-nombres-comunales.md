@@ -108,6 +108,20 @@ ver Preguntas abiertas #4 para el seguimiento.
 2. **¿Se agrega `resolve_regiones()` analogo?** 16 regiones, trivial de
    implementar si se decide — mismo patron, dataset mas chico.
 
+   **Resuelto en Plan 129 (2026-09-29).** Se agrego
+   `ChileHub.resolve_regiones(names)` con el mismo contrato que
+   `resolve_comunas` (`input`, `codigo_region`, `nombre_region`, `matched`,
+   orden/duplicados preservados, codigos `null` sin excepcion) y el subcomando
+   CLI `chile-hub resolve-regiones`. La tabla de alias se promovio al paquete
+   (`chile_hub/regions.py::REGION_ALIASES`, fuente unica, con las variantes
+   oficiales del dataset `regiones` y el alias "RM") y
+   `src/extractors/region_utils.py` delega en ella conservando su API publica
+   (`norm_text`, `REGION_A_CODIGO`, `region_nombre_a_codigo`). Un guardrail de
+   paridad en `tests/test_core.py` congela la equivalencia con la copia de
+   fallback que necesita el entorno efimero de CI de `autoridades_electas`
+   (que corre sin las dependencias del paquete). Las preguntas #1 (fuzzy) y #3
+   (Series/DataFrame) siguen diferidas; `resolve_regiones` no las aborda.
+
 3. **¿Aceptar `pl.DataFrame`/`pl.Series` de entrada ademas de `list[str]`?**
    Hoy el usuario pasa `df["columna"].to_list()`. Aceptar la Series/columna
    directamente ahorra esa conversion pero agrega ramificacion de tipos al

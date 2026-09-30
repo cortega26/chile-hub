@@ -21,9 +21,15 @@ Gracias por ayudar a mantener chile-hub confiable.
 
 ## Verificaciones locales
 
-Ejecuta las verificaciones útiles más pequeñas antes de abrir un pull request:
+Requiere [uv](https://docs.astral.sh/uv/getting-started/installation/) y Git.
+Prepara el entorno una vez con `make bootstrap`; luego ejecuta las
+verificaciones útiles más pequeñas antes de abrir un pull request.
+Para clones más livianos: `git clone --filter=blob:none
+https://github.com/cortega26/chile-hub` (el ZIP publicable no se versiona; se
+descarga desde el último GitHub Release).
 
 ```bash
+make bootstrap
 make lint
 make format-check
 make test

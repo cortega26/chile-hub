@@ -30,6 +30,7 @@ from scripts.fetch_adoption_stats import (
     load_offline_fixture as load_adoption_offline_fixture,
 )
 from scripts.fetch_adoption_stats import (
+    parse_huggingface_stats,
     parse_pypi_stats,
     sum_github_downloads,
 )
@@ -3570,6 +3571,31 @@ class SyncLandingMetadataTests(unittest.TestCase):
                 with self.assertRaises(OSError):
                     landing.sync_landing_metadata("https://example.cl/chile-hub/")
 
+    def test_render_catalog_json_ld_block_escapes_script_sequence(self):
+        """Plan 113: un `</script>` en la metadata no puede cerrar el tag.
+
+        Regresión a evitar: `json.dumps` crudo dentro del `<script>` inline de
+        `index.html` — una descripción con `</script><script>...` rompería el
+        documento (o inyectaría markup).
+        """
+        from src.builders import landing
+
+        description = "cierre </script><script>alert(1)</script> y & <x>"
+        with patch.object(landing, "DATASET_CATALOG_CONFIG", {"x": {"description": description}}):
+            block = landing.render_catalog_json_ld_block("https://example.cl/")
+
+        self.assertNotIn("</script><script>", block)
+        self.assertIn("\\u003c/script\\u003e", block)
+        self.assertIn("\\u0026", block)
+        # El payload sigue siendo JSON válido: los escapes unicode se decodifican.
+        match = re.search(
+            r'<script type="application/ld\+json">\s*(.*?)\s*</script>',
+            block,
+            flags=re.DOTALL,
+        )
+        self.assertIsNotNone(match)
+        self.assertEqual(json.loads(match.group(1))["dataset"][0]["description"], description)
+
 
 class CheckAgentsSyncTests(unittest.TestCase):
     """Tests para scripts/check_agents_sync.py (Plan 098): el gate anti-drift
@@ -3928,6 +3954,36 @@ class DocSyncTests(unittest.TestCase):
 
             self.assertIn("chile-hub==9.9.9", readme.read_text(encoding="utf-8"))
 
+    def test_installation_pins_sync_from_pyproject(self):
+        """Los pines de versión de docs/installation.md salen de pyproject.toml.
+
+        Regresión: la página de instalación seguía recomendando 1.15.0 cuando
+        el paquete iba en 1.44.x (Plan 127).
+        """
+        from src.builders import doc_sync
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            (Path(tmpdir) / "pyproject.toml").write_text(
+                '[project]\nname = "x"\nversion = "9.9.9"\n', encoding="utf-8"
+            )
+            installation = Path(tmpdir) / "installation.md"
+            installation.write_text(
+                "<!-- START_INSTALLATION_PIN -->\n\nviejo\n\n<!-- END_INSTALLATION_PIN -->",
+                encoding="utf-8",
+            )
+
+            with (
+                patch.object(doc_sync, "ROOT_DIR", tmpdir),
+                patch.object(doc_sync, "INSTALLATION_PATH", str(installation)),
+            ):
+                changed = doc_sync.sync_installation_pins()
+
+            content = installation.read_text(encoding="utf-8")
+            self.assertTrue(changed)
+            self.assertIn("pip install chile-hub==9.9.9", content)
+            self.assertIn("cache update --data-version v9.9.9", content)
+            self.assertNotIn("viejo", content)
+
     def test_dataset_badge_counts_only_datasets_with_outputs(self):
         from src.builders import doc_sync
 
@@ -4234,17 +4290,99 @@ class AdoptionStatsTests(unittest.TestCase):
         self.assertIn("label", badge)
         self.assertIn("color", badge)
 
-    def test_adoption_payload_contains_pypi_and_github_releases_keys(self):
+    def test_adoption_parse_huggingface_stats_from_fixture(self):
+        fixture = self._load_fixture()
+        stats = parse_huggingface_stats(fixture["huggingface"])
+        self.assertEqual(
+            stats,
+            {
+                "downloads": 274,
+                "likes": 3,
+                "lastModified": "2026-09-29T17:01:35.000Z",
+            },
+        )
+
+    def test_adoption_parse_huggingface_degrades_to_none_without_payload(self):
+        """404/red caída se representan como null, nunca como ceros medidos."""
+        self.assertIsNone(parse_huggingface_stats(None))
+        self.assertIsNone(parse_huggingface_stats([]))
+
+    def test_adoption_fetch_huggingface_degrades_to_none_on_404(self):
+        """Un 404 del API HF no debe tumbar el job (la señal HF degrada sola)."""
+        import urllib.error
+        import urllib.request
+
+        import scripts.fetch_adoption_stats as adoption_mod
+
+        error = urllib.error.HTTPError(adoption_mod.HUGGINGFACE_URL, 404, "Not Found", {}, None)
+        with (
+            patch.object(adoption_mod, "REQUEST_MAX_ATTEMPTS", 1),
+            patch.object(urllib.request, "urlopen", side_effect=error),
+        ):
+            self.assertIsNone(adoption_mod.fetch_huggingface())
+
+    def test_adoption_fetch_huggingface_degrades_to_none_on_network_error(self):
+        """Una caída de red del API HF tampoco debe tumbar el job."""
+        import urllib.error
+        import urllib.request
+
+        import scripts.fetch_adoption_stats as adoption_mod
+
+        error = urllib.error.URLError("dns failure")
+        with (
+            patch.object(adoption_mod, "REQUEST_MAX_ATTEMPTS", 1),
+            patch.object(urllib.request, "urlopen", side_effect=error),
+        ):
+            self.assertIsNone(adoption_mod.fetch_huggingface())
+
+    def test_adoption_fetch_huggingface_parses_mocked_public_response(self):
+        """Con respuesta viva, fetch_huggingface devuelve el payload crudo de HF."""
+        import urllib.request
+
+        import scripts.fetch_adoption_stats as adoption_mod
+
+        class FakeResponse:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                return False
+
+            def read(self):
+                return b'{"downloads": 274, "likes": 0, "lastModified": "2026-09-29T17:01:35.000Z"}'
+
+        with patch.object(urllib.request, "urlopen", return_value=FakeResponse()):
+            payload = adoption_mod.fetch_huggingface()
+        self.assertEqual(
+            parse_huggingface_stats(payload),
+            {
+                "downloads": 274,
+                "likes": 0,
+                "lastModified": "2026-09-29T17:01:35.000Z",
+            },
+        )
+
+    def test_adoption_payload_contains_pypi_github_and_huggingface_keys(self):
         fixture = self._load_fixture()
         pypi_stats = parse_pypi_stats(fixture["pypi_recent"])
         github_total = sum_github_downloads(fixture["github_releases"])
-        payload = build_adoption_payload(pypi_stats, github_total)
+        huggingface_stats = parse_huggingface_stats(fixture["huggingface"])
+        payload = build_adoption_payload(pypi_stats, github_total, huggingface_stats)
         self.assertIn("generated_at_utc", payload)
         self.assertEqual(payload["pypi"], pypi_stats)
         self.assertEqual(payload["github_releases"], {"total_downloads": 567})
+        self.assertEqual(payload["huggingface"], huggingface_stats)
+
+    def test_adoption_payload_huggingface_is_null_without_signal(self):
+        payload = build_adoption_payload(
+            {"last_day": None, "last_week": None, "last_month": None}, 0
+        )
+        self.assertIsNone(payload["huggingface"])
 
     def test_adoption_offline_fixture_end_to_end_matches_shields_contract(self):
-        pypi_recent, github_releases = load_adoption_offline_fixture(self.FIXTURE_PATH)
+        pypi_recent, github_releases, huggingface_payload = load_adoption_offline_fixture(
+            self.FIXTURE_PATH
+        )
         pypi_stats = parse_pypi_stats(pypi_recent)
         github_total = sum_github_downloads(github_releases)
         badge = build_adoption_badge(pypi_stats["last_month"])
@@ -4261,11 +4399,32 @@ class AdoptionStatsTests(unittest.TestCase):
             },
         )
         self.assertEqual(github_total, 567)
+        self.assertEqual(parse_huggingface_stats(huggingface_payload)["downloads"], 274)
+
+    def test_adoption_offline_file_writes_payload_with_huggingface_key(self):
+        """`--offline <fixture>` escribe un payload con la clave `huggingface`."""
+        import scripts.fetch_adoption_stats as adoption_mod
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            adoption_path = Path(tmpdir) / "adoption.json"
+            badge_path = Path(tmpdir) / "adoption_badge.json"
+            with (
+                patch.object(adoption_mod, "ADOPTION_PATH", adoption_path),
+                patch.object(adoption_mod, "BADGE_PATH", badge_path),
+            ):
+                self.assertEqual(
+                    adoption_mod.main(["--offline", str(self.FIXTURE_PATH)]),
+                    0,
+                )
+            payload = json.loads(adoption_path.read_text(encoding="utf-8"))
+            self.assertEqual(payload["huggingface"]["downloads"], 274)
+            self.assertEqual(payload["pypi"]["last_month"], 1234)
 
     def test_adoption_main_fails_closed_without_writing_when_both_sources_fail(self):
-        """Si ambas fuentes fallan no se escribe nada (exit 1): commitear
+        """Si PyPI y GitHub fallan no se escribe nada (exit 1): commitear
         nulls sobre datos reales pierde la señal en silencio — el modo en que
-        el job semanal produjo nulls semana tras semana."""
+        el job semanal produjo nulls semana tras semana. La regla se mantiene
+        anclada a las dos fuentes originales: HF degrada sola (Plan 129)."""
         import scripts.fetch_adoption_stats as adoption_mod
 
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -4276,14 +4435,31 @@ class AdoptionStatsTests(unittest.TestCase):
                 patch.object(adoption_mod, "BADGE_PATH", badge_path),
                 patch.object(adoption_mod, "fetch_pypi_recent", return_value=None),
                 patch.object(adoption_mod, "fetch_github_releases", return_value=None),
+                patch.object(adoption_mod, "fetch_huggingface", return_value=None),
             ):
                 self.assertEqual(adoption_mod.main([]), 1)
             self.assertFalse(adoption_path.exists())
             self.assertFalse(badge_path.exists())
 
+    def test_adoption_main_fails_closed_even_when_huggingface_is_alive(self):
+        """HF viva no rescata el exit 1: el gate sigue anclado a PyPI+GitHub."""
+        import scripts.fetch_adoption_stats as adoption_mod
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with (
+                patch.object(adoption_mod, "ADOPTION_PATH", Path(tmpdir) / "adoption.json"),
+                patch.object(adoption_mod, "BADGE_PATH", Path(tmpdir) / "adoption_badge.json"),
+                patch.object(adoption_mod, "fetch_pypi_recent", return_value=None),
+                patch.object(adoption_mod, "fetch_github_releases", return_value=None),
+                patch.object(
+                    adoption_mod, "fetch_huggingface", return_value={"downloads": 274, "likes": 0}
+                ),
+            ):
+                self.assertEqual(adoption_mod.main([]), 1)
+
     def test_adoption_main_writes_partial_signal_when_one_source_fails(self):
         """Con una fuente viva se escribe igual (exit 0): la degradación
-        parcial sigue siendo informativa."""
+        parcial sigue siendo informativa. HF ausente se registra como null."""
         import scripts.fetch_adoption_stats as adoption_mod
 
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -4293,6 +4469,7 @@ class AdoptionStatsTests(unittest.TestCase):
                 patch.object(adoption_mod, "ADOPTION_PATH", adoption_path),
                 patch.object(adoption_mod, "BADGE_PATH", badge_path),
                 patch.object(adoption_mod, "fetch_pypi_recent", return_value=None),
+                patch.object(adoption_mod, "fetch_huggingface", return_value=None),
                 patch.object(
                     adoption_mod,
                     "fetch_github_releases",
@@ -4303,6 +4480,7 @@ class AdoptionStatsTests(unittest.TestCase):
             payload = json.loads(adoption_path.read_text(encoding="utf-8"))
             self.assertIsNone(payload["pypi"]["last_month"])
             self.assertEqual(payload["github_releases"], {"total_downloads": 7})
+            self.assertIsNone(payload["huggingface"])
 
     def test_adoption_http_sends_identifiable_user_agent(self):
         """Varios WAFs bloquean el default 'Python-urllib/3.x' (causa raíz de
@@ -5055,6 +5233,21 @@ class HfDatasetCardTests(unittest.TestCase):
                 sorted(cfg["config_name"] for cfg in configs), ["censo_comunal", "comunas"]
             )
 
+    def test_main_aborts_when_publishable_selection_is_empty(self):
+        """Plan 113: con 0 capas publicables no se debe borrar el espejo HF.
+
+        Regresión a evitar: un rename de `publication_track` deja la selección
+        vacía y `upload_folder(delete_patterns=["data/*.parquet"])` borraría
+        todos los Parquet remotos sin subir ninguno."""
+        from scripts import publish_hf_dataset
+
+        with (
+            patch.object(publish_hf_dataset, "select_publishable_files", return_value=([], [])),
+            patch.object(sys, "argv", ["publish_hf_dataset.py", "--repo-id", "x/y"]),
+            self.assertRaisesRegex(SystemExit, "quedó vacía"),
+        ):
+            publish_hf_dataset.main()
+
 
 class DatasetSeoTests(unittest.TestCase):
     """Plan 102: páginas de dataset elegibles para Google Dataset Search.
@@ -5079,6 +5272,43 @@ class DatasetSeoTests(unittest.TestCase):
             entry["distribution"]["contentUrl"].endswith("data/normalized/comunas.parquet")
         )
 
+    def test_default_site_url_reads_pyproject(self):
+        """Plan 115: el default del inyector sale de `[tool.chile_hub] public_site_url`."""
+        import tomllib
+
+        from scripts.inject_dataset_json_ld import default_site_url
+
+        with open(ROOT_DIR / "pyproject.toml", "rb") as f:
+            pyproject_data = tomllib.load(f)
+        expected = pyproject_data["tool"]["chile_hub"]["public_site_url"]
+        self.assertEqual(default_site_url(), expected)
+
+    def test_main_honors_explicit_site_url(self):
+        """Plan 115: `--site-url` debe mandar sobre el default de pyproject."""
+        from scripts.inject_dataset_json_ld import main
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            page_dir = Path(tmpdir) / "datasets" / "comunas"
+            page_dir.mkdir(parents=True)
+            (page_dir / "index.html").write_text(
+                "<html><head><title>Comunas</title></head><body></body></html>",
+                encoding="utf-8",
+            )
+            rc = main(
+                [
+                    "--site-dir",
+                    tmpdir,
+                    "--site-url",
+                    "https://example.test/x",
+                    "--catalog",
+                    str(ROOT_DIR / "data" / "dataset_catalog_config.json"),
+                ]
+            )
+            self.assertEqual(rc, 0)
+            injected = (page_dir / "index.html").read_text(encoding="utf-8")
+            self.assertIn("https://example.test/x/reference/datasets/comunas/", injected)
+            self.assertNotIn("tooltician.com", injected)
+
     def test_inject_page_is_idempotent_and_parseable(self):
         from scripts.inject_dataset_json_ld import inject_page
 
@@ -5093,6 +5323,21 @@ class DatasetSeoTests(unittest.TestCase):
         )
         self.assertIsNotNone(match)
         self.assertEqual(json.loads(match.group(1))["name"], "Comunas")
+
+    def test_inject_page_escapes_script_sequence_in_json_ld(self):
+        """Plan 113: el inyector de mkdocs usa el mismo escape que la landing."""
+        from scripts.inject_dataset_json_ld import inject_page
+
+        name = "x </script><script>alert(1)</script> & <b>"
+        html = "<html><head><title>x</title></head><body></body></html>"
+        injected = inject_page(html, {"@type": "Dataset", "name": name})
+        self.assertNotIn("</script><script>", injected)
+        self.assertIn("\\u003c/script\\u003e", injected)
+        match = re.search(
+            r'id="chile-hub-dataset-json-ld">\n(.*?)\n</script>', injected, flags=re.DOTALL
+        )
+        self.assertIsNotNone(match)
+        self.assertEqual(json.loads(match.group(1))["name"], name)
 
     def test_main_fails_loud_without_dataset_pages(self):
         from scripts.inject_dataset_json_ld import main
@@ -5125,6 +5370,30 @@ class DatasetSeoTests(unittest.TestCase):
             self.assertIn("reference/datasets/comunas/", injected)
 
 
+class PlaygroundSqlRewriteTests(unittest.TestCase):
+    """Plan 115: el explorador SQL debe reescribir todas las rutas Parquet.
+
+    Regresión a evitar: `replace` reemplazaba solo la primera aparición (un
+    self-join contra el mismo Parquet fallaba) y la regex solo aceptaba
+    comillas simples (`read_parquet("...")` nunca se registraba). El smoke de
+    Playwright no ejecuta SQL a propósito (evita instanciar el WASM en CI), así
+    que este guardrail textual fija el contrato mínimo del archivo; la
+    ejecución real se verificó en navegador (self-join con comillas dobles).
+    """
+
+    PLAYGROUND_JS = ROOT_DIR / "playground.js"
+
+    def test_rewrites_every_parquet_path_with_both_quote_styles(self):
+        source = self.PLAYGROUND_JS.read_text(encoding="utf-8")
+        self.assertIn(
+            r"""/read_parquet\s*\(\s*['"]([^'"]+)['"]\s*\)/g""",
+            source,
+            "la regex debe aceptar comillas simples y dobles",
+        )
+        self.assertIn("modifiedSql = modifiedSql.replaceAll(path, basename);", source)
+        self.assertNotIn("modifiedSql = modifiedSql.replace(path, basename);", source)
+
+
 class McpToolsTests(unittest.TestCase):
     """Plan 104: tools MCP puras, sin red ni el paquete `mcp`.
 
@@ -5133,9 +5402,41 @@ class McpToolsTests(unittest.TestCase):
     cuando el extra `mcp` no está instalado.
     """
 
+    def setUp(self):
+        from chile_hub.mcp_tools import _read_parquet_cached
+
+        _read_parquet_cached.cache_clear()
+
     def _write_parquet(self, tmpdir: str, name: str, df) -> str:
         df.write_parquet(Path(tmpdir) / f"{name}.parquet")
         return tmpdir
+
+    def _serve_parquet_http(self, payload: bytes):
+        """Servidor HTTP local que cuenta descargas (Plan 119).
+
+        HTTP/1.0 sin `Content-Length`, igual que el hosting estático real.
+        Retorna `(server, downloads)`; el test debe hacer `shutdown()` y
+        `server_close()` en un `finally`.
+        """
+        import threading
+        from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+        downloads: list[str] = []
+
+        class _CountingHandler(BaseHTTPRequestHandler):
+            def do_GET(self):  # noqa: N802
+                downloads.append(self.path)
+                self.send_response(200)
+                self.send_header("Content-Type", "application/octet-stream")
+                self.end_headers()
+                self.wfile.write(payload)
+
+            def log_message(self, *args):  # pragma: no cover - silencio
+                pass
+
+        server = ThreadingHTTPServer(("127.0.0.1", 0), _CountingHandler)
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+        return server, downloads
 
     def test_list_datasets_covers_enum(self):
         from chile_hub.datasets import Dataset
@@ -5267,6 +5568,75 @@ class McpToolsTests(unittest.TestCase):
                 server.shutdown()
                 server.server_close()
 
+    def test_read_dataset_uses_cache(self):
+        """Dos tool calls al mismo Parquet HTTP descargan una sola vez (Plan 119)."""
+        from chile_hub.mcp_tools import get_dataset
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "comunas.parquet"
+            pl.DataFrame(
+                {"codigo_comuna": ["01101", "13101"], "nombre_comuna": ["Iquique", "Santiago"]}
+            ).write_parquet(path)
+            server, downloads = self._serve_parquet_http(path.read_bytes())
+            try:
+                base = f"http://127.0.0.1:{server.server_port}"
+                first = get_dataset("comunas", limite=1, base_url=base)
+                second = get_dataset("comunas", limite=1, base_url=base)
+            finally:
+                server.shutdown()
+                server.server_close()
+
+            self.assertEqual(first["filas_totales"], 2)
+            self.assertEqual(second["registros"][0]["codigo_comuna"], "01101")
+            self.assertEqual(len(downloads), 1, "el mismo Parquet no debe descargarse dos veces")
+
+    def test_cache_key_includes_base_url(self):
+        """Dos `base_url` distintos no comparten entrada de caché (Plan 119)."""
+        from chile_hub.mcp_tools import get_dataset
+
+        with (
+            tempfile.TemporaryDirectory() as tmpdir_a,
+            tempfile.TemporaryDirectory() as tmpdir_b,
+        ):
+            pl.DataFrame({"codigo_comuna": ["01101"], "nombre_comuna": ["Iquique"]}).write_parquet(
+                Path(tmpdir_a) / "comunas.parquet"
+            )
+            pl.DataFrame({"codigo_comuna": ["13120"], "nombre_comuna": ["Ñuñoa"]}).write_parquet(
+                Path(tmpdir_b) / "comunas.parquet"
+            )
+
+            first = get_dataset("comunas", limite=1, base_url=tmpdir_a)
+            second = get_dataset("comunas", limite=1, base_url=tmpdir_b)
+
+            self.assertEqual(first["registros"][0]["codigo_comuna"], "01101")
+            self.assertEqual(
+                second["registros"][0]["codigo_comuna"],
+                "13120",
+                "cada base_url debe tener su propia entrada de caché",
+            )
+
+    def test_cache_clear_resets(self):
+        """`cache_clear()` fuerza una nueva descarga del Parquet (Plan 119)."""
+        from chile_hub.mcp_tools import _read_parquet_cached, get_dataset
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "comunas.parquet"
+            pl.DataFrame({"codigo_comuna": ["01101"], "nombre_comuna": ["Iquique"]}).write_parquet(
+                path
+            )
+            server, downloads = self._serve_parquet_http(path.read_bytes())
+            try:
+                base = f"http://127.0.0.1:{server.server_port}"
+                get_dataset("comunas", limite=1, base_url=base)
+                self.assertEqual(len(downloads), 1)
+
+                _read_parquet_cached.cache_clear()
+                get_dataset("comunas", limite=1, base_url=base)
+                self.assertEqual(len(downloads), 2, "tras cache_clear se vuelve a descargar")
+            finally:
+                server.shutdown()
+                server.server_close()
+
     def test_server_module_import_is_lazy(self):
         """Sin el extra `mcp`, importar el módulo no debe romper; `build_server`
         debe dar un error explícito con la instrucción de instalación."""
@@ -5308,8 +5678,9 @@ class ComunaPagesTests(unittest.TestCase):
     def test_render_comuna_page_escapes_text_and_has_json_ld(self):
         from scripts.build_comuna_pages import render_comuna_page
 
+        row = {**self.PERFIL_ROW, "anio_finanzas": 2024}
         page = render_comuna_page(
-            self.PERFIL_ROW,
+            row,
             {"ingresos": 5.4, "multidimensional": 8.1},
             "nunoa",
             "https://tooltician.com/chile-hub",
@@ -5319,12 +5690,39 @@ class ComunaPagesTests(unittest.TestCase):
         self.assertNotIn("<norte>", page)
         self.assertIn("13120", page, "el CUT debe aparecer como texto")
         self.assertIn("5.4%", page)
+        self.assertIn(
+            "<tr><td>Año de finanzas</td><td>2024</td></tr>",
+            page,
+            "anio_finanzas debe formatearse como año, no con separador de miles",
+        )
+        self.assertNotIn("2.024", page)
         self.assertEqual(page.count("application/ld+json"), 2, "Dataset + BreadcrumbList")
         blocks = re.findall(
             r'<script type="application/ld\+json">\n(.*?)\n</script>', page, flags=re.DOTALL
         )
         for block in blocks:
             json.loads(block)
+
+    def test_render_comuna_page_download_links_use_site_url(self):
+        """Plan 115: los botones de descarga deben derivar del `site_url` recibido.
+
+        Regresión a evitar: `PARQUET_BASE` hardcodeado ignoraba `--site-url`, así
+        que un cambio de dominio dejaba cientos de fichas apuntando al host viejo.
+        """
+        from scripts.build_comuna_pages import render_comuna_page
+
+        page = render_comuna_page(
+            self.PERFIL_ROW, {}, "nunoa", "https://example.test/chile-hub", "2026-09-25"
+        )
+        self.assertIn(
+            'href="https://example.test/chile-hub/data/normalized/perfil_territorial_comunal.parquet"',
+            page,
+        )
+        self.assertIn(
+            'href="https://example.test/chile-hub/data/normalized/perfil_territorial_comunal.json"',
+            page,
+        )
+        self.assertNotIn("tooltician.com", page)
 
     def test_render_comuna_page_has_shell_chart_and_related(self):
         from scripts.build_comuna_pages import render_comuna_page
@@ -5353,6 +5751,83 @@ class ComunaPagesTests(unittest.TestCase):
         self.assertIn("Comunas de la misma provincia", page)
         self.assertIn('href="https://tooltician.com/chile-hub/comunas/valparaiso/"', page)
         self.assertIn("Licencias", page)
+
+    def _dataset_json_ld(self, page: str) -> dict:
+        blocks = re.findall(
+            r'<script type="application/ld\+json">\n(.*?)\n</script>', page, flags=re.DOTALL
+        )
+        datasets = [json.loads(block) for block in blocks]
+        return next(block for block in datasets if block["@type"] == "Dataset")
+
+    def test_render_comuna_page_links_official_sources(self):
+        """ADR-023: la ficha enlaza a la fuente oficial y declara `isBasedOn`."""
+        from scripts.build_comuna_pages import render_comuna_page
+
+        sources = [
+            ("INE", "https://www.ine.gob.cl/"),
+            ("MINSAL vía datos.gob.cl", "https://datos.gob.cl/"),
+        ]
+        page = render_comuna_page(
+            self.PERFIL_ROW,
+            {"ingresos": 5.4},
+            "nunoa",
+            "https://tooltician.com/chile-hub",
+            "2026-09-25",
+            sources=sources,
+        )
+        self.assertIn('<a href="https://www.ine.gob.cl/">INE</a>', page)
+        self.assertIn('<a href="https://datos.gob.cl/">MINSAL vía datos.gob.cl</a>', page)
+        self.assertIn("proyecto independiente", page)
+        self.assertNotIn("Indicadores oficiales", page)
+        self.assertEqual(page.count("application/ld+json"), 2, "Dataset + BreadcrumbList")
+        self.assertEqual(
+            self._dataset_json_ld(page)["isBasedOn"],
+            ["https://www.ine.gob.cl/", "https://datos.gob.cl/"],
+        )
+
+    def test_render_comuna_page_without_sources_uses_plain_text(self):
+        from scripts.build_comuna_pages import SOURCES_PLAIN_TEXT, render_comuna_page
+
+        page = render_comuna_page(
+            self.PERFIL_ROW,
+            {},
+            "nunoa",
+            "https://tooltician.com/chile-hub",
+            "2026-09-25",
+        )
+        self.assertIn(SOURCES_PLAIN_TEXT, page)
+        self.assertNotIn("isBasedOn", self._dataset_json_ld(page))
+
+    def test_load_sources_from_registry_are_official_landing_pages(self):
+        """Las fuentes enlazadas deben ser páginas oficiales, no descargas ni el repo.
+
+        Regresión a evitar: leer todo el registro a ciegas enlazaría el propio
+        GitHub (capa derivada) o archivos `.rar`/`.xlsm` como "fuente oficial".
+        """
+        from scripts.build_comuna_pages import SOURCE_AGENCIES, load_sources
+
+        sources = load_sources()
+        self.assertEqual([label for label, _ in sources], [label for label, _ in SOURCE_AGENCIES])
+        for label, url in sources:
+            self.assertTrue(url.startswith("https://"), f"{label}: {url}")
+            self.assertNotIn("github.com/cortega26", url, label)
+            self.assertFalse(
+                url.lower().endswith((".rar", ".zip", ".xls", ".xlsx", ".xlsm", ".csv")),
+                f"{label} apunta a una descarga directa: {url}",
+            )
+
+    def test_load_sources_fails_loud_on_missing_dataset(self):
+        from scripts.build_comuna_pages import load_sources
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            registry = Path(tmpdir) / "source_registry.json"
+            registry.write_text(
+                json.dumps([{"dataset": "censo_comunal", "official_url": "https://x.cl/"}]),
+                encoding="utf-8",
+            )
+            with self.assertRaises(SystemExit):
+                load_sources(registry)
+            self.assertEqual(load_sources(Path(tmpdir) / "no-existe.json"), [])
 
     def test_main_uses_complete_permit_year_from_metrics(self):
         import json as json_module

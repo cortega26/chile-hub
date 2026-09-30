@@ -36,10 +36,10 @@ try:
     from src.extractors.base import (
         BaseExtractor,
         ensure_staging_directories,
-        write_staging_metadata,
+        write_staging_csv_atomic,
     )
 except ModuleNotFoundError:
-    from base import BaseExtractor, ensure_staging_directories, write_staging_metadata
+    from base import BaseExtractor, ensure_staging_directories, write_staging_csv_atomic
 
 DATA_DIR = Path(__file__).resolve().parents[2] / "data"
 RAW_DIR = DATA_DIR / "raw"
@@ -472,9 +472,7 @@ class SinimFinanzasLiveExtractor(BaseExtractor):
 
     def write_staging(self, df: pl.DataFrame, metadata: dict) -> Path:
         ensure_staging_directories()
-        df.write_csv(STAGING_CSV_PATH)
-        write_staging_metadata(str(METADATA_PATH), metadata)
-        return STAGING_CSV_PATH
+        return write_staging_csv_atomic(df, STAGING_CSV_PATH, METADATA_PATH, metadata)
 
 
 if __name__ == "__main__":
