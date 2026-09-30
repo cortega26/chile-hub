@@ -163,7 +163,7 @@ Planes de implementación generados por auditoría `/improve deep` en commits `b
 | 088 | [Cobertura catálogo→validación: gate + exenciones explícitas](088-catalog-validation-coverage.md) | P1 | S | LOW | — | DONE (2026-09-15, commit 48a60be — regla catálogo−registered + 3 exenciones; branch advisor/wave-1) |
 | 089 | [bcentral: fechas a UTC y throttle real](089-bcentral-tz-throttle.md) | P1 | S | LOW | — | DONE (2026-09-15, commit fbddeaa — UTC×3 + submits espaciados; branch advisor/wave-1) |
 | 090 | [Una sola conversión `to_pandas()` + descarte pre-conversión](090-single-pandas-conversion.md) | P1 | S | LOW | — | DONE (2026-09-15, commit 62143ac — frames compartidos, skip pre-conversión, equivalencia byte-probada; branch advisor/wave-1) |
-| 091 | [Opcionales ruidosos + fallback sintético strict](091-optional-datasets-strict.md) | P1 | M | MED | — | TODO (REVERTED 2026-09-15: bc3e02f→79b41fa — choca con garantía Phase-1 "omitted optional does not block core build"; el gate publication ya cubre los 3 casos. Requiere decisión del mantenedor o cierre como cubierto) |
+| 091 | [Opcionales ruidosos + fallback sintético strict](091-optional-datasets-strict.md) | P1 | M | MED | — | REJECTED (2026-09-30 — cerrada como cubierta por el gate `publication`: los 3 casos missing/non-live/stale ya se rechazan al publicar; el rediseño del contrato Phase-1 queda descartado. Reabrir solo con una decisión explícita del mantenedor) |
 | 092 | [Paralelizar formatos + `indicadores_hoy` = última fecha](092-parallel-formats-hoy-payload.md) | P2 | M | MED | 090 | DONE (2026-09-15, commit c9d8c2a — payload última-fecha-por-código + clamp hoy UTC; paralelización descartada con números; branch advisor/wave-2) |
 | 093 | [Scans O(K·N)→`partition_by` + allowlist única + cache acotado](093-validation-scans-cache.md) | P2 | M | LOW | — | DONE (2026-09-15, commit 3a155bd — partition_by idéntico, allowlist ×15→1, LRU cap 8; anio no persistido por costo-beneficio; branch advisor/wave-2) |
 | 094 | [Toolchain única + targets locales](094-dx-single-toolchain.md) | P1 | S | LOW | — | DONE (2026-09-15, commit 972ffbb — ruff 0.16.7 + mypy 2.3.1 single-source, hook pip-audit espeja CI, make typecheck/audit/sec; + 238bc10 isort canónico 0.16.7; branch advisor/wave-3) |
@@ -211,8 +211,6 @@ Los 5 planes quedaron **DONE y archivados** el mismo día (2026-09-25) — ver
 |---|------|----------|----------|--------|-----------|--------|
 | 106 | [Snapshot de release liviano (geometría fuera de git + wasm no usado)](106-slim-release-snapshot.md) | P2 | S-M | MED | — | DONE (2026-09-25 — árbol 412→140 MB, auditoría a prerelease `geometry-audit`, ADR-021, guardrails; branch `advisor/106-slim-release-snapshot`) |
 | 107 | [Handoff de activación de lanzamiento (agente autónomo)](107-activacion-lanzamiento-handoff.md) | P2 | S | LOW | — | READY (2026-09-26 — handoff para Cowork: GSC meta tag, sitemap, schedule, adopción; fallbacks + STOP; branch `advisor/107-activacion-lanzamiento`) |
-| 108 | [Gate "Check build-synced files" bloquea el publish diario (deadlock README)](108-build-synced-stale.md) | P1 | S | MED | — | IN REVIEW (2026-09-26 — implementado en branch `fix/108-build-synced-stale`, sin push: gate README→notice, guard de caída de record_count >20% en verify publication + override `--allow-record-drop` propagado vía provenance al release, ADR-022; requiere aprobación: edita workflows) |
-| 109 | [README sin datos volátiles + alerta de schedule roto](109-readme-sin-datos-volatiles-y-alerta-schedule.md) | P2 | M | MED | 108 | PROPOSED (2026-09-26) |
 
 ## Plan 110 — sostenibilidad y patrocinios (2026-09-29)
 
@@ -229,6 +227,11 @@ Los 5 planes quedaron **DONE y archivados** el mismo día (2026-09-25) — ver
 | # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
 |---|------|----------|----------|--------|-----------|--------|
 | 110 | [Programa de patrocinios — sostenibilidad y plan de ataque](110-programa-de-patrocinios.md) | P2 | M + continuo | MED | — | PROPOSED (2026-09-29) |
+
+### Planes 108 y 109 — archivados (2026-09-30)
+
+- **108** [Gate "Check build-synced files" bloquea el publish diario](archive/108-build-synced-stale.md) — **DONE**: implementación mergeada en PR #110 (`7652568` + merge `4528872`): README→notice, guard de caída de `record_count` >20% en verify publication con override `--allow-record-drop` propagado vía provenance, ADR-022.
+- **109** [README sin datos volátiles + alerta de schedule roto](archive/109-readme-sin-datos-volatiles-y-alerta-schedule.md) — **DONE** (2026-09-30): tabla de capas y resúmenes de salud/calidad/auditoría legal estables (sin datos del día); README fuera del artifact/publish y de vuelta en el gate duro; job `notify-schedule-failure` (issue `ci-schedule`) + SLO de frescura 48 h en `make doctor`. Commits `efad585` + `cbeb572` (revisión), merge `509a123`. Parte C (expectativas por dataset) descartada: sin caso concreto.
 
 ## Dependencias 086–100 (ver `ROADMAP.md` para el grafo completo)
 

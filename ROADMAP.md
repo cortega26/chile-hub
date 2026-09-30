@@ -20,9 +20,9 @@
 - **Batch activo**: auditoría `/improve deep` 2026-09-29 (commit `1464109`) →
   **20 planes (111–130)** organizados en **4 waves**. Todos `TODO`; la wave 1
   está lista para arrancar.
-- **Planes previos aún abiertos** (no de este batch): 107 `READY`, 108
-  `IN REVIEW`, 109 `PROPOSED`, 110 `PROPOSED`, y **091** pendiente de decisión
-  del mantenedor (reverted; ver Decisiones pendientes).
+- **Planes previos aún abiertos** (no de este batch): 107 `READY` (handoff de
+  operador) y 110 `PROPOSED` (patrocinios, no toca código). **091 cerrada** como
+  cubierta por el gate `publication` (2026-09-30); **108 y 109 DONE**.
 - **Tracción de referencia**: ~2.2k instalaciones/mes PyPI (2026-09-25); espejo
   HF con 274 descargas (2026-09-29, registrado a mano hasta que aterrice el
   Plan 129); 21 capas publicables; DOI Zenodo aplicado
@@ -143,7 +143,7 @@
 | 117 | Rama A (alinear docs con ADR-015) vs Rama B (implementar `archived`) | Rama A (refleja el código) | Se ejecuta Rama A y se deja constancia |
 | 128 | Step 1 (3.15) después del 2026-10-01 | Sí | Step 1 queda BLOCKED; Step 2 corre igual |
 | 111 | Edita workflows privilegiados (release/HF) | Requiere revisión del mantenedor antes del merge | El plan queda implementado en branch |
-| 091 | Opcionales estrictos: ¿rediseñar el contrato Phase-1 o cerrar como cubierto por el gate `publication`? | Cerrar como cubierto (ya lo rechaza el gate) | Sigue en backlog sin bloquear nada |
+| 091 | Opcionales estrictos — decisión | **Cerrada (2026-09-30): cubierta por el gate `publication`** | — |
 | — | MkDocs Material → Zensical | Watch item; decidir antes de may-2027 | Ninguno hoy |
 
 ---
@@ -211,10 +211,10 @@ W4:  130 (decisión)
 | # | Plan | Estado | Nota |
 |---|------|--------|------|
 | 107 | Handoff de activación de lanzamiento | READY | Issues de leads #107/#108/#109 creados; ejecución por agente externo |
-| 108 | Gate "Check build-synced files" bloquea el publish diario | IN REVIEW | Implementado en branch `fix/108-build-synced-stale`, sin push; requiere aprobación (edita workflows) |
-| 109 | README sin datos volátiles + alerta de schedule roto | PROPOSED | Depende de 108 |
+| 108 | Gate "Check build-synced files" bloquea el publish diario | DONE | Mergeado en PR #110 (`7652568`, merge `4528872`); ADR-022 |
+| 109 | README sin datos volátiles + alerta de schedule roto | DONE | `efad585`+`cbeb572` (revisión), merge `509a123`; Parte C descartada sin caso concreto |
 | 110 | Programa de patrocinios | PROPOSED | No toca código; acciones del operador |
-| 091 | Opcionales estrictos + fallback sintético strict | REVERTED | Pendiente decisión (ver §2) |
+| 091 | Opcionales estrictos + fallback sintético strict | REJECTED | Cerrada 2026-09-30: cubierta por el gate `publication` |
 
 Detalle execrable de estos en `plans/README.md` y sus `.md`.
 
@@ -271,8 +271,11 @@ Del posicionamiento 2026-09-29 (ADR-023); requieren la cuenta del mantenedor:
   Wave 6 077–079. Bandit 0 issues; suite ~1037 tests verdes.
 - **Auditorías 2026-06 a 2026-08 (024–085)** — DONE/archivadas en su totalidad;
   ver secciones "Planes archivados" en `plans/README.md`.
-- **CI**: el deadlock del gate "Check build-synced files" quedó resuelto
-  (ADR-022) y su plan 108 está en revisión (§5).
+- **CI**: el deadlock del gate "Check build-synced files" quedó resuelto (ADR-022,
+  plan 108 DONE) y el plan 109 (README estable + alerta de schedule roto) quedó
+  DONE el 2026-09-30.
+- **Migración de arquitectura — Phase 4** (`ExtractionResult` tipado): rama
+  `feat/phase4-extraction-result` mergeada el 2026-09-30 (`a5669b6`).
 
 ---
 
