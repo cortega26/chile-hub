@@ -77,14 +77,12 @@ jobs:
         run: uv run bandit -c pyproject.toml -r src/
 
       - name: Dependency audit (pip-audit)
-        # PYSEC-2026-2132 (click.edit() command injection, click==8.1.8) se
-        # ignora de forma acotada: el pin lo impone python-semantic-release
-        # 10.6.2 (último disponible) y nada en el repo llama click.edit()
-        # (el CLI no usa click; PSR tampoco).
-        # EXPIRY (Plan 096): re-evaluar en cada bump de python-semantic-release
-        # (grupo python-dev de dependabot, semanal) y como tope el 2026-12-31:
-        # si el pin ya permite click>=8.3, quitar este flag en el mismo PR.
-        run: uv run pip-audit --ignore-vuln PYSEC-2026-2132
+        # Sin ignores: PYSEC-2026-2132 (click.edit() command injection en
+        # click==8.1.8) quedó resuelto al subir python-semantic-release a
+        # 10.7.0, que admite click>=8.1,<8.6 (el lock resuelve click 8.4.2).
+        # El ignore temporal de Plan 096 se retira en el mismo bump, como
+        # indicaba su EXPIRY.
+        run: uv run pip-audit
 
       - name: Docstring coverage (informational)
         run: uv run interrogate --fail-under=80 src/chile_hub || true
@@ -94,10 +92,10 @@ jobs:
 
       - name: Check Python lint
         # Pin single-source con pyproject dev + pre-commit (Plan 094).
-        run: uvx ruff@0.16.8 check src/ tests/ scripts/
+        run: uvx ruff@0.16.9 check src/ tests/ scripts/
 
       - name: Check Python format
-        run: uvx ruff@0.16.8 format --check src/ tests/ scripts/
+        run: uvx ruff@0.16.9 format --check src/ tests/ scripts/
 
       - name: Check dataset registry/docs/contracts sync
         run: python scripts/check_companion_paths.py registry
@@ -280,10 +278,11 @@ jobs:
             python src/extractors/estadisticas_vitales_extractor.py
             python src/extractors/permisos_edificacion_extractor.py
             python src/extractors/calidad_aire_extractor.py
-            # autoridades_electas necesita scrapling (anti-403 en camara.cl/senado.cl),
-            # que no puede coexistir con el extra dev en el venv del job (conflicto
-            # de click via python-semantic-release — ver pyproject.toml). Se ejecuta
-            # en un entorno efímero de uv en vez del venv del proyecto. Sin esto, un
+            # autoridades_electas necesita scrapling (anti-403 en camara.cl/senado.cl).
+            # Se ejecuta en un entorno efímero de uv en vez del venv del proyecto
+            # (aislamiento del extra `scraping`; el conflicto de click que lo motivó
+            # quedó resuelto con python-semantic-release 10.7.0 — ver pyproject.toml).
+            # Sin esto, un
             # cache-miss produce 155 registros (0 senadores) y el paso
             # "Check build-synced files" aborta el publish diario (2026-07-19/20).
             PYTHONPATH=src uv run --no-project --with "scrapling[fetchers]==0.4.10" --with polars==1.44.2 --with requests==2.34.2 --with structlog==26.1.0 --with tenacity==9.1.4 --with curl_cffi==0.16.3 --with defusedxml==0.7.1 python src/extractors/autoridades_electas_extractor.py
