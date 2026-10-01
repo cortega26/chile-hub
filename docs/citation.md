@@ -9,6 +9,9 @@ atribuye además la fuente de cada capa que hayas usado.
 
 ## Citar el software
 
+**Autor:** Carlos Ortega — ORCID
+[0009-0000-3470-6181](https://orcid.org/0009-0000-3470-6181)
+
 **BibTeX** (reemplaza la versión por la que usaste, visible en `pyproject.toml`):
 
 ```bibtex

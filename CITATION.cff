@@ -12,6 +12,7 @@ type: software
 authors:
   - family-names: Ortega
     given-names: Carlos
+    orcid: "https://orcid.org/0009-0000-3470-6181"
 repository-code: "https://github.com/cortega26/chile-hub"
 url: "https://tooltician.com/chile-hub/"
 license: MIT
