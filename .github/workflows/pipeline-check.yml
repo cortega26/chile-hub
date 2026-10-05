@@ -92,10 +92,10 @@ jobs:
 
       - name: Check Python lint
         # Pin single-source con pyproject dev + pre-commit (Plan 094).
-        run: uvx ruff@0.16.9 check src/ tests/ scripts/
+        run: uvx ruff@0.16.10 check src/ tests/ scripts/
 
       - name: Check Python format
-        run: uvx ruff@0.16.9 format --check src/ tests/ scripts/
+        run: uvx ruff@0.16.10 format --check src/ tests/ scripts/
 
       - name: Check dataset registry/docs/contracts sync
         run: python scripts/check_companion_paths.py registry
