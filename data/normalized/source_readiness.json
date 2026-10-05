@@ -33,7 +33,7 @@
       "review_status": "upcoming",
       "owner": "core",
       "next_action": "Maintain DPA cardinality and CUT format checks.",
-      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 87 días. Maintain DPA cardinality and CUT format checks."
+      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 86 días. Maintain DPA cardinality and CUT format checks."
     },
     {
       "dataset": "provincias",
@@ -57,7 +57,7 @@
       "review_status": "upcoming",
       "owner": "core",
       "next_action": "Maintain DPA cardinality and CUT format checks.",
-      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 87 días. Maintain DPA cardinality and CUT format checks."
+      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 86 días. Maintain DPA cardinality and CUT format checks."
     },
     {
       "dataset": "comunas",
@@ -81,7 +81,7 @@
       "review_status": "upcoming",
       "owner": "core",
       "next_action": "Maintain 346-comuna invariant and enrichment references.",
-      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 87 días. Maintain 346-comuna invariant and enrichment references."
+      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 86 días. Maintain 346-comuna invariant and enrichment references."
     },
     {
       "dataset": "comunas_enriquecidas",
@@ -105,7 +105,7 @@
       "review_status": "upcoming",
       "owner": "core",
       "next_action": "Keep derived schema aligned with comunas.",
-      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 87 días. Keep derived schema aligned with comunas."
+      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 86 días. Keep derived schema aligned with comunas."
     },
     {
       "dataset": "indicadores",
@@ -129,7 +129,7 @@
       "review_status": "upcoming",
       "owner": "core",
       "next_action": "Monitor empty monthly IPC responses and published backfill behavior.",
-      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 87 días. Monitor empty monthly IPC responses and published backfill behavior."
+      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 86 días. Monitor empty monthly IPC responses and published backfill behavior."
     },
     {
       "dataset": "censo_comunal",
@@ -153,7 +153,7 @@
       "review_status": "upcoming",
       "owner": "core",
       "next_action": "Keep decennial source and schema documentation current.",
-      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 87 días. Keep decennial source and schema documentation current."
+      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 86 días. Keep decennial source and schema documentation current."
     },
     {
       "dataset": "censo_hogares_viviendas",
@@ -177,7 +177,7 @@
       "review_status": "upcoming",
       "owner": "core",
       "next_action": "Keep decennial source and schema documentation current.",
-      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 87 días. Keep decennial source and schema documentation current."
+      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 86 días. Keep decennial source and schema documentation current."
     },
     {
       "dataset": "establecimientos_salud",
@@ -201,7 +201,7 @@
       "review_status": "upcoming",
       "owner": "core",
       "next_action": "Monitor monthly source freshness and geocoding coverage.",
-      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 87 días. Monitor monthly source freshness and geocoding coverage."
+      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 86 días. Monitor monthly source freshness and geocoding coverage."
     },
     {
       "dataset": "distritos_electorales",
@@ -225,7 +225,7 @@
       "review_status": "upcoming",
       "owner": "core",
       "next_action": "Update only when electoral district law changes.",
-      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 87 días. Update only when electoral district law changes."
+      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 86 días. Update only when electoral district law changes."
     },
     {
       "dataset": "establecimientos_educacionales",
@@ -249,7 +249,7 @@
       "review_status": "upcoming",
       "owner": "core",
       "next_action": "Monitor annual source package and RAR extraction dependency.",
-      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 87 días. Monitor annual source package and RAR extraction dependency."
+      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 86 días. Monitor annual source package and RAR extraction dependency."
     },
     {
       "dataset": "finanzas_municipales",
@@ -273,7 +273,7 @@
       "review_status": "upcoming",
       "owner": "core",
       "next_action": "Fase 3.2 PoC exitoso: extractor live implementado (sinim_finanzas_live_extractor.py). Cobertura 345/346 municipios (2024). Pendiente: workflow mensual (3.3) y metadata de cadencia (3.4).",
-      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 87 días. Fase 3.2 PoC exitoso: extractor live implementado (sinim_finanzas_live_extractor.py). Cobertura 345/346 municipios (2024). Pendiente: workflow mensual (3.3) y metadata de cadencia (3.4)."
+      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 86 días. Fase 3.2 PoC exitoso: extractor live implementado (sinim_finanzas_live_extractor.py). Cobertura 345/346 municipios (2024). Pendiente: workflow mensual (3.3) y metadata de cadencia (3.4)."
     },
     {
       "dataset": "resultados_educacionales",
@@ -297,7 +297,7 @@
       "review_status": "upcoming",
       "owner": "core",
       "next_action": "Actualizar URL anualmente (año en nombre de archivo). Verificar columnas SIT_FIN_R si MINEDUC cambia metodología.",
-      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 87 días. Actualizar URL anualmente (año en nombre de archivo). Verificar columnas SIT_FIN_R si MINEDUC cambia metodología."
+      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 86 días. Actualizar URL anualmente (año en nombre de archivo). Verificar columnas SIT_FIN_R si MINEDUC cambia metodología."
     },
     {
       "dataset": "indicadores_urbanos_siedu",
@@ -321,7 +321,7 @@
       "review_status": "upcoming",
       "owner": "core",
       "next_action": "Monitorear si INE publica una 6ta medición (post-2022) y actualizar URL y SHEET_YEARS.",
-      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 87 días. Monitorear si INE publica una 6ta medición (post-2022) y actualizar URL y SHEET_YEARS."
+      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 86 días. Monitorear si INE publica una 6ta medición (post-2022) y actualizar URL y SHEET_YEARS."
     },
     {
       "dataset": "perfil_territorial_comunal",
@@ -345,7 +345,7 @@
       "review_status": "upcoming",
       "owner": "core",
       "next_action": "Track readiness inherited from upstream component datasets (12 upstreams desde 2026-09: +estadisticas_vitales, +permisos_edificacion, +calidad_aire).",
-      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 87 días. Track readiness inherited from upstream component datasets (12 upstreams desde 2026-09: +estadisticas_vitales, +permisos_edificacion, +calidad_aire)."
+      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 86 días. Track readiness inherited from upstream component datasets (12 upstreams desde 2026-09: +estadisticas_vitales, +permisos_edificacion, +calidad_aire)."
     },
     {
       "dataset": "empresas",
@@ -369,7 +369,7 @@
       "review_status": "upcoming",
       "owner": "core",
       "next_action": "Keep large-output behavior documented and verify Parquet-first consumption.",
-      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 87 días. Keep large-output behavior documented and verify Parquet-first consumption."
+      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 86 días. Keep large-output behavior documented and verify Parquet-first consumption."
     },
     {
       "dataset": "pobreza_comunal",
@@ -441,7 +441,7 @@
       "review_status": "upcoming",
       "owner": "core",
       "next_action": "Cobertura 345/346 (falta codigo_comuna=12202/Antártica, hueco conocido de la fuente BCN — ver ADR-012). Evaluar promoción a stable_publishable una vez confirmada cadencia de refresco y estabilidad del endpoint ArcGIS (region 12/Magallanes requiere fallback comuna-por-comuna por payload combinado grande).",
-      "recommended_action": "⏳ REVIEW BY 2026-10-21 — 16 días. Cobertura 345/346 (falta codigo_comuna=12202/Antártica, hueco conocido de la fuente BCN — ver ADR-012). Evaluar promoción a stable_publishable una vez confirmada cadencia de refresco y estabilidad del endpoint ArcGIS (region 12/Magallanes requiere fallback comuna-por-comuna por payload combinado grande)."
+      "recommended_action": "⏳ REVIEW BY 2026-10-21 — 15 días. Cobertura 345/346 (falta codigo_comuna=12202/Antártica, hueco conocido de la fuente BCN — ver ADR-012). Evaluar promoción a stable_publishable una vez confirmada cadencia de refresco y estabilidad del endpoint ArcGIS (region 12/Magallanes requiere fallback comuna-por-comuna por payload combinado grande)."
     },
     {
       "dataset": "delincuencia_comunal",
@@ -484,12 +484,12 @@
       "fallback_policy": "fallback_to_last_snapshot",
       "source_contract_url": "github:chile-hub/chile-hub/contracts/datasets/partidos_politicos.schema.json",
       "stalled_after_days": 90,
-      "review_by": "2026-10-05",
+      "review_by": "2026-12-31",
       "stalled": false,
       "review_status": "upcoming",
       "owner": "core",
-      "next_action": "estado_legal/fecha_constitucion completados desde SERVEL (15/36 partidos matcheados por nombre; el resto son históricos no listados en SERVEL). ambito (nacional/regional) queda nullable: no se encontró esa señal en ninguna fuente institucional disponible.",
-      "recommended_action": "⏳ REVIEW BY 2026-10-05 — 0 días. estado_legal/fecha_constitucion completados desde SERVEL (15/36 partidos matcheados por nombre; el resto son históricos no listados en SERVEL). ambito (nacional/regional) queda nullable: no se encontró esa señal en ninguna fuente institucional disponible."
+      "next_action": "Review 2026-10-05: extractor live y validación OK; último build publicó 37 registros, 16/37 con estado_legal vía SERVEL. La variación del roster es esperable porque Cámara incluye partidos vigentes e históricos. Mantener stable_publishable; ambito sigue nullable por falta de señal institucional. Próxima revisión 2026-12-31.",
+      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 86 días. Review 2026-10-05: extractor live y validación OK; último build publicó 37 registros, 16/37 con estado_legal vía SERVEL. La variación del roster es esperable porque Cámara incluye partidos vigentes e históricos. Mantener stable_publishable; ambito sigue nullable por falta de señal institucional. Próxima revisión 2026-12-31."
     },
     {
       "dataset": "autoridades_electas",
@@ -508,12 +508,12 @@
       "fallback_policy": "fallback_to_last_snapshot",
       "source_contract_url": "github:chile-hub/chile-hub/contracts/datasets/autoridades_electas.schema.json",
       "stalled_after_days": 90,
-      "review_by": "2026-10-05",
+      "review_by": "2026-12-31",
       "stalled": false,
       "review_status": "upcoming",
       "owner": "core",
-      "next_action": "codigo_region/periodo de senadores completados desde senado.cl (REGION/PERIODOS). gobernador_regional y alcalde viven en el dataset segregado autoridades_locales (CC-BY-SA, candidate) por decisión de licencia.",
-      "recommended_action": "⏳ REVIEW BY 2026-10-05 — 0 días. codigo_region/periodo de senadores completados desde senado.cl (REGION/PERIODOS). gobernador_regional y alcalde viven en el dataset segregado autoridades_locales (CC-BY-SA, candidate) por decisión de licencia."
+      "next_action": "Review 2026-10-05: extractor live y validación OK con 205/205 registros (155 diputados + 50 senadores); región y período de senadores continúan poblados desde senado.cl. Mantener stable_publishable. Próxima revisión 2026-12-31.",
+      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 86 días. Review 2026-10-05: extractor live y validación OK con 205/205 registros (155 diputados + 50 senadores); región y período de senadores continúan poblados desde senado.cl. Mantener stable_publishable. Próxima revisión 2026-12-31."
     },
     {
       "dataset": "autoridades_locales",
@@ -532,12 +532,12 @@
       "fallback_policy": "fallback_to_last_snapshot",
       "source_contract_url": "github:chile-hub/chile-hub/contracts/datasets/autoridades_locales.schema.json",
       "stalled_after_days": 90,
-      "review_by": "2026-10-05",
+      "review_by": "2026-12-31",
       "stalled": false,
       "review_status": "upcoming",
       "owner": "core",
-      "next_action": "Ampliar cobertura de alcaldes (~165/345 identificados; ~121 sin página en Wikipedia, ~59 sin marca de vigencia clara); buscar fuente redistribuible no-share-alike para promover a stable_publishable.",
-      "recommended_action": "⏳ REVIEW BY 2026-10-05 — 0 días. Ampliar cobertura de alcaldes (~165/345 identificados; ~121 sin página en Wikipedia, ~59 sin marca de vigencia clara); buscar fuente redistribuible no-share-alike para promover a stable_publishable."
+      "next_action": "Review 2026-10-05: la brecha de alcaldes quedó resuelta al migrar la fuente primaria a BCN SIIT (346/346 comunas). El único bloqueo para promover a stable_publishable es la licencia CC-BY-SA de los gobernadores obtenidos desde Wikipedia; buscar fuente institucional no-share-alike o definir publicación segregada compatible. Próxima revisión 2026-12-31.",
+      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 86 días. Review 2026-10-05: la brecha de alcaldes quedó resuelta al migrar la fuente primaria a BCN SIIT (346/346 comunas). El único bloqueo para promover a stable_publishable es la licencia CC-BY-SA de los gobernadores obtenidos desde Wikipedia; buscar fuente institucional no-share-alike o definir publicación segregada compatible. Próxima revisión 2026-12-31."
     },
     {
       "dataset": "estadisticas_vitales",
@@ -561,7 +561,7 @@
       "review_status": "upcoming",
       "owner": "core",
       "next_action": "Monitorear publicación del anuario 2024 (el extractor lo incorpora solo).",
-      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 87 días. Monitorear publicación del anuario 2024 (el extractor lo incorpora solo)."
+      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 86 días. Monitorear publicación del anuario 2024 (el extractor lo incorpora solo)."
     },
     {
       "dataset": "permisos_edificacion",
@@ -585,7 +585,7 @@
       "review_status": "upcoming",
       "owner": "core",
       "next_action": "Monitorear que el biblionumber 25583 siga resolviendo al XLSX anual vigente.",
-      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 87 días. Monitorear que el biblionumber 25583 siga resolviendo al XLSX anual vigente."
+      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 86 días. Monitorear que el biblionumber 25583 siga resolviendo al XLSX anual vigente."
     },
     {
       "dataset": "calidad_aire",
@@ -609,7 +609,7 @@
       "review_status": "upcoming",
       "owner": "core",
       "next_action": "Vigilar estabilidad del endpoint listadomapa2k19 y crecimiento de la serie incremental.",
-      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 87 días. Vigilar estabilidad del endpoint listadomapa2k19 y crecimiento de la serie incremental."
+      "recommended_action": "⏳ REVIEW BY 2026-12-31 — 86 días. Vigilar estabilidad del endpoint listadomapa2k19 y crecimiento de la serie incremental."
     }
   ]
 }
