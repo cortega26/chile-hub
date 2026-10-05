@@ -23,10 +23,10 @@
     "live_ready": true,
     "fallback_allowed": true,
     "publish_blocking": true,
-    "review_by": "2026-10-05",
+    "review_by": "2026-12-31",
     "stalled_after_days": 90,
     "owner": "core",
-    "next_action": "estado_legal/fecha_constitucion completados desde SERVEL (15/36 partidos matcheados por nombre; el resto son históricos no listados en SERVEL). ambito (nacional/regional) queda nullable: no se encontró esa señal en ninguna fuente institucional disponible."
+    "next_action": "Review 2026-10-05: extractor live y validación OK; último build publicó 37 registros, 16/37 con estado_legal vía SERVEL. La variación del roster es esperable porque Cámara incluye partidos vigentes e históricos. Mantener stable_publishable; ambito sigue nullable por falta de señal institucional. Próxima revisión 2026-12-31."
   },
   "reuse_policy": {
     "status": "open-attribution",
