@@ -1,18 +1,15 @@
 <div align="center">
 
 <h1>
-  <img
-    src="https://rawcdn.githack.com/twitter/twemoji/v14.0.2/assets/svg/1f1e8-1f1f1.svg"
-    alt="Bandera de Chile"
-    width="39"
-    align="absmiddle"
-  >
+  <img src="https://rawcdn.githack.com/twitter/twemoji/v14.0.2/assets/svg/1f1e8-1f1f1.svg" alt="Bandera de Chile" width="39" align="absmiddle">
   chile-hub
 </h1>
 
-<p><strong>Datos públicos de Chile, curados y listos para análisis en una línea de código.</strong></p>
-<p><em>La última milla de los datos oficiales de Chile — parte del ecosistema Tooltician.</em></p>
+<p><strong>Deja de pelear con planillas, enlaces rotos y esquemas incompatibles.</strong></p>
+<p><strong>Datos públicos de Chile curados, normalizados, validados y listos para Python, SQL, Excel y pipelines.</strong></p>
+<p><em>La última milla entre “el dato existe” y “el dato ya sirve”.</em></p>
 
+[![GitHub stars](https://img.shields.io/github/stars/cortega26/chile-hub?style=flat&logo=github)](https://github.com/cortega26/chile-hub/stargazers)
 [![CI/CD](https://github.com/cortega26/chile-hub/actions/workflows/pipeline-check.yml/badge.svg)](https://github.com/cortega26/chile-hub/actions)
 [![PyPI version](https://img.shields.io/pypi/v/chile-hub.svg)](https://pypi.org/project/chile-hub/)
 [![PyPI downloads](https://img.shields.io/pypi/dm/chile-hub.svg)](https://pypi.org/project/chile-hub/)
@@ -20,7 +17,6 @@
 [![Data](https://img.shields.io/endpoint?url=https://tooltician.com/chile-hub/data/normalized/freshness_badge.json)](https://tooltician.com/chile-hub/data/normalized/hub_health.json)
 [![License: MIT](https://img.shields.io/badge/Code%20License-MIT-blue.svg)](LICENSE)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22968698.svg)](https://doi.org/10.5281/zenodo.22968698)
-[![ORCID](https://img.shields.io/badge/ORCID-0009--0000--3470--6181-A6CE39?logo=orcid&logoColor=white)](https://orcid.org/0009-0000-3470-6181)
 <!-- START_PYTHON_BADGE -->
 [![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-3776AB.svg?style=flat&logo=python&logoColor=white)]()
 <!-- END_PYTHON_BADGE -->
@@ -30,25 +26,38 @@
 <!-- END_DATASET_BADGE -->
 
 <p>
-  <a href="#instalar-y-usar-en-30-segundos">Instalación</a> ·
-  <a href="#por-qué-confiar">Confianza</a> ·
-  <a href="#qué-incluye">Capas</a> ·
-  <a href="#recetas-de-uso">Recetas</a> ·
-  <a href="#api-y-cli">API y CLI</a> ·
-  <a href="#fuentes-licencias-y-reúso">Licencias</a>
+  <a href="https://tooltician.com/chile-hub/"><strong>Explorar datos en el navegador</strong></a> ·
+  <a href="#instalar-y-usar-en-30-segundos">Instalar</a> ·
+  <a href="#qué-incluye">Ver capas</a> ·
+  <a href="#por-qué-confiar">Auditar calidad</a>
 </p>
 
 <a href="https://tooltician.com/chile-hub/">
-  <img
-    src="https://raw.githubusercontent.com/cortega26/chile-hub/main/docs/assets/landing-hero.png"
-    alt="Landing de chile-hub: capas de datos de Chile listas para consumir"
-    width="860"
-  >
+  <img src="https://raw.githubusercontent.com/cortega26/chile-hub/main/docs/assets/landing-hero.png" alt="Landing de chile-hub: capas de datos de Chile listas para consumir" width="860">
 </a>
 
 </div>
 
 ---
+
+## El dato público existe. El problema es dejarlo listo para usar.
+
+Si trabajas con datos de Chile, probablemente ya conoces la fricción: archivos Excel con formatos cambiantes, códigos territoriales que pierden ceros, fuentes dispersas, APIs inconsistentes y cruces que fallan por diferencias mínimas de nombres.
+
+**chile-hub convierte esa última milla en infraestructura reutilizable.**
+
+| Necesitas | chile-hub te entrega |
+|:---|:---|
+| Cruzar comunas, regiones o distritos sin limpiar claves a mano | Códigos CUT normalizados y contratos de esquema |
+| Analizar datos oficiales desde Python o SQL | Parquet + Polars + DuckDB + SQLite |
+| Llevar datos a Excel o automatizaciones | JSON y workbook multipestaña listos para consumo |
+| Saber de dónde salió un dato y cuándo se obtuvo | Procedencia, frescura, licencia y estado por capa |
+| Detectar cambios silenciosos en las fuentes | Validaciones, drift detection y pipeline fail-loud |
+
+> [!TIP]
+> **¿Solo quieres probarlo?** Abre el [explorador SQL](https://tooltician.com/chile-hub/) y consulta los Parquet directamente en tu navegador con DuckDB-WASM. Sin instalar nada.
+
+**En 30 segundos puedes pasar de “necesito datos de Chile” a un DataFrame listo para cruzar.**
 
 ## Instalar y usar en 30 segundos
 
