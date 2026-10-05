@@ -79,7 +79,10 @@
     "stalled_after_days": 90,
     "owner": "core",
     "next_action": "Keep derived schema aligned with comunas.",
-    "upstream_datasets": ["comunas", "censo_comunal"],
+    "upstream_datasets": [
+      "comunas",
+      "censo_comunal"
+    ],
     "publication_track": "stable_publishable",
     "public_bundle_eligible": true,
     "cadencia": "bajo_demanda"
@@ -431,10 +434,10 @@
     "live_ready": true,
     "fallback_allowed": true,
     "publish_blocking": true,
-    "review_by": "2026-10-05",
+    "review_by": "2026-12-31",
     "stalled_after_days": 90,
     "owner": "core",
-    "next_action": "estado_legal/fecha_constitucion completados desde SERVEL (15/36 partidos matcheados por nombre; el resto son históricos no listados en SERVEL). ambito (nacional/regional) queda nullable: no se encontró esa señal en ninguna fuente institucional disponible.",
+    "next_action": "Review 2026-10-05: extractor live y validación OK; último build publicó 37 registros, 16/37 con estado_legal vía SERVEL. La variación del roster es esperable porque Cámara incluye partidos vigentes e históricos. Mantener stable_publishable; ambito sigue nullable por falta de señal institucional. Próxima revisión 2026-12-31.",
     "publication_track": "stable_publishable",
     "public_bundle_eligible": true,
     "cadencia": "bajo_demanda"
@@ -452,10 +455,10 @@
     "live_ready": true,
     "fallback_allowed": true,
     "publish_blocking": true,
-    "review_by": "2026-10-05",
+    "review_by": "2026-12-31",
     "stalled_after_days": 90,
     "owner": "core",
-    "next_action": "codigo_region/periodo de senadores completados desde senado.cl (REGION/PERIODOS). gobernador_regional y alcalde viven en el dataset segregado autoridades_locales (CC-BY-SA, candidate) por decisión de licencia.",
+    "next_action": "Review 2026-10-05: extractor live y validación OK con 205/205 registros (155 diputados + 50 senadores); región y período de senadores continúan poblados desde senado.cl. Mantener stable_publishable. Próxima revisión 2026-12-31.",
     "publication_track": "stable_publishable",
     "public_bundle_eligible": true,
     "cadencia": "bajo_demanda"
@@ -473,10 +476,10 @@
     "live_ready": false,
     "fallback_allowed": true,
     "publish_blocking": true,
-    "review_by": "2026-10-05",
+    "review_by": "2026-12-31",
     "stalled_after_days": 90,
     "owner": "core",
-    "next_action": "Ampliar cobertura de alcaldes (~165/345 identificados; ~121 sin página en Wikipedia, ~59 sin marca de vigencia clara); buscar fuente redistribuible no-share-alike para promover a stable_publishable.",
+    "next_action": "Review 2026-10-05: la brecha de alcaldes quedó resuelta al migrar la fuente primaria a BCN SIIT (346/346 comunas). El único bloqueo para promover a stable_publishable es la licencia CC-BY-SA de los gobernadores obtenidos desde Wikipedia; buscar fuente institucional no-share-alike o definir publicación segregada compatible. Próxima revisión 2026-12-31.",
     "publication_track": "candidate",
     "public_bundle_eligible": false,
     "cadencia": "bajo_demanda"
