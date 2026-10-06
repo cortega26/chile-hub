@@ -2,7 +2,7 @@
 
 > **Carril:** `candidate` — NO incluido en el bundle público.
 > **Fuente:** BCN SIIT (alcaldes) + Wikipedia (gobernadores).
-> **review_by:** 2026-10-05
+> **review_by:** 2026-12-31
 
 ## Descripcion
 

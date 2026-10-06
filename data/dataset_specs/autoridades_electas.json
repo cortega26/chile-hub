@@ -23,10 +23,10 @@
     "live_ready": true,
     "fallback_allowed": true,
     "publish_blocking": true,
-    "review_by": "2026-10-05",
+    "review_by": "2026-12-31",
     "stalled_after_days": 90,
     "owner": "core",
-    "next_action": "codigo_region/periodo de senadores completados desde senado.cl (REGION/PERIODOS). gobernador_regional y alcalde viven en el dataset segregado autoridades_locales (CC-BY-SA, candidate) por decisión de licencia."
+    "next_action": "Review 2026-10-05: extractor live y validación OK con 205/205 registros (155 diputados + 50 senadores); región y período de senadores continúan poblados desde senado.cl. Mantener stable_publishable. Próxima revisión 2026-12-31."
   },
   "reuse_policy": {
     "status": "open-attribution",
