@@ -372,75 +372,57 @@ def verify_source_registry(registry=None, catalog=None):
                         )
 
 
-def _verify_stagnation(report=None, reference_date=None):
-    """Verifica reglas de estancamiento según maturity_status.
+def _stagnation_reason(entry, reference_date):
+    """Return the existing policy outcome for one dataset, without side effects.
 
-    Reglas:
-    - experimental: estancamiento emite warning (no falla)
-    - candidate: estancamiento hace fallar verify-readiness
-    - stable: regresión en madurez de fuente hace fallar verify-readiness
-    - derivados: pueden marcarse estancados solo por bloqueadores upstream
+    The review deadline is a governance gate, not proof of source degradation.
+    Keep maturity-specific blocking behavior unchanged.
     """
+    review_by = entry.get("review_by")
+    if not review_by:
+        return None
+    try:
+        deadline = datetime.fromisoformat(str(review_by))
+    except (ValueError, TypeError):
+        return None  # Registry validation reports invalid dates separately.
+    if deadline.tzinfo is None:
+        deadline = deadline.replace(tzinfo=UTC)
+    if reference_date <= deadline:
+        return None
+
+    dataset = entry["dataset"]
+    maturity = entry.get("maturity_status", "unknown")
+    days = entry.get("stalled_after_days", 90)
+    if entry.get("access_method") == "derived" and maturity != "deprecated":
+        return ("warning", f"{dataset}: estancado (derivado) — revisar fuentes upstream. Revisión vencida: {review_by}")
+    if maturity == "experimental":
+        return ("warning", f"{dataset}: estancado (experimental, {days}d) — revisión vencida {review_by}")
+    if maturity == "candidate":
+        return ("failure", f"{dataset}: estancado (candidate, {days}d) — revisión vencida {review_by}. Requiere acción.")
+    if maturity == "stable":
+        return ("failure", f"{dataset}: regresión en madurez estable — revisión vencida {review_by}. Investigar degradación de fuente.")
+    if maturity == "deprecated":
+        return ("warning", f"{dataset}: estancado y deprecado — considerar eliminación del registry")
+    return None
+
+
+def _verify_stagnation(report=None, reference_date=None):
+    """Apply the maturity-specific review deadline gate to a readiness report."""
     if report is None:
         report = load_json(NORMALIZED_DIR / "source_readiness.json")
     if reference_date is None:
         reference_date = datetime.now(UTC)
 
-    warnings = []
     failures = []
-
     for entry in report.get("datasets", []):
-        dataset = entry["dataset"]
-        maturity = entry.get("maturity_status", "unknown")
-        access_method = entry.get("access_method", "")
-        review_by = entry.get("review_by")
-        stalled_after_days = entry.get("stalled_after_days", 90)
-
-        # Determinar estancamiento contra la fecha de referencia
-        stalled = False
-        if review_by:
-            try:
-                review_date = datetime.fromisoformat(str(review_by))
-                if review_date.tzinfo is None:
-                    review_date = review_date.replace(tzinfo=UTC)
-                stalled = reference_date > review_date
-            except (ValueError, TypeError):
-                pass
-
-        if not stalled:
+        result = _stagnation_reason(entry, reference_date)
+        if result is None:
             continue
-
-        # Datasets derivados: advertir en lugar de fallar (dependen de upstream)
-        if access_method == "derived" and maturity != "deprecated":
-            warnings.append(
-                f"{dataset}: estancado (derivado) — revisar fuentes upstream. "
-                f"Revisión vencida: {review_by}"
-            )
-            continue
-
-        if maturity == "experimental":
-            warnings.append(
-                f"{dataset}: estancado (experimental, {stalled_after_days}d) — "
-                f"revisión vencida {review_by}"
-            )
-        elif maturity == "candidate":
-            failures.append(
-                f"{dataset}: estancado (candidate, {stalled_after_days}d) — "
-                f"revisión vencida {review_by}. Requiere acción."
-            )
-        elif maturity == "stable":
-            failures.append(
-                f"{dataset}: regresión en madurez estable — "
-                f"revisión vencida {review_by}. Investigar degradación de fuente."
-            )
-        elif maturity == "deprecated":
-            warnings.append(
-                f"{dataset}: estancado y deprecado — considerar eliminación del registry"
-            )
-
-    for w in warnings:
-        print(f"WARNING [stagnation]: {w}")
-
+        severity, message = result
+        if severity == "warning":
+            print(f"WARNING [stagnation]: {message}")
+        else:
+            failures.append(message)
     if failures:
         fail("Stagnation policy rejected this build: " + "; ".join(failures))
 
