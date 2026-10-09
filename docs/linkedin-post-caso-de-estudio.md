@@ -7,10 +7,7 @@
 > explica cómo está construido y por qué. El operador decide el momento.
 > **Basado en** `docs/case-study-construccion-chile-hub.md`.
 >
-> **⚠ Antes de publicar (2026-09-30):** la frase "~2.200 instalaciones al mes" no es
-> correcta. Esas son descargas de PyPI que siguen la cadencia de releases, no
-> instalaciones ni usuarios. Reemplázala por una cifra verificable. Ver
-> [`docs/sostenibilidad/README.md`](sostenibilidad/README.md).
+> **Revisión de afirmaciones (2026-10-08):** se retiró el conteo de "instalaciones"; las descargas de PyPI no identifican personas ni instalaciones reales. Revisar las demás métricas antes de publicar. Ver [`docs/sostenibilidad/README.md`](sostenibilidad/README.md).
 
 ---
 
@@ -21,7 +18,7 @@ capas de datos públicos chilenos (censo, salud, educación, pobreza, energía,
 finanzas municipales, geometría, permisos de edificación…), las valida con
 contratos de esquema ejecutables y las publica en formatos listos para análisis.
 Corre sobre GitHub Actions, se refresca a diario y se consume en una línea de
-Python. Hoy lo usan ~2.200 instalaciones al mes y el bundle también se replica
+Python. El paquete se distribuye por PyPI; el bundle también se replica
 en Hugging Face Hub y se expone a agentes de código vía MCP.
 
 No es un producto. Es un **activo técnico** construido bajo una regla no
@@ -76,7 +73,7 @@ no es total. La integridad de la narrativa vale más que el conteo de capas.
 
 - 22 capas construibles (21 publicables), 1.106 tests, 21 ADRs, 25 contratos
 - Calidad promedio: 94.0/100 · salud del hub: 20 `ok`, 1 `warn`, 0 `error`
-- **0 datos corruptos publicados.** El pipeline falló varias veces — fuentes
+- **Bloqueos de publicación documentados.** El pipeline falló varias veces — fuentes
   caídas, cambios de esquema no anunciados, Excels renombrados, un portal que
   bloquea por IP — y en cada caso **abortó antes de publicar** o degradó a un
   modo declarado. El fail-loud funcionó exactamente como fue diseñado.

@@ -4,7 +4,7 @@
 > **Fuentes:** Cámara de Diputadas y Diputados de Chile, portal de datos abiertos
 > (`WSComun.asmx/retornarPartidosPoliticos`) + SERVEL (`partidos-constituidos`/
 > `partidos-en-formacion`).
-> **review_by:** 2026-10-05 · **stalled_after_days:** 90
+> **review_by:** 2026-12-31 · **stalled_after_days:** 90
 
 ## Descripción
 
@@ -34,9 +34,9 @@ ver `docs/legal/b2-2-electoral-research.md`).
 
 ## Cobertura
 
-- **Registros:** ~36 partidos (varía según altas/bajas; el roster de la Cámara incluye históricos).
-- **`estado_legal`/`fecha_constitucion`:** ~15/36 matcheados por nombre contra SERVEL
-  (observado 2026-07-06). El resto son partidos históricos que ya no aparecen en las
+- **Registros:** ~37 partidos (varía según altas/bajas; el roster de la Cámara incluye históricos).
+- **`estado_legal`/`fecha_constitucion`:** 16/37 matcheados por nombre contra SERVEL
+  (último build revisado 2026-10-05). El resto son partidos históricos que ya no aparecen en las
   páginas vigentes de SERVEL — coherente con que el roster de la Cámara incluye
   militancias pasadas, no solo partidos legalmente activos hoy.
 - **Frecuencia de actualización:** bajo demanda (fuentes estables, sin cadencia fija).
@@ -65,7 +65,7 @@ ver `docs/legal/b2-2-electoral-research.md`).
 ## Clasificación de salud (ADR-014)
 
 `estado_legal` viene poblado sólo para los partidos que SERVEL publica con ese
-dato (15/36 al último build). Es una característica de la fuente, no un fallo de
+dato (16/37 al último build). Es una característica de la fuente, no un fallo de
 extracción: el warning está declarado como *esperado* y no cuenta como
 degradación accionable ni como drift.
 

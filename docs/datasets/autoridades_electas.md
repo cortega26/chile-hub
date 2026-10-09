@@ -3,7 +3,7 @@
 > **Carril:** `stable_publishable` — incluido en el bundle público.
 > **Fuentes:** Cámara de Diputadas y Diputados (datos abiertos + listado web) y
 > Senado de Chile (`senado.cl`).
-> **review_by:** 2026-10-05 · **stalled_after_days:** 90
+> **review_by:** 2026-12-31 · **stalled_after_days:** 90
 
 ## Descripción
 
@@ -15,9 +15,9 @@ institucional. **v1** cubre dos cargos:
 - **Senadores/as (50)** en ejercicio, con partido, **circunscripción senatorial**,
   **región** y **período de mandato**.
 
-Los cargos subnacionales `gobernador_regional` (16) y `alcalde` (345) **no viven
-aquí**: se compilan desde Wikipedia (CC-BY-SA) y se publican por separado en el
-dataset segregado `autoridades_locales`, para no propagar la licencia share-alike a
+Los cargos subnacionales `gobernador_regional` (16) y `alcalde` (346) **no viven
+aquí**: se compilan por separado en `autoridades_locales` desde BCN SIIT (alcaldes)
+y Wikipedia (gobernadores, CC-BY-SA), para no propagar la licencia share-alike a
 los cargos oficiales CC-BY de este dataset.
 
 Solo datos institucionales públicos de cargos en ejercicio; **sin datos personales**

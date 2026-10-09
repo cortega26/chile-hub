@@ -1316,3 +1316,59 @@ class IndicadoresDiagnosticsTests(unittest.TestCase):
             vp.verify_top_issue_summary(
                 f"prioridad: {top_issue['dataset']}", top_issue, self.ORIGIN
             )
+
+
+class TestStagnationPolicyCharacterization(unittest.TestCase):
+    """Protect the pre-refactor policy matrix and deadline boundaries."""
+
+    def test_maturity_matrix_and_derived_exception(self):
+        from datetime import datetime, timezone
+
+        now = datetime(2026, 10, 7, tzinfo=timezone.utc)
+        for maturity, severity in (
+            ("stable", "failure"),
+            ("candidate", "failure"),
+            ("experimental", "warning"),
+            ("deprecated", "warning"),
+        ):
+            with self.subTest(maturity=maturity):
+                result = vp._stagnation_reason(
+                    {"dataset": "sample", "maturity_status": maturity, "review_by": "2026-10-05"},
+                    now,
+                )
+                self.assertEqual(result[0], severity)
+        result = vp._stagnation_reason(
+            {
+                "dataset": "sample",
+                "maturity_status": "stable",
+                "access_method": "derived",
+                "review_by": "2026-10-05",
+            },
+            now,
+        )
+        self.assertEqual(result[0], "warning")
+
+    def test_deadline_boundary_and_missing_date(self):
+        from datetime import datetime, timezone
+
+        at_deadline = datetime(2026, 10, 5, tzinfo=timezone.utc)
+        entry = {"dataset": "sample", "maturity_status": "stable", "review_by": "2026-10-05"}
+        self.assertIsNone(vp._stagnation_reason(entry, at_deadline))
+        self.assertIsNone(vp._stagnation_reason({**entry, "review_by": None}, at_deadline))
+        self.assertIsNone(vp._stagnation_reason({**entry, "review_by": "invalid"}, at_deadline))
+
+    def test_fail_closed_for_overdue_stable_and_candidate(self):
+        from datetime import datetime, timezone
+
+        report = {
+            "datasets": [
+                {"dataset": "stable_one", "maturity_status": "stable", "review_by": "2026-10-05"},
+                {
+                    "dataset": "candidate_one",
+                    "maturity_status": "candidate",
+                    "review_by": "2026-10-05",
+                },
+            ]
+        }
+        with contextlib.redirect_stdout(io.StringIO()), self.assertRaises(SystemExit):
+            vp._verify_stagnation(report, datetime(2026, 10, 7, tzinfo=timezone.utc))

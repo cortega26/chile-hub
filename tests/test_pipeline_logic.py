@@ -6193,6 +6193,248 @@ class MapaMetricasTests(unittest.TestCase):
         self.assertEqual(metricas["viviendas_autorizadas_anio"], 2025)
 
 
+class PublicationBadgeRegressionTests(unittest.TestCase):
+    """Los badges públicos deben reflejar métricas reales y respetar las severidades."""
+
+    def test_coverage_xml_reports_actual_rounded_line_rate(self):
+        from scripts import generate_coverage_badge as coverage_badge
+
+        with tempfile.TemporaryDirectory() as tmp:
+            xml = Path(tmp) / "coverage.xml"
+            xml.write_text('<coverage line-rate="0.7549"/>', encoding="utf-8")
+            self.assertEqual(coverage_badge.parse_coverage_pct(xml), 75.5)
+            xml.write_text("<coverage/>", encoding="utf-8")
+            self.assertEqual(coverage_badge.parse_coverage_pct(xml), 0.0)
+
+    def test_coverage_badge_thresholds_do_not_exaggerate_status(self):
+        from scripts import generate_coverage_badge as coverage_badge
+
+        for pct, expected in (
+            (49.9, "red"),
+            (50.0, "yellow"),
+            (79.9, "yellow"),
+            (80.0, "green"),
+        ):
+            with self.subTest(pct=pct):
+                payload = coverage_badge.build_badge(pct)
+                self.assertEqual(payload["color"], expected)
+                self.assertEqual(payload["message"], f"{pct}%")
+                self.assertEqual(payload["schemaVersion"], 1)
+
+    def test_coverage_badge_main_writes_endpoint_json_from_xml(self):
+        from scripts import generate_coverage_badge as coverage_badge
+
+        with tempfile.TemporaryDirectory() as tmp:
+            xml = Path(tmp) / "coverage.xml"
+            xml.write_text('<coverage line-rate="0.751"/>', encoding="utf-8")
+            badge_path = Path(tmp) / "nested" / "coverage_badge.json"
+            with (
+                patch.object(coverage_badge, "COVERAGE_XML", xml),
+                patch.object(coverage_badge, "BADGE_PATH", badge_path),
+            ):
+                coverage_badge.main()
+            payload = json.loads(badge_path.read_text(encoding="utf-8"))
+            self.assertEqual(payload["message"], "75.1%")
+            self.assertEqual(payload["color"], "yellow")
+
+    def test_coverage_badge_main_rejects_missing_report(self):
+        from scripts import generate_coverage_badge as coverage_badge
+
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp) / "badge.json"
+            with (
+                patch.object(coverage_badge, "COVERAGE_XML", Path(tmp) / "missing.xml"),
+                patch.object(coverage_badge, "BADGE_PATH", output),
+                self.assertRaises(SystemExit) as error,
+            ):
+                coverage_badge.main()
+            self.assertEqual(error.exception.code, 1)
+            self.assertFalse(output.exists())
+
+    def test_freshness_badge_priority_and_error_flag(self):
+        from scripts import generate_freshness_badge as freshness_badge
+
+        cases = (
+            ({"overall_status": "ok"}, "fresh", "green", False),
+            (
+                {"overall_status": "warning", "error_count": 1, "stale_count": 2},
+                "error",
+                "red",
+                False,
+            ),
+            ({"overall_status": "error", "error_count": 1}, "error", "red", True),
+            ({"overall_status": "warning", "stale_count": 3}, "3 stale", "orange", False),
+            ({"overall_status": "warning", "warn_count": 2}, "2 warn", "yellow", False),
+            ({}, "unknown", "lightgrey", False),
+        )
+        for health, message, color, is_error in cases:
+            with self.subTest(health=health):
+                payload = freshness_badge.build_badge(health)
+                self.assertEqual(payload["message"], message)
+                self.assertEqual(payload["color"], color)
+                self.assertEqual(payload["isError"], is_error)
+
+    def test_freshness_badge_main_persists_actual_health_status(self):
+        from scripts import generate_freshness_badge as freshness_badge
+
+        with tempfile.TemporaryDirectory() as tmp:
+            health_path = Path(tmp) / "hub_health.json"
+            badge_path = Path(tmp) / "freshness_badge.json"
+            health_path.write_text(
+                json.dumps({"overall_status": "warning", "stale_count": 2}),
+                encoding="utf-8",
+            )
+            with (
+                patch.object(freshness_badge, "HEALTH_PATH", health_path),
+                patch.object(freshness_badge, "BADGE_PATH", badge_path),
+            ):
+                freshness_badge.main()
+            badge = json.loads(badge_path.read_text(encoding="utf-8"))
+            self.assertEqual(badge["message"], "2 stale")
+            self.assertEqual(badge["color"], "orange")
+
+    def test_freshness_badge_main_fails_if_health_artifact_missing(self):
+        from scripts import generate_freshness_badge as freshness_badge
+
+        with tempfile.TemporaryDirectory() as tmp:
+            badge_path = Path(tmp) / "freshness_badge.json"
+            with (
+                patch.object(freshness_badge, "HEALTH_PATH", Path(tmp) / "missing.json"),
+                patch.object(freshness_badge, "BADGE_PATH", badge_path),
+                self.assertRaises(SystemExit) as error,
+            ):
+                freshness_badge.main()
+            self.assertEqual(error.exception.code, 1)
+            self.assertFalse(badge_path.exists())
+
+
+class PublishableBundleRegressionTests(unittest.TestCase):
+    """Verifica el ZIP con archivos reales aislados y el modo cleanup sin efectos externos."""
+
+    def test_build_zip_packages_only_declared_files_with_canonical_paths(self):
+        import zipfile
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            artifact = root / "data" / "normalized" / "regiones.json"
+            artifact.parent.mkdir(parents=True)
+            artifact.write_bytes(b'{"rows": 1}')
+            zip_path = root / "published.zip"
+            manifest = {"artifacts": [{"path": "data/normalized/regiones.json"}]}
+            with (
+                patch.object(package_publishable_bundle, "ROOT_DIR", root),
+                patch.object(
+                    package_publishable_bundle,
+                    "list_artifact_paths",
+                    return_value=[artifact],
+                ),
+            ):
+                result = package_publishable_bundle.build_zip(manifest, output_path=zip_path)
+
+            self.assertEqual(result, zip_path)
+            with zipfile.ZipFile(zip_path) as archive:
+                self.assertEqual(archive.namelist(), ["data/normalized/regiones.json"])
+                self.assertEqual(archive.read("data/normalized/regiones.json"), b'{"rows": 1}')
+
+    def test_build_zip_fails_if_manifest_declares_missing_artifact(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            missing = root / "data" / "normalized" / "missing.parquet"
+            zip_path = root / "published.zip"
+            with (
+                patch.object(package_publishable_bundle, "ROOT_DIR", root),
+                patch.object(
+                    package_publishable_bundle, "list_artifact_paths", return_value=[missing]
+                ),
+                self.assertRaisesRegex(FileNotFoundError, "missing.parquet"),
+            ):
+                package_publishable_bundle.build_zip(
+                    {"artifacts": [{"path": "data/normalized/missing.parquet"}]},
+                    output_path=zip_path,
+                )
+            self.assertFalse(zip_path.exists())
+
+    def test_cleanup_from_existing_manifest_preserves_unlisted_files(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            directory = root / "data" / "normalized"
+            directory.mkdir(parents=True)
+            manifest_path = directory / "artifact_manifest.json"
+            managed = directory / "regiones.json"
+            unrelated = directory / "user-notes.txt"
+            managed.write_text("data", encoding="utf-8")
+            unrelated.write_text("keep", encoding="utf-8")
+            manifest_path.write_text(
+                json.dumps(
+                    {
+                        "artifacts": [
+                            {"path": "data/normalized/regiones.json"},
+                            {"path": "data/normalized/artifact_manifest.json"},
+                        ]
+                    }
+                ),
+                encoding="utf-8",
+            )
+            removed = package_publishable_bundle.clean_publishable_from_manifest(
+                manifest_path=manifest_path,
+                root_dir=root,
+            )
+            self.assertEqual(
+                removed,
+                ["data/normalized/regiones.json", "data/normalized/artifact_manifest.json"],
+            )
+            self.assertFalse(managed.exists())
+            self.assertFalse(manifest_path.exists())
+            self.assertEqual(unrelated.read_text(encoding="utf-8"), "keep")
+
+    def test_main_build_reports_written_bundle_size_and_artifact_count(self):
+        import contextlib
+        import io
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            zip_path = root / "bundle.zip"
+            zip_path.write_bytes(b"mock-archive")
+            out = io.StringIO()
+            with (
+                patch.object(package_publishable_bundle, "ROOT_DIR", root),
+                patch.object(
+                    package_publishable_bundle,
+                    "load_manifest",
+                    return_value={"artifact_count": 2},
+                ),
+                patch.object(package_publishable_bundle, "build_zip", return_value=zip_path),
+                patch.object(sys, "argv", ["package_publishable_bundle.py"]),
+                contextlib.redirect_stdout(out),
+            ):
+                package_publishable_bundle.main()
+            payload = json.loads(out.getvalue())
+            self.assertEqual(payload["artifact_count"], 2)
+            self.assertEqual(payload["zip_path"], "bundle.zip")
+            self.assertEqual(payload["size_bytes"], len(b"mock-archive"))
+
+    def test_main_clean_reports_only_manifest_selected_paths(self):
+        import contextlib
+        import io
+
+        out = io.StringIO()
+        removed_paths = ["data/normalized/example.parquet"]
+        with (
+            patch.object(
+                package_publishable_bundle,
+                "clean_publishable_from_manifest",
+                return_value=removed_paths,
+            ) as clean,
+            patch.object(sys, "argv", ["package_publishable_bundle.py", "--clean"]),
+            contextlib.redirect_stdout(out),
+        ):
+            package_publishable_bundle.main()
+        clean.assert_called_once_with()
+        payload = json.loads(out.getvalue())
+        self.assertEqual(payload["removed_count"], 1)
+        self.assertEqual(payload["removed_paths"], removed_paths)
+
+
 if __name__ == "__main__":
     import pytest
 
