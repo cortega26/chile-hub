@@ -12,6 +12,194 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.47.2 - 2026-10-09
+
+### Corregido
+
+- Normalize comuna keys for Wikipedia mandate enrichment
+  ([#138](https://github.com/cortega26/chile-hub/pull/138),
+  [`4010a32`](https://github.com/cortega26/chile-hub/commit/4010a32308960eca67d6424a8088587c2bfd335d))
+
+- **test**: Reuse existing extractor import in inlined source tests
+  ([#138](https://github.com/cortega26/chile-hub/pull/138),
+  [`4010a32`](https://github.com/cortega26/chile-hub/commit/4010a32308960eca67d6424a8088587c2bfd335d))
+
+### Mantenimiento
+
+- **ci**: Sync coverage badge from verified tests [skip ci]
+  ([`2955694`](https://github.com/cortega26/chile-hub/commit/29556944b083012601cbf4b63c75d84714cefb8a))
+
+- **ci**: Sync coverage badge from verified tests [skip ci]
+  ([`87b0607`](https://github.com/cortega26/chile-hub/commit/87b0607da21e852678456470173d016c77f3c7de))
+
+- **deps**: Bump astral-sh/setup-uv from 10.1.0 to 10.2.0
+  ([#123](https://github.com/cortega26/chile-hub/pull/123),
+  [`58295f0`](https://github.com/cortega26/chile-hub/commit/58295f06d0c37526963d835e8f32f90beda37b70))
+
+- **deps**: Bump the codeql-action group with 2 updates
+  ([#122](https://github.com/cortega26/chile-hub/pull/122),
+  [`79cb73d`](https://github.com/cortega26/chile-hub/commit/79cb73d8a831c2c0ae7544e43b4a6328634bb81f))
+
+- **deps**: Integra el bump de python-dev y retira el ignore de PYSEC-2026-2132
+  ([#121](https://github.com/cortega26/chile-hub/pull/121),
+  [`3ee0751`](https://github.com/cortega26/chile-hub/commit/3ee0751915ab0257c9478551ece889334b96b772))
+
+- **deps**: Sync uv.lock [skip ci] ([#129](https://github.com/cortega26/chile-hub/pull/129),
+  [`ee3a4ce`](https://github.com/cortega26/chile-hub/commit/ee3a4ce9e1a94094a2fa137ec6f4f6581053c67a))
+
+- **deps**: Sync uv.lock [skip ci] ([#130](https://github.com/cortega26/chile-hub/pull/130),
+  [`0a8d875`](https://github.com/cortega26/chile-hub/commit/0a8d87566e30f02e03592166c35cf90a8c76a02b))
+
+- **deps**: Sync uv.lock [skip ci] ([#121](https://github.com/cortega26/chile-hub/pull/121),
+  [`3ee0751`](https://github.com/cortega26/chile-hub/commit/3ee0751915ab0257c9478551ece889334b96b772))
+
+- **deps-dev**: Bump duckdb ([#129](https://github.com/cortega26/chile-hub/pull/129),
+  [`ee3a4ce`](https://github.com/cortega26/chile-hub/commit/ee3a4ce9e1a94094a2fa137ec6f4f6581053c67a))
+
+- **deps-dev**: Bump duckdb from 1.5.5 to 1.5.6 in the python-pipeline group
+  ([#129](https://github.com/cortega26/chile-hub/pull/129),
+  [`ee3a4ce`](https://github.com/cortega26/chile-hub/commit/ee3a4ce9e1a94094a2fa137ec6f4f6581053c67a))
+
+- **deps-dev**: Bump the python-dev group with 3 updates
+  ([#121](https://github.com/cortega26/chile-hub/pull/121),
+  [`3ee0751`](https://github.com/cortega26/chile-hub/commit/3ee0751915ab0257c9478551ece889334b96b772))
+
+- **deps-dev**: Bump the python-dev group with 4 updates
+  ([#130](https://github.com/cortega26/chile-hub/pull/130),
+  [`0a8d875`](https://github.com/cortega26/chile-hub/commit/0a8d87566e30f02e03592166c35cf90a8c76a02b))
+
+### Code Style
+
+- Format source fallback test fixture ([#138](https://github.com/cortega26/chile-hub/pull/138),
+  [`4010a32`](https://github.com/cortega26/chile-hub/commit/4010a32308960eca67d6424a8088587c2bfd335d))
+
+- Keep source-contract fixtures compact and Ruff-formatted
+  ([#138](https://github.com/cortega26/chile-hub/pull/138),
+  [`4010a32`](https://github.com/cortega26/chile-hub/commit/4010a32308960eca67d6424a8088587c2bfd335d))
+
+### Integración continua
+
+- Align ruff pins across pyproject, pre-commit and workflow
+  ([`5d8f40f`](https://github.com/cortega26/chile-hub/commit/5d8f40f7cb1570072818ffeddb63532641f05a51))
+
+- Sync verified coverage badge on successful main runs
+  ([#137](https://github.com/cortega26/chile-hub/pull/137),
+  [`9c18643`](https://github.com/cortega26/chile-hub/commit/9c18643292e394d66322b87997c7d53c3c566e77))
+
+### Documentación
+
+- Correct unsupported adoption claims in public engineering evidence
+  ([#134](https://github.com/cortega26/chile-hub/pull/134),
+  [`41836b3`](https://github.com/cortega26/chile-hub/commit/41836b39447d49dbf0c762711d203a8245e014f9))
+
+- Make the README sell the value faster ([#131](https://github.com/cortega26/chile-hub/pull/131),
+  [`83461eb`](https://github.com/cortega26/chile-hub/commit/83461eb97c0586c44342faa84824b80f50838d18))
+
+- Refresh autoridades review and source notes
+  ([`5d8f40f`](https://github.com/cortega26/chile-hub/commit/5d8f40f7cb1570072818ffeddb63532641f05a51))
+
+- Refresh partidos review evidence
+  ([`5d8f40f`](https://github.com/cortega26/chile-hub/commit/5d8f40f7cb1570072818ffeddb63532641f05a51))
+
+- Sync collected test count after source-contract tests
+  ([#138](https://github.com/cortega26/chile-hub/pull/138),
+  [`4010a32`](https://github.com/cortega26/chile-hub/commit/4010a32308960eca67d6424a8088587c2bfd335d))
+
+- Sync generated README count after eleven regression tests
+  ([#135](https://github.com/cortega26/chile-hub/pull/135),
+  [`709c5da`](https://github.com/cortega26/chile-hub/commit/709c5dadf029fae6b7b530f4f8901dc4871738c6))
+
+- Synchronize generated README test count (1286)
+  ([#136](https://github.com/cortega26/chile-hub/pull/136),
+  [`26f479c`](https://github.com/cortega26/chile-hub/commit/26f479c6d453765aea8568e9422bbd922ed7365b))
+
+- **citation**: Añade ORCID del autor ([#128](https://github.com/cortega26/chile-hub/pull/128),
+  [`2066d2e`](https://github.com/cortega26/chile-hub/commit/2066d2e05598429fd5c839f132f58815ef047fe2))
+
+- **sostenibilidad**: Registra la decisión de no buscar sponsors por ahora
+  ([#125](https://github.com/cortega26/chile-hub/pull/125),
+  [`95800c9`](https://github.com/cortega26/chile-hub/commit/95800c9c0911d3b46169b1d60f5bfb09851c1f90))
+
+- **trust**: Correct draft adoption and reliability claims
+  ([#134](https://github.com/cortega26/chile-hub/pull/134),
+  [`41836b3`](https://github.com/cortega26/chile-hub/commit/41836b39447d49dbf0c762711d203a8245e014f9))
+
+- **trust**: Remove unsupported PyPI installation and zero-error claims
+  ([#134](https://github.com/cortega26/chile-hub/pull/134),
+  [`41836b3`](https://github.com/cortega26/chile-hub/commit/41836b39447d49dbf0c762711d203a8245e014f9))
+
+### Refactorizado
+
+- Isolate stagnation policy evaluation without changing gates
+  ([#133](https://github.com/cortega26/chile-hub/pull/133),
+  [`de318fa`](https://github.com/cortega26/chile-hub/commit/de318fa69eb4e53e2609ffefa38e25c70fa47511))
+
+- Simplify stagnation policy gate and lock regression behavior
+  ([#133](https://github.com/cortega26/chile-hub/pull/133),
+  [`de318fa`](https://github.com/cortega26/chile-hub/commit/de318fa69eb4e53e2609ffefa38e25c70fa47511))
+
+### Tests
+
+- Apply Ruff formatting to bundle mock ([#136](https://github.com/cortega26/chile-hub/pull/136),
+  [`26f479c`](https://github.com/cortega26/chile-hub/commit/26f479c6d453765aea8568e9422bbd922ed7365b))
+
+- Backfill SIEDU parsing and MINEDUC aggregation regressions
+  ([#135](https://github.com/cortega26/chile-hub/pull/135),
+  [`709c5da`](https://github.com/cortega26/chile-hub/commit/709c5dadf029fae6b7b530f4f8901dc4871738c6))
+
+- Characterize stagnation severity and deadline boundaries
+  ([#133](https://github.com/cortega26/chile-hub/pull/133),
+  [`de318fa`](https://github.com/cortega26/chile-hub/commit/de318fa69eb4e53e2609ffefa38e25c70fa47511))
+
+- Correct parser fixture count and format long assertions
+  ([#135](https://github.com/cortega26/chile-hub/pull/135),
+  [`709c5da`](https://github.com/cortega26/chile-hub/commit/709c5dadf029fae6b7b530f4f8901dc4871738c6))
+
+- Cover published health badges and bundle integrity
+  ([#136](https://github.com/cortega26/chile-hub/pull/136),
+  [`26f479c`](https://github.com/cortega26/chile-hub/commit/26f479c6d453765aea8568e9422bbd922ed7365b))
+
+- Cover truthful badges and publishable archive failure paths
+  ([#136](https://github.com/cortega26/chile-hub/pull/136),
+  [`26f479c`](https://github.com/cortega26/chile-hub/commit/26f479c6d453765aea8568e9422bbd922ed7365b))
+
+- Declare manifest explicitly in cleanup fixture
+  ([#136](https://github.com/cortega26/chile-hub/pull/136),
+  [`26f479c`](https://github.com/cortega26/chile-hub/commit/26f479c6d453765aea8568e9422bbd922ed7365b))
+
+- Keep local-authority regression cases with existing extractor suite
+  ([#138](https://github.com/cortega26/chile-hub/pull/138),
+  [`4010a32`](https://github.com/cortega26/chile-hub/commit/4010a32308960eca67d6424a8088587c2bfd335d))
+
+- Local authority source fallbacks and comuna matching
+  ([#138](https://github.com/cortega26/chile-hub/pull/138),
+  [`4010a32`](https://github.com/cortega26/chile-hub/commit/4010a32308960eca67d6424a8088587c2bfd335d))
+
+- Match newline delimiters in workflow job guards
+  ([#137](https://github.com/cortega26/chile-hub/pull/137),
+  [`9c18643`](https://github.com/cortega26/chile-hub/commit/9c18643292e394d66322b87997c7d53c3c566e77))
+
+- Protect local-authority source precedence and outages
+  ([#138](https://github.com/cortega26/chile-hub/pull/138),
+  [`4010a32`](https://github.com/cortega26/chile-hub/commit/4010a32308960eca67d6424a8088587c2bfd335d))
+
+- Raise meaningful coverage of SIEDU and MINEDUC extractors
+  ([#135](https://github.com/cortega26/chile-hub/pull/135),
+  [`709c5da`](https://github.com/cortega26/chile-hub/commit/709c5dadf029fae6b7b530f4f8901dc4871738c6))
+
+- Remove redundant standalone suite to preserve test inventory
+  ([#138](https://github.com/cortega26/chile-hub/pull/138),
+  [`4010a32`](https://github.com/cortega26/chile-hub/commit/4010a32308960eca67d6424a8088587c2bfd335d))
+
+- Satisfy Ruff formatting for MINEDUC HTTP mock
+  ([#135](https://github.com/cortega26/chile-hub/pull/135),
+  [`709c5da`](https://github.com/cortega26/chile-hub/commit/709c5dadf029fae6b7b530f4f8901dc4871738c6))
+
+- Update workflow contracts and enforce coverage sync guardrails
+  ([#137](https://github.com/cortega26/chile-hub/pull/137),
+  [`9c18643`](https://github.com/cortega26/chile-hub/commit/9c18643292e394d66322b87997c7d53c3c566e77))
+
+
 ## 1.47.1 - 2026-09-30
 
 ### Corregido
