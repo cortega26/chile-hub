@@ -12,6 +12,36 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.47.3 - 2026-10-09
+
+### Corregido
+
+- Degrade optional senate source on malformed Next.js JSON
+  ([#139](https://github.com/cortega26/chile-hub/pull/139),
+  [`3da34f7`](https://github.com/cortega26/chile-hub/commit/3da34f78ef9aab7d95754b87296d5f7ce17babaa))
+
+### Mantenimiento
+
+- **ci**: Sync coverage badge from verified tests [skip ci]
+  ([`f312530`](https://github.com/cortega26/chile-hub/commit/f312530c99f6b27be10d8f66fc8b9edaf8712ea8))
+
+### Documentación
+
+- Sync collected test count after senate source regression tests
+  ([#139](https://github.com/cortega26/chile-hub/pull/139),
+  [`3da34f7`](https://github.com/cortega26/chile-hub/commit/3da34f78ef9aab7d95754b87296d5f7ce17babaa))
+
+### Tests
+
+- Cover Senate Next.js failures and Chamber district enrichment
+  ([#139](https://github.com/cortega26/chile-hub/pull/139),
+  [`3da34f7`](https://github.com/cortega26/chile-hub/commit/3da34f78ef9aab7d95754b87296d5f7ce17babaa))
+
+- Cover Senate source failures and district enrichment
+  ([#139](https://github.com/cortega26/chile-hub/pull/139),
+  [`3da34f7`](https://github.com/cortega26/chile-hub/commit/3da34f78ef9aab7d95754b87296d5f7ce17babaa))
+
+
 ## 1.47.2 - 2026-10-09
 
 ### Corregido
