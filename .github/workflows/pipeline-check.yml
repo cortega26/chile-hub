@@ -566,6 +566,88 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
 
+
+  # PR/push CI computes the coverage badge, but does not publish the full
+  # data/normalized tree. Sync only this badge on successful main CI runs.
+  sync-coverage-badge:
+    name: Sync coverage badge (main)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, '[skip ci]')
+    needs: [build-and-test, package-quality, landing]
+    concurrency:
+      # Shared with docs auto-sync, data publication and releases.
+      group: bot-writes-main
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout current main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Download verified output from this run
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ env.PIPELINE_ARTIFACT }}
+          path: .coverage-output/
+
+      - name: Validate provenance and copy coverage badge only
+        env:
+          SOURCE_SHA: ${{ github.sha }}
+          SOURCE_RUN_ID: ${{ github.run_id }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          source = Path(".coverage-output/data/normalized")
+          provenance = json.loads((source / "pipeline_artifact_provenance.json").read_text())
+          if (
+              provenance.get("source_sha") != os.environ["SOURCE_SHA"]
+              or str(provenance.get("source_run_id")) != os.environ["SOURCE_RUN_ID"]
+              or provenance.get("source_run_event") != "push"
+              or provenance.get("verification_profile") != "readiness"
+          ):
+              raise SystemExit("Coverage artifact provenance does not match this CI run")
+
+          raw = (source / "coverage_badge.json").read_bytes()
+          badge = json.loads(raw)
+          if badge.get("schemaVersion") != 1 or badge.get("label") != "coverage":
+              raise SystemExit("Unexpected coverage badge schema")
+          message = badge.get("message")
+          if not isinstance(message, str) or not message.endswith("%"):
+              raise SystemExit("Invalid coverage percentage")
+          try:
+              percentage = float(message[:-1])
+          except ValueError as exc:
+              raise SystemExit("Invalid coverage percentage") from exc
+          if not 0 <= percentage <= 100:
+              raise SystemExit("Coverage percentage outside 0–100")
+          expected_color = "green" if percentage >= 80 else "yellow" if percentage >= 50 else "red"
+          if badge.get("color") != expected_color:
+              raise SystemExit("Coverage badge color does not match percentage")
+
+          Path("data/normalized/coverage_badge.json").write_bytes(raw)
+          print(f"Verified badge: {message} ({expected_color})")
+          PY
+
+      - name: Commit badge only when it changed
+        run: |
+          if git diff --quiet -- data/normalized/coverage_badge.json; then
+            echo "Coverage badge already current; no commit required."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- data/normalized/coverage_badge.json
+          git commit -m "chore(ci): sync coverage badge from verified tests [skip ci]"
+          git pull --rebase origin main
+          git push origin HEAD:main
+
   publish:
     concurrency:
       group: bot-writes-main
