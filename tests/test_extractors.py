@@ -1716,7 +1716,6 @@ class MineducEstablecimientosExtractorTests(unittest.TestCase):
                 csv_files = list(Path(tmp).glob("*.csv"))
                 self.assertEqual(len(csv_files), 1)  # solo el fixture
 
-
     @staticmethod
     def _rar_response():
         response = MagicMock()
@@ -1744,7 +1743,9 @@ class MineducEstablecimientosExtractorTests(unittest.TestCase):
             ):
                 result = mineduc_establecimientos_extractor.fetch_data()
 
-            self.assertEqual(result, (snapshot, "fallback", mineduc_establecimientos_extractor.DOWNLOAD_URL))
+            self.assertEqual(
+                result, (snapshot, "fallback", mineduc_establecimientos_extractor.DOWNLOAD_URL)
+            )
             self.assertFalse((raw / "mineduc_directorio_2025.rar").exists())
             extract.assert_not_called()
 
