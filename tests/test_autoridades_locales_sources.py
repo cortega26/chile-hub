@@ -128,6 +128,7 @@ class LocalAuthoritySourceFallbackTests(unittest.TestCase):
             "chile": ("00000", "00"),
             "invalid": ("7", "01"),
         }
+
         def resolve(codigo):
             return "Titular BCN" if codigo == "15101" else None
 
