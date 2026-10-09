@@ -1716,6 +1716,134 @@ class MineducEstablecimientosExtractorTests(unittest.TestCase):
                 csv_files = list(Path(tmp).glob("*.csv"))
                 self.assertEqual(len(csv_files), 1)  # solo el fixture
 
+    @staticmethod
+    def _rar_response():
+        response = MagicMock()
+        response.content = b"synthetic RAR payload"
+        response.__enter__.return_value = response
+        return response
+
+    def test_fetch_data_missing_unrar_recovers_offline_csv(self):
+        """A missing system binary must not bypass the snapshot fallback."""
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp) / "raw"
+            raw.mkdir()
+            snapshot = self._write_fixture_csv(raw / "2025_Directorio_Oficial_EE.csv")
+            with (
+                patch.object(mineduc_establecimientos_extractor, "RAW_DIR", str(raw)),
+                patch.object(mineduc_establecimientos_extractor, "ROOT_DIR", tmp),
+                patch.object(mineduc_establecimientos_extractor, "ensure_staging_directories"),
+                patch.object(
+                    mineduc_establecimientos_extractor,
+                    "fetch_with_retry",
+                    return_value=self._rar_response(),
+                ),
+                patch.object(mineduc_establecimientos_extractor.shutil, "which", return_value=None),
+                patch.object(mineduc_establecimientos_extractor.subprocess, "run") as extract,
+            ):
+                result = mineduc_establecimientos_extractor.fetch_data()
+
+            self.assertEqual(
+                result, (snapshot, "fallback", mineduc_establecimientos_extractor.DOWNLOAD_URL)
+            )
+            self.assertFalse((raw / "mineduc_directorio_2025.rar").exists())
+            extract.assert_not_called()
+
+    def test_fetch_data_missing_unrar_without_snapshot_fails_closed(self):
+        """No snapshot: raise a specific error rather than inventing live data."""
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp) / "raw"
+            raw.mkdir()
+            with (
+                patch.object(mineduc_establecimientos_extractor, "RAW_DIR", str(raw)),
+                patch.object(mineduc_establecimientos_extractor, "ROOT_DIR", tmp),
+                patch.object(mineduc_establecimientos_extractor, "ensure_staging_directories"),
+                patch.object(
+                    mineduc_establecimientos_extractor,
+                    "fetch_with_retry",
+                    return_value=self._rar_response(),
+                ),
+                patch.object(mineduc_establecimientos_extractor.shutil, "which", return_value=None),
+                self.assertRaisesRegex(FileNotFoundError, "No hay snapshots locales"),
+            ):
+                mineduc_establecimientos_extractor.fetch_data()
+
+            self.assertFalse((raw / "mineduc_directorio_2025.rar").exists())
+
+    def test_fetch_data_failed_unrar_execution_recovers_snapshot(self):
+        """Corrupt RAR should reuse the snapshot and remove the downloaded RAR."""
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp) / "raw"
+            raw.mkdir()
+            snapshot = self._write_fixture_csv(raw / "2025_Directorio_Oficial_EE.csv")
+            failed = MagicMock(returncode=3, stderr="invalid RAR")
+            with (
+                patch.object(mineduc_establecimientos_extractor, "RAW_DIR", str(raw)),
+                patch.object(mineduc_establecimientos_extractor, "ROOT_DIR", tmp),
+                patch.object(mineduc_establecimientos_extractor, "ensure_staging_directories"),
+                patch.object(
+                    mineduc_establecimientos_extractor,
+                    "fetch_with_retry",
+                    return_value=self._rar_response(),
+                ),
+                patch.object(
+                    mineduc_establecimientos_extractor.shutil,
+                    "which",
+                    return_value="/usr/bin/unrar",
+                ),
+                patch.object(
+                    mineduc_establecimientos_extractor.subprocess,
+                    "run",
+                    return_value=failed,
+                ) as extract,
+            ):
+                result = mineduc_establecimientos_extractor.fetch_data()
+
+            self.assertEqual(result[0], snapshot)
+            self.assertEqual(result[1], "fallback")
+            self.assertFalse((raw / "mineduc_directorio_2025.rar").exists())
+            extract.assert_called_once()
+
+    def test_fetch_data_valid_unrar_extracts_and_saves_live_csv(self):
+        """Success path copies the extracted CSV and reports live provenance."""
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp) / "raw"
+            raw.mkdir()
+
+            def extract_csv(command, **_kwargs):
+                self._write_fixture_csv(Path(command[-1]) / "2025_Directorio_Oficial_EE.csv")
+                return MagicMock(returncode=0, stderr="")
+
+            with (
+                patch.object(mineduc_establecimientos_extractor, "RAW_DIR", str(raw)),
+                patch.object(mineduc_establecimientos_extractor, "ROOT_DIR", tmp),
+                patch.object(mineduc_establecimientos_extractor, "ensure_staging_directories"),
+                patch.object(
+                    mineduc_establecimientos_extractor,
+                    "fetch_with_retry",
+                    return_value=self._rar_response(),
+                ),
+                patch.object(
+                    mineduc_establecimientos_extractor.shutil,
+                    "which",
+                    return_value="/usr/bin/unrar",
+                ),
+                patch.object(
+                    mineduc_establecimientos_extractor.subprocess,
+                    "run",
+                    side_effect=extract_csv,
+                ) as extract,
+            ):
+                path, mode, source_url = mineduc_establecimientos_extractor.fetch_data()
+
+            self.assertEqual(mode, "live")
+            self.assertEqual(source_url, mineduc_establecimientos_extractor.DOWNLOAD_URL)
+            self.assertEqual(path.parent, raw)
+            self.assertTrue(path.exists())
+            self.assertEqual(mineduc_establecimientos_extractor.parse_csv(path).height, 2)
+            self.assertFalse((raw / "mineduc_directorio_2025.rar").exists())
+            extract.assert_called_once()
+
     def test_extractor_dataset_name(self):
         """dataset_name retorna el identificador canónico."""
         self.assertEqual(
