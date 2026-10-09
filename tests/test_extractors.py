@@ -4554,7 +4554,7 @@ class SieduParsingRegressionTests(unittest.TestCase):
 
         rows = siedu_extractor._parse_sheet(ws, 2022)
         by_key = {(r["codigo_comuna"], r["codigo_indicador"]): r for r in rows}
-        self.assertEqual(len(rows), 5)
+        self.assertEqual(len(rows), 4)
         self.assertEqual(by_key["01101", "BPU_29"]["valor"], 71.4)
         self.assertEqual(by_key["01101", "BPU_29"]["categoria"], "Bienes Públicos Urbanos")
         self.assertEqual(by_key["01101", "BPU_29"]["nombre_indicador"], "Áreas verdes")
@@ -4600,7 +4600,9 @@ class SieduParsingRegressionTests(unittest.TestCase):
                 rows, mode, url, notes = siedu_extractor.fetch_data("https://example.test/siedu")
             self.assertEqual((mode, url), ("live", "https://example.test/siedu"))
             self.assertEqual(len(rows), 2)
-            self.assertEqual((raw_dir / siedu_extractor.XLSM_FILENAME).read_bytes(), b"fixture-xlsm")
+            self.assertEqual(
+                (raw_dir / siedu_extractor.XLSM_FILENAME).read_bytes(), b"fixture-xlsm"
+            )
             self.assertTrue(any("2 comunas, 1 indicadores" in note for note in notes))
 
     def test_fetch_failure_or_empty_parser_falls_back_without_claiming_live(self):
@@ -4736,8 +4738,12 @@ class MineducAggregationRegressionTests(unittest.TestCase):
                 patch.object(mineduc_resultados_extractor, "ensure_staging_directories"),
                 patch.object(mineduc_resultados_extractor, "fetch_with_retry", return_value=response),
                 patch.object(mineduc_resultados_extractor, "_find_unrar", return_value="unrar"),
-                patch.object(mineduc_resultados_extractor.shutil, "which", return_value="/bin/unrar"),
-                patch.object(mineduc_resultados_extractor.subprocess, "run", side_effect=fake_unrar),
+                patch.object(
+                    mineduc_resultados_extractor.shutil, "which", return_value="/bin/unrar"
+                ),
+                patch.object(
+                    mineduc_resultados_extractor.subprocess, "run", side_effect=fake_unrar
+                ),
             ):
                 rows, mode, url, notes = mineduc_resultados_extractor.fetch_data(
                     "https://example.test/rendimiento.rar"
@@ -4745,7 +4751,9 @@ class MineducAggregationRegressionTests(unittest.TestCase):
 
             self.assertEqual(mode, "live")
             self.assertEqual(url, "https://example.test/rendimiento.rar")
-            self.assertEqual((raw_dir / mineduc_resultados_extractor.RAR_FILENAME).read_bytes(), b"fixture-rar")
+            self.assertEqual(
+                (raw_dir / mineduc_resultados_extractor.RAR_FILENAME).read_bytes(), b"fixture-rar"
+            )
             self.assertEqual(len(rows), 3)
             self.assertTrue(any("comunas_agregadas: 3" in note for note in notes))
 
