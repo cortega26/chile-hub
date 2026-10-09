@@ -138,7 +138,7 @@ A septiembre de 2026, el proyecto produce:
 | Tests | 1 106 |
 | ADRs | 21 |
 | Contratos JSON Schema | 25 |
-| Instalaciones PyPI | ~2 200 / mes |
+| Distribución PyPI | Paquete publicado. Las descargas no prueban instalaciones ni usuarios únicos. |
 | Mirror Hugging Face | 21 subsets, ~135 descargas / mes |
 | Páginas estáticas por comuna | 347 |
 | DOI citable | [10.5281/zenodo.22968698](https://doi.org/10.5281/zenodo.22968698) |
@@ -155,7 +155,7 @@ estáticas por comuna con indicadores de fuentes oficiales, `llms.txt` guía a l
 que navegan el sitio, y Zenodo emite un DOI por release (concept DOI estable
 para citar). Todo se publica desde CI, sin intervención manual.
 
-**Lo que no se ve en la tabla:** 0 datos corruptos publicados. El pipeline falló
+**Lo que no se ve en la tabla:** hay evidencia documentada de controles que bloquearon publicaciones ante fallas. El pipeline falló
 varias veces — fuentes caídas, cambios de esquema no anunciados, archivos Excel
 renombrados en el portal del MINEDUC, y un portal (MINVU CEDOC) que bloquea por
 IP a los runners de GitHub — y en cada caso **abortó antes de publicar** o
