@@ -2798,6 +2798,68 @@ class AutoridadesElectasExtractorTests(unittest.TestCase):
         # el email no debe filtrarse como columna
         self.assertNotIn("email", {c.lower() for c in df.columns})
 
+    @staticmethod
+    def _fake_scrapling(html: str = "", *, failure: Exception | None = None):
+        """Inject a deterministic Scrapling stub without installing the optional extra."""
+        from types import ModuleType
+
+        package = ModuleType("scrapling")
+        package.__path__ = []
+        fetchers = ModuleType("scrapling.fetchers")
+        fetcher = MagicMock()
+        if failure is not None:
+            fetcher.get.side_effect = failure
+        else:
+            fetcher.get.return_value.html_content = html
+        fetchers.Fetcher = fetcher
+        return patch.dict(sys.modules, {"scrapling": package, "scrapling.fetchers": fetchers})
+
+    def test_fetch_senadores_nested_next_data_selects_current_roster(self):
+        payload = {
+            "props": {
+                "pageProps": {
+                    "previous": [{"NOMBRE_COMPLETO": "Antiguo", "ID_PARLAMENTARIO": 1}],
+                    "current": [
+                        {"NOMBRE_COMPLETO": "Titular Uno", "ID_PARLAMENTARIO": 2},
+                        {"NOMBRE_COMPLETO": "Titular Dos", "ID_PARLAMENTARIO": 3},
+                    ],
+                }
+            }
+        }
+        html = f'<script id="__NEXT_DATA__">{json.dumps(payload)}</script>'
+        with self._fake_scrapling(html):
+            rows = autoridades_electas_extractor.fetch_senadores()
+
+        self.assertEqual([row["ID_PARLAMENTARIO"] for row in rows], [2, 3])
+
+    def test_fetch_senadores_invalid_next_data_does_not_abort_diputados(self):
+        html = '<script id="__NEXT_DATA__">{truncated-json</script>'
+        with self._fake_scrapling(html):
+            self.assertEqual(autoridades_electas_extractor.fetch_senadores(), [])
+
+    def test_fetch_senadores_missing_next_data_is_empty(self):
+        with self._fake_scrapling("<html><body>Markup changed</body></html>"):
+            self.assertEqual(autoridades_electas_extractor.fetch_senadores(), [])
+
+    def test_fetch_senadores_fetch_failure_degrades_without_network(self):
+        with self._fake_scrapling(failure=OSError("Senado offline")):
+            self.assertEqual(autoridades_electas_extractor.fetch_senadores(), [])
+
+    def test_fetch_distritos_diputados_parses_ids_and_ignores_incomplete_cards(self):
+        html = (
+            '<article><a href="/diputados/detalle?prmID=1009">Diputado</a> Distrito: Nº 10'
+            '<article><a href="/diputados/detalle?prmID=1015">Diputado</a> Distrito: N° 7'
+            '<article><a href="/diputados/detalle?prmID=9999">Sin distrito</a>'
+        )
+        with self._fake_scrapling(html):
+            result = autoridades_electas_extractor.fetch_distritos_diputados()
+
+        self.assertEqual(result, {"1009": "10", "1015": "7"})
+
+    def test_fetch_distritos_diputados_failure_returns_empty_enrichment(self):
+        with self._fake_scrapling(failure=OSError("Cámara offline")):
+            self.assertEqual(autoridades_electas_extractor.fetch_distritos_diputados(), {})
+
     def test_senador_sin_periodo_vigente_queda_nulo(self):
         senadores = [
             {
