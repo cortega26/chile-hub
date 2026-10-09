@@ -6365,7 +6365,14 @@ class PublishableBundleRegressionTests(unittest.TestCase):
             managed.write_text("data", encoding="utf-8")
             unrelated.write_text("keep", encoding="utf-8")
             manifest_path.write_text(
-                json.dumps({"artifacts": [{"path": "data/normalized/regiones.json"}]}),
+                json.dumps(
+                    {
+                        "artifacts": [
+                            {"path": "data/normalized/regiones.json"},
+                            {"path": "data/normalized/artifact_manifest.json"},
+                        ]
+                    }
+                ),
                 encoding="utf-8",
             )
             removed = package_publishable_bundle.clean_publishable_from_manifest(
