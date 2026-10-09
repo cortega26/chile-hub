@@ -1338,7 +1338,12 @@ class TestStagnationPolicyCharacterization(unittest.TestCase):
                 )
                 self.assertEqual(result[0], severity)
         result = vp._stagnation_reason(
-            {"dataset": "sample", "maturity_status": "stable", "access_method": "derived", "review_by": "2026-10-05"},
+            {
+                "dataset": "sample",
+                "maturity_status": "stable",
+                "access_method": "derived",
+                "review_by": "2026-10-05",
+            },
             now,
         )
         self.assertEqual(result[0], "warning")
@@ -1355,9 +1360,15 @@ class TestStagnationPolicyCharacterization(unittest.TestCase):
     def test_fail_closed_for_overdue_stable_and_candidate(self):
         from datetime import datetime, timezone
 
-        report = {"datasets": [
-            {"dataset": "stable_one", "maturity_status": "stable", "review_by": "2026-10-05"},
-            {"dataset": "candidate_one", "maturity_status": "candidate", "review_by": "2026-10-05"},
-        ]}
+        report = {
+            "datasets": [
+                {"dataset": "stable_one", "maturity_status": "stable", "review_by": "2026-10-05"},
+                {
+                    "dataset": "candidate_one",
+                    "maturity_status": "candidate",
+                    "review_by": "2026-10-05",
+                },
+            ]
+        }
         with contextlib.redirect_stdout(io.StringIO()), self.assertRaises(SystemExit):
             vp._verify_stagnation(report, datetime(2026, 10, 7, tzinfo=timezone.utc))

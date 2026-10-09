@@ -1,6 +1,6 @@
 {
-  "generated_at_utc": "2026-10-06T16:28:11.793983+00:00",
-  "previous_generated_at_utc": "2026-10-04T15:06:08.814398+00:00",
+  "generated_at_utc": "2026-10-09T16:47:06.967555+00:00",
+  "previous_generated_at_utc": "2026-10-07T17:10:49.855406+00:00",
   "dataset_count": 22,
   "datasets": [
     {
@@ -25,9 +25,9 @@
     },
     {
       "dataset": "calidad_aire",
-      "previous_record_count": 4953,
-      "current_record_count": 5751,
-      "record_count_delta": 798,
+      "previous_record_count": 6154,
+      "current_record_count": 6948,
+      "record_count_delta": 794,
       "added_fields": [],
       "removed_fields": [],
       "previous_source_mode": "live",
@@ -205,8 +205,8 @@
     },
     {
       "dataset": "establecimientos_salud",
-      "previous_record_count": 5743,
-      "current_record_count": 5743,
+      "previous_record_count": 5782,
+      "current_record_count": 5782,
       "record_count_delta": 0,
       "added_fields": [],
       "removed_fields": [],
@@ -265,9 +265,9 @@
     },
     {
       "dataset": "indicadores",
-      "previous_record_count": 677,
-      "current_record_count": 679,
-      "record_count_delta": 2,
+      "previous_record_count": 681,
+      "current_record_count": 718,
+      "record_count_delta": 37,
       "added_fields": [],
       "removed_fields": [],
       "previous_source_mode": "live",

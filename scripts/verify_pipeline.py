@@ -394,15 +394,30 @@ def _stagnation_reason(entry, reference_date):
     maturity = entry.get("maturity_status", "unknown")
     days = entry.get("stalled_after_days", 90)
     if entry.get("access_method") == "derived" and maturity != "deprecated":
-        return ("warning", f"{dataset}: estancado (derivado) — revisar fuentes upstream. Revisión vencida: {review_by}")
+        return (
+            "warning",
+            f"{dataset}: estancado (derivado) — revisar fuentes upstream. Revisión vencida: {review_by}",
+        )
     if maturity == "experimental":
-        return ("warning", f"{dataset}: estancado (experimental, {days}d) — revisión vencida {review_by}")
+        return (
+            "warning",
+            f"{dataset}: estancado (experimental, {days}d) — revisión vencida {review_by}",
+        )
     if maturity == "candidate":
-        return ("failure", f"{dataset}: estancado (candidate, {days}d) — revisión vencida {review_by}. Requiere acción.")
+        return (
+            "failure",
+            f"{dataset}: estancado (candidate, {days}d) — revisión vencida {review_by}. Requiere acción.",
+        )
     if maturity == "stable":
-        return ("failure", f"{dataset}: regresión en madurez estable — revisión vencida {review_by}. Investigar degradación de fuente.")
+        return (
+            "failure",
+            f"{dataset}: regresión en madurez estable — revisión vencida {review_by}. Investigar degradación de fuente.",
+        )
     if maturity == "deprecated":
-        return ("warning", f"{dataset}: estancado y deprecado — considerar eliminación del registry")
+        return (
+            "warning",
+            f"{dataset}: estancado y deprecado — considerar eliminación del registry",
+        )
     return None
 
 
