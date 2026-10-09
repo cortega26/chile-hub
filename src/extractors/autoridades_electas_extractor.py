@@ -199,7 +199,13 @@ def fetch_senadores() -> list[dict[str, Any]]:
     if not match:
         print("Advertencia: senado.cl no expuso __NEXT_DATA__. Se omiten senadores.")
         return []
-    data = json.loads(match.group(1))
+    try:
+        data = json.loads(match.group(1))
+    except json.JSONDecodeError as exc:
+        # Next.js can expose an incomplete script during site/source changes.
+        # Keep the optional Senado lane degraded instead of aborting diputados.
+        print(f"Advertencia: senado.cl entregó __NEXT_DATA__ inválido ({exc}). Se omiten.")
+        return []
     best: list[dict[str, Any]] = []
 
     def _walk(obj: Any) -> None:
