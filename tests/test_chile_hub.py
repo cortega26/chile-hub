@@ -1953,12 +1953,13 @@ class WorkflowContractTests(unittest.TestCase):
             "build-and-test:",
             "package-quality:",
             "landing:",
+            "sync-coverage-badge:",
             "publish:",
             # Plan 109: alerta de schedule roto (issue fijo + anotaciones).
             "notify-schedule-failure:",
         ):
             self.assertIn(job, self.workflow_text)
-        self.assertEqual(self.workflow_text.count("timeout-minutes:"), 7)
+        self.assertEqual(self.workflow_text.count("timeout-minutes:"), 8)
         self.assertIn("concurrency:", self.workflow_text)
 
     def test_pipeline_check_workflow_uses_one_generated_output_artifact(self):
@@ -1970,8 +1971,20 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("data/normalized/", self.workflow_text)
         self.assertIn("index.html\n            app.js", self.workflow_text)
         self.assertNotIn("README.md\n            index.html", self.workflow_text)
-        self.assertEqual(self.workflow_text.count("name: ${{ env.PIPELINE_ARTIFACT }}"), 3)
+        self.assertEqual(self.workflow_text.count("name: ${{ env.PIPELINE_ARTIFACT }}"), 4)
         self.assertNotIn("data/normalized/hub_status.json\n", self.workflow_text)
+        # The fourth consumer only synchronizes the verified coverage badge
+        # on successful main pushes, never the smoke-test dataset bundle.
+        badge_job = self.workflow_text.split("\n  sync-coverage-badge:", 1)[1].split(
+            "\n  publish:", 1
+        )[0]
+        self.assertIn("needs: [build-and-test, package-quality, landing]", badge_job)
+        self.assertIn("github.event_name == 'push'", badge_job)
+        self.assertIn("group: bot-writes-main", badge_job)
+        self.assertIn('provenance.get("source_sha")', badge_job)
+        self.assertIn('provenance.get("source_run_id")', badge_job)
+        self.assertIn("git add -- data/normalized/coverage_badge.json", badge_job)
+        self.assertNotIn("git add --all data/normalized", badge_job)
 
     def test_pipeline_check_workflow_has_guarded_least_privilege_publication(self):
         self.assertIn("permissions:\n  contents: read", self.workflow_text)
