@@ -75,7 +75,9 @@ def fetch_data() -> tuple[Path, str, str]:
             unrar_bin = "unrar"
 
         if shutil.which(str(unrar_bin)) is None and not Path(unrar_bin).exists():
-            raise SystemExit(
+            # Recover from a local CSV snapshot rather than aborting before
+            # the catch-all fallback below can run (SystemExit bypasses it).
+            raise RuntimeError(
                 f"unrar no está disponible ({unrar_bin}). Instala con 'apt-get install unrar'."
             )
 
