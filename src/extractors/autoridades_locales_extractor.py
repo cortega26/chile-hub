@@ -318,7 +318,9 @@ def fetch_alcaldes() -> list[dict[str, str | None]]:
         for title, wikitext in wikitext_por_titulo.items():
             comuna = _comuna_name_from_title(title)
             nombre_wp, inicio = _extract_alcalde_actual(wikitext)
-            wikidata[comuna] = {
+            # Los títulos de Wikipedia conservan mayúsculas y tildes; el lookup
+            # oficial usa nombres normalizados. Ambos lados deben coincidir.
+            wikidata[norm_text(comuna)] = {
                 "comuna": comuna,
                 "nombre_wikipedia": nombre_wp,
                 "periodo_inicio": inicio,
@@ -329,7 +331,7 @@ def fetch_alcaldes() -> list[dict[str, str | None]]:
     # --- Merge: BCN SIIT como base, Wikipedia como enriquecimiento ---
     filas: list[dict[str, str | None]] = []
     for comuna_bcn, datos_bcn in filas_bcn.items():
-        wp = wikidata.get(comuna_bcn, {})
+        wp = wikidata.get(norm_text(comuna_bcn), {})
         nombre = datos_bcn["nombre"]  # BCN SIIT es la fuente autoritativa del nombre
         if not nombre:
             # Fallback: si BCN SIIT no tiene nombre, usar Wikipedia
