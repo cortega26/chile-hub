@@ -12,6 +12,40 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.47.4 - 2026-10-09
+
+### Corregido
+
+- Honor MINEDUC CSV fallback when unrar is unavailable
+  ([#140](https://github.com/cortega26/chile-hub/pull/140),
+  [`7630919`](https://github.com/cortega26/chile-hub/commit/7630919dbf2e72b509d96f6de27c2fb7ae0b6e40))
+
+### Mantenimiento
+
+- **ci**: Sync coverage badge from verified tests [skip ci]
+  ([`eff1614`](https://github.com/cortega26/chile-hub/commit/eff1614ef9c67f2a0d5b7f7124da26ad751d4ef3))
+
+### Code Style
+
+- Format MINEDUC recovery fixture tests ([#140](https://github.com/cortega26/chile-hub/pull/140),
+  [`7630919`](https://github.com/cortega26/chile-hub/commit/7630919dbf2e72b509d96f6de27c2fb7ae0b6e40))
+
+### Documentación
+
+- Sync MINEDUC regression test count ([#140](https://github.com/cortega26/chile-hub/pull/140),
+  [`7630919`](https://github.com/cortega26/chile-hub/commit/7630919dbf2e72b509d96f6de27c2fb7ae0b6e40))
+
+### Tests
+
+- Cover MINEDUC RAR extraction and failover without network
+  ([#140](https://github.com/cortega26/chile-hub/pull/140),
+  [`7630919`](https://github.com/cortega26/chile-hub/commit/7630919dbf2e72b509d96f6de27c2fb7ae0b6e40))
+
+- Exercise MINEDUC fallback when unrar is missing
+  ([#140](https://github.com/cortega26/chile-hub/pull/140),
+  [`7630919`](https://github.com/cortega26/chile-hub/commit/7630919dbf2e72b509d96f6de27c2fb7ae0b6e40))
+
+
 ## 1.47.3 - 2026-10-09
 
 ### Corregido
