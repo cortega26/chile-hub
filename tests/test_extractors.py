@@ -4736,7 +4736,9 @@ class MineducAggregationRegressionTests(unittest.TestCase):
             with (
                 patch.object(mineduc_resultados_extractor, "RAW_DIR", raw_dir),
                 patch.object(mineduc_resultados_extractor, "ensure_staging_directories"),
-                patch.object(mineduc_resultados_extractor, "fetch_with_retry", return_value=response),
+                patch.object(
+                    mineduc_resultados_extractor, "fetch_with_retry", return_value=response
+                ),
                 patch.object(mineduc_resultados_extractor, "_find_unrar", return_value="unrar"),
                 patch.object(
                     mineduc_resultados_extractor.shutil, "which", return_value="/bin/unrar"
