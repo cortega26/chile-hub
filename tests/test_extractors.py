@@ -4523,6 +4523,247 @@ class CalidadAireExtractorTests(unittest.TestCase):
             self.assertEqual(metadata["record_count"], 1)
 
 
+class SieduParsingRegressionTests(unittest.TestCase):
+    """Regresiones offline de XLSM SIEDU: parser, años, fallback y publicación."""
+
+    @staticmethod
+    def _add_measurement_sheet(ws, *, cut=1101, value="71,4"):
+        # Formato oficial: identificadores fila 11, unidades 13, nombres 14,
+        # observaciones desde fila 15; columna 7 contiene el CUT.
+        for _ in range(10):
+            ws.append([None] * 10)
+        ws.append([None] * 7 + ["BPU_29", "DE_1", "ZZ_9"])
+        ws.append([None] * 10)
+        ws.append([None] * 7 + ["m²/hab", "minutos", "índice"])
+        ws.append([None] * 7 + ["Áreas verdes.", "Viajes.", None])
+        ws.append([None] * 6 + [cut, value, "Sin medición", "3.5"])
+
+    def test_parse_sheet_rejects_incomplete_measurement(self):
+        wb = openpyxl.Workbook()
+        self.assertEqual(siedu_extractor._parse_sheet(wb.active, 2022), [])
+
+    def test_parse_sheet_preserves_cut_and_skips_invalid_values(self):
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        self._add_measurement_sheet(ws)
+        ws.append([None] * 6 + ["no-es-cut", "8", "8", "8"])
+        ws.append([None] * 6 + [13101, "no-numérico", "36", None])
+        ws.append([None] * 6 + [None, "10", "20", "30"])
+        ws.append([None] * 6 + [5109, None, "Sin valor", ""])
+        ws.append([None] * 6 + [8101, 0, " ", "valor inválido"])
+
+        rows = siedu_extractor._parse_sheet(ws, 2022)
+        by_key = {(r["codigo_comuna"], r["codigo_indicador"]): r for r in rows}
+        self.assertEqual(len(rows), 5)
+        self.assertEqual(by_key["01101", "BPU_29"]["valor"], 71.4)
+        self.assertEqual(by_key["01101", "BPU_29"]["categoria"], "Bienes Públicos Urbanos")
+        self.assertEqual(by_key["01101", "BPU_29"]["nombre_indicador"], "Áreas verdes")
+        self.assertEqual(by_key["01101", "ZZ_9"]["categoria"], "ZZ")
+        self.assertEqual(by_key["13101", "DE_1"]["valor"], 36.0)
+        self.assertEqual(by_key["08101", "BPU_29"]["valor"], 0.0)
+        self.assertTrue(all(len(row["codigo_comuna"]) == 5 for row in rows))
+
+    def test_parse_workbook_keeps_most_recent_measurement_for_each_key(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "siedu.xlsm"
+            wb = openpyxl.Workbook()
+            old = wb.active
+            old.title = "LÍNEA DE BASE"
+            self._add_measurement_sheet(old, value="10,0")
+            recent = wb.create_sheet("QUINTA MEDICIÓN")
+            self._add_measurement_sheet(recent, value="20,5")
+            wb.save(path)
+            rows = siedu_extractor._parse_siedu_xlsm(path)
+
+        by_key = {(r["codigo_comuna"], r["codigo_indicador"]): r for r in rows}
+        self.assertEqual(len(by_key), 2)
+        self.assertEqual(by_key["01101", "BPU_29"]["anio"], 2022)
+        self.assertEqual(by_key["01101", "BPU_29"]["valor"], 20.5)
+        self.assertEqual(by_key["01101", "ZZ_9"]["anio"], 2022)
+
+    def test_fetch_live_writes_snapshot_and_reports_parsed_records(self):
+        response = MagicMock()
+        response.content = b"fixture-xlsm"
+        response.__enter__.return_value = response
+        with tempfile.TemporaryDirectory() as tmp:
+            raw_dir = Path(tmp)
+            with (
+                patch.object(siedu_extractor, "RAW_DIR", raw_dir),
+                patch.object(siedu_extractor, "ensure_staging_directories"),
+                patch.object(siedu_extractor, "fetch_with_retry", return_value=response),
+                patch.object(
+                    siedu_extractor,
+                    "_parse_siedu_xlsm",
+                    return_value=siedu_extractor.FALLBACK_ROWS[:2],
+                ),
+            ):
+                rows, mode, url, notes = siedu_extractor.fetch_data("https://example.test/siedu")
+            self.assertEqual((mode, url), ("live", "https://example.test/siedu"))
+            self.assertEqual(len(rows), 2)
+            self.assertEqual((raw_dir / siedu_extractor.XLSM_FILENAME).read_bytes(), b"fixture-xlsm")
+            self.assertTrue(any("2 comunas, 1 indicadores" in note for note in notes))
+
+    def test_fetch_failure_or_empty_parser_falls_back_without_claiming_live(self):
+        response = MagicMock()
+        response.content = b"empty-xlsm"
+        response.__enter__.return_value = response
+        with tempfile.TemporaryDirectory() as tmp:
+            with (
+                patch.object(siedu_extractor, "RAW_DIR", Path(tmp)),
+                patch.object(siedu_extractor, "ensure_staging_directories"),
+                patch.object(
+                    siedu_extractor,
+                    "fetch_with_retry",
+                    side_effect=ConnectionError("sin red"),
+                ),
+            ):
+                rows, mode, _, notes = siedu_extractor.fetch_data()
+            self.assertEqual(mode, "fallback")
+            self.assertEqual(rows, siedu_extractor.FALLBACK_ROWS)
+            self.assertTrue(any("ConnectionError" in note for note in notes))
+
+            with (
+                patch.object(siedu_extractor, "RAW_DIR", Path(tmp)),
+                patch.object(siedu_extractor, "ensure_staging_directories"),
+                patch.object(siedu_extractor, "fetch_with_retry", return_value=response),
+                patch.object(siedu_extractor, "_parse_siedu_xlsm", return_value=[]),
+            ):
+                rows, mode, _, notes = siedu_extractor.fetch_data()
+            self.assertEqual(mode, "fallback")
+            self.assertEqual(rows, siedu_extractor.FALLBACK_ROWS)
+            self.assertTrue(any("no produjo registros válidos" in note for note in notes))
+
+    def test_metadata_labels_partial_urban_coverage_not_national(self):
+        df = siedu_extractor.normalize_rows(siedu_extractor.FALLBACK_ROWS)
+        for mode in ("live", "fallback"):
+            metadata = siedu_extractor.build_metadata(df, mode, "https://example.test", [])
+            self.assertEqual(metadata["source_mode"], mode)
+            self.assertEqual(metadata["coverage"]["status"], "partial_expected")
+            self.assertEqual(metadata["coverage"]["coverage_ratio"], round(3 / 346, 4))
+            self.assertIn("346 comunas", metadata["coverage"]["expected_scope"])
+            self.assertIn(
+                "xlsm" if mode == "live" else "fallback",
+                metadata["source_detail"],
+            )
+
+    def test_process_refuses_to_publish_invalid_data(self):
+        with (
+            patch.object(
+                siedu_extractor,
+                "fetch_data",
+                return_value=(siedu_extractor.FALLBACK_ROWS, "fallback", "url", []),
+            ),
+            patch.object(
+                siedu_extractor.SieduExtractor,
+                "validate",
+                return_value={"status": "error", "errors": ["bad data"]},
+            ),
+            patch.object(siedu_extractor.SieduExtractor, "write_staging") as writer,
+        ):
+            with self.assertRaisesRegex(SystemExit, "bad data"):
+                siedu_extractor.process_siedu()
+            writer.assert_not_called()
+
+    def test_process_persists_valid_data_with_source_provenance(self):
+        with (
+            patch.object(
+                siedu_extractor,
+                "fetch_data",
+                return_value=(siedu_extractor.FALLBACK_ROWS, "live", "url", ["parsed"]),
+            ),
+            patch.object(
+                siedu_extractor.SieduExtractor,
+                "validate",
+                return_value={"status": "ok", "errors": []},
+            ),
+            patch.object(siedu_extractor.SieduExtractor, "write_staging") as writer,
+        ):
+            output = siedu_extractor.process_siedu()
+            self.assertEqual(output, str(siedu_extractor.STAGING_CSV_PATH))
+            writer.assert_called_once()
+            df, meta = writer.call_args.args
+            self.assertEqual(df.height, len(siedu_extractor.FALLBACK_ROWS))
+            self.assertEqual(meta["source_mode"], "live")
+            self.assertIn("parsed", meta["notes"])
+
+
+class MineducAggregationRegressionTests(unittest.TestCase):
+    """Protege el cálculo de deserción y asistencia sin utilizar datos de alumnos reales."""
+
+    CSV = (
+        "AGNO;COD_COM_RBD;RBD;ASISTENCIA;SIT_FIN_R\n"
+        "2024;1101;10;90;P\n"
+        "2024;1101;11;70;R\n"
+        "2024;1101;11;100;T\n"
+        "2024;1101;12;80;Y\n"
+        "2024;13101;20;0;T\n"
+        "2024;13101;21;0;Y\n"
+        "2025;1101;10;95;P\n"
+    )
+
+    def test_aggregate_excludes_transfers_from_dropout_and_attendance(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "rendimiento.csv"
+            path.write_text(self.CSV, encoding="utf-8")
+            rows = mineduc_resultados_extractor._aggregate_rendimiento(path)
+
+        keyed = {(row["anio"], row["codigo_comuna"]): row for row in rows}
+        self.assertEqual(len(keyed), 3)
+        s2024 = keyed[2024, "01101"]
+        self.assertEqual(s2024["matricula_total"], 4)
+        self.assertEqual(s2024["asistencia_promedio"], 80.0)
+        self.assertEqual(s2024["tasa_aprobacion"], 25.0)
+        self.assertEqual(s2024["tasa_reprobacion"], 25.0)
+        self.assertEqual(s2024["tasa_retiro"], 25.0)  # Y, no T
+        self.assertEqual(s2024["establecimientos_reportados"], 3)
+        self.assertEqual(keyed[2024, "13101"]["asistencia_promedio"], 0.0)
+        self.assertEqual(keyed[2024, "13101"]["tasa_retiro"], 50.0)
+        self.assertEqual(keyed[2025, "01101"]["asistencia_promedio"], 95.0)
+
+    def test_fetch_live_aggregates_extracted_csv_with_no_network(self):
+        response = MagicMock()
+        response.content = b"fixture-rar"
+        response.__enter__.return_value = response
+
+        def fake_unrar(command, **kwargs):
+            Path(command[-1], "rendimiento.csv").write_text(self.CSV, encoding="utf-8")
+            return MagicMock(returncode=0, stderr="")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            raw_dir = Path(tmp)
+            with (
+                patch.object(mineduc_resultados_extractor, "RAW_DIR", raw_dir),
+                patch.object(mineduc_resultados_extractor, "ensure_staging_directories"),
+                patch.object(mineduc_resultados_extractor, "fetch_with_retry", return_value=response),
+                patch.object(mineduc_resultados_extractor, "_find_unrar", return_value="unrar"),
+                patch.object(mineduc_resultados_extractor.shutil, "which", return_value="/bin/unrar"),
+                patch.object(mineduc_resultados_extractor.subprocess, "run", side_effect=fake_unrar),
+            ):
+                rows, mode, url, notes = mineduc_resultados_extractor.fetch_data(
+                    "https://example.test/rendimiento.rar"
+                )
+
+            self.assertEqual(mode, "live")
+            self.assertEqual(url, "https://example.test/rendimiento.rar")
+            self.assertEqual((raw_dir / mineduc_resultados_extractor.RAR_FILENAME).read_bytes(), b"fixture-rar")
+            self.assertEqual(len(rows), 3)
+            self.assertTrue(any("comunas_agregadas: 3" in note for note in notes))
+
+    def test_fetch_network_failure_preserves_fallback_provenance(self):
+        with (
+            patch.object(mineduc_resultados_extractor, "ensure_staging_directories"),
+            patch.object(
+                mineduc_resultados_extractor,
+                "fetch_with_retry",
+                side_effect=ConnectionError("offline"),
+            ),
+        ):
+            rows, mode, _, notes = mineduc_resultados_extractor.fetch_data()
+        self.assertEqual(mode, "fallback")
+        self.assertEqual(rows, mineduc_resultados_extractor.FALLBACK_ROWS)
+        self.assertTrue(any("ConnectionError" in note for note in notes))
+
+
 if __name__ == "__main__":
     import sys
 
