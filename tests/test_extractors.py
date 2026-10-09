@@ -3045,19 +3045,18 @@ class AutoridadesLocalesExtractorTests(unittest.TestCase):
         self.assertEqual(row["fuente"], "BCN SIIT")
         self.assertIn("idcom=13501", row["url_fuente"])
 
-
     def test_bcn_name_wins_and_wikipedia_date_matches_accented_comuna(self):
         title = "Anexo:Alcaldes de Ñuñoa"
         with (
-            patch.object(local, "_load_comunas_lookup", return_value={"nunoa": ("13120", "13")}),
+            patch.object(autoridades_locales_extractor, "_load_comunas_lookup", return_value={"nunoa": ("13120", "13")}),
             patch.object(
-                local,
+                autoridades_locales_extractor,
                 "fetch_alcaldes_bcn",
                 return_value=[{"comuna": "nunoa", "nombre": "Titular BCN", "periodo_inicio": None}],
             ),
-            patch.object(local, "fetch_alcalde_titles", return_value=[title]),
+            patch.object(autoridades_locales_extractor, "fetch_alcalde_titles", return_value=[title]),
             patch.object(
-                local,
+                autoridades_locales_extractor,
                 "fetch_alcaldes_wikitext",
                 return_value={
                     title: "| titular = [[Otra persona]]\n| inicio = {{fecha|6|12|2024}}\n"
@@ -3075,21 +3074,21 @@ class AutoridadesLocalesExtractorTests(unittest.TestCase):
         title = "Anexo:Alcaldes de Arica"
         with (
             patch.object(
-                local,
+                autoridades_locales_extractor,
                 "_load_comunas_lookup",
                 return_value={"arica": ("15101", "15"), "iquique": ("01101", "01")},
             ),
             patch.object(
-                local,
+                autoridades_locales_extractor,
                 "fetch_alcaldes_bcn",
                 return_value=[
                     {"comuna": "arica", "nombre": None, "periodo_inicio": None},
                     {"comuna": "iquique", "nombre": "Titular BCN", "periodo_inicio": None},
                 ],
             ),
-            patch.object(local, "fetch_alcalde_titles", return_value=[title]),
+            patch.object(autoridades_locales_extractor, "fetch_alcalde_titles", return_value=[title]),
             patch.object(
-                local,
+                autoridades_locales_extractor,
                 "fetch_alcaldes_wikitext",
                 return_value={title: "| titular = [[Titular WP]]\n"},
             ),
@@ -3103,14 +3102,14 @@ class AutoridadesLocalesExtractorTests(unittest.TestCase):
 
     def test_wikipedia_outage_keeps_official_bcn_rows(self):
         with (
-            patch.object(local, "_load_comunas_lookup", return_value={"arica": ("15101", "15")}),
+            patch.object(autoridades_locales_extractor, "_load_comunas_lookup", return_value={"arica": ("15101", "15")}),
             patch.object(
-                local,
+                autoridades_locales_extractor,
                 "fetch_alcaldes_bcn",
                 return_value=[{"comuna": "arica", "nombre": "Titular BCN", "periodo_inicio": None}],
             ),
-            patch.object(local, "fetch_alcalde_titles", side_effect=OSError("wiki offline")),
-            patch.object(local, "fetch_alcaldes_wikitext") as fetch_text,
+            patch.object(autoridades_locales_extractor, "fetch_alcalde_titles", side_effect=OSError("wiki offline")),
+            patch.object(autoridades_locales_extractor, "fetch_alcaldes_wikitext") as fetch_text,
         ):
             rows = autoridades_locales_extractor.fetch_alcaldes()
 
@@ -3122,11 +3121,11 @@ class AutoridadesLocalesExtractorTests(unittest.TestCase):
     def test_total_bcn_outage_falls_back_to_wikipedia(self):
         title = "Anexo:Alcaldes de Arica"
         with (
-            patch.object(local, "_load_comunas_lookup", return_value={"arica": ("15101", "15")}),
-            patch.object(local, "fetch_alcaldes_bcn", side_effect=OSError("BCN offline")),
-            patch.object(local, "fetch_alcalde_titles", return_value=[title]),
+            patch.object(autoridades_locales_extractor, "_load_comunas_lookup", return_value={"arica": ("15101", "15")}),
+            patch.object(autoridades_locales_extractor, "fetch_alcaldes_bcn", side_effect=OSError("BCN offline")),
+            patch.object(autoridades_locales_extractor, "fetch_alcalde_titles", return_value=[title]),
             patch.object(
-                local,
+                autoridades_locales_extractor,
                 "fetch_alcaldes_wikitext",
                 return_value={title: "| titular = [[Titular WP]]\n"},
             ),
@@ -3139,17 +3138,17 @@ class AutoridadesLocalesExtractorTests(unittest.TestCase):
 
     def test_both_sources_offline_do_not_invent_authorities(self):
         with (
-            patch.object(local, "_load_comunas_lookup", return_value={"arica": ("15101", "15")}),
-            patch.object(local, "fetch_alcaldes_bcn", side_effect=OSError("BCN offline")),
-            patch.object(local, "fetch_alcalde_titles", side_effect=OSError("wiki offline")),
+            patch.object(autoridades_locales_extractor, "_load_comunas_lookup", return_value={"arica": ("15101", "15")}),
+            patch.object(autoridades_locales_extractor, "fetch_alcaldes_bcn", side_effect=OSError("BCN offline")),
+            patch.object(autoridades_locales_extractor, "fetch_alcalde_titles", side_effect=OSError("wiki offline")),
         ):
             self.assertEqual(autoridades_locales_extractor.fetch_alcaldes(), [])
 
     def test_missing_comuna_lookup_short_circuits_all_requests(self):
         with (
-            patch.object(local, "_load_comunas_lookup", return_value={}),
-            patch.object(local, "fetch_alcaldes_bcn") as bcn,
-            patch.object(local, "fetch_alcalde_titles") as wikipedia,
+            patch.object(autoridades_locales_extractor, "_load_comunas_lookup", return_value={}),
+            patch.object(autoridades_locales_extractor, "fetch_alcaldes_bcn") as bcn,
+            patch.object(autoridades_locales_extractor, "fetch_alcalde_titles") as wikipedia,
         ):
             self.assertEqual(autoridades_locales_extractor.fetch_alcaldes(), [])
 
@@ -3167,7 +3166,7 @@ class AutoridadesLocalesExtractorTests(unittest.TestCase):
         def resolve(codigo):
             return "Titular BCN" if codigo == "15101" else None
 
-        with patch.object(local, "fetch_alcalde_bcn", side_effect=resolve) as fetch:
+        with patch.object(autoridades_locales_extractor, "fetch_alcalde_bcn", side_effect=resolve) as fetch:
             rows = autoridades_locales_extractor.fetch_alcaldes_bcn(lookup, max_workers=2)
 
         by_comuna = {row["comuna"]: row for row in rows}
@@ -3181,11 +3180,11 @@ class AutoridadesLocalesExtractorTests(unittest.TestCase):
             response = MagicMock(text=f"<td>Alcalde</td><td>{cell}</td>")
             with (
                 self.subTest(cell=cell),
-                patch.object(local, "fetch_with_retry", return_value=response),
+                patch.object(autoridades_locales_extractor, "fetch_with_retry", return_value=response),
             ):
                 self.assertIsNone(autoridades_locales_extractor.fetch_alcalde_bcn("15101"))
 
-        with patch.object(local, "fetch_with_retry", side_effect=OSError("offline")):
+        with patch.object(autoridades_locales_extractor, "fetch_with_retry", side_effect=OSError("offline")):
             self.assertIsNone(autoridades_locales_extractor.fetch_alcalde_bcn("15101"))
 
 
