@@ -1975,8 +1975,8 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertNotIn("data/normalized/hub_status.json\n", self.workflow_text)
         # The fourth consumer only synchronizes the verified coverage badge
         # on successful main pushes, never the smoke-test dataset bundle.
-        badge_job = self.workflow_text.split("\\n  sync-coverage-badge:", 1)[1].split(
-            "\\n  publish:", 1
+        badge_job = self.workflow_text.split("\n  sync-coverage-badge:", 1)[1].split(
+            "\n  publish:", 1
         )[0]
         self.assertIn("needs: [build-and-test, package-quality, landing]", badge_job)
         self.assertIn("github.event_name == 'push'", badge_job)
