@@ -6396,9 +6396,7 @@ class PublishableBundleRegressionTests(unittest.TestCase):
                     "load_manifest",
                     return_value={"artifact_count": 2},
                 ),
-                patch.object(
-                    package_publishable_bundle, "build_zip", return_value=zip_path
-                ),
+                patch.object(package_publishable_bundle, "build_zip", return_value=zip_path),
                 patch.object(sys, "argv", ["package_publishable_bundle.py"]),
                 contextlib.redirect_stdout(out),
             ):
