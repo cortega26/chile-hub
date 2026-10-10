@@ -1460,6 +1460,113 @@ class ResExtractorTests(unittest.TestCase):
             self.assertEqual(older.read_bytes(), backup)
             self.assertTrue(any(p.read_bytes() == invalid for p in raw.glob("*.csv")))
 
+    def test_res_wrong_year_http_200_uses_matching_snapshot(self):
+        """Un CSV estructuralmente válido de 2025 no representa el recurso 2026."""
+        package = self._package_mock([self._resource("current", 2026)])
+        wrong_year = self._valid_res_csv(2025)
+        correct_year = self._valid_res_csv(2026)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            raw = Path(tmpdir)
+            snapshot = raw / "res_Constituciones_del_año_2026_20261001T010101Z.csv"
+            snapshot.write_bytes(correct_year)
+            with (
+                patch.object(res_extractor, "RAW_DIR", tmpdir),
+                patch.object(res_extractor, "_staging_years_present", return_value=None),
+                patch.object(
+                    res_extractor,
+                    "fetch_with_retry",
+                    side_effect=[package, self._response_mock(wrong_year)],
+                ),
+            ):
+                contents, mode, detail = res_extractor.fetch_resources()
+            self.assertEqual((contents, mode), ([correct_year], "fallback"))
+            self.assertIn(snapshot.name, detail)
+            self.assertTrue(any(p.read_bytes() == wrong_year for p in raw.glob("*.csv")))
+
+    def test_res_wrong_year_latest_snapshot_uses_older_matching_one(self):
+        """Saltarse un backup de año erróneo aunque tenga columnas y RUT."""
+        from requests import RequestException
+
+        package = self._package_mock([self._resource("current", 2026)])
+        with tempfile.TemporaryDirectory() as tmpdir:
+            raw = Path(tmpdir)
+            older = raw / "res_Constituciones_del_año_2026_20261001T010101Z.csv"
+            newer = raw / "res_Constituciones_del_año_2026_20261002T010101Z.csv"
+            older.write_bytes(self._valid_res_csv(2026))
+            newer.write_bytes(self._valid_res_csv(2025))
+            with (
+                patch.object(res_extractor, "RAW_DIR", tmpdir),
+                patch.object(res_extractor, "_staging_years_present", return_value=None),
+                patch.object(
+                    res_extractor,
+                    "fetch_with_retry",
+                    side_effect=[package, RequestException("offline")],
+                ),
+            ):
+                contents, mode, detail = res_extractor.fetch_resources()
+        self.assertEqual((contents, mode), ([self._valid_res_csv(2026)], "fallback"))
+        self.assertIn(older.name, detail)
+        self.assertNotIn(newer.name, detail)
+
+    def test_res_wrong_year_without_matching_backup_fails_closed(self):
+        """No aceptar datos de otro año cuando no hay copia válida."""
+        package = self._package_mock([self._resource("current", 2026)])
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with (
+                patch.object(res_extractor, "RAW_DIR", tmpdir),
+                patch.object(res_extractor, "_staging_years_present", return_value=None),
+                patch.object(
+                    res_extractor,
+                    "fetch_with_retry",
+                    side_effect=[package, self._response_mock(self._valid_res_csv(2025))],
+                ),
+                self.assertRaisesRegex(
+                    SystemExit, "No hay snapshot raw de respaldo utilizable"
+                ),
+            ):
+                res_extractor.fetch_resources()
+
+    def test_res_year_validator_accepts_annual_overlap(self):
+        """Un recurso anual puede incluir filas de otro año si conserva su año."""
+        csv_2026 = self._valid_res_csv(2026)
+        csv_2025 = self._valid_res_csv(2025)
+        header, row_2026 = csv_2026.split(b"\n", 1)
+        row_2025 = csv_2025.split(b"\n", 1)[1]
+        overlapping = header + b"\n" + row_2025 + row_2026
+        package = self._package_mock([self._resource("current", 2026)])
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with (
+                patch.object(res_extractor, "RAW_DIR", tmpdir),
+                patch.object(res_extractor, "_staging_years_present", return_value=None),
+                patch.object(
+                    res_extractor,
+                    "fetch_with_retry",
+                    side_effect=[package, self._response_mock(overlapping)],
+                ),
+            ):
+                contents, mode, detail = res_extractor.fetch_resources()
+        self.assertEqual((contents, mode, detail), ([overlapping], "live", "datos_gob_cl_ckan_api"))
+
+    def test_res_unknown_resource_year_keeps_structural_validation(self):
+        """Naming CKAN desconocido no debe rechazar CSV por año no inferible."""
+        resource = self._resource("current", 2026)
+        resource["name"] = "Constituciones RES sin año identificable"
+        package = self._package_mock([resource])
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with (
+                patch.object(res_extractor, "RAW_DIR", tmpdir),
+                patch.object(res_extractor, "_staging_years_present", return_value=None),
+                patch.object(
+                    res_extractor,
+                    "fetch_with_retry",
+                    side_effect=[package, self._response_mock(self._valid_res_csv(2025))],
+                ),
+            ):
+                contents, mode, detail = res_extractor.fetch_resources()
+        self.assertEqual((contents, mode, detail), (
+            [self._valid_res_csv(2025)], "live", "datos_gob_cl_ckan_api"
+        ))
+
     def test_res_mixed_live_and_snapshot_is_fallback(self):
         """Una descarga de un año desde raw impide declarar live al RES completo."""
         from requests import RequestException
@@ -1650,7 +1757,10 @@ class ResExtractorTests(unittest.TestCase):
         current_year = datetime.date.today().year
         resources = [self._resource(f"y{year}", year) for year in (current_year - 1, current_year)]
         package_mock = self._package_mock([r | {"name": r["name"]} for r in resources])
-        response_mock = self._response_mock(self._valid_res_csv())
+        response_mocks = [
+            self._response_mock(self._valid_res_csv(year))
+            for year in (current_year - 1, current_year)
+        ]
 
         with tempfile.TemporaryDirectory() as tmpdir:
             # staging solo con años viejos (falta current_year - 1)
@@ -1661,7 +1771,7 @@ class ResExtractorTests(unittest.TestCase):
                 patch.object(
                     res_extractor,
                     "fetch_with_retry",
-                    side_effect=[package_mock, response_mock, response_mock],
+                    side_effect=[package_mock, *response_mocks],
                 ),
             ):
                 contents, _, _ = res_extractor.fetch_resources()
@@ -1675,7 +1785,10 @@ class ResExtractorTests(unittest.TestCase):
         current_year = datetime.date.today().year
         resources = [self._resource(f"y{year}", year) for year in range(2013, current_year + 1)]
         package_mock = self._package_mock([r | {"name": r["name"]} for r in resources])
-        response_mock = self._response_mock(self._valid_res_csv())
+        response_mocks = [
+            self._response_mock(self._valid_res_csv(year))
+            for year in range(2013, current_year + 1)
+        ]
 
         with tempfile.TemporaryDirectory() as tmpdir:
             with (
@@ -1684,7 +1797,7 @@ class ResExtractorTests(unittest.TestCase):
                 patch.object(
                     res_extractor,
                     "fetch_with_retry",
-                    side_effect=[package_mock] + [response_mock] * len(resources),
+                    side_effect=[package_mock, *response_mocks],
                 ),
             ):
                 contents, _, _ = res_extractor.fetch_resources()
