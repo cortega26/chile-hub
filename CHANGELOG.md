@@ -12,6 +12,15 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.47.8 - 2026-10-10
+
+### Corregido
+
+- Recover MDS poverty estimates from nonempty XLSX snapshots
+  ([#144](https://github.com/cortega26/chile-hub/pull/144),
+  [`67c67fc`](https://github.com/cortega26/chile-hub/commit/67c67fc4c90a4bdbc71ef9572c4e6cbbc555fc13))
+
+
 ## 1.47.7 - 2026-10-10
 
 ### Corregido
