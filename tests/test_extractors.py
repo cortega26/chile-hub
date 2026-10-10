@@ -2229,7 +2229,6 @@ class CensoExtractorExtendedTests(unittest.TestCase):
             self.assertFalse(csv_path.exists())
             self.assertFalse(meta_path.exists())
 
-
     def test_valid_live_censo_workbook_retains_provenance(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             raw = Path(tmpdir)
@@ -2292,9 +2291,7 @@ class CensoExtractorExtendedTests(unittest.TestCase):
             raw = Path(tmpdir)
             backup = raw / "ine_censo2024_comunal_20260901T010101Z.xlsx"
             _write_censo_workbook(backup)
-            (raw / "ine_censo2024_comunal_20260902T010101Z.xlsx").write_bytes(
-                b"not an xlsx"
-            )
+            (raw / "ine_censo2024_comunal_20260902T010101Z.xlsx").write_bytes(b"not an xlsx")
             empty = raw / "ine_censo2024_comunal_20260903T010101Z.xlsx"
             workbook = openpyxl.Workbook()
             workbook.active.title = "2"
@@ -2316,9 +2313,7 @@ class CensoExtractorExtendedTests(unittest.TestCase):
     def test_censo_no_usable_snapshot_fails_closed(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             raw = Path(tmpdir)
-            (raw / "ine_censo2024_comunal_20260901T010101Z.xlsx").write_bytes(
-                b"broken snapshot"
-            )
+            (raw / "ine_censo2024_comunal_20260901T010101Z.xlsx").write_bytes(b"broken snapshot")
             target = raw / "ine_censo2024_comunal_20261010T160000Z.xlsx"
             response = MagicMock()
             response.content = b"broken live xlsx"
