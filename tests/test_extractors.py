@@ -1486,10 +1486,7 @@ class ResExtractorTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             raw = Path(tmpdir)
             older = raw / "res_Constituciones_del_año_2026,_corte_julio_20261001T010101Z.csv"
-            newer = (
-                raw
-                / "res_Constituciones_del_año_2026,_corte_julio_20261001T010101Z_0001.csv"
-            )
+            newer = raw / "res_Constituciones_del_año_2026,_corte_julio_20261001T010101Z_0001.csv"
             older.write_bytes(older_data)
             newer.write_bytes(newer_data)
             with (
