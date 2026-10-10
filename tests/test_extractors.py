@@ -2856,6 +2856,127 @@ class PobrezaComunalExtractorTests(unittest.TestCase):
 class ConsumoElectricoExtractorTests(unittest.TestCase):
     """Tests unitarios para el extractor de consumo eléctrico comunal (CNE)."""
 
+    @staticmethod
+    def _write_cne_xlsx(path: Path, *, include_data: bool = True) -> Path:
+        """XLSX sintético de CNE sin requerir descargas externas."""
+        workbook = openpyxl.Workbook()
+        sheet = workbook.active
+        sheet.append(["Región", "Comuna", "Año", "Tipo", "Consumo", "Clientes"])
+        if include_data:
+            sheet.append(["Biobío", "Concepcion", 2023, "Residencial", 1234.5, 11])
+        workbook.save(path)
+        return path
+
+    @staticmethod
+    def _write_cne_lookup(staging: Path) -> None:
+        staging.mkdir()
+        (staging / "comunas.csv").write_text(
+            "codigo_region,codigo_comuna,nombre_comuna\\n08,08101,Concepcion\\n",
+            encoding="utf-8",
+        )
+
+    def test_fallback_skips_corrupt_and_empty_newer_snapshots(self):
+        """Se recupera un Excel más antiguo en vez de abortar con el último."""
+        from src.extractors import consumo_electrico_extractor as cne
+
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp) / "raw"
+            raw.mkdir()
+            staging = Path(tmp) / "staging"
+            self._write_cne_lookup(staging)
+            older = self._write_cne_xlsx(raw / "cne_consumo_electrico_comunal_20260101.xlsx")
+            corrupt = raw / "cne_consumo_electrico_comunal_20261008.xlsx"
+            corrupt.write_bytes(b"<html>portal fuera de servicio</html>")
+            empty = self._write_cne_xlsx(
+                raw / "cne_consumo_electrico_comunal_20261009.xlsx", include_data=False
+            )
+            with (
+                patch.object(cne, "RAW_DIR", str(raw)),
+                patch.object(cne, "STAGING_DIR", str(staging)),
+                patch.object(cne, "ensure_staging_directories"),
+                patch.object(cne, "_download_excel", side_effect=OSError("offline")),
+            ):
+                rows, mode, url, notes = cne.fetch_data()
+
+        self.assertEqual(mode, "fallback")
+        self.assertEqual(url, cne.DOWNLOAD_URL)
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["codigo_comuna"], "08101")
+        self.assertEqual(rows[0]["consumo_kwh"], 1234.5)
+        self.assertTrue(any(corrupt.name in note and "inválido" in note for note in notes))
+        self.assertTrue(any(empty.name in note and "inválido" in note for note in notes))
+        self.assertTrue(any(older.name in note for note in notes))
+
+    def test_empty_live_excel_uses_older_snapshot_without_claiming_live(self):
+        """Un archivo descargado correctamente pero vacío no es una fuente live."""
+        from src.extractors import consumo_electrico_extractor as cne
+
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp) / "raw"
+            raw.mkdir()
+            staging = Path(tmp) / "staging"
+            self._write_cne_lookup(staging)
+            older = self._write_cne_xlsx(raw / "cne_consumo_electrico_comunal_20260101.xlsx")
+            empty = self._write_cne_xlsx(
+                raw / "cne_consumo_electrico_comunal_20261010.xlsx", include_data=False
+            )
+            with (
+                patch.object(cne, "RAW_DIR", str(raw)),
+                patch.object(cne, "STAGING_DIR", str(staging)),
+                patch.object(cne, "ensure_staging_directories"),
+                patch.object(cne, "_download_excel", return_value=empty),
+            ):
+                rows, mode, _, notes = cne.fetch_data()
+
+        self.assertEqual(mode, "fallback")
+        self.assertEqual(rows[0]["codigo_comuna"], "08101")
+        self.assertTrue(any(older.name in note for note in notes))
+        self.assertFalse(any(note.startswith("live:") for note in notes))
+
+    def test_corrupt_live_and_snapshots_use_explicit_minimal_fallback(self):
+        """Todos los XLSX inutilizables preservan la procedencia fallback."""
+        from src.extractors import consumo_electrico_extractor as cne
+
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp) / "raw"
+            raw.mkdir()
+            bad = raw / "cne_consumo_electrico_comunal_20261010.xlsx"
+            bad.write_bytes(b"invalid zip payload")
+            with (
+                patch.object(cne, "RAW_DIR", str(raw)),
+                patch.object(cne, "ensure_staging_directories"),
+                patch.object(cne, "_download_excel", return_value=bad),
+            ):
+                rows, mode, _, notes = cne.fetch_data()
+
+        self.assertEqual(mode, "fallback")
+        self.assertEqual(rows, cne.FALLBACK_ROWS)
+        self.assertTrue(any(bad.name in note and "inválido" in note for note in notes))
+        self.assertTrue(any("usando datos de muestra" in note for note in notes))
+
+    def test_valid_live_excel_remains_live(self):
+        """El cambio no interfiere con la ruta legítima de éxito."""
+        from src.extractors import consumo_electrico_extractor as cne
+
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp) / "raw"
+            raw.mkdir()
+            staging = Path(tmp) / "staging"
+            self._write_cne_lookup(staging)
+            valid = self._write_cne_xlsx(raw / "cne_consumo_electrico_comunal_20261010.xlsx")
+            with (
+                patch.object(cne, "RAW_DIR", str(raw)),
+                patch.object(cne, "STAGING_DIR", str(staging)),
+                patch.object(cne, "ensure_staging_directories"),
+                patch.object(cne, "_download_excel", return_value=valid),
+            ):
+                rows, mode, _, notes = cne.fetch_data()
+
+        self.assertEqual(mode, "live")
+        self.assertEqual(rows[0]["codigo_comuna"], "08101")
+        self.assertEqual(rows[0]["consumo_kwh"], 1234.5)
+        self.assertTrue(any(note.startswith("live: 1 filas") for note in notes))
+
     def test_normalize_rows_writes_required_schema(self):
         from src.extractors.consumo_electrico_extractor import FALLBACK_ROWS, normalize_rows
 
