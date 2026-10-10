@@ -1364,12 +1364,19 @@ class ResExtractorTests(unittest.TestCase):
         """Invariante AGENTS 4.3: capturas RAW del mismo segundo son inmutables."""
         with tempfile.TemporaryDirectory() as tmpdir:
             with patch.object(res_extractor, "RAW_DIR", tmpdir):
-                a = res_extractor._archive_res_raw("Constituciones_2026", "20261010T120000Z", b"first")
-                b = res_extractor._archive_res_raw("Constituciones_2026", "20261010T120000Z", b"second")
-                c = res_extractor._archive_res_raw("Constituciones_2026", "20261010T120000Z", b"third")
-                self.assertEqual((a.read_bytes(), b.read_bytes(), c.read_bytes()), (
-                    b"first", b"second", b"third"
-                ))
+                a = res_extractor._archive_res_raw(
+                    "Constituciones_2026", "20261010T120000Z", b"first"
+                )
+                b = res_extractor._archive_res_raw(
+                    "Constituciones_2026", "20261010T120000Z", b"second"
+                )
+                c = res_extractor._archive_res_raw(
+                    "Constituciones_2026", "20261010T120000Z", b"third"
+                )
+                self.assertEqual(
+                    (a.read_bytes(), b.read_bytes(), c.read_bytes()),
+                    (b"first", b"second", b"third"),
+                )
                 self.assertEqual(
                     [a.name, b.name, c.name],
                     [
@@ -1390,17 +1397,16 @@ class ResExtractorTests(unittest.TestCase):
                 patch.object(res_extractor, "RAW_DIR", tmpdir),
                 patch.object(res_extractor, "_staging_years_present", return_value=None),
                 patch.object(
-                    res_extractor, "fetch_with_retry",
-                    side_effect=[
-                        package, self._response_mock(first), self._response_mock(second)
-                    ],
+                    res_extractor,
+                    "fetch_with_retry",
+                    side_effect=[package, self._response_mock(first), self._response_mock(second)],
                 ),
             ):
                 contents, mode, detail = res_extractor.fetch_resources()
             files = sorted(Path(tmpdir).glob("res_Constituciones_del_año_2026_*.csv"))
-            self.assertEqual((contents, mode, detail), (
-                [first, second], "live", "datos_gob_cl_ckan_api"
-            ))
+            self.assertEqual(
+                (contents, mode, detail), ([first, second], "live", "datos_gob_cl_ckan_api")
+            )
             self.assertEqual(len(files), 2)
             self.assertEqual([p.read_bytes() for p in files], [first, second])
             self.assertTrue(files[1].name.endswith("_0001.csv"))
@@ -1416,10 +1422,9 @@ class ResExtractorTests(unittest.TestCase):
                 patch.object(res_extractor, "RAW_DIR", tmpdir),
                 patch.object(res_extractor, "_staging_years_present", return_value=None),
                 patch.object(
-                    res_extractor, "fetch_with_retry",
-                    side_effect=[
-                        package, self._response_mock(good), self._response_mock(bad)
-                    ],
+                    res_extractor,
+                    "fetch_with_retry",
+                    side_effect=[package, self._response_mock(good), self._response_mock(bad)],
                 ),
             ):
                 contents, mode, detail = res_extractor.fetch_resources()
