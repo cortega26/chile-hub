@@ -12,6 +12,20 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.47.9 - 2026-10-10
+
+### Corregido
+
+- Recover CNE consumption from validated Excel snapshots
+  ([#145](https://github.com/cortega26/chile-hub/pull/145),
+  [`9cd3c4e`](https://github.com/cortega26/chile-hub/commit/9cd3c4e76695ef8c8ed706237a4522fada1ed665))
+
+### Mantenimiento
+
+- **ci**: Sync coverage badge from verified tests [skip ci]
+  ([`d8cc31f`](https://github.com/cortega26/chile-hub/commit/d8cc31f0c904854b8d48fbe754018e19a36d525c))
+
+
 ## 1.47.8 - 2026-10-10
 
 ### Corregido
