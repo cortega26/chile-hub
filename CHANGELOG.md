@@ -12,6 +12,15 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.47.7 - 2026-10-10
+
+### Corregido
+
+- Recover MINEDUC from validated CSV snapshots
+  ([#143](https://github.com/cortega26/chile-hub/pull/143),
+  [`db1dbd7`](https://github.com/cortega26/chile-hub/commit/db1dbd78755b00f79f8f1d14e8db4493ab29b0fd))
+
+
 ## 1.47.6 - 2026-10-10
 
 ### Corregido

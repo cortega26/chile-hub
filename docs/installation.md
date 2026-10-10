@@ -54,13 +54,13 @@ hub = ChileHub(data_dir="data/normalized")
 Fija la versión del paquete con pip:
 
 ```bash
-pip install chile-hub==1.47.6
+pip install chile-hub==1.47.7
 ```
 
 Fija los datos seleccionando el tag de release correspondiente al actualizar la caché:
 
 ```bash
-chile-hub cache update --data-version v1.47.6
+chile-hub cache update --data-version v1.47.7
 ```
 
 <!-- END_INSTALLATION_PIN -->
