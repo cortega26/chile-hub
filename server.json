@@ -8,12 +8,12 @@
     "source": "github",
     "id": "1254613303"
   },
-  "version": "1.47.10",
+  "version": "1.47.11",
   "packages": [
     {
       "registryType": "pypi",
       "identifier": "chile-hub",
-      "version": "1.47.10",
+      "version": "1.47.11",
       "transport": {
         "type": "stdio"
       }

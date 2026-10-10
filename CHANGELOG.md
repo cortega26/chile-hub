@@ -12,6 +12,19 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.47.11 - 2026-10-10
+
+### Corregido
+
+- Recover SINCA from valid JSON snapshots ([#147](https://github.com/cortega26/chile-hub/pull/147),
+  [`85b5c86`](https://github.com/cortega26/chile-hub/commit/85b5c86b561495ccd8c62d99ef8a9f5acb70df47))
+
+### Mantenimiento
+
+- **ci**: Sync coverage badge from verified tests [skip ci]
+  ([`14cd542`](https://github.com/cortega26/chile-hub/commit/14cd54277c72f2ed98b22a4e7e430563455f6e1e))
+
+
 ## 1.47.10 - 2026-10-10
 
 ### Corregido
