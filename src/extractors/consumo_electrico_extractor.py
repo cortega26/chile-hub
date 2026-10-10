@@ -9,6 +9,7 @@ import datetime
 import os
 import sys
 from pathlib import Path
+from zipfile import BadZipFile
 
 import openpyxl
 import polars as pl
@@ -258,6 +259,8 @@ def fetch_data() -> tuple[list[dict], str, str, list[str]]:
     try:
         path = _download_excel()
         rows = _parse_excel(path)
+        if not rows:
+            raise ValueError("XLSX de CNE sin registros de consumo")
         rows = _enrich_with_cut(rows)
         matched = sum(1 for r in rows if r["codigo_comuna"])
         notes.append(
@@ -265,12 +268,20 @@ def fetch_data() -> tuple[list[dict], str, str, list[str]]:
             f"({round(matched / max(len(rows), 1) * 100, 1)}% match)"
         )
         return rows, "live", DOWNLOAD_URL, notes
-    except (requests.RequestException, OSError, KeyError) as exc:
-        snapshots = sorted(Path(RAW_DIR).glob("cne_consumo_electrico_comunal_*.xlsx"))
-        if snapshots:
-            rows = _parse_excel(snapshots[-1])
+    except (requests.RequestException, OSError, KeyError, BadZipFile, ValueError) as exc:
+        snapshots = sorted(
+            Path(RAW_DIR).glob("cne_consumo_electrico_comunal_*.xlsx"), reverse=True
+        )
+        for snapshot in snapshots:
+            try:
+                rows = _parse_excel(snapshot)
+                if not rows:
+                    raise ValueError("XLSX sin registros de consumo")
+            except (OSError, KeyError, BadZipFile, ValueError) as snapshot_exc:
+                notes.append(f"fallback: snapshot inválido {snapshot.name} ({snapshot_exc})")
+                continue
             rows = _enrich_with_cut(rows)
-            notes.append(f"fallback: {len(rows)} filas desde snapshot {snapshots[-1].name} ({exc})")
+            notes.append(f"fallback: {len(rows)} filas desde snapshot {snapshot.name} ({exc})")
             return rows, "fallback", DOWNLOAD_URL, notes
         notes.append(f"fallback: usando datos de muestra ({exc}). {SOURCE_STATUS_NOTE}")
         return FALLBACK_ROWS, "fallback", DOWNLOAD_URL, notes
