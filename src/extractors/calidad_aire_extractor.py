@@ -360,6 +360,7 @@ def fetch_data() -> tuple[list[dict], str, str, list[str]]:
     notes.append(f"{len(rows)} filas diarias nuevas desde '{target.name}'")
     return rows, "live", LISTADO_URL, notes
 
+
 def _seed_history_from_parquet() -> pl.DataFrame | None:
     """Lee el historial publicado para sembrarlo en staging.
 
