@@ -193,6 +193,23 @@ def _assert_usable_res_snapshot(content: bytes, expected_year: int | None = None
         raise ValueError(f"snapshot RES sin registros utilizables del año {expected_year}")
 
 
+def _archive_res_raw(resource_name: str, stamp: str, content: bytes) -> Path:
+    """Archiva bytes RAW sin sobrescribir capturas previas del mismo segundo."""
+    prefix = f"res_{resource_name}_{stamp}"
+    sequence = 0
+    while True:
+        suffix = f"_{sequence:04d}" if sequence else ""
+        path = Path(RAW_DIR) / f"{prefix}{suffix}.csv"
+        try:
+            # 'xb' crea el archivo de forma exclusiva; nunca trunca un raw previo.
+            with path.open("xb") as raw_file:
+                raw_file.write(content)
+        except FileExistsError:
+            sequence += 1
+            continue
+        return path
+
+
 def fetch_resources() -> tuple[list[bytes], str, str]:
     """Obtiene los CSVs del dataset RES desde datos.gob.cl.
 
@@ -242,13 +259,11 @@ def fetch_resources() -> tuple[list[bytes], str, str]:
     for resource in selected_resources:
         expected_year = _resource_year(resource)
         resource_name = resource.get("name", "unknown").replace(" ", "_")
-        raw_path = Path(RAW_DIR) / f"res_{resource_name}_{stamp}.csv"
-
         try:
             with fetch_with_retry(resource["url"], timeout=120) as response:
                 response.raise_for_status()
                 content = response.content
-                raw_path.write_bytes(content)
+                _archive_res_raw(resource_name, stamp, content)
                 # Un HTTP 200 no garantiza un CSV utilizable; conservar el raw
                 # para auditoría, pero rechazarlo antes de atribuirle modo live.
                 _assert_usable_res_snapshot(content, expected_year)
