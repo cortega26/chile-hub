@@ -1851,9 +1851,7 @@ class MineducEstablecimientosExtractorTests(unittest.TestCase):
             raw.mkdir()
             older = self._write_fixture_csv(raw / "2024_Directorio_Oficial_EE.csv")
             (raw / "2025_Directorio_Oficial_EE.csv").write_bytes(b"<html>offline</html>")
-            (raw / "2026_Directorio_Oficial_EE.csv").write_text(
-                self._CSV_HEADER, encoding="utf-8"
-            )
+            (raw / "2026_Directorio_Oficial_EE.csv").write_text(self._CSV_HEADER, encoding="utf-8")
             with (
                 patch.object(mineduc_establecimientos_extractor, "RAW_DIR", str(raw)),
                 patch.object(mineduc_establecimientos_extractor, "ensure_staging_directories"),
