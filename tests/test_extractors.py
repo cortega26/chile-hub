@@ -1347,6 +1347,80 @@ class ResExtractorTests(unittest.TestCase):
         self.assertEqual(len(contents), 1)
         self.assertEqual(res_extractor._LAST_FETCH_MODE, "incremental")
 
+    def test_res_mixed_live_and_snapshot_is_fallback(self):
+        """Una descarga de un año desde raw impide declarar live al RES completo."""
+        from requests import RequestException
+
+        resources = [self._resource("previous", 2025), self._resource("current", 2026)]
+        package = self._package_mock(resources)
+        live_bytes = b"live csv data"
+        old_bytes = b"snapshot csv data"
+        with tempfile.TemporaryDirectory() as tmpdir:
+            raw = Path(tmpdir)
+            snapshot = raw / "res_Constituciones_del_año_2025_20261001T010101Z.csv"
+            snapshot.write_bytes(old_bytes)
+            with (
+                patch.object(res_extractor, "RAW_DIR", tmpdir),
+                patch.object(res_extractor, "_staging_years_present", return_value=None),
+                patch.object(
+                    res_extractor,
+                    "fetch_with_retry",
+                    side_effect=[
+                        package,
+                        RequestException("resource unavailable"),
+                        self._response_mock(live_bytes),
+                    ],
+                ),
+            ):
+                contents, mode, detail = res_extractor.fetch_resources()
+
+            self.assertEqual(contents, [old_bytes, live_bytes])
+            self.assertEqual(mode, "fallback")
+            self.assertIn("raw_snapshot_recovery", detail)
+            self.assertIn(snapshot.name, detail)
+            self.assertEqual(snapshot.read_bytes(), old_bytes)
+
+    def test_res_snapshot_only_does_not_claim_live(self):
+        """Un recurso anual recuperado también identifica su origen en el detalle."""
+        from requests import RequestException
+
+        resource = self._resource("current", 2026)
+        package = self._package_mock([resource])
+        with tempfile.TemporaryDirectory() as tmpdir:
+            snapshot = Path(tmpdir) / "res_Constituciones_del_año_2026_20261001T010101Z.csv"
+            snapshot.write_bytes(b"archived data")
+            with (
+                patch.object(res_extractor, "RAW_DIR", tmpdir),
+                patch.object(res_extractor, "_staging_years_present", return_value=None),
+                patch.object(
+                    res_extractor,
+                    "fetch_with_retry",
+                    side_effect=[package, RequestException("offline")],
+                ),
+            ):
+                contents, mode, detail = res_extractor.fetch_resources()
+
+        self.assertEqual((contents, mode), ([b"archived data"], "fallback"))
+        self.assertIn(snapshot.name, detail)
+
+    def test_res_failed_resource_without_snapshot_fails_closed(self):
+        """No se declara un fetch exitoso si la fuente y el respaldo fallan."""
+        from requests import RequestException
+
+        package = self._package_mock([self._resource("current", 2026)])
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with (
+                patch.object(res_extractor, "RAW_DIR", tmpdir),
+                patch.object(res_extractor, "_staging_years_present", return_value=None),
+                patch.object(
+                    res_extractor,
+                    "fetch_with_retry",
+                    side_effect=[package, RequestException("offline")],
+                ),
+                self.assertRaisesRegex(SystemExit, "No hay snapshot raw de respaldo"),
+            ):
+                res_extractor.fetch_resources()
+
     def test_incremental_fetches_previous_year_when_missing(self):
         """Plan 076: si el año anterior falta del staging (la fuente puede
         publicarlo con retraso), se descarga junto con el año en curso."""
