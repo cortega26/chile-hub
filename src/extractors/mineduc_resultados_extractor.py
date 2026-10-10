@@ -172,7 +172,7 @@ def fetch_data(source_url: str = DOWNLOAD_URL) -> tuple[list[dict[str, Any]], st
 
         unrar_bin = _find_unrar()
         if shutil.which(str(unrar_bin)) is None and not Path(unrar_bin).exists():
-            raise SystemExit(
+            raise RuntimeError(
                 f"unrar no está disponible ({unrar_bin}). Instala con 'apt-get install unrar'."
             )
 
