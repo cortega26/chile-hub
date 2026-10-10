@@ -12,6 +12,40 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.47.16 - 2026-10-10
+
+### Corregido
+
+- Reject unusable RES CSV snapshots and retry older versions
+  ([#152](https://github.com/cortega26/chile-hub/pull/152),
+  [`ab8417c`](https://github.com/cortega26/chile-hub/commit/ab8417cc09efc39fe82c8d3252f8d39bd5448a97))
+
+- Validate RES CSV snapshots before recovery
+  ([#152](https://github.com/cortega26/chile-hub/pull/152),
+  [`ab8417c`](https://github.com/cortega26/chile-hub/commit/ab8417cc09efc39fe82c8d3252f8d39bd5448a97))
+
+### Code Style
+
+- Align RES snapshot sort with Ruff format ([#152](https://github.com/cortega26/chile-hub/pull/152),
+  [`ab8417c`](https://github.com/cortega26/chile-hub/commit/ab8417cc09efc39fe82c8d3252f8d39bd5448a97))
+
+### Documentación
+
+- Update test inventory for four RES recovery regressions
+  ([#152](https://github.com/cortega26/chile-hub/pull/152),
+  [`ab8417c`](https://github.com/cortega26/chile-hub/commit/ab8417cc09efc39fe82c8d3252f8d39bd5448a97))
+
+### Tests
+
+- Cover RES snapshot validation, recovery ordering and fail-closed behavior
+  ([#152](https://github.com/cortega26/chile-hub/pull/152),
+  [`ab8417c`](https://github.com/cortega26/chile-hub/commit/ab8417cc09efc39fe82c8d3252f8d39bd5448a97))
+
+- Encode realistic RES fixture and malformed UTF-8 correctly
+  ([#152](https://github.com/cortega26/chile-hub/pull/152),
+  [`ab8417c`](https://github.com/cortega26/chile-hub/commit/ab8417cc09efc39fe82c8d3252f8d39bd5448a97))
+
+
 ## 1.47.15 - 2026-10-10
 
 ### Corregido
