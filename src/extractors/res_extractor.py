@@ -210,6 +210,36 @@ def _archive_res_raw(resource_name: str, stamp: str, content: bytes) -> Path:
         return path
 
 
+_RES_RAW_TIMESTAMP_RE = re.compile(r"_(\\d{8}T\\d{6}Z)(?:_(\\d+))?\\.csv$")
+_RES_RAW_YEAR_RE = re.compile(r"[Aa]ño_(\\d{4})(?!\\d)")
+
+
+def _res_snapshot_sort_key(snapshot: Path) -> tuple[str, int, str]:
+    """Ordena por momento real de captura y sufijo de colisión, no por nombre CKAN."""
+    match = _RES_RAW_TIMESTAMP_RE.search(snapshot.name)
+    if match is None:
+        return ("", 0, snapshot.name)
+    return (match.group(1), int(match.group(2) or 0), snapshot.name)
+
+
+def _res_snapshot_candidates(resource_name: str, expected_year: int | None) -> list[Path]:
+    """Recupera RAW del mismo tipo/año aunque CKAN cambie la fecha de corte.
+
+    Si no se reconoce un año, conserva la búsqueda exacta por nombre completo.
+    """
+    match = _RES_RAW_YEAR_RE.search(resource_name)
+    if expected_year is not None and match is not None and int(match.group(1)) == expected_year:
+        prefix = f"res_{resource_name[: match.end()]}"
+        candidates = (
+            path
+            for path in Path(RAW_DIR).glob(f"{prefix}*.csv")
+            if not path.name[len(prefix) :].startswith(tuple("0123456789"))
+        )
+    else:
+        candidates = Path(RAW_DIR).glob(f"res_{resource_name}_*.csv")
+    return sorted(candidates, key=_res_snapshot_sort_key, reverse=True)
+
+
 def fetch_resources() -> tuple[list[bytes], str, str]:
     """Obtiene los CSVs del dataset RES desde datos.gob.cl.
 
@@ -270,7 +300,7 @@ def fetch_resources() -> tuple[list[bytes], str, str]:
                 contents.append(content)
         except Exception as exc:
             # Si falla la descarga live, intentar recuperar snapshots raw previos
-            snapshots = sorted(Path(RAW_DIR).glob(f"res_{resource_name}_*.csv"), reverse=True)
+            snapshots = _res_snapshot_candidates(resource_name, expected_year)
             for snapshot in snapshots:
                 try:
                     candidate = snapshot.read_bytes()
