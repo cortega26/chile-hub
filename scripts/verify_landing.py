@@ -957,6 +957,22 @@ def verify_landing():
             fail("Expected nav-toggle aria-expanded=true after click")
         mobile_nav.locator("a", has_text="Catálogo").click()
         mobile_nav.wait_for(state="hidden")
+
+        # Capturas de QA tras verificar las interacciones. El CSS reveal se
+        # muestra como lo vería un usuario que recorriera todas las secciones.
+        # No se suben al sitio publicado: solo al artefacto de CI.
+        qa_dir = Path("/tmp/chile-hub-visual-qa")
+        qa_dir.mkdir(parents=True, exist_ok=True)
+        page.evaluate(
+            "() => document.querySelectorAll('.reveal').forEach(el => el.classList.add('is-visible'))"
+        )
+        page.screenshot(path=str(qa_dir / "desktop.png"), full_page=True)
+        mobile.locator("#mapa").scroll_into_view_if_needed()
+        mobile.wait_for_selector("#map-comunal path.leaflet-interactive", timeout=15000)
+        mobile.evaluate(
+            "() => document.querySelectorAll('.reveal').forEach(el => el.classList.add('is-visible'))"
+        )
+        mobile.screenshot(path=str(qa_dir / "mobile.png"), full_page=True)
         mobile.close()
 
         browser.close()
