@@ -12,6 +12,36 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.47.5 - 2026-10-10
+
+### Corregido
+
+- Skip corrupt MDS XLSX snapshots and use latest readable backup
+  ([#141](https://github.com/cortega26/chile-hub/pull/141),
+  [`3121cf0`](https://github.com/cortega26/chile-hub/commit/3121cf090ebee0b6bdc3f784e442208fab7760c4))
+
+### Mantenimiento
+
+- **ci**: Sync coverage badge from verified tests [skip ci]
+  ([`78b11eb`](https://github.com/cortega26/chile-hub/commit/78b11ebf7b672940cd52ec175224b9b34e05c1a5))
+
+### Documentación
+
+- Sync test count for MDS recovery regression suite
+  ([#141](https://github.com/cortega26/chile-hub/pull/141),
+  [`3121cf0`](https://github.com/cortega26/chile-hub/commit/3121cf090ebee0b6bdc3f784e442208fab7760c4))
+
+### Tests
+
+- Recover poverty data from readable XLSX snapshots
+  ([#141](https://github.com/cortega26/chile-hub/pull/141),
+  [`3121cf0`](https://github.com/cortega26/chile-hub/commit/3121cf090ebee0b6bdc3f784e442208fab7760c4))
+
+- Verify MDS corrupt workbook fallback and valid live provenance
+  ([#141](https://github.com/cortega26/chile-hub/pull/141),
+  [`3121cf0`](https://github.com/cortega26/chile-hub/commit/3121cf090ebee0b6bdc3f784e442208fab7760c4))
+
+
 ## 1.47.4 - 2026-10-09
 
 ### Corregido
