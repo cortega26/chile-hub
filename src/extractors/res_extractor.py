@@ -163,6 +163,26 @@ def _resource_year(resource: dict) -> int | None:
         return None
 
 
+def _assert_usable_res_snapshot(content: bytes) -> None:
+    """Rechaza CSV crudos corruptos, vacíos o sin los campos esenciales del RES."""
+    df = pl.read_csv(io.BytesIO(content), separator=";", infer_schema_length=0)
+    required = {
+        "RUT",
+        "Razon Social",
+        "Anio",
+        "Codigo de sociedad",
+        "Fecha de registro (ultima firma)",
+    }
+    if df.is_empty() or not required.issubset(df.columns):
+        raise ValueError("snapshot RES vacío o sin columnas requeridas")
+    if df.filter(
+        pl.col("RUT").is_not_null()
+        & (pl.col("RUT").str.strip_chars() != "")
+        & (~pl.col("RUT").str.strip_chars().is_in(RUT_SENTINELS))
+    ).is_empty():
+        raise ValueError("snapshot RES sin registros con RUT utilizable")
+
+
 def fetch_resources() -> tuple[list[bytes], str, str]:
     """Obtiene los CSVs del dataset RES desde datos.gob.cl.
 
@@ -220,15 +240,22 @@ def fetch_resources() -> tuple[list[bytes], str, str]:
                 contents.append(response.content)
         except Exception as exc:
             # Si falla la descarga live, intentar recuperar snapshots raw previos
-            snapshots = sorted(Path(RAW_DIR).glob(f"res_{resource_name}_*.csv"))
-            if snapshots:
-                snapshot = snapshots[-1]
-                contents.append(snapshot.read_bytes())
+            snapshots = sorted(Path(RAW_DIR).glob(f"res_{resource_name}_*.csv"), reverse=True)
+            for snapshot in snapshots:
+                try:
+                    candidate = snapshot.read_bytes()
+                    _assert_usable_res_snapshot(candidate)
+                except (OSError, UnicodeError, ValueError, pl.exceptions.PolarsError) as error:
+                    print(f"Advertencia RES: snapshot inválido {snapshot.name}: {error}")
+                    continue
+                contents.append(candidate)
                 recovered_snapshots.append(snapshot.name)
+                break
             else:
                 raise SystemExit(
-                    f"Error descargando {resource['url']}: {exc}. No hay snapshot raw de respaldo."
-                )
+                    f"Error descargando {resource['url']}: {exc}. "
+                    "No hay snapshot raw de respaldo utilizable."
+                ) from exc
 
     if recovered_snapshots:
         return contents, "fallback", "raw_snapshot_recovery: " + ", ".join(recovered_snapshots)
