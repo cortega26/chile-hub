@@ -96,7 +96,22 @@ main > section, main > div { min-width: 0; }
 .console-tab { color: #b7cec2; font-family: var(--font-sans); }
 .console-tab.active { color: #142d27; background: #e5f0e8; }
 .console-tab:hover { color: white; background: #356055; }
-.console-panel pre { white-space: pre; word-break: normal; overflow-wrap: normal; overflow-x: auto; max-width: 100%; line-height: 1.65; font-size: .76rem; padding-bottom: .35rem; }
+/* Prevent long code tokens from increasing the intrinsic width of the hero grid. */
+.intro, .intro-copy, .intro-playground, .playground-console,
+.console-body, .console-panel { min-width: 0; max-width: 100%; }
+.console-body { width: 100%; overflow-x: hidden; }
+.console-panel { width: 100%; overflow-x: auto; }
+.console-panel pre {
+  white-space: pre;
+  width: max-content;
+  min-width: 100%;
+  max-width: none;
+  word-break: normal;
+  overflow-wrap: normal;
+  line-height: 1.65;
+  font-size: .76rem;
+  padding-bottom: .35rem;
+}
 .console-panel .keyword { color: #d9af82; }
 .console-panel .string { color: #b1dca9; }
 .console-panel .comment { color: #afc4b7; }
