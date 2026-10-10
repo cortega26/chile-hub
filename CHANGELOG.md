@@ -12,6 +12,45 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.47.18 - 2026-10-10
+
+### Corregido
+
+- Enforce annual RES resource year on live and snapshot recovery
+  ([#155](https://github.com/cortega26/chile-hub/pull/155),
+  [`2ba1cad`](https://github.com/cortega26/chile-hub/commit/2ba1cada78e33e96f9bc3243d69e321f3d8840eb))
+
+- Validate RES annual resource year before accepting data
+  ([#155](https://github.com/cortega26/chile-hub/pull/155),
+  [`2ba1cad`](https://github.com/cortega26/chile-hub/commit/2ba1cada78e33e96f9bc3243d69e321f3d8840eb))
+
+### Mantenimiento
+
+- **ci**: Sync coverage badge from verified tests [skip ci]
+  ([`faf8de1`](https://github.com/cortega26/chile-hub/commit/faf8de1714520af2ed2002e5a41f4daf12c7b1d7))
+
+### Code Style
+
+- Format RES year-alignment tests with Ruff
+  ([#155](https://github.com/cortega26/chile-hub/pull/155),
+  [`2ba1cad`](https://github.com/cortega26/chile-hub/commit/2ba1cada78e33e96f9bc3243d69e321f3d8840eb))
+
+- Ruff-format RES annual year guard ([#155](https://github.com/cortega26/chile-hub/pull/155),
+  [`2ba1cad`](https://github.com/cortega26/chile-hub/commit/2ba1cada78e33e96f9bc3243d69e321f3d8840eb))
+
+### Documentación
+
+- Sync test count for annual RES data-integrity guards
+  ([#155](https://github.com/cortega26/chile-hub/pull/155),
+  [`2ba1cad`](https://github.com/cortega26/chile-hub/commit/2ba1cada78e33e96f9bc3243d69e321f3d8840eb))
+
+### Tests
+
+- Reject wrong-year RES data, recover older backups and allow legitimate overlaps
+  ([#155](https://github.com/cortega26/chile-hub/pull/155),
+  [`2ba1cad`](https://github.com/cortega26/chile-hub/commit/2ba1cada78e33e96f9bc3243d69e321f3d8840eb))
+
+
 ## 1.47.17 - 2026-10-10
 
 ### Corregido
