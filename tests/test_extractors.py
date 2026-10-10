@@ -2030,9 +2030,7 @@ class SaludExtractorExtendedTests(unittest.TestCase):
             with (
                 patch.object(salud_extractor, "RAW_DIR", tmpdir),
                 patch.object(salud_extractor, "ensure_staging_directories"),
-                patch.object(
-                    salud_extractor, "fetch_with_retry", side_effect=[package, response]
-                ),
+                patch.object(salud_extractor, "fetch_with_retry", side_effect=[package, response]),
             ):
                 path, mode, url = salud_extractor.fetch_csv()
 
