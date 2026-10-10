@@ -12,6 +12,20 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.48.0 - 2026-10-10
+
+### Mantenimiento
+
+- **ci**: Sync coverage badge from verified tests [skip ci]
+  ([`ddba5f9`](https://github.com/cortega26/chile-hub/commit/ddba5f97079d61ee3d45f33e42b596988bdafb5a))
+
+### Agregado
+
+- **landing**: Rediseño editorial de chile-hub
+  ([#154](https://github.com/cortega26/chile-hub/pull/154),
+  [`57306cf`](https://github.com/cortega26/chile-hub/commit/57306cfe19a390121024e6b9977f3a9a699b6253))
+
+
 ## 1.47.18 - 2026-10-10
 
 ### Corregido
