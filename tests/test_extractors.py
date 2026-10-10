@@ -2871,7 +2871,7 @@ class ConsumoElectricoExtractorTests(unittest.TestCase):
     def _write_cne_lookup(staging: Path) -> None:
         staging.mkdir()
         (staging / "comunas.csv").write_text(
-            "codigo_region,codigo_comuna,nombre_comuna\\n08,08101,Concepcion\\n",
+            "codigo_region,codigo_comuna,nombre_comuna\n08,08101,Concepcion\n",
             encoding="utf-8",
         )
 
