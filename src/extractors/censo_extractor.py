@@ -4,6 +4,7 @@ import datetime
 import os
 import sys
 from pathlib import Path
+from zipfile import BadZipFile
 
 import openpyxl
 import polars as pl
@@ -84,16 +85,39 @@ def _snapshot_path() -> Path:
 def fetch_workbook() -> tuple[Path, str]:
     ensure_staging_directories()
     target = _snapshot_path()
+    recoverable = (
+        requests.RequestException,
+        OSError,
+        BadZipFile,
+        KeyError,
+        IndexError,
+        TypeError,
+        ValueError,
+        pl.exceptions.PolarsError,
+    )
     try:
         with fetch_with_retry(CENSO_URL, timeout=60, headers=REQUEST_HEADERS) as response:
             response.raise_for_status()
             target.write_bytes(response.content)
+        _assert_usable_workbook(target)
         return target, "live"
-    except (requests.RequestException, OSError):
-        snapshots = sorted(Path(RAW_DIR).glob("ine_censo2024_comunal_*.xlsx"))
-        if not snapshots:
-            raise
-        return snapshots[-1], "fallback"
+    except recoverable:
+        snapshots = sorted(
+            Path(RAW_DIR).glob("ine_censo2024_comunal_*.xlsx"), reverse=True
+        )
+        for snapshot in snapshots:
+            try:
+                _assert_usable_workbook(snapshot)
+            except recoverable:
+                continue
+            return snapshot, "fallback"
+        raise
+
+
+def _assert_usable_workbook(path: Path) -> None:
+    """Rechaza descargas o snapshots que no producen registros comunales."""
+    if parse_workbook(path).is_empty():
+        raise ValueError(f"Censo comunal sin registros utilizables: {path.name}")
 
 
 def parse_workbook(path: Path) -> pl.DataFrame:
