@@ -12,6 +12,20 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.47.10 - 2026-10-10
+
+### Corregido
+
+- Recover MINEDUC rendimiento when unrar is missing
+  ([#146](https://github.com/cortega26/chile-hub/pull/146),
+  [`2221e41`](https://github.com/cortega26/chile-hub/commit/2221e41a16e0dd510b2f0f78e8964381885ea0af))
+
+### Mantenimiento
+
+- **ci**: Sync coverage badge from verified tests [skip ci]
+  ([`253dd46`](https://github.com/cortega26/chile-hub/commit/253dd4665cf174ef050d76bcecf97a0d0642fee4))
+
+
 ## 1.47.9 - 2026-10-10
 
 ### Corregido
