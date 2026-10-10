@@ -240,10 +240,12 @@ def fetch_data() -> tuple[list[dict], str, str, list[str]]:
         try:
             path = _download_xlsx(url, label)
             rows = _parse_pobreza_xlsx(path, dimension, anio=2022)
+            if not rows:
+                raise ValueError("XLSX del MDS sin estimaciones comunales")
             all_rows.extend(rows)
             any_live = True
             notes.append(f"{dimension}: {len(rows)} comunas con estimación desde URL oficial")
-        except (requests.RequestException, OSError, KeyError, BadZipFile) as exc:
+        except (requests.RequestException, OSError, KeyError, BadZipFile, ValueError) as exc:
             # Un HTTP 200 puede devolver HTML en vez de XLSX. El archivo
             # descargado también aparece entre los snapshots: omitir los
             # corruptos y recuperar el más reciente que realmente se pueda leer.
@@ -253,7 +255,9 @@ def fetch_data() -> tuple[list[dict], str, str, list[str]]:
             for snapshot in snapshots:
                 try:
                     rows = _parse_pobreza_xlsx(snapshot, dimension, anio=2022)
-                except (OSError, KeyError, BadZipFile) as snapshot_exc:
+                    if not rows:
+                        raise ValueError("XLSX sin estimaciones comunales")
+                except (OSError, KeyError, BadZipFile, ValueError) as snapshot_exc:
                     notes.append(f"{dimension}: snapshot inválido {snapshot.name} ({snapshot_exc})")
                     continue
                 all_rows.extend(rows)

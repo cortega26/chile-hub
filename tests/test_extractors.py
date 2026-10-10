@@ -2481,6 +2481,17 @@ class PobrezaComunalExtractorTests(unittest.TestCase):
         workbook.save(path)
         return path
 
+    @staticmethod
+    def _write_empty_mds_xlsx(path: Path) -> Path:
+        """XLSX con estructura válida pero sin estimaciones comunales."""
+        workbook = openpyxl.Workbook()
+        sheet = workbook.active
+        sheet.append(["Estimaciones pobreza comunal"])
+        sheet.append([])
+        sheet.append(["Código", "Región", "Comuna", "Población", "Pobreza", "Tasa", "LI", "LS"])
+        workbook.save(path)
+        return path
+
     def test_invalid_live_xlsx_recovers_latest_valid_older_snapshot(self):
         """An HTTP-success HTML payload must not supersede a valid old workbook."""
         from src.extractors import pobreza_extractor
@@ -2579,6 +2590,82 @@ class PobrezaComunalExtractorTests(unittest.TestCase):
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]["dimension"], "ingresos")
         self.assertTrue(any("1 comunas" in note for note in notes))
+
+    def test_empty_live_xlsx_recovers_older_valid_snapshot(self):
+        """Un HTTP 200 con XLSX vacío no debe bloquear el respaldo ni marcar live."""
+        from src.extractors import pobreza_extractor
+
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp)
+            older = self._write_mds_xlsx(raw / "mds_pobreza_comunal_ingresos_20260101T000000Z.xlsx")
+            empty = self._write_empty_mds_xlsx(
+                raw / "mds_pobreza_comunal_ingresos_20261009T000000Z.xlsx"
+            )
+
+            def download(_url, label):
+                if label == "ingresos":
+                    return empty
+                raise OSError("multidimensional offline")
+
+            with (
+                patch.object(pobreza_extractor, "RAW_DIR", tmp),
+                patch.object(pobreza_extractor, "ensure_staging_directories"),
+                patch.object(pobreza_extractor, "_download_xlsx", side_effect=download),
+            ):
+                rows, mode, _, notes = pobreza_extractor.fetch_data()
+
+        self.assertEqual(mode, "fallback")
+        self.assertEqual([row["codigo_comuna"] for row in rows], ["01101"])
+        self.assertTrue(any(empty.name in n and "inválido" in n for n in notes))
+        self.assertTrue(any(older.name in n for n in notes))
+        self.assertFalse(any("desde URL oficial" in n for n in notes))
+
+    def test_offline_fetch_skips_parseable_but_empty_newer_snapshot(self):
+        """Un snapshot XLSX legible pero sin datos no desplaza otro anterior."""
+        from src.extractors import pobreza_extractor
+
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp)
+            older = self._write_mds_xlsx(raw / "mds_pobreza_comunal_ingresos_20260101T000000Z.xlsx")
+            empty = self._write_empty_mds_xlsx(
+                raw / "mds_pobreza_comunal_ingresos_20261009T000000Z.xlsx"
+            )
+            with (
+                patch.object(pobreza_extractor, "RAW_DIR", tmp),
+                patch.object(pobreza_extractor, "ensure_staging_directories"),
+                patch.object(pobreza_extractor, "_download_xlsx", side_effect=OSError("offline")),
+            ):
+                rows, mode, _, notes = pobreza_extractor.fetch_data()
+
+        self.assertEqual(mode, "fallback")
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["dimension"], "ingresos")
+        self.assertTrue(any(empty.name in n and "inválido" in n for n in notes))
+        self.assertTrue(any(older.name in n for n in notes))
+
+    def test_all_empty_live_xlsx_use_labeled_minimal_fallback(self):
+        """Ninguna estimación real: solo devolver fallback explícito."""
+        from src.extractors import pobreza_extractor
+
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp)
+            ingresos = self._write_empty_mds_xlsx(raw / "ingresos.xlsx")
+            multi = self._write_empty_mds_xlsx(raw / "multidimensional.xlsx")
+
+            def download(_url, label):
+                return ingresos if label == "ingresos" else multi
+
+            with (
+                patch.object(pobreza_extractor, "RAW_DIR", tmp),
+                patch.object(pobreza_extractor, "ensure_staging_directories"),
+                patch.object(pobreza_extractor, "_download_xlsx", side_effect=download),
+            ):
+                rows, mode, _, notes = pobreza_extractor.fetch_data()
+
+        self.assertEqual(mode, "fallback")
+        self.assertEqual(rows, pobreza_extractor.FALLBACK_ROWS)
+        self.assertEqual(sum("sin datos" in n for n in notes), 2)
+        self.assertFalse(any("desde URL oficial" in n for n in notes))
 
     def test_normalize_rows_writes_required_schema(self):
         """normalize_rows produce las columnas requeridas con tipos correctos."""
