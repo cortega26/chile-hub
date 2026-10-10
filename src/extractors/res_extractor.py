@@ -206,6 +206,7 @@ def fetch_resources() -> tuple[list[bytes], str, str]:
             _LAST_FETCH_MODE = "incremental"
 
     contents = []
+    recovered_snapshots: list[str] = []
     stamp = datetime.datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
 
     for resource in selected_resources:
@@ -221,12 +222,16 @@ def fetch_resources() -> tuple[list[bytes], str, str]:
             # Si falla la descarga live, intentar recuperar snapshots raw previos
             snapshots = sorted(Path(RAW_DIR).glob(f"res_{resource_name}_*.csv"))
             if snapshots:
-                contents.append(snapshots[-1].read_bytes())
+                snapshot = snapshots[-1]
+                contents.append(snapshot.read_bytes())
+                recovered_snapshots.append(snapshot.name)
             else:
                 raise SystemExit(
                     f"Error descargando {resource['url']}: {exc}. No hay snapshot raw de respaldo."
                 )
 
+    if recovered_snapshots:
+        return contents, "fallback", "raw_snapshot_recovery: " + ", ".join(recovered_snapshots)
     return contents, "live", "datos_gob_cl_ckan_api"
 
 
