@@ -442,6 +442,41 @@ def verify_landing():
         if "Veintidós" in hero_copy:
             fail(f"Hero copy still claims 22 published layers: {hero_copy}")
 
+        # La nueva entrada orientada a tareas lleva a herramientas reales.
+        paths = page.locator(".use-paths .use-path")
+        expected_paths = [
+            ("#catalogo", "Buscar un dataset"),
+            ("#mapa", "Explorar el territorio"),
+            ("#explorador", "Ejecutar una consulta"),
+        ]
+        if paths.count() != len(expected_paths):
+            fail(f"Expected three task paths, got {paths.count()}")
+        for index, (href, heading) in enumerate(expected_paths):
+            path = paths.nth(index)
+            if path.get_attribute("href") != href or heading not in path.inner_text():
+                fail(f"Incorrect task path {index}: {path.inner_text()}")
+            if page.locator(href).count() != 1:
+                fail(f"Task path points to a missing or duplicate section: {href}")
+
+        main_order = page.locator("main > *").evaluate_all(
+            "(nodes) => nodes.map(node => node.id).filter(Boolean)"
+        )
+        expected_order = ["catalogo", "mapa", "comunas", "uso", "explorador"]
+        if any(value not in main_order for value in expected_order):
+            fail(f"Missing principal section in landing journey: {main_order}")
+        if [main_order.index(value) for value in expected_order] != sorted(
+            main_order.index(value) for value in expected_order
+        ):
+            fail(f"Principal sections are out of discovery order: {main_order}")
+
+        hero_copy_button = page.locator("#play-py .quickstart-copy")
+        if hero_copy_button.count() != 1:
+            fail("Missing copy action for the first hero example")
+        hero_copy_button.click()
+        page.wait_for_timeout(150)
+        if hero_copy_button.inner_text() != "Copiado":
+            fail("Hero example copy action did not acknowledge copying")
+
         # Geometría declarada como candidata, no como disponible
         geometry_card = page.locator(".capability-card", has_text="Geometría comunal")
         if geometry_card.count() != 1:
