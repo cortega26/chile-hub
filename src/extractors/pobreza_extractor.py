@@ -10,6 +10,7 @@ import datetime
 import os
 import sys
 from pathlib import Path
+from zipfile import BadZipFile
 
 import openpyxl
 import polars as pl
@@ -242,18 +243,29 @@ def fetch_data() -> tuple[list[dict], str, str, list[str]]:
             all_rows.extend(rows)
             any_live = True
             notes.append(f"{dimension}: {len(rows)} comunas con estimación desde URL oficial")
-        except (requests.RequestException, OSError, KeyError) as exc:
-            # Intentar recuperar del último snapshot
-            snapshots = sorted(Path(RAW_DIR).glob(f"mds_pobreza_comunal_{label}_*.xlsx"))
-            if snapshots:
-                rows = _parse_pobreza_xlsx(snapshots[-1], dimension, anio=2022)
+        except (requests.RequestException, OSError, KeyError, BadZipFile) as exc:
+            # Un HTTP 200 puede devolver HTML en vez de XLSX. El archivo
+            # descargado también aparece entre los snapshots: omitir los
+            # corruptos y recuperar el más reciente que realmente se pueda leer.
+            snapshots = sorted(
+                Path(RAW_DIR).glob(f"mds_pobreza_comunal_{label}_*.xlsx"), reverse=True
+            )
+            for snapshot in snapshots:
+                try:
+                    rows = _parse_pobreza_xlsx(snapshot, dimension, anio=2022)
+                except (OSError, KeyError, BadZipFile) as snapshot_exc:
+                    notes.append(f"{dimension}: snapshot inválido {snapshot.name} ({snapshot_exc})")
+                    continue
                 all_rows.extend(rows)
                 notes.append(
                     f"{dimension}: {len(rows)} comunas desde snapshot "
-                    f"{snapshots[-1].name} (error: {exc})"
+                    f"{snapshot.name} (error: {exc})"
                 )
+                break
             else:
-                notes.append(f"{dimension}: sin datos — descarga falló y no hay snapshot ({exc})")
+                notes.append(
+                    f"{dimension}: sin datos — descarga falló y no hay snapshot válido ({exc})"
+                )
 
     if not all_rows:
         return FALLBACK_ROWS, "fallback", POBREZA_INGRESOS_URL, notes
