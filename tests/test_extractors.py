@@ -2229,6 +2229,104 @@ class CensoExtractorExtendedTests(unittest.TestCase):
             self.assertFalse(csv_path.exists())
             self.assertFalse(meta_path.exists())
 
+    def test_valid_live_censo_workbook_retains_provenance(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            raw = Path(tmpdir)
+            fixture = raw / "fixture.xlsx"
+            _write_censo_workbook(fixture)
+            target = raw / "ine_censo2024_comunal_20261010T160000Z.xlsx"
+            response = MagicMock()
+            response.content = fixture.read_bytes()
+            response.__enter__.return_value = response
+            with (
+                patch.object(censo_extractor, "RAW_DIR", str(raw)),
+                patch.object(censo_extractor, "_snapshot_path", return_value=target),
+                patch.object(censo_extractor, "ensure_staging_directories"),
+                patch.object(censo_extractor, "fetch_with_retry", return_value=response),
+            ):
+                path, mode = censo_extractor.fetch_workbook()
+                df = censo_extractor.parse_workbook(path)
+                result = censo_extractor._build_extraction_result(
+                    df, path, mode, datetime.datetime.now(datetime.timezone.utc)
+                )
+
+            self.assertEqual((path, mode), (target, "live"))
+            self.assertEqual(df.height, 1)
+            self.assertEqual(result.snapshot_hash, result.compute_hash(target))
+            self.assertEqual(result.raw_snapshot_path, target)
+            self.assertEqual(result.source_detail, "official_xlsx")
+
+    def test_invalid_live_censo_workbook_recovers_valid_snapshot(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            raw = Path(tmpdir)
+            backup = raw / "ine_censo2024_comunal_20260901T010101Z.xlsx"
+            _write_censo_workbook(backup)
+            target = raw / "ine_censo2024_comunal_20261010T160000Z.xlsx"
+            response = MagicMock()
+            response.content = b"<html>source unavailable</html>"
+            response.__enter__.return_value = response
+            with (
+                patch.object(censo_extractor, "RAW_DIR", str(raw)),
+                patch.object(censo_extractor, "_snapshot_path", return_value=target),
+                patch.object(censo_extractor, "ensure_staging_directories"),
+                patch.object(censo_extractor, "fetch_with_retry", return_value=response),
+            ):
+                path, mode = censo_extractor.fetch_workbook()
+                result = censo_extractor._build_extraction_result(
+                    censo_extractor.parse_workbook(path),
+                    path,
+                    mode,
+                    datetime.datetime.now(datetime.timezone.utc),
+                )
+            metadata = result.to_staging_metadata("INE", censo_extractor.CENSO_URL)
+            self.assertEqual((path, mode), (backup, "fallback"))
+            self.assertEqual(result.snapshot_hash, result.compute_hash(backup))
+            self.assertEqual(metadata["snapshot_reference"], str(backup))
+            self.assertEqual(metadata["source_mode"], "fallback")
+            self.assertEqual(metadata["source_detail"], "raw_snapshot_recovery")
+            self.assertEqual(target.read_bytes(), response.content)
+
+    def test_censo_network_failure_skips_empty_and_corrupt_newer_snapshots(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            raw = Path(tmpdir)
+            backup = raw / "ine_censo2024_comunal_20260901T010101Z.xlsx"
+            _write_censo_workbook(backup)
+            (raw / "ine_censo2024_comunal_20260902T010101Z.xlsx").write_bytes(b"not an xlsx")
+            empty = raw / "ine_censo2024_comunal_20260903T010101Z.xlsx"
+            workbook = openpyxl.Workbook()
+            workbook.active.title = "2"
+            workbook.create_sheet("4")
+            workbook.save(empty)
+            with (
+                patch.object(censo_extractor, "RAW_DIR", str(raw)),
+                patch.object(censo_extractor, "ensure_staging_directories"),
+                patch.object(
+                    censo_extractor,
+                    "fetch_with_retry",
+                    side_effect=censo_extractor.requests.RequestException("offline"),
+                ),
+            ):
+                path, mode = censo_extractor.fetch_workbook()
+
+            self.assertEqual((path, mode), (backup, "fallback"))
+
+    def test_censo_no_usable_snapshot_fails_closed(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            raw = Path(tmpdir)
+            (raw / "ine_censo2024_comunal_20260901T010101Z.xlsx").write_bytes(b"broken snapshot")
+            target = raw / "ine_censo2024_comunal_20261010T160000Z.xlsx"
+            response = MagicMock()
+            response.content = b"broken live xlsx"
+            response.__enter__.return_value = response
+            with (
+                patch.object(censo_extractor, "RAW_DIR", str(raw)),
+                patch.object(censo_extractor, "_snapshot_path", return_value=target),
+                patch.object(censo_extractor, "ensure_staging_directories"),
+                patch.object(censo_extractor, "fetch_with_retry", return_value=response),
+                self.assertRaises(censo_extractor.BadZipFile),
+            ):
+                censo_extractor.fetch_workbook()
+
 
 class CensoHogaresViviendasExtractorExtendedTests(unittest.TestCase):
     """Tests extendidos para censo_hogares_viviendas (60% → +cobertura)."""
