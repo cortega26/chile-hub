@@ -5515,6 +5515,63 @@ class MineducAggregationRegressionTests(unittest.TestCase):
         self.assertEqual(keyed[2024, "13101"]["tasa_retiro"], 50.0)
         self.assertEqual(keyed[2025, "01101"]["asistencia_promedio"], 95.0)
 
+    def test_fetch_missing_unrar_uses_curated_fallback(self):
+        """La ausencia de unrar no debe abortar antes del fallback declarado."""
+        response = MagicMock()
+        response.content = b"synthetic-rar"
+        response.__enter__.return_value = response
+
+        with tempfile.TemporaryDirectory() as tmp:
+            with (
+                patch.object(mineduc_resultados_extractor, "RAW_DIR", Path(tmp)),
+                patch.object(mineduc_resultados_extractor, "ensure_staging_directories"),
+                patch.object(
+                    mineduc_resultados_extractor, "fetch_with_retry", return_value=response
+                ),
+                patch.object(mineduc_resultados_extractor, "_find_unrar", return_value="unrar"),
+                patch.object(mineduc_resultados_extractor.shutil, "which", return_value=None),
+                patch.object(mineduc_resultados_extractor.subprocess, "run") as extract,
+            ):
+                rows, mode, url, notes = mineduc_resultados_extractor.fetch_data(
+                    "https://example.test/rendimiento.rar"
+                )
+
+        self.assertEqual(rows, mineduc_resultados_extractor.FALLBACK_ROWS)
+        self.assertEqual(mode, "fallback")
+        self.assertEqual(url, "https://example.test/rendimiento.rar")
+        self.assertTrue(any("RuntimeError" in note and "unrar" in note for note in notes))
+        extract.assert_not_called()
+
+    def test_fetch_failed_unrar_uses_curated_fallback(self):
+        """Un RAR inválido conserva source_mode=fallback sin generar agregados."""
+        response = MagicMock()
+        response.content = b"invalid-rar"
+        response.__enter__.return_value = response
+
+        with tempfile.TemporaryDirectory() as tmp:
+            with (
+                patch.object(mineduc_resultados_extractor, "RAW_DIR", Path(tmp)),
+                patch.object(mineduc_resultados_extractor, "ensure_staging_directories"),
+                patch.object(
+                    mineduc_resultados_extractor, "fetch_with_retry", return_value=response
+                ),
+                patch.object(mineduc_resultados_extractor, "_find_unrar", return_value="unrar"),
+                patch.object(
+                    mineduc_resultados_extractor.shutil, "which", return_value="/usr/bin/unrar"
+                ),
+                patch.object(
+                    mineduc_resultados_extractor.subprocess,
+                    "run",
+                    return_value=MagicMock(returncode=3, stderr="invalid RAR"),
+                ) as extract,
+            ):
+                rows, mode, _, notes = mineduc_resultados_extractor.fetch_data()
+
+        self.assertEqual(rows, mineduc_resultados_extractor.FALLBACK_ROWS)
+        self.assertEqual(mode, "fallback")
+        self.assertTrue(any("RuntimeError" in note and "invalid RAR" in note for note in notes))
+        extract.assert_called_once()
+
     def test_fetch_live_aggregates_extracted_csv_with_no_network(self):
         response = MagicMock()
         response.content = b"fixture-rar"
