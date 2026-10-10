@@ -3598,6 +3598,64 @@ class SinimFinanzasLiveExtractorTests(unittest.TestCase):
             _parse_xml_spreadsheet(xml)
 
 
+    def test_parse_xml_spreadsheet_respects_sparse_cell_indices(self):
+        """Un salto ss:Index no debe mover importes entre indicadores."""
+        from src.extractors.sinim_finanzas_live_extractor import _parse_xml_spreadsheet
+
+        row = (
+            "<Row>"
+            "<Cell><Data>01101</Data></Cell>"
+            "<Cell><Data>Iquique</Data></Cell>"
+            '<Cell ss:Index="15"><Data>100</Data></Cell>'
+            '<Cell ss:Index="17"><Data>50</Data></Cell>'
+            '<Cell ss:Index="40"><Data>80</Data></Cell>'
+            '<Cell ss:Index="72"><Data>30</Data></Cell>'
+            "</Row>"
+        )
+        xml = f"<Workbook><Table>{'<Row></Row>' * 3}{row}</Table></Workbook>"
+
+        result = _parse_xml_spreadsheet(xml)
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["codigo_comuna"], "01101")
+        self.assertEqual(result[0]["ingresos_totales"], 100000.0)
+        self.assertEqual(result[0]["fondo_comun_municipal"], 50000.0)
+        self.assertEqual(result[0]["gastos_totales"], 80000.0)
+        self.assertEqual(result[0]["gasto_inversion"], 30000.0)
+        self.assertIsNone(result[0]["gasto_personal"])
+
+    def test_parse_xml_spreadsheet_does_not_shift_dense_row_after_index_gap(self):
+        """Incluso con 72 celdas físicas, ss:Index desplaza los valores posteriores."""
+        from src.extractors.sinim_finanzas_live_extractor import _parse_xml_spreadsheet
+
+        row = _sinim_xml_row({0: "01101", 1: "Iquique", 14: "999", 15: "321"})
+        row = row.replace(
+            '<Cell><Data ss:Type="String">999</Data></Cell>',
+            '<Cell ss:Index="16"><Data ss:Type="String">999</Data></Cell>',
+            1,
+        )
+        xml = f"<Workbook><Table>{'<Row></Row>' * 3}{row}</Table></Workbook>"
+
+        result = _parse_xml_spreadsheet(xml)
+
+        self.assertIsNone(result[0]["ingresos_totales"])
+        self.assertEqual(result[0]["fondo_comun_municipal"], 321000.0)
+
+    def test_parse_xml_spreadsheet_rejects_invalid_cell_indices(self):
+        """Índices inválidos o retrocesos no deben producir columnas incorrectas."""
+        from src.extractors.sinim_finanzas_live_extractor import _parse_xml_spreadsheet
+
+        for index in ("0", "1", "not-a-number"):
+            with self.subTest(index=index):
+                row = (
+                    "<Row><Cell><Data>01101</Data></Cell>"
+                    f'<Cell ss:Index="{index}"><Data>Iquique</Data></Cell></Row>'
+                )
+                xml = f"<Workbook><Table>{'<Row></Row>' * 3}{row}</Table></Workbook>"
+                with self.assertRaisesRegex(RuntimeError, "ss:Index"):
+                    _parse_xml_spreadsheet(xml)
+
+
 class CeadDelincuenciaLiveExtractorTests(unittest.TestCase):
     """El extractor CEAD está neutralizado (deprecated 2026-09-15, AGENTS.md
     §5 paso 4): toda invocación levanta NotImplementedError con el motivo."""
