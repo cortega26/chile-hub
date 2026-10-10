@@ -3411,14 +3411,14 @@
                 <div class="playground-console">
                     <div class="console-header">
                         <span class="console-kicker">EJEMPLOS / DATOS REALES</span>
-                        <div class="console-tabs">
-                            <button class="console-tab active" data-tab="py">Python</button>
-                            <button class="console-tab" data-tab="sql">DuckDB</button>
-                            <button class="console-tab" data-tab="bash">Bash</button>
+                        <div class="console-tabs" role="tablist" aria-label="Lenguaje de ejemplo">
+                            <button type="button" class="console-tab active" id="hero-tab-py" role="tab" aria-controls="play-py" aria-selected="true" tabindex="0" data-tab="py">Python</button>
+                            <button type="button" class="console-tab" id="hero-tab-sql" role="tab" aria-controls="play-sql" aria-selected="false" tabindex="-1" data-tab="sql">DuckDB</button>
+                            <button type="button" class="console-tab" id="hero-tab-bash" role="tab" aria-controls="play-bash" aria-selected="false" tabindex="-1" data-tab="bash">Bash</button>
                         </div>
                     </div>
                     <div class="console-body">
-                        <div class="console-panel active" id="play-py">
+                        <div class="console-panel active" id="play-py" role="tabpanel" aria-labelledby="hero-tab-py">
                             <button type="button" class="quickstart-copy" data-copy-target="hero-code-py" aria-label="Copiar ejemplo Python">Copiar</button>
                             <pre><code id="hero-code-py"><span class="keyword">import</span> io
 <span class="keyword">import</span> polars <span class="keyword">as</span> pl
@@ -3429,7 +3429,7 @@ url = <span class="string">"https://tooltician.com/chile-hub/data/normalized/com
 df = pl.read_parquet(io.BytesIO(requests.get(url, timeout=60).content))
 print(df.head())</code></pre>
                         </div>
-                        <div class="console-panel" id="play-sql">
+                        <div class="console-panel" id="play-sql" role="tabpanel" aria-labelledby="hero-tab-sql">
                             <button type="button" class="quickstart-copy" data-copy-target="hero-code-sql" aria-label="Copiar ejemplo DuckDB">Copiar</button>
                             <pre><code id="hero-code-sql">-- Consulta SQL directa
 INSTALL httpfs;
@@ -3439,7 +3439,7 @@ SELECT * FROM read_parquet(
     <span class="string">'https://tooltician.com/chile-hub/data/normalized/comunas.parquet'</span>
 ) LIMIT 5;</code></pre>
                         </div>
-                        <div class="console-panel" id="play-bash">
+                        <div class="console-panel" id="play-bash" role="tabpanel" aria-labelledby="hero-tab-bash">
                             <button type="button" class="quickstart-copy" data-copy-target="hero-code-bash" aria-label="Copiar ejemplo Bash">Copiar</button>
                             <pre><code id="hero-code-bash"># Descargar metadatos del catálogo
 curl -s <span class="string">"https://tooltician.com/chile-hub/data/normalized/hub_bundle.json"</span> \
