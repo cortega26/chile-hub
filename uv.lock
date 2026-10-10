@@ -443,7 +443,7 @@ wheels = [
 
 [[package]]
 name = "chile-hub"
-version = "1.47.17"
+version = "1.47.18"
 source = { editable = "." }
 dependencies = [
     { name = "platformdirs" },
