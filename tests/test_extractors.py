@@ -3597,7 +3597,6 @@ class SinimFinanzasLiveExtractorTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "solo 2 filas"):
             _parse_xml_spreadsheet(xml)
 
-
     def test_parse_xml_spreadsheet_respects_sparse_cell_indices(self):
         """Un salto ss:Index no debe mover importes entre indicadores."""
         from src.extractors.sinim_finanzas_live_extractor import _parse_xml_spreadsheet
