@@ -1360,6 +1360,170 @@ class ResExtractorTests(unittest.TestCase):
         self.assertEqual(len(contents), 1)
         self.assertEqual(res_extractor._LAST_FETCH_MODE, "incremental")
 
+    def test_res_renamed_yearly_resource_recovers_previous_cut(self):
+        """Un cambio de fecha de corte en CKAN no debe ocultar el RAW anterior."""
+        from requests import RequestException
+
+        resource = self._resource("current", 2026)
+        resource["name"] = "Constituciones del año 2026, corte octubre"
+        package = self._package_mock([resource])
+        saved = self._valid_res_csv(2026)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            snapshot = (
+                Path(tmpdir)
+                / "res_Constituciones_del_año_2026,_corte_septiembre_20261001T010101Z.csv"
+            )
+            snapshot.write_bytes(saved)
+            with (
+                patch.object(res_extractor, "RAW_DIR", tmpdir),
+                patch.object(res_extractor, "_staging_years_present", return_value=None),
+                patch.object(
+                    res_extractor,
+                    "fetch_with_retry",
+                    side_effect=[package, RequestException("offline")],
+                ),
+            ):
+                contents, mode, detail = res_extractor.fetch_resources()
+        self.assertEqual((contents, mode), ([saved], "fallback"))
+        self.assertIn(snapshot.name, detail)
+
+    def test_res_renamed_cut_http_200_html_preserves_and_recovers_old_snapshot(self):
+        """HTTP 200 HTML de un corte nuevo conserva evidencia y recupera otro corte."""
+        resource = self._resource("current", 2026)
+        resource["name"] = "Constituciones del año 2026, corte octubre"
+        package = self._package_mock([resource])
+        valid = self._valid_res_csv(2026)
+        invalid = b"<html>upstream error</html>"
+        with tempfile.TemporaryDirectory() as tmpdir:
+            raw = Path(tmpdir)
+            old = raw / "res_Constituciones_del_año_2026,_corte_julio_20260901T010101Z.csv"
+            old.write_bytes(valid)
+            with (
+                patch.object(res_extractor, "RAW_DIR", tmpdir),
+                patch.object(res_extractor, "_staging_years_present", return_value=None),
+                patch.object(
+                    res_extractor,
+                    "fetch_with_retry",
+                    side_effect=[package, self._response_mock(invalid)],
+                ),
+            ):
+                contents, mode, detail = res_extractor.fetch_resources()
+            files = list(raw.glob("res_*.csv"))
+            self.assertEqual((contents, mode), ([valid], "fallback"))
+            self.assertIn(old.name, detail)
+            self.assertEqual(old.read_bytes(), valid)
+            self.assertEqual(len(files), 2)
+            self.assertTrue(any(p.read_bytes() == invalid for p in files))
+
+    def test_res_renamed_cut_uses_capture_timestamp_not_cutoff_lexicography(self):
+        """El corte 'z' antiguo no debe ganar al corte 'a' capturado después."""
+        from requests import RequestException
+
+        resource = self._resource("current", 2026)
+        resource["name"] = "Constituciones del año 2026, corte vigente"
+        package = self._package_mock([resource])
+        older_data = self._valid_res_csv(2026)
+        newer_data = older_data.replace(b"Empresa Ejemplo", b"Empresa Actualizada")
+        with tempfile.TemporaryDirectory() as tmpdir:
+            raw = Path(tmpdir)
+            older = raw / "res_Constituciones_del_año_2026,_corte_z_20260901T010101Z.csv"
+            newer = raw / "res_Constituciones_del_año_2026,_corte_a_20261001T010101Z.csv"
+            older.write_bytes(older_data)
+            newer.write_bytes(newer_data)
+            with (
+                patch.object(res_extractor, "RAW_DIR", tmpdir),
+                patch.object(res_extractor, "_staging_years_present", return_value=None),
+                patch.object(
+                    res_extractor,
+                    "fetch_with_retry",
+                    side_effect=[package, RequestException("offline")],
+                ),
+            ):
+                contents, mode, detail = res_extractor.fetch_resources()
+        self.assertEqual((contents, mode), ([newer_data], "fallback"))
+        self.assertIn(newer.name, detail)
+        self.assertNotIn(older.name, detail)
+
+    def test_res_renamed_cut_excludes_other_year_and_resource_family(self):
+        """Ninguna recuperación puede cruzar de año ni de tipo de recurso RES."""
+        from requests import RequestException
+
+        resource = self._resource("current", 2026)
+        resource["name"] = "Constituciones del año 2026, corte octubre"
+        package = self._package_mock([resource])
+        with tempfile.TemporaryDirectory() as tmpdir:
+            raw = Path(tmpdir)
+            (raw / "res_Constituciones_del_año_2025_20261001T010101Z.csv").write_bytes(
+                self._valid_res_csv(2026)
+            )
+            (raw / "res_Modificaciones_del_año_2026_20261001T010101Z.csv").write_bytes(
+                self._valid_res_csv(2026)
+            )
+            (raw / "res_Constituciones_del_año_20260_20261001T010101Z.csv").write_bytes(
+                self._valid_res_csv(2026)
+            )
+            with (
+                patch.object(res_extractor, "RAW_DIR", tmpdir),
+                patch.object(res_extractor, "_staging_years_present", return_value=None),
+                patch.object(
+                    res_extractor,
+                    "fetch_with_retry",
+                    side_effect=[package, RequestException("offline")],
+                ),
+                self.assertRaisesRegex(SystemExit, "No hay snapshot raw de respaldo utilizable"),
+            ):
+                res_extractor.fetch_resources()
+
+    def test_res_renamed_cut_prefers_later_collision_suffix(self):
+        """Entre dos capturas del mismo segundo, gana la secuencia más alta."""
+        from requests import RequestException
+
+        resource = self._resource("current", 2026)
+        resource["name"] = "Constituciones del año 2026, corte octubre"
+        package = self._package_mock([resource])
+        older_data = self._valid_res_csv(2026)
+        newer_data = older_data.replace(b"Empresa Ejemplo", b"Empresa Revisada")
+        with tempfile.TemporaryDirectory() as tmpdir:
+            raw = Path(tmpdir)
+            older = raw / "res_Constituciones_del_año_2026,_corte_julio_20261001T010101Z.csv"
+            newer = raw / "res_Constituciones_del_año_2026,_corte_julio_20261001T010101Z_0001.csv"
+            older.write_bytes(older_data)
+            newer.write_bytes(newer_data)
+            with (
+                patch.object(res_extractor, "RAW_DIR", tmpdir),
+                patch.object(res_extractor, "_staging_years_present", return_value=None),
+                patch.object(
+                    res_extractor,
+                    "fetch_with_retry",
+                    side_effect=[package, RequestException("offline")],
+                ),
+            ):
+                contents, mode, detail = res_extractor.fetch_resources()
+        self.assertEqual((contents, mode), ([newer_data], "fallback"))
+        self.assertIn(newer.name, detail)
+
+    def test_res_unknown_year_snapshot_recovery_stays_exact(self):
+        """Sin año inferible no cruzar a otro nombre desconocido del mismo RES."""
+        from requests import RequestException
+
+        resource = self._resource("current", 2026)
+        resource["name"] = "Constituciones RES edición actual"
+        package = self._package_mock([resource])
+        with tempfile.TemporaryDirectory() as tmpdir:
+            old = Path(tmpdir) / "res_Constituciones_RES_edición_anterior_20261001T010101Z.csv"
+            old.write_bytes(self._valid_res_csv(2026))
+            with (
+                patch.object(res_extractor, "RAW_DIR", tmpdir),
+                patch.object(res_extractor, "_staging_years_present", return_value=None),
+                patch.object(
+                    res_extractor,
+                    "fetch_with_retry",
+                    side_effect=[package, RequestException("offline")],
+                ),
+                self.assertRaisesRegex(SystemExit, "No hay snapshot raw de respaldo utilizable"),
+            ):
+                res_extractor.fetch_resources()
+
     def test_res_raw_archive_collision_never_overwrites_existing_bytes(self):
         """Invariante AGENTS 4.3: capturas RAW del mismo segundo son inmutables."""
         with tempfile.TemporaryDirectory() as tmpdir:
