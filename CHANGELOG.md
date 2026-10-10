@@ -12,6 +12,46 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.48.2 - 2026-10-10
+
+### Corregido
+
+- Recover RES archives across updated CKAN cutoff names
+  ([#158](https://github.com/cortega26/chile-hub/pull/158),
+  [`9ab5b9e`](https://github.com/cortega26/chile-hub/commit/9ab5b9ef2c9f7b12e51c6f31eb8901939238119a))
+
+- Recover RES snapshots across renamed annual cutoffs in capture-time order
+  ([#158](https://github.com/cortega26/chile-hub/pull/158),
+  [`9ab5b9e`](https://github.com/cortega26/chile-hub/commit/9ab5b9ef2c9f7b12e51c6f31eb8901939238119a))
+
+- Use regex digit classes to parse annual RES archive timestamps
+  ([#158](https://github.com/cortega26/chile-hub/pull/158),
+  [`9ab5b9e`](https://github.com/cortega26/chile-hub/commit/9ab5b9ef2c9f7b12e51c6f31eb8901939238119a))
+
+### Mantenimiento
+
+- **ci**: Sync coverage badge from verified tests [skip ci]
+  ([`b5a94d9`](https://github.com/cortega26/chile-hub/commit/b5a94d9512a06890dd30968cb9d598a710f42247))
+
+### Code Style
+
+- Align collision test path formatting with Ruff
+  ([#158](https://github.com/cortega26/chile-hub/pull/158),
+  [`9ab5b9e`](https://github.com/cortega26/chile-hub/commit/9ab5b9ef2c9f7b12e51c6f31eb8901939238119a))
+
+### Documentación
+
+- Reflect six RES named-cutoff regression tests in inventory
+  ([#158](https://github.com/cortega26/chile-hub/pull/158),
+  [`9ab5b9e`](https://github.com/cortega26/chile-hub/commit/9ab5b9ef2c9f7b12e51c6f31eb8901939238119a))
+
+### Tests
+
+- Recover renamed annual RES captures safely by timestamp, type and year
+  ([#158](https://github.com/cortega26/chile-hub/pull/158),
+  [`9ab5b9e`](https://github.com/cortega26/chile-hub/commit/9ab5b9ef2c9f7b12e51c6f31eb8901939238119a))
+
+
 ## 1.48.1 - 2026-10-10
 
 ### Corregido
