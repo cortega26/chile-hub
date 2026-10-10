@@ -278,9 +278,7 @@ def _parse_xml_spreadsheet(xml_content: str) -> list[dict[str, Any]]:
     for row_xml in data_rows:
         # SpreadsheetML permite omitir celdas: ss:Index expresa la columna
         # 1-based, no la posición física en el XML.
-        cell_blocks = re.findall(
-            r"<Cell\b[^>]*?/>|<Cell\b[^>]*?>.*?</Cell>", row_xml, re.DOTALL
-        )
+        cell_blocks = re.findall(r"<Cell\b[^>]*?/>|<Cell\b[^>]*?>.*?</Cell>", row_xml, re.DOTALL)
         cells: dict[int, str] = {}
         next_index = 0
         for cell in cell_blocks:
