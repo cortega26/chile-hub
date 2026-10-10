@@ -12,6 +12,36 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.47.15 - 2026-10-10
+
+### Corregido
+
+- Disclose recovered RES snapshots in provenance
+  ([#151](https://github.com/cortega26/chile-hub/pull/151),
+  [`c1f0f50`](https://github.com/cortega26/chile-hub/commit/c1f0f5096e5fd5d6353942fa938c3c8bb81fc161))
+
+- Disclose RES snapshot recovery instead of claiming live data
+  ([#151](https://github.com/cortega26/chile-hub/pull/151),
+  [`c1f0f50`](https://github.com/cortega26/chile-hub/commit/c1f0f5096e5fd5d6353942fa938c3c8bb81fc161))
+
+### Mantenimiento
+
+- **ci**: Sync coverage badge from verified tests [skip ci]
+  ([`1e9f99c`](https://github.com/cortega26/chile-hub/commit/1e9f99ca4a24bb87e713cc0568d7ad4a6596bf2d))
+
+### Documentación
+
+- Sync README count after RES provenance regressions
+  ([#151](https://github.com/cortega26/chile-hub/pull/151),
+  [`c1f0f50`](https://github.com/cortega26/chile-hub/commit/c1f0f5096e5fd5d6353942fa938c3c8bb81fc161))
+
+### Tests
+
+- Cover RES mixed and snapshot-only provenance and fail-closed path
+  ([#151](https://github.com/cortega26/chile-hub/pull/151),
+  [`c1f0f50`](https://github.com/cortega26/chile-hub/commit/c1f0f5096e5fd5d6353942fa938c3c8bb81fc161))
+
+
 ## 1.47.14 - 2026-10-10
 
 ### Corregido
