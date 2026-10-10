@@ -966,12 +966,14 @@ def verify_landing():
         page.evaluate(
             "() => document.querySelectorAll('.reveal').forEach(el => el.classList.add('is-visible'))"
         )
+        page.evaluate("() => window.scrollTo(0, 0)")
         page.screenshot(path=str(qa_dir / "desktop.png"), full_page=True)
         mobile.locator("#mapa").scroll_into_view_if_needed()
         mobile.wait_for_selector("#map-comunal path.leaflet-interactive", timeout=15000)
         mobile.evaluate(
             "() => document.querySelectorAll('.reveal').forEach(el => el.classList.add('is-visible'))"
         )
+        mobile.evaluate("() => window.scrollTo(0, 0)")
         mobile.screenshot(path=str(qa_dir / "mobile.png"), full_page=True)
         mobile.close()
 
