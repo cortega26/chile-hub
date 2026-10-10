@@ -477,6 +477,30 @@ def verify_landing():
         if hero_copy_button.inner_text() != "Copiado":
             fail("Hero example copy action did not acknowledge copying")
 
+        # Las pestañas de código deben cambiar el panel visible y soportar teclado.
+        hero_tabs = page.locator(".console-tabs [role='tab']")
+        if hero_tabs.count() != 3:
+            fail("Expected three accessible code example tabs")
+        hero_tabs.nth(1).click()
+        if (
+            hero_tabs.nth(1).get_attribute("aria-selected") != "true"
+            or not page.locator("#play-sql").is_visible()
+            or page.locator("#play-py").is_visible()
+        ):
+            fail("DuckDB tab did not activate its code panel")
+        hero_tabs.nth(1).press("ArrowRight")
+        if (
+            hero_tabs.nth(2).get_attribute("aria-selected") != "true"
+            or not page.locator("#play-bash").is_visible()
+        ):
+            fail("Hero code tabs did not respond to ArrowRight")
+        hero_tabs.nth(2).press("Home")
+        if (
+            hero_tabs.first.get_attribute("aria-selected") != "true"
+            or not page.locator("#play-py").is_visible()
+        ):
+            fail("Hero code tabs did not respond to Home")
+
         # Geometría declarada como candidata, no como disponible
         geometry_card = page.locator(".capability-card", has_text="Geometría comunal")
         if geometry_card.count() != 1:
