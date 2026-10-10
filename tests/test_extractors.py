@@ -2388,6 +2388,117 @@ class StealthGetTests(unittest.TestCase):
 class PobrezaComunalExtractorTests(unittest.TestCase):
     """Tests unitarios para el extractor de pobreza comunal (CASEN / SAE)."""
 
+    @staticmethod
+    def _write_mds_xlsx(path: Path) -> Path:
+        """Create a real but tiny MDS-layout workbook without external requests."""
+        workbook = openpyxl.Workbook()
+        sheet = workbook.active
+        sheet.append(["Estimaciones pobreza comunal"])
+        sheet.append([])
+        sheet.append(["Código", "Región", "Comuna", "Población", "Pobreza", "Tasa", "LI", "LS"])
+        sheet.append([1101, "Tarapacá", "Iquique", 229674, 18000, 0.05, 0.04, 0.06])
+        workbook.save(path)
+        return path
+
+    def test_invalid_live_xlsx_recovers_latest_valid_older_snapshot(self):
+        """An HTTP-success HTML payload must not supersede a valid old workbook."""
+        from src.extractors import pobreza_extractor
+
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp)
+            older = self._write_mds_xlsx(raw / "mds_pobreza_comunal_ingresos_20260101T000000Z.xlsx")
+            corrupt = raw / "mds_pobreza_comunal_ingresos_20261009T000000Z.xlsx"
+            corrupt.write_bytes(b"<html>service temporarily unavailable</html>")
+
+            def download(_url, label):
+                if label == "ingresos":
+                    return corrupt
+                raise OSError("multidimensional offline")
+
+            with (
+                patch.object(pobreza_extractor, "RAW_DIR", tmp),
+                patch.object(pobreza_extractor, "ensure_staging_directories"),
+                patch.object(pobreza_extractor, "_download_xlsx", side_effect=download),
+            ):
+                rows, mode, _, notes = pobreza_extractor.fetch_data()
+
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["codigo_comuna"], "01101")
+        self.assertEqual(rows[0]["dimension"], "ingresos")
+        self.assertEqual(mode, "fallback")
+        self.assertTrue(any(corrupt.name in note and "inválido" in note for note in notes))
+        self.assertTrue(any(older.name in note for note in notes))
+
+    def test_corrupt_snapshots_without_valid_backup_use_labeled_fallback(self):
+        """Unavailable or corrupt source data must not masquerade as live."""
+        from src.extractors import pobreza_extractor
+
+        with tempfile.TemporaryDirectory() as tmp:
+            corrupt = Path(tmp) / "mds_pobreza_comunal_ingresos_20261009T000000Z.xlsx"
+            corrupt.write_bytes(b"not a zip file")
+
+            def download(_url, label):
+                if label == "ingresos":
+                    return corrupt
+                raise OSError("multidimensional offline")
+
+            with (
+                patch.object(pobreza_extractor, "RAW_DIR", tmp),
+                patch.object(pobreza_extractor, "ensure_staging_directories"),
+                patch.object(pobreza_extractor, "_download_xlsx", side_effect=download),
+            ):
+                rows, mode, _, notes = pobreza_extractor.fetch_data()
+
+        self.assertEqual(mode, "fallback")
+        self.assertEqual(rows, pobreza_extractor.FALLBACK_ROWS)
+        self.assertTrue(any("sin datos" in note for note in notes))
+        self.assertTrue(any("snapshot inválido" in note for note in notes))
+
+    def test_http_failure_skips_corrupt_newest_stored_snapshot(self):
+        """A failed download should search older snapshots until one parses."""
+        from src.extractors import pobreza_extractor
+
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp)
+            older = self._write_mds_xlsx(raw / "mds_pobreza_comunal_ingresos_20260101T000000Z.xlsx")
+            bad = raw / "mds_pobreza_comunal_ingresos_20261009T000000Z.xlsx"
+            bad.write_bytes(b"broken xlsx")
+            with (
+                patch.object(pobreza_extractor, "RAW_DIR", tmp),
+                patch.object(pobreza_extractor, "ensure_staging_directories"),
+                patch.object(pobreza_extractor, "_download_xlsx", side_effect=OSError("offline")),
+            ):
+                rows, mode, _, notes = pobreza_extractor.fetch_data()
+
+        self.assertEqual(mode, "fallback")
+        self.assertEqual([row["codigo_comuna"] for row in rows], ["01101"])
+        self.assertTrue(any(bad.name in note for note in notes))
+        self.assertTrue(any(older.name in note for note in notes))
+
+    def test_valid_xlsx_download_remains_live(self):
+        """The successful path must not be mislabeled as snapshot fallback."""
+        from src.extractors import pobreza_extractor
+
+        with tempfile.TemporaryDirectory() as tmp:
+            valid = self._write_mds_xlsx(Path(tmp) / "download.xlsx")
+
+            def download(_url, label):
+                if label == "ingresos":
+                    return valid
+                raise OSError("multidimensional offline")
+
+            with (
+                patch.object(pobreza_extractor, "RAW_DIR", tmp),
+                patch.object(pobreza_extractor, "ensure_staging_directories"),
+                patch.object(pobreza_extractor, "_download_xlsx", side_effect=download),
+            ):
+                rows, mode, _, notes = pobreza_extractor.fetch_data()
+
+        self.assertEqual(mode, "live")
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["dimension"], "ingresos")
+        self.assertTrue(any("1 comunas" in note for note in notes))
+
     def test_normalize_rows_writes_required_schema(self):
         """normalize_rows produce las columnas requeridas con tipos correctos."""
         from src.extractors.pobreza_extractor import FALLBACK_ROWS, normalize_rows
