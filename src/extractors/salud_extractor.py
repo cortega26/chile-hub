@@ -58,12 +58,28 @@ def fetch_csv() -> tuple[Path, str, str]:
             stamp = datetime.datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
             target = Path(RAW_DIR) / f"minsal_establecimientos_salud_{stamp}.csv"
             target.write_bytes(response.content)
+        _assert_readable_csv(target)
         return target, "live", resource["url"]
-    except (requests.RequestException, OSError):
-        snapshots = sorted(Path(RAW_DIR).glob("minsal_establecimientos_salud_*.csv"))
-        if not snapshots:
-            raise
-        return snapshots[-1], "fallback", PACKAGE_API_URL
+    except (
+        requests.RequestException,
+        OSError,
+        KeyError,
+        StopIteration,
+        TypeError,
+        AttributeError,
+        ValueError,
+        pl.exceptions.PolarsError,
+    ) as exc:
+        snapshots = sorted(
+            Path(RAW_DIR).glob("minsal_establecimientos_salud_*.csv"), reverse=True
+        )
+        for snapshot in snapshots:
+            try:
+                _assert_readable_csv(snapshot)
+            except (OSError, ValueError, pl.exceptions.PolarsError):
+                continue
+            return snapshot, "fallback", PACKAGE_API_URL
+        raise FileNotFoundError("No hay snapshots MINSAL utilizables en data/raw/") from exc
 
 
 def parse_csv(path: Path) -> pl.DataFrame:
@@ -95,6 +111,12 @@ def parse_csv(path: Path) -> pl.DataFrame:
         .unique(subset=["codigo_establecimiento"], keep="last")
         .sort("codigo_establecimiento")
     )
+
+
+def _assert_readable_csv(path: Path) -> None:
+    """Un CSV solo es utilizable si se transforma en al menos un establecimiento."""
+    if parse_csv(path).is_empty():
+        raise ValueError(f"CSV MINSAL sin establecimientos: {path.name}")
 
 
 def process_salud() -> str:
