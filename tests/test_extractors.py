@@ -1360,6 +1360,76 @@ class ResExtractorTests(unittest.TestCase):
         self.assertEqual(len(contents), 1)
         self.assertEqual(res_extractor._LAST_FETCH_MODE, "incremental")
 
+    def test_res_raw_archive_collision_never_overwrites_existing_bytes(self):
+        """Invariante AGENTS 4.3: capturas RAW del mismo segundo son inmutables."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with patch.object(res_extractor, "RAW_DIR", tmpdir):
+                a = res_extractor._archive_res_raw("Constituciones_2026", "20261010T120000Z", b"first")
+                b = res_extractor._archive_res_raw("Constituciones_2026", "20261010T120000Z", b"second")
+                c = res_extractor._archive_res_raw("Constituciones_2026", "20261010T120000Z", b"third")
+                self.assertEqual((a.read_bytes(), b.read_bytes(), c.read_bytes()), (
+                    b"first", b"second", b"third"
+                ))
+                self.assertEqual(
+                    [a.name, b.name, c.name],
+                    [
+                        "res_Constituciones_2026_20261010T120000Z.csv",
+                        "res_Constituciones_2026_20261010T120000Z_0001.csv",
+                        "res_Constituciones_2026_20261010T120000Z_0002.csv",
+                    ],
+                )
+
+    def test_res_same_second_duplicate_live_resources_preserve_both_raw_files(self):
+        """CKAN puede repetir nombre en un lote; ambas respuestas permanecen auditables."""
+        resource = self._resource("current", 2026)
+        package = self._package_mock([resource, resource])
+        first = self._valid_res_csv()
+        second = first.replace(b"Empresa Ejemplo", b"Empresa Distinta")
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with (
+                patch.object(res_extractor, "RAW_DIR", tmpdir),
+                patch.object(res_extractor, "_staging_years_present", return_value=None),
+                patch.object(
+                    res_extractor, "fetch_with_retry",
+                    side_effect=[
+                        package, self._response_mock(first), self._response_mock(second)
+                    ],
+                ),
+            ):
+                contents, mode, detail = res_extractor.fetch_resources()
+            files = sorted(Path(tmpdir).glob("res_Constituciones_del_año_2026_*.csv"))
+            self.assertEqual((contents, mode, detail), (
+                [first, second], "live", "datos_gob_cl_ckan_api"
+            ))
+            self.assertEqual(len(files), 2)
+            self.assertEqual([p.read_bytes() for p in files], [first, second])
+            self.assertTrue(files[1].name.endswith("_0001.csv"))
+
+    def test_res_same_second_bad_http_200_recovers_unmodified_first_snapshot(self):
+        """HTML posterior no puede destruir el RAW válido que necesita el fallback."""
+        resource = self._resource("current", 2026)
+        package = self._package_mock([resource, resource])
+        good = self._valid_res_csv()
+        bad = b"<html>upstream unavailable</html>"
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with (
+                patch.object(res_extractor, "RAW_DIR", tmpdir),
+                patch.object(res_extractor, "_staging_years_present", return_value=None),
+                patch.object(
+                    res_extractor, "fetch_with_retry",
+                    side_effect=[
+                        package, self._response_mock(good), self._response_mock(bad)
+                    ],
+                ),
+            ):
+                contents, mode, detail = res_extractor.fetch_resources()
+            files = sorted(Path(tmpdir).glob("res_Constituciones_del_año_2026_*.csv"))
+            self.assertEqual((contents, mode), ([good, good], "fallback"))
+            self.assertEqual(len(files), 2)
+            self.assertEqual([p.read_bytes() for p in files], [good, bad])
+            self.assertIn(files[0].name, detail)
+            self.assertNotIn(files[1].name, detail)
+
     def test_res_valid_http_response_is_live_and_keeps_raw(self):
         """Un CSV HTTP 200 utilizable conserva modo live y raw auditado."""
         package = self._package_mock([self._resource("current", 2026)])
