@@ -12,6 +12,42 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.47.14 - 2026-10-10
+
+### Corregido
+
+- Recover usable Censo 2024 communal workbooks
+  ([#150](https://github.com/cortega26/chile-hub/pull/150),
+  [`c2541d4`](https://github.com/cortega26/chile-hub/commit/c2541d495bbb25443fcbc08abc356bc8afba1900))
+
+- Recover usable censo comunal XLSX snapshots
+  ([#150](https://github.com/cortega26/chile-hub/pull/150),
+  [`c2541d4`](https://github.com/cortega26/chile-hub/commit/c2541d495bbb25443fcbc08abc356bc8afba1900))
+
+### Mantenimiento
+
+- **ci**: Sync coverage badge from verified tests [skip ci]
+  ([`225fb7e`](https://github.com/cortega26/chile-hub/commit/225fb7e08f7ef5e107b25917d45e0c76d6099249))
+
+### Code Style
+
+- Apply exact Ruff formatting for iteration 13
+  ([#150](https://github.com/cortega26/chile-hub/pull/150),
+  [`c2541d4`](https://github.com/cortega26/chile-hub/commit/c2541d495bbb25443fcbc08abc356bc8afba1900))
+
+### Documentación
+
+- Sync test count after four censo recovery regressions
+  ([#150](https://github.com/cortega26/chile-hub/pull/150),
+  [`c2541d4`](https://github.com/cortega26/chile-hub/commit/c2541d495bbb25443fcbc08abc356bc8afba1900))
+
+### Tests
+
+- Cover censo live validation and snapshot recovery
+  ([#150](https://github.com/cortega26/chile-hub/pull/150),
+  [`c2541d4`](https://github.com/cortega26/chile-hub/commit/c2541d495bbb25443fcbc08abc356bc8afba1900))
+
+
 ## 1.47.13 - 2026-10-10
 
 ### Corregido
