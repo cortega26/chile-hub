@@ -316,7 +316,7 @@ def fetch_data() -> tuple[list[dict], str, str, list[str]]:
     except FileNotFoundError as exc:
         return FALLBACK_ROWS, "fallback", LISTADO_URL, [str(exc)]
 
-    from_snapshot = False
+    hoy = datetime.datetime.now(UTC).strftime("%Y-%m-%d")
     try:
         with fetch_with_retry(LISTADO_URL, timeout=120) as response:
             response.raise_for_status()
@@ -324,33 +324,39 @@ def fetch_data() -> tuple[list[dict], str, str, list[str]]:
         target = _snapshot_path()
         target.write_bytes(response.content)
     except (requests.RequestException, OSError, ValueError) as exc:
-        snapshots = sorted(Path(RAW_DIR).glob("sinca_listadomapa_*.json"))
+        snapshots = sorted(Path(RAW_DIR).glob("sinca_listadomapa_*.json"), reverse=True)
         if not snapshots:
             notes.append(f"listado SINCA inaccesible y sin snapshots ({exc})")
             return FALLBACK_ROWS, "fallback", LISTADO_URL, notes
-        target = snapshots[-1]
-        notes.append(f"listado SINCA inaccesible, usando snapshot {target.name} ({exc})")
-        try:
-            import json as _json
 
-            payload = _json.loads(target.read_text(encoding="utf-8"))
-        except (OSError, ValueError) as exc2:
-            notes.append(f"snapshot ilegible ({exc2})")
-            return FALLBACK_ROWS, "fallback", LISTADO_URL, notes
-        # El payload viene de disco (potencialmente viejo): no es "live".
-        # Se reporta "fallback" para que freshness/publication lo traten como
-        # no-fresco (Plan 086). Ver VALID_SOURCE_MODES en _shared.py.
-        from_snapshot = True
+        import json as _json
 
-    hoy = datetime.datetime.now(UTC).strftime("%Y-%m-%d")
+        for snapshot in snapshots:
+            try:
+                payload = _json.loads(snapshot.read_text(encoding="utf-8"))
+                rows, parse_notes, _ = _parse_listado(
+                    payload, lookup, LISTADO_URL, fecha_fuente, hoy
+                )
+                if not rows:
+                    raise ValueError("listado sin filas parseables")
+            except (OSError, ValueError, TypeError, AttributeError, KeyError, IndexError) as err:
+                notes.append(f"snapshot SINCA inválido {snapshot.name} ({err})")
+                continue
+
+            # Un respaldo no es una descarga fresca: nunca marcarlo live.
+            notes.append(f"listado SINCA inaccesible, usando snapshot {snapshot.name} ({exc})")
+            notes.extend(parse_notes)
+            notes.append(f"{len(rows)} filas diarias recuperadas desde snapshot '{snapshot.name}'")
+            return rows, "fallback", LISTADO_URL, notes
+
+        notes.append(f"sin snapshots SINCA válidos; usando datos de muestra ({exc})")
+        return FALLBACK_ROWS, "fallback", LISTADO_URL, notes
+
     rows, parse_notes, _ = _parse_listado(payload, lookup, LISTADO_URL, fecha_fuente, hoy)
     notes.extend(parse_notes)
     if not rows:
         notes.append("listado sin filas parseables")
         return FALLBACK_ROWS, "fallback", LISTADO_URL, notes
-    if from_snapshot:
-        notes.append(f"{len(rows)} filas diarias recuperadas desde snapshot '{target.name}'")
-        return rows, "fallback", LISTADO_URL, notes
     notes.append(f"{len(rows)} filas diarias nuevas desde '{target.name}'")
     return rows, "live", LISTADO_URL, notes
 
