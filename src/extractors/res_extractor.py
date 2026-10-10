@@ -163,8 +163,8 @@ def _resource_year(resource: dict) -> int | None:
         return None
 
 
-def _assert_usable_res_snapshot(content: bytes) -> None:
-    """Rechaza CSV crudos corruptos, vacíos o sin los campos esenciales del RES."""
+def _assert_usable_res_snapshot(content: bytes, expected_year: int | None = None) -> None:
+    """Rechaza CSV crudos vacíos, inválidos o ajenos al año anual esperado."""
     df = pl.read_csv(io.BytesIO(content), separator=";", infer_schema_length=0)
     required = {
         "RUT",
@@ -175,12 +175,19 @@ def _assert_usable_res_snapshot(content: bytes) -> None:
     }
     if df.is_empty() or not required.issubset(df.columns):
         raise ValueError("snapshot RES vacío o sin columnas requeridas")
-    if df.filter(
+    usable = df.filter(
         pl.col("RUT").is_not_null()
         & (pl.col("RUT").str.strip_chars() != "")
         & (~pl.col("RUT").str.strip_chars().is_in(RUT_SENTINELS))
-    ).is_empty():
+    )
+    if usable.is_empty():
         raise ValueError("snapshot RES sin registros con RUT utilizable")
+    # Un CSV puede ser parseable pero provenir de otro recurso/año CKAN.
+    # Exigir al menos una fila útil del año declarado; tolerar solapamientos.
+    if expected_year is not None and usable.filter(
+        pl.col("Anio").str.strip_chars().cast(pl.Int32, strict=False) == expected_year
+    ).is_empty():
+        raise ValueError(f"snapshot RES sin registros utilizables del año {expected_year}")
 
 
 def fetch_resources() -> tuple[list[bytes], str, str]:
@@ -230,6 +237,7 @@ def fetch_resources() -> tuple[list[bytes], str, str]:
     stamp = datetime.datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
 
     for resource in selected_resources:
+        expected_year = _resource_year(resource)
         resource_name = resource.get("name", "unknown").replace(" ", "_")
         raw_path = Path(RAW_DIR) / f"res_{resource_name}_{stamp}.csv"
 
@@ -240,7 +248,7 @@ def fetch_resources() -> tuple[list[bytes], str, str]:
                 raw_path.write_bytes(content)
                 # Un HTTP 200 no garantiza un CSV utilizable; conservar el raw
                 # para auditoría, pero rechazarlo antes de atribuirle modo live.
-                _assert_usable_res_snapshot(content)
+                _assert_usable_res_snapshot(content, expected_year)
                 contents.append(content)
         except Exception as exc:
             # Si falla la descarga live, intentar recuperar snapshots raw previos
@@ -248,7 +256,7 @@ def fetch_resources() -> tuple[list[bytes], str, str]:
             for snapshot in snapshots:
                 try:
                     candidate = snapshot.read_bytes()
-                    _assert_usable_res_snapshot(candidate)
+                    _assert_usable_res_snapshot(candidate, expected_year)
                 except (OSError, UnicodeError, ValueError, pl.exceptions.PolarsError) as error:
                     print(f"Advertencia RES: snapshot inválido {snapshot.name}: {error}")
                     continue
