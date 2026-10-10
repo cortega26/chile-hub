@@ -269,9 +269,7 @@ def fetch_data() -> tuple[list[dict], str, str, list[str]]:
         )
         return rows, "live", DOWNLOAD_URL, notes
     except (requests.RequestException, OSError, KeyError, BadZipFile, ValueError) as exc:
-        snapshots = sorted(
-            Path(RAW_DIR).glob("cne_consumo_electrico_comunal_*.xlsx"), reverse=True
-        )
+        snapshots = sorted(Path(RAW_DIR).glob("cne_consumo_electrico_comunal_*.xlsx"), reverse=True)
         for snapshot in snapshots:
             try:
                 rows = _parse_excel(snapshot)
