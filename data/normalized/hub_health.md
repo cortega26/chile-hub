@@ -1,6 +1,6 @@
 # chile-hub health summary
 
-- `generated_at_utc`: `2026-10-09T16:47:06.967555+00:00`
+- `generated_at_utc`: `2026-10-10T15:42:48.652730+00:00`
 - `overall_status`: `warn`
 - `dataset_count`: `22`
 - `ok_count`: `20`
