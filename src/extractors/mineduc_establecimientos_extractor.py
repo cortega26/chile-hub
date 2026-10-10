@@ -103,6 +103,7 @@ def fetch_data() -> tuple[Path, str, str]:
 
             # Persistir el snapshot crudo en data/raw/ (lo usa el fallback
             # offline); el resto del temporal se elimina al salir del with.
+            _assert_readable_csv(csv_files[-1])
             raw_csv_path = Path(RAW_DIR) / csv_files[-1].name
             shutil.copy2(csv_files[-1], raw_csv_path)
 
@@ -115,13 +116,19 @@ def fetch_data() -> tuple[Path, str, str]:
         if rar_path.exists():
             rar_path.unlink()
 
-        # Estrategia fallback: Buscar algún CSV existente en data/raw
-        snapshots = sorted(Path(RAW_DIR).glob("*Directorio_Oficial_EE*.csv"))
-        if not snapshots:
-            raise FileNotFoundError(
-                "No hay snapshots locales de MINEDUC en data/raw/ para fallback."
-            ) from e
-        return snapshots[-1], "fallback", DOWNLOAD_URL
+        # El más reciente puede estar truncado: buscar el primero interpretable.
+        snapshots = sorted(Path(RAW_DIR).glob("*Directorio_Oficial_EE*.csv"), reverse=True)
+        for snapshot in snapshots:
+            try:
+                _assert_readable_csv(snapshot)
+            except (OSError, ValueError, pl.exceptions.PolarsError) as snapshot_exc:
+                print(f"Snapshot MINEDUC inválido {snapshot.name}: {snapshot_exc}")
+                continue
+            return snapshot, "fallback", DOWNLOAD_URL
+
+        raise FileNotFoundError(
+            "No hay snapshots locales válidos de MINEDUC en data/raw/ para fallback."
+        ) from e
 
 
 def parse_csv(path: Path) -> pl.DataFrame:
@@ -186,6 +193,12 @@ def parse_csv(path: Path) -> pl.DataFrame:
     )
 
     return normalized
+
+
+def _assert_readable_csv(path: Path) -> None:
+    """Rechaza CSV ilegibles o sin establecimientos vigentes."""
+    if parse_csv(path).is_empty():
+        raise ValueError(f"Directorio MINEDUC sin establecimientos vigentes: {path.name}")
 
 
 def process_mineduc() -> str:
