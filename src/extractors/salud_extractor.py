@@ -70,9 +70,7 @@ def fetch_csv() -> tuple[Path, str, str]:
         ValueError,
         pl.exceptions.PolarsError,
     ) as exc:
-        snapshots = sorted(
-            Path(RAW_DIR).glob("minsal_establecimientos_salud_*.csv"), reverse=True
-        )
+        snapshots = sorted(Path(RAW_DIR).glob("minsal_establecimientos_salud_*.csv"), reverse=True)
         for snapshot in snapshots:
             try:
                 _assert_readable_csv(snapshot)
