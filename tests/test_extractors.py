@@ -1310,10 +1310,10 @@ class ResExtractorTests(unittest.TestCase):
             "ID;RUT;Razon Social;Fecha de actuacion (1era firma);"
             "Fecha de registro (ultima firma);Fecha de aprobacion x SII;"
             "Anio;Mes;Comuna Tributaria;Region Tributaria;"
-            "Codigo de sociedad;Tipo de actuacion;Capital;Comuna Social;Region Social\\n"
+            "Codigo de sociedad;Tipo de actuacion;Capital;Comuna Social;Region Social\n"
             f"1;76286049-K;Empresa Ejemplo EIRL;02-05-{year};02-05-{year};"
             f"02-05-{year};{year};Mayo;Santiago;13;EIRL;CONSTITUCION;"
-            "1000000;Santiago;13\\n"
+            "1000000;Santiago;13\n"
         ).encode("utf-8")
 
     def _write_staging(self, tmpdir: str, years: list[int]) -> None:
@@ -1447,7 +1447,7 @@ class ResExtractorTests(unittest.TestCase):
             newest_html = raw / f"{prefix}20261003T010101Z.csv"
             good_bytes = self._valid_res_csv()
             older.write_bytes(good_bytes)
-            newer_empty.write_bytes(good_bytes.split(b"\\n", 1)[0] + b"\\n")
+            newer_empty.write_bytes(good_bytes.split(b"\n", 1)[0] + b"\n")
             newest_html.write_bytes(b"<html>Temporarily unavailable</html>")
             with (
                 patch.object(res_extractor, "RAW_DIR", tmpdir),
@@ -1477,7 +1477,7 @@ class ResExtractorTests(unittest.TestCase):
             older = raw / f"{prefix}20261001T010101Z.csv"
             newest = raw / f"{prefix}20261002T010101Z.csv"
             older.write_bytes(self._valid_res_csv())
-            newest.write_bytes(b"RUT;Razon Social\\n\\xff\\xfe")
+            newest.write_bytes(b"RUT;Razon Social\n\xff\xfe")
             with (
                 patch.object(res_extractor, "RAW_DIR", tmpdir),
                 patch.object(res_extractor, "_staging_years_present", return_value=None),
@@ -1503,7 +1503,7 @@ class ResExtractorTests(unittest.TestCase):
                 b"<html>Error 503</html>"
             )
             (raw / "res_Constituciones_del_año_2026_20261002T010101Z.csv").write_bytes(
-                b"RUT;Razon Social\\n"
+                b"RUT;Razon Social\n"
             )
             with (
                 patch.object(res_extractor, "RAW_DIR", tmpdir),
