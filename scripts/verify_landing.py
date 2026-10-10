@@ -945,6 +945,12 @@ def verify_landing():
         # Móvil: el toggle reemplaza las 3 líneas de enlaces del nav
         mobile = browser.new_page(viewport={"width": 390, "height": 844})
         mobile.goto(url, wait_until="networkidle")
+        # Los ejemplos de código no pueden ensanchar el documento móvil.
+        mobile_width = mobile.evaluate(
+            "() => [document.documentElement.clientWidth, document.documentElement.scrollWidth]"
+        )
+        if mobile_width[1] > mobile_width[0] + 1:
+            fail(f"Horizontal overflow on mobile: viewport/document widths {mobile_width}")
         mobile_toggle = mobile.locator("#nav-toggle")
         mobile_nav = mobile.locator("#site-nav")
         if not mobile_toggle.is_visible():
