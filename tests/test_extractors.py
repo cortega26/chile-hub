@@ -1428,10 +1428,12 @@ class ResExtractorTests(unittest.TestCase):
 
     def test_res_mixed_invalid_live_utf8_recovery_preserves_provenance(self):
         """Una descarga live corrupta degrada todo el lote a fallback."""
-        package = self._package_mock([
-            self._resource("previous", 2025),
-            self._resource("current", 2026),
-        ])
+        package = self._package_mock(
+            [
+                self._resource("previous", 2025),
+                self._resource("current", 2026),
+            ]
+        )
         live_bytes = self._valid_res_csv(2025)
         backup = self._valid_res_csv(2026)
         invalid = b"RUT;Razon Social\n\xff\xfe"
