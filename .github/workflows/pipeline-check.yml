@@ -562,9 +562,16 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: lighthouse-report
-          path: |
-            /tmp/chile-hub-lighthouse.json
-            /tmp/chile-hub-visual-qa/*.png
+          path: /tmp/chile-hub-lighthouse.json
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Upload landing visual QA captures
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: landing-visual-qa
+          path: /tmp/chile-hub-visual-qa/*.png
           if-no-files-found: warn
           retention-days: 7
 
