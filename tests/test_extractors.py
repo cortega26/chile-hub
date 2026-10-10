@@ -5081,9 +5081,7 @@ class CalidadAireExtractorTests(unittest.TestCase):
             raw = Path(tmpdir)
             older = raw / "sinca_listadomapa_20261001.json"
             older.write_text(json.dumps(self._payload()), encoding="utf-8")
-            (raw / "sinca_listadomapa_20261002.json").write_text(
-                "invalid json", encoding="utf-8"
-            )
+            (raw / "sinca_listadomapa_20261002.json").write_text("invalid json", encoding="utf-8")
             (raw / "sinca_listadomapa_20261003.json").write_text(
                 json.dumps({"error": "offline"}), encoding="utf-8"
             )
@@ -5114,12 +5112,8 @@ class CalidadAireExtractorTests(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as tmpdir:
             raw = Path(tmpdir)
-            (raw / "sinca_listadomapa_20261001.json").write_text(
-                "invalid json", encoding="utf-8"
-            )
-            (raw / "sinca_listadomapa_20261002.json").write_text(
-                "[]", encoding="utf-8"
-            )
+            (raw / "sinca_listadomapa_20261001.json").write_text("invalid json", encoding="utf-8")
+            (raw / "sinca_listadomapa_20261002.json").write_text("[]", encoding="utf-8")
             with (
                 patch.object(
                     calidad_aire_extractor, "_load_comunas_lookup", return_value=self.FAKE_LOOKUP
