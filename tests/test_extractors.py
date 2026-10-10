@@ -1342,7 +1342,7 @@ class ResExtractorTests(unittest.TestCase):
         current_year = datetime.date.today().year
         resources = [self._resource(f"y{year}", year) for year in range(2013, current_year + 2)]
         package_mock = self._package_mock([r | {"name": r["name"]} for r in resources])
-        response_mock = self._response_mock()
+        response_mock = self._response_mock(self._valid_res_csv())
 
         with tempfile.TemporaryDirectory() as tmpdir:
             self._write_staging(tmpdir, list(range(2013, current_year)))
@@ -1360,13 +1360,111 @@ class ResExtractorTests(unittest.TestCase):
         self.assertEqual(len(contents), 1)
         self.assertEqual(res_extractor._LAST_FETCH_MODE, "incremental")
 
+    def test_res_valid_http_response_is_live_and_keeps_raw(self):
+        """Un CSV HTTP 200 utilizable conserva modo live y raw auditado."""
+        package = self._package_mock([self._resource("current", 2026)])
+        live_bytes = self._valid_res_csv()
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with (
+                patch.object(res_extractor, "RAW_DIR", tmpdir),
+                patch.object(res_extractor, "_staging_years_present", return_value=None),
+                patch.object(
+                    res_extractor,
+                    "fetch_with_retry",
+                    side_effect=[package, self._response_mock(live_bytes)],
+                ),
+            ):
+                contents, mode, detail = res_extractor.fetch_resources()
+            saved = list(Path(tmpdir).glob("res_Constituciones_del_año_2026_*.csv"))
+
+        self.assertEqual((contents, mode, detail), ([live_bytes], "live", "datos_gob_cl_ckan_api"))
+        self.assertEqual(len(saved), 1)
+
+    def test_res_http_200_html_recovers_older_snapshot(self):
+        """HTML con HTTP 200 se archiva pero no se declara live."""
+        package = self._package_mock([self._resource("current", 2026)])
+        invalid = b"<html><body>Temporarily unavailable</body></html>"
+        backup = self._valid_res_csv()
+        with tempfile.TemporaryDirectory() as tmpdir:
+            raw = Path(tmpdir)
+            older = raw / "res_Constituciones_del_año_2026_20261001T010101Z.csv"
+            older.write_bytes(backup)
+            with (
+                patch.object(res_extractor, "RAW_DIR", tmpdir),
+                patch.object(res_extractor, "_staging_years_present", return_value=None),
+                patch.object(
+                    res_extractor,
+                    "fetch_with_retry",
+                    side_effect=[package, self._response_mock(invalid)],
+                ),
+            ):
+                contents, mode, detail = res_extractor.fetch_resources()
+            new_files = [p for p in raw.glob("res_Constituciones_del_año_2026_*.csv") if p != older]
+            self.assertEqual((contents, mode), ([backup], "fallback"))
+            self.assertIn(older.name, detail)
+            self.assertEqual(older.read_bytes(), backup)
+            self.assertEqual(len(new_files), 1)
+            self.assertEqual(new_files[0].read_bytes(), invalid)
+
+    def test_res_http_200_header_only_without_backup_fails_closed(self):
+        """No publicar un CSV de solo cabecera aunque HTTP indique éxito."""
+        package = self._package_mock([self._resource("current", 2026)])
+        invalid = self._valid_res_csv().split(b"\n", 1)[0] + b"\n"
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with (
+                patch.object(res_extractor, "RAW_DIR", tmpdir),
+                patch.object(res_extractor, "_staging_years_present", return_value=None),
+                patch.object(
+                    res_extractor,
+                    "fetch_with_retry",
+                    side_effect=[package, self._response_mock(invalid)],
+                ),
+                self.assertRaisesRegex(SystemExit, "No hay snapshot raw de respaldo utilizable"),
+            ):
+                res_extractor.fetch_resources()
+            saved = list(Path(tmpdir).glob("res_Constituciones_del_año_2026_*.csv"))
+            self.assertEqual(len(saved), 1)
+            self.assertEqual(saved[0].read_bytes(), invalid)
+
+    def test_res_mixed_invalid_live_utf8_recovery_preserves_provenance(self):
+        """Una descarga live corrupta degrada todo el lote a fallback."""
+        package = self._package_mock([
+            self._resource("previous", 2025),
+            self._resource("current", 2026),
+        ])
+        live_bytes = self._valid_res_csv(2025)
+        backup = self._valid_res_csv(2026)
+        invalid = b"RUT;Razon Social\n\xff\xfe"
+        with tempfile.TemporaryDirectory() as tmpdir:
+            raw = Path(tmpdir)
+            older = raw / "res_Constituciones_del_año_2026_20261001T010101Z.csv"
+            older.write_bytes(backup)
+            with (
+                patch.object(res_extractor, "RAW_DIR", tmpdir),
+                patch.object(res_extractor, "_staging_years_present", return_value=None),
+                patch.object(
+                    res_extractor,
+                    "fetch_with_retry",
+                    side_effect=[
+                        package,
+                        self._response_mock(live_bytes),
+                        self._response_mock(invalid),
+                    ],
+                ),
+            ):
+                contents, mode, detail = res_extractor.fetch_resources()
+            self.assertEqual((contents, mode), ([live_bytes, backup], "fallback"))
+            self.assertIn(older.name, detail)
+            self.assertEqual(older.read_bytes(), backup)
+            self.assertTrue(any(p.read_bytes() == invalid for p in raw.glob("*.csv")))
+
     def test_res_mixed_live_and_snapshot_is_fallback(self):
         """Una descarga de un año desde raw impide declarar live al RES completo."""
         from requests import RequestException
 
         resources = [self._resource("previous", 2025), self._resource("current", 2026)]
         package = self._package_mock(resources)
-        live_bytes = b"live csv data"
+        live_bytes = self._valid_res_csv(2026)
         old_bytes = self._valid_res_csv(2025)
         with tempfile.TemporaryDirectory() as tmpdir:
             raw = Path(tmpdir)
@@ -1550,7 +1648,7 @@ class ResExtractorTests(unittest.TestCase):
         current_year = datetime.date.today().year
         resources = [self._resource(f"y{year}", year) for year in (current_year - 1, current_year)]
         package_mock = self._package_mock([r | {"name": r["name"]} for r in resources])
-        response_mock = self._response_mock()
+        response_mock = self._response_mock(self._valid_res_csv())
 
         with tempfile.TemporaryDirectory() as tmpdir:
             # staging solo con años viejos (falta current_year - 1)
@@ -1575,7 +1673,7 @@ class ResExtractorTests(unittest.TestCase):
         current_year = datetime.date.today().year
         resources = [self._resource(f"y{year}", year) for year in range(2013, current_year + 1)]
         package_mock = self._package_mock([r | {"name": r["name"]} for r in resources])
-        response_mock = self._response_mock()
+        response_mock = self._response_mock(self._valid_res_csv())
 
         with tempfile.TemporaryDirectory() as tmpdir:
             with (
