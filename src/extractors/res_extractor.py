@@ -236,8 +236,12 @@ def fetch_resources() -> tuple[list[bytes], str, str]:
         try:
             with fetch_with_retry(resource["url"], timeout=120) as response:
                 response.raise_for_status()
-                raw_path.write_bytes(response.content)
-                contents.append(response.content)
+                content = response.content
+                raw_path.write_bytes(content)
+                # Un HTTP 200 no garantiza un CSV utilizable; conservar el raw
+                # para auditoría, pero rechazarlo antes de atribuirle modo live.
+                _assert_usable_res_snapshot(content)
+                contents.append(content)
         except Exception as exc:
             # Si falla la descarga live, intentar recuperar snapshots raw previos
             snapshots = sorted(Path(RAW_DIR).glob(f"res_{resource_name}_*.csv"), reverse=True)
