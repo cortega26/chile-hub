@@ -184,9 +184,12 @@ def _assert_usable_res_snapshot(content: bytes, expected_year: int | None = None
         raise ValueError("snapshot RES sin registros con RUT utilizable")
     # Un CSV puede ser parseable pero provenir de otro recurso/año CKAN.
     # Exigir al menos una fila útil del año declarado; tolerar solapamientos.
-    if expected_year is not None and usable.filter(
-        pl.col("Anio").str.strip_chars().cast(pl.Int32, strict=False) == expected_year
-    ).is_empty():
+    if (
+        expected_year is not None
+        and usable.filter(
+            pl.col("Anio").str.strip_chars().cast(pl.Int32, strict=False) == expected_year
+        ).is_empty()
+    ):
         raise ValueError(f"snapshot RES sin registros utilizables del año {expected_year}")
 
 
