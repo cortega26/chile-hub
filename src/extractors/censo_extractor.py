@@ -102,9 +102,7 @@ def fetch_workbook() -> tuple[Path, str]:
         _assert_usable_workbook(target)
         return target, "live"
     except recoverable:
-        snapshots = sorted(
-            Path(RAW_DIR).glob("ine_censo2024_comunal_*.xlsx"), reverse=True
-        )
+        snapshots = sorted(Path(RAW_DIR).glob("ine_censo2024_comunal_*.xlsx"), reverse=True)
         for snapshot in snapshots:
             try:
                 _assert_usable_workbook(snapshot)
