@@ -1939,6 +1939,105 @@ class MineducEstablecimientosExtractorTests(unittest.TestCase):
 class SaludExtractorExtendedTests(unittest.TestCase):
     """Fetch/write_staging/dry_run para salud_extractor (43% → +cobertura)."""
 
+    def test_fetch_csv_missing_resource_recovers_valid_snapshot(self):
+        """Un catálogo CKAN sin recurso CSV activa el respaldo disponible."""
+        package = MagicMock()
+        package.json.return_value = {"result": {"resources": []}}
+        package.__enter__.return_value = package
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            raw = Path(tmpdir)
+            older = raw / "minsal_establecimientos_salud_20260101T000000Z.csv"
+            _write_salud_csv(older)
+            with (
+                patch.object(salud_extractor, "RAW_DIR", tmpdir),
+                patch.object(salud_extractor, "ensure_staging_directories"),
+                patch.object(salud_extractor, "fetch_with_retry", return_value=package) as fetch,
+            ):
+                path, mode, url = salud_extractor.fetch_csv()
+
+        self.assertEqual((path, mode, url), (older, "fallback", salud_extractor.PACKAGE_API_URL))
+        fetch.assert_called_once()
+
+    def test_fetch_csv_skips_corrupt_and_empty_newer_snapshots(self):
+        """Los snapshots más nuevos pueden ser HTML o tener solo cabecera."""
+        from requests import RequestException
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            raw = Path(tmpdir)
+            older = raw / "minsal_establecimientos_salud_20260101T000000Z.csv"
+            _write_salud_csv(older)
+            (raw / "minsal_establecimientos_salud_20261008T000000Z.csv").write_text(
+                "<html>offline</html>", encoding="utf-8"
+            )
+            empty = raw / "minsal_establecimientos_salud_20261009T000000Z.csv"
+            empty.write_text(older.read_text(encoding="utf-8").splitlines()[0], encoding="utf-8")
+            with (
+                patch.object(salud_extractor, "RAW_DIR", tmpdir),
+                patch.object(salud_extractor, "ensure_staging_directories"),
+                patch.object(
+                    salud_extractor, "fetch_with_retry", side_effect=RequestException("offline")
+                ),
+            ):
+                path, mode, url = salud_extractor.fetch_csv()
+
+        self.assertEqual((path, mode, url), (older, "fallback", salud_extractor.PACKAGE_API_URL))
+
+    def test_fetch_csv_empty_live_download_recovers_previous_snapshot(self):
+        """Un HTTP 200 con CSV vacío no debe declararse live."""
+        package = MagicMock()
+        package.json.return_value = {
+            "result": {"resources": [{"format": "CSV", "url": "https://example.test/minsal.csv"}]}
+        }
+        package.__enter__.return_value = package
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            raw = Path(tmpdir)
+            older = raw / "minsal_establecimientos_salud_20260101T000000Z.csv"
+            _write_salud_csv(older)
+            response = MagicMock()
+            response.content = older.read_bytes().splitlines()[0] + b"\n"
+            response.__enter__.return_value = response
+            with (
+                patch.object(salud_extractor, "RAW_DIR", tmpdir),
+                patch.object(salud_extractor, "ensure_staging_directories"),
+                patch.object(
+                    salud_extractor, "fetch_with_retry", side_effect=[package, response]
+                ) as fetch,
+            ):
+                path, mode, url = salud_extractor.fetch_csv()
+
+            self.assertEqual(
+                (path, mode, url), (older, "fallback", salud_extractor.PACKAGE_API_URL)
+            )
+            self.assertEqual(fetch.call_count, 2)
+
+    def test_fetch_csv_valid_download_remains_live(self):
+        """Una descarga MINSAL válida conserva la URL de origen y modo live."""
+        package = MagicMock()
+        package.json.return_value = {
+            "result": {"resources": [{"format": "csv", "url": "https://example.test/minsal.csv"}]}
+        }
+        package.__enter__.return_value = package
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            raw = Path(tmpdir)
+            source = raw / "fixture.csv"
+            _write_salud_csv(source)
+            response = MagicMock()
+            response.content = source.read_bytes()
+            response.__enter__.return_value = response
+            with (
+                patch.object(salud_extractor, "RAW_DIR", tmpdir),
+                patch.object(salud_extractor, "ensure_staging_directories"),
+                patch.object(salud_extractor, "fetch_with_retry", side_effect=[package, response]),
+            ):
+                path, mode, url = salud_extractor.fetch_csv()
+
+            self.assertEqual(mode, "live")
+            self.assertEqual(url, "https://example.test/minsal.csv")
+            self.assertEqual(salud_extractor.parse_csv(path).height, 1)
+
     def test_write_staging_persists_csv_and_metadata(self):
         df = pl.DataFrame(
             {
