@@ -1520,9 +1520,7 @@ class ResExtractorTests(unittest.TestCase):
                     "fetch_with_retry",
                     side_effect=[package, self._response_mock(self._valid_res_csv(2025))],
                 ),
-                self.assertRaisesRegex(
-                    SystemExit, "No hay snapshot raw de respaldo utilizable"
-                ),
+                self.assertRaisesRegex(SystemExit, "No hay snapshot raw de respaldo utilizable"),
             ):
                 res_extractor.fetch_resources()
 
@@ -1563,9 +1561,9 @@ class ResExtractorTests(unittest.TestCase):
                 ),
             ):
                 contents, mode, detail = res_extractor.fetch_resources()
-        self.assertEqual((contents, mode, detail), (
-            [self._valid_res_csv(2025)], "live", "datos_gob_cl_ckan_api"
-        ))
+        self.assertEqual(
+            (contents, mode, detail), ([self._valid_res_csv(2025)], "live", "datos_gob_cl_ckan_api")
+        )
 
     def test_res_mixed_live_and_snapshot_is_fallback(self):
         """Una descarga de un año desde raw impide declarar live al RES completo."""
@@ -1786,8 +1784,7 @@ class ResExtractorTests(unittest.TestCase):
         resources = [self._resource(f"y{year}", year) for year in range(2013, current_year + 1)]
         package_mock = self._package_mock([r | {"name": r["name"]} for r in resources])
         response_mocks = [
-            self._response_mock(self._valid_res_csv(year))
-            for year in range(2013, current_year + 1)
+            self._response_mock(self._valid_res_csv(year)) for year in range(2013, current_year + 1)
         ]
 
         with tempfile.TemporaryDirectory() as tmpdir:
