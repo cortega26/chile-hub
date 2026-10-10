@@ -12,6 +12,37 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.48.1 - 2026-10-10
+
+### Corregido
+
+- Archive RES raw captures exclusively instead of overwriting same-second snapshots
+  ([#157](https://github.com/cortega26/chile-hub/pull/157),
+  [`e3c125e`](https://github.com/cortega26/chile-hub/commit/e3c125e56971ef9f97401d116d05b4365bc71680))
+
+- Preserve immutable RES raw captures across timestamp collisions
+  ([#157](https://github.com/cortega26/chile-hub/pull/157),
+  [`e3c125e`](https://github.com/cortega26/chile-hub/commit/e3c125e56971ef9f97401d116d05b4365bc71680))
+
+### Code Style
+
+- Align RES raw immutability regression tests with Ruff
+  ([#157](https://github.com/cortega26/chile-hub/pull/157),
+  [`e3c125e`](https://github.com/cortega26/chile-hub/commit/e3c125e56971ef9f97401d116d05b4365bc71680))
+
+### Documentación
+
+- Sync 1360-test inventory after RES raw immutability regressions
+  ([#157](https://github.com/cortega26/chile-hub/pull/157),
+  [`e3c125e`](https://github.com/cortega26/chile-hub/commit/e3c125e56971ef9f97401d116d05b4365bc71680))
+
+### Tests
+
+- Verify immutable same-second RAW archives and RES recovery with name collisions
+  ([#157](https://github.com/cortega26/chile-hub/pull/157),
+  [`e3c125e`](https://github.com/cortega26/chile-hub/commit/e3c125e56971ef9f97401d116d05b4365bc71680))
+
+
 ## 1.48.0 - 2026-10-10
 
 ### Mantenimiento
