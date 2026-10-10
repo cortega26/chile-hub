@@ -2233,6 +2233,106 @@ class CensoExtractorExtendedTests(unittest.TestCase):
 class CensoHogaresViviendasExtractorExtendedTests(unittest.TestCase):
     """Tests extendidos para censo_hogares_viviendas (60% → +cobertura)."""
 
+    def test_fetch_workbook_invalid_live_xlsx_uses_previous_valid_snapshot(self):
+        """Un HTTP 200 con contenido inválido no se declara como datos live."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            raw = Path(tmpdir)
+            backup = raw / "ine_censo2024_hogares_viviendas_20260901T010101Z.xlsx"
+            _write_censo_hogares_viviendas_workbook(backup)
+            response = MagicMock()
+            response.content = b"<html>fuente fuera de servicio</html>"
+            response.__enter__.return_value = response
+            with (
+                patch.object(censo_hogares_viviendas_extractor, "RAW_DIR", raw),
+                patch.object(censo_hogares_viviendas_extractor, "ensure_staging_directories"),
+                patch.object(
+                    censo_hogares_viviendas_extractor,
+                    "fetch_with_retry",
+                    return_value=response,
+                ),
+            ):
+                path, mode = censo_hogares_viviendas_extractor.fetch_workbook()
+
+            self.assertEqual((path, mode), (backup, "fallback"))
+            self.assertEqual(censo_hogares_viviendas_extractor.parse_workbook(path).height, 1)
+
+    def test_fetch_workbook_skips_empty_and_corrupt_recent_snapshots(self):
+        """Con la red caída, recupera un XLSX más antiguo realmente parseable."""
+        import requests as _requests
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            raw = Path(tmpdir)
+            backup = raw / "ine_censo2024_hogares_viviendas_20260901T010101Z.xlsx"
+            _write_censo_hogares_viviendas_workbook(backup)
+            newer = raw / "ine_censo2024_hogares_viviendas_20260902T010101Z.xlsx"
+            newer.write_bytes(b"not an xlsx")
+            empty = raw / "ine_censo2024_hogares_viviendas_20260903T010101Z.xlsx"
+            wb = openpyxl.Workbook()
+            wb.active.title = "2"
+            wb.create_sheet("6")
+            wb.save(empty)
+            with (
+                patch.object(censo_hogares_viviendas_extractor, "RAW_DIR", raw),
+                patch.object(censo_hogares_viviendas_extractor, "ensure_staging_directories"),
+                patch.object(
+                    censo_hogares_viviendas_extractor,
+                    "fetch_with_retry",
+                    side_effect=_requests.RequestException("offline"),
+                ),
+            ):
+                path, mode = censo_hogares_viviendas_extractor.fetch_workbook()
+
+        self.assertEqual((path, mode), (backup, "fallback"))
+
+    def test_fetch_workbook_no_usable_snapshots_raises(self):
+        """No inventa una recuperación exitosa cuando todos los XLSX fallan."""
+        from zipfile import BadZipFile
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            raw = Path(tmpdir)
+            (raw / "ine_censo2024_hogares_viviendas_20260901T010101Z.xlsx").write_bytes(
+                b"broken snapshot"
+            )
+            response = MagicMock()
+            response.content = b"bad live xlsx"
+            response.__enter__.return_value = response
+            with (
+                patch.object(censo_hogares_viviendas_extractor, "RAW_DIR", raw),
+                patch.object(censo_hogares_viviendas_extractor, "ensure_staging_directories"),
+                patch.object(
+                    censo_hogares_viviendas_extractor,
+                    "fetch_with_retry",
+                    return_value=response,
+                ),
+                self.assertRaises(BadZipFile),
+            ):
+                censo_hogares_viviendas_extractor.fetch_workbook()
+
+    def test_fetch_workbook_valid_live_xlsx_remains_live(self):
+        """La descarga oficial correcta conserva su modo y contenido."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            raw = Path(tmpdir)
+            fixture = raw / "fixture.xlsx"
+            _write_censo_hogares_viviendas_workbook(fixture)
+            response = MagicMock()
+            response.content = fixture.read_bytes()
+            response.__enter__.return_value = response
+            with (
+                patch.object(censo_hogares_viviendas_extractor, "RAW_DIR", raw),
+                patch.object(censo_hogares_viviendas_extractor, "ensure_staging_directories"),
+                patch.object(
+                    censo_hogares_viviendas_extractor,
+                    "fetch_with_retry",
+                    return_value=response,
+                ),
+            ):
+                path, mode = censo_hogares_viviendas_extractor.fetch_workbook()
+                df = censo_hogares_viviendas_extractor.parse_workbook(path)
+
+            self.assertEqual(mode, "live")
+            self.assertEqual(df.height, 1)
+            self.assertEqual(df["codigo_comuna"].to_list(), ["01101"])
+
     def test_dry_run_does_not_write_files(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             workbook = Path(tmpdir) / "hogares.xlsx"
