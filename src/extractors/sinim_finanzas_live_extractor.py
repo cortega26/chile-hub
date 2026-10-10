@@ -276,19 +276,36 @@ def _parse_xml_spreadsheet(xml_content: str) -> list[dict[str, Any]]:
     rows_out = []
 
     for row_xml in data_rows:
-        cells = re.findall(r"<Cell[^>]*?>.*?</Cell>", row_xml, re.DOTALL)
-        if len(cells) < max(VARIABLE_COLUMN_MAP.values()) + 1:
+        # SpreadsheetML permite omitir celdas: ss:Index expresa la columna
+        # 1-based, no la posición física en el XML.
+        cell_blocks = re.findall(r"<Cell\b[^>]*?/>|<Cell\b[^>]*?>.*?</Cell>", row_xml, re.DOTALL)
+        cells: dict[int, str] = {}
+        next_index = 0
+        for cell in cell_blocks:
+            index_attr = re.search(r"""ss:Index\s*=\s*["']([^"']+)["']""", cell.partition(">")[0])
+            if index_attr:
+                try:
+                    cell_index = int(index_attr.group(1)) - 1
+                except ValueError as exc:
+                    raise RuntimeError("SINIM XML contiene ss:Index inválido") from exc
+                if cell_index < next_index:
+                    raise RuntimeError("SINIM XML contiene ss:Index fuera de orden")
+                next_index = cell_index
+            cells[next_index] = cell
+            next_index += 1
+
+        if next_index < max(VARIABLE_COLUMN_MAP.values()) + 1:
             continue  # Fila incompleta
 
         # Extraer código de comuna (Cell[0])
-        codigo_match = re.search(r"<Data[^>]*>(.*?)</Data>", cells[0], re.DOTALL)
+        codigo_match = re.search(r"<Data[^>]*>(.*?)</Data>", cells.get(0, ""), re.DOTALL)
         if not codigo_match:
             continue
         codigo_comuna = codigo_match.group(1).strip()
 
         # Extraer nombre de comuna (Cell[1])
         # El XML viene en latin-1 (ISO-8859-1), convertir a UTF-8
-        nombre_match = re.search(r"<Data[^>]*>(.*?)</Data>", cells[1], re.DOTALL)
+        nombre_match = re.search(r"<Data[^>]*>(.*?)</Data>", cells.get(1, ""), re.DOTALL)
         nombre_comuna = nombre_match.group(1).strip() if nombre_match else ""
         # Corregir encoding: SINIM entrega nombres en latin-1
         try:
@@ -298,7 +315,7 @@ def _parse_xml_spreadsheet(xml_content: str) -> list[dict[str, Any]]:
 
         # Extraer valores financieros
         def _extract_number(cell_index: int) -> float | None:
-            if cell_index >= len(cells):
+            if cell_index not in cells:
                 return None
             data_match = re.search(r"<Data[^>]*>(.*?)</Data>", cells[cell_index], re.DOTALL)
             if not data_match:
