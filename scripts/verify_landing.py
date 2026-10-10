@@ -442,6 +442,65 @@ def verify_landing():
         if "Veintidós" in hero_copy:
             fail(f"Hero copy still claims 22 published layers: {hero_copy}")
 
+        # La nueva entrada orientada a tareas lleva a herramientas reales.
+        paths = page.locator(".use-paths .use-path")
+        expected_paths = [
+            ("#catalogo", "Buscar un dataset"),
+            ("#mapa", "Explorar el territorio"),
+            ("#explorador", "Ejecutar una consulta"),
+        ]
+        if paths.count() != len(expected_paths):
+            fail(f"Expected three task paths, got {paths.count()}")
+        for index, (href, heading) in enumerate(expected_paths):
+            path = paths.nth(index)
+            if path.get_attribute("href") != href or heading not in path.inner_text():
+                fail(f"Incorrect task path {index}: {path.inner_text()}")
+            if page.locator(href).count() != 1:
+                fail(f"Task path points to a missing or duplicate section: {href}")
+
+        main_order = page.locator("main > *").evaluate_all(
+            "(nodes) => nodes.map(node => node.id).filter(Boolean)"
+        )
+        expected_order = ["catalogo", "mapa", "comunas", "uso", "explorador"]
+        if any(value not in main_order for value in expected_order):
+            fail(f"Missing principal section in landing journey: {main_order}")
+        if [main_order.index(value) for value in expected_order] != sorted(
+            main_order.index(value) for value in expected_order
+        ):
+            fail(f"Principal sections are out of discovery order: {main_order}")
+
+        hero_copy_button = page.locator("#play-py .quickstart-copy")
+        if hero_copy_button.count() != 1:
+            fail("Missing copy action for the first hero example")
+        hero_copy_button.click()
+        page.wait_for_timeout(150)
+        if hero_copy_button.inner_text() != "Copiado":
+            fail("Hero example copy action did not acknowledge copying")
+
+        # Las pestañas de código deben cambiar el panel visible y soportar teclado.
+        hero_tabs = page.locator(".console-tabs [role='tab']")
+        if hero_tabs.count() != 3:
+            fail("Expected three accessible code example tabs")
+        hero_tabs.nth(1).click()
+        if (
+            hero_tabs.nth(1).get_attribute("aria-selected") != "true"
+            or not page.locator("#play-sql").is_visible()
+            or page.locator("#play-py").is_visible()
+        ):
+            fail("DuckDB tab did not activate its code panel")
+        hero_tabs.nth(1).press("ArrowRight")
+        if (
+            hero_tabs.nth(2).get_attribute("aria-selected") != "true"
+            or not page.locator("#play-bash").is_visible()
+        ):
+            fail("Hero code tabs did not respond to ArrowRight")
+        hero_tabs.nth(2).press("Home")
+        if (
+            hero_tabs.first.get_attribute("aria-selected") != "true"
+            or not page.locator("#play-py").is_visible()
+        ):
+            fail("Hero code tabs did not respond to Home")
+
         # Geometría declarada como candidata, no como disponible
         geometry_card = page.locator(".capability-card", has_text="Geometría comunal")
         if geometry_card.count() != 1:
@@ -886,6 +945,12 @@ def verify_landing():
         # Móvil: el toggle reemplaza las 3 líneas de enlaces del nav
         mobile = browser.new_page(viewport={"width": 390, "height": 844})
         mobile.goto(url, wait_until="networkidle")
+        # Los ejemplos de código no pueden ensanchar el documento móvil.
+        mobile_width = mobile.evaluate(
+            "() => [document.documentElement.clientWidth, document.documentElement.scrollWidth]"
+        )
+        if mobile_width[1] > mobile_width[0] + 1:
+            fail(f"Horizontal overflow on mobile: viewport/document widths {mobile_width}")
         mobile_toggle = mobile.locator("#nav-toggle")
         mobile_nav = mobile.locator("#site-nav")
         if not mobile_toggle.is_visible():
@@ -896,8 +961,26 @@ def verify_landing():
         mobile_nav.wait_for(state="visible")
         if mobile_toggle.get_attribute("aria-expanded") != "true":
             fail("Expected nav-toggle aria-expanded=true after click")
-        mobile_nav.locator("a", has_text="Datos").click()
+        mobile_nav.locator("a", has_text="Catálogo").click()
         mobile_nav.wait_for(state="hidden")
+
+        # Capturas de QA tras verificar las interacciones. El CSS reveal se
+        # muestra como lo vería un usuario que recorriera todas las secciones.
+        # No se suben al sitio publicado: solo al artefacto de CI.
+        qa_dir = Path("/tmp/chile-hub-visual-qa")
+        qa_dir.mkdir(parents=True, exist_ok=True)
+        page.evaluate(
+            "() => document.querySelectorAll('.reveal').forEach(el => el.classList.add('is-visible'))"
+        )
+        page.evaluate("() => window.scrollTo({top: 0, behavior: 'instant'})")
+        page.screenshot(path=str(qa_dir / "desktop.png"), full_page=True)
+        mobile.locator("#mapa").scroll_into_view_if_needed()
+        mobile.wait_for_selector("#map-comunal path.leaflet-interactive", timeout=15000)
+        mobile.evaluate(
+            "() => document.querySelectorAll('.reveal').forEach(el => el.classList.add('is-visible'))"
+        )
+        mobile.evaluate("() => window.scrollTo({top: 0, behavior: 'instant'})")
+        mobile.screenshot(path=str(qa_dir / "mobile.png"), full_page=True)
         mobile.close()
 
         browser.close()

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>chile-hub — Capas de Datos de Chile</title>
-    <meta name="description" content="chile-hub normaliza y valida datos oficiales de Chile y los deja listos para cruzar: DPA, economía, salud, educación y más en Parquet, JSON y DuckDB.">
+    <meta name="description" content="chile-hub: explora y cruza datos públicos de Chile con 21 capas curadas, mapa territorial, consultas SQL y procedencia verificable por dataset.">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://tooltician.com/chile-hub/">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b0f19'/%3E%3Cpath d='M18 20h11c9 0 14 5 14 12 0 9-6 14-15 14H18V20zm9 20c6 0 9-3 9-8 0-4-3-7-8-7h-3v15h2z' fill='%2322d3ee'/%3E%3Cpath d='M45 18l4 7 7 4-7 4-4 7-4-7-7-4 7-4 4-7z' fill='%23818cf8'/%3E%3C/svg%3E">
@@ -3361,6 +3361,7 @@
             .health-summary { gap: 0.5rem 1rem; }
         }
     </style>
+    <link rel="stylesheet" href="landing-revamp.css?v=20261010">
 </head>
 <body>
     <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
@@ -3382,14 +3383,12 @@
             <span class="nav-toggle-bar" aria-hidden="true"></span>
         </button>
         <nav class="site-nav" id="site-nav" aria-label="Navegación principal">
-            <a href="#catalogo">Datos</a>
+            <a href="#catalogo">Catálogo</a>
             <a href="#mapa">Mapa</a>
-            <a href="#capacidades">Capacidades</a>
-            <a href="#cobertura">Cobertura</a>
-            <a href="#confianza">Metodología</a>
+            <a href="#comunas">Comunas</a>
+            <a href="#explorador">SQL en línea</a>
             <a href="#uso">Desarrolladores</a>
             <a href="reference/">Documentación</a>
-            <a href="#participar">Participar</a>
             <a href="#apoyar">Apoyar</a>
             <a class="nav-github" href="https://github.com/cortega26/chile-hub" target="_blank" rel="noopener noreferrer">GitHub Repo</a>
         </nav>
@@ -3398,32 +3397,30 @@
     <main id="main-content" tabindex="-1">
         <section class="intro">
             <div class="intro-copy">
-                <p class="intro-eyebrow">Complementa a datos.gob.cl y a las fuentes oficiales</p>
-                <h2>La última milla de los datos oficiales de Chile.</h2>
-                <p>Veintiuna capas publicadas y una en evaluación, todas normalizadas — geografía, demografía, economía, salud, educación y más — listas para consumir en una línea de código. Con resolución de entidades por nombre y por coordenadas. No reemplaza a las fuentes oficiales: las vuelve cruzables.</p>
+                <p class="intro-eyebrow">La última milla de los datos oficiales de Chile</p>
+                <h2>Datos públicos de Chile, listos para cruzar.</h2>
+                <p class="intro-description">chile-hub reúne capas de distintas instituciones, normaliza claves, valida su calidad y publica archivos reproducibles. Explora los datos, compara comunas o consulta Parquet directamente con SQL.</p>
+                <p class="intro-qualification">Proyecto independiente. Las fuentes oficiales siempre prevalecen.</p>
                 <div class="intro-links">
-                    <a class="btn btn-primary" href="#catalogo">Explorar datos</a>
+                    <a class="btn btn-primary" href="#catalogo">Explorar catálogo</a>
                     <a class="btn btn-secondary" href="reference/">Ver documentación</a>
-                    <a class="text-link" href="#uso">Empezar a construir</a>
+                    <a class="text-link" href="#explorador">Probar SQL en el navegador →</a>
                 </div>
             </div>
             <aside class="intro-playground" aria-label="Consola de inicio rápido">
                 <div class="playground-console">
                     <div class="console-header">
-                        <div class="console-dots">
-                            <span class="dot red"></span>
-                            <span class="dot yellow"></span>
-                            <span class="dot green"></span>
-                        </div>
-                        <div class="console-tabs">
-                            <button class="console-tab active" data-tab="py">Python</button>
-                            <button class="console-tab" data-tab="sql">DuckDB</button>
-                            <button class="console-tab" data-tab="bash">Bash</button>
+                        <span class="console-kicker">EJEMPLOS / DATOS REALES</span>
+                        <div class="console-tabs" role="tablist" aria-label="Lenguaje de ejemplo">
+                            <button type="button" class="console-tab active" id="hero-tab-py" role="tab" aria-controls="play-py" aria-selected="true" tabindex="0" data-tab="py">Python</button>
+                            <button type="button" class="console-tab" id="hero-tab-sql" role="tab" aria-controls="play-sql" aria-selected="false" tabindex="-1" data-tab="sql">DuckDB</button>
+                            <button type="button" class="console-tab" id="hero-tab-bash" role="tab" aria-controls="play-bash" aria-selected="false" tabindex="-1" data-tab="bash">Bash</button>
                         </div>
                     </div>
                     <div class="console-body">
-                        <div class="console-panel active" id="play-py">
-                            <pre><code><span class="keyword">import</span> io
+                        <div class="console-panel active" id="play-py" role="tabpanel" aria-labelledby="hero-tab-py">
+                            <button type="button" class="quickstart-copy" data-copy-target="hero-code-py" aria-label="Copiar ejemplo Python">Copiar</button>
+                            <pre><code id="hero-code-py"><span class="keyword">import</span> io
 <span class="keyword">import</span> polars <span class="keyword">as</span> pl
 <span class="keyword">import</span> requests
 
@@ -3432,8 +3429,9 @@ url = <span class="string">"https://tooltician.com/chile-hub/data/normalized/com
 df = pl.read_parquet(io.BytesIO(requests.get(url, timeout=60).content))
 print(df.head())</code></pre>
                         </div>
-                        <div class="console-panel" id="play-sql">
-                            <pre><code>-- Consulta SQL directa
+                        <div class="console-panel" id="play-sql" role="tabpanel" aria-labelledby="hero-tab-sql">
+                            <button type="button" class="quickstart-copy" data-copy-target="hero-code-sql" aria-label="Copiar ejemplo DuckDB">Copiar</button>
+                            <pre><code id="hero-code-sql">-- Consulta SQL directa
 INSTALL httpfs;
 LOAD httpfs;
 
@@ -3441,12 +3439,14 @@ SELECT * FROM read_parquet(
     <span class="string">'https://tooltician.com/chile-hub/data/normalized/comunas.parquet'</span>
 ) LIMIT 5;</code></pre>
                         </div>
-                        <div class="console-panel" id="play-bash">
-                            <pre><code># Descargar metadatos del catálogo
+                        <div class="console-panel" id="play-bash" role="tabpanel" aria-labelledby="hero-tab-bash">
+                            <button type="button" class="quickstart-copy" data-copy-target="hero-code-bash" aria-label="Copiar ejemplo Bash">Copiar</button>
+                            <pre><code id="hero-code-bash"># Descargar metadatos del catálogo
 curl -s <span class="string">"https://tooltician.com/chile-hub/data/normalized/hub_bundle.json"</span> \
   | jq <span class="string">'.datasets[].dataset'</span></code></pre>
                         </div>
                     </div>
+                    <div class="console-footer">Archivos abiertos · sin claves API · consulta reproducible</div>
                 </div>
             </aside>
         </section>
@@ -3454,50 +3454,64 @@ curl -s <span class="string">"https://tooltician.com/chile-hub/data/normalized/h
             <span class="hero-signal"><strong>21</strong> capas publicadas <span class="hero-signal-note">+ 1 en evaluación</span></span>
             <span class="hero-signal"><strong>346</strong> comunas en el catálogo</span>
             <span class="hero-signal"><strong>100%</strong> códigos CUT normalizados</span>
-            <span class="hero-signal"><strong>Diaria</strong> actualización automática</span>
+            <span class="hero-signal"><strong>SHA-256</strong> integridad verificable</span>
         </div>
-        <!-- KPI Indicators -->
-        <section class="kpi-container" id="kpi-container">
-            <div class="kpi-card" id="kpi-uf">
-                <span class="kpi-label">Unidad de Fomento (UF)</span>
-                <span class="kpi-value"><div class="skeleton-pulse skeleton-value"></div></span>
-                <span class="kpi-date"><span class="skeleton-pulse skeleton-label"></span></span>
+        <section class="use-paths" aria-labelledby="use-paths-title">
+            <div class="use-paths-heading">
+                <span class="eyebrow">PUNTO DE PARTIDA</span>
+                <h2 id="use-paths-title">¿Qué necesitas hacer?</h2>
+                <p>Ve directamente a los datos o a una herramienta. No necesitas crear una cuenta.</p>
             </div>
-            <div class="kpi-card" id="kpi-dolar">
-                <span class="kpi-label">Dólar Observado</span>
-                <span class="kpi-value"><div class="skeleton-pulse skeleton-value"></div></span>
-                <span class="kpi-date"><span class="skeleton-pulse skeleton-label"></span></span>
-            </div>
-            <div class="kpi-card" id="kpi-euro">
-                <span class="kpi-label">Euro</span>
-                <span class="kpi-value"><div class="skeleton-pulse skeleton-value"></div></span>
-                <span class="kpi-date"><span class="skeleton-pulse skeleton-label"></span></span>
-            </div>
-            <div class="kpi-card" id="kpi-utm">
-                <span class="kpi-label">U. Tributaria Mensual (UTM)</span>
-                <span class="kpi-value"><div class="skeleton-pulse skeleton-value"></div></span>
-                <span class="kpi-date"><span class="skeleton-pulse skeleton-label"></span></span>
+            <div class="use-paths-grid">
+                <a class="use-path" href="#catalogo">
+                    <span class="path-index">01 / ENCONTRAR</span>
+                    <strong>Buscar un dataset</strong>
+                    <span class="path-text">Compara fuentes, cobertura y formatos antes de descargar.</span>
+                    <span class="path-cta">Ver catálogo →</span>
+                </a>
+                <a class="use-path" href="#mapa">
+                    <span class="path-index">02 / COMPARAR</span>
+                    <strong>Explorar el territorio</strong>
+                    <span class="path-text">Visualiza indicadores por comuna y abre sus fichas.</span>
+                    <span class="path-cta">Abrir mapa →</span>
+                </a>
+                <a class="use-path" href="#explorador">
+                    <span class="path-index">03 / CONSULTAR</span>
+                    <strong>Ejecutar una consulta</strong>
+                    <span class="path-text">Usa SQL sobre Parquet y exporta resultados en CSV.</span>
+                    <span class="path-cta">Probar SQL →</span>
+                </a>
             </div>
         </section>
-
-        <section class="status-banner" id="status-banner">
-            <div class="status-copy">
-                <h2 class="status-title">Estado del pipeline</h2>
-                <span class="status-subtitle" id="status-subtitle">Cargando estado del hub...</span>
+        <section class="catalog-section" id="catalogo">
+            <div class="catalog-header">
+                <div>
+                    <h2 class="catalog-title">Explora los datasets publicados</h2>
+                    <div class="catalog-meta">Busca por tema o institución. Cada ficha incluye fuente, calidad, archivos y cómo utilizarlos.</div>
+                </div>
+                <div class="catalog-meta" id="catalog-generated-at">Cargando...</div>
             </div>
-            <details class="technical-details">
-                <summary>Detalles técnicos y reportes</summary>
-                <div class="status-meta" id="status-meta">Cargando...</div>
-                <div class="status-pills" id="status-pills"><span class="status-pill">Cargando...</span></div>
-                <div class="status-actions" id="status-actions"></div>
-            </details>
+            <div class="catalog-toolbar">
+                <label class="catalog-search" for="catalog-search-input">
+                    <span class="visually-hidden">Filtrar catálogo de capas</span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 3a6.5 6.5 0 104.03 11.6L19.94 21 21 19.94l-6.4-6.41A6.5 6.5 0 009.5 3zm0 1.5a5 5 0 110 10 5 5 0 010-10z"/></svg>
+                    <input id="catalog-search-input" type="search" placeholder="Ej.: censo, salud, región, INE..." autocomplete="off" aria-label="Filtrar catálogo de capas">
+                </label>
+                <div class="catalog-count" id="catalog-count" aria-live="polite">Cargando capas...</div>
+            </div>
+            <div class="catalog-grid" id="catalog-grid" aria-label="Cargando catálogo">
+                <div class="skeleton-card"><div class="skeleton-pulse skeleton-title"></div><div class="skeleton-pulse skeleton-desc"></div><div class="skeleton-pulse skeleton-meta"></div></div>
+                <div class="skeleton-card"><div class="skeleton-pulse skeleton-title"></div><div class="skeleton-pulse skeleton-desc"></div><div class="skeleton-pulse skeleton-meta"></div></div>
+                <div class="skeleton-card"><div class="skeleton-pulse skeleton-title"></div><div class="skeleton-pulse skeleton-desc"></div><div class="skeleton-pulse skeleton-meta"></div></div>
+                <div class="skeleton-card"><div class="skeleton-pulse skeleton-title"></div><div class="skeleton-pulse skeleton-desc"></div><div class="skeleton-pulse skeleton-meta"></div></div>
+            </div>
         </section>
 
         <section class="section-shell map-section" id="mapa" aria-labelledby="mapa-title">
             <div class="catalog-header">
                 <div>
                     <h2 id="mapa-title" class="catalog-title">Mapa territorial</h2>
-                    <div class="catalog-meta">345 de las 346 comunas con geometría publicada (Antártica es un gap upstream). Haz clic en una comuna para ver su ficha.</div>
+                    <div class="catalog-meta">Mapa con límites simplificados de 345 de 346 comunas (Antártica sin geometría). La capa GeoParquet sigue en evaluación y no forma parte del bundle público. Selecciona una comuna para abrir su ficha.</div>
                 </div>
             </div>
             <div class="map-layout">
@@ -3536,153 +3550,72 @@ curl -s <span class="string">"https://tooltician.com/chile-hub/data/normalized/h
             </div>
         </section>
 
-        <section class="capabilities-section" id="capacidades" aria-labelledby="capabilities-title">
-            <div class="section-heading reveal">
-                <div>
-                    <h2 id="capabilities-title" class="capabilities-title">Más que datasets: capacidades para construir</h2>
-                    <p>La capa de datos se acompaña de resolutores, geometría y canales de distribución para que el dato llegue donde lo necesitas.</p>
+        <div class="explorer-heading" id="comunas">
+            <h2>Encuentra una comuna y descarga el resultado</h2>
+            <p>Filtra las 346 comunas por nombre, código CUT, provincia o región. Descarga un CSV con los resultados filtrados o abre una ficha comunal.</p>
+        </div>
+
+        <!-- Search Bar and Controls -->
+        <section class="search-section">
+            <div class="search-inputs">
+                <div class="input-group">
+                    <label for="search-input" class="visually-hidden">Buscar comuna, provincia o región</label>
+                    <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                    <input type="text" id="search-input" placeholder="Buscar comuna, provincia o región..." aria-label="Buscar comuna, provincia o región">
+                </div>
+                <div style="max-width: 220px; flex: 1;">
+                    <label for="region-filter" class="visually-hidden">Filtrar comunas por región</label>
+                    <select id="region-filter" aria-label="Filtrar comunas por región">
+                        <option value="">Todas las regiones</option>
+                    </select>
                 </div>
             </div>
-            <div class="capabilities-grid">
-                <article class="capability-card reveal">
-                    <div class="capability-head">
-                        <h3>Resolución de entidades</h3>
-                        <span class="capability-code">resolve_comunas()</span>
-                    </div>
-                    <p>Convierte nombres de comunas en códigos CUT normalizados (normaliza acentos y mayúsculas; match exacto).</p>
-                    <pre class="capability-example">from chile_hub import ChileHub
-hub = ChileHub()
-hub.resolve_comunas(["santiago", "nunoa"])</pre>
-                </article>
-                <article class="capability-card reveal">
-                    <div class="capability-head">
-                        <h3>Reverse geocoding</h3>
-                        <span class="capability-code">resolve_by_coords()</span>
-                    </div>
-                    <p>De un par de coordenadas a la comuna que las contiene — sin servicios externos ni claves.</p>
-                    <pre class="capability-example">hub.resolve_by_coords(
-    [(-33.4489, -70.6693)]  # centro de Santiago
-)</pre>
-                </article>
-                <article class="capability-card reveal">
-                    <div class="capability-head">
-                        <h3>Geometría comunal</h3>
-                        <span class="capability-code">GeoParquet</span>
-                    </div>
-                    <p>Límites poligonales de 345 de las 346 comunas en GeoParquet (Antártica es un gap upstream documentado). Capa en carril candidato con revisión en curso: disponible para evaluación local, aún no incluida en el bundle público ni en el catálogo. <a href="reference/extraction-lanes/">Ver carriles de publicación</a>.</p>
-                    <pre class="capability-example">gdf = gpd.read_parquet(
-  "…/geometria_comunal.parquet")</pre>
-                </article>
-                <article class="capability-card reveal">
-                    <div class="capability-head">
-                        <h3>Indicadores en vivo</h3>
-                        <span class="capability-code">UF · UTM · IPC</span>
-                    </div>
-                    <p>Series diarias y mensuales actualizadas automáticamente, con IPC desde la fuente oficial INE.</p>
-                    <pre class="capability-example">hub.load_polars("indicadores")</pre>
-                </article>
-                <article class="capability-card reveal">
-                    <div class="capability-head">
-                        <h3>Distribución abierta</h3>
-                        <span class="capability-code">PyPI · Hugging Face · DCAT</span>
-                    </div>
-                    <p>El paquete instalable, el mirror en Hugging Face Hub y el catálogo DCAT <code>data.json</code> para descubrimiento.</p>
-                    <pre class="capability-example">pip install chile-hub</pre>
-                </article>
-                <article class="capability-card reveal">
-                    <div class="capability-head">
-                        <h3>Salud verificable</h3>
-                        <span class="capability-code">build → verify → publish</span>
-                    </div>
-                    <p>Cada build valida contratos, integridad SHA-256, frescura y procedencia antes de publicar.</p>
-                    <pre class="capability-example">hub.health()</pre>
-                </article>
+            <div class="actions-group">
+                <button class="btn btn-primary" id="export-csv-btn">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
+                    Descargar CSV filtrado
+                </button>
             </div>
         </section>
 
-        <section class="package-section" id="package-section">
-            <div class="package-card">
-                <div class="package-copy">
-                    <h2 class="package-title">Paquete descargable</h2>
-                    <div class="package-desc">ZIP reproducible del hub listo para mover, adjuntar o consumir fuera del repo.</div>
-                    <div class="package-meta" id="package-meta">Cargando...</div>
-                    <details class="package-verify">
-                        <summary>Verificar integridad del archivo</summary>
-                        <div class="package-verify-head">
-                            <div class="package-verify-title">Verificar integridad</div>
-                            <button class="quickstart-copy" id="package-verify-copy" data-copy-target="package-verify-code" aria-label="Copiar comando de verificación al portapapeles">Copiar</button>
-                        </div>
-                        <pre class="quickstart-code" id="package-verify-code">curl -L -o data/normalized/chile-hub-publishable-bundle.zip https://github.com/cortega26/chile-hub/releases/latest/download/chile-hub-publishable-bundle.zip
-curl -L -o data/normalized/chile-hub-publishable-bundle.zip.sha256 https://github.com/cortega26/chile-hub/releases/latest/download/chile-hub-publishable-bundle.zip.sha256
-shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256</pre>
-                    </details>
-                </div>
-                <div class="package-actions" id="package-actions">
-                    <a class="dataset-action" href="https://github.com/cortega26/chile-hub/releases/latest/download/chile-hub-publishable-bundle.zip" target="_blank" rel="noopener noreferrer">Bundle ZIP</a>
-                    <a class="dataset-action muted" href="data/normalized/hub_bundle.json" target="_blank" rel="noopener noreferrer">Bundle JSON</a>
-                </div>
+        <!-- Table -->
+        <section class="table-container">
+            <div class="table-wrapper">
+                <table id="comunas-table">
+                    <caption class="visually-hidden">Listado de comunas de Chile con códigos CUT, población y coordenadas</caption>
+                    <thead>
+                        <tr>
+                            <th>Código CUT</th>
+                            <th>Comuna</th>
+                            <th>Provincia</th>
+                            <th>Región</th>
+                            <th>Población Est.</th>
+                            <th>Coordenadas</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <tr>
+                            <td colspan="6" class="no-results">
+                                <div class="spinner"></div><br><br>Cargando comunas...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-        </section>
 
-        <section class="catalog-section" id="catalogo">
-            <div class="catalog-header">
-                <div>
-                    <h2 class="catalog-title">Capas publicadas</h2>
-                    <div class="catalog-meta">Formatos abiertos, procedencia y ejemplos de uso por dataset.</div>
+            <div class="pagination">
+                <div class="page-info" id="page-info" aria-live="polite">Mostrando 0 - 0 de 0 comunas</div>
+                <div class="page-controls">
+                    <button class="btn-page" id="prev-page-btn" disabled>Anterior</button>
+                    <button class="btn-page" id="next-page-btn" disabled>Siguiente</button>
                 </div>
-                <div class="catalog-meta" id="catalog-generated-at">Cargando...</div>
             </div>
-            <div class="catalog-toolbar">
-                <label class="catalog-search" for="catalog-search-input">
-                    <span class="visually-hidden">Filtrar catálogo de capas</span>
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 3a6.5 6.5 0 104.03 11.6L19.94 21 21 19.94l-6.4-6.41A6.5 6.5 0 009.5 3zm0 1.5a5 5 0 110 10 5 5 0 010-10z"/></svg>
-                    <input id="catalog-search-input" type="search" placeholder="Buscar datos por nombre, fuente o campo" autocomplete="off" aria-label="Filtrar catálogo de capas">
-                </label>
-                <div class="catalog-count" id="catalog-count" aria-live="polite">Cargando capas...</div>
-            </div>
-            <div class="catalog-grid" id="catalog-grid" aria-label="Cargando catálogo">
-                <div class="skeleton-card"><div class="skeleton-pulse skeleton-title"></div><div class="skeleton-pulse skeleton-desc"></div><div class="skeleton-pulse skeleton-meta"></div></div>
-                <div class="skeleton-card"><div class="skeleton-pulse skeleton-title"></div><div class="skeleton-pulse skeleton-desc"></div><div class="skeleton-pulse skeleton-meta"></div></div>
-                <div class="skeleton-card"><div class="skeleton-pulse skeleton-title"></div><div class="skeleton-pulse skeleton-desc"></div><div class="skeleton-pulse skeleton-meta"></div></div>
-                <div class="skeleton-card"><div class="skeleton-pulse skeleton-title"></div><div class="skeleton-pulse skeleton-desc"></div><div class="skeleton-pulse skeleton-meta"></div></div>
-            </div>
-        </section>
-
-        <section class="section-shell" id="cobertura">
-            <div class="section-heading reveal">
-                <h2>Un modelo de datos nacional, capa por capa</h2>
-                <p>Cada capa nueva pasa un filtro de utilidad real, estabilidad de la fuente y licencia verificable. Lo que está publicado funciona; lo que está en evaluación, todavía no.</p>
-            </div>
-            <div class="domain-list">
-                <article class="domain-item"><h3>Territorio</h3><p>Regiones, provincias, comunas, códigos CUT, coordenadas y población de referencia.</p><span class="domain-state">Disponible</span></article>
-                <article class="domain-item"><h3>Economía</h3><p>UF, UTM, dólar, euro e IPC en series normalizadas para análisis y productos.</p><span class="domain-state">Disponible</span></article>
-                <article class="domain-item"><h3>Demografía</h3><p>Población, proyecciones, hogares y estructura etaria con claves territoriales comunes.</p><span class="domain-state">Disponible</span></article>
-                <article class="domain-item"><h3>Gobierno local</h3><p>Presupuestos, servicios, infraestructura y directorios municipales reutilizables.</p><span class="domain-state planned">En evaluación</span></article>
-                <article class="domain-item"><h3>Educación y salud</h3><p>Establecimientos e indicadores públicos con cobertura y licencias verificables.</p><span class="domain-state">Disponible</span></article>
-                <article class="domain-item"><h3>Medioambiente</h3><p>Clima, agua, energía y territorio para cruces longitudinales y geográficos.</p><span class="domain-state planned">En investigación</span></article>
-            </div>
-        </section>
-
-        <section class="section-shell" id="confianza">
-            <div class="section-heading reveal">
-                <h2>Los datos son tan buenos como su procedencia</h2>
-                <p>Cada capa incluye la información que necesitas para decidir si sirve en producción, análisis o investigación.</p>
-            </div>
-            <div class="trust-grid">
-                <article class="trust-item"><h3>Procedencia</h3><p>Fuente primaria, método de acceso, timestamp y snapshot crudo para auditoría.</p></article>
-                <article class="trust-item"><h3>Contratos</h3><p>Esquemas, tipos y claves estables con validaciones que detienen publicaciones inválidas.</p></article>
-                <article class="trust-item"><h3>Reutilización</h3><p>Licencia, atribución y redistribución documentadas por dataset, sin ambigüedad.</p></article>
-                <article class="trust-item"><h3>Integridad</h3><p>Manifest, hashes SHA256, cobertura, freshness y drift disponibles en cada build.</p></article>
-            </div>
-            <p style="text-align:center; margin-top:2rem;">
-                <a href="https://github.com/cortega26/chile-hub/blob/main/docs/case-study-construccion-chile-hub.md">Leer el caso de estudio completo →</a>
-            </p>
         </section>
 
         <section class="quickstart-section" id="uso">
             <div class="catalog-header reveal">
                 <div>
-                    <h2 class="catalog-title">Uso rápido</h2>
+                    <h2 class="catalog-title">Lleva los datos a tu proyecto</h2>
                     <div class="catalog-meta">Consume archivos publicados sin clonar el repositorio ni instalar el helper.</div>
                 </div>
             </div>
@@ -3726,8 +3659,8 @@ LIMIT 10;</pre>
         <section class="section-shell" id="explorador">
             <div class="catalog-header">
                 <div>
-                    <h2 class="catalog-title">Explorador SQL</h2>
-                    <div class="catalog-meta">Ejecuta SQL contra los Parquet publicados, en tu navegador. El motor se carga al primer clic.</div>
+                    <h2 class="catalog-title">Consulta los datos sin instalar nada</h2>
+                    <div class="catalog-meta">Selecciona una consulta de ejemplo o escribe la tuya. DuckDB funciona en tu navegador; el motor se carga al ejecutar.</div>
                 </div>
                 <div class="sql-toolbar">
                     <label for="sql-example">Ejemplo</label>
@@ -3753,97 +3686,159 @@ LIMIT 10;</pre>
             <div id="sql-result"></div>
         </section>
 
-        <section class="participate-section" id="participar">
-            <div>
-                <h2>Contribuye o propón el próximo dataset</h2>
-                <p>Las nuevas capas se priorizan con casos de uso reales. ¿Qué dato chileno necesitas que esté a una línea de distancia?</p>
-            </div>
-            <div class="participate-actions">
-                <a class="btn btn-primary" href="https://github.com/cortega26/chile-hub/issues/new?title=Solicitud%20de%20dataset%3A%20&amp;body=%23%23%20Dato%20que%20necesito%0A%0A%23%23%20Caso%20de%20uso%0A%0A%23%23%20Fuente%20oficial%20sugerida%0A" target="_blank" rel="noopener noreferrer">Solicitar un dataset</a>
-                <a class="dataset-action muted" href="https://github.com/cortega26/chile-hub/issues/new?title=Proyecto%20construido%20con%20chile-hub%3A%20&amp;body=%23%23%20Qu%C3%A9%20constru%C3%AD%0A%0A%23%23%20Datasets%20utilizados%0A%0A%23%23%20Enlace%0A" target="_blank" rel="noopener noreferrer">Compartir un proyecto</a>
-            </div>
-        </section>
-
-        <section class="support-section" id="apoyar" aria-labelledby="support-title">
-            <div>
-                <h2 id="support-title">Apoya el mantenimiento del proyecto</h2>
-                <p>Si chile-hub te ahorra horas de limpieza, puedes ayudar a sostener extractores, validaciones y documentación pública.</p>
-            </div>
-            <div class="support-actions" id="support-actions" aria-label="Fuentes de apoyo al proyecto"></div>
-        </section>
-
-        <section class="manifesto">
-            <h2>Menos tiempo buscando y limpiando datos. Más tiempo construyendo.</h2>
-            <div>
-                <p>chile-hub no reemplaza a las fuentes oficiales. Las vuelve consistentes, comparables y utilizables en flujos modernos de datos.</p>
-                <p style="margin-top: 1rem;">Hecho en Chile ·
-                <a href="https://github.com/cortega26/chile-hub" target="_blank" rel="noopener noreferrer">GitHub</a> ·
-                <a href="https://github.com/sponsors/cortega26" target="_blank" rel="noopener noreferrer">GitHub Sponsors</a> ·
-                <a href="https://www.buymeacoffee.com/cortega26" target="_blank" rel="noopener noreferrer">Buy Me a Coffee</a> ·
-                <a href="https://linkedin.com/in/cortega26" target="_blank" rel="noopener noreferrer">LinkedIn</a></p>
-            </div>
-        </section>
-
-        <div class="explorer-heading">
-            <h2>Explorador de comunas</h2>
-            <p>Busca por nombre, código CUT, provincia o región. Cada comuna enlaza a su ficha pública.</p>
-        </div>
-
-        <!-- Search Bar and Controls -->
-        <section class="search-section">
-            <div class="search-inputs">
-                <div class="input-group">
-                    <label for="search-input" class="visually-hidden">Buscar comuna, provincia o región</label>
-                    <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-                    <input type="text" id="search-input" placeholder="Buscar comuna, provincia o región..." aria-label="Buscar comuna, provincia o región">
-                </div>
-                <div style="max-width: 220px; flex: 1;">
-                    <label for="region-filter" class="visually-hidden">Filtrar comunas por región</label>
-                    <select id="region-filter" aria-label="Filtrar comunas por región">
-                        <option value="">Todas las regiones</option>
-                    </select>
+        <section class="capabilities-section" id="capacidades" aria-labelledby="capabilities-title">
+            <div class="section-heading reveal">
+                <div>
+                    <h2 id="capabilities-title" class="capabilities-title">Herramientas para trabajar con los datos</h2>
+                    <p>Además de archivos listos para descargar, el paquete incluye resolutores territoriales y controles de calidad consultables.</p>
                 </div>
             </div>
-            <div class="actions-group">
-                <button class="btn btn-primary" id="export-csv-btn">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
-                    Exportar Filtro CSV
-                </button>
+            <div class="capabilities-grid">
+                <article class="capability-card reveal">
+                    <div class="capability-head">
+                        <h3>Resolución de entidades</h3>
+                        <span class="capability-code">resolve_comunas()</span>
+                    </div>
+                    <p>Convierte nombres de comunas en códigos CUT normalizados (normaliza acentos y mayúsculas; match exacto).</p>
+                    <pre class="capability-example">from chile_hub import ChileHub
+hub = ChileHub()
+hub.resolve_comunas(["santiago", "nunoa"])</pre>
+                </article>
+                <article class="capability-card reveal">
+                    <div class="capability-head">
+                        <h3>Reverse geocoding</h3>
+                        <span class="capability-code">resolve_by_coords()</span>
+                    </div>
+                    <p>De un par de coordenadas a la comuna que las contiene — sin servicios externos ni claves.</p>
+                    <pre class="capability-example">hub.resolve_by_coords(
+    [(-33.4489, -70.6693)]  # centro de Santiago
+)</pre>
+                </article>
+                <article class="capability-card reveal">
+                    <div class="capability-head">
+                        <h3>Geometría comunal</h3>
+                        <span class="capability-code">GeoParquet</span>
+                    </div>
+                    <p>Límites poligonales de 345 de las 346 comunas en GeoParquet (Antártica es un gap upstream documentado). Capa en carril candidato con revisión en curso: disponible para evaluación local, aún no incluida en el bundle público ni en el catálogo. <a href="reference/extraction-lanes/">Ver carriles de publicación</a>.</p>
+                    <p class="capability-example">Candidato: consulta la ficha y los requisitos de uso antes de incorporarlo.</p>
+                </article>
+                <article class="capability-card reveal">
+                    <div class="capability-head">
+                        <h3>Indicadores económicos</h3>
+                        <span class="capability-code">UF · UTM · IPC</span>
+                    </div>
+                    <p>Series diarias y mensuales con fechas de vigencia explícitas; IPC desde la fuente oficial INE. Comprueba la frescura antes de usarlas.</p>
+                    <pre class="capability-example">hub.load_polars("indicadores")</pre>
+                </article>
+                <article class="capability-card reveal">
+                    <div class="capability-head">
+                        <h3>Distribución abierta</h3>
+                        <span class="capability-code">PyPI · Hugging Face · DCAT</span>
+                    </div>
+                    <p>El paquete instalable, el mirror en Hugging Face Hub y el catálogo DCAT <code>data.json</code> para descubrimiento.</p>
+                    <pre class="capability-example">pip install chile-hub</pre>
+                </article>
+                <article class="capability-card reveal">
+                    <div class="capability-head">
+                        <h3>Salud verificable</h3>
+                        <span class="capability-code">build → verify → publish</span>
+                    </div>
+                    <p>Cada build valida contratos, integridad SHA-256, frescura y procedencia antes de publicar.</p>
+                    <pre class="capability-example">hub.health()</pre>
+                </article>
             </div>
         </section>
 
-        <!-- Table -->
-        <section class="table-container">
-            <div class="table-wrapper">
-                <table id="comunas-table">
-                    <caption class="visually-hidden">Listado de comunas de Chile con códigos CUT, población y coordenadas</caption>
-                    <thead>
-                        <tr>
-                            <th>Código CUT</th>
-                            <th>Comuna</th>
-                            <th>Provincia</th>
-                            <th>Región</th>
-                            <th>Población Est.</th>
-                            <th>Coordenadas</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-body">
-                        <tr>
-                            <td colspan="6" class="no-results">
-                                <div class="spinner"></div><br><br>Cargando comunas...
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+        <!-- KPI Indicators -->
+        <section class="kpi-container" id="kpi-container">
+            <div class="kpi-card" id="kpi-uf">
+                <span class="kpi-label">Unidad de Fomento (UF)</span>
+                <span class="kpi-value"><div class="skeleton-pulse skeleton-value"></div></span>
+                <span class="kpi-date"><span class="skeleton-pulse skeleton-label"></span></span>
             </div>
+            <div class="kpi-card" id="kpi-dolar">
+                <span class="kpi-label">Dólar Observado</span>
+                <span class="kpi-value"><div class="skeleton-pulse skeleton-value"></div></span>
+                <span class="kpi-date"><span class="skeleton-pulse skeleton-label"></span></span>
+            </div>
+            <div class="kpi-card" id="kpi-euro">
+                <span class="kpi-label">Euro</span>
+                <span class="kpi-value"><div class="skeleton-pulse skeleton-value"></div></span>
+                <span class="kpi-date"><span class="skeleton-pulse skeleton-label"></span></span>
+            </div>
+            <div class="kpi-card" id="kpi-utm">
+                <span class="kpi-label">U. Tributaria Mensual (UTM)</span>
+                <span class="kpi-value"><div class="skeleton-pulse skeleton-value"></div></span>
+                <span class="kpi-date"><span class="skeleton-pulse skeleton-label"></span></span>
+            </div>
+        </section>
 
-            <div class="pagination">
-                <div class="page-info" id="page-info" aria-live="polite">Mostrando 0 - 0 de 0 comunas</div>
-                <div class="page-controls">
-                    <button class="btn-page" id="prev-page-btn" disabled>Anterior</button>
-                    <button class="btn-page" id="next-page-btn" disabled>Siguiente</button>
+        <section class="package-section" id="package-section">
+            <div class="package-card">
+                <div class="package-copy">
+                    <h2 class="package-title">Paquete descargable</h2>
+                    <div class="package-desc">ZIP reproducible del hub listo para mover, adjuntar o consumir fuera del repo.</div>
+                    <div class="package-meta" id="package-meta">Cargando...</div>
+                    <details class="package-verify">
+                        <summary>Verificar integridad del archivo</summary>
+                        <div class="package-verify-head">
+                            <div class="package-verify-title">Verificar integridad</div>
+                            <button class="quickstart-copy" id="package-verify-copy" data-copy-target="package-verify-code" aria-label="Copiar comando de verificación al portapapeles">Copiar</button>
+                        </div>
+                        <pre class="quickstart-code" id="package-verify-code">curl -L -o data/normalized/chile-hub-publishable-bundle.zip https://github.com/cortega26/chile-hub/releases/latest/download/chile-hub-publishable-bundle.zip
+curl -L -o data/normalized/chile-hub-publishable-bundle.zip.sha256 https://github.com/cortega26/chile-hub/releases/latest/download/chile-hub-publishable-bundle.zip.sha256
+shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256</pre>
+                    </details>
+                </div>
+                <div class="package-actions" id="package-actions">
+                    <a class="dataset-action" href="https://github.com/cortega26/chile-hub/releases/latest/download/chile-hub-publishable-bundle.zip" target="_blank" rel="noopener noreferrer">Bundle ZIP</a>
+                    <a class="dataset-action muted" href="data/normalized/hub_bundle.json" target="_blank" rel="noopener noreferrer">Bundle JSON</a>
                 </div>
             </div>
+        </section>
+
+        <section class="section-shell" id="cobertura">
+            <div class="section-heading reveal">
+                <h2>Qué datos puedes cruzar hoy</h2>
+                <p>Cada capa nueva pasa un filtro de utilidad real, estabilidad de la fuente y licencia verificable. Lo que está publicado funciona; lo que está en evaluación, todavía no.</p>
+            </div>
+            <div class="domain-list">
+                <article class="domain-item"><h3>Territorio</h3><p>Regiones, provincias, comunas, códigos CUT, coordenadas y población de referencia.</p><span class="domain-state">Disponible</span></article>
+                <article class="domain-item"><h3>Economía</h3><p>UF, UTM, dólar, euro e IPC en series normalizadas para análisis y productos.</p><span class="domain-state">Disponible</span></article>
+                <article class="domain-item"><h3>Demografía</h3><p>Población, proyecciones, hogares y estructura etaria con claves territoriales comunes.</p><span class="domain-state">Disponible</span></article>
+                <article class="domain-item"><h3>Gobierno local</h3><p>Presupuestos, servicios, infraestructura y directorios municipales reutilizables.</p><span class="domain-state planned">En evaluación</span></article>
+                <article class="domain-item"><h3>Educación y salud</h3><p>Establecimientos e indicadores públicos con cobertura y licencias verificables.</p><span class="domain-state">Disponible</span></article>
+                <article class="domain-item"><h3>Medioambiente</h3><p>Clima, agua, energía y territorio para cruces longitudinales y geográficos.</p><span class="domain-state planned">En investigación</span></article>
+            </div>
+        </section>
+
+        <section class="section-shell" id="confianza">
+            <div class="section-heading reveal">
+                <h2>Cómo comprobar la calidad de una capa</h2>
+                <p>Cada capa incluye la información que necesitas para decidir si sirve en producción, análisis o investigación.</p>
+            </div>
+            <div class="trust-grid">
+                <article class="trust-item"><h3>Procedencia</h3><p>Fuente primaria, método de acceso, timestamp y snapshot crudo para auditoría.</p></article>
+                <article class="trust-item"><h3>Contratos</h3><p>Esquemas, tipos y claves estables con validaciones que detienen publicaciones inválidas.</p></article>
+                <article class="trust-item"><h3>Reutilización</h3><p>Licencia, atribución y redistribución documentadas por dataset, sin ambigüedad.</p></article>
+                <article class="trust-item"><h3>Integridad</h3><p>Manifest, hashes SHA256, cobertura, freshness y drift disponibles en cada build.</p></article>
+            </div>
+            <p style="text-align:center; margin-top:2rem;">
+                <a href="https://github.com/cortega26/chile-hub/blob/main/docs/case-study-construccion-chile-hub.md">Leer el caso de estudio completo →</a>
+            </p>
+        </section>
+
+        <section class="status-banner" id="status-banner">
+            <div class="status-copy">
+                <h2 class="status-title">Estado del pipeline</h2>
+                <span class="status-subtitle" id="status-subtitle">Cargando estado del hub...</span>
+            </div>
+            <details class="technical-details">
+                <summary>Detalles técnicos y reportes</summary>
+                <div class="status-meta" id="status-meta">Cargando...</div>
+                <div class="status-pills" id="status-pills"><span class="status-pill">Cargando...</span></div>
+                <div class="status-actions" id="status-actions"></div>
+            </details>
         </section>
 
         <!-- ══════════ Health Dashboard ══════════ -->
@@ -3911,6 +3906,37 @@ LIMIT 10;</pre>
                 </table>
             </div>
         </section>
+        <section class="participate-section" id="participar">
+            <div>
+                <h2>¿Falta un dataset útil?</h2>
+                <p>Propón una fuente o muestra cómo utilizaste una capa. Cada incorporación se evalúa por utilidad, procedencia y condiciones de reutilización.</p>
+            </div>
+            <div class="participate-actions">
+                <a class="btn btn-primary" href="https://github.com/cortega26/chile-hub/issues/new?title=Solicitud%20de%20dataset%3A%20&amp;body=%23%23%20Dato%20que%20necesito%0A%0A%23%23%20Caso%20de%20uso%0A%0A%23%23%20Fuente%20oficial%20sugerida%0A" target="_blank" rel="noopener noreferrer">Solicitar un dataset</a>
+                <a class="dataset-action muted" href="https://github.com/cortega26/chile-hub/issues/new?title=Proyecto%20construido%20con%20chile-hub%3A%20&amp;body=%23%23%20Qu%C3%A9%20constru%C3%AD%0A%0A%23%23%20Datasets%20utilizados%0A%0A%23%23%20Enlace%0A" target="_blank" rel="noopener noreferrer">Compartir un proyecto</a>
+            </div>
+        </section>
+
+        <section class="support-section" id="apoyar" aria-labelledby="support-title">
+            <div>
+                <h2 id="support-title">Apoya el mantenimiento del proyecto</h2>
+                <p>Si chile-hub te ahorra horas de limpieza, puedes ayudar a sostener extractores, validaciones y documentación pública.</p>
+            </div>
+            <div class="support-actions" id="support-actions" aria-label="Fuentes de apoyo al proyecto"></div>
+        </section>
+
+        <section class="manifesto">
+            <h2>Datos trazables, de la fuente a tu análisis.</h2>
+            <div>
+                <p>chile-hub complementa a datos.gob.cl y a las instituciones fuente. Las capas derivadas documentan su origen, claves y condiciones de uso.</p>
+                <p style="margin-top: 1rem;">Hecho en Chile ·
+                <a href="https://github.com/cortega26/chile-hub" target="_blank" rel="noopener noreferrer">GitHub</a> ·
+                <a href="https://github.com/sponsors/cortega26" target="_blank" rel="noopener noreferrer">GitHub Sponsors</a> ·
+                <a href="https://www.buymeacoffee.com/cortega26" target="_blank" rel="noopener noreferrer">Buy Me a Coffee</a> ·
+                <a href="https://linkedin.com/in/cortega26" target="_blank" rel="noopener noreferrer">LinkedIn</a></p>
+            </div>
+        </section>
+
     </main>
 
     <footer>

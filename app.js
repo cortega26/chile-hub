@@ -1464,6 +1464,39 @@ quickstartCopyButtons.forEach(button => {
     });
 });
 
+// La consola del hero es un ejemplo realmente navegable, no una maqueta.
+function initHeroExampleTabs() {
+    const tabs = Array.from(document.querySelectorAll(".console-tabs .console-tab"));
+    if (tabs.length === 0) return;
+
+    function activate(index, focus = false) {
+        tabs.forEach((tab, tabIndex) => {
+            const selected = index === tabIndex;
+            const panel = document.getElementById(tab.getAttribute("aria-controls"));
+            tab.classList.toggle("active", selected);
+            tab.setAttribute("aria-selected", String(selected));
+            tab.tabIndex = selected ? 0 : -1;
+            if (panel) panel.classList.toggle("active", selected);
+        });
+        if (focus) tabs[index].focus();
+    }
+
+    tabs.forEach((tab, index) => {
+        tab.addEventListener("click", () => activate(index));
+        tab.addEventListener("keydown", (event) => {
+            const keys = ["ArrowRight", "ArrowLeft", "Home", "End"];
+            if (!keys.includes(event.key)) return;
+            event.preventDefault();
+            let next = index;
+            if (event.key === "ArrowRight") next = (index + 1) % tabs.length;
+            if (event.key === "ArrowLeft") next = (index - 1 + tabs.length) % tabs.length;
+            if (event.key === "Home") next = 0;
+            if (event.key === "End") next = tabs.length - 1;
+            activate(next, true);
+        });
+    });
+}
+
 // Navegación móvil: el toggle muestra/oculta el panel de enlaces bajo el
 // header. En desktop el botón está oculto por CSS y el nav se comporta igual.
 function initNavToggle() {
@@ -1799,6 +1832,7 @@ function initMapLazy() {
 
 // Inicialización
 window.addEventListener("DOMContentLoaded", () => {
+    initHeroExampleTabs();
     renderSupportLinks();
     initNavToggle();
     initMapLazy();

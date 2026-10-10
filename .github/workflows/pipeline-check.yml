@@ -566,6 +566,15 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
 
+      - name: Upload landing visual QA captures
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: landing-visual-qa
+          path: /tmp/chile-hub-visual-qa/*.png
+          if-no-files-found: warn
+          retention-days: 7
+
 
   # PR/push CI computes the coverage badge, but does not publish the full
   # data/normalized tree. Sync only this badge on successful main CI runs.
