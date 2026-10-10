@@ -931,7 +931,7 @@ def verify_landing():
         mobile_nav.wait_for(state="visible")
         if mobile_toggle.get_attribute("aria-expanded") != "true":
             fail("Expected nav-toggle aria-expanded=true after click")
-        mobile_nav.locator("a", has_text="Datos").click()
+        mobile_nav.locator("a", has_text="Catálogo").click()
         mobile_nav.wait_for(state="hidden")
         mobile.close()
 
