@@ -210,8 +210,8 @@ def _archive_res_raw(resource_name: str, stamp: str, content: bytes) -> Path:
         return path
 
 
-_RES_RAW_TIMESTAMP_RE = re.compile(r"_(\\d{8}T\\d{6}Z)(?:_(\\d+))?\\.csv$")
-_RES_RAW_YEAR_RE = re.compile(r"[Aa]ño_(\\d{4})(?!\\d)")
+_RES_RAW_TIMESTAMP_RE = re.compile(r"_(\d{8}T\d{6}Z)(?:_(\d+))?\.csv$")
+_RES_RAW_YEAR_RE = re.compile(r"[Aa]ño_(\d{4})(?!\d)")
 
 
 def _res_snapshot_sort_key(snapshot: Path) -> tuple[str, int, str]:
