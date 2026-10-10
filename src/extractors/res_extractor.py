@@ -240,9 +240,7 @@ def fetch_resources() -> tuple[list[bytes], str, str]:
                 contents.append(response.content)
         except Exception as exc:
             # Si falla la descarga live, intentar recuperar snapshots raw previos
-            snapshots = sorted(
-                Path(RAW_DIR).glob(f"res_{resource_name}_*.csv"), reverse=True
-            )
+            snapshots = sorted(Path(RAW_DIR).glob(f"res_{resource_name}_*.csv"), reverse=True)
             for snapshot in snapshots:
                 try:
                     candidate = snapshot.read_bytes()
