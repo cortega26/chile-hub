@@ -1844,6 +1844,89 @@ class MineducEstablecimientosExtractorTests(unittest.TestCase):
             self.assertFalse((raw / "mineduc_directorio_2025.rar").exists())
             extract.assert_called_once()
 
+    def test_fallback_skips_corrupt_and_empty_newer_csv_snapshots(self):
+        """El respaldo más reciente puede no tener registros utilizables."""
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp) / "raw"
+            raw.mkdir()
+            older = self._write_fixture_csv(raw / "2024_Directorio_Oficial_EE.csv")
+            (raw / "2025_Directorio_Oficial_EE.csv").write_bytes(b"<html>offline</html>")
+            (raw / "2026_Directorio_Oficial_EE.csv").write_text(
+                self._CSV_HEADER, encoding="utf-8"
+            )
+            with (
+                patch.object(mineduc_establecimientos_extractor, "RAW_DIR", str(raw)),
+                patch.object(mineduc_establecimientos_extractor, "ensure_staging_directories"),
+                patch.object(
+                    mineduc_establecimientos_extractor,
+                    "fetch_with_retry",
+                    side_effect=OSError("download offline"),
+                ),
+            ):
+                result = mineduc_establecimientos_extractor.fetch_data()
+
+            self.assertEqual(
+                result, (older, "fallback", mineduc_establecimientos_extractor.DOWNLOAD_URL)
+            )
+
+    def test_invalid_csv_extracted_from_rar_does_not_replace_good_backup(self):
+        """Un RAR extraído exitosamente puede contener un CSV vacío."""
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp) / "raw"
+            raw.mkdir()
+            older = self._write_fixture_csv(raw / "2024_Directorio_Oficial_EE.csv")
+
+            def extract_empty_csv(command, **_kwargs):
+                (Path(command[-1]) / "2025_Directorio_Oficial_EE.csv").write_text(
+                    self._CSV_HEADER, encoding="utf-8"
+                )
+                return MagicMock(returncode=0, stderr="")
+
+            with (
+                patch.object(mineduc_establecimientos_extractor, "RAW_DIR", str(raw)),
+                patch.object(mineduc_establecimientos_extractor, "ROOT_DIR", tmp),
+                patch.object(mineduc_establecimientos_extractor, "ensure_staging_directories"),
+                patch.object(
+                    mineduc_establecimientos_extractor,
+                    "fetch_with_retry",
+                    return_value=self._rar_response(),
+                ),
+                patch.object(
+                    mineduc_establecimientos_extractor.shutil,
+                    "which",
+                    return_value="/usr/bin/unrar",
+                ),
+                patch.object(
+                    mineduc_establecimientos_extractor.subprocess,
+                    "run",
+                    side_effect=extract_empty_csv,
+                ),
+            ):
+                result = mineduc_establecimientos_extractor.fetch_data()
+
+            self.assertEqual(result[0], older)
+            self.assertEqual(result[1], "fallback")
+            self.assertFalse((raw / "2025_Directorio_Oficial_EE.csv").exists())
+            self.assertFalse((raw / "mineduc_directorio_2025.rar").exists())
+
+    def test_only_unreadable_csv_backups_fail_closed(self):
+        """Sin respaldo interpretable se informa ausencia de datos."""
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp) / "raw"
+            raw.mkdir()
+            (raw / "2025_Directorio_Oficial_EE.csv").write_bytes(b"bad header")
+            with (
+                patch.object(mineduc_establecimientos_extractor, "RAW_DIR", str(raw)),
+                patch.object(mineduc_establecimientos_extractor, "ensure_staging_directories"),
+                patch.object(
+                    mineduc_establecimientos_extractor,
+                    "fetch_with_retry",
+                    side_effect=OSError("offline"),
+                ),
+                self.assertRaisesRegex(FileNotFoundError, "No hay snapshots locales válidos"),
+            ):
+                mineduc_establecimientos_extractor.fetch_data()
+
     def test_extractor_dataset_name(self):
         """dataset_name retorna el identificador canónico."""
         self.assertEqual(
