@@ -12,6 +12,20 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.47.6 - 2026-10-10
+
+### Corregido
+
+- Honor SINIM SpreadsheetML sparse cell indices
+  ([#142](https://github.com/cortega26/chile-hub/pull/142),
+  [`581b362`](https://github.com/cortega26/chile-hub/commit/581b362267031378f3098a74db93066485f69ee9))
+
+### Mantenimiento
+
+- **ci**: Sync coverage badge from verified tests [skip ci]
+  ([`e814e58`](https://github.com/cortega26/chile-hub/commit/e814e5801da077ec789346a2d9645e030c11a947))
+
+
 ## 1.47.5 - 2026-10-10
 
 ### Corregido
