@@ -12,6 +12,20 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.47.13 - 2026-10-10
+
+### Corregido
+
+- Recover Censo homes from validated Excel snapshots
+  ([#149](https://github.com/cortega26/chile-hub/pull/149),
+  [`674f0e8`](https://github.com/cortega26/chile-hub/commit/674f0e82f7ab7c7d2d4ac7eb429e659147603536))
+
+### Mantenimiento
+
+- **ci**: Sync coverage badge from verified tests [skip ci]
+  ([`bebd0ec`](https://github.com/cortega26/chile-hub/commit/bebd0ec7480c1455f4524c97a8d4bc74db392d5a))
+
+
 ## 1.47.12 - 2026-10-10
 
 ### Corregido
