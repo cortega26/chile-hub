@@ -3,6 +3,7 @@
 import datetime
 import sys
 from pathlib import Path
+from zipfile import BadZipFile
 
 import openpyxl
 import polars as pl
@@ -83,16 +84,38 @@ def fetch_workbook():
         RAW_DIR
         / f"ine_censo2024_hogares_viviendas_{datetime.datetime.now(UTC):%Y%m%dT%H%M%SZ}.xlsx"
     )
+    recoverable = (
+        requests.RequestException,
+        OSError,
+        BadZipFile,
+        KeyError,
+        IndexError,
+        TypeError,
+        ValueError,
+        pl.exceptions.PolarsError,
+    )
     try:
         with fetch_with_retry(SOURCE_URL, timeout=60, headers=REQUEST_HEADERS) as response:
             response.raise_for_status()
             target.write_bytes(response.content)
+        _assert_usable_workbook(target)
         return target, "live"
-    except (requests.RequestException, OSError):
-        snapshots = sorted(RAW_DIR.glob("ine_censo2024_hogares_viviendas_*.xlsx"))
-        if not snapshots:
-            raise
-        return snapshots[-1], "fallback"
+    except recoverable:
+        snapshots = sorted(RAW_DIR.glob("ine_censo2024_hogares_viviendas_*.xlsx"), reverse=True)
+        for snapshot in snapshots:
+            try:
+                _assert_usable_workbook(snapshot)
+            except recoverable:
+                continue
+            return snapshot, "fallback"
+        raise
+
+
+def _assert_usable_workbook(path: Path) -> None:
+    """Rechaza XLSX corruptos, vacíos o sin una tabla de hogares reconocible."""
+    df = parse_workbook(path)
+    if df.is_empty() or "hogares_censados" not in df.columns:
+        raise ValueError(f"Censo viviendas/hogares sin registros utilizables: {path.name}")
 
 
 def parse_workbook(path):
