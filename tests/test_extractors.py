@@ -1303,6 +1303,19 @@ class ResExtractorTests(unittest.TestCase):
         pkg.__enter__.return_value = pkg
         return pkg
 
+    @staticmethod
+    def _valid_res_csv(year: int = 2026) -> bytes:
+        """CSV anual realista: columnas requeridas, delimitador y un RUT útil."""
+        return (
+            "ID;RUT;Razon Social;Fecha de actuacion (1era firma);"
+            "Fecha de registro (ultima firma);Fecha de aprobacion x SII;"
+            "Anio;Mes;Comuna Tributaria;Region Tributaria;"
+            "Codigo de sociedad;Tipo de actuacion;Capital;Comuna Social;Region Social\\n"
+            f"1;76286049-K;Empresa Ejemplo EIRL;02-05-{year};02-05-{year};"
+            f"02-05-{year};{year};Mayo;Santiago;13;EIRL;CONSTITUCION;"
+            "1000000;Santiago;13\\n"
+        ).encode("utf-8")
+
     def _write_staging(self, tmpdir: str, years: list[int]) -> None:
         """Escribe un staging consolidado sintético (columnas normalizadas,
         como las escribe write_csv del extractor) con filas de los años dados."""
@@ -1354,7 +1367,7 @@ class ResExtractorTests(unittest.TestCase):
         resources = [self._resource("previous", 2025), self._resource("current", 2026)]
         package = self._package_mock(resources)
         live_bytes = b"live csv data"
-        old_bytes = b"snapshot csv data"
+        old_bytes = self._valid_res_csv(2025)
         with tempfile.TemporaryDirectory() as tmpdir:
             raw = Path(tmpdir)
             snapshot = raw / "res_Constituciones_del_año_2025_20261001T010101Z.csv"
@@ -1388,7 +1401,7 @@ class ResExtractorTests(unittest.TestCase):
         package = self._package_mock([resource])
         with tempfile.TemporaryDirectory() as tmpdir:
             snapshot = Path(tmpdir) / "res_Constituciones_del_año_2026_20261001T010101Z.csv"
-            snapshot.write_bytes(b"archived data")
+            snapshot.write_bytes(self._valid_res_csv())
             with (
                 patch.object(res_extractor, "RAW_DIR", tmpdir),
                 patch.object(res_extractor, "_staging_years_present", return_value=None),
@@ -1400,7 +1413,7 @@ class ResExtractorTests(unittest.TestCase):
             ):
                 contents, mode, detail = res_extractor.fetch_resources()
 
-        self.assertEqual((contents, mode), ([b"archived data"], "fallback"))
+        self.assertEqual((contents, mode), ([self._valid_res_csv()], "fallback"))
         self.assertIn(snapshot.name, detail)
 
     def test_res_failed_resource_without_snapshot_fails_closed(self):
@@ -1420,6 +1433,116 @@ class ResExtractorTests(unittest.TestCase):
                 self.assertRaisesRegex(SystemExit, "No hay snapshot raw de respaldo"),
             ):
                 res_extractor.fetch_resources()
+
+    def test_res_recovery_skips_html_and_header_only_newer_snapshots(self):
+        """La captura más reciente puede ser HTML 200 o CSV sin registros."""
+        from requests import RequestException
+
+        package = self._package_mock([self._resource("current", 2026)])
+        with tempfile.TemporaryDirectory() as tmpdir:
+            raw = Path(tmpdir)
+            prefix = "res_Constituciones_del_año_2026_"
+            older = raw / f"{prefix}20261001T010101Z.csv"
+            newer_empty = raw / f"{prefix}20261002T010101Z.csv"
+            newest_html = raw / f"{prefix}20261003T010101Z.csv"
+            good_bytes = self._valid_res_csv()
+            older.write_bytes(good_bytes)
+            newer_empty.write_bytes(good_bytes.split(b"\\n", 1)[0] + b"\\n")
+            newest_html.write_bytes(b"<html>Temporarily unavailable</html>")
+            with (
+                patch.object(res_extractor, "RAW_DIR", tmpdir),
+                patch.object(res_extractor, "_staging_years_present", return_value=None),
+                patch.object(
+                    res_extractor,
+                    "fetch_with_retry",
+                    side_effect=[package, RequestException("offline")],
+                ),
+            ):
+                contents, mode, detail = res_extractor.fetch_resources()
+
+            self.assertEqual((contents, mode), ([good_bytes], "fallback"))
+            self.assertIn(older.name, detail)
+            self.assertNotIn(newest_html.name, detail)
+            self.assertNotIn(newer_empty.name, detail)
+            self.assertEqual(newest_html.read_bytes(), b"<html>Temporarily unavailable</html>")
+
+    def test_res_recovery_skips_invalid_utf8_newer_snapshot(self):
+        """Un CSV con bytes inválidos no oculta el respaldo anterior."""
+        from requests import RequestException
+
+        package = self._package_mock([self._resource("current", 2026)])
+        with tempfile.TemporaryDirectory() as tmpdir:
+            raw = Path(tmpdir)
+            prefix = "res_Constituciones_del_año_2026_"
+            older = raw / f"{prefix}20261001T010101Z.csv"
+            newest = raw / f"{prefix}20261002T010101Z.csv"
+            older.write_bytes(self._valid_res_csv())
+            newest.write_bytes(b"RUT;Razon Social\\n\\xff\\xfe")
+            with (
+                patch.object(res_extractor, "RAW_DIR", tmpdir),
+                patch.object(res_extractor, "_staging_years_present", return_value=None),
+                patch.object(
+                    res_extractor,
+                    "fetch_with_retry",
+                    side_effect=[package, RequestException("offline")],
+                ),
+            ):
+                contents, mode, detail = res_extractor.fetch_resources()
+
+        self.assertEqual((contents, mode), ([self._valid_res_csv()], "fallback"))
+        self.assertIn(older.name, detail)
+
+    def test_res_recovery_all_snapshots_invalid_fails_closed(self):
+        """No publicar CSV vacío o corrupto cuando faltan respaldos utilizables."""
+        from requests import RequestException
+
+        package = self._package_mock([self._resource("current", 2026)])
+        with tempfile.TemporaryDirectory() as tmpdir:
+            raw = Path(tmpdir)
+            (raw / "res_Constituciones_del_año_2026_20261001T010101Z.csv").write_bytes(
+                b"<html>Error 503</html>"
+            )
+            (raw / "res_Constituciones_del_año_2026_20261002T010101Z.csv").write_bytes(
+                b"RUT;Razon Social\\n"
+            )
+            with (
+                patch.object(res_extractor, "RAW_DIR", tmpdir),
+                patch.object(res_extractor, "_staging_years_present", return_value=None),
+                patch.object(
+                    res_extractor,
+                    "fetch_with_retry",
+                    side_effect=[package, RequestException("offline")],
+                ),
+                self.assertRaisesRegex(SystemExit, "No hay snapshot raw de respaldo utilizable"),
+            ):
+                res_extractor.fetch_resources()
+
+    def test_res_recovery_prefers_newest_usable_snapshot(self):
+        """Selecciona el más reciente de dos CSV válidos y declara fallback."""
+        from requests import RequestException
+
+        package = self._package_mock([self._resource("current", 2026)])
+        with tempfile.TemporaryDirectory() as tmpdir:
+            raw = Path(tmpdir)
+            prefix = "res_Constituciones_del_año_2026_"
+            older = raw / f"{prefix}20261001T010101Z.csv"
+            newest = raw / f"{prefix}20261002T010101Z.csv"
+            older.write_bytes(self._valid_res_csv(2025))
+            newest.write_bytes(self._valid_res_csv(2026))
+            with (
+                patch.object(res_extractor, "RAW_DIR", tmpdir),
+                patch.object(res_extractor, "_staging_years_present", return_value=None),
+                patch.object(
+                    res_extractor,
+                    "fetch_with_retry",
+                    side_effect=[package, RequestException("offline")],
+                ),
+            ):
+                contents, mode, detail = res_extractor.fetch_resources()
+
+        self.assertEqual((contents, mode), ([self._valid_res_csv(2026)], "fallback"))
+        self.assertIn(newest.name, detail)
+        self.assertNotIn(older.name, detail)
 
     def test_incremental_fetches_previous_year_when_missing(self):
         """Plan 076: si el año anterior falta del staging (la fuente puede
