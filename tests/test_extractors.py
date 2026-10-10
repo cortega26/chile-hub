@@ -5073,6 +5073,96 @@ class CalidadAireExtractorTests(unittest.TestCase):
             self.assertEqual(mode, "fallback")
             self.assertTrue(any("sinca_listadomapa_test.json" in n for n in notes))
 
+    def test_snapshot_recovery_skips_corrupt_and_empty_newer_files(self):
+        """Un JSON corrupto o sin mediciones no bloquea un respaldo anterior."""
+        import requests as _requests
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            raw = Path(tmpdir)
+            older = raw / "sinca_listadomapa_20261001.json"
+            older.write_text(json.dumps(self._payload()), encoding="utf-8")
+            (raw / "sinca_listadomapa_20261002.json").write_text(
+                "invalid json", encoding="utf-8"
+            )
+            (raw / "sinca_listadomapa_20261003.json").write_text(
+                json.dumps({"error": "offline"}), encoding="utf-8"
+            )
+            with (
+                patch.object(
+                    calidad_aire_extractor, "_load_comunas_lookup", return_value=self.FAKE_LOOKUP
+                ),
+                patch.object(calidad_aire_extractor, "RAW_DIR", tmpdir),
+                patch.object(calidad_aire_extractor, "ensure_staging_directories"),
+                patch.object(
+                    calidad_aire_extractor,
+                    "fetch_with_retry",
+                    side_effect=_requests.RequestException("offline"),
+                ),
+            ):
+                rows, mode, _, notes = calidad_aire_extractor.fetch_data()
+
+        self.assertEqual(mode, "fallback")
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["codigo_comuna"], "13144")
+        self.assertTrue(any(older.name in n and "usando snapshot" in n for n in notes))
+        self.assertTrue(any("20261002" in n and "inválido" in n for n in notes))
+        self.assertTrue(any("20261003" in n and "inválido" in n for n in notes))
+
+    def test_snapshot_recovery_all_invalid_uses_curated_fallback(self):
+        """Sin snapshots legibles y útiles, se preserva la procedencia fallback."""
+        import requests as _requests
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            raw = Path(tmpdir)
+            (raw / "sinca_listadomapa_20261001.json").write_text(
+                "invalid json", encoding="utf-8"
+            )
+            (raw / "sinca_listadomapa_20261002.json").write_text(
+                "[]", encoding="utf-8"
+            )
+            with (
+                patch.object(
+                    calidad_aire_extractor, "_load_comunas_lookup", return_value=self.FAKE_LOOKUP
+                ),
+                patch.object(calidad_aire_extractor, "RAW_DIR", tmpdir),
+                patch.object(calidad_aire_extractor, "ensure_staging_directories"),
+                patch.object(
+                    calidad_aire_extractor,
+                    "fetch_with_retry",
+                    side_effect=_requests.RequestException("offline"),
+                ),
+            ):
+                rows, mode, _, notes = calidad_aire_extractor.fetch_data()
+
+        self.assertEqual(mode, "fallback")
+        self.assertEqual(rows, calidad_aire_extractor.FALLBACK_ROWS)
+        self.assertEqual(sum("snapshot SINCA inválido" in n for n in notes), 2)
+        self.assertTrue(any("sin snapshots SINCA válidos" in n for n in notes))
+
+    def test_valid_sinca_download_remains_live(self):
+        """Una descarga correcta sigue marcada live y almacena su captura."""
+        response = MagicMock()
+        response.content = json.dumps(self._payload()).encode("utf-8")
+        response.json.return_value = self._payload()
+        response.__enter__.return_value = response
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            target = Path(tmpdir) / "sinca_listadomapa_20261010.json"
+            with (
+                patch.object(
+                    calidad_aire_extractor, "_load_comunas_lookup", return_value=self.FAKE_LOOKUP
+                ),
+                patch.object(calidad_aire_extractor, "_snapshot_path", return_value=target),
+                patch.object(calidad_aire_extractor, "ensure_staging_directories"),
+                patch.object(calidad_aire_extractor, "fetch_with_retry", return_value=response),
+            ):
+                rows, mode, _, notes = calidad_aire_extractor.fetch_data()
+
+            self.assertEqual(mode, "live")
+            self.assertEqual(len(rows), 1)
+            self.assertTrue(target.exists())
+            self.assertTrue(any("filas diarias nuevas" in n for n in notes))
+
     def test_fetch_data_without_snapshot_is_fallback(self):
         import requests as _requests
 
