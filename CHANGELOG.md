@@ -12,6 +12,36 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.47.17 - 2026-10-10
+
+### Corregido
+
+- Reject invalid RES HTTP 200 bodies before accepting live data
+  ([#153](https://github.com/cortega26/chile-hub/pull/153),
+  [`1d2aaf1`](https://github.com/cortega26/chile-hub/commit/1d2aaf1c85e8d22c6c5b9ee1cf5bbe9e91b7d8f4))
+
+- Validate RES HTTP 200 bodies before treating them as live
+  ([#153](https://github.com/cortega26/chile-hub/pull/153),
+  [`1d2aaf1`](https://github.com/cortega26/chile-hub/commit/1d2aaf1c85e8d22c6c5b9ee1cf5bbe9e91b7d8f4))
+
+### Code Style
+
+- Align RES mixed-response regression with Ruff formatter
+  ([#153](https://github.com/cortega26/chile-hub/pull/153),
+  [`1d2aaf1`](https://github.com/cortega26/chile-hub/commit/1d2aaf1c85e8d22c6c5b9ee1cf5bbe9e91b7d8f4))
+
+### Documentación
+
+- Sync README to 1352 collected tests ([#153](https://github.com/cortega26/chile-hub/pull/153),
+  [`1d2aaf1`](https://github.com/cortega26/chile-hub/commit/1d2aaf1c85e8d22c6c5b9ee1cf5bbe9e91b7d8f4))
+
+### Tests
+
+- Cover HTTP 200 RES validation, snapshot recovery and fail-closed behavior
+  ([#153](https://github.com/cortega26/chile-hub/pull/153),
+  [`1d2aaf1`](https://github.com/cortega26/chile-hub/commit/1d2aaf1c85e8d22c6c5b9ee1cf5bbe9e91b7d8f4))
+
+
 ## 1.47.16 - 2026-10-10
 
 ### Corregido
