@@ -12,6 +12,20 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.47.12 - 2026-10-10
+
+### Corregido
+
+- Validate MINSAL CSV and recover usable snapshots
+  ([#148](https://github.com/cortega26/chile-hub/pull/148),
+  [`d26fc4f`](https://github.com/cortega26/chile-hub/commit/d26fc4ff30827518ab62309f7fa95b57edeb6a97))
+
+### Mantenimiento
+
+- **ci**: Sync coverage badge from verified tests [skip ci]
+  ([`0ca473a`](https://github.com/cortega26/chile-hub/commit/0ca473a13c460e56b75f1ab2dfdec6a278508e20))
+
+
 ## 1.47.11 - 2026-10-10
 
 ### Corregido
