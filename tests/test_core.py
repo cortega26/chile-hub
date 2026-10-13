@@ -1031,6 +1031,35 @@ class ArtifactStoreTests(unittest.TestCase):
         self.assertTrue(hub.health().get("_test_marker_134a"))
 
 
+class QueryDelegationTests(unittest.TestCase):
+    """Plan 134c (auditoría 2026-10-13): motor de consulta en `_query` con la
+    fachada delegando; `sql()` se queda en el hub a propósito (STOP del plan,
+    indicado por el advisor: estado lazy de instancia + test que parchea
+    `ChileHub.get_output_path` a nivel clase después de crear el hub)."""
+
+    def test_hub_query_methods_delegate_to_query_module(self):
+        import inspect as _inspect
+
+        for method in ("cross_view", "resolve_comunas", "resolve_regiones", "resolve_by_coords"):
+            with self.subTest(method=method):
+                src = _inspect.getsource(getattr(ChileHub, method))
+                self.assertIn("_query.", src, f"{method} no delega en _query")
+
+    def test_sql_stays_in_hub_by_documented_decision(self):
+        import inspect as _inspect
+
+        from chile_hub import _query
+
+        self.assertFalse(
+            hasattr(_query, "sql"),
+            "sql() debe quedarse en el hub (STOP del plan 134): estado lazy + "
+            "patch de clase sobre get_output_path en los tests",
+        )
+        src = _inspect.getsource(ChileHub.sql)
+        self.assertIn("_sql_views_registered", src)
+        self.assertIn("get_output_path", src)
+
+
 class ReportingGoldensTests(unittest.TestCase):
     """Plan 134b (auditoría 2026-10-13): goldens de salida EXACTA de los
     `render_*` puros movidos a `_reporting`.
