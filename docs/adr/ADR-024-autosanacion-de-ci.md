@@ -52,8 +52,10 @@ con release); esta ADR los declara política y define cuándo aplican.
    de ruff/mypy pasan a `repo: local` + `language: system` con `uv run`
    (dev-pin de `pyproject.toml` + `uv.lock`), y CI corre `uv run ruff` en
    lugar de `uvx ruff@X`: la versión deja de existir en tres lugares. Se
-   elimina el step muerto de Codecov y el barrido de pins se generaliza a
-   todos los workflows exigiendo SHA de 40 hex + comentario `# vX.Y.Z`.
+   elimina el step muerto de Codecov, los `uvx twine` sin pin de los jobs de
+   packaging pasan a `uv run --frozen --extra dev` (lock) y el barrido de
+   pins se generaliza a todos los workflows exigiendo SHA de 40 hex +
+   comentario `# vX.Y.Z`.
 2. **Guardrails de automejora.** `SingleSourceToolingGuardrailTests` prohíbe
    reintroducir los `rev` de mirrores; `NoHardcodedActionPinGuardrailTests`
    prohíbe embeber SHAs de acciones como literal en tests/scripts;

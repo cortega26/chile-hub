@@ -499,7 +499,9 @@ jobs:
       - name: Build wheel and source distribution
         run: |
           uv build
-          uvx twine check dist/*
+          # twine desde el lock (ADR-024), no `uvx` sin pin resolviendo
+          # latest en cada corrida.
+          uv run --frozen --extra dev twine check dist/*
 
       - name: Install wheel and smoke test CLI
         run: |

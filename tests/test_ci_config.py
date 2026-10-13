@@ -186,6 +186,11 @@ class EphemeralInstallPinGuardrailTests(unittest.TestCase):
     release upstream comprometida o rompedora cambiaba el resultado de un
     job privilegiado sin ningún diff en el repo. Fix (Plan 112): extra
     `publish` pinneado + lock, y `==` en cada `--with`.
+
+    Cuarta ruta (2026-10-13): `uvx twine check dist/*` en package-quality
+    (pipeline-check.yml) y testpypi.yml resolvía twine latest fuera del
+    lock. Fix (ADR-024): `uv run --frozen --extra dev twine` desde el lock,
+    más este guardrail de que todo `uvx` declare `@X.Y.Z`.
     """
 
     def test_ephemeral_scrapling_fetch_pins_every_with_flag(self):
@@ -205,6 +210,24 @@ class EphemeralInstallPinGuardrailTests(unittest.TestCase):
             "Todo `--with` del entorno efímero debe fijar versión exacta "
             "(sin pin, uv resuelve latest en cada corrida fuera del lock): "
             f"{unpinned}",
+        )
+
+    def test_workflows_pin_every_uvx_invocation(self):
+        """`uvx` sin `@X.Y.Z` resuelve latest fuera de uv.lock (ruta twine,
+        2026-10-13). Preferir `uv run --frozen` desde el lock; si hace falta
+        `uvx`, siempre con versión fija."""
+        unpinned = []
+        for workflow in sorted((ROOT_DIR / ".github" / "workflows").glob("*.yml")):
+            for lineno, line in enumerate(
+                workflow.read_text(encoding="utf-8").splitlines(), start=1
+            ):
+                if line.lstrip().startswith("#"):
+                    continue
+                for tool in re.findall(r"\buvx\s+([^\s]+)", line):
+                    if "@" not in tool:
+                        unpinned.append(f"{workflow.name}:{lineno}: uvx {tool}")
+        self.assertEqual(
+            unpinned, [], "uvx sin versión fija (fuera de uv.lock): " + "; ".join(unpinned)
         )
 
     def test_pypi_release_uses_locked_publish_extra_for_hf(self):

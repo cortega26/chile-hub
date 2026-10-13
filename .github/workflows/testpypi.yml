@@ -30,7 +30,8 @@ jobs:
         id: build-package
         run: |
           uv build
-          uvx twine check dist/*
+          # twine desde el lock (ADR-024), no `uvx` sin pin.
+          uv run --frozen --extra dev twine check dist/*
           version="$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")"
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
