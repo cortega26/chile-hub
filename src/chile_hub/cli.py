@@ -69,12 +69,29 @@ def _output_dataframe(df, output, fmt):
         print(df)
 
 
-def build_parser():  # pragma: no cover — entry point de CLI, testeado vía integración
-    parser = argparse.ArgumentParser(description="CLI minima para inspeccionar chile-hub")
-    subparsers = parser.add_subparsers(dest="command", required=True)
+def _add_format_parser(
+    subparsers,
+    name,
+    help_text,
+    format_help,
+    *,
+    choices=("json", "table"),
+    default="json",
+    exit_code=False,
+):
+    """Subparser con `--format` (y `--exit-code` opcional). Plan 132d."""
+    parser = subparsers.add_parser(name, help=help_text)
+    parser.add_argument("--format", choices=list(choices), default=default, help=format_help)
+    if exit_code:
+        parser.add_argument(
+            "--exit-code",
+            action="store_true",
+            help="Retorna exit code 1 si overall_status no es 'ok'.",
+        )
+    return parser
 
-    subparsers.add_parser("version", help="Mostrar version instalada de chile-hub")
 
+def _add_cache_parser(subparsers):
     cache_parser = subparsers.add_parser("cache", help="Administrar cache local de datos")
     cache_subparsers = cache_parser.add_subparsers(dest="cache_command", required=True)
     cache_subparsers.add_parser("status", help="Mostrar estado del cache local")
@@ -88,11 +105,13 @@ def build_parser():  # pragma: no cover — entry point de CLI, testeado vía in
     )
     cache_subparsers.add_parser("clear", help="Eliminar cache local de chile-hub")
 
-    subparsers.add_parser("list", help="Listar datasets disponibles")
 
+def _add_show_parser(subparsers):
     show_parser = subparsers.add_parser("show", help="Mostrar metadata de un dataset")
     show_parser.add_argument("dataset", help="Nombre del dataset")
 
+
+def _add_path_parser(subparsers):
     path_parser = subparsers.add_parser("path", help="Resolver path de salida de un dataset")
     path_parser.add_argument("dataset", help="Nombre del dataset")
     path_parser.add_argument(
@@ -101,6 +120,8 @@ def build_parser():  # pragma: no cover — entry point de CLI, testeado vía in
         help="Tipo de output a resolver, por ejemplo parquet, json o sqlite_table",
     )
 
+
+def _add_example_parser(subparsers):
     example_parser = subparsers.add_parser("example", help="Mostrar ejemplo de uso de un dataset")
     example_parser.add_argument("dataset", help="Nombre del dataset")
     example_parser.add_argument(
@@ -109,6 +130,8 @@ def build_parser():  # pragma: no cover — entry point de CLI, testeado vía in
         help="Tipo de ejemplo a mostrar, por ejemplo python, duckdb o cli",
     )
 
+
+def _add_artifacts_parser(subparsers):
     artifacts_parser = subparsers.add_parser("artifacts", help="Mostrar artefactos publicables")
     artifacts_parser.add_argument(
         "dataset",
@@ -116,6 +139,8 @@ def build_parser():  # pragma: no cover — entry point de CLI, testeado vía in
         help="Nombre opcional de dataset para filtrar artefactos",
     )
 
+
+def _add_shared_artifacts_parser(subparsers):
     shared_artifacts_parser = subparsers.add_parser(
         "shared-artifacts", help="Mostrar artefactos compartidos del hub"
     )
@@ -131,14 +156,8 @@ def build_parser():  # pragma: no cover — entry point de CLI, testeado vía in
         help="Formato de salida de shared-artifacts",
     )
 
-    reports_parser = subparsers.add_parser("reports", help="Listar reportes compartidos del hub")
-    reports_parser.add_argument(
-        "--format",
-        choices=["json", "table"],
-        default="json",
-        help="Formato de salida del indice de reportes",
-    )
 
+def _add_report_parser(subparsers):
     report_parser = subparsers.add_parser(
         "report", help="Resolver metadata de un reporte compartido"
     )
@@ -151,101 +170,8 @@ def build_parser():  # pragma: no cover — entry point de CLI, testeado vía in
         help="Formato del reporte, por ejemplo json o markdown",
     )
 
-    inventory_parser = subparsers.add_parser(
-        "inventory", help="Mostrar inventario compacto de datasets y artefactos"
-    )
-    inventory_parser.add_argument(
-        "--format",
-        choices=["json", "table"],
-        default="json",
-        help="Formato de salida del inventario",
-    )
-    snapshot_parser = subparsers.add_parser(
-        "snapshot", help="Mostrar snapshot humano y compacto del hub"
-    )
-    snapshot_parser.add_argument(
-        "--format",
-        choices=["text", "table"],
-        default="text",
-        help="Formato de salida del snapshot",
-    )
-    overview_parser = subparsers.add_parser(
-        "overview", help="Mostrar vista agregada compacta del hub"
-    )
-    overview_parser.add_argument(
-        "--format",
-        choices=["json", "table"],
-        default="json",
-        help="Formato de salida de overview",
-    )
-    status_parser = subparsers.add_parser(
-        "status", help="Mostrar status operativo compacto del hub"
-    )
-    status_parser.add_argument(
-        "--format",
-        choices=["json", "table"],
-        default="json",
-        help="Formato de salida de status",
-    )
-    status_parser.add_argument(
-        "--exit-code",
-        action="store_true",
-        help="Retorna exit code 1 si overall_status no es 'ok'.",
-    )
-    subparsers.add_parser("dataset-status", help="Mostrar status detallado por dataset")
-    subparsers.add_parser("dataset-changelog", help="Mostrar changelog de datasets")
-    subparsers.add_parser("source-readiness", help="Mostrar madurez de fuente por dataset")
-    subparsers.add_parser("dataset-quality", help="Mostrar puntuacion de calidad por dataset")
-    health_parser = subparsers.add_parser("health", help="Mostrar salud agregada del hub")
-    health_parser.add_argument(
-        "--format",
-        choices=["json", "table"],
-        default="json",
-        help="Formato de salida de health",
-    )
-    health_parser.add_argument(
-        "--exit-code",
-        action="store_true",
-        help="Retorna exit code 1 si overall_status no es 'ok'.",
-    )
-    subparsers.add_parser("bundle", help="Mostrar bundle consolidado del hub")
-    freshness_audit_parser = subparsers.add_parser(
-        "freshness-audit",
-        help="Recalcular frescura contra el reloj actual sin reconstruir el hub",
-    )
-    freshness_audit_parser.add_argument(
-        "--format",
-        choices=["json", "table"],
-        default="json",
-        help="Formato de salida de freshness-audit",
-    )
-    runtime_status_parser = subparsers.add_parser(
-        "runtime-status",
-        help="Combinar estado build y estado actual recalculado del hub",
-    )
-    runtime_status_parser.add_argument(
-        "--format",
-        choices=["json", "table"],
-        default="json",
-        help="Formato de salida de runtime-status",
-    )
-    top_issue_parser = subparsers.add_parser(
-        "top-issue",
-        help="Mostrar la capa prioritaria que requiere atención operativa",
-    )
-    top_issue_parser.add_argument(
-        "--format",
-        choices=["json", "text", "table"],
-        default="json",
-        help="Formato de salida de top-issue",
-    )
-    packages_parser = subparsers.add_parser("packages", help="Mostrar paquetes publicables del hub")
-    packages_parser.add_argument(
-        "--format",
-        choices=["json", "table"],
-        default="json",
-        help="Formato de salida de packages",
-    )
+
+def _add_package_parsers(subparsers):
     package_parser = subparsers.add_parser("package", help="Mostrar package principal del hub")
     package_parser.add_argument(
         "--type", default="zip", help="package_type a resolver, por ejemplo zip"
@@ -257,42 +183,9 @@ def build_parser():  # pragma: no cover — entry point de CLI, testeado vía in
     verify_package_parser.add_argument(
         "--type", default="zip", help="package_type a resolver, por ejemplo zip"
     )
-    redistribution_parser = subparsers.add_parser(
-        "redistribution", help="Mostrar inventario de redistribucion del hub"
-    )
-    redistribution_parser.add_argument(
-        "--format",
-        choices=["json", "table"],
-        default="json",
-        help="Formato de salida de redistribution",
-    )
-    provenance_parser = subparsers.add_parser(
-        "provenance", help="Mostrar inventario de procedencia del hub"
-    )
-    provenance_parser.add_argument(
-        "--format",
-        choices=["json", "table"],
-        default="json",
-        help="Formato de salida de provenance",
-    )
-    drift_parser = subparsers.add_parser(
-        "drift", help="Mostrar inventario de drift operativo del hub"
-    )
-    drift_parser.add_argument(
-        "--format",
-        choices=["json", "table"],
-        default="json",
-        help="Formato de salida de drift",
-    )
 
-    summary_parser = subparsers.add_parser("summary", help="Mostrar resumen breve de datasets")
-    summary_parser.add_argument(
-        "--format",
-        choices=["json", "table"],
-        default="json",
-        help="Formato de salida del summary",
-    )
 
+def _add_export_parser(subparsers):
     export_parser = subparsers.add_parser(
         "export", help="Exportar un dataset a un archivo (CSV, JSON o Parquet)"
     )
@@ -309,29 +202,25 @@ def build_parser():  # pragma: no cover — entry point de CLI, testeado vía in
         help="Ruta de destino del archivo exportado",
     )
 
-    check_sources_parser = subparsers.add_parser(
+
+def _add_check_sources_parser(subparsers):
+    parser = _add_format_parser(
+        subparsers,
         "check-sources",
-        help="Verificar el estado de conexión de las fuentes externas oficiales",
-    )
-    check_sources_parser.add_argument(
-        "--format",
-        choices=["json", "table"],
+        "Verificar el estado de conexión de las fuentes externas oficiales",
+        "Formato de salida de check-sources",
         default="table",
-        help="Formato de salida de check-sources",
+        exit_code=True,
     )
-    check_sources_parser.add_argument(
+    parser.add_argument(
         "--timeout",
         type=int,
         default=5,
         help="Timeout en segundos para la conexión HTTP",
     )
-    check_sources_parser.add_argument(
-        "--exit-code",
-        action="store_true",
-        help="Retorna exit code 1 si alguna fuente está offline.",
-    )
 
-    # Subcomando: cross
+
+def _add_cross_parser(subparsers):
     cross_parser = subparsers.add_parser("cross", help="Cruza datasets por clave territorial comun")
     cross_parser.add_argument("datasets", nargs="+", help="Datasets a cruzar (min 2)")
     cross_parser.add_argument(
@@ -347,37 +236,22 @@ def build_parser():  # pragma: no cover — entry point de CLI, testeado vía in
         "--output", default=None, help="Archivo de salida (.csv, .parquet, o .json)"
     )
 
-    # Subcomando: resolve
-    resolve_parser = subparsers.add_parser(
-        "resolve", help="Resuelve nombres de comuna a codigos CUT (match determinista)"
-    )
-    resolve_parser.add_argument("names", nargs="+", help="Nombres de comuna a resolver")
-    resolve_parser.add_argument(
+
+def _add_resolve_parser(subparsers, name, help_text, argument_help):
+    parser = subparsers.add_parser(name, help=help_text)
+    parser.add_argument("names", nargs="+", help=argument_help)
+    parser.add_argument(
         "--format",
         choices=["json", "table"],
         default="table",
         help="Formato de salida (default: table)",
     )
-    resolve_parser.add_argument(
+    parser.add_argument(
         "--output", default=None, help="Archivo de salida (.csv, .parquet, o .json)"
     )
 
-    # Subcomando: resolve-regiones
-    resolve_regiones_parser = subparsers.add_parser(
-        "resolve-regiones", help="Resuelve nombres de región a códigos CUT (match determinista)"
-    )
-    resolve_regiones_parser.add_argument("names", nargs="+", help="Nombres de región a resolver")
-    resolve_regiones_parser.add_argument(
-        "--format",
-        choices=["json", "table"],
-        default="table",
-        help="Formato de salida (default: table)",
-    )
-    resolve_regiones_parser.add_argument(
-        "--output", default=None, help="Archivo de salida (.csv, .parquet, o .json)"
-    )
 
-    # Subcomando: search
+def _add_search_parser(subparsers):
     search_parser = subparsers.add_parser(
         "search", help="Busca datasets por keyword, fuente o madurez"
     )
@@ -397,7 +271,8 @@ def build_parser():  # pragma: no cover — entry point de CLI, testeado vía in
         help="Formato de salida (default: json)",
     )
 
-    # Subcomando: validate
+
+def _add_validate_parser(subparsers):
     validate_parser = subparsers.add_parser(
         "validate", help="Valida un dataset del hub o un archivo CSV/Parquet contra su schema"
     )
@@ -412,317 +287,538 @@ def build_parser():  # pragma: no cover — entry point de CLI, testeado vía in
         "un archivo externo; opcional si target es un dataset del hub.",
     )
 
+
+def build_parser():
+    parser = argparse.ArgumentParser(description="CLI minima para inspeccionar chile-hub")
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    subparsers.add_parser("version", help="Mostrar version instalada de chile-hub")
+
+    _add_cache_parser(subparsers)
+
+    subparsers.add_parser("list", help="Listar datasets disponibles")
+
+    _add_show_parser(subparsers)
+    _add_path_parser(subparsers)
+    _add_example_parser(subparsers)
+    _add_artifacts_parser(subparsers)
+    _add_shared_artifacts_parser(subparsers)
+
+    _add_format_parser(
+        subparsers,
+        "reports",
+        "Listar reportes compartidos del hub",
+        "Formato de salida del indice de reportes",
+    )
+    _add_report_parser(subparsers)
+    _add_format_parser(
+        subparsers,
+        "inventory",
+        "Mostrar inventario compacto de datasets y artefactos",
+        "Formato de salida del inventario",
+    )
+    _add_format_parser(
+        subparsers,
+        "snapshot",
+        "Mostrar snapshot humano y compacto del hub",
+        "Formato de salida del snapshot",
+        choices=("text", "table"),
+        default="text",
+    )
+    _add_format_parser(
+        subparsers,
+        "overview",
+        "Mostrar vista agregada compacta del hub",
+        "Formato de salida de overview",
+    )
+    _add_format_parser(
+        subparsers,
+        "status",
+        "Mostrar status operativo compacto del hub",
+        "Formato de salida de status",
+        exit_code=True,
+    )
+    subparsers.add_parser("dataset-status", help="Mostrar status detallado por dataset")
+    subparsers.add_parser("dataset-changelog", help="Mostrar changelog de datasets")
+    subparsers.add_parser("source-readiness", help="Mostrar madurez de fuente por dataset")
+    subparsers.add_parser("dataset-quality", help="Mostrar puntuacion de calidad por dataset")
+    _add_format_parser(
+        subparsers,
+        "health",
+        "Mostrar salud agregada del hub",
+        "Formato de salida de health",
+        exit_code=True,
+    )
+    subparsers.add_parser("bundle", help="Mostrar bundle consolidado del hub")
+    _add_format_parser(
+        subparsers,
+        "freshness-audit",
+        "Recalcular frescura contra el reloj actual sin reconstruir el hub",
+        "Formato de salida de freshness-audit",
+    )
+    _add_format_parser(
+        subparsers,
+        "runtime-status",
+        "Combinar estado build y estado actual recalculado del hub",
+        "Formato de salida de runtime-status",
+    )
+    _add_format_parser(
+        subparsers,
+        "top-issue",
+        "Mostrar la capa prioritaria que requiere atención operativa",
+        "Formato de salida de top-issue",
+        choices=("json", "text", "table"),
+    )
+    _add_format_parser(
+        subparsers,
+        "packages",
+        "Mostrar paquetes publicables del hub",
+        "Formato de salida de packages",
+    )
+    _add_package_parsers(subparsers)
+    _add_format_parser(
+        subparsers,
+        "redistribution",
+        "Mostrar inventario de redistribucion del hub",
+        "Formato de salida de redistribution",
+    )
+    _add_format_parser(
+        subparsers,
+        "provenance",
+        "Mostrar inventario de procedencia del hub",
+        "Formato de salida de provenance",
+    )
+    _add_format_parser(
+        subparsers,
+        "drift",
+        "Mostrar inventario de drift operativo del hub",
+        "Formato de salida de drift",
+    )
+
+    _add_format_parser(
+        subparsers, "summary", "Mostrar resumen breve de datasets", "Formato de salida del summary"
+    )
+
+    _add_export_parser(subparsers)
+    _add_check_sources_parser(subparsers)
+
+    # Subcomando: cross
+    _add_cross_parser(subparsers)
+
+    # Subcomando: resolve
+    _add_resolve_parser(
+        subparsers,
+        "resolve",
+        "Resuelve nombres de comuna a codigos CUT (match determinista)",
+        "Nombres de comuna a resolver",
+    )
+
+    # Subcomando: resolve-regiones
+    _add_resolve_parser(
+        subparsers,
+        "resolve-regiones",
+        "Resuelve nombres de región a códigos CUT (match determinista)",
+        "Nombres de región a resolver",
+    )
+
+    _add_search_parser(subparsers)
+
+    # Subcomando: validate
+    _add_validate_parser(subparsers)
+
     return parser
 
 
-def _main(argv=None):  # pragma: no cover — dispatch de CLI, testeado vía smoke tests
-    parser = build_parser()
-    args = parser.parse_args(argv)
+def _cmd_version(args):
+    try:
+        version = importlib.metadata.version("chile-hub")
+    except importlib.metadata.PackageNotFoundError:
+        version = "1.0.1"
+    print(version)
 
-    if args.command == "version":
-        try:
-            version = importlib.metadata.version("chile-hub")
-        except importlib.metadata.PackageNotFoundError:
-            version = "1.0.1"
-        print(version)
+
+def _cmd_cache(args):
+    manager = ChileHubDataManager(
+        data_version=getattr(args, "data_version", "latest"),
+    )
+    if args.cache_command == "status":
+        print(json.dumps(manager.status(), ensure_ascii=False, indent=2))
+        return
+    if args.cache_command == "update":
+        data_dir = manager.update()
+        print(data_dir)
+        return
+    if args.cache_command == "clear":
+        manager.clear()
+        print(manager.cache_root)
         return
 
-    if args.command == "cache":
-        manager = ChileHubDataManager(
-            data_version=getattr(args, "data_version", "latest"),
-        )
-        if args.cache_command == "status":
-            print(json.dumps(manager.status(), ensure_ascii=False, indent=2))
-            return
-        if args.cache_command == "update":
-            data_dir = manager.update()
-            print(data_dir)
-            return
-        if args.cache_command == "clear":
-            manager.clear()
-            print(manager.cache_root)
-            return
 
+def _cmd_export(args):
     hub = ChileHub()
+    df = hub.load_polars(args.dataset)
+    out_path = Path(args.output)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    if args.format == "csv":
+        df.write_csv(out_path)
+    elif args.format == "json":
+        df.write_json(out_path)
+    elif args.format == "parquet":
+        df.write_parquet(out_path)
+    print(
+        f"Dataset '{args.dataset}' exportado exitosamente a '{args.output}' ({args.format.upper()})"
+    )
 
-    if args.command == "export":
-        df = hub.load_polars(args.dataset)
-        out_path = Path(args.output)
-        out_path.parent.mkdir(parents=True, exist_ok=True)
-        if args.format == "csv":
-            df.write_csv(out_path)
-        elif args.format == "json":
-            df.write_json(out_path)
-        elif args.format == "parquet":
-            df.write_parquet(out_path)
+
+def _cmd_check_sources(args):
+    hub = ChileHub()
+    timeout = getattr(args, "timeout", 5)
+    results = hub.check_sources(timeout=timeout)
+    if args.format == "table":
+        print(hub.check_sources_table(results), end="")
+    else:
+        print(json.dumps(results, ensure_ascii=False, indent=2))
+    if getattr(args, "exit_code", False):
+        offline = [s for s in results if s.get("status") == "offline"]
+        if offline:
+            raise SystemExit(1)
+
+
+def _cmd_list(args):
+    hub = ChileHub()
+    for dataset in hub.list_datasets():
+        print(dataset)
+
+
+def _cmd_show(args):
+    hub = ChileHub()
+    print(json.dumps(hub.get_dataset(args.dataset), ensure_ascii=False, indent=2))
+
+
+def _cmd_path(args):
+    hub = ChileHub()
+    print(hub.get_output_path(args.dataset, args.output))
+
+
+def _cmd_example(args):
+    hub = ChileHub()
+    print(hub.example_usage(args.dataset, args.kind))
+
+
+def _cmd_artifacts(args):
+    hub = ChileHub()
+    print(json.dumps(hub.artifacts(args.dataset), ensure_ascii=False, indent=2))
+
+
+def _cmd_shared_artifacts(args):
+    hub = ChileHub()
+    if args.output == "table":
         print(
-            f"Dataset '{args.dataset}' exportado exitosamente a '{args.output}' ({args.format.upper()})"
+            hub.shared_artifacts_table(args.shared_type, args.artifact_format),
+            end="",
         )
-        return
-
-    if args.command == "check-sources":
-        timeout = getattr(args, "timeout", 5)
-        results = hub.check_sources(timeout=timeout)
-        if args.format == "table":
-            print(hub.check_sources_table(results), end="")
-        else:
-            print(json.dumps(results, ensure_ascii=False, indent=2))
-        if getattr(args, "exit_code", False):
-            offline = [s for s in results if s.get("status") == "offline"]
-            if offline:
-                raise SystemExit(1)
-        return
-
-    if args.command == "list":
-        for dataset in hub.list_datasets():
-            print(dataset)
-        return
-
-    if args.command == "show":
-        print(json.dumps(hub.get_dataset(args.dataset), ensure_ascii=False, indent=2))
-        return
-
-    if args.command == "path":
-        print(hub.get_output_path(args.dataset, args.output))
-        return
-
-    if args.command == "example":
-        print(hub.example_usage(args.dataset, args.kind))
-        return
-
-    if args.command == "artifacts":
-        print(json.dumps(hub.artifacts(args.dataset), ensure_ascii=False, indent=2))
-        return
-
-    if args.command == "shared-artifacts":
-        if args.output == "table":
-            print(
-                hub.shared_artifacts_table(args.shared_type, args.artifact_format),
-                end="",
-            )
-        else:
-            print(
-                json.dumps(
-                    hub.shared_artifacts(args.shared_type, args.artifact_format),
-                    ensure_ascii=False,
-                    indent=2,
-                )
-            )
-        return
-
-    if args.command == "reports":
-        if args.format == "table":
-            print(hub.report_index_table(), end="")
-        else:
-            print(json.dumps(hub.report_index(), ensure_ascii=False, indent=2))
-        return
-
-    if args.command == "report":
+    else:
         print(
             json.dumps(
-                hub.get_report(args.shared_type, args.format),
+                hub.shared_artifacts(args.shared_type, args.artifact_format),
                 ensure_ascii=False,
                 indent=2,
             )
         )
-        return
 
-    if args.command == "inventory":
-        if args.format == "table":
-            print(hub.inventory_table(), end="")
-        else:
-            print(json.dumps(hub.inventory(), ensure_ascii=False, indent=2))
-        return
 
-    if args.command == "snapshot":
-        if args.format == "table":
-            print(hub.snapshot_table(), end="")
-        else:
-            print(hub.snapshot_text(), end="")
-        return
+def _cmd_reports(args):
+    hub = ChileHub()
+    if args.format == "table":
+        print(hub.report_index_table(), end="")
+    else:
+        print(json.dumps(hub.report_index(), ensure_ascii=False, indent=2))
 
-    if args.command == "overview":
-        if args.format == "table":
-            print(hub.overview_table(), end="")
-        else:
-            print(json.dumps(hub.overview(), ensure_ascii=False, indent=2))
-        return
 
-    if args.command == "status":
-        if args.format == "table":
-            print(hub.status_table(), end="")
-        else:
-            print(json.dumps(hub.status(), ensure_ascii=False, indent=2))
-        if getattr(args, "exit_code", False):
-            status_data = hub.status()
-            if status_data.get("overall_status") != "ok":
-                raise SystemExit(1)
-        return
-
-    if args.command == "dataset-status":
-        print(json.dumps(hub.dataset_status(), ensure_ascii=False, indent=2))
-        return
-
-    if args.command == "dataset-changelog":
-        print(json.dumps(hub.dataset_changelog(), ensure_ascii=False, indent=2))
-        return
-
-    if args.command == "source-readiness":
-        print(json.dumps(hub.source_readiness(), ensure_ascii=False, indent=2))
-        return
-
-    if args.command == "dataset-quality":
-        print(json.dumps(hub.dataset_quality(), ensure_ascii=False, indent=2))
-        return
-
-    if args.command == "health":
-        if args.format == "table":
-            print(hub.health_table(), end="")
-        else:
-            print(json.dumps(hub.health(), ensure_ascii=False, indent=2))
-        if getattr(args, "exit_code", False):
-            health_data = hub.health()
-            if health_data.get("overall_status") != "ok":
-                raise SystemExit(1)
-        return
-
-    if args.command == "bundle":
-        print(json.dumps(hub.bundle(), ensure_ascii=False, indent=2))
-        return
-
-    if args.command == "freshness-audit":
-        if args.format == "table":
-            print(hub.freshness_audit_table(), end="")
-        else:
-            print(json.dumps(hub.freshness_audit(), ensure_ascii=False, indent=2))
-        return
-
-    if args.command == "runtime-status":
-        if args.format == "table":
-            print(hub.runtime_status_table(), end="")
-        else:
-            print(json.dumps(hub.runtime_status(), ensure_ascii=False, indent=2))
-        return
-
-    if args.command == "top-issue":
-        top_issue = hub.top_issue()
-        if args.format == "table":
-            print(hub.top_issue_table(), end="")
-        elif args.format == "text":
-            if not top_issue:
-                print("chile-hub top issue\n\nSin top issue activo.\n", end="")
-            else:
-                print(
-                    "chile-hub top issue\n\n"
-                    f"dataset={top_issue.get('dataset')} | "
-                    f"build={top_issue.get('build_freshness_status', 'unknown')} | "
-                    f"current={top_issue.get('current_freshness_status', 'unknown')} | "
-                    f"drift={top_issue.get('drift_status', 'unknown')} | "
-                    f"warnings={top_issue.get('warning_count', 0)} | "
-                    f"source_detail={top_issue.get('source_detail', 'unknown')} | "
-                    f"reason={top_issue.get('diagnostic_summary', 'unknown')} | "
-                    f"action={top_issue.get('recommended_action', 'unknown')}\n",
-                    end="",
-                )
-        else:
-            print(json.dumps(top_issue, ensure_ascii=False, indent=2))
-        return
-
-    if args.command == "packages":
-        if args.format == "table":
-            print(hub.packages_table(), end="")
-        else:
-            print(json.dumps(hub.packages(), ensure_ascii=False, indent=2))
-        return
-
-    if args.command == "package":
-        print(json.dumps(hub.primary_package(args.type), ensure_ascii=False, indent=2))
-        return
-
-    if args.command == "verify-package":
-        print(json.dumps(hub.package_verification(args.type), ensure_ascii=False, indent=2))
-        return
-
-    if args.command == "redistribution":
-        if args.format == "table":
-            print(hub.redistribution_table(), end="")
-        else:
-            print(json.dumps(hub.redistribution(), ensure_ascii=False, indent=2))
-        return
-
-    if args.command == "provenance":
-        if args.format == "table":
-            print(hub.provenance_table(), end="")
-        else:
-            print(json.dumps(hub.provenance(), ensure_ascii=False, indent=2))
-        return
-
-    if args.command == "drift":
-        if args.format == "table":
-            print(hub.drift_table(), end="")
-        else:
-            print(json.dumps(hub.drift(), ensure_ascii=False, indent=2))
-        return
-
-    if args.command == "cross":
-        df = hub.cross_view(args.datasets, on=args.on)
-        _output_dataframe(df, args.output, args.format)
-        return
-
-    if args.command == "resolve":
-        df = hub.resolve_comunas(args.names)
-        _output_dataframe(df, args.output, args.format)
-        return
-
-    if args.command == "resolve-regiones":
-        df = hub.resolve_regiones(args.names)
-        _output_dataframe(df, args.output, args.format)
-        return
-
-    if args.command == "search":
-        results = hub.search_datasets(
-            query=args.query,
-            source_name=args.source,
-            maturity=args.maturity,
+def _cmd_report(args):
+    hub = ChileHub()
+    print(
+        json.dumps(
+            hub.get_report(args.shared_type, args.format),
+            ensure_ascii=False,
+            indent=2,
         )
-        _print_result(results, args.format)
-        return
+    )
 
-    if args.command == "validate":
-        if args.target is None:
-            # Sin argumento: mostrar ayuda del subcomando
-            parser.parse_args(["validate", "--help"])
-            return
 
-        target_path = Path(args.target)
+def _cmd_inventory(args):
+    hub = ChileHub()
+    if args.format == "table":
+        print(hub.inventory_table(), end="")
+    else:
+        print(json.dumps(hub.inventory(), ensure_ascii=False, indent=2))
 
-        # Si target existe como archivo, validar archivo externo
-        if target_path.exists() and target_path.suffix in (".csv", ".parquet"):
-            if not args.dataset:
-                raise ChileHubError("Debes especificar --dataset al validar un archivo externo.")
-            import polars as pl
 
-            if target_path.suffix == ".csv":
-                df = pl.read_csv(target_path, infer_schema_length=0)
-            else:
-                df = pl.read_parquet(target_path)
-            result = hub.validate_user_data(df, args.dataset)
-        else:
-            # Si no es archivo, validar dataset del hub
-            dataset_name = args.dataset if args.dataset else args.target
-            result = hub.validate_dataset(dataset_name)
+def _cmd_snapshot(args):
+    hub = ChileHub()
+    if args.format == "table":
+        print(hub.snapshot_table(), end="")
+    else:
+        print(hub.snapshot_text(), end="")
 
-        print(json.dumps(result, ensure_ascii=False, indent=2))
-        if result["status"] == "error":
+
+def _cmd_overview(args):
+    hub = ChileHub()
+    if args.format == "table":
+        print(hub.overview_table(), end="")
+    else:
+        print(json.dumps(hub.overview(), ensure_ascii=False, indent=2))
+
+
+def _cmd_status(args):
+    hub = ChileHub()
+    if args.format == "table":
+        print(hub.status_table(), end="")
+    else:
+        print(json.dumps(hub.status(), ensure_ascii=False, indent=2))
+    if getattr(args, "exit_code", False):
+        status_data = hub.status()
+        if status_data.get("overall_status") != "ok":
             raise SystemExit(1)
+
+
+def _cmd_dataset_status(args):
+    hub = ChileHub()
+    print(json.dumps(hub.dataset_status(), ensure_ascii=False, indent=2))
+
+
+def _cmd_dataset_changelog(args):
+    hub = ChileHub()
+    print(json.dumps(hub.dataset_changelog(), ensure_ascii=False, indent=2))
+
+
+def _cmd_source_readiness(args):
+    hub = ChileHub()
+    print(json.dumps(hub.source_readiness(), ensure_ascii=False, indent=2))
+
+
+def _cmd_dataset_quality(args):
+    hub = ChileHub()
+    print(json.dumps(hub.dataset_quality(), ensure_ascii=False, indent=2))
+
+
+def _cmd_health(args):
+    hub = ChileHub()
+    if args.format == "table":
+        print(hub.health_table(), end="")
+    else:
+        print(json.dumps(hub.health(), ensure_ascii=False, indent=2))
+    if getattr(args, "exit_code", False):
+        health_data = hub.health()
+        if health_data.get("overall_status") != "ok":
+            raise SystemExit(1)
+
+
+def _cmd_bundle(args):
+    hub = ChileHub()
+    print(json.dumps(hub.bundle(), ensure_ascii=False, indent=2))
+
+
+def _cmd_freshness_audit(args):
+    hub = ChileHub()
+    if args.format == "table":
+        print(hub.freshness_audit_table(), end="")
+    else:
+        print(json.dumps(hub.freshness_audit(), ensure_ascii=False, indent=2))
+
+
+def _cmd_runtime_status(args):
+    hub = ChileHub()
+    if args.format == "table":
+        print(hub.runtime_status_table(), end="")
+    else:
+        print(json.dumps(hub.runtime_status(), ensure_ascii=False, indent=2))
+
+
+def _cmd_top_issue(args):
+    hub = ChileHub()
+    top_issue = hub.top_issue()
+    if args.format == "table":
+        print(hub.top_issue_table(), end="")
+    elif args.format == "text":
+        if not top_issue:
+            print("chile-hub top issue\n\nSin top issue activo.\n", end="")
+        else:
+            print(
+                "chile-hub top issue\n\n"
+                f"dataset={top_issue.get('dataset')} | "
+                f"build={top_issue.get('build_freshness_status', 'unknown')} | "
+                f"current={top_issue.get('current_freshness_status', 'unknown')} | "
+                f"drift={top_issue.get('drift_status', 'unknown')} | "
+                f"warnings={top_issue.get('warning_count', 0)} | "
+                f"source_detail={top_issue.get('source_detail', 'unknown')} | "
+                f"reason={top_issue.get('diagnostic_summary', 'unknown')} | "
+                f"action={top_issue.get('recommended_action', 'unknown')}\n",
+                end="",
+            )
+    else:
+        print(json.dumps(top_issue, ensure_ascii=False, indent=2))
+
+
+def _cmd_packages(args):
+    hub = ChileHub()
+    if args.format == "table":
+        print(hub.packages_table(), end="")
+    else:
+        print(json.dumps(hub.packages(), ensure_ascii=False, indent=2))
+
+
+def _cmd_package(args):
+    hub = ChileHub()
+    print(json.dumps(hub.primary_package(args.type), ensure_ascii=False, indent=2))
+
+
+def _cmd_verify_package(args):
+    hub = ChileHub()
+    print(json.dumps(hub.package_verification(args.type), ensure_ascii=False, indent=2))
+
+
+def _cmd_redistribution(args):
+    hub = ChileHub()
+    if args.format == "table":
+        print(hub.redistribution_table(), end="")
+    else:
+        print(json.dumps(hub.redistribution(), ensure_ascii=False, indent=2))
+
+
+def _cmd_provenance(args):
+    hub = ChileHub()
+    if args.format == "table":
+        print(hub.provenance_table(), end="")
+    else:
+        print(json.dumps(hub.provenance(), ensure_ascii=False, indent=2))
+
+
+def _cmd_drift(args):
+    hub = ChileHub()
+    if args.format == "table":
+        print(hub.drift_table(), end="")
+    else:
+        print(json.dumps(hub.drift(), ensure_ascii=False, indent=2))
+
+
+def _cmd_cross(args):
+    hub = ChileHub()
+    df = hub.cross_view(args.datasets, on=args.on)
+    _output_dataframe(df, args.output, args.format)
+
+
+def _cmd_resolve(args):
+    hub = ChileHub()
+    df = hub.resolve_comunas(args.names)
+    _output_dataframe(df, args.output, args.format)
+
+
+def _cmd_resolve_regiones(args):
+    hub = ChileHub()
+    df = hub.resolve_regiones(args.names)
+    _output_dataframe(df, args.output, args.format)
+
+
+def _cmd_search(args):
+    hub = ChileHub()
+    results = hub.search_datasets(
+        query=args.query,
+        source_name=args.source,
+        maturity=args.maturity,
+    )
+    _print_result(results, args.format)
+
+
+def _cmd_validate(args):
+    hub = ChileHub()
+    if args.target is None:
+        # Sin argumento: mostrar ayuda del subcomando
+        build_parser().parse_args(["validate", "--help"])
         return
 
-    if args.command == "summary":
-        if args.format == "table":
-            print(hub.summary_table(), end="")
+    target_path = Path(args.target)
+
+    # Si target existe como archivo, validar archivo externo
+    if target_path.exists() and target_path.suffix in (".csv", ".parquet"):
+        if not args.dataset:
+            raise ChileHubError("Debes especificar --dataset al validar un archivo externo.")
+        import polars as pl
+
+        if target_path.suffix == ".csv":
+            df = pl.read_csv(target_path, infer_schema_length=0)
         else:
-            print(json.dumps(hub.summary(), ensure_ascii=False, indent=2))
-        return
+            df = pl.read_parquet(target_path)
+        result = hub.validate_user_data(df, args.dataset)
+    else:
+        # Si no es archivo, validar dataset del hub
+        dataset_name = args.dataset if args.dataset else args.target
+        result = hub.validate_dataset(dataset_name)
+
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+    if result["status"] == "error":
+        raise SystemExit(1)
+
+
+def _cmd_summary(args):
+    hub = ChileHub()
+    if args.format == "table":
+        print(hub.summary_table(), end="")
+    else:
+        print(json.dumps(hub.summary(), ensure_ascii=False, indent=2))
+
+
+HANDLERS = {
+    "version": _cmd_version,
+    "cache": _cmd_cache,
+    "export": _cmd_export,
+    "check-sources": _cmd_check_sources,
+    "list": _cmd_list,
+    "show": _cmd_show,
+    "path": _cmd_path,
+    "example": _cmd_example,
+    "artifacts": _cmd_artifacts,
+    "shared-artifacts": _cmd_shared_artifacts,
+    "reports": _cmd_reports,
+    "report": _cmd_report,
+    "inventory": _cmd_inventory,
+    "snapshot": _cmd_snapshot,
+    "overview": _cmd_overview,
+    "status": _cmd_status,
+    "dataset-status": _cmd_dataset_status,
+    "dataset-changelog": _cmd_dataset_changelog,
+    "source-readiness": _cmd_source_readiness,
+    "dataset-quality": _cmd_dataset_quality,
+    "health": _cmd_health,
+    "bundle": _cmd_bundle,
+    "freshness-audit": _cmd_freshness_audit,
+    "runtime-status": _cmd_runtime_status,
+    "top-issue": _cmd_top_issue,
+    "packages": _cmd_packages,
+    "package": _cmd_package,
+    "verify-package": _cmd_verify_package,
+    "redistribution": _cmd_redistribution,
+    "provenance": _cmd_provenance,
+    "drift": _cmd_drift,
+    "cross": _cmd_cross,
+    "resolve": _cmd_resolve,
+    "resolve-regiones": _cmd_resolve_regiones,
+    "search": _cmd_search,
+    "validate": _cmd_validate,
+    "summary": _cmd_summary,
+}
+
+
+def _main(argv=None):
+    """Parseo de argumentos y dispatch al handler del subcomando (plan 132d)."""
+    parser = build_parser()
+    args = parser.parse_args(argv)
+
+    handler = HANDLERS.get(args.command)
+    if handler is None:  # argparse restringe `command`; rama defensiva
+        parser.error(f"comando no soportado: {args.command}")
+        return None  # inalcanzable: parser.error termina en SystemExit(2)
+    return handler(args)
 
 
 def main(argv=None):  # pragma: no cover — entry point de consola

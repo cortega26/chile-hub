@@ -2240,6 +2240,46 @@ class DatasetEnumTests(unittest.TestCase):
         return ChileHub()
 
 
+class ChileHubCliDispatchTests(unittest.TestCase):
+    """Plan 132d (auditoría 2026-10-13): el dispatch de `_main` se cubre
+    in-process — antes era `# pragma: no cover` y solo smoke por subprocess."""
+
+    def _run_main(self, argv):
+        import contextlib
+        import io
+
+        from chile_hub import cli
+
+        stdout = io.StringIO()
+        exit_code = None
+        with contextlib.redirect_stdout(stdout):
+            try:
+                cli._main(argv)
+            except SystemExit as exc:
+                exit_code = exc.code
+        return exit_code, stdout.getvalue()
+
+    def test_version_returns_without_hub(self):
+        exit_code, output = self._run_main(["version"])
+        self.assertIsNone(exit_code)
+        self.assertTrue(output.strip())
+
+    def test_list_dispatches_to_hub(self):
+        exit_code, output = self._run_main(["list"])
+        self.assertIsNone(exit_code)
+        self.assertIn("comunas", output.splitlines())
+
+    def test_summary_json_is_parseable(self):
+        exit_code, output = self._run_main(["summary", "--format", "json"])
+        self.assertIsNone(exit_code)
+        payload = json.loads(output)
+        self.assertIsInstance(payload, list)
+
+    def test_unknown_command_exits_2(self):
+        exit_code, _ = self._run_main(["no-existe"])
+        self.assertEqual(exit_code, 2)
+
+
 class EntryPointTests(unittest.TestCase):
     """Smoke tests para puntos de entrada y código de inicialización."""
 
