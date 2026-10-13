@@ -271,120 +271,95 @@ def compute_top_issue(entries, freshness_field="freshness_status"):
     return res
 
 
-def build_hub_health(metadata):
-    datasets = metadata.get("datasets", {})
-    validations = metadata.get("validations", {})
-    retired_datasets = _load_retired_datasets()
-    entries = []
+def _severity_for(
+    validation_status: str,
+    freshness_status: str,
+    source_mode: str,
+    actionable_warning_count: int,
+) -> str:
+    """Severidad operativa de un dataset (ADR-014: warnings esperados no cuentan)."""
+    if validation_status != "ok":
+        return "error"
+    if (
+        freshness_status in {"stale", "unknown"}
+        or source_mode == "fallback"
+        or actionable_warning_count > 0
+    ):
+        return "warn"
+    return "ok"
 
-    for dataset_name in sorted(datasets.keys()):
-        dataset = datasets[dataset_name]
-        validation = validations.get(dataset_name, {})
-        warning_count = len(validation.get("warnings", []))
-        # Los warnings esperados describen diseño confirmado, no degradación:
-        # se cuentan aparte para que la severidad refleje trabajo real (ADR-014).
-        expected_warning_set = set(validation.get("expected_warnings", []))
-        actionable_warning_count = sum(
-            1 for warning in validation.get("warnings", []) if warning not in expected_warning_set
-        )
-        freshness_status = dataset.get("freshness", {}).get("status", "unknown")
-        source_mode = dataset.get("source_mode", "unknown")
-        validation_status = validation.get("status", "unknown")
-        reuse_policy = dataset.get("reuse_policy", {})
-        redistribution_ok = reuse_policy.get("redistribution_ok")
-        reuse_status = reuse_policy.get("status", "unknown")
-        degradation_status = dataset.get("degradation", {}).get("status", "none")
-        coverage = dataset.get("coverage", {})
-        coverage_status = coverage.get("status", "unknown")
-        coverage_ratio = coverage.get("coverage_ratio")
-        coverage_expected = coverage.get("expected") is True
-        drift_status = dataset.get("drift", {}).get("status", "healthy")
-        warnings = validation.get("warnings", [])
-        diagnostic_summary = "Sin observaciones operativas."
-        if warnings:
-            diagnostic_summary = warnings[0]
-        elif dataset.get("degradation", {}).get("impact"):
-            diagnostic_summary = dataset.get("degradation", {}).get("impact")
 
-        severity = "ok"
-        if validation_status != "ok":
-            severity = "error"
-        elif (
-            freshness_status in {"stale", "unknown"}
-            or source_mode == "fallback"
-            or actionable_warning_count > 0
-        ):
-            severity = "warn"
+def _publishability_for(redistribution_ok: object, reuse_status: str) -> str:
+    """Estado de publicación según reuso/licencia del dataset."""
+    if redistribution_ok is False:
+        return "review_terms"
+    if reuse_status == "unknown":
+        return "unknown"
+    return "ready"
 
-        publishability_status = "ready"
-        if redistribution_ok is False:
-            publishability_status = "review_terms"
-        elif reuse_status == "unknown":
-            publishability_status = "unknown"
 
-        entries.append(
-            {
-                "dataset": dataset_name,
-                "severity": severity,
-                "source_mode": source_mode,
-                "freshness_status": freshness_status,
-                "validation_status": validation_status,
-                "warning_count": warning_count,
-                "actionable_warning_count": actionable_warning_count,
-                "coverage_expected": coverage_expected,
-                "reuse_status": reuse_status,
-                "redistribution_ok": redistribution_ok,
-                "publishability_status": publishability_status,
-                "degradation_status": degradation_status,
-                "coverage_status": coverage_status,
-                "coverage_ratio": coverage_ratio,
-                "drift_status": drift_status,
-                "source_detail": dataset.get("source_detail"),
-                "diagnostic_summary": diagnostic_summary,
-                "recommended_action": dataset.get("drift", {}).get("recommended_action")
-                or dataset.get("degradation", {}).get("recommended_action")
-                or "Ninguna.",
-                # Siempre presente, para que sea inspeccionable (mismo criterio
-                # que coverage.expected en ADR-014).
-                "retired": dataset_name in retired_datasets,
-            }
-        )
+def _dataset_health_entry(dataset_name, dataset, validation, retired_datasets):
+    """Entrada de salud de un dataset (severidad, frescura, reuso, cobertura…).
 
-    # Los datasets retirados siguen listados y visibles, pero no participan en
-    # los contadores ni en overall_status: su fuente está muerta y su drift no
-    # es accionable (ADR-015). `dataset_count` NO cambia — el dataset sigue en
-    # el pipeline y en los artefactos.
-    active = [entry for entry in entries if not entry["retired"]]
-    retired_count = len(entries) - len(active)
+    Plan 132b (auditoría 2026-10-13): extraída del loop de `build_hub_health`
+    sin cambios de semántica; el orden de las claves es el del artefacto.
+    """
+    warnings = validation.get("warnings", [])
+    # Los warnings esperados describen diseño confirmado, no degradación:
+    # se cuentan aparte para que la severidad refleje trabajo real (ADR-014).
+    expected_warning_set = set(validation.get("expected_warnings", []))
+    actionable_warning_count = sum(1 for warning in warnings if warning not in expected_warning_set)
+    freshness_status = dataset.get("freshness", {}).get("status", "unknown")
+    source_mode = dataset.get("source_mode", "unknown")
+    validation_status = validation.get("status", "unknown")
+    reuse_policy = dataset.get("reuse_policy", {})
+    redistribution_ok = reuse_policy.get("redistribution_ok")
+    reuse_status = reuse_policy.get("status", "unknown")
+    degradation = dataset.get("degradation", {})
+    coverage = dataset.get("coverage", {})
+    drift = dataset.get("drift", {})
+    diagnostic_summary = "Sin observaciones operativas."
+    if warnings:
+        diagnostic_summary = warnings[0]
+    elif degradation.get("impact"):
+        diagnostic_summary = degradation["impact"]
+
+    return {
+        "dataset": dataset_name,
+        "severity": _severity_for(
+            validation_status, freshness_status, source_mode, actionable_warning_count
+        ),
+        "source_mode": source_mode,
+        "freshness_status": freshness_status,
+        "validation_status": validation_status,
+        "warning_count": len(warnings),
+        "actionable_warning_count": actionable_warning_count,
+        "coverage_expected": coverage.get("expected") is True,
+        "reuse_status": reuse_status,
+        "redistribution_ok": redistribution_ok,
+        "publishability_status": _publishability_for(redistribution_ok, reuse_status),
+        "degradation_status": degradation.get("status", "none"),
+        "coverage_status": coverage.get("status", "unknown"),
+        "coverage_ratio": coverage.get("coverage_ratio"),
+        "drift_status": drift.get("status", "healthy"),
+        "source_detail": dataset.get("source_detail"),
+        "diagnostic_summary": diagnostic_summary,
+        "recommended_action": drift.get("recommended_action")
+        or degradation.get("recommended_action")
+        or "Ninguna.",
+        # Siempre presente, para que sea inspeccionable (mismo criterio
+        # que coverage.expected en ADR-014).
+        "retired": dataset_name in retired_datasets,
+    }
+
+
+def _health_counters(active):
+    """Contadores del conjunto ACTIVO (ADR-015: retirados fuera de contadores)."""
     error_count = sum(1 for entry in active if entry["severity"] == "error")
     warn_count = sum(1 for entry in active if entry["severity"] == "warn")
     ok_count = sum(1 for entry in active if entry["severity"] == "ok")
-    overall_status = "error" if error_count else "warn" if warn_count else "ok"
-
-    # top_issue alimenta el enlace "Ver top issue" de la landing page, que
-    # apunta a #dataset-{nombre}; los datasets candidate no tienen tarjeta
-    # ahí (ver artifacts.py), así que solo pueden ser el top_issue los
-    # datasets con tarjeta pública real, o el enlace queda roto. Solo se
-    # filtra si algún dataset de `entries` existe realmente en el registry
-    # — así build_status_text/build_status_markdown siguen siendo puras
-    # frente a fixtures sintéticos de tests (datasets inventados que no
-    # están en source_registry.json no activan el filtro).
-    registry_datasets, public_datasets = _load_source_registry_datasets()
-    entries_match_registry = any(entry["dataset"] in registry_datasets for entry in entries)
-    top_issue_candidates = (
-        [entry for entry in entries if entry["dataset"] in public_datasets]
-        if entries_match_registry
-        else entries
-    )
-    top_issue = compute_top_issue(top_issue_candidates)
-
     return {
-        "generated_at_utc": metadata.get("generated_at_utc"),
-        "overall_status": overall_status,
-        "dataset_count": len(entries),
-        # Regla única: todos los contadores describen el conjunto ACTIVO.
-        # Solo `dataset_count` y `retired_count` describen el inventario (ADR-015).
-        "retired_count": retired_count,
+        "overall_status": "error" if error_count else "warn" if warn_count else "ok",
         "ok_count": ok_count,
         "warn_count": warn_count,
         "error_count": error_count,
@@ -417,6 +392,71 @@ def build_hub_health(metadata):
         ),
         "drifted_count": sum(1 for entry in active if entry["drift_status"] == "drifted"),
         "warning_count": sum(entry["warning_count"] for entry in active),
+    }
+
+
+def build_hub_health(metadata):
+    datasets = metadata.get("datasets", {})
+    validations = metadata.get("validations", {})
+    retired_datasets = _load_retired_datasets()
+    entries = [
+        _dataset_health_entry(
+            dataset_name,
+            datasets[dataset_name],
+            validations.get(dataset_name, {}),
+            retired_datasets,
+        )
+        for dataset_name in sorted(datasets.keys())
+    ]
+
+    # Los datasets retirados siguen listados y visibles, pero no participan en
+    # los contadores ni en overall_status: su fuente está muerta y su drift no
+    # es accionable (ADR-015). `dataset_count` NO cambia — el dataset sigue en
+    # el pipeline y en los artefactos.
+    active = [entry for entry in entries if not entry["retired"]]
+    retired_count = len(entries) - len(active)
+    counters = _health_counters(active)
+
+    # top_issue alimenta el enlace "Ver top issue" de la landing page, que
+    # apunta a #dataset-{nombre}; los datasets candidate no tienen tarjeta
+    # ahí (ver artifacts.py), así que solo pueden ser el top_issue los
+    # datasets con tarjeta pública real, o el enlace queda roto. Solo se
+    # filtra si algún dataset de `entries` existe realmente en el registry
+    # — así build_status_text/build_status_markdown siguen siendo puras
+    # frente a fixtures sintéticos de tests (datasets inventados que no
+    # están en source_registry.json no activan el filtro).
+    registry_datasets, public_datasets = _load_source_registry_datasets()
+    entries_match_registry = any(entry["dataset"] in registry_datasets for entry in entries)
+    top_issue_candidates = (
+        [entry for entry in entries if entry["dataset"] in public_datasets]
+        if entries_match_registry
+        else entries
+    )
+    top_issue = compute_top_issue(top_issue_candidates)
+
+    return {
+        "generated_at_utc": metadata.get("generated_at_utc"),
+        "overall_status": counters["overall_status"],
+        "dataset_count": len(entries),
+        # Regla única: todos los contadores describen el conjunto ACTIVO.
+        # Solo `dataset_count` y `retired_count` describen el inventario (ADR-015).
+        "retired_count": retired_count,
+        "ok_count": counters["ok_count"],
+        "warn_count": counters["warn_count"],
+        "error_count": counters["error_count"],
+        "live_count": counters["live_count"],
+        "fallback_count": counters["fallback_count"],
+        "stale_count": counters["stale_count"],
+        "unknown_freshness_count": counters["unknown_freshness_count"],
+        "publishable_count": counters["publishable_count"],
+        "review_terms_count": counters["review_terms_count"],
+        "unknown_reuse_count": counters["unknown_reuse_count"],
+        "degraded_count": counters["degraded_count"],
+        "degradation_warning_count": counters["degradation_warning_count"],
+        "partial_coverage_count": counters["partial_coverage_count"],
+        "unknown_coverage_count": counters["unknown_coverage_count"],
+        "drifted_count": counters["drifted_count"],
+        "warning_count": counters["warning_count"],
         # Señal proactiva de cadencia (Plan 083): review_by a menos de 30 días
         # (upcoming) o ya vencida (due). Aditiva — no afecta overall_status.
         "review_approaching_count": _compute_review_status_counts()[0],
