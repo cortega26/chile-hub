@@ -16,26 +16,31 @@ repos:
         args: ['--maxkb=500']
       - id: check-json
 
-  # Versiones single-source con CI y el lock (Plan 094): ruff == 0.17.0
-  # (pyproject dev-pin), mypy == 2.3.1 con deps pineadas a uv.lock. Un pin
-  # distinto por superficie hacía que el mismo código pasara en un lado y
-  # fallara en otro. Guardrail: tests/test_ci_config.py::RuffPinSingleSourceTests.
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.17.0
-    hooks:
-      - id: ruff
-        args: [--fix, --exit-non-zero-on-fix]
-      - id: ruff-format
-
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v2.3.1
-    hooks:
-      - id: mypy
-        pass_filenames: false
-        additional_dependencies: [polars==1.44.2, requests==2.34.2, tenacity==9.1.4]
-
+  # ruff y mypy corren con `uv run` (dev-pin de pyproject + uv.lock): una sola
+  # superficie de versión, igual que pip-audit/interrogate/bandit. Antes había
+  # tres (pyproject, rev de pre-commit, uvx ruff@ del workflow) y cada bump de
+  # Dependabot dejaba main rojo hasta alinear a mano; ADR-024 eliminó la
+  # duplicación en vez de sincronizarla.
+  # Guardrail: tests/test_ci_config.py::SingleSourceToolingGuardrailTests.
   - repo: local
     hooks:
+      - id: ruff
+        name: ruff check
+        entry: uv run ruff check
+        args: [--fix, --exit-non-zero-on-fix]
+        language: system
+        types_or: [python, pyi]
+      - id: ruff-format
+        name: ruff format
+        entry: uv run ruff format
+        language: system
+        types_or: [python, pyi]
+      - id: mypy
+        name: mypy
+        entry: uv run mypy
+        language: system
+        types: [python]
+        pass_filenames: false
       - id: sync-docs
         name: sync-docs
         entry: bash -c 'make sync-docs && git add README.md AGENTS.md'

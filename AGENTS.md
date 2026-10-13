@@ -705,11 +705,15 @@ grep -n "^class " tests/*.py
   investigar antes de tocar cualquiera de los dos.
 - `skip`/`xfail` temporal solo con razón explícita y fecha de revisión en el
   mismo commit; nunca como forma silenciosa de esquivar un fallo.
+- Un guardrail que falle por el bump de una dependencia se **des-brittlea**
+  (verifica el invariante, no el valor móvil) o se elimina la superficie
+  duplicada; nunca se actualiza el literal que falló. Política completa:
+  [`docs/adr/ADR-024-autosanacion-de-ci.md`](docs/adr/ADR-024-autosanacion-de-ci.md).
 
 **Cobertura:** `.codecov.yml` define `patch.target: 75%` (diffs) y
 `project.target: auto` con `threshold: 2%` como piso de referencia — aunque
-el upload a Codecov esté deshabilitado hoy (se usa el badge autogenerado), el
-criterio sigue vigente: código nuevo del pipeline debe venir acompañado de
+el upload a Codecov se haya retirado (ADR-024; se usa el badge autogenerado),
+el criterio sigue vigente: código nuevo del pipeline debe venir acompañado de
 tests que ejerciten sus ramas nuevas, no solo el camino feliz.
 
 **Co-cambio automático:** `scripts/check_companion_paths.py` (modo `companions`,
@@ -948,6 +952,33 @@ protegido por un chequeo automatizado en vez de depender solo de buena voluntad.
 | Hechos operacionales del piloto DatasetSpec (Phase 2–3D cohort) | `data/dataset_specs/` (25 specs: complete — cubre todo el catálogo) — proyección shadow en `_shared.py`/`reports.py` | `tests/test_phase2_datasetspec.py` (equivalencia vs. catálogo/registry/contrato legacy, 26 tests) |
 | Hechos contables de docs de agentes (anclas de líneas y listas del §2 + tabla §1 de AGENTS.md; ausencia de conteos literales en CLAUDE.md/SOURCE_OF_TRUTH.md) | código (`wc -l`, `src/`, `data/dataset_catalog_config.json`) — prosa curada, no bloque regenerado | `scripts/check_agents_sync.py --docs AGENTS.md,CLAUDE.md,SOURCE_OF_TRUTH.md` |
 | Liveness de `official_url` de fuentes | `data/source_registry.json` | `.github/workflows/source-urls.yml` + `scripts/check_source_urls.py` (semanal, no bloquea publish) |
+| Versiones de herramientas (ruff/mypy) en local, pre-commit y CI | `pyproject.toml` (dev-pin) + `uv.lock`, vía `uv run` — una sola superficie (ADR-024) | `tests/test_ci_config.py::SingleSourceToolingGuardrailTests` + `pre-commit validate-config` en el job `quality` |
+| Pin de acciones de GitHub en workflows | `.github/workflows/*.yml` (SHA de 40 hex + comentario `# vX.Y.Z`) | `tests/test_chile_hub.py::WorkflowContractTests::test_all_workflows_pin_third_party_actions` |
+| Literales de pines móviles en tests/scripts | — (prohibidos; el valor vive solo en su superficie, ADR-024) | `tests/test_ci_config.py::NoHardcodedActionPinGuardrailTests` |
+
+### Mecanismo: autosanación de CI (ADR-024)
+
+Política ante un fallo de CI, en orden de preferencia:
+
+1. **Eliminar la derivación duplicada.** Si dos superficies repiten un mismo
+   hecho (una versión, un pin), se elimina la segunda: ruff/mypy corren con
+   `uv run` desde `pyproject.toml`/`uv.lock`, sin `rev` de pre-commit ni
+   `uvx ruff@` que sincronizar.
+2. **Auto-sanar el drift determinista** en el evento que lo origina:
+   `dependabot-lock.yml` regenera `uv.lock` en PRs de Dependabot y el job
+   main-only `docs-autosync` regenera docs tras carreras con release. Reglas:
+   `--check` antes de escribir, un solo evento originador, commit `[skip ci]`
+   con GITHUB_TOKEN, jobs con escritura separados y main-only — nunca en el
+   job `quality` (lección P1 del PR #60). Lo no determinista no se auto-sana:
+   alerta (`notify-schedule-failure`).
+3. **Detectar y bloquear** lo que no es regenerable, con un guardrail
+   mecánico y un docstring que documente el incidente (PR/run/commit).
+
+Un guardrail no fija el *valor* de un pin móvil (un SHA que Dependabot mueve):
+verifica el invariante (p. ej. un pin de 40 hex) y deja el valor en su única
+superficie. Cuando un guardrail se rompe por un bump, se des-brittlea; la
+igualdad entre superficies solo se reemplaza por una eliminación real, nunca
+se relaja a ciegas.
 
 ### Mecanismo: `scripts/check_landing_sync.py`
 

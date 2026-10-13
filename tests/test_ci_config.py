@@ -186,6 +186,11 @@ class EphemeralInstallPinGuardrailTests(unittest.TestCase):
     release upstream comprometida o rompedora cambiaba el resultado de un
     job privilegiado sin ningún diff en el repo. Fix (Plan 112): extra
     `publish` pinneado + lock, y `==` en cada `--with`.
+
+    Cuarta ruta (2026-10-13): `uvx twine check dist/*` en package-quality
+    (pipeline-check.yml) y testpypi.yml resolvía twine latest fuera del
+    lock. Fix (ADR-024): `uv run --frozen --extra dev twine` desde el lock,
+    más este guardrail de que todo `uvx` declare `@X.Y.Z`.
     """
 
     def test_ephemeral_scrapling_fetch_pins_every_with_flag(self):
@@ -207,6 +212,24 @@ class EphemeralInstallPinGuardrailTests(unittest.TestCase):
             f"{unpinned}",
         )
 
+    def test_workflows_pin_every_uvx_invocation(self):
+        """`uvx` sin `@X.Y.Z` resuelve latest fuera de uv.lock (ruta twine,
+        2026-10-13). Preferir `uv run --frozen` desde el lock; si hace falta
+        `uvx`, siempre con versión fija."""
+        unpinned = []
+        for workflow in sorted((ROOT_DIR / ".github" / "workflows").glob("*.yml")):
+            for lineno, line in enumerate(
+                workflow.read_text(encoding="utf-8").splitlines(), start=1
+            ):
+                if line.lstrip().startswith("#"):
+                    continue
+                for tool in re.findall(r"\buvx\s+([^\s]+)", line):
+                    if "@" not in tool:
+                        unpinned.append(f"{workflow.name}:{lineno}: uvx {tool}")
+        self.assertEqual(
+            unpinned, [], "uvx sin versión fija (fuera de uv.lock): " + "; ".join(unpinned)
+        )
+
     def test_pypi_release_uses_locked_publish_extra_for_hf(self):
         content = PYPI_RELEASE_WORKFLOW.read_text(encoding="utf-8")
         self.assertNotIn(
@@ -223,50 +246,81 @@ class EphemeralInstallPinGuardrailTests(unittest.TestCase):
         self.assertNotIn("--with huggingface_hub", content)
 
 
-class RuffPinSingleSourceTests(unittest.TestCase):
-    """Regresión: Dependabot bumpeó el pin de ruff solo en `pyproject.toml`
-    (`ruff==0.16.8`, commit b5f31e8) y dejó atrás pre-commit y CI (ambos
-    `0.16.7`). Resultado: `make lint` local (usa el pin de pyproject) pasaba
-    y CI (`uvx ruff@0.16.7`) fallaba — la discrepancia exacta que Plan 094
-    eliminó. Las tres superficies deben moverse juntas.
+class SingleSourceToolingGuardrailTests(unittest.TestCase):
+    """Regresión: las versiones de ruff/mypy vivieron duplicadas en tres
+    superficies (dev-pin de `pyproject.toml`, `rev` de los repos de
+    pre-commit, `uvx ruff@` del workflow) y cada bump de Dependabot dejaba
+    CI o `main` rojo hasta alinear a mano: ruff 0.16.7→0.16.8 (b5f31e8),
+    0.16.9→0.16.10 (7f5d467), 0.16.10→0.17.0 (#160 → run 38394297445 →
+    #165); mypy 2.4.0 vs mirrors-mypy v2.3.1 y `tenacity==9.1.4` vs lock
+    9.2.1 (auditoría 2026-10-13).
+
+    Plan 094 sincronizaba las tres superficies con un guardrail de igualdad;
+    ADR-024 eliminó la duplicación: hooks y CI corren `uv run ruff|mypy`
+    (pyproject dev-pin + uv.lock) y no hay segunda superficie que pueda
+    divergir. Des-brittlear aplica a valores (un literal de pin móvil se
+    cambia por el invariante); la igualdad entre superficies solo se
+    reemplaza por una eliminación real, nunca se relaja a ciegas.
     """
 
-    def _ruff_pin_pyproject(self) -> str:
-        match = re.search(r"ruff==([\d.]+)", PYPROJECT_TOML.read_text(encoding="utf-8"))
-        self.assertIsNotNone(match, "No se encontró el pin ruff==X.Y.Z en pyproject.toml.")
-        return match.group(1)
+    REMOVED_HOOK_REPOS = ("astral-sh/ruff-pre-commit", "pre-commit/mirrors-mypy")
 
-    def _ruff_pin_precommit(self) -> str:
+    def test_precommit_runs_tools_from_the_locked_project_env(self):
         content = PRECOMMIT_CONFIG.read_text(encoding="utf-8")
-        repo_pos = content.find("https://github.com/astral-sh/ruff-pre-commit")
-        self.assertNotEqual(repo_pos, -1, "No se encontró el repo ruff-pre-commit.")
-        match = re.search(r"rev:\s*v([\d.]+)", content[repo_pos:])
-        self.assertIsNotNone(match, "No se encontró el rev de ruff-pre-commit.")
-        return match.group(1)
+        for removed_repo in self.REMOVED_HOOK_REPOS:
+            self.assertNotIn(
+                removed_repo,
+                content,
+                f"{removed_repo} reintroduce una superficie de versión duplicada: "
+                "usar `uv run` (ADR-024).",
+            )
+        for entry in (
+            "entry: uv run ruff check",
+            "entry: uv run ruff format",
+            "entry: uv run mypy",
+        ):
+            self.assertIn(entry, content)
 
-    def _ruff_pins_workflow(self) -> list[str]:
+    def test_ci_lints_with_uv_run_instead_of_a_duplicated_pin(self):
         content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
-        pins = re.findall(r"uvx ruff@([\d.]+)", content)
-        self.assertEqual(
-            len(pins), 2, "Se esperaban dos invocaciones uvx ruff@X.Y.Z (check y format)."
-        )
-        return pins
+        self.assertNotIn("uvx ruff@", content)
+        self.assertIn("uv run ruff check src/ tests/ scripts/", content)
+        self.assertIn("uv run ruff format --check src/ tests/ scripts/", content)
 
-    def test_pyproject_precommit_and_ci_pins_match(self):
-        pyproject_pin = self._ruff_pin_pyproject()
-        precommit_pin = self._ruff_pin_precommit()
-        workflow_pins = self._ruff_pins_workflow()
+    def test_pyproject_keeps_the_single_source_pins(self):
+        content = PYPROJECT_TOML.read_text(encoding="utf-8")
+        self.assertRegex(content, r'"ruff==[\d.]+"')
+        self.assertRegex(content, r'"mypy==[\d.]+"')
+
+
+class NoHardcodedActionPinGuardrailTests(unittest.TestCase):
+    """Regresión (PR #163, run 38387365191): el guardrail de Lighthouse fijaba
+    el SHA exacto de `actions/upload-artifact@v7.0.1`; el bump de Dependabot a
+    v7.0.2 puso rojo "Build and verify data", y la respuesta correcta fue
+    des-brittlear el guardrail (PR #165), no actualizar el literal.
+
+    Un test o gate no fija el valor de un pin que Dependabot mueve: verifica
+    el invariante (p. ej. que el workflow use un SHA de 40 hex) y deja el
+    valor en su única superficie (el workflow). ADR-024.
+    """
+
+    PIN_LITERAL_PATTERN = re.compile(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+@[0-9a-f]{40}\b")
+    SCANNED_DIRS = (ROOT_DIR / "tests", ROOT_DIR / "scripts")
+
+    def test_tests_and_scripts_do_not_embed_action_pin_literals(self):
+        offenders = []
+        for base_dir in self.SCANNED_DIRS:
+            for path in sorted(base_dir.rglob("*.py")):
+                for lineno, line in enumerate(
+                    path.read_text(encoding="utf-8").splitlines(), start=1
+                ):
+                    if self.PIN_LITERAL_PATTERN.search(line):
+                        offenders.append(f"{path.relative_to(ROOT_DIR)}:{lineno}")
         self.assertEqual(
-            precommit_pin,
-            pyproject_pin,
-            "El rev de ruff-pre-commit no coincide con el pin de pyproject.toml "
-            f"(pre-commit={precommit_pin}, pyproject={pyproject_pin}).",
-        )
-        self.assertEqual(
-            workflow_pins,
-            [pyproject_pin] * 2,
-            "Las invocaciones uvx ruff@ del workflow no coinciden con el pin de "
-            f"pyproject.toml (ci={workflow_pins}, pyproject={pyproject_pin}).",
+            offenders,
+            [],
+            "Pin de acción embebido como literal; el valor debe vivir solo en el "
+            f"workflow (guardrail por invariante, ADR-024): {offenders}",
         )
 
 

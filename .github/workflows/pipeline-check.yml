@@ -91,11 +91,19 @@ jobs:
         run: uv lock --locked
 
       - name: Check Python lint
-        # Pin single-source con pyproject dev + pre-commit (Plan 094).
-        run: uvx ruff@0.17.0 check src/ tests/ scripts/
+        # `uv run` = versión única desde pyproject/uv.lock (ADR-024; antes el
+        # workflow fijaba la versión de ruff por su cuenta y drifteaba con
+        # cada bump).
+        run: uv run ruff check src/ tests/ scripts/
 
       - name: Check Python format
-        run: uvx ruff@0.17.0 format --check src/ tests/ scripts/
+        run: uv run ruff format --check src/ tests/ scripts/
+
+      - name: Validate pre-commit config
+        # Los hooks no corren en CI (cada contributor los corre local); al
+        # menos el config debe seguir siendo válido o romperían para todos
+        # sin ninguna señal (ADR-024).
+        run: uv run pre-commit validate-config
 
       - name: Check dataset registry/docs/contracts sync
         run: python scripts/check_companion_paths.py registry
@@ -418,15 +426,10 @@ jobs:
           print(f"OK: MCP server {server.name}")
           PY
 
-      - name: Upload coverage to Codecov
-        if: false  # Deshabilitado: migrado a badge autogenerado (coverage_badge.json)
-        uses: codecov/codecov-action@v7
-        with:
-          files: coverage.xml
-          flags: unittests
-          fail_ci_if_error: false
-          token: ${{ secrets.CODECOV_TOKEN }}
-
+      # (ADR-024) Step "Upload coverage to Codecov" eliminado: estaba muerto
+      # (`if: false`) y usaba un tag flotante, sin pin de SHA. La señal de
+      # cobertura es `data/normalized/coverage_badge.json`; si se reactiva,
+      # volver con SHA pinneado + comentario `# vX.Y.Z`.
       - name: Generate coverage badge
         run: python scripts/generate_coverage_badge.py
 
@@ -496,7 +499,9 @@ jobs:
       - name: Build wheel and source distribution
         run: |
           uv build
-          uvx twine check dist/*
+          # twine desde el lock (ADR-024), no `uvx` sin pin resolviendo
+          # latest en cada corrida.
+          uv run --frozen --extra dev twine check dist/*
 
       - name: Install wheel and smoke test CLI
         run: |
