@@ -55,6 +55,8 @@ from src.build_dev_db import (
 from src.build_dev_db import (
     main as build_main,
 )
+from src.builders.inputs import STAGING_INPUTS
+from src.builders.staging_schema import STAGING_SCHEMAS
 from src.extractors import bcentral_extractor
 from src.pipeline_status_utils import build_hub_health, build_status_text
 from src.validation import (
@@ -84,6 +86,48 @@ from src.validation import (
     validate_regiones,
     validate_resultados_educacionales,
 )
+
+
+class StagingInputsTableTests(unittest.TestCase):
+    """Plan 132a (auditoría 2026-10-13): `STAGING_INPUTS` es la fuente única de
+    insumos del build. Estos invariantes evitan que un dataset quede sin schema
+    en `STAGING_SCHEMAS`, que un nombre/archivo se duplique, o que el set
+    requerido cambie sin revisar el harness Phase 1 (que lo asume)."""
+
+    REQUIRED_NAMES: ClassVar[set[str]] = {
+        "comunas",
+        "indicadores",
+        "censo",
+        "salud",
+        "censo_hogares",
+        "electoral",
+        "educacionales",
+        "finanzas",
+        "resultados_educacionales",
+        "siedu",
+    }
+
+    def test_names_and_files_are_unique(self):
+        names = [spec.name for spec in STAGING_INPUTS]
+        csvs = [spec.csv for spec in STAGING_INPUTS]
+        self.assertEqual(len(names), len(set(names)))
+        self.assertEqual(len(csvs), len(set(csvs)))
+
+    def test_schema_keys_exist_in_staging_schemas(self):
+        for spec in STAGING_INPUTS:
+            if spec.read == "no_schema":
+                continue
+            with self.subTest(spec=spec.name):
+                self.assertIn(spec.schema or spec.name, STAGING_SCHEMAS)
+
+    def test_required_set_matches_phase1_contract(self):
+        required = {spec.name for spec in STAGING_INPUTS if spec.required}
+        self.assertEqual(required, self.REQUIRED_NAMES)
+
+    def test_read_variants_are_known(self):
+        for spec in STAGING_INPUTS:
+            with self.subTest(spec=spec.name):
+                self.assertIn(spec.read, {"csv", "date", "datecast", "no_schema"})
 
 
 class PipelineLogicTests(unittest.TestCase):
