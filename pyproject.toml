@@ -202,7 +202,6 @@ ignore = [
     "RUF001",  # unicode intencional en docstrings/salidas (×, ─, ✓…)
     "RUF002",
     "RUF003",
-    "B019",  # plan 134: lru_cache en métodos de ChileHub (fuga de instancias)
     "SIM117",  # fix solo-preview en ruff; deuda cosmética de tests (plan 138)
 ]
 

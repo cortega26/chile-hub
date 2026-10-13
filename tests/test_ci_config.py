@@ -323,7 +323,6 @@ class RuffRatchetGuardrailTests(unittest.TestCase):
         "RUF001",
         "RUF002",
         "RUF003",
-        "B019",
         "SIM117",
     }
 
@@ -488,6 +487,7 @@ class CompanionPathsRuleTests(unittest.TestCase):
         "src/validation.py": "src/validation.py",
         "src/extractors/": "src/extractors/calidad_aire_extractor.py",
         "src/build_dev_db.py": "src/build_dev_db.py",
+        "src/chile_hub/core.py": "src/chile_hub/core.py",
         "Makefile": "Makefile",
         "scripts/check_agents_sync.py": "scripts/check_agents_sync.py",
         "scripts/check_source_urls.py": "scripts/check_source_urls.py",
@@ -541,7 +541,7 @@ class CompanionPathsRuleTests(unittest.TestCase):
             ["README.md"],
             ["docs/product-spec.md"],
             ["tests/test_ci_config.py"],
-            ["src/chile_hub/core.py"],
+            ["src/chile_hub/cli.py"],
         ):
             with self.subTest(changed=changed):
                 self.assertEqual(check_companions(changed), [])
