@@ -2044,7 +2044,11 @@ class LighthouseGuardrailTests(unittest.TestCase):
         step = content[start:end]
         # `if: always()`: el reporte interesa justo cuando el audit falla.
         self.assertIn("if: always()", step)
-        self.assertIn("actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a", step)
+        # Pin completo (40 hex) sin exigir una versión exacta: cada bump de
+        # Dependabot rompía este guardrail (p. ej. PR #163, v7.0.1 → v7.0.2).
+        # El invariante de pin repo-wide lo posee
+        # `test_pipeline_check_workflow_pins_third_party_actions` (test_chile_hub.py).
+        self.assertRegex(step, r"actions/upload-artifact@[0-9a-f]{40}\b")
         self.assertIn("name: lighthouse-report", step)
         self.assertIn("path: /tmp/chile-hub-lighthouse.json", step)
 
