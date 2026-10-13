@@ -8,7 +8,9 @@ No cubren el CLI (argparse + _main) — eso corresponde a tests de integración.
 """
 
 import datetime
+import json
 import os
+import re
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -967,6 +969,75 @@ class ChileHubResolveByCoordsTests(unittest.TestCase):
             clear_geometry_cache()
             after_clear = load_geometry(fixture)
         self.assertIsNot(after_clear, after_touch)
+
+
+class PublicSurfaceGuardrailTests(unittest.TestCase):
+    """Plan 134a (auditoría 2026-10-13): congela la superficie pública de
+    `ChileHub` (inventario + firmas) ANTES de partir el god object en módulos
+    internos.
+
+    El refactor mueve implementación a `_store.py`/`_reporting.py`/`_query.py`;
+    este golden garantiza que nombres, firmas y tipos de atributo públicos no
+    cambien sin una decisión explícita. Si el cambio es deliberado, actualiza
+    `tests/fixtures/chilehub_public_surface.json` en el mismo PR y documenta el
+    porqué en el commit/PR (contrato de la API pública).
+    """
+
+    GOLDEN_PATH = ROOT_DIR / "tests" / "fixtures" / "chilehub_public_surface.json"
+
+    @staticmethod
+    def _normalize_signature(text: str) -> str:
+        """Aplana calificadores de módulo en anotaciones (`typing.Any` → `Any`).
+
+        El contrato es el nombre/firma/parámetros, no la calificación del
+        módulo de cada anotación; así el golden es estable entre versiones de
+        Python y no acopla a rutas internas de tipos.
+        """
+        return re.sub(r"\b(?:[A-Za-z_]\w*\.)+([A-Za-z_]\w*)", r"\1", text)
+
+    def _current_surface(self) -> dict[str, str]:
+        import inspect
+
+        surface: dict[str, str] = {}
+        for name in dir(ChileHub):
+            if name.startswith("_"):
+                continue
+            attr = inspect.getattr_static(ChileHub, name)
+            if isinstance(attr, property):
+                surface[name] = "property"
+            elif isinstance(attr, (classmethod, staticmethod)):
+                surface[name] = self._normalize_signature(str(inspect.signature(attr.__func__)))
+            elif inspect.isfunction(attr):
+                surface[name] = self._normalize_signature(str(inspect.signature(attr)))
+            else:
+                surface[name] = f"attr:{type(attr).__name__}"
+        return surface
+
+    def test_public_surface_matches_golden(self):
+        golden = json.loads(self.GOLDEN_PATH.read_text(encoding="utf-8"))
+        current = self._current_surface()
+
+        faltantes = sorted(set(golden) - set(current))
+        nuevos = sorted(set(current) - set(golden))
+        self.assertEqual(
+            (faltantes, nuevos),
+            ([], []),
+            "La superficie pública de ChileHub cambió (plan 134a): si es "
+            "deliberado, actualiza tests/fixtures/chilehub_public_surface.json "
+            "en el mismo PR y documenta el porqué; un método ausente rompe el "
+            "contrato de la API pública.",
+        )
+
+        firma_cambiada = {
+            name: (golden[name], current[name])
+            for name in golden
+            if name in current and golden[name] != current[name]
+        }
+        self.assertEqual(
+            firma_cambiada,
+            {},
+            f"Firma o tipo de atributo público modificado (plan 134a): {firma_cambiada}",
+        )
 
 
 if __name__ == "__main__":

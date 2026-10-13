@@ -40,6 +40,10 @@ COMPANION_RULES: dict[str, list[str]] = {
     "src/validation.py": ["tests/test_validation.py", "tests/test_pipeline_logic.py"],
     "src/extractors/": ["tests/test_extractors.py"],
     "src/build_dev_db.py": ["tests/test_pipeline_logic.py", "tests/test_chile_hub.py"],
+    # La superficie pública de ChileHub es el contrato de la API más usada del
+    # repo: su guardrail (inventario + firmas congeladas) vive en test_core.py
+    # (plan 134a, auditoría 2026-10-13).
+    "src/chile_hub/core.py": ["tests/test_core.py"],
     # Workflow pin updates are routinely opened by Dependabot. They do not alter
     # the documented pipeline contract, so requiring AGENTS.md makes valid
     # dependency-only PRs fail before their workflow checks can run.
