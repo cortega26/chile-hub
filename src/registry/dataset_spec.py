@@ -444,13 +444,10 @@ def _parse_documentation(payload: Mapping[str, Any], where: str) -> Documentatio
     )
 
 
-def parse_dataset_spec(payload: Mapping[str, Any], *, source_path: str = "<memory>") -> DatasetSpec:
-    """Valida y tipa un payload de DatasetSpec; falla cerrado ante cualquier
-    violación de forma, tipo o autoridad."""
-    where = os.path.basename(source_path)
+def _validate_payload_shape(payload: Mapping[str, Any], where: str) -> None:
+    """Payload objeto + sin claves del contrato + claves requeridas (ADR-018)."""
     if not isinstance(payload, dict):
         raise DatasetSpecError(f"DatasetSpec {where}: el spec debe ser un objeto JSON")
-
     rejected = sorted(CONTRACT_OWNED_KEYS & set(payload))
     if rejected:
         raise DatasetSpecError(
@@ -460,27 +457,11 @@ def parse_dataset_spec(payload: Mapping[str, Any], *, source_path: str = "<memor
         )
     _require_keys(payload, _REQUIRED_SPEC_KEYS, where)
 
-    spec_version = _require_str(payload, "spec_version", where)
-    dataset = _require_str(payload, "dataset", where)
-    kind = _require_str(payload, "kind", where)
-    if kind not in VALID_KINDS:
-        raise DatasetSpecError(
-            f"DatasetSpec {where}: 'kind' inválido '{kind}' (válidos: {', '.join(sorted(VALID_KINDS))})"
-        )
 
-    publication_track = _require_str(payload, "publication_track", where)
-    if publication_track not in VALID_PUBLICATION_TRACKS:
-        raise DatasetSpecError(
-            f"DatasetSpec {where}: 'publication_track' inválido '{publication_track}'"
-        )
-    maturity_status = _require_str(payload, "maturity_status", where)
-    if maturity_status not in VALID_MATURITY_STATUSES:
-        raise DatasetSpecError(
-            f"DatasetSpec {where}: 'maturity_status' inválido '{maturity_status}'"
-        )
-
-    alias_for = payload.get("alias_for")
-    dependencies = _require_str_list(payload, "dependencies", where)
+def _validate_kind_consistency(
+    kind: str, alias_for: Any, dependencies: tuple[str, ...], where: str
+) -> None:
+    """Reglas de alias_for/dependencies por kind (direct | alias | derived)."""
     if kind == "direct":
         if alias_for is not None:
             raise DatasetSpecError(f"DatasetSpec {where}: 'direct' no puede tener alias_for")
@@ -497,6 +478,9 @@ def parse_dataset_spec(payload: Mapping[str, Any], *, source_path: str = "<memor
         if not dependencies:
             raise DatasetSpecError(f"DatasetSpec {where}: 'derived' requiere dependencies")
 
+
+def _validate_extractor(payload: Mapping[str, Any], kind: str, where: str) -> Any:
+    """Valida `extractor` (string, lista de strings o null) y su obligatoriedad."""
     extractor = payload.get("extractor")
     if (
         extractor is not None
@@ -510,14 +494,22 @@ def parse_dataset_spec(payload: Mapping[str, Any], *, source_path: str = "<memor
         raise DatasetSpecError(
             f"DatasetSpec {where}: 'extractor' es obligatorio para kind '{kind}'"
         )
+    return extractor
 
+
+def _resolve_contract_path(payload: Mapping[str, Any], where: str) -> str:
+    """Resuelve y verifica la existencia del contrato referenciado."""
     contract_path = _require_str(payload, "contract_path", where)
     contract_abs = os.path.join(ROOT_DIR, contract_path)
     if not os.path.isfile(contract_abs):
         raise DatasetSpecError(
             f"DatasetSpec {where}: el contrato referenciado no existe: {contract_path}"
         )
+    return contract_path
 
+
+def _parse_optional_annotations(payload: Mapping[str, Any], where: str) -> dict[str, Any]:
+    """Campos opcionales: validator, catalog_notes, coverage_* y outputs."""
     validator_raw = payload.get("validator")
     if validator_raw is not None and not isinstance(validator_raw, str):
         raise DatasetSpecError(f"DatasetSpec {where}: 'validator' debe ser string o null")
@@ -548,6 +540,53 @@ def parse_dataset_spec(payload: Mapping[str, Any], *, source_path: str = "<memor
         raise DatasetSpecError(f"DatasetSpec {where}: 'outputs' debe ser dict de strings")
     outputs: dict[str, str] = dict(outputs_raw)
 
+    return {
+        "validator": validator,
+        "catalog_notes": catalog_notes,
+        "coverage_note": coverage_note,
+        "coverage_pct": coverage_pct,
+        "outputs": outputs,
+    }
+
+
+def parse_dataset_spec(payload: Mapping[str, Any], *, source_path: str = "<memory>") -> DatasetSpec:
+    """Valida y tipa un payload de DatasetSpec; falla cerrado ante cualquier
+    violación de forma, tipo o autoridad.
+
+    Plan 132e (auditoría 2026-10-13): orquesta helpers por fase
+    (`_validate_payload_shape`, `_validate_kind_consistency`,
+    `_validate_extractor`, `_resolve_contract_path`,
+    `_parse_optional_annotations`); la semántica y los mensajes no cambian.
+    """
+    where = os.path.basename(source_path)
+    _validate_payload_shape(payload, where)
+
+    spec_version = _require_str(payload, "spec_version", where)
+    dataset = _require_str(payload, "dataset", where)
+    kind = _require_str(payload, "kind", where)
+    if kind not in VALID_KINDS:
+        raise DatasetSpecError(
+            f"DatasetSpec {where}: 'kind' inválido '{kind}' (válidos: {', '.join(sorted(VALID_KINDS))})"
+        )
+
+    publication_track = _require_str(payload, "publication_track", where)
+    if publication_track not in VALID_PUBLICATION_TRACKS:
+        raise DatasetSpecError(
+            f"DatasetSpec {where}: 'publication_track' inválido '{publication_track}'"
+        )
+    maturity_status = _require_str(payload, "maturity_status", where)
+    if maturity_status not in VALID_MATURITY_STATUSES:
+        raise DatasetSpecError(
+            f"DatasetSpec {where}: 'maturity_status' inválido '{maturity_status}'"
+        )
+
+    alias_for = payload.get("alias_for")
+    dependencies = _require_str_list(payload, "dependencies", where)
+    _validate_kind_consistency(kind, alias_for, dependencies, where)
+    extractor = _validate_extractor(payload, kind, where)
+    contract_path = _resolve_contract_path(payload, where)
+    annotations = _parse_optional_annotations(payload, where)
+
     return DatasetSpec(
         spec_version=spec_version,
         dataset=dataset,
@@ -559,18 +598,18 @@ def parse_dataset_spec(payload: Mapping[str, Any], *, source_path: str = "<memor
         extraction_lane=_require_str(payload, "extraction_lane", where),
         extractor=extractor,
         contract_path=contract_path,
-        validator=validator,
+        validator=annotations["validator"],
         alias_for=alias_for,
         dependencies=dependencies,
         source=_parse_source(payload, where),
         reuse_policy=_parse_reuse(payload, where),
         freshness_policy=_parse_freshness(payload, where),
         documentation=_parse_documentation(payload, where),
-        outputs=outputs,
+        outputs=annotations["outputs"],
         join_keys=_require_str_list(payload, "join_keys", where),
-        catalog_notes=catalog_notes,
-        coverage_note=coverage_note,
-        coverage_pct=coverage_pct,
+        catalog_notes=annotations["catalog_notes"],
+        coverage_note=annotations["coverage_note"],
+        coverage_pct=annotations["coverage_pct"],
     )
 
 

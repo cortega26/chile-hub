@@ -194,7 +194,7 @@ target-version = "py311"
 # Trinquete del audit de prácticas 2026-10-13 (plan 131): el select original
 # (E,W,F,I) dejó pasar god functions, duplicación y tipado débil sin señal.
 # Los conjuntos se amplían por batches; C90 llega en el plan 132.
-select = ["E", "W", "F", "I", "B", "C4", "RET", "RUF", "SIM", "UP"]
+select = ["E", "W", "F", "I", "B", "C4", "RET", "RUF", "SIM", "UP", "C90"]
 ignore = [
     "E501",
     "E402",
@@ -205,6 +205,13 @@ ignore = [
     "B019",  # plan 134: lru_cache en métodos de ChileHub (fuga de instancias)
     "SIM117",  # fix solo-preview en ruff; deuda cosmética de tests (plan 138)
 ]
+
+[tool.ruff.lint.mccabe]
+# Trinquete del audit 2026-10-13 (plan 132e): 35 es el mínimo que deja el
+# árbol verde con la deuda actual documentada en `# noqa: C901` (extractores
+# → plan 133; verifica_pipeline → plan 136). Bajar el umbral a medida que
+# esos planes descomponen sus funciones.
+max-complexity = 35
 
 [tool.ruff.lint.per-file-ignores]
 # check_source_urls.py co-evoluciona con data/source_registry.json y

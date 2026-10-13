@@ -142,7 +142,7 @@ chile-hub/
 │   │   ├── pipeline_status_utils.py  Reportes Markdown de salud, catálogo y redistribución (1 064 líneas)
 │   │   ├── _render.py             Helper de renderizado de tablas
 │   │   └── text.py                Utils de texto compartidas
-│   ├── registry/                  DatasetSpec cohort Phase 2–3D (ADR-018): modelo tipado + proyecciones de compatibilidad (dataset_spec.py, 657 líneas)
+│   ├── registry/                  DatasetSpec cohort Phase 2–3D (ADR-018): modelo tipado + proyecciones de compatibilidad (dataset_spec.py, 697 líneas)
 │   └── pipeline_status_utils.py   Shim de compatibilidad (21 líneas) — re-exporta del paquete; NO duplicar lógica aquí
 │
 ├── data/

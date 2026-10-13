@@ -303,7 +303,19 @@ class RuffRatchetGuardrailTests(unittest.TestCase):
     decisión explícita registrada aquí.
     """
 
-    REQUIRED_SELECT: ClassVar[set[str]] = {"E", "W", "F", "I", "B", "C4", "RET", "RUF", "SIM", "UP"}
+    REQUIRED_SELECT: ClassVar[set[str]] = {
+        "E",
+        "W",
+        "F",
+        "I",
+        "B",
+        "C4",
+        "RET",
+        "RUF",
+        "SIM",
+        "UP",
+        "C90",
+    }
     DOCUMENTED_IGNORES: ClassVar[set[str]] = {
         "E501",
         "E402",

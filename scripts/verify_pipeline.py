@@ -187,7 +187,7 @@ def verify_data_package():
         fail(f"datapackage.json no es un Frictionless Data Package valido: {errors}")
 
 
-def verify_source_registry(registry=None, catalog=None):
+def verify_source_registry(registry=None, catalog=None):  # noqa: C901  # plan 136
     if registry is None:
         registry = load_json(SOURCE_REGISTRY_PATH)
     if catalog is None:
