@@ -9,8 +9,10 @@ wrappers delgados de fetch; la normalización y la metadata son una sola
 implementación.
 
 Lo que NO se comparte (a propósito): `REUSE_POLICY` (divergió entre stub y
-scraper; se pasa por parámetro), `FALLBACK_ROWS`, ni nada del lado fetch
-(`VARIABLE_COLUMN_MAP`, `_parse_xml_spreadsheet`, scraping).
+scraper; se pasa por parámetro) ni nada del lado fetch
+(`VARIABLE_COLUMN_MAP`, `_parse_xml_spreadsheet`, scraping). La muestra
+`FALLBACK_ROWS` sí se comparte desde el plan 133a (auditoría 2026-10-13):
+era byte-idéntica en ambos y podía derivar en silencio.
 """
 
 from typing import Any
@@ -21,6 +23,46 @@ try:
     from src.extractors.source_adapter import build_standard_metadata
 except ModuleNotFoundError:  # ejecución como script (python src/extractors/*.py)
     from source_adapter import build_standard_metadata
+
+
+# Muestra de respaldo curada (3 comunas con datos verificados). Única fuente:
+# antes estaba copiada byte a byte en `sinim_finanzas_extractor` (stub) y
+# `sinim_finanzas_live_extractor` (`_get_fallback_rows`).
+FALLBACK_ROWS: list[dict[str, Any]] = [
+    {
+        "anio": 2024,
+        "codigo_comuna": "13101",
+        "nombre_comuna": "Santiago",
+        "ingresos_totales": 245000000000.0,
+        "gastos_totales": 231000000000.0,
+        "ingresos_propios_permanentes": 162000000000.0,
+        "fondo_comun_municipal": 39000000000.0,
+        "gasto_personal": 70500000000.0,
+        "gasto_inversion": 28500000000.0,
+    },
+    {
+        "anio": 2024,
+        "codigo_comuna": "05109",
+        "nombre_comuna": "Viña del Mar",
+        "ingresos_totales": 155000000000.0,
+        "gastos_totales": 149000000000.0,
+        "ingresos_propios_permanentes": 98000000000.0,
+        "fondo_comun_municipal": 21000000000.0,
+        "gasto_personal": 52300000000.0,
+        "gasto_inversion": 17400000000.0,
+    },
+    {
+        "anio": 2024,
+        "codigo_comuna": "08101",
+        "nombre_comuna": "Concepción",
+        "ingresos_totales": 132000000000.0,
+        "gastos_totales": 126000000000.0,
+        "ingresos_propios_permanentes": 76500000000.0,
+        "fondo_comun_municipal": 24500000000.0,
+        "gasto_personal": 41800000000.0,
+        "gasto_inversion": 15200000000.0,
+    },
+]
 
 
 def normalize_rows(rows: list[dict[str, Any]]) -> pl.DataFrame:

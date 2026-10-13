@@ -34,6 +34,7 @@ if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
 try:
+    from src.extractors.authoridades_shared import SCHEMA
     from src.extractors.base import (
         BaseExtractor,
         ensure_staging_directories,
@@ -42,6 +43,7 @@ try:
     from src.extractors.http_utils import fetch_with_retry
     from src.extractors.region_utils import REGION_A_CODIGO, norm_text
 except ModuleNotFoundError:
+    from autoridades_shared import SCHEMA
     from base import BaseExtractor, ensure_staging_directories, write_staging_csv_atomic
     from http_utils import fetch_with_retry
     from region_utils import REGION_A_CODIGO, norm_text
@@ -66,25 +68,6 @@ _BCN_HEADERS = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
     "Accept-Language": "es-CL,es;q=0.9,en;q=0.8",
     "Referer": "https://www.google.com/",
-}
-
-SCHEMA: dict[str, type[pl.DataType]] = {
-    "id_autoridad": pl.String,
-    "nombre": pl.String,
-    "cargo": pl.String,
-    "institucion": pl.String,
-    "partido": pl.String,
-    "pacto": pl.String,
-    "distrito_electoral": pl.String,
-    "circunscripcion_senatorial": pl.String,
-    "codigo_comuna": pl.String,
-    "codigo_region": pl.String,
-    "periodo_inicio": pl.String,
-    "periodo_fin": pl.String,
-    "estado_mandato": pl.String,
-    "fuente": pl.String,
-    "url_fuente": pl.String,
-    "fecha_consulta": pl.String,
 }
 
 REUSE_POLICY = {

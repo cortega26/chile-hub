@@ -98,8 +98,9 @@ chile-hub/
 │
 ├── src/
 <!-- START_AGENTS_EXTRACTOR_LIST -->
-│   ├── extractors/                 22 extractores por dataset + 7 módulos compartidos (ver nota abajo)
+│   ├── extractors/                 22 extractores por dataset + 8 módulos compartidos (ver nota abajo)
 │   │   ├── _sinim_shared.py                              Normalización/metadata compartida stub+scraper (Plan 099)
+│   │   ├── autoridades_shared.py                         Esquema canónico del carril autoridades (plan 133a)
 │   │   ├── base.py                                       BaseExtractor ABC (contrato para todos los extractores)
 │   │   ├── http_utils.py                                 Reintentos/backoff HTTP compartidos
 │   │   ├── ine_ipc.py                                    Override de IPC desde el INE (fuente autoritativa; Plan 069)

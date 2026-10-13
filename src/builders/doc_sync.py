@@ -349,6 +349,7 @@ _AGENTS_EXTRACTOR_DESCRIPTIONS = {
     "result.py": "ExtractionResult tipado (Phase 4) — provenance/tiempo final",
     "ine_ipc.py": "Override de IPC desde el INE (fuente autoritativa; Plan 069)",
     "_sinim_shared.py": "Normalización/metadata compartida stub+scraper (Plan 099)",
+    "autoridades_shared.py": "Esquema canónico del carril autoridades (plan 133a)",
     "subdere_extractor.py": (
         "DPA: regiones/provincias/comunas/comunas_enriquecidas (BCN ArcGIS) → data/staging/"
     ),
@@ -416,6 +417,10 @@ _SHARED_MODULES = {
     # compartida stub+scraper, Plan 099) pero vive en extractors/ — sin esto,
     # el inventario lo reporta como fichero huérfano.
     "_sinim_shared.py",
+    # autoridades_shared.py: esquema canónico compartido del carril
+    # autoridades (plan 133a, auditoría 2026-10-13) — sin esto el inventario
+    # lo reporta como fichero huérfano.
+    "autoridades_shared.py",
 }
 
 
