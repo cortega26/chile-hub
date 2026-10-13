@@ -91,17 +91,6 @@ COLUMN_RENAME = {
 # conteo queda en los metadatos de staging para que un alza sea visible.
 RUT_SENTINELS = ["0"]
 
-# Filas descartadas por centinela en la última corrida de parse_resources().
-# Se expone como estado de módulo (el pipeline es secuencial y de un solo hilo)
-# para que process() pueda registrarlo en los metadatos de staging sin cambiar
-# la firma de parse_resources(), que es parte del contrato del extractor.
-_LAST_SENTINEL_DROP_COUNT = 0
-
-# Modo del último fetch (Plan 076): "incremental" (solo el año en curso porque
-# el staging ya tiene el histórico) o "full" (primera carga o staging ilegible).
-# Mismo patrón de estado de módulo que _LAST_SENTINEL_DROP_COUNT.
-_LAST_FETCH_MODE = "full"
-
 # Tipos de sociedad que mapean a abreviaturas canónicas
 SOCIEDAD_MAP = {
     "SRL": "SRL",
@@ -240,7 +229,7 @@ def _res_snapshot_candidates(resource_name: str, expected_year: int | None) -> l
     return sorted(candidates, key=_res_snapshot_sort_key, reverse=True)
 
 
-def fetch_resources() -> tuple[list[bytes], str, str]:
+def fetch_resources() -> tuple[list[bytes], str, str, str]:
     """Obtiene los CSVs del dataset RES desde datos.gob.cl.
 
     Incremental (Plan 076): si el staging consolidado ya existe, solo se
@@ -249,7 +238,7 @@ def fetch_resources() -> tuple[list[bytes], str, str]:
     histórico completo. El merge con el staging previo lo hace process().
 
     Retorna:
-        Tupla con (lista_de_contenidos_csv_bytes, source_mode, source_detail).
+        Tupla con (lista_de_contenidos_csv_bytes, source_mode, fetch_mode, source_detail).
     """
     ensure_staging_directories()
 
@@ -262,13 +251,12 @@ def fetch_resources() -> tuple[list[bytes], str, str]:
     if not csv_resources:
         raise SystemExit("No se encontraron recursos CSV en el dataset RES.")
 
-    global _LAST_FETCH_MODE
     present_years = _staging_years_present()
     current_year = datetime.datetime.now(datetime.UTC).year
 
     if present_years is None:
         selected_resources = csv_resources
-        _LAST_FETCH_MODE = "full"
+        fetch_mode = "full"
     else:
         years_to_fetch = {current_year}
         if current_year - 1 not in present_years:
@@ -278,9 +266,9 @@ def fetch_resources() -> tuple[list[bytes], str, str]:
         # buscados, degradar a fetch completo en vez de quedarse sin datos.
         if not selected_resources:
             selected_resources = csv_resources
-            _LAST_FETCH_MODE = "full"
+            fetch_mode = "full"
         else:
-            _LAST_FETCH_MODE = "incremental"
+            fetch_mode = "incremental"
 
     contents = []
     recovered_snapshots: list[str] = []
@@ -318,18 +306,24 @@ def fetch_resources() -> tuple[list[bytes], str, str]:
                 ) from exc
 
     if recovered_snapshots:
-        return contents, "fallback", "raw_snapshot_recovery: " + ", ".join(recovered_snapshots)
-    return contents, "live", "datos_gob_cl_ckan_api"
+        return (
+            contents,
+            "fallback",
+            fetch_mode,
+            "raw_snapshot_recovery: " + ", ".join(recovered_snapshots),
+        )
+    return contents, "live", fetch_mode, "datos_gob_cl_ckan_api"
 
 
-def parse_resources(contents: list[bytes]) -> pl.DataFrame:
+def parse_resources(contents: list[bytes]) -> tuple[pl.DataFrame, int]:
     """Parsea y consolida todos los CSVs anuales del RES en un solo DataFrame.
 
     Args:
         contents: Lista de contenidos CSV en bytes (uno por año).
 
     Retorna:
-        DataFrame de Polars con todas las constituciones normalizadas.
+        Tupla (DataFrame de Polars con todas las constituciones normalizadas,
+        filas descartadas por RUT centinela).
     """
     frames = []
 
@@ -412,9 +406,8 @@ def parse_resources(contents: list[bytes]) -> pl.DataFrame:
     # porque validate_empresas() trata los RUT nulos como error duro. Se
     # descartan y se cuentan: un alza en este contador es señal de que la
     # fuente cambió de comportamiento (issue #42).
-    global _LAST_SENTINEL_DROP_COUNT
-    _LAST_SENTINEL_DROP_COUNT = df.filter(pl.col("rut").is_in(RUT_SENTINELS)).height
-    if _LAST_SENTINEL_DROP_COUNT:
+    sentinel_drop_count = df.filter(pl.col("rut").is_in(RUT_SENTINELS)).height
+    if sentinel_drop_count:
         df = df.filter(~pl.col("rut").is_in(RUT_SENTINELS))
 
     # Eliminar duplicados exactos (puede haber overlap entre archivos anuales)
@@ -443,7 +436,7 @@ def parse_resources(contents: list[bytes]) -> pl.DataFrame:
     # Solo incluir columnas que existen
     available = [c for c in final_cols if c in df.columns]
 
-    return df.select(available)
+    return df.select(available), sentinel_drop_count
 
 
 class ResExtractor(BaseExtractor):
@@ -457,8 +450,9 @@ class ResExtractor(BaseExtractor):
         return fetch_resources()
 
     def normalize(self, raw_data):
-        contents, _, _ = raw_data
-        return parse_resources(contents)
+        contents, _, _, _ = raw_data
+        df, _sentinel_drop_count = parse_resources(contents)
+        return df
 
     def validate(self, df, metadata: dict) -> dict:
         from src.validation import validate_empresas
@@ -505,9 +499,9 @@ def _merge_incremental(df_new: pl.DataFrame) -> pl.DataFrame:
 
 def process() -> str:
     """Ejecuta el pipeline completo del extractor RES."""
-    contents, source_mode, source_detail = fetch_resources()
-    df = parse_resources(contents)
-    if _LAST_FETCH_MODE == "incremental":
+    contents, source_mode, fetch_mode, source_detail = fetch_resources()
+    df, sentinel_drop_count = parse_resources(contents)
+    if fetch_mode == "incremental":
         df = _merge_incremental(df)
 
     extractor = ResExtractor()
@@ -527,7 +521,7 @@ def process() -> str:
         "record_count": df.height,
         "fields": df.columns,
         "notes": [
-            f"filas descartadas por RUT centinela {RUT_SENTINELS}: {_LAST_SENTINEL_DROP_COUNT}",
+            f"filas descartadas por RUT centinela {RUT_SENTINELS}: {sentinel_drop_count}",
             (
                 "Solo incluye empresas constituidas bajo el Regimen Simplificado "
                 "(Ley 20.659) desde mayo 2013."
