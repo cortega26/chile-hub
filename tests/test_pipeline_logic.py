@@ -4330,6 +4330,64 @@ class ValidationCoverageTests(unittest.TestCase):
         uncovered = cvr.catalog_keys() - cvr.registered_validation_keys()
         self.assertEqual(uncovered, set(cvr.ALLOWED_UNVALIDATED_DATASETS))
 
+    def test_package_scan_counts_definitions_not_reexports(self):
+        """Plan 135: el checker escanea DEFINICIONES de los submódulos; los
+        re-exports del `__init__` (ImportFrom) no cuentan ni duplican."""
+        from scripts import check_validation_registration as cvr
+
+        functions = cvr.validation_functions()
+        # 23 validadores definidos en el paquete, exactamente una vez cada uno.
+        self.assertEqual(len(functions), 23)
+        self.assertIn("comunas", functions)  # definida en _dpa.py
+
+    def test_validate_def_in_init_fails_the_split_contract(self):
+        """Un `validate_*` definido en el `__init__` es un defecto del split."""
+        import tempfile
+        from pathlib import Path
+        from unittest import mock
+
+        from scripts import check_validation_registration as cvr
+
+        with tempfile.TemporaryDirectory() as tmp:
+            pkg = Path(tmp)
+            (pkg / "__init__.py").write_text(
+                "def validate_leak(df, metadata):\n    return {}\n", encoding="utf-8"
+            )
+            (pkg / "_dpa.py").write_text(
+                "def validate_comunas(df, metadata):\n    return {}\n", encoding="utf-8"
+            )
+            with (
+                mock.patch.object(cvr, "VALIDATION_DIR", pkg),
+                self.assertRaises(SystemExit) as ctx,
+            ):
+                cvr.validation_functions()
+        self.assertIn("__init__", str(ctx.exception))
+
+    def test_validation_facade_reexports_full_inventory(self):
+        """La fachada re-exporta todo lo definido en el paquete (move-only 135)."""
+        import ast
+        from pathlib import Path
+
+        pkg = Path(__file__).resolve().parents[1] / "src" / "validation"
+        defined: set[str] = set()
+        for path in sorted(pkg.glob("*.py")):
+            if path.name == "__init__.py":
+                continue
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+            for node in tree.body:
+                if isinstance(node, ast.FunctionDef):
+                    defined.add(node.name)
+                elif isinstance(node, ast.Assign):
+                    defined.update(t.id for t in node.targets if isinstance(t, ast.Name))
+        init_tree = ast.parse((pkg / "__init__.py").read_text(encoding="utf-8"))
+        reexported = {
+            alias.asname
+            for node in init_tree.body
+            if isinstance(node, ast.ImportFrom)
+            for alias in node.names
+        }
+        self.assertEqual(defined - reexported, set(), "faltan re-exports en la fachada")
+
     def test_exemptions_reference_real_catalog_keys_with_reasons(self):
         from scripts import check_validation_registration as cvr
 
@@ -5053,21 +5111,26 @@ class DriftTaxonomyTests(unittest.TestCase):
         un basurero de warnings molestos.
         """
         import ast
-        import inspect
+        from pathlib import Path
 
-        import src.validation as validation_mod
-
-        tree = ast.parse(inspect.getsource(validation_mod))
-        declaring = {
-            node.name
-            for node in ast.walk(tree)
-            if isinstance(node, ast.FunctionDef)
-            and any(
-                isinstance(call.func, ast.Name) and call.func.id == "_add_expected_warning"
-                for call in ast.walk(node)
-                if isinstance(call, ast.Call)
+        # Plan 135: validation es un paquete por dominio; se recorren las
+        # DEFINICIONES de los submódulos (el __init__ solo re-exporta).
+        validation_dir = Path(__file__).resolve().parents[1] / "src" / "validation"
+        declaring = set()
+        for path in sorted(validation_dir.glob("*.py")):
+            if path.name == "__init__.py":
+                continue
+            tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+            declaring.update(
+                node.name
+                for node in ast.walk(tree)
+                if isinstance(node, ast.FunctionDef)
+                and any(
+                    isinstance(call.func, ast.Name) and call.func.id == "_add_expected_warning"
+                    for call in ast.walk(node)
+                    if isinstance(call, ast.Call)
+                )
             )
-        }
         self.assertEqual(
             declaring,
             {

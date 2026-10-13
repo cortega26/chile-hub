@@ -29,6 +29,7 @@ SRC_DIR = os.path.join(ROOT_DIR, "src")
 TESTS_DIR = os.path.join(ROOT_DIR, "tests")
 BUILDERS_DIR = os.path.join(SRC_DIR, "builders")
 CHILEHUB_DIR = os.path.join(SRC_DIR, "chile_hub")
+VALIDATION_DIR = os.path.join(SRC_DIR, "validation")
 CATALOG_PATH = os.path.join(ROOT_DIR, "data", "dataset_catalog_config.json")
 
 ERRORS: list[str] = []
@@ -149,6 +150,30 @@ def check_chilehub_package_list(content: str) -> None:
             )
 
 
+def check_validation_package_list(content: str) -> None:
+    """Plan 135: el paquete validation/ listado en el §2 debe existir (y estar completo).
+
+    Hecho de existencia (robusto frente a líneas movibles), espejo de
+    `check_chilehub_package_list`.
+    """
+    subtree = content[content.index("│   ├── validation/") :]
+    subtree = subtree[: subtree.index("│   ├── build_dev_db.py")]
+    named = set(re.findall(r"│   │   [├└]── ([\w]+\.py)", subtree))
+    real = {f for f in os.listdir(VALIDATION_DIR) if f.endswith(".py")}
+    missing_on_disk = named - real
+    not_listed = real - named
+    if missing_on_disk:
+        fail(
+            "AGENTS.md lista módulos del paquete validation/ que no existen en "
+            f"src/validation/: {', '.join(sorted(missing_on_disk))}."
+        )
+    if not_listed:
+        fail(
+            "src/validation/ tiene módulos que AGENTS.md §2 no lista: "
+            f"{', '.join(sorted(not_listed))}. Actualiza el bloque del paquete."
+        )
+
+
 # ---------------------------------------------------------------------------
 # 3. Tabla de capas del §1: cada dataset del catálogo debe tener su fila.
 #    Mapa curado: clave de catálogo -> fragmento distintivo de la fila.
@@ -252,6 +277,7 @@ def main(argv: list[str] | None = None) -> None:
             check_line_count_anchors(doc, content)
             check_builders_list(content)
             check_chilehub_package_list(content)
+            check_validation_package_list(content)
             check_layers_table(content)
             check_tests_tree(content)
         else:

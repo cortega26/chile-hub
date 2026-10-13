@@ -1,4 +1,4 @@
-"""Tests unitarios para las funciones de validación en src/validation.py.
+"""Tests unitarios para las funciones de validación del paquete src/validation/.
 
 Cada validador se prueba con casos mínimos: datos correctos, errores
 esperados y condiciones de borde.  Estos tests complementan los tests

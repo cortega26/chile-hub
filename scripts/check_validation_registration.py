@@ -2,7 +2,7 @@ import ast
 from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
-VALIDATION_PATH = ROOT_DIR / "src" / "validation.py"
+VALIDATION_DIR = ROOT_DIR / "src" / "validation"
 BUILD_PATH = ROOT_DIR / "src" / "build_dev_db.py"
 
 ALLOWED_UNREGISTERED_VALIDATORS = {
@@ -44,12 +44,35 @@ def load_tree(path: Path) -> ast.Module:
 
 
 def validation_functions() -> set[str]:
-    tree = load_tree(VALIDATION_PATH)
-    return {
-        node.name.removeprefix("validate_")
-        for node in tree.body
+    """Definiciones `validate_*` del paquete (plan 135).
+
+    Escanea las DEFINICIONES de los submódulos; los re-exports del
+    `__init__` son `ImportFrom` y no cuentan (evita dobles). Un `validate_*`
+    definido en el `__init__` es un defecto del split: falla duro.
+    """
+    init_tree = load_tree(VALIDATION_DIR / "__init__.py")
+    leaked = [
+        node.name
+        for node in init_tree.body
         if isinstance(node, ast.FunctionDef) and node.name.startswith("validate_")
-    }
+    ]
+    if leaked:
+        raise SystemExit(
+            f"ERROR: __init__.py del paquete validation define validate_*: {leaked}. "
+            "Los validadores viven en submódulos por dominio; el __init__ solo re-exporta."
+        )
+
+    names: set[str] = set()
+    for path in sorted(VALIDATION_DIR.glob("**/*.py")):
+        if path.name == "__init__.py":
+            continue
+        tree = load_tree(path)
+        names.update(
+            node.name.removeprefix("validate_")
+            for node in tree.body
+            if isinstance(node, ast.FunctionDef) and node.name.startswith("validate_")
+        )
+    return names
 
 
 def collect_validation_keys_from_dict(node: ast.Dict) -> set[str]:

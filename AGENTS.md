@@ -130,7 +130,18 @@ chile-hub/
 │   │   ├── sinim_finanzas_live_extractor.py              Finanzas municipales — scraper real; corre en `monthly-scrape.yml`
 │   │   └── subdere_extractor.py                          DPA: regiones/provincias/comunas/comunas_enriquecidas (BCN ArcGIS) → data/staging/
 <!-- END_AGENTS_EXTRACTOR_LIST -->
-│   ├── validation.py              Todas las funciones validate_*() — módulo independiente (1 958 líneas)
+│   ├── validation/                Paquete por dominio con fachada (plan 135)
+│   │   ├── __init__.py            Re-exports explícitos — superficie estable
+│   │   ├── _constants.py          Constantes canónicas del pipeline de validación
+│   │   ├── _helpers.py            Helpers compartidos (RUTs, duplicados, conteos)
+│   │   ├── _dpa.py                comunas / regiones / provincias
+│   │   ├── _poblacion.py          censo / hogares y viviendas / estadísticas vitales
+│   │   ├── _educacion.py          establecimientos y resultados educacionales
+│   │   ├── _salud.py              establecimientos de salud
+│   │   ├── _economia.py           indicadores / finanzas / empresas / consumo / pobreza
+│   │   ├── _territorio.py         SIEDU / perfil / POI / geometría / permisos / aire
+│   │   ├── _politica.py           distritos / partidos / autoridades
+│   │   └── _anomalias.py          detect_series_anomalies
 │   ├── build_dev_db.py            Orquestador (600 líneas): main() + fases (_load_inputs, _compute_validations, _write_data_artifacts, _generate_reports)
 │   ├── builders/                  Módulos del pipeline extraídos de build_dev_db.py (formats, metadata, reports, artifacts, datasets, catalog, landing, io_utils, _shared, dcat_catalog, data_package, doc_sync, geo, _logging)
 │   ├── chile_hub/                 Paquete Python instalable (ChileHub API + CLI + data manager)
@@ -158,7 +169,7 @@ chile-hub/
 │   ├── test_chile_hub.py         API/CLI de ChileHub, contratos de artefactos, workflow, Makefile
 │   ├── test_extractors.py        Un test class por extractor + contrato de BaseExtractor
 │   ├── test_pipeline_logic.py    Lógica interna de build_dev_db.py, invariantes CUT, changelog
-│   ├── test_validation.py        Funciones validate_*() de src/validation.py
+│   ├── test_validation.py        Funciones validate_*() del paquete src/validation/
 │   ├── test_core.py              Métodos públicos de ChileHub (core.py)
 │   ├── test_data_package.py      Builder de Frictionless Data Package
 │   ├── test_packaging_runtime.py Empaquetado del bundle publicable en runtime
@@ -204,7 +215,7 @@ codegraph impact validate_comunas                   # Qué se rompe si cambio es
 
 **Reglas para acotar lecturas y ahorrar tokens:**
 - Usar `Read` con `offset`/`limit` — nunca leer archivos grandes enteros de golpe.
-- `base.py` (146 líneas) es seguro de leer completo. `validation.py` (1 958 líneas) — leer por validador individual.
+- `base.py` (146 líneas) es seguro de leer completo. El paquete `validation/` — leer por dominio (`_dpa`, `_poblacion`, `_economia`…), no entero.
 - `build_dev_db.py` (600 líneas) y `src/chile_hub/core.py` (1 250 líneas) — usar estas áncoras:
 
 | Archivo | Líneas de interés |
@@ -417,7 +428,8 @@ en ese JSON siguiendo el patrón de los datasets existentes (`regiones`, `provin
 
 ### Paso 4 — Agregar validaciones
 
-Agregar una función `validate_{nombre}(df, metadata)` en **`src/validation.py`** (no en
+Agregar una función `validate_{nombre}(df, metadata)` en **`src/validation/`** (el
+submódulo del dominio — no en
 `build_dev_db.py`) con al menos:
 - Verificar que el DataFrame no está vacío.
 - Verificar unicidad de la clave primaria.
@@ -427,7 +439,7 @@ Luego importarla en `build_dev_db.py` y llamarla dentro del bloque `validations 
 
 > **Verificación obligatoria:** después de registrar la validación, ejecutar
 > `python scripts/check_validation_registration.py` o `make doctor`.
-> La verificación compara las funciones `validate_*()` de `src/validation.py`
+> La verificación compara las funciones `validate_*()` del paquete `src/validation/`
 > contra las claves del bloque `validations = {…}` de `build_dev_db.py`, con
 > excepciones explícitas para alias semánticos y validadores archivados. Una
 > validación definida pero no registrada se salta silenciosamente: los datos se
@@ -662,7 +674,7 @@ grep -n "^class " tests/*.py
 | `test_phase4_extraction.py` | No | ExtractionResult Phase 4: modelo tipado, 3 extractores piloto (ordinary/fallback/multi-source) y adapters legacy |
 | `test_pipeline_logic.py` | No | Lógica interna de `build_dev_db.py`, invariantes CUT, fallback de indicadores, severidad de `dataset_changelog.json`, builders (`reports`, `pipeline_status_utils`) |
 | `test_render.py` | No | Helper de renderizado de tablas (`_render.py`) |
-| `test_validation.py` | No | Funciones `validate_*()` de `src/validation.py`: bordes vacíos, claves duplicadas, casos límite |
+| `test_validation.py` | No | Funciones `validate_*()` del paquete `src/validation/`: bordes vacíos, claves duplicadas, casos límite |
 | `test_verify_pipeline.py` | Sí (`make build` antes) | Verificación de pipeline (`verify_pipeline.py`) — guardia pre-publicación de artefactos |
 
 <!-- END_AGENTS_TEST_TABLE -->
@@ -718,7 +730,7 @@ el criterio sigue vigente: código nuevo del pipeline debe venir acompañado de
 tests que ejerciten sus ramas nuevas, no solo el camino feliz.
 
 **Co-cambio automático:** `scripts/check_companion_paths.py` (modo `companions`,
-§12) bloquea en CI un PR que modifique `src/validation.py`, `src/extractors/**`
+§12) bloquea en CI un PR que modifique `src/validation/`, `src/extractors/**`
 o `src/build_dev_db.py` sin tocar también su archivo de test compañero. Esto no
 reemplaza el criterio humano de arriba — solo evita el caso más simple de
 "cambié código y me olvidé de tocar el test".
@@ -836,7 +848,8 @@ _lockfile_ (`uv.lock`) es el único contrato reproducible — `uv sync` lo repro
 
 ### ❌ Publicar datos sin pasar por validate_*()
 
-Las funciones `validate_comunas()`, `validate_indicadores()`, etc. viven en `src/validation.py`
+Las funciones `validate_comunas()`, `validate_indicadores()`, etc. viven en el
+paquete `src/validation/` (un submódulo por dominio, fachada en `__init__.py`)
 y son importadas por `build_dev_db.py`. Son la última línea de defensa antes de publicar.
 No bypassear estas validaciones ni mover su lógica a otro módulo.
 
@@ -1015,7 +1028,7 @@ Dos modos, ambos corren en `make doctor` y/o en el job `quality` de CI
    y su doc en `docs/datasets/`. Bloqueante — `SystemExit` si falta alguno.
 2. **`companions`** (solo en `pull_request`, vía diff contra el commit base):
    aplica la tabla `COMPANION_RULES` — si cambia una ruta disparadora (p. ej.
-   `data/dataset_catalog_config.json`, `src/validation.py`,
+   `data/dataset_catalog_config.json`, `src/validation/`,
    `src/extractors/**`) y ninguna de sus rutas compañeras (docs, tests,
    `AGENTS.md`) aparece en el mismo diff, el PR falla con un mensaje explícito
    de qué se esperaba.

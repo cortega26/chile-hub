@@ -241,7 +241,7 @@ _AGENTS_TEST_DESCRIPTIONS = {
         "builders (`reports`, `pipeline_status_utils`)"
     ),
     "test_validation.py": (
-        "Funciones `validate_*()` de `src/validation.py`: bordes vacíos, "
+        "Funciones `validate_*()` del paquete `src/validation/`: bordes vacíos, "
         "claves duplicadas, casos límite"
     ),
     "test_core.py": (

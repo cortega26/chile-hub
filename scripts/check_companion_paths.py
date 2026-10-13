@@ -37,7 +37,7 @@ COMPANION_RULES: dict[str, list[str]] = {
         "docs/dataset-inclusion-criteria.md",
     ],
     "contracts/datasets/": ["docs/datasets/"],
-    "src/validation.py": ["tests/test_validation.py", "tests/test_pipeline_logic.py"],
+    "src/validation/": ["tests/test_validation.py", "tests/test_pipeline_logic.py"],
     "src/extractors/": ["tests/test_extractors.py"],
     "src/build_dev_db.py": ["tests/test_pipeline_logic.py", "tests/test_chile_hub.py"],
     # La superficie pública de ChileHub es el contrato de la API más usada del
