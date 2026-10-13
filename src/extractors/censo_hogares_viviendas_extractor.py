@@ -9,7 +9,7 @@ import openpyxl
 import polars as pl
 import requests
 
-UTC = datetime.timezone.utc
+UTC = datetime.UTC
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
 if str(ROOT_DIR) not in sys.path:

@@ -17,7 +17,7 @@ try:
 except ModuleNotFoundError:
     from http_utils import fetch_with_retry
 
-UTC = datetime.timezone.utc
+UTC = datetime.UTC
 
 
 def fetch_url_snapshot(

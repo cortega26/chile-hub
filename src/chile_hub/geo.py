@@ -17,8 +17,9 @@ import hashlib
 import logging
 import os
 import tempfile
+from collections.abc import Callable
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
 
 import requests
 from platformdirs import user_cache_dir
@@ -185,7 +186,7 @@ def acquire_geometry(
         ) from exc
 
 
-def validate_geometry(gdf: "GeoDataFrame") -> None:
+def validate_geometry(gdf: GeoDataFrame) -> None:
     """Validación estructural del GeoParquet (contrato ADR-012, Plan 065 Step 3).
 
     Fallos: sin columna geometry, CRS distinto de EPSG:4326, codigo_comuna no
@@ -217,10 +218,10 @@ def validate_geometry(gdf: "GeoDataFrame") -> None:
         )
 
 
-_GEOMETRY_CACHE: dict[tuple[str, int], "GeoDataFrame"] = {}
+_GEOMETRY_CACHE: dict[tuple[str, int], GeoDataFrame] = {}
 
 
-def load_geometry(path: Path) -> "GeoDataFrame":
+def load_geometry(path: Path) -> GeoDataFrame:
     """Carga un GeoParquet local como GeoDataFrame, con validación estructural.
 
     Cachea el GeoDataFrame en memoria a nivel de módulo, con clave
@@ -250,7 +251,7 @@ def clear_geometry_cache() -> None:
 
 
 def resolve_points(
-    gdf: "GeoDataFrame",
+    gdf: GeoDataFrame,
     points: list[tuple[float, float]],
 ) -> list[tuple[str | None, str | None, bool]]:
     """Función pura: resuelve puntos ``(latitud, longitud)`` contra un GeoDataFrame cargado.

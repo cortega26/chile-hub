@@ -8,7 +8,7 @@ from typing import Any
 
 import polars as pl
 
-UTC = datetime.timezone.utc
+UTC = datetime.UTC
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 if ROOT_DIR not in sys.path:

@@ -8,7 +8,7 @@ from pathlib import Path
 import polars as pl
 import requests
 
-UTC = datetime.timezone.utc
+UTC = datetime.UTC
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 if ROOT_DIR not in sys.path:

@@ -14,8 +14,10 @@ import re
 import subprocess
 import sys
 import tempfile
+import tomllib
 import unittest
 from pathlib import Path
+from typing import ClassVar
 from unittest.mock import MagicMock, patch
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
@@ -293,6 +295,50 @@ class SingleSourceToolingGuardrailTests(unittest.TestCase):
         self.assertRegex(content, r'"mypy==[\d.]+"')
 
 
+class RuffRatchetGuardrailTests(unittest.TestCase):
+    """Auditoría 2026-10-13 (plan 131): el select de ruff vivía en `E,W,F,I`;
+    el audit encontró god functions (C901 ×44), branch-complexity y 767 errores
+    `mypy --strict` que ningún gate veía. Este guardrail fija el trinquete: los
+    conjuntos habilitados no vuelven atrás y los `ignore` no crecen sin una
+    decisión explícita registrada aquí.
+    """
+
+    REQUIRED_SELECT: ClassVar[set[str]] = {"E", "W", "F", "I", "B", "C4", "RET", "RUF", "SIM", "UP"}
+    DOCUMENTED_IGNORES: ClassVar[set[str]] = {
+        "E501",
+        "E402",
+        "COM812",
+        "RUF001",
+        "RUF002",
+        "RUF003",
+        "B019",
+        "SIM117",
+    }
+
+    def _ruff_lint_config(self) -> dict:
+        with open(PYPROJECT_TOML, "rb") as handle:
+            return tomllib.load(handle)["tool"]["ruff"]["lint"]
+
+    def test_select_keeps_the_audit_ratchet(self):
+        select = set(self._ruff_lint_config().get("select", []))
+        missing = self.REQUIRED_SELECT - select
+        self.assertEqual(
+            missing,
+            set(),
+            f"El select de ruff perdió conjuntos del trinquete (plan 131): {sorted(missing)}",
+        )
+
+    def test_ignores_do_not_grow_without_a_documented_decision(self):
+        ignores = set(self._ruff_lint_config().get("ignore", []))
+        undocumented = ignores - self.DOCUMENTED_IGNORES
+        self.assertEqual(
+            undocumented,
+            set(),
+            "Ignore nuevos sin decisión documentada (audit 2026-10-13): sumarlos a "
+            f"DOCUMENTED_IGNORES con su porqué: {sorted(undocumented)}",
+        )
+
+
 class NoHardcodedActionPinGuardrailTests(unittest.TestCase):
     """Regresión (PR #163, run 38387365191): el guardrail de Lighthouse fijaba
     el SHA exacto de `actions/upload-artifact@v7.0.1`; el bump de Dependabot a
@@ -423,7 +469,7 @@ class CompanionPathsRuleTests(unittest.TestCase):
     """
 
     # Path representativo por prefijo disparador (debe cubrir COMPANION_RULES).
-    TRIGGER_REPRESENTATIVES = {
+    TRIGGER_REPRESENTATIVES: ClassVar[dict[str, str]] = {
         "data/dataset_catalog_config.json": "data/dataset_catalog_config.json",
         "data/source_registry.json": "data/source_registry.json",
         "contracts/datasets/": "contracts/datasets/comunas.schema.json",
@@ -870,7 +916,7 @@ class DocsSyncGateGuardrailTests(unittest.TestCase):
         content = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
         self.assertIn("merge_group:", content)
         # La cola no debe cancelar builds en curso (prueba varios PRs en paralelo).
-        cancel_line = [line for line in content.splitlines() if "cancel-in-progress:" in line][0]
+        cancel_line = next(line for line in content.splitlines() if "cancel-in-progress:" in line)
         self.assertNotIn("merge_group", cancel_line)
 
     def test_required_codeql_check_listens_to_merge_group(self):
@@ -1799,7 +1845,7 @@ class PlanLinkGuardrailTests(unittest.TestCase):
     PLAN_LINK_PATTERN = re.compile(r"plans/(\d{3}-[a-z0-9-]+\.md)")
 
     def test_plan_links_resolve_to_plans_or_archive(self):
-        files = sorted(DOCS_DIR.rglob("*.md")) + [ROOT_DIR / "plans" / "README.md"]
+        files = [*sorted(DOCS_DIR.rglob("*.md")), ROOT_DIR / "plans" / "README.md"]
         broken = []
         for path in files:
             content = path.read_text(encoding="utf-8")
@@ -2026,7 +2072,7 @@ class PipelineFreshnessSloTests(unittest.TestCase):
         self.assertIn("scripts/check_pipeline_freshness.py", body)
 
     def test_stale_metadata_warns_without_failing(self):
-        now = datetime.datetime(2026, 9, 29, 12, 0, tzinfo=datetime.timezone.utc)
+        now = datetime.datetime(2026, 9, 29, 12, 0, tzinfo=datetime.UTC)
         generated = (now - datetime.timedelta(hours=72)).isoformat()
         with tempfile.TemporaryDirectory() as tmpdir:
             path = Path(tmpdir) / "pipeline_metadata.json"
@@ -2038,7 +2084,7 @@ class PipelineFreshnessSloTests(unittest.TestCase):
         self.assertIn("Schedule diario roto", output)
 
     def test_fresh_metadata_passes(self):
-        now = datetime.datetime(2026, 9, 29, 12, 0, tzinfo=datetime.timezone.utc)
+        now = datetime.datetime(2026, 9, 29, 12, 0, tzinfo=datetime.UTC)
         generated = (now - datetime.timedelta(hours=1)).isoformat()
         with tempfile.TemporaryDirectory() as tmpdir:
             path = Path(tmpdir) / "pipeline_metadata.json"
@@ -2276,13 +2322,15 @@ class SourceUrlsCheckerTests(unittest.TestCase):
             503: "DEAD",
         }
         for status_code, expected in cases.items():
-            with self.subTest(status_code=status_code):
-                with patch.object(
+            with (
+                self.subTest(status_code=status_code),
+                patch.object(
                     check_source_urls,
                     "fetch_with_retry",
                     return_value=self._response(status_code),
-                ):
-                    self.assertEqual(check_source_urls.check_url("https://x.example"), expected)
+                ),
+            ):
+                self.assertEqual(check_source_urls.check_url("https://x.example"), expected)
 
     def test_source_urls_check_url_network_error_is_dead(self):
         import requests

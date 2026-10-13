@@ -10,7 +10,7 @@ from pathlib import Path
 
 import polars as pl
 
-UTC = datetime.timezone.utc
+UTC = datetime.UTC
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 if ROOT_DIR not in sys.path:
@@ -86,7 +86,7 @@ def fetch_data() -> tuple[Path, str, str]:
             # `unrar e` (sin restaurar paths del archivo) extrae al temporal:
             # un RAR con paths absolutos o `..` no puede escribir fuera de él.
             cmd = [str(unrar_bin), "e", "-y", str(rar_path), tmp_dir + "/"]
-            res = subprocess.run(cmd, capture_output=True, text=True, timeout=60)  # nosec B603  # cmd: lista con paths locales (unrar/tmp), sin shell ni input externo
+            res = subprocess.run(cmd, capture_output=True, text=True, timeout=60, check=False)  # nosec B603  # cmd: lista con paths locales (unrar/tmp), sin shell ni input externo
 
             # Eliminar archivo RAR temporal para no ensuciar data/raw
             if rar_path.exists():
@@ -150,7 +150,7 @@ def parse_csv(path: Path) -> pl.DataFrame:
 
     # Filtrar establecimientos cerrados (ESTADO_ESTAB == 3)
     # y realizar las transformaciones del schema canónico
-    normalized = (
+    return (
         source.filter(pl.col("ESTADO_ESTAB") != 3)
         .select(
             [
@@ -191,8 +191,6 @@ def parse_csv(path: Path) -> pl.DataFrame:
         .unique(subset=["rbd"], keep="last")
         .sort("rbd")
     )
-
-    return normalized
 
 
 def _assert_readable_csv(path: Path) -> None:

@@ -17,7 +17,7 @@ from typing import Any
 
 import polars as pl
 
-UTC = datetime.timezone.utc
+UTC = datetime.UTC
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 if ROOT_DIR not in sys.path:
@@ -179,7 +179,7 @@ def fetch_data(source_url: str = DOWNLOAD_URL) -> tuple[list[dict[str, Any]], st
         with tempfile.TemporaryDirectory() as tmp_dir:
             print(f"Extrayendo CSV a {tmp_dir} ...")
             cmd = [str(unrar_bin), "e", "-y", str(rar_path), tmp_dir + "/"]
-            res = subprocess.run(cmd, capture_output=True, text=True, timeout=120)  # nosec B603  # cmd: lista con paths locales (unrar/tmp), sin shell ni input externo
+            res = subprocess.run(cmd, capture_output=True, text=True, timeout=120, check=False)  # nosec B603  # cmd: lista con paths locales (unrar/tmp), sin shell ni input externo
             if res.returncode != 0:
                 raise RuntimeError(f"Error al extraer RAR (code {res.returncode}): {res.stderr}")
 

@@ -6,14 +6,14 @@ import sys
 import tempfile
 import unittest
 import zipfile
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import ClassVar
 from unittest.mock import patch
 
 import polars as pl
 
-UTC = timezone.utc
+UTC = UTC
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
@@ -2296,9 +2296,8 @@ class ChileHubConstructorTests(unittest.TestCase):
         """catalog_path + data_dir simultáneos lanza ValueError."""
         from chile_hub import ChileHub
 
-        with tempfile.TemporaryDirectory() as tmp:
-            with self.assertRaises(ValueError):
-                ChileHub(catalog_path=Path(tmp) / "catalog.json", data_dir=tmp)
+        with tempfile.TemporaryDirectory() as tmp, self.assertRaises(ValueError):
+            ChileHub(catalog_path=Path(tmp) / "catalog.json", data_dir=tmp)
 
     def test_falls_back_to_data_manager_when_no_catalog(self):
         """Usa el catálogo empaquetado cuando no hay data_dir ni catalog_path explícito."""

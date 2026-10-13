@@ -196,7 +196,7 @@ def sync_landing_metadata(public_site_url, version=None):
 
     try:
         if os.path.exists(index_path):
-            with open(index_path, "r", encoding="utf-8") as f:
+            with open(index_path, encoding="utf-8") as f:
                 content = f.read()
 
             new_script = render_catalog_json_ld_block(public_site_url)
@@ -236,7 +236,7 @@ def sync_landing_metadata(public_site_url, version=None):
                     f"Sincronización Landing: index.html actualizado a {public_site_url} con JSON-LD sincronizado."
                 )
         if os.path.exists(app_path):
-            with open(app_path, "r", encoding="utf-8") as f:
+            with open(app_path, encoding="utf-8") as f:
                 content = f.read()
             new_content = re.sub(
                 r'const PUBLIC_DATA_BASE = "[^"]+";',

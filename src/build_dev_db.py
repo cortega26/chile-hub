@@ -1,7 +1,7 @@
 import json
 import os
 import sys
-from datetime import timezone
+from datetime import UTC
 
 import polars as pl
 
@@ -18,12 +18,12 @@ from src.builders._logging import get_logger
 
 log = get_logger("build_dev_db")
 
-UTC = timezone.utc
+UTC = UTC
 
 # Rutas, constantes y configuración de catálogo compartidas (re-exportadas para
 # mantener compatibilidad con scripts externos y tests que las importan desde aquí;
 # DATASET_CATALOG_CONFIG se consume vía build_dev_db en verify_pipeline.py y tests).
-from src.builders._shared import (  # noqa: E402, F401
+from src.builders._shared import (  # noqa: F401
     AUTORIDADES_ELECTAS_METADATA_PATH,
     CALIDAD_AIRE_METADATA_PATH,
     CENSO_HOGARES_METADATA_PATH,
@@ -45,25 +45,25 @@ from src.builders._shared import (  # noqa: E402, F401
     SIEDU_METADATA_PATH,
     STAGING_DIR,
 )
-from src.builders.artifacts import (  # noqa: E402
+from src.builders.artifacts import (
     attach_publishable_package_to_manifest,
     write_artifact_manifest,
     write_hub_bundle_json,
     write_publishable_bundle_sha256,
     write_publishable_bundle_zip,
 )
-from src.builders.catalog import (  # noqa: E402
+from src.builders.catalog import (
     write_dataset_catalog,
     write_pipeline_metadata,
 )
-from src.builders.data_package import build_data_package, write_data_package_json  # noqa: E402
-from src.builders.datasets import (  # noqa: E402
+from src.builders.data_package import build_data_package, write_data_package_json
+from src.builders.datasets import (
     build_perfil_territorial_comunal,
     derive_geography_layers,
 )
-from src.builders.dcat_catalog import write_dcat_catalog_json  # noqa: E402
-from src.builders.doc_sync import sync_all_docs  # noqa: E402
-from src.builders.formats import (  # noqa: E402
+from src.builders.dcat_catalog import write_dcat_catalog_json
+from src.builders.doc_sync import sync_all_docs
+from src.builders.formats import (
     EXCEL_MAX_ROWS_SKIP,
     SQLITE_MAX_ROWS,
     build_duckdb,
@@ -71,7 +71,7 @@ from src.builders.formats import (  # noqa: E402
     build_flat_files,
     build_sqlite,
 )
-from src.builders.io_utils import (  # noqa: E402
+from src.builders.io_utils import (
     compute_sha256,
     write_json_atomic,
     write_parquet_atomic,
@@ -79,7 +79,7 @@ from src.builders.io_utils import (  # noqa: E402
 
 # build_coverage, build_degradation y build_drift se re-exportan para los tests
 # (no se usan directamente aquí, solo a través de enrich_dataset_metadata).
-from src.builders.metadata import (  # noqa: E402, F401
+from src.builders.metadata import (  # noqa: F401
     build_coverage,
     build_dataset_metadata,
     build_degradation,
@@ -92,7 +92,7 @@ from src.builders.metadata import (  # noqa: E402, F401
     load_metadata,
     load_schema_contract,
 )
-from src.builders.reports import (  # noqa: E402
+from src.builders.reports import (
     MAPA_METRICAS_FILENAME,
     append_hub_health_history,
     build_dataset_changelog,
@@ -117,7 +117,7 @@ from src.builders.reports import (  # noqa: E402
     write_redistribution_report_json,
     write_source_readiness_json,
 )
-from src.builders.staging_schema import STAGING_SCHEMAS, apply_date_casts  # noqa: E402
+from src.builders.staging_schema import STAGING_SCHEMAS, apply_date_casts
 from src.pipeline_status_utils import (
     build_hub_health,
     write_dataset_catalog_markdown_file,

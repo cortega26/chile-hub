@@ -31,7 +31,7 @@ def load_schema_contract(dataset_name):
     if not os.path.exists(contract_path):
         return None
     try:
-        with open(contract_path, "r", encoding="utf-8") as f:
+        with open(contract_path, encoding="utf-8") as f:
             return json.load(f)
     except (json.JSONDecodeError, OSError):
         return None
@@ -79,7 +79,7 @@ def load_metadata(path):
         raise SystemExit(
             f"Error: Archivo de metadatos {os.path.relpath(path, ROOT_DIR)} "
             f"contiene un JSON malformado: {e}"
-        )
+        ) from e
 
     validate_metadata_schema(path, content)
     return content
@@ -142,7 +142,7 @@ def build_indicator_delivery(metadata):
     if isinstance(delivery, dict) and delivery:
         return delivery
 
-    delivery = {code: "live" for code in indicator_codes}
+    delivery = dict.fromkeys(indicator_codes, "live")
     for pair in metadata.get("raw_recoveries", []):
         delivery[pair.split("/", 1)[0]] = "raw_recovery"
     for pair in metadata.get("preserved_existing_pairs", []):
@@ -440,7 +440,7 @@ def build_dataset_metadata(dfs, meta):
     permisos_edificacion_metadata = meta["permisos_edificacion"]
     calidad_aire_metadata = meta["calidad_aire"]
 
-    dataset_metadata = {
+    return {
         "regiones": {
             **comunas_metadata,
             "dataset": "regiones",
@@ -839,4 +839,3 @@ def build_dataset_metadata(dfs, meta):
             else {}
         ),
     }
-    return dataset_metadata

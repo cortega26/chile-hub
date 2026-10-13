@@ -27,7 +27,7 @@ from pathlib import Path
 
 import polars as pl
 
-UTC = datetime.timezone.utc
+UTC = datetime.UTC
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 if ROOT_DIR not in sys.path:
@@ -305,7 +305,7 @@ def fetch_alcaldes() -> list[dict[str, str | None]]:
             f"BCN SIIT: {sum(1 for f in filas_bcn.values() if f['nombre'])}/"
             f"{len(filas_bcn)} alcaldes con nombre."
         )
-    except Exception as exc:  # noqa: BLE001 — degradación a Wikipedia sola
+    except Exception as exc:
         print(f"Advertencia: BCN SIIT falló por completo ({exc}). Degradando a Wikipedia.")
         filas_bcn = {}
 
@@ -325,7 +325,7 @@ def fetch_alcaldes() -> list[dict[str, str | None]]:
                 "nombre_wikipedia": nombre_wp,
                 "periodo_inicio": inicio,
             }
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         print(f"Advertencia: Wikipedia inaccesible ({exc}). Sin enriquecimiento de partido.")
 
     # --- Merge: BCN SIIT como base, Wikipedia como enriquecimiento ---
@@ -370,7 +370,7 @@ def fetch_gobernadores() -> list[dict[str, str]]:
 
         page = Fetcher.get(GOBERNADORES_URL, stealthy_headers=True)
         tables = page.css("table.wikitable")
-    except Exception as exc:  # noqa: BLE001 — degradación intencional
+    except Exception as exc:
         print(f"Advertencia: no se pudo obtener gobernadores ({exc}). Se omiten.")
         return []
     if not tables:
@@ -664,10 +664,14 @@ def process_autoridades_locales() -> str:
         "fields": df.columns,
         "notes": [
             f"gobernador_regional: {n_gob}/{EXPECTED_GOBERNADORES}.",
-            f"alcalde: {n_comunas} comunas procesadas desde BCN SIIT, {n_con_titular} "
-            "con alcalde identificado (fuente oficial del Congreso Nacional).",
-            "BCN SIIT es dato público gubernamental chileno; sin restricción de "
-            "licencia para datos factuales de autoridades.",
+            (
+                f"alcalde: {n_comunas} comunas procesadas desde BCN SIIT, {n_con_titular} "
+                "con alcalde identificado (fuente oficial del Congreso Nacional)."
+            ),
+            (
+                "BCN SIIT es dato público gubernamental chileno; sin restricción de "
+                "licencia para datos factuales de autoridades."
+            ),
         ],
         "reuse_policy": REUSE_POLICY,
     }

@@ -1,11 +1,13 @@
 import functools
 import importlib.resources
 import json
+import warnings
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from difflib import get_close_matches
 from pathlib import Path
-from typing import Any, Callable, Literal, cast
+from typing import Any, Literal, cast
 
 import polars as pl
 import requests
@@ -28,7 +30,7 @@ from .pipeline_status_utils import (
 from .regions import REGION_ALIASES, normalize_region_name
 from .text import normalize_comuna_name
 
-UTC = timezone.utc
+UTC = UTC
 
 from ._paths import NORMALIZED_DIR, ROOT_DIR  # noqa: F401  (re-export: ROOT_DIR/NORMALIZED_DIR)
 
@@ -89,7 +91,7 @@ def _resolve_names_to_frame(
         rows.append(row)
     schema = {
         "input": pl.String,
-        **{column: pl.String for column in value_columns},
+        **dict.fromkeys(value_columns, pl.String),
         "matched": pl.Boolean,
     }
     return pl.DataFrame(rows, schema=schema)
@@ -133,13 +135,13 @@ class ChileHub:
         try:
             with self.catalog_path.open("r", encoding="utf-8") as f:
                 return json.load(f)  # type: ignore[no-any-return]  # json.load → dict en runtime
-        except FileNotFoundError:
+        except FileNotFoundError as exc:
             raise ChileHubDataError(
                 f"Catálogo de datasets no encontrado en {self.catalog_path}. "
                 f"Usa ChileHub() sin argumentos para descargar el bundle automáticamente, "
                 f"o asegúrate de que el directorio '{self.catalog_path.parent}' contiene "
                 f"los datos normalizados (ejecuta 'make build' si estás en desarrollo)."
-            )
+            ) from exc
 
     def _load_json_artifact(self, filename: str) -> dict[str, Any]:
         with (self.normalized_dir / filename).open("r", encoding="utf-8") as f:
@@ -317,12 +319,14 @@ class ChileHub:
             path = self.get_output_path(dataset_name, "parquet")
             try:
                 df = pl.read_parquet(path)
-            except FileNotFoundError:
+            except FileNotFoundError as exc:
                 raise ChileHubDatasetError(
                     f"Archivo Parquet no encontrado para '{dataset_name}': {path}"
-                )
+                ) from exc
             except Exception as exc:
-                raise ChileHubDatasetError(f"Error al leer Parquet para '{dataset_name}': {exc}")
+                raise ChileHubDatasetError(
+                    f"Error al leer Parquet para '{dataset_name}': {exc}"
+                ) from exc
             self._df_cache[dataset_name] = df
             while len(self._df_cache) > _DF_CACHE_MAXSIZE:
                 self._df_cache.pop(next(iter(self._df_cache)))
@@ -538,7 +542,7 @@ class ChileHub:
                     "nombre_comuna": name,
                     "matched": matched,
                 }
-                for (lat, lon), (code, name, matched) in zip(points, results)
+                for (lat, lon), (code, name, matched) in zip(points, results, strict=False)
             ],
             schema={
                 "input_lat": pl.Float64,
@@ -574,21 +578,27 @@ class ChileHub:
         """
         try:
             import duckdb
-        except ImportError:
+        except ImportError as exc:
             raise ImportError(
                 "Para usar SQL necesitas instalar duckdb: pip install chile-hub[query]"
-            )
+            ) from exc
 
         if not hasattr(self, "_sql_views_registered"):
             con = duckdb.connect()
+            skipped: list[str] = []
             for dataset_name in Dataset:
+                name = dataset_name.value
                 try:
-                    name = dataset_name.value
                     path = self.get_output_path(name, "parquet")
                     con.execute(f"CREATE VIEW \"{name}\" AS SELECT * FROM read_parquet('{path}')")  # nosec
-                except Exception:  # nosec
-                    # Skip datasets whose Parquet isn't available
-                    pass
+                except Exception:  # nosec — dataset sin Parquet: se omite con aviso
+                    skipped.append(name)
+            if skipped:
+                warnings.warn(
+                    f"sql(): {len(skipped)} dataset(s) sin Parquet quedaron fuera de "
+                    f"las vistas: {', '.join(skipped)}",
+                    stacklevel=2,
+                )
             self._sql_views_registered = True
             self._sql_connection = con
         else:
@@ -632,11 +642,11 @@ class ChileHub:
         """
         try:
             import frictionless
-        except ImportError:
+        except ImportError as exc:
             raise ImportError(
                 "Para usar from_datapackage necesitas instalar frictionless: "
                 "pip install chile-hub[validation]"
-            )
+            ) from exc
 
         path_or_url_str = str(path_or_url)
         if path_or_url_str.startswith(("http://", "https://")):
@@ -692,11 +702,11 @@ class ChileHub:
         """
         try:
             import frictionless
-        except ImportError:
+        except ImportError as exc:
             raise ImportError(
                 "Para validar datapackage.json necesitas instalar frictionless: "
                 "pip install chile-hub[validation]"
-            )
+            ) from exc
 
         descriptor_path = self.normalized_dir / "datapackage.json"
         if not descriptor_path.exists():
@@ -713,8 +723,10 @@ class ChileHub:
                 return {
                     "valid": False,
                     "errors": [
-                        f"Dataset '{dataset_name}' no encontrado en datapackage.json. "
-                        f"Disponibles: {', '.join(sorted(names))}"
+                        (
+                            f"Dataset '{dataset_name}' no encontrado en datapackage.json. "
+                            f"Disponibles: {', '.join(sorted(names))}"
+                        )
                     ],
                     "stats": {"resources_total": len(names)},
                 }
@@ -846,7 +858,7 @@ class ChileHub:
 
         import json as json_module
 
-        with open(schema_path, "r", encoding="utf-8") as f:
+        with open(schema_path, encoding="utf-8") as f:
             schema = json_module.load(f)
 
         errors = []
@@ -936,9 +948,8 @@ class ChileHub:
             desc = entry.get("description", "").lower()
 
             # Filtro por query
-            if query_lower:
-                if query_lower not in name.lower() and query_lower not in desc:
-                    continue
+            if query_lower and query_lower not in name.lower() and query_lower not in desc:
+                continue
 
             # Filtro por fuente
             entry_source = entry.get("source_name", "").lower()

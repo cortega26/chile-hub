@@ -47,7 +47,7 @@ def build_synthetic_gdf(comunas: list[dict[str, Any]] | None = None):
     import geopandas as gpd
     from shapely.geometry import box
 
-    gdf = gpd.GeoDataFrame(
+    return gpd.GeoDataFrame(
         {
             "codigo_comuna": [c["codigo_comuna"] for c in comunas],
             "nombre_comuna": [c["nombre_comuna"] for c in comunas],
@@ -57,7 +57,6 @@ def build_synthetic_gdf(comunas: list[dict[str, Any]] | None = None):
         },
         crs="EPSG:4326",
     )
-    return gdf
 
 
 def write_synthetic_parquet(path: Path, comunas: list[dict[str, Any]] | None = None) -> Path:

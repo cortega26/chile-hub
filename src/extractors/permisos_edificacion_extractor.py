@@ -42,7 +42,7 @@ import openpyxl
 import polars as pl
 import requests
 
-UTC = datetime.timezone.utc
+UTC = datetime.UTC
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 if ROOT_DIR not in sys.path:
@@ -232,7 +232,7 @@ def _discover_xlsx_url() -> tuple[str, str]:
         ):
             parsed = urllib.parse.urlparse(href.replace("&amp;", "&"))
             params = urllib.parse.parse_qs(parsed.query)
-            if "uri" in params and params["uri"]:
+            if params.get("uri"):
                 return params["uri"][0], "repositorio-biblionumber"
             if href.startswith("http"):
                 return href, "repositorio-tracklinks"
@@ -553,9 +553,9 @@ def normalize_rows(rows: list[dict]) -> pl.DataFrame:
     """Convierte filas a DataFrame canónico."""
     if not rows:
         return pl.DataFrame(
-            schema={col: pl.String for col in REQUIRED_COLUMNS}
+            schema=dict.fromkeys(REQUIRED_COLUMNS, pl.String)
             | {"anio": pl.Int64}
-            | {col: pl.Int64 for col in METRIC_COLUMNS}
+            | dict.fromkeys(METRIC_COLUMNS, pl.Int64)
         )
 
     df = pl.DataFrame(rows, strict=False)

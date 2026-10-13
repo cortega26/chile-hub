@@ -87,7 +87,7 @@ def catalog_keys() -> set[str]:
     import json as _json
 
     catalog_path = ROOT_DIR / "data" / "dataset_catalog_config.json"
-    with open(catalog_path, "r", encoding="utf-8") as f:
+    with open(catalog_path, encoding="utf-8") as f:
         return set(_json.load(f).keys())
 
 

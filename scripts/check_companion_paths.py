@@ -73,7 +73,7 @@ EXTRACTOR_RULE_EXCLUDED_PATHS = {
 
 
 def dataset_keys() -> set[str]:
-    with open(DATASET_CATALOG_PATH, "r", encoding="utf-8") as f:
+    with open(DATASET_CATALOG_PATH, encoding="utf-8") as f:
         return set(json.load(f).keys())
 
 
@@ -97,7 +97,7 @@ def check_registry() -> list[str]:
 
 def check_extractors() -> list[str]:
     errors = []
-    with open(DATASET_CATALOG_PATH, "r", encoding="utf-8") as f:
+    with open(DATASET_CATALOG_PATH, encoding="utf-8") as f:
         catalog = json.load(f)
     referenced: set[str] = set()
     for key, cfg in sorted(catalog.items()):

@@ -20,17 +20,17 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-import polars as pl  # noqa: E402
+import polars as pl
 
-from src.builders.geo import (  # noqa: E402
+from src.builders.geo import (
     write_geometria_comunal_parquet,
     write_mapa_comunal_geojson,
 )
-from src.extractors.geometria_comunal_extractor import (  # noqa: E402
+from src.extractors.geometria_comunal_extractor import (
     STAGING_CSV_PATH,
     process_geometria_comunal,
 )
-from src.validation import validate_geometria_comunal  # noqa: E402
+from src.validation import validate_geometria_comunal
 
 NORMALIZED_DIR = ROOT_DIR / "data" / "normalized"
 OUTPUT_PATH = NORMALIZED_DIR / "geometria_comunal.parquet"

@@ -23,11 +23,11 @@ import argparse
 import json
 import os
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-UTC = timezone.utc
+UTC = UTC
 
 REPO_OWNER = "cortega26"
 REPO_NAME = "chile-hub"
@@ -47,7 +47,7 @@ def _http_get(url: str) -> Any:
 
     req = urllib.request.Request(url, headers={"Accept": "application/json"})
     try:
-        with urllib.request.urlopen(req, timeout=30) as resp:  # noqa: S310
+        with urllib.request.urlopen(req, timeout=30) as resp:
             return json.loads(resp.read().decode())
     except urllib.error.HTTPError as exc:
         print(f"Error HTTP {exc.code} al consultar {url}", file=sys.stderr)
@@ -111,7 +111,7 @@ def load_existing_snapshots() -> list[dict[str, Any]]:
     if not SNAPSHOTS_PATH.exists():
         return []
     try:
-        with open(SNAPSHOTS_PATH, "r", encoding="utf-8") as f:
+        with open(SNAPSHOTS_PATH, encoding="utf-8") as f:
             data = json.load(f)
         return data.get("snapshots", [])
     except (json.JSONDecodeError, OSError) as exc:

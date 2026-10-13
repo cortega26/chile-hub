@@ -16,7 +16,7 @@ import polars as pl
 
 from ._paths import find_root
 
-__all__ = ["verify_dataset_contract", "contract_type"]
+__all__ = ["contract_type", "verify_dataset_contract"]
 
 
 def contract_type(dtype: Any) -> str:

@@ -8,6 +8,7 @@ de integración en test_chile_hub.py y test_pipeline_logic.py.
 import sys
 import unittest
 from pathlib import Path
+from typing import ClassVar
 
 import polars as pl
 
@@ -1089,7 +1090,7 @@ class RUTCheckDigitTests(unittest.TestCase):
         expected = [self._dv_modulo11(b) for b in bases]
 
         mismatches = []
-        for i, (v, e) in enumerate(zip(vectorized, expected)):
+        for i, (v, e) in enumerate(zip(vectorized, expected, strict=False)):
             if v != e:
                 mismatches.append((bases[i], str(v), str(e)))
         self.assertEqual(mismatches, [], f"Mismatches found: {mismatches}")
@@ -2180,7 +2181,7 @@ class EstadisticasVitalesValidatorTests(unittest.TestCase):
 class PermisosEdificacionValidatorTests(unittest.TestCase):
     """Tests unitarios para validate_permisos_edificacion."""
 
-    METRICS = [
+    METRICS: ClassVar[list[str]] = [
         "unidades_total",
         "superficie_m2_total",
         "unidades_casas",
@@ -2217,7 +2218,7 @@ class PermisosEdificacionValidatorTests(unittest.TestCase):
                 "codigo_region": pl.String,
                 "codigo_comuna": pl.String,
                 "nombre_comuna": pl.String,
-                **{col: pl.Int64 for col in self.METRICS},
+                **dict.fromkeys(self.METRICS, pl.Int64),
                 "estado_dato": pl.String,
                 "fuente": pl.String,
                 "url_fuente": pl.String,

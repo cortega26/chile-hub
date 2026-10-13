@@ -22,7 +22,7 @@ MAX_AGE_HOURS = 48.0
 
 def age_hours(generated_at_utc: str, now: datetime.datetime | None = None) -> float:
     """Horas transcurridas desde `generated_at_utc` (ISO 8601 con offset)."""
-    now = now or datetime.datetime.now(datetime.timezone.utc)
+    now = now or datetime.datetime.now(datetime.UTC)
     generated = datetime.datetime.fromisoformat(generated_at_utc)
     return (now - generated).total_seconds() / 3600
 

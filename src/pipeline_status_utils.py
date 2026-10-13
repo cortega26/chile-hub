@@ -10,12 +10,12 @@ from typing import Any
 
 
 def __getattr__(name: str) -> Any:
-    import chile_hub.pipeline_status_utils as _canonical  # noqa: F401
+    import chile_hub.pipeline_status_utils as _canonical
 
     return getattr(_canonical, name)
 
 
 def __dir__() -> list[str]:
-    import chile_hub.pipeline_status_utils as _canonical  # noqa: F401
+    import chile_hub.pipeline_status_utils as _canonical
 
     return [k for k in dir(_canonical) if not k.startswith("__")]

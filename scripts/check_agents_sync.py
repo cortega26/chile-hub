@@ -39,14 +39,14 @@ def fail(msg: str) -> None:
 
 
 def wc_lines(path: str) -> int:
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         return sum(1 for _ in f)
 
 
 def load_catalog() -> dict:
     import json
 
-    with open(CATALOG_PATH, "r", encoding="utf-8") as f:
+    with open(CATALOG_PATH, encoding="utf-8") as f:
         raw = json.load(f)
     return raw.get("datasets", raw) if isinstance(raw, dict) else dict(raw)
 
@@ -246,7 +246,7 @@ def main(argv: list[str] | None = None) -> None:
         if not os.path.isfile(path):
             fail(f"Documento esperado no existe: {doc}")
             continue
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             content = f.read()
         if doc == "AGENTS.md":
             check_line_count_anchors(doc, content)

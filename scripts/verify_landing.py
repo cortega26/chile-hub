@@ -4,13 +4,13 @@ import re
 import socket
 import threading
 import tomllib
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
-UTC = timezone.utc
+UTC = UTC
 BUNDLE_PATH = ROOT_DIR / "data" / "normalized" / "hub_bundle.json"
 # El ZIP publicable no se versiona (Plan 130): la landing lo descarga desde el
 # asset del último GitHub Release. Mantener en sync con RELEASE_DOWNLOAD_BASE de app.js.
@@ -740,11 +740,11 @@ def verify_landing():
             "tipo: parquet · sha256: " in line for line in artifact_meta
         ):
             fail(f"Unexpected artifact metadata: {artifact_meta}")
-        if _has_json:
-            if len(artifact_meta) < 2 or not any(
-                "tipo: json · sha256: " in line for line in artifact_meta
-            ):
-                fail(f"Missing JSON artifact metadata: {artifact_meta}")
+        if _has_json and (
+            len(artifact_meta) < 2
+            or not any("tipo: json · sha256: " in line for line in artifact_meta)
+        ):
+            fail(f"Missing JSON artifact metadata: {artifact_meta}")
 
         first_card_facts = drawer.locator(".dataset-fact").all_inner_texts()
         first_card_facts_text = "\n".join(first_card_facts).upper()

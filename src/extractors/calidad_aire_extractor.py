@@ -29,7 +29,7 @@ from typing import Any
 import polars as pl
 import requests
 
-UTC = datetime.timezone.utc
+UTC = datetime.UTC
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 if ROOT_DIR not in sys.path:
@@ -372,7 +372,7 @@ def _seed_history_from_parquet() -> pl.DataFrame | None:
         return None
     try:
         return pl.read_parquet(HISTORY_PARQUET_PATH)
-    except Exception:  # noqa: BLE001 — Parquet corrupto: partir de cero con nota
+    except Exception:
         return None
 
 
@@ -481,7 +481,7 @@ def process_calidad_aire() -> dict:
                 )
             )
             notes.append("historial: fusionado con staging existente")
-        except Exception as exc:  # noqa: BLE001 — staging corrupto: partir de lo nuevo
+        except Exception as exc:
             notes.append(f"historial: staging ilegible, se parte de lo nuevo ({exc})")
     else:
         seeded = _seed_history_from_parquet()

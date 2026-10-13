@@ -32,7 +32,7 @@ import polars as pl
 import requests
 from shapely.geometry import shape
 
-UTC = datetime.timezone.utc
+UTC = datetime.UTC
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 if ROOT_DIR not in sys.path:
@@ -258,7 +258,7 @@ def normalize_features(features: list[dict[str, Any]]) -> pl.DataFrame:
         .str.replace_all("ñ", "n")
         .alias("nombre_comuna_clean")
     )
-    df = df.select(
+    return df.select(
         [
             "codigo_region",
             "codigo_comuna",
@@ -268,7 +268,6 @@ def normalize_features(features: list[dict[str, Any]]) -> pl.DataFrame:
             "geometry_wkt",
         ]
     ).sort("codigo_comuna")
-    return df
 
 
 def build_metadata(df: pl.DataFrame, source_mode: str, notes: list[str]) -> dict[str, Any]:
