@@ -1243,7 +1243,7 @@ class ResExtractorTests(unittest.TestCase):
             "2022;Junio;Valparaiso;05;SRL;CONSTITUCION;5000000;Valparaiso;05\n"
         )
         contents = [csv_content.encode("utf-8")]
-        df = res_extractor.parse_resources(contents)
+        df, _ = res_extractor.parse_resources(contents)
 
         self.assertGreater(df.height, 0)
         self.assertIn("rut", df.columns)
@@ -1276,11 +1276,11 @@ class ResExtractorTests(unittest.TestCase):
             "2;0;Empresa Sin RUT Spa;03-06-2022;03-06-2022;03-06-2022;"
             "2022;Junio;Las Condes;13;SPA;CONSTITUCION;25000000;Las Condes;13\n"
         )
-        df = res_extractor.parse_resources([csv_content.encode("utf-8")])
+        df, drop = res_extractor.parse_resources([csv_content.encode("utf-8")])
 
         self.assertEqual(df.height, 1)
         self.assertNotIn("0", df["rut"].to_list())
-        self.assertEqual(res_extractor._LAST_SENTINEL_DROP_COUNT, 1)
+        self.assertEqual(drop, 1)
 
     def test_parse_resources_keeps_valid_ruts_and_resets_sentinel_count(self):
         """Sin centinelas, el contador vuelve a cero (no arrastra la corrida previa)."""
@@ -1292,10 +1292,10 @@ class ResExtractorTests(unittest.TestCase):
             "1;76286049-K;Servicios Digitales EIRL;02-05-2022;02-05-2022;02-05-2022;"
             "2022;Mayo;Providencia;13;EIRL;CONSTITUCION;7000000;Providencia;13\n"
         )
-        df = res_extractor.parse_resources([csv_content.encode("utf-8")])
+        df, drop = res_extractor.parse_resources([csv_content.encode("utf-8")])
 
         self.assertEqual(df.height, 1)
-        self.assertEqual(res_extractor._LAST_SENTINEL_DROP_COUNT, 0)
+        self.assertEqual(drop, 0)
 
     def test_parse_resources_handles_empty(self):
         """Parseo de lista vacia lanza SystemExit."""
@@ -1317,7 +1317,7 @@ class ResExtractorTests(unittest.TestCase):
         fake_contents = [csv_content.encode("utf-8")]
 
         with patch.object(
-            res_extractor, "fetch_resources", return_value=(fake_contents, "live", "test")
+            res_extractor, "fetch_resources", return_value=(fake_contents, "live", "full", "test")
         ):
             extractor = res_extractor.ResExtractor()
             result = extractor.run(dry_run=True)
@@ -1407,12 +1407,12 @@ class ResExtractorTests(unittest.TestCase):
                     res_extractor, "fetch_with_retry", side_effect=[package_mock, response_mock]
                 ),
             ):
-                contents, mode, _ = res_extractor.fetch_resources()
+                contents, mode, fetch_mode, _ = res_extractor.fetch_resources()
 
         # El año anterior ya está en el staging → solo se descarga el actual
         self.assertEqual(mode, "live")
         self.assertEqual(len(contents), 1)
-        self.assertEqual(res_extractor._LAST_FETCH_MODE, "incremental")
+        self.assertEqual(fetch_mode, "incremental")
 
     def test_res_renamed_yearly_resource_recovers_previous_cut(self):
         """Un cambio de fecha de corte en CKAN no debe ocultar el RAW anterior."""
@@ -1437,7 +1437,7 @@ class ResExtractorTests(unittest.TestCase):
                     side_effect=[package, RequestException("offline")],
                 ),
             ):
-                contents, mode, detail = res_extractor.fetch_resources()
+                contents, mode, _, detail = res_extractor.fetch_resources()
         self.assertEqual((contents, mode), ([saved], "fallback"))
         self.assertIn(snapshot.name, detail)
 
@@ -1461,7 +1461,7 @@ class ResExtractorTests(unittest.TestCase):
                     side_effect=[package, self._response_mock(invalid)],
                 ),
             ):
-                contents, mode, detail = res_extractor.fetch_resources()
+                contents, mode, _, detail = res_extractor.fetch_resources()
             files = list(raw.glob("res_*.csv"))
             self.assertEqual((contents, mode), ([valid], "fallback"))
             self.assertIn(old.name, detail)
@@ -1493,7 +1493,7 @@ class ResExtractorTests(unittest.TestCase):
                     side_effect=[package, RequestException("offline")],
                 ),
             ):
-                contents, mode, detail = res_extractor.fetch_resources()
+                contents, mode, _, detail = res_extractor.fetch_resources()
         self.assertEqual((contents, mode), ([newer_data], "fallback"))
         self.assertIn(newer.name, detail)
         self.assertNotIn(older.name, detail)
@@ -1552,7 +1552,7 @@ class ResExtractorTests(unittest.TestCase):
                     side_effect=[package, RequestException("offline")],
                 ),
             ):
-                contents, mode, detail = res_extractor.fetch_resources()
+                contents, mode, _, detail = res_extractor.fetch_resources()
         self.assertEqual((contents, mode), ([newer_data], "fallback"))
         self.assertIn(newer.name, detail)
 
@@ -1620,7 +1620,7 @@ class ResExtractorTests(unittest.TestCase):
                     side_effect=[package, self._response_mock(first), self._response_mock(second)],
                 ),
             ):
-                contents, mode, detail = res_extractor.fetch_resources()
+                contents, mode, _, detail = res_extractor.fetch_resources()
             files = sorted(Path(tmpdir).glob("res_Constituciones_del_año_2026_*.csv"))
             self.assertEqual(
                 (contents, mode, detail), ([first, second], "live", "datos_gob_cl_ckan_api")
@@ -1645,7 +1645,7 @@ class ResExtractorTests(unittest.TestCase):
                     side_effect=[package, self._response_mock(good), self._response_mock(bad)],
                 ),
             ):
-                contents, mode, detail = res_extractor.fetch_resources()
+                contents, mode, _, detail = res_extractor.fetch_resources()
             files = sorted(Path(tmpdir).glob("res_Constituciones_del_año_2026_*.csv"))
             self.assertEqual((contents, mode), ([good, good], "fallback"))
             self.assertEqual(len(files), 2)
@@ -1667,7 +1667,7 @@ class ResExtractorTests(unittest.TestCase):
                     side_effect=[package, self._response_mock(live_bytes)],
                 ),
             ):
-                contents, mode, detail = res_extractor.fetch_resources()
+                contents, mode, _, detail = res_extractor.fetch_resources()
             saved = list(Path(tmpdir).glob("res_Constituciones_del_año_2026_*.csv"))
 
         self.assertEqual((contents, mode, detail), ([live_bytes], "live", "datos_gob_cl_ckan_api"))
@@ -1691,7 +1691,7 @@ class ResExtractorTests(unittest.TestCase):
                     side_effect=[package, self._response_mock(invalid)],
                 ),
             ):
-                contents, mode, detail = res_extractor.fetch_resources()
+                contents, mode, _, detail = res_extractor.fetch_resources()
             new_files = [p for p in raw.glob("res_Constituciones_del_año_2026_*.csv") if p != older]
             self.assertEqual((contents, mode), ([backup], "fallback"))
             self.assertIn(older.name, detail)
@@ -1747,7 +1747,7 @@ class ResExtractorTests(unittest.TestCase):
                     ],
                 ),
             ):
-                contents, mode, detail = res_extractor.fetch_resources()
+                contents, mode, _, detail = res_extractor.fetch_resources()
             self.assertEqual((contents, mode), ([live_bytes, backup], "fallback"))
             self.assertIn(older.name, detail)
             self.assertEqual(older.read_bytes(), backup)
@@ -1771,7 +1771,7 @@ class ResExtractorTests(unittest.TestCase):
                     side_effect=[package, self._response_mock(wrong_year)],
                 ),
             ):
-                contents, mode, detail = res_extractor.fetch_resources()
+                contents, mode, _, detail = res_extractor.fetch_resources()
             self.assertEqual((contents, mode), ([correct_year], "fallback"))
             self.assertIn(snapshot.name, detail)
             self.assertTrue(any(p.read_bytes() == wrong_year for p in raw.glob("*.csv")))
@@ -1796,7 +1796,7 @@ class ResExtractorTests(unittest.TestCase):
                     side_effect=[package, RequestException("offline")],
                 ),
             ):
-                contents, mode, detail = res_extractor.fetch_resources()
+                contents, mode, _, detail = res_extractor.fetch_resources()
         self.assertEqual((contents, mode), ([self._valid_res_csv(2026)], "fallback"))
         self.assertIn(older.name, detail)
         self.assertNotIn(newer.name, detail)
@@ -1835,7 +1835,7 @@ class ResExtractorTests(unittest.TestCase):
                 side_effect=[package, self._response_mock(overlapping)],
             ),
         ):
-            contents, mode, detail = res_extractor.fetch_resources()
+            contents, mode, _, detail = res_extractor.fetch_resources()
         self.assertEqual((contents, mode, detail), ([overlapping], "live", "datos_gob_cl_ckan_api"))
 
     def test_res_unknown_resource_year_keeps_structural_validation(self):
@@ -1853,7 +1853,7 @@ class ResExtractorTests(unittest.TestCase):
                 side_effect=[package, self._response_mock(self._valid_res_csv(2025))],
             ),
         ):
-            contents, mode, detail = res_extractor.fetch_resources()
+            contents, mode, _, detail = res_extractor.fetch_resources()
         self.assertEqual(
             (contents, mode, detail), ([self._valid_res_csv(2025)], "live", "datos_gob_cl_ckan_api")
         )
@@ -1883,7 +1883,7 @@ class ResExtractorTests(unittest.TestCase):
                     ],
                 ),
             ):
-                contents, mode, detail = res_extractor.fetch_resources()
+                contents, mode, _, detail = res_extractor.fetch_resources()
 
             self.assertEqual(contents, [old_bytes, live_bytes])
             self.assertEqual(mode, "fallback")
@@ -1909,7 +1909,7 @@ class ResExtractorTests(unittest.TestCase):
                     side_effect=[package, RequestException("offline")],
                 ),
             ):
-                contents, mode, detail = res_extractor.fetch_resources()
+                contents, mode, _, detail = res_extractor.fetch_resources()
 
         self.assertEqual((contents, mode), ([self._valid_res_csv()], "fallback"))
         self.assertIn(snapshot.name, detail)
@@ -1956,7 +1956,7 @@ class ResExtractorTests(unittest.TestCase):
                     side_effect=[package, RequestException("offline")],
                 ),
             ):
-                contents, mode, detail = res_extractor.fetch_resources()
+                contents, mode, _, detail = res_extractor.fetch_resources()
 
             self.assertEqual((contents, mode), ([good_bytes], "fallback"))
             self.assertIn(older.name, detail)
@@ -1985,7 +1985,7 @@ class ResExtractorTests(unittest.TestCase):
                     side_effect=[package, RequestException("offline")],
                 ),
             ):
-                contents, mode, detail = res_extractor.fetch_resources()
+                contents, mode, _, detail = res_extractor.fetch_resources()
 
         self.assertEqual((contents, mode), ([self._valid_res_csv()], "fallback"))
         self.assertIn(older.name, detail)
@@ -2036,7 +2036,7 @@ class ResExtractorTests(unittest.TestCase):
                     side_effect=[package, RequestException("offline")],
                 ),
             ):
-                contents, mode, detail = res_extractor.fetch_resources()
+                contents, mode, _, detail = res_extractor.fetch_resources()
 
         self.assertEqual((contents, mode), ([self._valid_res_csv(2026)], "fallback"))
         self.assertIn(newest.name, detail)
@@ -2065,10 +2065,10 @@ class ResExtractorTests(unittest.TestCase):
                     side_effect=[package_mock, *response_mocks],
                 ),
             ):
-                contents, _, _ = res_extractor.fetch_resources()
+                contents, _, fetch_mode, _ = res_extractor.fetch_resources()
 
         self.assertEqual(len(contents), 2)
-        self.assertEqual(res_extractor._LAST_FETCH_MODE, "incremental")
+        self.assertEqual(fetch_mode, "incremental")
 
     def test_full_fetch_when_no_staging(self):
         """Plan 076: sin staging previo, el fetch descarga el histórico
@@ -2090,10 +2090,10 @@ class ResExtractorTests(unittest.TestCase):
                 side_effect=[package_mock, *response_mocks],
             ),
         ):
-            contents, _, _ = res_extractor.fetch_resources()
+            contents, _, fetch_mode, _ = res_extractor.fetch_resources()
 
         self.assertEqual(len(contents), len(resources))
-        self.assertEqual(res_extractor._LAST_FETCH_MODE, "full")
+        self.assertEqual(fetch_mode, "full")
 
     def test_incremental_merge_keeps_canonical_types_for_validation(self):
         """Regresión 2026-08-13 (dispatch de validación de write-races): el
@@ -2123,7 +2123,7 @@ class ResExtractorTests(unittest.TestCase):
             staging_path = self._write_staging(tmpdir, [2013, prev_year])
             # El staging con padding "01" en regiones (el caso que motivó
             # infer_schema_length=0 en el merge).
-            df_nuevo = res_extractor.parse_resources([csv_content.encode("utf-8")])
+            df_nuevo, _ = res_extractor.parse_resources([csv_content.encode("utf-8")])
             with patch.object(res_extractor, "STAGING_CSV_PATH", str(staging_path)):
                 merged = res_extractor._merge_incremental(df_nuevo)
 
@@ -2155,7 +2155,7 @@ class ResExtractorTests(unittest.TestCase):
         )
         with tempfile.TemporaryDirectory() as tmpdir:
             staging_path = self._write_staging(tmpdir, [2013, prev_year])
-            df_nuevo = res_extractor.parse_resources([csv_content.encode("utf-8")])
+            df_nuevo, _ = res_extractor.parse_resources([csv_content.encode("utf-8")])
             with patch.object(res_extractor, "STAGING_CSV_PATH", str(staging_path)):
                 merged = res_extractor._merge_incremental(df_nuevo)
 
@@ -3205,7 +3205,7 @@ class ResExtractorExtendedTests(unittest.TestCase):
                 patch.object(
                     res_extractor,
                     "fetch_resources",
-                    return_value=([csv_content.encode("utf-8")], "live", "test"),
+                    return_value=([csv_content.encode("utf-8")], "live", "full", "test"),
                 ),
                 patch.object(res_extractor, "STAGING_CSV_PATH", str(csv_path)),
                 patch.object(res_extractor, "METADATA_PATH", str(meta_path)),
@@ -5372,7 +5372,7 @@ class EstadisticasVitalesExtractorTests(unittest.TestCase):
                 patch.object(ev, "RAW_DIR", tmpdir),
                 patch.object(ev, "_load_comunas_lookup", return_value=(fake_lookup, set())),
             ):
-                rows, mode, _url, notes = ev.fetch_data()
+                rows, mode, _fetch_mode, _url, notes = ev.fetch_data()
         self.assertEqual(mode, "live")
         self.assertTrue(any(r["codigo_comuna"] == "13101" for r in rows))
         self.assertTrue(any("snapshots locales" in n for n in notes))
@@ -5481,12 +5481,12 @@ class EstadisticasVitalesExtractorTests(unittest.TestCase):
                 ),
                 patch.object(ev, "STAGING_CSV_PATH", str(staging_csv)),
             ):
-                rows, mode, _url, notes = ev.fetch_data()
+                rows, mode, fetch_mode, _url, notes = ev.fetch_data()
 
         # 2021 falta del staging; 2023 es el máximo (se re-descarga siempre).
         self.assertEqual(sorted(descargados), [2021, 2023])
         self.assertEqual(mode, "live")
-        self.assertEqual(ev._LAST_FETCH_MODE, "incremental")
+        self.assertEqual(fetch_mode, "incremental")
         self.assertEqual({r["anio"] for r in rows}, {2021, 2023})
         self.assertTrue(any("fetch incremental: 2 de 4" in n for n in notes))
 
@@ -5504,9 +5504,10 @@ class EstadisticasVitalesExtractorTests(unittest.TestCase):
             with (
                 patch.object(ev, "STAGING_CSV_PATH", str(staging_csv)),
                 patch.object(ev, "METADATA_PATH", str(metadata_path)),
-                patch.object(ev, "_LAST_FETCH_MODE", "incremental"),
                 patch.object(
-                    ev, "fetch_data", return_value=(nuevos, "live", ev.EEVV_PAGE, ["test"])
+                    ev,
+                    "fetch_data",
+                    return_value=(nuevos, "live", "incremental", ev.EEVV_PAGE, ["test"]),
                 ),
             ):
                 metadata = ev.process_estadisticas_vitales()
@@ -5540,9 +5541,10 @@ class EstadisticasVitalesExtractorTests(unittest.TestCase):
             with (
                 patch.object(ev, "STAGING_CSV_PATH", str(staging_csv)),
                 patch.object(ev, "METADATA_PATH", str(metadata_path)),
-                patch.object(ev, "_LAST_FETCH_MODE", "incremental"),
                 patch.object(
-                    ev, "fetch_data", return_value=(nuevos, "live", ev.EEVV_PAGE, ["test"])
+                    ev,
+                    "fetch_data",
+                    return_value=(nuevos, "live", "incremental", ev.EEVV_PAGE, ["test"]),
                 ),
             ):
                 ev.process_estadisticas_vitales()
@@ -5582,11 +5584,11 @@ class EstadisticasVitalesExtractorTests(unittest.TestCase):
                 ),
                 patch.object(ev, "STAGING_CSV_PATH", str(staging_csv)),
             ):
-                rows, _mode, _url, notes = ev.fetch_data()
+                rows, _mode, fetch_mode, _url, notes = ev.fetch_data()
 
         # Sin el override, con staging 2020-2022 solo se bajaría 2023.
         self.assertEqual(sorted(descargados), [2020, 2021, 2022, 2023])
-        self.assertEqual(ev._LAST_FETCH_MODE, "full")
+        self.assertEqual(fetch_mode, "full")
         self.assertFalse(any("incremental" in n for n in notes))
         self.assertEqual({r["anio"] for r in rows}, {2020, 2021, 2022, 2023})
 
@@ -5613,10 +5615,10 @@ class EstadisticasVitalesExtractorTests(unittest.TestCase):
                 ),
                 patch.object(ev, "STAGING_CSV_PATH", str(staging_csv)),
             ):
-                rows, _mode, _url, notes = ev.fetch_data()
+                rows, _mode, fetch_mode, _url, notes = ev.fetch_data()
 
         self.assertEqual(sorted(descargados), [2020, 2021, 2022, 2023])
-        self.assertEqual(ev._LAST_FETCH_MODE, "full")
+        self.assertEqual(fetch_mode, "full")
         self.assertFalse(any("incremental" in n for n in notes))
         self.assertEqual({r["anio"] for r in rows}, {2020, 2021, 2022, 2023})
 
@@ -5645,10 +5647,10 @@ class EstadisticasVitalesExtractorTests(unittest.TestCase):
                 patch.object(ev, "STAGING_CSV_PATH", str(staging_csv)),
             ):
                 self.assertIsNone(ev._staging_years_present())
-                _rows, _mode, _url, notes = ev.fetch_data()
+                _rows, _mode, fetch_mode, _url, notes = ev.fetch_data()
 
         self.assertEqual(sorted(descargados), [2020, 2021, 2022, 2023])
-        self.assertEqual(ev._LAST_FETCH_MODE, "full")
+        self.assertEqual(fetch_mode, "full")
         self.assertFalse(any("incremental" in n for n in notes))
 
     def test_run_dry_run_returns_validation_without_writing(self):
@@ -5667,6 +5669,7 @@ class EstadisticasVitalesExtractorTests(unittest.TestCase):
                     return_value=(
                         estadisticas_vitales_extractor.FALLBACK_ROWS,
                         "fallback",
+                        "full",
                         estadisticas_vitales_extractor.EEVV_PAGE,
                         ["test"],
                     ),
@@ -5677,6 +5680,21 @@ class EstadisticasVitalesExtractorTests(unittest.TestCase):
                 )
                 self.assertEqual(result["status"], "ok")
                 self.assertFalse(staging_csv.exists())
+
+
+class FetchModeIsolationTests(unittest.TestCase):
+    """Plan 133b (auditoría 2026-10-13): el modo de fetch y el conteo de
+    centinelas ya no son estado mutable de módulo — viajan por retorno
+    explícito, así dos corridas consecutivas no se contaminan (el bug que el
+    global permitía). Los tests de merge de vitales PASAN el modo por el mock
+    de `fetch_data`: con el global viejo no habrían mergeado."""
+
+    def test_modules_no_longer_expose_last_state_globals(self):
+        from src.extractors import estadisticas_vitales_extractor as ev
+
+        self.assertFalse(hasattr(ev, "_LAST_FETCH_MODE"))
+        self.assertFalse(hasattr(res_extractor, "_LAST_FETCH_MODE"))
+        self.assertFalse(hasattr(res_extractor, "_LAST_SENTINEL_DROP_COUNT"))
 
 
 class PermisosEdificacionExtractorTests(unittest.TestCase):

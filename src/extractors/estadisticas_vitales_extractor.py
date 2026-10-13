@@ -201,12 +201,6 @@ REQUIRED_COLUMNS = [
     "fecha_fuente",
 ]
 
-# Modo del último fetch (Plan 118): "incremental" cuando solo se descargan los
-# anuarios ausentes del staging más el más reciente; "full" en primera carga,
-# staging ilegible, reconstrucción desde snapshots o refresh forzado por
-# variable de entorno. Mismo patrón de estado de módulo que RES (Plan 076).
-_LAST_FETCH_MODE = "full"
-
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -590,7 +584,7 @@ def _gate_reconciliacion(rows: list[dict], totals: dict[str, int]) -> tuple[list
     return kept, [f"ERROR de reconciliación ({detalle}); filas omitidas"]
 
 
-def fetch_data() -> tuple[list[dict], str, str, list[str]]:
+def fetch_data() -> tuple[list[dict], str, str, str, list[str]]:
     """Obtiene estadísticas vitales comunales desde el INE.
 
     Incremental (Plan 118): si el staging consolidado ya existe, solo se
@@ -598,10 +592,9 @@ def fetch_data() -> tuple[list[dict], str, str, list[str]]:
     republicar el último año); el merge con el staging previo lo hace
     `process_estadisticas_vitales`. Sin staging legible, fetch completo.
 
-    Retorna (rows, source_mode, source_url, notes).
+    Retorna (rows, source_mode, fetch_mode, source_url, notes).
     """
-    global _LAST_FETCH_MODE
-    _LAST_FETCH_MODE = "full"
+    fetch_mode = "full"
 
     ensure_staging_directories()
     notes: list[str] = []
@@ -611,7 +604,7 @@ def fetch_data() -> tuple[list[dict], str, str, list[str]]:
     try:
         lookup, provinces = _load_comunas_lookup()
     except FileNotFoundError as exc:
-        return FALLBACK_ROWS, "fallback", EEVV_PAGE, [str(exc)]
+        return FALLBACK_ROWS, "fallback", "full", EEVV_PAGE, [str(exc)]
 
     force_full = os.environ.get("CHILE_HUB_VITALES_FULL") == "1"
     try:
@@ -659,7 +652,7 @@ def fetch_data() -> tuple[list[dict], str, str, list[str]]:
                 )
         if not por_archivo:
             notes.append("sin anuarios definitivos ni snapshots previos disponibles")
-            return FALLBACK_ROWS, "fallback", EEVV_PAGE, notes
+            return FALLBACK_ROWS, "fallback", "full", EEVV_PAGE, notes
         notes.append(
             f"descubrimiento no disponible; reconstruyendo desde {len(por_archivo)} "
             "snapshots locales"
@@ -728,11 +721,10 @@ def fetch_data() -> tuple[list[dict], str, str, list[str]]:
             notes.append(f"{year}: año omitido ({'; '.join(resto)})")
 
     if not all_rows:
-        return FALLBACK_ROWS, "fallback", EEVV_PAGE, notes
+        return FALLBACK_ROWS, "fallback", "full", EEVV_PAGE, notes
 
-    _LAST_FETCH_MODE = fetch_mode
     mode = "live" if any_live else "fallback"
-    return all_rows, mode, EEVV_PAGE, notes
+    return all_rows, mode, fetch_mode, EEVV_PAGE, notes
 
 
 def normalize_rows(rows: list[dict]) -> pl.DataFrame:
@@ -796,10 +788,10 @@ def build_metadata(mode: str, source_url: str, notes: list[str], row_count: int)
 
 def process_estadisticas_vitales() -> dict:
     """Ejecuta el flujo completo de extracción y staging."""
-    rows, mode, source_url, notes = fetch_data()
+    rows, mode, fetch_mode, source_url, notes = fetch_data()
     df_new = normalize_rows(rows)
 
-    if _LAST_FETCH_MODE == "incremental" and os.path.exists(STAGING_CSV_PATH):
+    if fetch_mode == "incremental" and os.path.exists(STAGING_CSV_PATH):
         # Merge con el staging previo (Plan 118): el fetch incremental solo
         # trae los anuarios ausentes + el más reciente. `anio` y `cantidad` se
         # leen con su tipo canónico y el resto como string para no perder los
@@ -847,7 +839,7 @@ class EstadisticasVitalesExtractor(BaseExtractor):
         return fetch_data()
 
     def normalize(self, raw_data):
-        rows, _mode, _url, _notes = raw_data
+        rows, _mode, _fetch_mode, _url, _notes = raw_data
         return normalize_rows(rows)
 
     def validate(self, df, metadata: dict) -> dict:
