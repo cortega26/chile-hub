@@ -51,7 +51,7 @@ pipeline = [
     "defusedxml==0.7.1",
     "openpyxl==3.1.5",
     "structlog==26.1.0",
-    "tenacity==9.1.4",
+    "tenacity==9.2.1",
     "shapely>=2.1.2",
     "geopandas>=1.1.4",
 ]
@@ -84,14 +84,14 @@ mcp = [
 # jobs de publicación (pypi-release, hf-publish). Pin exacto + lock: el job
 # corre con HF_TOKEN, no puede resolver "latest" desde PyPI (Plan 112).
 publish = [
-    "huggingface_hub==2.1.1",
+    "huggingface_hub==2.2.0",
 ]
 dev = [
     "build==1.6.1",
     "twine==7.0.0",
     "python-semantic-release==10.7.0",
     "playwright==1.63.0",
-    "ruff==0.16.10",
+    "ruff==0.17.0",
     "pytest==9.1.1",
     "pytest-cov==7.1.0",
     "pre-commit==4.6.2",
@@ -99,7 +99,7 @@ dev = [
     "pip-audit==2.10.1",
     "interrogate==1.7.0",
     "pytest-xdist==3.8.0",
-    "hypothesis==6.168.3",
+    "hypothesis==6.168.5",
     "bandit==1.9.4",
     "structlog==26.1.0",
     "frictionless>=5.18,<6",
