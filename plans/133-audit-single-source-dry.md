@@ -47,7 +47,9 @@ cada duplicación que pueda divergir es un riesgo silencioso de joins.
   `permisos_edificacion_extractor.py:335` `_parse_sheet` D28;
   `bcentral_extractor.py:590` `process_indicators` D26; `subdere_extractor.py:454`
   `normalize_dpa` (195 L, C12 pero linealmente enorme).
-- Si 132 habilitó C901: estos llevan `# noqa: C901  # 133` a remover.
+- C901 quedó habilitado en 132e (umbral 35): ruff-mccabe **no** marca a estos
+  extractores (radon sí: `_parse_comuna_sheet` 61, `fetch_data` 40), así que no
+  hay noqa pendiente acá; el umbral se baja cuando este plan los descomponga.
 
 ## Commands you will need
 

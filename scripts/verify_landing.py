@@ -167,7 +167,7 @@ def verify_no_inline_handlers():
             )
 
 
-def verify_landing():
+def verify_landing():  # noqa: C901  # plan 136
     verify_no_inline_handlers()
     try:
         from playwright.sync_api import sync_playwright
