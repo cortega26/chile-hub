@@ -116,6 +116,14 @@ antes de tocar `core.py`).
 
 ## Done criteria
 
+> **Ejecutado 2026-10-13 (134a #177 · 134b #178 · 134c)**: B019 fuera ✓ · sin
+> `lru_cache` sobre métodos ✓ · guardrail de superficie (golden de 59
+> entradas) ✓ · MI **A** en `core.py`/`_store.py`/`_reporting.py`/`_query.py` ✓ ·
+> `core.py` 2 086 → **1 250 L** (el "≤ ~900" no se alcanza conservando los
+> delegadores con def+docstring — son la documentación pública de la API; la
+> desviación queda registrada acá). `sql()` se queda en el hub por STOP
+> documentado (estado lazy + patch de clase de `get_output_path` en tests).
+
 - [ ] `core.py` ≤ ~900 L, sin `lru_cache` sobre métodos, MI A/B
 - [ ] Superficie pública intacta (guardrail) + suites verdes
 - [ ] `B019` removido del ignore de ruff

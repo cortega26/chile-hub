@@ -1,7 +1,6 @@
 import importlib.resources
 import json
 import warnings
-from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime
 from difflib import get_close_matches
@@ -11,7 +10,7 @@ from typing import Any, Literal, cast
 import polars as pl
 import requests
 
-from . import _reporting
+from . import _query, _reporting
 from ._paths import NORMALIZED_DIR, ROOT_DIR  # noqa: F401  (re-export: ROOT_DIR/NORMALIZED_DIR)
 from ._store import ArtifactStore
 from .data_manager import ChileHubDataManager
@@ -22,14 +21,11 @@ from .exceptions import (
     ChileHubExampleError,
     ChileHubOutputError,
 )
-from .geo import acquire_geometry, load_geometry, resolve_points
 from .pipeline_status_utils import (
     compute_freshness,
     compute_top_issue,
     format_top_issue_summary,
 )
-from .regions import REGION_ALIASES, normalize_region_name
-from .text import normalize_comuna_name
 
 DATASET_CATALOG_PATH = NORMALIZED_DIR / "dataset_catalog.json"
 
@@ -64,34 +60,6 @@ def _format_available(values: list[str], requested: str | None = None) -> str:
     if matches:
         return f"Disponibles: {available}. Quizas quisiste decir '{matches[0]}'."
     return f"Disponibles: {available}"
-
-
-def _resolve_names_to_frame(
-    names: list[str],
-    lookup: dict[str, dict[str, str]],
-    normalizer: Callable[[str], str],
-    value_columns: tuple[str, ...],
-) -> pl.DataFrame:
-    """Fila por input (orden y duplicados preservados) con ``matched`` explícito.
-
-    Helper común de ``resolve_comunas`` y ``resolve_regiones``: normaliza cada
-    input con ``normalizer``, busca en ``lookup`` y devuelve códigos nulos (sin
-    excepción) para los no encontrados.
-    """
-    rows: list[dict[str, Any]] = []
-    for original in names:
-        hit = lookup.get(normalizer(str(original)))
-        row: dict[str, Any] = {"input": original}
-        for column in value_columns:
-            row[column] = hit[column] if hit else None
-        row["matched"] = hit is not None
-        rows.append(row)
-    schema = {
-        "input": pl.String,
-        **dict.fromkeys(value_columns, pl.String),
-        "matched": pl.Boolean,
-    }
-    return pl.DataFrame(rows, schema=schema)
 
 
 class ChileHub:
@@ -290,18 +258,8 @@ class ChileHub:
                 f"cross_view requiere al menos 2 datasets. Recibido: {len(datasets)}"
             )
 
-        dfs = []
-        for name in datasets:
-            df = self.load_polars(name)
-            # Prefijar columnas no-clave con el nombre del dataset para evitar colisiones
-            cols_to_prefix = [c for c in df.columns if c != on]
-            df = df.select([pl.col(on)] + [pl.col(c).alias(f"{name}_{c}") for c in cols_to_prefix])
-            dfs.append(df)
-
-        result = dfs[0]
-        for df in dfs[1:]:
-            result = result.join(df, on=on, how=how)
-        return result
+        frames = [(str(name), self.load_polars(name)) for name in datasets]
+        return _query.cross_view(frames, on=on, how=how)
 
     def resolve_comunas(self, names: list[str]) -> pl.DataFrame:
         """Resuelve nombres de comuna (tipeados por humanos) a códigos CUT.
@@ -325,21 +283,7 @@ class ChileHub:
             >>> hub = ChileHub()
             >>> hub.resolve_comunas(["Ñuñoa", "concon", "No Existe"])
         """
-        comunas = self.load_polars("comunas")
-        lookup = {
-            row["nombre_comuna_clean"]: {
-                "codigo_comuna": row["codigo_comuna"],
-                "nombre_comuna": row["nombre_comuna"],
-                "codigo_region": row["codigo_region"],
-            }
-            for row in comunas.iter_rows(named=True)
-        }
-        return _resolve_names_to_frame(
-            names,
-            lookup,
-            normalize_comuna_name,
-            ("codigo_comuna", "nombre_comuna", "codigo_region"),
-        )
+        return _query.resolve_comunas(names, self.load_polars("comunas"))
 
     def resolve_regiones(self, names: list[str]) -> pl.DataFrame:
         """Resuelve nombres de región (tipeados por humanos) a códigos CUT.
@@ -365,29 +309,7 @@ class ChileHub:
             >>> hub = ChileHub()
             >>> hub.resolve_regiones(["Metropolitana", "Ñuble", "RM"])
         """
-        regiones = self.load_polars("regiones")
-        nombre_por_codigo = {
-            row["codigo_region"]: row["nombre_region"] for row in regiones.iter_rows(named=True)
-        }
-        lookup: dict[str, dict[str, str]] = {}
-        for row in regiones.iter_rows(named=True):
-            lookup[normalize_region_name(row["nombre_region"])] = {
-                "codigo_region": row["codigo_region"],
-                "nombre_region": row["nombre_region"],
-            }
-        for alias, codigo in REGION_ALIASES.items():
-            nombre_oficial = nombre_por_codigo.get(codigo)
-            if nombre_oficial is not None:
-                lookup.setdefault(
-                    alias,
-                    {"codigo_region": codigo, "nombre_region": nombre_oficial},
-                )
-        return _resolve_names_to_frame(
-            names,
-            lookup,
-            normalize_region_name,
-            ("codigo_region", "nombre_region"),
-        )
+        return _query.resolve_regiones(names, self.load_polars("regiones"))
 
     def resolve_by_coords(
         self,
@@ -433,46 +355,8 @@ class ChileHub:
             >>> hub = ChileHub()
             >>> hub.resolve_by_coords([(-33.4489, -70.6693)])  # centro de Santiago
         """
-        for i, point in enumerate(points):
-            lat, lon = point
-            if not (-90.0 <= lat <= 90.0) or not (-180.0 <= lon <= 180.0):
-                raise ValueError(
-                    f"Coordenada inválida en el input {i}: ({lat}, {lon}). "
-                    "Se espera (latitud en [-90, 90], longitud en [-180, 180])."
-                )
-
-        try:
-            if geometry_path is not None:
-                path = geometry_path
-            else:
-                path = acquire_geometry(refresh_geometry=refresh_geometry)
-            gdf = load_geometry(path)
-        except ImportError:
-            raise
-        except ChileHubDataError:
-            raise
-        except Exception as exc:
-            raise ChileHubDataError(f"No se pudo cargar la geometría comunal: {exc}") from exc
-
-        results = resolve_points(gdf, points)
-        return pl.DataFrame(
-            [
-                {
-                    "input_lat": lat,
-                    "input_lon": lon,
-                    "codigo_comuna": code,
-                    "nombre_comuna": name,
-                    "matched": matched,
-                }
-                for (lat, lon), (code, name, matched) in zip(points, results, strict=False)
-            ],
-            schema={
-                "input_lat": pl.Float64,
-                "input_lon": pl.Float64,
-                "codigo_comuna": pl.String,
-                "nombre_comuna": pl.String,
-                "matched": pl.Boolean,
-            },
+        return _query.resolve_by_coords(
+            points, refresh_geometry=refresh_geometry, geometry_path=geometry_path
         )
 
     def sql(self, query: str) -> pl.DataFrame:
