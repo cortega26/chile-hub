@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -1997,12 +1998,35 @@ class WorkflowContractTests(unittest.TestCase):
         )
         self.assertIn("chore(data): daily refresh [skip ci]", self.workflow_text)
 
-    def test_pipeline_check_workflow_pins_third_party_actions(self):
-        for line in self.workflow_lines:
-            stripped = line.strip()
-            if stripped.startswith("uses: actions/"):
-                revision = stripped.split("@", 1)[1].split()[0]
-                self.assertRegex(revision, r"^[0-9a-f]{40}$")
+    def test_all_workflows_pin_third_party_actions(self):
+        """Todo `uses:` de terceros, en cualquier workflow, va a SHA completo.
+
+        Regresión (PR #163 / ADR-024): este barrido cubría solo
+        pipeline-check.yml y el prefijo `actions/`, así que
+        `codecov/codecov-action@v7` (sin pin) quedó sin señal. El valor del
+        pin vive únicamente en el workflow; los guardrails verifican el
+        invariante (40 hex), nunca un SHA concreto.
+        """
+        workflows = sorted((ROOT_DIR / ".github" / "workflows").glob("*.yml"))
+        self.assertTrue(workflows, "No se encontraron workflows bajo .github/workflows/.")
+        missing_pin, missing_comment = [], []
+        for workflow in workflows:
+            for line in workflow.read_text(encoding="utf-8").splitlines():
+                stripped = line.strip()
+                if not stripped.startswith("uses: "):
+                    continue
+                target = stripped.split("uses: ", 1)[1].split()[0]
+                if target.startswith("./"):
+                    continue  # workflow reutilizable local: no aplica pin
+                revision = target.rsplit("@", 1)[-1]
+                if not re.fullmatch(r"[0-9a-f]{40}", revision):
+                    missing_pin.append(f"{workflow.name}: {target}")
+                elif " # v" not in stripped:
+                    missing_comment.append(f"{workflow.name}: {target}")
+        self.assertEqual(missing_pin, [], "Uses sin SHA completo: " + "; ".join(missing_pin))
+        self.assertEqual(
+            missing_comment, [], "Uses sin comentario de versión: " + "; ".join(missing_comment)
+        )
 
     def test_pipeline_check_workflow_orders_critical_steps_consistently(self):
         self.assertSequenceContainsOrderedSubsequence(
