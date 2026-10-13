@@ -2,12 +2,10 @@ import argparse
 import sys
 import tomllib
 import zipfile
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import polars as pl
-
-UTC = timezone.utc
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
@@ -601,12 +599,13 @@ def verify_publication_policy(
         if freshness.get("status") != "fresh":
             violations.append(f"{dataset_name}: freshness={freshness.get('status')}")
         fallback_policy = registry_fallback_policy.get(dataset_name, "none")
-        if fallback_policy == "allowed_for_dev_blocked_for_publication":
-            if dataset.get("source_mode") == "fallback":
-                violations.append(
-                    f"{dataset_name}: data in fallback mode but publication track is "
-                    f"stable_publishable and fallback_policy forbids publication"
-                )
+        if fallback_policy == "allowed_for_dev_blocked_for_publication" and (
+            dataset.get("source_mode") == "fallback"
+        ):
+            violations.append(
+                f"{dataset_name}: data in fallback mode but publication track is "
+                f"stable_publishable and fallback_policy forbids publication"
+            )
 
     # Check candidate datasets: must be absent from public manifest/ZIP
     if manifest is not None:
@@ -1180,37 +1179,46 @@ def verify_artifact_manifest():
     for entry in artifacts:
         path = entry.get("path")
         if path in expected_paths:
-            if path.endswith((".parquet", ".json")) and path not in {
-                "data/normalized/pipeline_metadata.json",
-                "data/normalized/hub_health.json",
-                "data/normalized/hub_status.json",
-                "data/normalized/dataset_status.json",
-                "data/normalized/dataset_changelog.json",
-                "data/normalized/hub_bundle.json",
-                "data/normalized/redistribution_report.json",
-                "data/normalized/provenance_report.json",
-                "data/normalized/drift_report.json",
-                "data/normalized/overview.json",
-                "data/normalized/dataset_catalog.json",
-                "data/normalized/artifact_manifest.json",
-            }:
-                if not entry.get("dataset"):
-                    fail(f"artifact manifest entry is missing dataset: {entry}")
-            if path.endswith((".parquet", ".json")) and path not in {
-                "data/normalized/pipeline_metadata.json",
-                "data/normalized/hub_health.json",
-                "data/normalized/hub_status.json",
-                "data/normalized/dataset_status.json",
-                "data/normalized/dataset_changelog.json",
-                "data/normalized/hub_bundle.json",
-                "data/normalized/redistribution_report.json",
-                "data/normalized/provenance_report.json",
-                "data/normalized/drift_report.json",
-                "data/normalized/dataset_catalog.json",
-                "data/normalized/artifact_manifest.json",
-            }:
-                if path.endswith(".parquet") and not entry.get("output_type") == "parquet":
-                    fail(f"artifact manifest entry has invalid output_type for parquet: {entry}")
+            if (
+                path.endswith((".parquet", ".json"))
+                and path
+                not in {
+                    "data/normalized/pipeline_metadata.json",
+                    "data/normalized/hub_health.json",
+                    "data/normalized/hub_status.json",
+                    "data/normalized/dataset_status.json",
+                    "data/normalized/dataset_changelog.json",
+                    "data/normalized/hub_bundle.json",
+                    "data/normalized/redistribution_report.json",
+                    "data/normalized/provenance_report.json",
+                    "data/normalized/drift_report.json",
+                    "data/normalized/overview.json",
+                    "data/normalized/dataset_catalog.json",
+                    "data/normalized/artifact_manifest.json",
+                }
+                and not entry.get("dataset")
+            ):
+                fail(f"artifact manifest entry is missing dataset: {entry}")
+            if (
+                path.endswith((".parquet", ".json"))
+                and path
+                not in {
+                    "data/normalized/pipeline_metadata.json",
+                    "data/normalized/hub_health.json",
+                    "data/normalized/hub_status.json",
+                    "data/normalized/dataset_status.json",
+                    "data/normalized/dataset_changelog.json",
+                    "data/normalized/hub_bundle.json",
+                    "data/normalized/redistribution_report.json",
+                    "data/normalized/provenance_report.json",
+                    "data/normalized/drift_report.json",
+                    "data/normalized/dataset_catalog.json",
+                    "data/normalized/artifact_manifest.json",
+                }
+                and path.endswith(".parquet")
+                and entry.get("output_type") != "parquet"
+            ):
+                fail(f"artifact manifest entry has invalid output_type for parquet: {entry}")
         if path in {
             "data/normalized/pipeline_metadata.json",
             "data/normalized/hub_health.json",
@@ -1250,7 +1258,7 @@ def verify_artifact_manifest():
                 "data/normalized/comunas.json",
                 "data/normalized/indicadores_hoy.json",
             }
-            and not entry.get("output_type") == "json"
+            and entry.get("output_type") != "json"
         ):
             fail(f"artifact manifest entry has invalid output_type for json: {entry}")
         if not entry.get("sha256"):
@@ -1368,14 +1376,7 @@ def verify_hub_health():
                 f"warning_count: {entry}"
             )
 
-    if health.get("warning_count", 0) > 0:
-        verify_top_issue(health.get("top_issue"), "hub_health.json")
-        verify_top_issue_summary(
-            health.get("top_issue_summary"),
-            health.get("top_issue"),
-            "hub_health.json",
-        )
-    elif health.get("top_issue") is not None:
+    if health.get("warning_count", 0) > 0 or health.get("top_issue") is not None:
         verify_top_issue(health.get("top_issue"), "hub_health.json")
         verify_top_issue_summary(
             health.get("top_issue_summary"),
@@ -1402,14 +1403,7 @@ def verify_hub_status():
     ):
         if status.get(key) is None:
             fail(f"hub_status.json is missing {key}")
-    if status.get("warning_count", 0) > 0:
-        verify_top_issue(status.get("top_issue"), "hub_status.json")
-        verify_top_issue_summary(
-            status.get("top_issue_summary"),
-            status.get("top_issue"),
-            "hub_status.json",
-        )
-    elif status.get("top_issue") is not None:
+    if status.get("warning_count", 0) > 0 or status.get("top_issue") is not None:
         verify_top_issue(status.get("top_issue"), "hub_status.json")
         verify_top_issue_summary(
             status.get("top_issue_summary"),
@@ -1704,14 +1698,7 @@ def verify_overview():
         )
     if overview.get("package_count", 0) <= 0:
         fail(f"overview.json has invalid package_count: {overview.get('package_count')}")
-    if overview.get("warning_count", 0) > 0:
-        verify_top_issue(overview.get("top_issue"), "overview.json")
-        verify_top_issue_summary(
-            overview.get("top_issue_summary"),
-            overview.get("top_issue"),
-            "overview.json",
-        )
-    elif overview.get("top_issue") is not None:
+    if overview.get("warning_count", 0) > 0 or overview.get("top_issue") is not None:
         verify_top_issue(overview.get("top_issue"), "overview.json")
         verify_top_issue_summary(
             overview.get("top_issue_summary"),

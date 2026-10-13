@@ -36,7 +36,7 @@ CATALOG_JSON_FILES = ["datapackage.json", "dataset_catalog.json", "artifact_mani
 def _read_json(path: Path) -> dict:
     import json
 
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -229,8 +229,8 @@ def main(argv: list[str] | None = None) -> None:
 
         try:
             from huggingface_hub import HfApi
-        except ImportError:
-            raise SystemExit("ERROR: instala con: pip install huggingface_hub")
+        except ImportError as exc:
+            raise SystemExit("ERROR: instala con: pip install huggingface_hub") from exc
 
         version = _read_project_version()
         api = HfApi()

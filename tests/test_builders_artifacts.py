@@ -178,7 +178,7 @@ class TestBundleZip:
             with zipfile.ZipFile(zip_path, "r") as zf:
                 namelist = zf.namelist()
 
-            with open(os.path.join(normalized, "artifact_manifest.json"), "r") as f:
+            with open(os.path.join(normalized, "artifact_manifest.json")) as f:
                 manifest = json.load(f)
 
             for artifact in manifest["artifacts"]:
@@ -300,7 +300,7 @@ class TestBundleSha256:
                 expected_digest = hashlib.sha256(f.read()).hexdigest()
 
             # Leer el digest del archivo .sha256
-            with open(sha256_path, "r") as f:
+            with open(sha256_path) as f:
                 line = f.read().strip()
 
             # Formato: "<sha256>  data/normalized/<zip>"
@@ -326,7 +326,7 @@ class TestBundleSha256:
                 zip_path = write_publishable_bundle_zip()
                 sha256_path = write_publishable_bundle_sha256(zip_path)
 
-            with open(sha256_path, "r") as f:
+            with open(sha256_path) as f:
                 line = f.read().strip()
 
             parts = line.split("  ")
@@ -403,7 +403,7 @@ class TestManifestPackage:
             pkg_sha256 = manifest["packages"][0]["sha256"]
 
             # Leer del .sha256
-            with open(sha256_path, "r") as f:
+            with open(sha256_path) as f:
                 sha256_digest = f.read().strip().split("  ")[0]
 
             assert pkg_sha256 == sha256_digest, (
@@ -504,7 +504,7 @@ class TestFromNormalFlow:
                 assert os.path.exists(sha256_path)
 
                 # 5. Anadir paquete al manifiesto
-                mpath, updated_manifest = attach_publishable_package_to_manifest(
+                _mpath, updated_manifest = attach_publishable_package_to_manifest(
                     zip_path, sha256_path
                 )
                 assert len(updated_manifest["packages"]) == 1

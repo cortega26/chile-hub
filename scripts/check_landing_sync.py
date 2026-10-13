@@ -31,7 +31,7 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT_DIR))
 
-from src.builders.landing import (  # noqa: E402
+from src.builders.landing import (
     CATALOG_JSON_LD_START_MARKER,
     extract_catalog_json_ld_block,
     normalize_site_url,
@@ -62,16 +62,20 @@ def check_json_ld_block(index_html, public_site_url):
     """El bloque JSON-LD commiteado debe ser byte a byte el que genera el build."""
     if CATALOG_JSON_LD_START_MARKER not in index_html:
         return [
-            "index.html no contiene el marcador "
-            f"{CATALOG_JSON_LD_START_MARKER} — sync_landing_metadata() no puede "
-            "regenerar el bloque JSON-LD y fallaría en silencio"
+            (
+                "index.html no contiene el marcador "
+                f"{CATALOG_JSON_LD_START_MARKER} — sync_landing_metadata() no puede "
+                "regenerar el bloque JSON-LD y fallaría en silencio"
+            )
         ]
 
     actual = extract_catalog_json_ld_block(index_html)
     if actual is None:
         return [
-            "index.html tiene el marcador de apertura del JSON-LD pero no el de "
-            "cierre — el bloque está malformado"
+            (
+                "index.html tiene el marcador de apertura del JSON-LD pero no el de "
+                "cierre — el bloque está malformado"
+            )
         ]
 
     expected = render_catalog_json_ld_block(public_site_url)
@@ -128,8 +132,10 @@ def check_app_cache_buster(index_html, version):
     actual_version = match.group(1)
     if actual_version != version:
         return [
-            f"index.html carga app.js?v={actual_version} pero pyproject.toml "
-            f"declara la versión {version}"
+            (
+                f"index.html carga app.js?v={actual_version} pero pyproject.toml "
+                f"declara la versión {version}"
+            )
         ]
     return []
 

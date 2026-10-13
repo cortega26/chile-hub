@@ -10,7 +10,7 @@ import openpyxl
 import polars as pl
 import requests
 
-UTC = datetime.timezone.utc
+UTC = datetime.UTC
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 if ROOT_DIR not in sys.path:
@@ -136,7 +136,7 @@ def parse_workbook(path: Path) -> pl.DataFrame:
             "hombres": int(row[7]),
             "mujeres": int(row[8]),
             "razon_hombre_mujer": float(row[9]),
-            **{band: 0 for band in AGE_BANDS},
+            **dict.fromkeys(AGE_BANDS, 0),
         }
 
     for row in workbook["4"].iter_rows(min_row=6, values_only=True):

@@ -129,17 +129,17 @@ chile-hub/
 │   │   ├── sinim_finanzas_live_extractor.py              Finanzas municipales — scraper real; corre en `monthly-scrape.yml`
 │   │   └── subdere_extractor.py                          DPA: regiones/provincias/comunas/comunas_enriquecidas (BCN ArcGIS) → data/staging/
 <!-- END_AGENTS_EXTRACTOR_LIST -->
-│   ├── validation.py              Todas las funciones validate_*() — módulo independiente (1 960 líneas)
-│   ├── build_dev_db.py            Orquestador (965 líneas): main() + fases (_load_inputs, _compute_validations, _write_data_artifacts, _generate_reports)
+│   ├── validation.py              Todas las funciones validate_*() — módulo independiente (1 958 líneas)
+│   ├── build_dev_db.py            Orquestador (963 líneas): main() + fases (_load_inputs, _compute_validations, _write_data_artifacts, _generate_reports)
 │   ├── builders/                  Módulos del pipeline extraídos de build_dev_db.py (formats, metadata, reports, artifacts, datasets, catalog, landing, io_utils, _shared, dcat_catalog, data_package, doc_sync, geo, _logging)
 │   ├── chile_hub/                 Paquete Python instalable (ChileHub API + CLI + data manager)
-│   │   ├── core.py                ChileHub class + API pública (2 078 líneas)
+│   │   ├── core.py                ChileHub class + API pública (2 086 líneas)
 │   │   ├── cli.py                 CLI entry points (build_parser/_main/main — TECHDEBT-02, movido de core.py)
 │   │   ├── contracts.py           Schemas de contrato runtime
 │   │   ├── datasets.py            Definición de Dataset(StrEnum) y tipos
 │   │   ├── exceptions.py          Excepciones de dominio de la API
 │   │   ├── data_manager.py        Descarga de bundle, cache, verificación SHA256
-│   │   ├── pipeline_status_utils.py  Reportes Markdown de salud, catálogo y redistribución (1 022 líneas)
+│   │   ├── pipeline_status_utils.py  Reportes Markdown de salud, catálogo y redistribución (1 024 líneas)
 │   │   ├── _render.py             Helper de renderizado de tablas
 │   │   └── text.py                Utils de texto compartidas
 │   ├── registry/                  DatasetSpec cohort Phase 2–3D (ADR-018): modelo tipado + proyecciones de compatibilidad (dataset_spec.py, 657 líneas)
@@ -203,8 +203,8 @@ codegraph impact validate_comunas                   # Qué se rompe si cambio es
 
 **Reglas para acotar lecturas y ahorrar tokens:**
 - Usar `Read` con `offset`/`limit` — nunca leer archivos grandes enteros de golpe.
-- `base.py` (146 líneas) es seguro de leer completo. `validation.py` (1 960 líneas) — leer por validador individual.
-- `build_dev_db.py` (965 líneas) y `src/chile_hub/core.py` (2 078 líneas) — usar estas áncoras:
+- `base.py` (146 líneas) es seguro de leer completo. `validation.py` (1 958 líneas) — leer por validador individual.
+- `build_dev_db.py` (963 líneas) y `src/chile_hub/core.py` (2 086 líneas) — usar estas áncoras:
 
 | Archivo | Líneas de interés |
 |---|---|

@@ -202,7 +202,7 @@ class TestOverlayAdapters:
         overlaid = source_registry_with_spec_overlay(legacy)
         assert len(overlaid) == len(legacy)
         specs = {s.dataset: s for s in iter_specs()}
-        for legacy_entry, overlaid_entry in zip(legacy, overlaid):
+        for legacy_entry, overlaid_entry in zip(legacy, overlaid, strict=False):
             ds = legacy_entry["dataset"]
             if ds in specs:
                 assert overlaid_entry == specs[ds].to_source_registry_entry()

@@ -12,7 +12,7 @@ import json
 import shutil
 import zipfile
 from contextlib import ExitStack
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from unittest.mock import patch
 
@@ -49,7 +49,7 @@ REQUIRED_METADATA_PATHS = (
     "PARTIDOS_POLITICOS_METADATA_PATH",
     "AUTORIDADES_ELECTAS_METADATA_PATH",
 )
-FROZEN_BUILD_TIME = datetime(2026, 8, 23, 12, 0, tzinfo=timezone.utc)
+FROZEN_BUILD_TIME = datetime(2026, 8, 23, 12, 0, tzinfo=UTC)
 _SERIALIZATION_VARIANT_PATHS = {
     # Frozen input data still reaches these paths through implementation-defined
     # JSON dict iteration and ZIP member timestamps respectively.
@@ -556,7 +556,7 @@ def test_only_explicit_volatile_json_paths_are_ignored(tmp_path: Path) -> None:
         second / "report.json", {"generated_at_utc": "2026-01-02T00:00:00Z", "status": "ok"}
     )
 
-    with pytest.raises(AssertionError, match="report.json"):
+    with pytest.raises(AssertionError, match=r"report\.json"):
         assert_artifact_trees_equivalent(first, second)
     assert_artifact_trees_equivalent(first, second, volatile_json_paths={("generated_at_utc",)})
 
@@ -570,7 +570,7 @@ def test_allowlist_does_not_hide_other_public_report_changes(tmp_path: Path) -> 
     _write_json(first / "report.json", {"generated_at_utc": "a", "status": "ok"})
     _write_json(second / "report.json", {"generated_at_utc": "b", "status": "error"})
 
-    with pytest.raises(AssertionError, match="report.json"):
+    with pytest.raises(AssertionError, match=r"report\.json"):
         assert_artifact_trees_equivalent(first, second, volatile_json_paths={("generated_at_utc",)})
 
 

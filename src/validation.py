@@ -1573,9 +1573,7 @@ def validate_estadisticas_vitales(
     dup_count = _duplicate_count(df, ["anio", "codigo_comuna", "evento", "sexo"])
     if dup_count > 0:
         errors.append(
-            "found {0} duplicate rows by primary key (anio, codigo_comuna, evento, sexo)".format(
-                dup_count
-            )
+            f"found {dup_count} duplicate rows by primary key (anio, codigo_comuna, evento, sexo)"
         )
 
     # Formato de códigos CUT
@@ -1648,7 +1646,7 @@ def validate_estadisticas_vitales(
         warnings.append("estadisticas_vitales source_mode no es live; cobertura parcial esperada.")
 
     # Años razonables (serie de anuarios definitivos 2010 en adelante)
-    current_year = datetime.datetime.now(datetime.timezone.utc).year
+    current_year = datetime.datetime.now(datetime.UTC).year
     years = df["anio"].drop_nulls().unique().to_list()
     odd_years = sorted(y for y in years if y < 2010 or y > current_year)
     if odd_years:
@@ -1793,7 +1791,7 @@ def validate_permisos_edificacion(
         warnings.append("permisos_edificacion source_mode no es live; cobertura parcial esperada.")
 
     # Años razonables (serie desde 2002)
-    current_year = datetime.datetime.now(datetime.timezone.utc).year
+    current_year = datetime.datetime.now(datetime.UTC).year
     years = df["anio"].drop_nulls().unique().to_list()
     odd_years = sorted(y for y in years if y < 2002 or y > current_year + 1)
     if odd_years:
@@ -1880,8 +1878,8 @@ def validate_calidad_aire(
     dup_count = _duplicate_count(df, ["fecha", "id_estacion", "codigo_contaminante"])
     if dup_count > 0:
         errors.append(
-            "found {0} duplicate rows by primary key "
-            "(fecha, id_estacion, codigo_contaminante)".format(dup_count)
+            f"found {dup_count} duplicate rows by primary key "
+            "(fecha, id_estacion, codigo_contaminante)"
         )
 
     # Formato de códigos CUT

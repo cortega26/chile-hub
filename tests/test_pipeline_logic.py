@@ -6,6 +6,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from typing import ClassVar
 from unittest.mock import patch
 
 import polars as pl
@@ -96,9 +97,7 @@ class PipelineLogicTests(unittest.TestCase):
 
     def test_build_main_fails_when_metadata_inputs_are_missing(self):
         def mock_exists(path):
-            if str(path).endswith(".csv"):
-                return True
-            return False
+            return bool(str(path).endswith(".csv"))
 
         with (
             patch("src.build_dev_db.ensure_directories"),
@@ -165,9 +164,9 @@ class PipelineLogicTests(unittest.TestCase):
             }
             for name in DATASET_CATALOG_CONFIG
         }
-        datasets["indicadores"]["indicator_delivery"] = {
-            code: "live" for code in EXPECTED_INDICATOR_CODES
-        }
+        datasets["indicadores"]["indicator_delivery"] = dict.fromkeys(
+            EXPECTED_INDICATOR_CODES, "live"
+        )
         registry = [self._stable_registry_entry(name) for name in DATASET_CATALOG_CONFIG]
 
         verify_publication_policy({"datasets": datasets}, registry=registry)
@@ -213,9 +212,9 @@ class PipelineLogicTests(unittest.TestCase):
             }
             for name in DATASET_CATALOG_CONFIG
         }
-        datasets["indicadores"]["indicator_delivery"] = {
-            code: "live" for code in EXPECTED_INDICATOR_CODES
-        }
+        datasets["indicadores"]["indicator_delivery"] = dict.fromkeys(
+            EXPECTED_INDICATOR_CODES, "live"
+        )
         finanzas_name = next(name for name in DATASET_CATALOG_CONFIG if name != "indicadores")
         datasets[finanzas_name]["source_mode"] = "monthly"
         registry = [self._stable_registry_entry(name) for name in DATASET_CATALOG_CONFIG]
@@ -4126,9 +4125,9 @@ class DocSyncTests(unittest.TestCase):
             with (
                 patch.object(doc_sync, "DATASET_CATALOG_CONFIG", fake_catalog),
                 patch.object(doc_sync, "README_PATH", str(readme)),
+                self.assertRaises(SystemExit),
             ):
-                with self.assertRaises(SystemExit):
-                    doc_sync.sync_readme_extractor_table()
+                doc_sync.sync_readme_extractor_table()
 
 
 class ReadmeLayersTableStabilityTests(unittest.TestCase):
@@ -4299,11 +4298,13 @@ class ValidationCoverageTests(unittest.TestCase):
         from scripts import check_validation_registration as cvr
 
         real_catalog = cvr.catalog_keys()
-        with patch.object(
-            cvr, "catalog_keys", return_value=set(real_catalog) | {"dataset_fantasma"}
+        with (
+            patch.object(
+                cvr, "catalog_keys", return_value=set(real_catalog) | {"dataset_fantasma"}
+            ),
+            self.assertRaises(SystemExit) as ctx,
         ):
-            with self.assertRaises(SystemExit) as ctx:
-                cvr.main()
+            cvr.main()
         self.assertIn("dataset_fantasma", str(ctx.exception))
 
 
@@ -5405,9 +5406,8 @@ class DatasetSeoTests(unittest.TestCase):
     def test_main_fails_loud_without_dataset_pages(self):
         from scripts.inject_dataset_json_ld import main
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            with self.assertRaises(SystemExit):
-                main(["--site-dir", tmpdir])
+        with tempfile.TemporaryDirectory() as tmpdir, self.assertRaises(SystemExit):
+            main(["--site-dir", tmpdir])
 
     def test_main_injects_real_catalog_page(self):
         from scripts.inject_dataset_json_ld import main
@@ -5487,7 +5487,7 @@ class McpToolsTests(unittest.TestCase):
         downloads: list[str] = []
 
         class _CountingHandler(BaseHTTPRequestHandler):
-            def do_GET(self):  # noqa: N802
+            def do_GET(self):
                 downloads.append(self.path)
                 self.send_response(200)
                 self.send_header("Content-Type", "application/octet-stream")
@@ -5610,7 +5610,7 @@ class McpToolsTests(unittest.TestCase):
             class _NoLengthHandler(BaseHTTPRequestHandler):
                 # HTTP/1.0 sin Content-Length: el body se delimita al cerrar
                 # la conexión, igual que el hosting estático real.
-                def do_GET(self):  # noqa: N802
+                def do_GET(self):
                     self.send_response(200)
                     self.send_header("Content-Type", "application/octet-stream")
                     self.end_headers()
@@ -5724,7 +5724,7 @@ class ComunaPagesTests(unittest.TestCase):
     páginas no deterministas (dos corridas iguales deben dar bytes iguales).
     """
 
-    PERFIL_ROW = {
+    PERFIL_ROW: ClassVar[dict[str, str]] = {
         "codigo_region": "13",
         "nombre_region": "Metropolitana de Santiago",
         "codigo_provincia": "131",

@@ -5,6 +5,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from typing import ClassVar
 
 import polars as pl
 
@@ -505,7 +506,7 @@ class BCentralExtractorTests(unittest.TestCase):
         # Cota tolerante al 50% (el scheduling solo puede AUMENTAR gaps, no
         # reducirlos bajo el espaciamiento de submits menos jitter de hilos).
         self.assertEqual(len(call_times), 5)
-        gaps = [b - a for a, b in zip(sorted(call_times), sorted(call_times)[1:])]
+        gaps = [b - a for a, b in zip(sorted(call_times), sorted(call_times)[1:], strict=False)]
         self.assertTrue(gaps, "se esperaban llamadas espaciadas")
         self.assertGreaterEqual(min(gaps), 0.025)
 
@@ -765,7 +766,7 @@ class IneIpcOverrideIntegrationTests(unittest.TestCase):
             patch.object(bcentral_extractor, "fetch_indicator_year", side_effect=fetch),
             patch.object(bcentral_extractor, "fetch_ine_ipc") as ine_mock,
         ):
-            df, diagnostics = bcentral_extractor.fetch_all_history()
+            _df, diagnostics = bcentral_extractor.fetch_all_history()
 
         ine_mock.assert_not_called()
         self.assertEqual(diagnostics["ine_override_pairs"], [])
@@ -794,7 +795,7 @@ class IneIpcOverrideIntegrationTests(unittest.TestCase):
                 return_value=IneIpcReading(value=0.1, date_iso=f"{current_year}-07-01"),
             ) as ine_mock,
         ):
-            df, diagnostics = bcentral_extractor.fetch_all_history()
+            _df, diagnostics = bcentral_extractor.fetch_all_history()
 
         ine_mock.assert_called_once()
         self.assertEqual(len(diagnostics["ine_override_pairs"]), 1)
@@ -960,6 +961,47 @@ class SinimFinanzasExtractorTests(unittest.TestCase):
         meta_wrapped = sinim_finanzas_extractor.build_metadata(df_stub, "fallback", "url", [])
         del meta_wrapped["refreshed_at_utc"]
         self.assertEqual(meta_wrapped, meta_stub)
+
+
+class SinimLiveXmlParseTests(unittest.TestCase):
+    """Auditoría 2026-10-13 (plan 131): `_extract_number` era un closure sobre
+    la variable de loop `cells` (B023) y solo funcionaba por invocarse antes de
+    la iteración siguiente. El helper ahora recibe la fila explícita; este test
+    fija que cada fila conserva sus propios valores."""
+
+    @staticmethod
+    def _row_xml(codigo: str, nombre: str, values: dict[int, str], width: int = 72) -> str:
+        cells = []
+        for index in range(width):
+            if index == 0:
+                value = codigo
+            elif index == 1:
+                value = nombre
+            else:
+                value = values.get(index, str(index))
+            cells.append(f"<Cell><Data>{value}</Data></Cell>" if value else "<Cell/>")
+        return "<Row>" + "".join(cells) + "</Row>"
+
+    def test_parse_xml_spreadsheet_keeps_row_values_independent(self):
+        from src.extractors import sinim_finanzas_live_extractor as live
+
+        xml = (
+            "<Workbook><Worksheet><Table>"
+            "<Row><Cell><Data>titulo</Data></Cell></Row>"
+            "<Row><Cell><Data>encabezados</Data></Cell></Row>"
+            "<Row><Cell><Data>tipos</Data></Cell></Row>"
+            + self._row_xml("13101", "Santiago", {14: "1000", 39: "2000"})
+            + self._row_xml("13102", "Cerrillos", {14: "3000", 39: "4000", 71: ""})
+            + "</Table></Worksheet></Workbook>"
+        )
+        rows = live._parse_xml_spreadsheet(xml)
+        self.assertEqual([row["codigo_comuna"] for row in rows], ["13101", "13102"])
+        self.assertEqual(rows[0]["ingresos_totales"], 1000.0 * 1000)
+        self.assertEqual(rows[1]["ingresos_totales"], 3000.0 * 1000)
+        self.assertEqual(rows[0]["gastos_totales"], 2000.0 * 1000)
+        self.assertEqual(rows[1]["gastos_totales"], 4000.0 * 1000)
+        # Celda ausente → None (no 0): el guard `cell_index not in cells` sigue vivo.
+        self.assertIsNone(rows[1]["gasto_inversion"])
 
 
 class MineducResultadosExtractorTests(unittest.TestCase):
@@ -1314,7 +1356,7 @@ class ResExtractorTests(unittest.TestCase):
             f"1;76286049-K;Empresa Ejemplo EIRL;02-05-{year};02-05-{year};"
             f"02-05-{year};{year};Mayo;Santiago;13;EIRL;CONSTITUCION;"
             "1000000;Santiago;13\n"
-        ).encode("utf-8")
+        ).encode()
 
     def _write_staging(self, tmpdir: str, years: list[int]) -> None:
         """Escribe un staging consolidado sintético (columnas normalizadas,
@@ -1750,18 +1792,18 @@ class ResExtractorTests(unittest.TestCase):
     def test_res_wrong_year_without_matching_backup_fails_closed(self):
         """No aceptar datos de otro año cuando no hay copia válida."""
         package = self._package_mock([self._resource("current", 2026)])
-        with tempfile.TemporaryDirectory() as tmpdir:
-            with (
-                patch.object(res_extractor, "RAW_DIR", tmpdir),
-                patch.object(res_extractor, "_staging_years_present", return_value=None),
-                patch.object(
-                    res_extractor,
-                    "fetch_with_retry",
-                    side_effect=[package, self._response_mock(self._valid_res_csv(2025))],
-                ),
-                self.assertRaisesRegex(SystemExit, "No hay snapshot raw de respaldo utilizable"),
-            ):
-                res_extractor.fetch_resources()
+        with (
+            tempfile.TemporaryDirectory() as tmpdir,
+            patch.object(res_extractor, "RAW_DIR", tmpdir),
+            patch.object(res_extractor, "_staging_years_present", return_value=None),
+            patch.object(
+                res_extractor,
+                "fetch_with_retry",
+                side_effect=[package, self._response_mock(self._valid_res_csv(2025))],
+            ),
+            self.assertRaisesRegex(SystemExit, "No hay snapshot raw de respaldo utilizable"),
+        ):
+            res_extractor.fetch_resources()
 
     def test_res_year_validator_accepts_annual_overlap(self):
         """Un recurso anual puede incluir filas de otro año si conserva su año."""
@@ -1771,17 +1813,17 @@ class ResExtractorTests(unittest.TestCase):
         row_2025 = csv_2025.split(b"\n", 1)[1]
         overlapping = header + b"\n" + row_2025 + row_2026
         package = self._package_mock([self._resource("current", 2026)])
-        with tempfile.TemporaryDirectory() as tmpdir:
-            with (
-                patch.object(res_extractor, "RAW_DIR", tmpdir),
-                patch.object(res_extractor, "_staging_years_present", return_value=None),
-                patch.object(
-                    res_extractor,
-                    "fetch_with_retry",
-                    side_effect=[package, self._response_mock(overlapping)],
-                ),
-            ):
-                contents, mode, detail = res_extractor.fetch_resources()
+        with (
+            tempfile.TemporaryDirectory() as tmpdir,
+            patch.object(res_extractor, "RAW_DIR", tmpdir),
+            patch.object(res_extractor, "_staging_years_present", return_value=None),
+            patch.object(
+                res_extractor,
+                "fetch_with_retry",
+                side_effect=[package, self._response_mock(overlapping)],
+            ),
+        ):
+            contents, mode, detail = res_extractor.fetch_resources()
         self.assertEqual((contents, mode, detail), ([overlapping], "live", "datos_gob_cl_ckan_api"))
 
     def test_res_unknown_resource_year_keeps_structural_validation(self):
@@ -1789,17 +1831,17 @@ class ResExtractorTests(unittest.TestCase):
         resource = self._resource("current", 2026)
         resource["name"] = "Constituciones RES sin año identificable"
         package = self._package_mock([resource])
-        with tempfile.TemporaryDirectory() as tmpdir:
-            with (
-                patch.object(res_extractor, "RAW_DIR", tmpdir),
-                patch.object(res_extractor, "_staging_years_present", return_value=None),
-                patch.object(
-                    res_extractor,
-                    "fetch_with_retry",
-                    side_effect=[package, self._response_mock(self._valid_res_csv(2025))],
-                ),
-            ):
-                contents, mode, detail = res_extractor.fetch_resources()
+        with (
+            tempfile.TemporaryDirectory() as tmpdir,
+            patch.object(res_extractor, "RAW_DIR", tmpdir),
+            patch.object(res_extractor, "_staging_years_present", return_value=None),
+            patch.object(
+                res_extractor,
+                "fetch_with_retry",
+                side_effect=[package, self._response_mock(self._valid_res_csv(2025))],
+            ),
+        ):
+            contents, mode, detail = res_extractor.fetch_resources()
         self.assertEqual(
             (contents, mode, detail), ([self._valid_res_csv(2025)], "live", "datos_gob_cl_ckan_api")
         )
@@ -1865,18 +1907,18 @@ class ResExtractorTests(unittest.TestCase):
         from requests import RequestException
 
         package = self._package_mock([self._resource("current", 2026)])
-        with tempfile.TemporaryDirectory() as tmpdir:
-            with (
-                patch.object(res_extractor, "RAW_DIR", tmpdir),
-                patch.object(res_extractor, "_staging_years_present", return_value=None),
-                patch.object(
-                    res_extractor,
-                    "fetch_with_retry",
-                    side_effect=[package, RequestException("offline")],
-                ),
-                self.assertRaisesRegex(SystemExit, "No hay snapshot raw de respaldo"),
-            ):
-                res_extractor.fetch_resources()
+        with (
+            tempfile.TemporaryDirectory() as tmpdir,
+            patch.object(res_extractor, "RAW_DIR", tmpdir),
+            patch.object(res_extractor, "_staging_years_present", return_value=None),
+            patch.object(
+                res_extractor,
+                "fetch_with_retry",
+                side_effect=[package, RequestException("offline")],
+            ),
+            self.assertRaisesRegex(SystemExit, "No hay snapshot raw de respaldo"),
+        ):
+            res_extractor.fetch_resources()
 
     def test_res_recovery_skips_html_and_header_only_newer_snapshots(self):
         """La captura más reciente puede ser HTML 200 o CSV sin registros."""
@@ -2026,17 +2068,17 @@ class ResExtractorTests(unittest.TestCase):
             self._response_mock(self._valid_res_csv(year)) for year in range(2013, current_year + 1)
         ]
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            with (
-                patch.object(res_extractor, "RAW_DIR", tmpdir),
-                patch.object(res_extractor, "STAGING_CSV_PATH", str(Path(tmpdir) / "empresas.csv")),
-                patch.object(
-                    res_extractor,
-                    "fetch_with_retry",
-                    side_effect=[package_mock, *response_mocks],
-                ),
-            ):
-                contents, _, _ = res_extractor.fetch_resources()
+        with (
+            tempfile.TemporaryDirectory() as tmpdir,
+            patch.object(res_extractor, "RAW_DIR", tmpdir),
+            patch.object(res_extractor, "STAGING_CSV_PATH", str(Path(tmpdir) / "empresas.csv")),
+            patch.object(
+                res_extractor,
+                "fetch_with_retry",
+                side_effect=[package_mock, *response_mocks],
+            ),
+        ):
+            contents, _, _ = res_extractor.fetch_resources()
 
         self.assertEqual(len(contents), len(resources))
         self.assertEqual(res_extractor._LAST_FETCH_MODE, "full")
@@ -2145,20 +2187,22 @@ class SourceAdapterTests(unittest.TestCase):
         """fetch_url_snapshot ante error de red retorna success=False."""
         from src.extractors.source_adapter import fetch_url_snapshot
 
-        with patch(
-            "src.extractors.source_adapter.fetch_with_retry",
-            side_effect=ConnectionError("timeout"),
+        with (
+            patch(
+                "src.extractors.source_adapter.fetch_with_retry",
+                side_effect=ConnectionError("timeout"),
+            ),
+            tempfile.TemporaryDirectory() as tmp,
         ):
-            with tempfile.TemporaryDirectory() as tmp:
-                raw_dir = Path(tmp) / "raw"
-                success, content, note, data_parsed = fetch_url_snapshot(
-                    "https://example.com/data", raw_dir, "test_dataset"
-                )
-                self.assertFalse(success)
-                self.assertIsNone(content)
-                self.assertIn("official_landing_unavailable", note)
-                self.assertIn("timeout", note)
-                self.assertFalse(data_parsed)
+            raw_dir = Path(tmp) / "raw"
+            success, content, note, data_parsed = fetch_url_snapshot(
+                "https://example.com/data", raw_dir, "test_dataset"
+            )
+            self.assertFalse(success)
+            self.assertIsNone(content)
+            self.assertIn("official_landing_unavailable", note)
+            self.assertIn("timeout", note)
+            self.assertFalse(data_parsed)
 
     def test_source_mode_from_live_success(self):
         """source_mode_from_live_success: True → live, False → fallback."""
@@ -2893,7 +2937,7 @@ class CensoExtractorExtendedTests(unittest.TestCase):
                 path, mode = censo_extractor.fetch_workbook()
                 df = censo_extractor.parse_workbook(path)
                 result = censo_extractor._build_extraction_result(
-                    df, path, mode, datetime.datetime.now(datetime.timezone.utc)
+                    df, path, mode, datetime.datetime.now(datetime.UTC)
                 )
 
             self.assertEqual((path, mode), (target, "live"))
@@ -2922,7 +2966,7 @@ class CensoExtractorExtendedTests(unittest.TestCase):
                     censo_extractor.parse_workbook(path),
                     path,
                     mode,
-                    datetime.datetime.now(datetime.timezone.utc),
+                    datetime.datetime.now(datetime.UTC),
                 )
             metadata = result.to_staging_metadata("INE", censo_extractor.CENSO_URL)
             self.assertEqual((path, mode), (backup, "fallback"))
@@ -4051,22 +4095,22 @@ class PartidosPoliticosExtractorTests(unittest.TestCase):
         "<Alias>FA</Alias></PartidoPolitico>"  # duplicado: debe deduplicarse
         "<PartidoPolitico><Id></Id><Nombre>Sin id</Nombre></PartidoPolitico>"  # se descarta
         "</PartidosPoliticosColeccion>"
-    ).encode("utf-8")
+    ).encode()
 
     # Bomba de entidades en miniatura (Plan 096): con ET.fromstring expandiría
     # memoria de forma exponencial; defusedxml debe rechazarla al parsear.
     ENTITY_BOMB = (
-        '<?xml version="1.0" encoding="utf-8"?>'
-        "<!DOCTYPE lolz ["
-        '<!ENTITY lol "lollollollollollollollollollol">'
-        '<!ENTITY lol2 "&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;">'
-        '<!ENTITY lol3 "&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;">'
-        "]>"
-        "<PartidosPoliticosColeccion "
-        'xmlns="http://opendata.camara.cl/camaradiputados/v1">'
-        "<PartidoPolitico><Id>XX</Id><Nombre>&lol3;</Nombre></PartidoPolitico>"
-        "</PartidosPoliticosColeccion>"
-    ).encode("utf-8")
+        b'<?xml version="1.0" encoding="utf-8"?>'
+        b"<!DOCTYPE lolz ["
+        b'<!ENTITY lol "lollollollollollollollollollol">'
+        b'<!ENTITY lol2 "&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;">'
+        b'<!ENTITY lol3 "&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;">'
+        b"]>"
+        b"<PartidosPoliticosColeccion "
+        b'xmlns="http://opendata.camara.cl/camaradiputados/v1">'
+        b"<PartidoPolitico><Id>XX</Id><Nombre>&lol3;</Nombre></PartidoPolitico>"
+        b"</PartidosPoliticosColeccion>"
+    )
 
     def test_parse_partidos_rejects_entity_expansion_bomb(self):
         """Plan 096 (B314): XML con entidades debe fallar cerrado, no expandir."""
@@ -4197,23 +4241,23 @@ class AutoridadesElectasExtractorTests(unittest.TestCase):
         "<Partido><Id>FA</Id><Nombre>Frente Amplio</Nombre></Partido></Militancia></Militancias>"
         "</Diputado></DiputadoPeriodo>"
         "</DiputadosPeriodoColeccion>"
-    ).encode("utf-8")
+    ).encode()
 
-    DISTRITOS = {"1009": "10", "1015": "7"}
+    DISTRITOS: ClassVar[dict[str, str]] = {"1009": "10", "1015": "7"}
 
     # Bomba de entidades en miniatura (Plan 096): ver comentario equivalente
     # en PartidosPoliticosExtractorTests.ENTITY_BOMB.
     ENTITY_BOMB = (
-        '<?xml version="1.0" encoding="utf-8"?>'
-        "<!DOCTYPE lolz ["
-        '<!ENTITY lol "lollollollollollollollollollol">'
-        '<!ENTITY lol2 "&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;">'
-        "]>"
-        '<DiputadosPeriodoColeccion xmlns="http://opendata.camara.cl/camaradiputados/v1">'
-        "<DiputadoPeriodo><Diputado><Id>1</Id><Nombre>&lol2;</Nombre>"
-        "</Diputado></DiputadoPeriodo>"
-        "</DiputadosPeriodoColeccion>"
-    ).encode("utf-8")
+        b'<?xml version="1.0" encoding="utf-8"?>'
+        b"<!DOCTYPE lolz ["
+        b'<!ENTITY lol "lollollollollollollollollollol">'
+        b'<!ENTITY lol2 "&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;">'
+        b"]>"
+        b'<DiputadosPeriodoColeccion xmlns="http://opendata.camara.cl/camaradiputados/v1">'
+        b"<DiputadoPeriodo><Diputado><Id>1</Id><Nombre>&lol2;</Nombre>"
+        b"</Diputado></DiputadoPeriodo>"
+        b"</DiputadosPeriodoColeccion>"
+    )
 
     def test_build_rejects_entity_expansion_bomb(self):
         """Plan 096 (B314): XML con entidades debe fallar cerrado, no expandir."""
@@ -4399,7 +4443,7 @@ class AutoridadesLocalesExtractorTests(unittest.TestCase):
     def test_extract_alcalde_actual_titular_una_linea_no_se_come_otros_campos(self):
         # Bug real: infobox con varios campos en una sola línea separados por "|".
         wikitext = "|titular=Patricio Ferreira Rivera|inicio=6 de diciembre de 2016|dirige=[[Alto Hospicio]]|sede=[[Municipalidad]]"
-        nombre, inicio = autoridades_locales_extractor._extract_alcalde_actual(wikitext)
+        nombre, _inicio = autoridades_locales_extractor._extract_alcalde_actual(wikitext)
         self.assertEqual(nombre, "Patricio Ferreira Rivera")
 
     def test_extract_alcalde_actual_titular_vacio_cae_a_fallback(self):
@@ -4792,7 +4836,7 @@ class SinimFinanzasLiveExtractorTests(unittest.TestCase):
             _parse_xml_spreadsheet,
         )
 
-        nombre_mal_codificado = "Ñuñoa".encode("utf-8").decode("latin-1")
+        nombre_mal_codificado = "Ñuñoa".encode().decode("latin-1")
         row = _sinim_xml_row(
             {
                 0: "13120",
@@ -5018,12 +5062,12 @@ class GeometriaComunalExtractorTests(unittest.TestCase):
 class EstadisticasVitalesExtractorTests(unittest.TestCase):
     """Tests unitarios para el extractor de estadísticas vitales (INE)."""
 
-    FAKE_LOOKUP = {
+    FAKE_LOOKUP: ClassVar[dict[str, tuple[str, str, str]]] = {
         "santiago": ("13101", "13", "Santiago"),
         "puente alto": ("13201", "13", "Puente Alto"),
         "concepcion": ("08101", "08", "Concepción"),
     }
-    FAKE_PROVINCES = {"santiago", "cordillera", "concepcion"}
+    FAKE_PROVINCES: ClassVar[set[str]] = {"santiago", "cordillera", "concepcion"}
 
     def _rows_2023_layout(self):
         """Mini-hoja estilo anuario 2023: split por sexo, provincia indentada."""
@@ -5613,7 +5657,7 @@ class EstadisticasVitalesExtractorTests(unittest.TestCase):
 class PermisosEdificacionExtractorTests(unittest.TestCase):
     """Tests unitarios para el extractor de permisos de edificación (MINVU CEDOC)."""
 
-    FAKE_LOOKUP = {
+    FAKE_LOOKUP: ClassVar[dict[str, tuple[str, str, str]]] = {
         "santiago": ("13101", "13", "Santiago"),
         "puente alto": ("13201", "13", "Puente Alto"),
         "chillan": ("16101", "16", "Chillán"),
@@ -5795,7 +5839,7 @@ class PermisosEdificacionExtractorTests(unittest.TestCase):
                 return iter(self._rows)
 
         class _FakeWorkbook:
-            sheetnames = [
+            sheetnames: ClassVar[list[str]] = [
                 "Número Total",
                 "M2 Total",
                 "Número Casas",
@@ -5846,16 +5890,14 @@ class PermisosEdificacionExtractorTests(unittest.TestCase):
         """Sin snapshot versionado, un fallo de descarga sigue siendo fallback."""
         from src.extractors import permisos_edificacion_extractor as pe
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            with (
-                patch.object(pe, "RAW_DIR", tmpdir),
-                patch.object(pe, "_load_comunas_lookup", return_value={}),
-                patch.object(
-                    pe, "_discover_xlsx_url", return_value=(pe.HARDCODED_XLSX_URL, "test")
-                ),
-                patch.object(pe, "_download_xlsx", side_effect=OSError("bloqueado por IP")),
-            ):
-                rows, mode, _url, _notes, refreshed_at = pe.fetch_data()
+        with (
+            tempfile.TemporaryDirectory() as tmpdir,
+            patch.object(pe, "RAW_DIR", tmpdir),
+            patch.object(pe, "_load_comunas_lookup", return_value={}),
+            patch.object(pe, "_discover_xlsx_url", return_value=(pe.HARDCODED_XLSX_URL, "test")),
+            patch.object(pe, "_download_xlsx", side_effect=OSError("bloqueado por IP")),
+        ):
+            _rows, mode, _url, _notes, refreshed_at = pe.fetch_data()
         self.assertEqual(mode, "fallback")
         self.assertIsNone(refreshed_at)
 
@@ -5890,7 +5932,7 @@ class PermisosEdificacionExtractorTests(unittest.TestCase):
 class CalidadAireExtractorTests(unittest.TestCase):
     """Tests unitarios para el extractor de calidad del aire (SINCA)."""
 
-    FAKE_LOOKUP = {
+    FAKE_LOOKUP: ClassVar[dict[str, tuple[str, str, str]]] = {
         "quilicura": ("13144", "13", "Quilicura"),
         "santiago": ("13101", "13", "Santiago"),
     }

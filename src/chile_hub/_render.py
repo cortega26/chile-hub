@@ -7,7 +7,7 @@ estable en tests y en pipes. El color es un follow-up deferido.
 from __future__ import annotations
 
 import io
-from typing import Sequence
+from collections.abc import Sequence
 
 from rich.console import Console
 from rich.table import Table

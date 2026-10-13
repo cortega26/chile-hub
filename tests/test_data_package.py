@@ -37,7 +37,7 @@ class DataPackageBuilderTests(unittest.TestCase):
     ):
         if fields is None:
             fields = ["id", "value"]
-        entry = {
+        return {
             "dataset": name,
             "description": description,
             "source_name": source_name,
@@ -50,7 +50,6 @@ class DataPackageBuilderTests(unittest.TestCase):
                 "license_url": license_url,
             },
         }
-        return entry
 
     def _make_contract(self, column_types=None, required_columns=None, primary_key=None):
         contract = {}

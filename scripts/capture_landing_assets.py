@@ -26,7 +26,7 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 ASSETS_DIR = ROOT_DIR / "docs" / "assets"
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from verify_landing import local_server  # noqa: E402
+from verify_landing import local_server
 
 
 def _scroll_below_header(page, selector: str) -> None:

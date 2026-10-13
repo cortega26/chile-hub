@@ -16,6 +16,7 @@ Guardarraíles (§4.2 del plan):
 - Honestidad de cadencia: source_mode = "mensual/programada" (3.4)
 """
 
+import contextlib
 import datetime
 import os
 import re
@@ -26,7 +27,7 @@ from typing import Any
 
 import polars as pl
 
-UTC = datetime.timezone.utc
+UTC = datetime.UTC
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 if ROOT_DIR not in sys.path:
@@ -255,6 +256,24 @@ def _download_excel_xml(phpsessid: str, user_agent: str, raw_path: Path) -> str:
     return response.content.decode("latin-1")
 
 
+def _extract_number(cells: dict[int, str], cell_index: int) -> float | None:
+    """Extrae un valor numérico de una celda XML (miles de pesos → ×1000).
+
+    Recibe `cells` explícito: antes era un closure sobre la variable de loop
+    (B023, auditoría 2026-10-13) y solo funcionaba porque la llamada ocurría
+    antes de la siguiente iteración.
+    """
+    if cell_index not in cells:
+        return None
+    data_match = re.search(r"<Data[^>]*>(.*?)</Data>", cells[cell_index], re.DOTALL)
+    if not data_match:
+        return None
+    try:
+        return float(data_match.group(1).strip()) * 1000
+    except (ValueError, TypeError):
+        return None
+
+
 def _parse_xml_spreadsheet(xml_content: str) -> list[dict[str, Any]]:
     """Parsea el XML Spreadsheet 2003 y extrae las filas de datos.
 
@@ -307,37 +326,26 @@ def _parse_xml_spreadsheet(xml_content: str) -> list[dict[str, Any]]:
         # El XML viene en latin-1 (ISO-8859-1), convertir a UTF-8
         nombre_match = re.search(r"<Data[^>]*>(.*?)</Data>", cells.get(1, ""), re.DOTALL)
         nombre_comuna = nombre_match.group(1).strip() if nombre_match else ""
-        # Corregir encoding: SINIM entrega nombres en latin-1
-        try:
+        # Corregir encoding: SINIM entrega nombres en latin-1 (si la conversión
+        # falla, se mantiene el nombre original: suppress no reasigna).
+        with contextlib.suppress(UnicodeDecodeError, UnicodeEncodeError):
             nombre_comuna = nombre_comuna.encode("latin-1").decode("utf-8")
-        except (UnicodeDecodeError, UnicodeEncodeError):
-            pass  # Mantener el nombre como está si la conversión falla
 
-        # Extraer valores financieros
-        def _extract_number(cell_index: int) -> float | None:
-            if cell_index not in cells:
-                return None
-            data_match = re.search(r"<Data[^>]*>(.*?)</Data>", cells[cell_index], re.DOTALL)
-            if not data_match:
-                return None
-            try:
-                # Valor en miles de pesos → multiplicar × 1000
-                return float(data_match.group(1).strip()) * 1000
-            except (ValueError, TypeError):
-                return None
-
+        # Extraer valores financieros (helper a nivel de módulo, sin closure)
         row = {
             "anio": 2024,
             "codigo_comuna": codigo_comuna,
             "nombre_comuna": nombre_comuna,
-            "ingresos_totales": _extract_number(VARIABLE_COLUMN_MAP["ingresos_totales"]),
-            "gastos_totales": _extract_number(VARIABLE_COLUMN_MAP["gastos_totales"]),
+            "ingresos_totales": _extract_number(cells, VARIABLE_COLUMN_MAP["ingresos_totales"]),
+            "gastos_totales": _extract_number(cells, VARIABLE_COLUMN_MAP["gastos_totales"]),
             "ingresos_propios_permanentes": _extract_number(
-                VARIABLE_COLUMN_MAP["ingresos_propios_permanentes"]
+                cells, VARIABLE_COLUMN_MAP["ingresos_propios_permanentes"]
             ),
-            "fondo_comun_municipal": _extract_number(VARIABLE_COLUMN_MAP["fondo_comun_municipal"]),
-            "gasto_personal": _extract_number(VARIABLE_COLUMN_MAP["gasto_personal"]),
-            "gasto_inversion": _extract_number(VARIABLE_COLUMN_MAP["gasto_inversion"]),
+            "fondo_comun_municipal": _extract_number(
+                cells, VARIABLE_COLUMN_MAP["fondo_comun_municipal"]
+            ),
+            "gasto_personal": _extract_number(cells, VARIABLE_COLUMN_MAP["gasto_personal"]),
+            "gasto_inversion": _extract_number(cells, VARIABLE_COLUMN_MAP["gasto_inversion"]),
         }
         rows_out.append(row)
 

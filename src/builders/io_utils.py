@@ -52,7 +52,7 @@ def compute_sha256_bytes(data: bytes) -> str:
 def read_json_if_exists(path):
     if not os.path.exists(path):
         return None
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -83,7 +83,7 @@ def replace_delimited_block(file_path, block_name, new_body, check_only=False, s
     """
     start_marker = f"<!-- START_{block_name} -->"
     end_marker = f"<!-- END_{block_name} -->"
-    with open(file_path, "r", encoding="utf-8") as f:
+    with open(file_path, encoding="utf-8") as f:
         content = f.read()
 
     if start_marker not in content or end_marker not in content:

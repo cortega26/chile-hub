@@ -1,11 +1,9 @@
 import os
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import polars as pl
-
-UTC = timezone.utc
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 if ROOT_DIR not in sys.path:
@@ -442,10 +440,9 @@ def download_subdere_file():
                 f.write(response.content)
             print("Descarga completada y almacenada en raw/cut_2018.xls")
             return target_path
-        else:
-            print(
-                f"Error de descarga HTTP: Código {response.status_code}. Se utilizará el fallback local."
-            )
+        print(
+            f"Error de descarga HTTP: Código {response.status_code}. Se utilizará el fallback local."
+        )
     except Exception as e:
         print(f"Error al descargar la base territorial: {e}. Se utilizará el fallback local.")
     return None

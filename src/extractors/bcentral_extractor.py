@@ -23,7 +23,7 @@ from pathlib import Path
 
 import polars as pl
 
-UTC = datetime.timezone.utc
+UTC = datetime.UTC
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 if ROOT_DIR not in sys.path:
@@ -502,12 +502,12 @@ def _build_extraction_result(
         except Exception:
             observed_period = {
                 "start": f"{HISTORY_START_YEAR}-01-01",
-                "end": datetime.date.today().isoformat(),
+                "end": datetime.datetime.now(datetime.UTC).date().isoformat(),
             }
     else:
         observed_period = {
             "start": f"{HISTORY_START_YEAR}-01-01",
-            "end": datetime.date.today().isoformat(),
+            "end": datetime.datetime.now(datetime.UTC).date().isoformat(),
         }
 
     return ExtractionResult(
@@ -524,7 +524,7 @@ def _build_extraction_result(
         source_detail=source_detail,
         notes=tuple(notes),
         record_count=df.height if df is not None else 0,
-        fields=tuple(df.columns) if df is not None else tuple(),
+        fields=tuple(df.columns) if df is not None else (),
     )
 
 
@@ -639,7 +639,7 @@ def process_indicators() -> str:
         notes.append("ine_override_used_for_pairs: " + ", ".join(diagnostics["ine_override_pairs"]))
 
     indicator_codes = sorted(df["codigo_indicador"].unique().to_list())
-    indicator_delivery = {code: "live" for code in indicator_codes}
+    indicator_delivery = dict.fromkeys(indicator_codes, "live")
     for pair in diagnostics.get("raw_recoveries", []):
         indicator_delivery[pair.split("/", 1)[0]] = "raw_recovery"
     for pair in diagnostics.get("preserved_existing_pairs", []):

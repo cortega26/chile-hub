@@ -55,7 +55,7 @@ def append_hub_health_history(health):
     path = os.path.join(NORMALIZED_DIR, HUB_HEALTH_HISTORY_NAME)
     lines = []
     if os.path.exists(path):
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             lines = [ln for ln in f.read().splitlines() if ln.strip()]
     if lines:
         try:
@@ -141,9 +141,7 @@ def _is_compatible_type_change(old_type, new_type):
     """
     if old_type == new_type:
         return True
-    if old_type == "integer" and new_type == "float":
-        return True
-    return False
+    return bool(old_type == "integer" and new_type == "float")
 
 
 def _compute_dataset_change_severity(current, previous, entry, is_new_dataset):
@@ -187,12 +185,15 @@ def _compute_dataset_change_severity(current, previous, entry, is_new_dataset):
         # 3. Cambios de tipo incompatibles → major
         for col, prev_type in prev_types.items():
             curr_type = curr_types.get(col)
-            if curr_type and prev_type != curr_type:
-                if not _is_compatible_type_change(prev_type, curr_type):
-                    breaking_changes.append(
-                        f"Column type changed incompatibly: {col} from {prev_type} to {curr_type}"
-                    )
-                    contract_changed = True
+            if (
+                curr_type
+                and prev_type != curr_type
+                and not _is_compatible_type_change(prev_type, curr_type)
+            ):
+                breaking_changes.append(
+                    f"Column type changed incompatibly: {col} from {prev_type} to {curr_type}"
+                )
+                contract_changed = True
 
         # 4. Columnas agregadas o eliminadas del contrato
         prev_contract_cols = set(prev_types.keys()) | prev_required | prev_nullable
@@ -217,9 +218,7 @@ def _compute_dataset_change_severity(current, previous, entry, is_new_dataset):
     # Determinar severidad global
     if breaking_changes:
         change_severity = "major"
-    elif contract_changed:
-        change_severity = "minor"
-    elif is_new_dataset:
+    elif contract_changed or is_new_dataset:
         change_severity = "minor"
     elif (
         entry.get("added_fields")
@@ -330,7 +329,7 @@ def build_redistribution_report(dataset_catalog):
             }
         )
 
-    report = {
+    return {
         "generated_at_utc": dataset_catalog.get("generated_at_utc"),
         "dataset_count": len(datasets),
         "ready_count": sum(1 for entry in datasets if entry["publishability_status"] == "ready"),
@@ -342,7 +341,6 @@ def build_redistribution_report(dataset_catalog):
         ),
         "datasets": datasets,
     }
-    return report
 
 
 def write_redistribution_report_json(report):
@@ -527,7 +525,7 @@ def load_source_registry():
     proyecta desde su spec; todo dataset sin spec conserva su entrada legacy.
     """
     registry_path = os.path.join(DATA_DIR, "source_registry.json")
-    with open(registry_path, "r", encoding="utf-8") as f:
+    with open(registry_path, encoding="utf-8") as f:
         registry = json.load(f)
     from src.registry.dataset_spec import source_registry_with_spec_overlay
 
@@ -969,7 +967,7 @@ def sync_readme_layers_table(check_only=False):
         " `chile-hub provenance` y `chile-hub health`."
     )
 
-    table_block = "\n".join([header] + rows) + "\n\n" + legend
+    table_block = "\n".join([header, *rows]) + "\n\n" + legend
 
     readme_path = os.path.join(ROOT_DIR, "README.md")
     changed = replace_delimited_block(

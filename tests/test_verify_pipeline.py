@@ -40,6 +40,8 @@ SRC_DIR = ROOT_DIR / "src"
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
+from datetime import UTC
+
 from scripts import verify_pipeline as vp
 
 # ── helpers ────────────────────────────────────────────────────────────────
@@ -681,7 +683,7 @@ class VerifySyntheticTests(unittest.TestCase):
             "source_mode": "live",
             "source_detail": "public_api",
             "freshness": {"status": "fresh"},
-            "indicator_delivery": {code: "live" for code in ("uf", "dolar", "euro", "utm", "ipc")},
+            "indicator_delivery": dict.fromkeys(("uf", "dolar", "euro", "utm", "ipc"), "live"),
             "degradation": (
                 {"anomaly_detected": True, "anomaly_indicator_codes": sorted(anomaly_codes)}
                 if anomaly_codes
@@ -698,7 +700,7 @@ class VerifySyntheticTests(unittest.TestCase):
             "source_detail": "public_api_with_published_backfill",
             "freshness": {"status": "fresh"},
             "indicator_delivery": {
-                **{c: "live" for c in ("uf", "dolar", "euro", "utm", "ipc")},
+                **dict.fromkeys(("uf", "dolar", "euro", "utm", "ipc"), "live"),
                 code: status,
             },
             "indicator_age_days": {"uf": -11, "dolar": 2, "euro": 2, "utm": -3, code: age_days},
@@ -769,9 +771,8 @@ class VerifySyntheticTests(unittest.TestCase):
         (perfil publication / --require-live) lo rechaza."""
         datasets = {"indicadores": self._indicadores_dataset(anomaly_codes={"uf"})}
         registry = [self._stable_registry_entry("indicadores")]
-        with patch("builtins.print") as mock_print:
-            with self.assertRaises(SystemExit):
-                vp.verify_publication_policy({"datasets": datasets}, registry=registry)
+        with patch("builtins.print") as mock_print, self.assertRaises(SystemExit):
+            vp.verify_publication_policy({"datasets": datasets}, registry=registry)
         printed = " ".join(str(call.args[0]) for call in mock_print.call_args_list)
         self.assertIn("anomaly", printed)
 
@@ -1044,9 +1045,8 @@ class IndicadoresDiagnosticsTests(unittest.TestCase):
         # `fail()` imprime el detalle a stdout y levanta SystemExit(1): el
         # mensaje no viaja en la excepción, hay que capturarlo de la salida.
         captured = io.StringIO()
-        with self.assertRaises(SystemExit):
-            with contextlib.redirect_stdout(captured):
-                vp.verify_indicadores_diagnostics(metadata, validation or {}, self.ORIGIN)
+        with self.assertRaises(SystemExit), contextlib.redirect_stdout(captured):
+            vp.verify_indicadores_diagnostics(metadata, validation or {}, self.ORIGIN)
         if message:
             self.assertIn(message, captured.getvalue())
 
@@ -1300,15 +1300,13 @@ class IndicadoresDiagnosticsTests(unittest.TestCase):
             "missing recommended_action": {**valid, "recommended_action": ""},
         }
         for label, payload in invalid_payloads.items():
-            with self.subTest(label):
-                with self.assertRaises(SystemExit):
-                    vp.verify_top_issue(payload, self.ORIGIN)
+            with self.subTest(label), self.assertRaises(SystemExit):
+                vp.verify_top_issue(payload, self.ORIGIN)
 
     def test_top_issue_summary_requires_dataset_mention(self) -> None:
         top_issue = self._valid_top_issue()
-        with self.subTest("non-string summary"):
-            with self.assertRaises(SystemExit):
-                vp.verify_top_issue_summary(None, top_issue, self.ORIGIN)
+        with self.subTest("non-string summary"), self.assertRaises(SystemExit):
+            vp.verify_top_issue_summary(None, top_issue, self.ORIGIN)
         with self.subTest("summary does not mention dataset"):
             with self.assertRaises(SystemExit):
                 vp.verify_top_issue_summary("todo en orden", top_issue, self.ORIGIN)
@@ -1322,9 +1320,9 @@ class TestStagnationPolicyCharacterization(unittest.TestCase):
     """Protect the pre-refactor policy matrix and deadline boundaries."""
 
     def test_maturity_matrix_and_derived_exception(self):
-        from datetime import datetime, timezone
+        from datetime import datetime
 
-        now = datetime(2026, 10, 7, tzinfo=timezone.utc)
+        now = datetime(2026, 10, 7, tzinfo=UTC)
         for maturity, severity in (
             ("stable", "failure"),
             ("candidate", "failure"),
@@ -1349,16 +1347,16 @@ class TestStagnationPolicyCharacterization(unittest.TestCase):
         self.assertEqual(result[0], "warning")
 
     def test_deadline_boundary_and_missing_date(self):
-        from datetime import datetime, timezone
+        from datetime import datetime
 
-        at_deadline = datetime(2026, 10, 5, tzinfo=timezone.utc)
+        at_deadline = datetime(2026, 10, 5, tzinfo=UTC)
         entry = {"dataset": "sample", "maturity_status": "stable", "review_by": "2026-10-05"}
         self.assertIsNone(vp._stagnation_reason(entry, at_deadline))
         self.assertIsNone(vp._stagnation_reason({**entry, "review_by": None}, at_deadline))
         self.assertIsNone(vp._stagnation_reason({**entry, "review_by": "invalid"}, at_deadline))
 
     def test_fail_closed_for_overdue_stable_and_candidate(self):
-        from datetime import datetime, timezone
+        from datetime import datetime
 
         report = {
             "datasets": [
@@ -1371,4 +1369,4 @@ class TestStagnationPolicyCharacterization(unittest.TestCase):
             ]
         }
         with contextlib.redirect_stdout(io.StringIO()), self.assertRaises(SystemExit):
-            vp._verify_stagnation(report, datetime(2026, 10, 7, tzinfo=timezone.utc))
+            vp._verify_stagnation(report, datetime(2026, 10, 7, tzinfo=UTC))

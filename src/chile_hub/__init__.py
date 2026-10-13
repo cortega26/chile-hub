@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import re
-import sys
 
 from .cli import main
 from .core import ChileHub
@@ -50,13 +49,12 @@ def _get_version() -> str:
                 return _match.group(1)
 
     # 2. Instalado desde rueda PyPI — la versión está en los metadatos de la rueda.
-    if sys.version_info >= (3, 8):  # pragma: no cover – always true on 3.10+
-        try:
-            from importlib.metadata import PackageNotFoundError, version
+    try:
+        from importlib.metadata import PackageNotFoundError, version
 
-            return version("chile-hub")
-        except PackageNotFoundError:
-            pass
+        return version("chile-hub")
+    except PackageNotFoundError:
+        pass
 
     # 3. Último recurso — nunca debería ocurrir en la práctica.
     return "0.0.0"

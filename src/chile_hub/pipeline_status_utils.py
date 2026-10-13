@@ -7,12 +7,10 @@ desde src/ y desde src/chile_hub/ sin divergencia.
 
 import json
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from ._paths import ROOT_DIR  # fuente única de raíz del proyecto (TECHDEBT-05)
-
-UTC = timezone.utc
 
 
 def write_text_atomic(content, path):
@@ -44,7 +42,7 @@ def _load_source_registry_datasets() -> tuple:
     en el registry) y así no filtrar en ese segundo caso.
     """
     try:
-        with open(SOURCE_REGISTRY_PATH, "r", encoding="utf-8") as f:
+        with open(SOURCE_REGISTRY_PATH, encoding="utf-8") as f:
             registry = json.load(f)
     except FileNotFoundError:
         return set(), set()
@@ -69,7 +67,7 @@ def _compute_review_status_counts():
     sintéticos de tests).
     """
     try:
-        with open(SOURCE_REGISTRY_PATH, "r", encoding="utf-8") as f:
+        with open(SOURCE_REGISTRY_PATH, encoding="utf-8") as f:
             registry = json.load(f)
     except FileNotFoundError:
         return 0, 0
@@ -103,7 +101,7 @@ def _load_retired_datasets():
     existe (tests sintéticos), no retira nada.
     """
     try:
-        with open(SOURCE_REGISTRY_PATH, "r", encoding="utf-8") as f:
+        with open(SOURCE_REGISTRY_PATH, encoding="utf-8") as f:
             registry = json.load(f)
     except FileNotFoundError:
         return set()
@@ -311,9 +309,11 @@ def build_hub_health(metadata):
         severity = "ok"
         if validation_status != "ok":
             severity = "error"
-        elif freshness_status in {"stale", "unknown"}:
-            severity = "warn"
-        elif source_mode == "fallback" or actionable_warning_count > 0:
+        elif (
+            freshness_status in {"stale", "unknown"}
+            or source_mode == "fallback"
+            or actionable_warning_count > 0
+        ):
             severity = "warn"
 
         publishability_status = "ready"
@@ -986,12 +986,14 @@ def build_dataset_quality_markdown(quality):
         f"- `generated_at_utc`: `{quality.get('generated_at_utc', 'unknown')}`",
         f"- `dataset_count`: `{quality.get('dataset_count', 0)}`",
         f"- `average_score`: `{quality.get('average_score', 0)}`",
-        f"- `grade_distribution`: "
-        f"A={quality.get('grade_distribution', {}).get('A', 0)}, "
-        f"B={quality.get('grade_distribution', {}).get('B', 0)}, "
-        f"C={quality.get('grade_distribution', {}).get('C', 0)}, "
-        f"D={quality.get('grade_distribution', {}).get('D', 0)}, "
-        f"F={quality.get('grade_distribution', {}).get('F', 0)}",
+        (
+            f"- `grade_distribution`: "
+            f"A={quality.get('grade_distribution', {}).get('A', 0)}, "
+            f"B={quality.get('grade_distribution', {}).get('B', 0)}, "
+            f"C={quality.get('grade_distribution', {}).get('C', 0)}, "
+            f"D={quality.get('grade_distribution', {}).get('D', 0)}, "
+            f"F={quality.get('grade_distribution', {}).get('F', 0)}"
+        ),
         "",
         "| Dataset | Nota | Valid | Contrato | Madurez | Frescura | Cobert | Reúso | Bloqueadores |",
         "| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | :--- |",

@@ -38,7 +38,7 @@ def _count_test_functions():
         if not (name.startswith("test_") and name.endswith(".py")):
             continue
         path = os.path.join(TESTS_DIR, name)
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             tree = ast.parse(f.read(), filename=path)
         for node in ast.walk(tree):
             if isinstance(node, ast.FunctionDef) and node.name.startswith("test_"):
@@ -296,7 +296,7 @@ def _test_file_requires_normalized(filepath):
     """Heurística: ¿el archivo de test lee de data/normalized/?"""
     if os.path.basename(filepath) in _TEST_FILES_WITHOUT_REPOSITORY_NORMALIZED:
         return False
-    with open(filepath, "r", encoding="utf-8") as f:
+    with open(filepath, encoding="utf-8") as f:
         return "data/normalized" in f.read(4096)
 
 
@@ -334,7 +334,7 @@ def sync_agents_test_table(check_only=False):
         "```"
     )
 
-    body = intro + "\n\n" + "\n".join([header] + rows)
+    body = intro + "\n\n" + "\n".join([header, *rows])
 
     return replace_delimited_block(
         AGENTS_PATH, "AGENTS_TEST_TABLE", body, check_only=check_only, separator="\n\n"
@@ -430,9 +430,11 @@ def sync_agents_extractor_list(check_only=False):
     shared_count = len(shared)
 
     lines = [
-        "│   ├── extractors/                 "
-        f"{extractor_count} extractores por dataset + {shared_count}"
-        " módulos compartidos (ver nota abajo)"
+        (
+            "│   ├── extractors/                 "
+            f"{extractor_count} extractores por dataset + {shared_count}"
+            " módulos compartidos (ver nota abajo)"
+        )
     ]
 
     # Shared modules first
@@ -557,7 +559,7 @@ def sync_readme_extractor_table(check_only=False):
     rows.append("| Derivado en `build_dev_db.py` (sin extractor) | `perfil_territorial_comunal` |")
 
     header = "| Dominio | Extractores |\n|:---|:---|"
-    body = "\n".join([header] + rows)
+    body = "\n".join([header, *rows])
 
     return replace_delimited_block(
         README_PATH, "EXTRACTOR_TABLE", body, check_only=check_only, separator="\n\n"
@@ -581,7 +583,7 @@ def sync_docs_schema_blocks(check_only=False):
         if not os.path.exists(contract_path) or not os.path.exists(doc_path):
             continue
 
-        with open(contract_path, "r", encoding="utf-8") as f:
+        with open(contract_path, encoding="utf-8") as f:
             contract = json.load(f)
 
         columns_list = contract.get("columns", [])
@@ -614,7 +616,7 @@ def sync_docs_schema_blocks(check_only=False):
                 f"| `{col_name}` | `{col_type}` | {example_str} | {required_str} | {note} |"
             )
 
-        body = header + "\n\n" + "\n".join([table_header] + rows)
+        body = header + "\n\n" + "\n".join([table_header, *rows])
         replace_delimited_block(
             doc_path, "DATASET_SCHEMA", body, check_only=check_only, separator="\n\n"
         )
@@ -633,7 +635,7 @@ def sync_readme_schema_details(check_only=False):
         if not os.path.exists(contract_path):
             continue
 
-        with open(contract_path, "r", encoding="utf-8") as f:
+        with open(contract_path, encoding="utf-8") as f:
             contract = json.load(f)
 
         columns_list = contract.get("columns", [])
@@ -674,7 +676,7 @@ def sync_readme_schema_details(check_only=False):
                 example_str = f'`"{example}"`'
             table_rows.append(f"| `{col_name}` | `{col_type}` | {example_str} |")
 
-        sections.append("\n".join([header, table_header] + table_rows))
+        sections.append("\n".join([header, table_header, *table_rows]))
 
     body = "\n\n".join(sections)
 

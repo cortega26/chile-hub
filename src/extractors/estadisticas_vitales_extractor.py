@@ -28,7 +28,7 @@ import openpyxl
 import polars as pl
 import requests
 
-UTC = datetime.timezone.utc
+UTC = datetime.UTC
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 if ROOT_DIR not in sys.path:
@@ -397,7 +397,7 @@ def _parse_comuna_sheet(
             i for i, r in enumerate(rows[:20]) if any(norm(c) == "nacidos vivos" for c in r)
         )
     except StopIteration:
-        raise KeyError("no se encontró la fila de grupos (Nacidos Vivos)")
+        raise KeyError("no se encontró la fila de grupos (Nacidos Vivos)") from None
     group_row = [norm(c) for c in rows[group_idx]]
     prev_row = [norm(c) for c in rows[group_idx - 1]] if group_idx > 0 else []
     # Fila de sexo: la siguiente, solo si trae Hombre/Mujer.
@@ -711,7 +711,7 @@ def fetch_data() -> tuple[list[dict], str, str, list[str]]:
                 f"{year}: {len(rows)} filas desde '{title}' (hoja {sheet_name}; "
                 f"TOTAL país: {tot_nac} nacimientos, {tot_def} defunciones)"
             )
-        except Exception as exc:  # noqa: BLE001 — un archivo no tumba al resto; queda en notes
+        except Exception as exc:
             errores.setdefault(year, []).append(f"'{title}': {exc}")
             continue
     # Solo reportar años omitidos si NINGÚN archivo del año aportó filas
@@ -810,7 +810,7 @@ def process_estadisticas_vitales() -> dict:
         prev = pl.read_csv(
             STAGING_CSV_PATH,
             schema_overrides={
-                **{c: pl.String for c in REQUIRED_COLUMNS},
+                **dict.fromkeys(REQUIRED_COLUMNS, pl.String),
                 "anio": pl.Int64,
                 "cantidad": pl.Int64,
             },

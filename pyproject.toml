@@ -191,11 +191,28 @@ line-length = 100
 target-version = "py311"
 
 [tool.ruff.lint]
-select = ["E", "W", "F", "I"]
+# Trinquete del audit de prácticas 2026-10-13 (plan 131): el select original
+# (E,W,F,I) dejó pasar god functions, duplicación y tipado débil sin señal.
+# Los conjuntos se amplían por batches; C90 llega en el plan 132.
+select = ["E", "W", "F", "I", "B", "C4", "RET", "RUF", "SIM", "UP"]
 ignore = [
     "E501",
     "E402",
+    "COM812",  # incompatible con ruff-format (decisión documentada, no deuda)
+    "RUF001",  # unicode intencional en docstrings/salidas (×, ─, ✓…)
+    "RUF002",
+    "RUF003",
+    "B019",  # plan 134: lru_cache en métodos de ChileHub (fuga de instancias)
+    "SIM117",  # fix solo-preview en ruff; deuda cosmética de tests (plan 138)
 ]
+
+[tool.ruff.lint.per-file-ignores]
+# check_source_urls.py co-evoluciona con data/source_registry.json y
+# .github/workflows/source-urls.yml (COMPANION_RULES): este batch de lint no
+# tiene un compañero real que tocar, así que sus dos fixes cosméticos
+# (RUF100: noqa E402 redundante; UP015: modo "r" redundante) quedan
+# suprimidos acá y se limpian al reestructurar scripts/ (plan 136).
+"scripts/check_source_urls.py" = ["RUF100", "UP015"]
 
 [tool.ruff.format]
 quote-style = "double"

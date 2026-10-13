@@ -21,7 +21,7 @@ from pathlib import Path
 
 import polars as pl
 
-UTC = datetime.timezone.utc
+UTC = datetime.UTC
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 if ROOT_DIR not in sys.path:
@@ -264,7 +264,7 @@ def fetch_resources() -> tuple[list[bytes], str, str]:
 
     global _LAST_FETCH_MODE
     present_years = _staging_years_present()
-    current_year = datetime.date.today().year
+    current_year = datetime.datetime.now(datetime.UTC).year
 
     if present_years is None:
         selected_resources = csv_resources
@@ -500,8 +500,7 @@ def _merge_incremental(df_new: pl.DataFrame) -> pl.DataFrame:
         merged = merged.with_columns(pl.col("capital").cast(schema["capital"], strict=False))
     merged = apply_date_casts(merged, "empresas")
     merged = merged.unique(subset=["rut", "razon_social", "fecha_registro"], keep="last")
-    merged = merged.sort(["fecha_registro", "rut"], descending=[True, False])
-    return merged
+    return merged.sort(["fecha_registro", "rut"], descending=[True, False])
 
 
 def process() -> str:
@@ -529,13 +528,17 @@ def process() -> str:
         "fields": df.columns,
         "notes": [
             f"filas descartadas por RUT centinela {RUT_SENTINELS}: {_LAST_SENTINEL_DROP_COUNT}",
-            "Solo incluye empresas constituidas bajo el Regimen Simplificado "
-            "(Ley 20.659) desde mayo 2013.",
+            (
+                "Solo incluye empresas constituidas bajo el Regimen Simplificado "
+                "(Ley 20.659) desde mayo 2013."
+            ),
             "No contiene dirección postal (solo comuna y región).",
             "No contiene actividad económica (giro).",
             "No refleja cese de actividades ni modificaciones posteriores.",
-            "Los codigos de region usan el formato numerico del SII (1-15), "
-            "distinto del codigo CUT (01-16). Verificar antes de cruzar con DPA.",
+            (
+                "Los codigos de region usan el formato numerico del SII (1-15), "
+                "distinto del codigo CUT (01-16). Verificar antes de cruzar con DPA."
+            ),
         ],
         "reuse_policy": REUSE_POLICY,
     }

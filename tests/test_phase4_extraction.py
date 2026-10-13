@@ -16,7 +16,7 @@ import polars as pl
 
 from src.extractors.result import ExtractionResult
 
-UTC = datetime.timezone.utc
+UTC = datetime.UTC
 
 
 def _assert_mandatory_fields(result: ExtractionResult) -> None:

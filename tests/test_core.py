@@ -555,6 +555,22 @@ class ChileHubSQLTests(unittest.TestCase):
         self.assertIn("nombre_comuna_clean", result.columns)
         self.assertIn("poblacion_censada", result.columns)
 
+    def test_sql_warns_and_skips_datasets_without_parquet(self):
+        """Auditoría 2026-10-13 (plan 131): antes el registro de vistas omitía
+        los datasets sin Parquet en silencio (`except: pass`); ahora se avisa
+        con la lista de los saltados."""
+        hub = _hub()
+        real_get_output_path = ChileHub.get_output_path
+
+        def fake_get_output_path(self, dataset_name, output_type="parquet"):
+            if str(dataset_name) == "comunas":
+                raise FileNotFoundError("simulado: sin Parquet")
+            return real_get_output_path(self, dataset_name, output_type)
+
+        with mock.patch.object(ChileHub, "get_output_path", fake_get_output_path):
+            with self.assertWarnsRegex(UserWarning, "sin Parquet"):
+                hub.sql("SELECT 1")
+
     def test_sql_missing_duckdb_raises_import_error(self):
         """Si duckdb no estÃ¡ instalado, sql() lanza ImportError con mensaje Ãºtil."""
         import sys

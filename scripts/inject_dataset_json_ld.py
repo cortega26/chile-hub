@@ -26,7 +26,7 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from src.builders.landing import build_dataset_json_ld, json_for_html  # noqa: E402
+from src.builders.landing import build_dataset_json_ld, json_for_html
 
 JSON_LD_ID = "chile-hub-dataset-json-ld"
 _MARKER = f'id="{JSON_LD_ID}"'

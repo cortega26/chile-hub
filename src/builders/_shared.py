@@ -7,10 +7,8 @@ y por `build_dev_db.py` sin riesgo de imports circulares.
 
 import json
 import os
-from datetime import timezone
+from datetime import UTC as UTC  # re-export explícito (F401-safe) para builders
 from typing import Any
-
-UTC = timezone.utc
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -70,7 +68,7 @@ def _load_catalog_config() -> dict:
             "Asegúrate de que existe en el repositorio (debe estar tracked en git).\n"
             "Si acabas de clonar, verifica que el archivo no esté en .gitignore."
         )
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         loaded: dict[str, Any] = json.load(f)
         config = loaded
     # Piloto Phase 2 (ADR-018): el dataset con DatasetSpec se lee a través de

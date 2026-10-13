@@ -24,7 +24,7 @@ from pathlib import Path
 import polars as pl
 from defusedxml.ElementTree import fromstring as _defused_fromstring
 
-UTC = datetime.timezone.utc
+UTC = datetime.UTC
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 if ROOT_DIR not in sys.path:
@@ -170,13 +170,13 @@ def fetch_servel_estado_legal() -> dict[str, tuple[str, str | None]]:
         for nombre, fecha_texto in _parse_servel_tabla(constituidos_html, con_fecha=True):
             fecha_iso = _parse_fecha_espanol(fecha_texto) if fecha_texto else None
             lookup[_norm_partido(nombre)] = ("constituido", fecha_iso)
-    except Exception as exc:  # noqa: BLE001 — degradación intencional
+    except Exception as exc:
         print(f"Advertencia: no se pudo obtener SERVEL (constituidos): {exc}")
     try:
         en_formacion_html = fetch_with_retry(SERVEL_EN_FORMACION_URL, timeout=30).text
         for nombre, _fecha in _parse_servel_tabla(en_formacion_html, con_fecha=False):
             lookup.setdefault(_norm_partido(nombre), ("en_formacion", None))
-    except Exception as exc:  # noqa: BLE001 — degradación intencional
+    except Exception as exc:
         print(f"Advertencia: no se pudo obtener SERVEL (en_formación): {exc}")
     return lookup
 

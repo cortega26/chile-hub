@@ -15,7 +15,7 @@ import openpyxl
 import polars as pl
 import requests
 
-UTC = datetime.timezone.utc
+UTC = datetime.UTC
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 if ROOT_DIR not in sys.path:
@@ -288,7 +288,7 @@ def fetch_data() -> tuple[list[dict], str, str, list[str]]:
 def normalize_rows(rows: list[dict]) -> pl.DataFrame:
     """Convierte filas de consumo eléctrico a DataFrame canónico."""
     if not rows:
-        return pl.DataFrame(schema={col: pl.String for col in REQUIRED_COLUMNS})
+        return pl.DataFrame(schema=dict.fromkeys(REQUIRED_COLUMNS, pl.String))
 
     df = pl.DataFrame(rows, strict=False)
 

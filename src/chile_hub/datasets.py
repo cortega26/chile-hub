@@ -15,7 +15,7 @@ import enum
 from difflib import get_close_matches
 
 
-class Dataset(str, enum.Enum):
+class Dataset(enum.StrEnum):
     """Enumeración de todos los datasets curados por ChileHub.
 
     Hereda de ``str`` para compatibilidad total: ``Dataset.COMUNAS`` es
@@ -61,12 +61,12 @@ class Dataset(str, enum.Enum):
         """
         try:
             return cls(name)
-        except ValueError:
+        except ValueError as exc:
             matches = get_close_matches(name, [m.value for m in cls], n=1)
             hint = f" Quizás quisiste decir '{matches[0]}'." if matches else ""
             raise ValueError(
                 f"Dataset '{name}' no es válido.{hint} Valores posibles: {', '.join(cls.values())}"
-            )
+            ) from exc
 
     @classmethod
     def values(cls) -> list[str]:

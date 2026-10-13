@@ -41,8 +41,8 @@ def _configure_pipeline_logging() -> None:
     if _IS_CI:
         # JSON → los logs de CI son parseables por jq, grep, etc.
         structlog.configure(
-            processors=shared_processors
-            + [
+            processors=[
+                *shared_processors,
                 structlog.processors.dict_tracebacks,
                 structlog.processors.JSONRenderer(),
             ],
@@ -54,10 +54,7 @@ def _configure_pipeline_logging() -> None:
     else:
         # Consola con colores para desarrollo
         structlog.configure(
-            processors=shared_processors
-            + [
-                structlog.dev.ConsoleRenderer(),
-            ],
+            processors=[*shared_processors, structlog.dev.ConsoleRenderer()],
             wrapper_class=structlog.stdlib.BoundLogger,
             context_class=dict,
             logger_factory=structlog.PrintLoggerFactory(sys.stderr),

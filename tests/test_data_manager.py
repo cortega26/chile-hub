@@ -16,11 +16,9 @@ import unittest
 import warnings
 import zipfile
 from contextlib import redirect_stdout
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from unittest.mock import Mock, patch
-
-UTC = timezone.utc
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
@@ -481,19 +479,20 @@ class GeoCacheIntegrityTests(unittest.TestCase):
             f"{digest}",
         ]
         for body in bad_bodies:
-            with self.subTest(body=body):
-                with tempfile.TemporaryDirectory() as tmpdir:
-                    cache = Path(tmpdir) / "geometria_comunal.parquet"
-                    with patch(
+            with self.subTest(body=body), tempfile.TemporaryDirectory() as tmpdir:
+                cache = Path(tmpdir) / "geometria_comunal.parquet"
+                with (
+                    patch(
                         "chile_hub.geo.requests.get",
                         return_value=self._fake_sha_response(body),
-                    ):
-                        with self.assertRaises(ChileHubDataError):
-                            acquire_geometry(
-                                refresh_geometry=True,
-                                cache_file=cache,
-                                sha_url="https://x/geometria_comunal.parquet.sha256",
-                            )
+                    ),
+                    self.assertRaises(ChileHubDataError),
+                ):
+                    acquire_geometry(
+                        refresh_geometry=True,
+                        cache_file=cache,
+                        sha_url="https://x/geometria_comunal.parquet.sha256",
+                    )
 
     # --- validación estructural del GeoParquet ----------------------------
 
@@ -651,5 +650,5 @@ class GeoParquetWriterTests(unittest.TestCase):
             write_geometria_comunal_parquet(df, path, simplify_tolerance=0)
 
             gdf = gpd.read_parquet(path)
-            for got, expected in zip(gdf.geometry.area.to_list(), expected_areas):
+            for got, expected in zip(gdf.geometry.area.to_list(), expected_areas, strict=False):
                 self.assertAlmostEqual(got, expected, places=9)

@@ -23,9 +23,10 @@ from __future__ import annotations
 
 import json
 import os
+from collections.abc import Iterator, Mapping
 from dataclasses import asdict, dataclass, field
-from functools import lru_cache
-from typing import Any, Iterator, Mapping
+from functools import cache
+from typing import Any
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SPECS_DIR = os.path.join(ROOT_DIR, "data", "dataset_specs")
@@ -534,9 +535,9 @@ def parse_dataset_spec(payload: Mapping[str, Any], *, source_path: str = "<memor
     coverage_pct = payload.get("coverage_pct")
     if coverage_pct is not None and not isinstance(coverage_pct, (int, float)):
         raise DatasetSpecError(f"DatasetSpec {where}: 'coverage_pct' debe ser número")
-    if isinstance(coverage_pct, int) and not isinstance(coverage_pct, bool):
-        coverage_pct = float(coverage_pct)
-    elif coverage_pct is not None:
+    if (
+        isinstance(coverage_pct, int) and not isinstance(coverage_pct, bool)
+    ) or coverage_pct is not None:
         coverage_pct = float(coverage_pct)
 
     # outputs: may be {} for candidate datasets without public outputs
@@ -588,7 +589,7 @@ def load_dataset_spec(dataset_id: str) -> DatasetSpec:
     path = spec_path(dataset_id)
     if not os.path.isfile(path):
         raise DatasetSpecError(f"No existe DatasetSpec para '{dataset_id}' en {SPECS_DIR}")
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         payload = json.load(f)
     spec = parse_dataset_spec(payload, source_path=path)
     if spec.dataset != dataset_id:
@@ -608,12 +609,12 @@ def iter_specs() -> Iterator[DatasetSpec]:
             yield load_dataset_spec(name[: -len(".json")])
 
 
-@lru_cache(maxsize=None)
+@cache
 def _load_contract_payload(contract_path: str) -> dict[str, Any] | None:
     """Lee el contrato referenciado (autoridad de esquema) para proyecciones."""
     contract_abs = os.path.join(ROOT_DIR, contract_path)
     try:
-        with open(contract_abs, "r", encoding="utf-8") as f:
+        with open(contract_abs, encoding="utf-8") as f:
             return json.load(f)  # type: ignore[no-any-return]
     except FileNotFoundError:
         return None

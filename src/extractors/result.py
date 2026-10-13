@@ -12,13 +12,11 @@ from __future__ import annotations
 
 import hashlib
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
 import polars as pl
-
-UTC = timezone.utc
 
 
 def _compute_snapshot_hash(path: Path | None) -> str | None:

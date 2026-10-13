@@ -31,7 +31,7 @@ from typing import Any
 import polars as pl
 from defusedxml.ElementTree import fromstring as _defused_fromstring
 
-UTC = datetime.timezone.utc
+UTC = datetime.UTC
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 if ROOT_DIR not in sys.path:
@@ -168,7 +168,7 @@ def fetch_distritos_diputados() -> dict[str, str]:
 
         page = Fetcher.get(DIPUTADOS_LISTADO_URL, stealthy_headers=True)
         html = page.html_content
-    except Exception as exc:  # noqa: BLE001 — degradación intencional
+    except Exception as exc:
         print(f"Advertencia: no se pudo obtener el distrito de diputados ({exc}). Queda nulo.")
         return {}
     mapa: dict[str, str] = {}
@@ -192,7 +192,7 @@ def fetch_senadores() -> list[dict[str, Any]]:
 
         page = Fetcher.get(SENADORES_URL, stealthy_headers=True)
         html = page.html_content
-    except Exception as exc:  # noqa: BLE001 — degradación intencional
+    except Exception as exc:
         print(f"Advertencia: no se pudo obtener senadores ({exc}). Se omiten.")
         return []
     match = re.search(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', html, re.S)
@@ -210,11 +210,14 @@ def fetch_senadores() -> list[dict[str, Any]]:
 
     def _walk(obj: Any) -> None:
         nonlocal best
-        if isinstance(obj, list) and obj and isinstance(obj[0], dict):
-            if any(isinstance(x, dict) and "NOMBRE_COMPLETO" in x for x in obj) and len(obj) > len(
-                best
-            ):
-                best = obj
+        if (
+            isinstance(obj, list)
+            and obj
+            and isinstance(obj[0], dict)
+            and any(isinstance(x, dict) and "NOMBRE_COMPLETO" in x for x in obj)
+            and len(obj) > len(best)
+        ):
+            best = obj
         if isinstance(obj, dict):
             for value in obj.values():
                 _walk(value)
@@ -427,11 +430,15 @@ def process_autoridades_electas() -> str:
         "record_count": df.height,
         "fields": df.columns,
         "notes": [
-            f"v1: diputados ({n_dip}) + senadores ({n_sen}). Gobernador_regional/alcalde viven "
-            "en el dataset segregado autoridades_locales (licencia CC-BY-SA).",
+            (
+                f"v1: diputados ({n_dip}) + senadores ({n_sen}). Gobernador_regional/alcalde viven "
+                "en el dataset segregado autoridades_locales (licencia CC-BY-SA)."
+            ),
             f"distrito_electoral vía Scrapling: {n_con_distrito}/{n_dip} diputados.",
-            f"codigo_region/periodo de senadores: {n_sen_con_region}/{n_sen} poblados desde "
-            "senado.cl (REGION/PERIODOS).",
+            (
+                f"codigo_region/periodo de senadores: {n_sen_con_region}/{n_sen} poblados desde "
+                "senado.cl (REGION/PERIODOS)."
+            ),
             "RUT (Cámara) y email/teléfono (Senado) descartados (línea roja de datos personales).",
         ],
         "reuse_policy": REUSE_POLICY,
