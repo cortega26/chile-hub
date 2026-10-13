@@ -484,7 +484,7 @@ class CompanionPathsRuleTests(unittest.TestCase):
         "data/dataset_catalog_config.json": "data/dataset_catalog_config.json",
         "data/source_registry.json": "data/source_registry.json",
         "contracts/datasets/": "contracts/datasets/comunas.schema.json",
-        "src/validation.py": "src/validation.py",
+        "src/validation/": "src/validation/_dpa.py",
         "src/extractors/": "src/extractors/calidad_aire_extractor.py",
         "src/build_dev_db.py": "src/build_dev_db.py",
         "src/chile_hub/core.py": "src/chile_hub/core.py",

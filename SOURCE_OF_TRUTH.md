@@ -71,7 +71,7 @@ src/
 ├── extractors/
 │   ├── base.py                    ABC BaseExtractor — breve, leer completo
 │   └── {name}_extractor.py        Un archivo por dataset, extiende BaseExtractor
-├── validation.py                  TODAS las validate_*() — leer por validador
+├── validation/                    paquete por dominio — leer por submódulo
 ├── build_dev_db.py                Orquestador del pipeline — main() + fases:
 │   _load_inputs / _compute_validations / _write_data_artifacts / _generate_reports
 │   El bloque validations = {…} vive en _compute_validations()
@@ -113,7 +113,7 @@ tests/                      15 archivos — inventario completo en AGENTS.md §8
 | Ejecutar pipeline completo | **`AGENTS.md §11`** → `make refresh` |
 | Ejecutar un paso | `CLAUDE.md` → `make extract` / `make build` / `make test` |
 | Agregar un nuevo dataset | **`AGENTS.md §5`** — lista de verificacion de 7 pasos |
-| Escribir una funcion `validate_*()` | `src/validation.py` — luego importar en `build_dev_db.py` |
+| Escribir una funcion `validate_*()` | `src/validation/` (submódulo del dominio) — luego importar en `build_dev_db.py` |
 | Entender los jobs de CI/CD | **`AGENTS.md §9`** |
 | Verificar estado legal de redistribucion de una fuente | **`AGENTS.md §6`** |
 | Revisar que antipatrones evitar | **`AGENTS.md §10`** |

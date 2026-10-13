@@ -112,6 +112,14 @@ test) no cambian; `scripts/check_agents_sync.py` debe quedar verde.
 
 ## Done criteria
 
+> **Ejecutado 2026-10-13 (PR de 135)**: `src/validation/` con 10 módulos por
+> dominio + `__init__` de re-exports explícitos ✓ · checker escanea el paquete
+> (definiciones; leak en `__init__` falla duro) ✓ · AST-hash 43/43 idéntico
+> (evidencia move-only) ✓ · suite/typecheck/doctor verdes ✓.
+> **Step 3 (split de los D-grade) diferido a secuencia propia**: no es
+> move-only y contaminaría un diff auditable — se hará con el mismo patrón
+> (evidencia AST por función) en un PR posterior.
+
 - [ ] `src/validation/` por dominio; `__init__` re-exporta todo
 - [ ] Checker escanea el paquete y pasa; guardrails actualizados
 - [ ] Suite/tipos/doctor verdes; ningún cuerpo de validador cambió

@@ -156,7 +156,7 @@ def actionable_warnings(validation):
     """Warnings que exigen acción: todos menos los declarados como esperados.
 
     ``expected_warnings`` lo declara el validador que emite el mensaje
-    (``src/validation.py::_add_expected_warning``), nunca este consumidor.
+    (``src/validation/_helpers.py::_add_expected_warning``), nunca este consumidor.
     ``warnings`` conserva siempre la lista completa (ver ADR-014).
     """
     expected = set(validation.get("expected_warnings", []))
