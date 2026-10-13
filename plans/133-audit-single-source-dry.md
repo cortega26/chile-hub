@@ -79,6 +79,12 @@ documentar cómo resuelve imports; esto decide el Step 1.
 
 ### Step 1 — D1: una sola fuente para alias de regiones
 
+> **Resuelto y verificado (2026-10-13)**: el Plan 129 ya delegó el mapa en
+> `chile_hub.regions` (fuente única); el fallback local está **documentado**
+> (entorno efímero de CI sin deps del paquete) y
+> `tests/test_core.py::RegionAliasParityTests` congela la equivalencia con el
+> paquete. No hay acción pendiente en este step.
+
 - Si el fallback de `region_utils` es inalcanzable en modo soportado →
   eliminarlo y quedarse con el import canónico (la copia desaparece).
 - Si es alcanzable (p. ej. ejecución sin raíz en `sys.path`) → dejarlo, pero

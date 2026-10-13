@@ -37,6 +37,17 @@ ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
+# SCHEMA canónico compartido del carril autoridades (plan 133a). Import por
+# paquete (`from src.extractors import X`): la forma `from src.extractors.X
+# import Y` falla de manera intermitente en algunos entornos (mismo archivo,
+# verificado en CI y local) — el import por paquete lo resuelve siempre.
+try:
+    from src.extractors import autoridades_shared as _autoridades_shared
+except ModuleNotFoundError:  # ejecución como script (python src/extractors/*.py)
+    import autoridades_shared as _autoridades_shared
+
+SCHEMA = _autoridades_shared.SCHEMA
+
 try:
     from src.extractors.base import (
         BaseExtractor,
@@ -72,26 +83,6 @@ CAMARA_NS = {"v": "http://opendata.camara.cl/camaradiputados/v1"}
 
 # Período legislativo vigente de la Cámara (actualizar cada 4 años; ver review_by).
 PERIODO_DIPUTADOS = {"inicio": "2026-03-11", "fin": "2030-03-10"}
-
-# Columnas canónicas del dataset autoridades_electas.
-SCHEMA: dict[str, type[pl.DataType]] = {
-    "id_autoridad": pl.String,
-    "nombre": pl.String,
-    "cargo": pl.String,
-    "institucion": pl.String,
-    "partido": pl.String,
-    "pacto": pl.String,
-    "distrito_electoral": pl.String,
-    "circunscripcion_senatorial": pl.String,
-    "codigo_comuna": pl.String,
-    "codigo_region": pl.String,
-    "periodo_inicio": pl.String,
-    "periodo_fin": pl.String,
-    "estado_mandato": pl.String,
-    "fuente": pl.String,
-    "url_fuente": pl.String,
-    "fecha_consulta": pl.String,
-}
 
 REUSE_POLICY = {
     "status": "open-attribution",

@@ -962,6 +962,18 @@ class SinimFinanzasExtractorTests(unittest.TestCase):
         del meta_wrapped["refreshed_at_utc"]
         self.assertEqual(meta_wrapped, meta_stub)
 
+    def test_fallback_rows_have_single_source(self):
+        """Plan 133a (auditoría 2026-10-13): la muestra fallback vive solo en
+        `_sinim_shared`; stub y scraper la comparten (antes era una copia
+        byte a byte en cada uno)."""
+        from src.extractors import _sinim_shared, sinim_finanzas_live_extractor
+
+        self.assertIs(sinim_finanzas_extractor.FALLBACK_ROWS, _sinim_shared.FALLBACK_ROWS)
+        self.assertIs(
+            sinim_finanzas_live_extractor._get_fallback_rows(),
+            _sinim_shared.FALLBACK_ROWS,
+        )
+
 
 class SinimLiveXmlParseTests(unittest.TestCase):
     """Auditoría 2026-10-13 (plan 131): `_extract_number` era un closure sobre
@@ -4389,6 +4401,19 @@ class AutoridadesElectasExtractorTests(unittest.TestCase):
         self.assertIsNone(sen["periodo_inicio"])
         self.assertIsNone(sen["periodo_fin"])
         self.assertEqual(sen["codigo_region"], "12")  # variante real de senado.cl
+
+    def test_schema_is_single_source(self):
+        """Plan 133a (auditoría 2026-10-13): `SCHEMA` de autoridades vive solo
+        en `autoridades_shared`; ambos extractores lo comparten (antes eran
+        dos copias idénticas de 16 columnas)."""
+        from src.extractors import (
+            autoridades_electas_extractor,
+            autoridades_locales_extractor,
+            autoridades_shared,
+        )
+
+        self.assertIs(autoridades_electas_extractor.SCHEMA, autoridades_shared.SCHEMA)
+        self.assertIs(autoridades_locales_extractor.SCHEMA, autoridades_shared.SCHEMA)
 
 
 # Compact alias for the offline multi-source regression fixtures below.

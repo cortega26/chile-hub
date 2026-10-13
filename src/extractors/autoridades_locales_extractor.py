@@ -33,6 +33,17 @@ ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
+# SCHEMA canónico compartido del carril autoridades (plan 133a). Import por
+# paquete (`from src.extractors import X`): la forma `from src.extractors.X
+# import Y` falla de manera intermitente en algunos entornos (mismo archivo,
+# verificado en CI y local) — el import por paquete lo resuelve siempre.
+try:
+    from src.extractors import autoridades_shared as _autoridades_shared
+except ModuleNotFoundError:  # ejecución como script (python src/extractors/*.py)
+    import autoridades_shared as _autoridades_shared
+
+SCHEMA = _autoridades_shared.SCHEMA
+
 try:
     from src.extractors.base import (
         BaseExtractor,
@@ -66,25 +77,6 @@ _BCN_HEADERS = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
     "Accept-Language": "es-CL,es;q=0.9,en;q=0.8",
     "Referer": "https://www.google.com/",
-}
-
-SCHEMA: dict[str, type[pl.DataType]] = {
-    "id_autoridad": pl.String,
-    "nombre": pl.String,
-    "cargo": pl.String,
-    "institucion": pl.String,
-    "partido": pl.String,
-    "pacto": pl.String,
-    "distrito_electoral": pl.String,
-    "circunscripcion_senatorial": pl.String,
-    "codigo_comuna": pl.String,
-    "codigo_region": pl.String,
-    "periodo_inicio": pl.String,
-    "periodo_fin": pl.String,
-    "estado_mandato": pl.String,
-    "fuente": pl.String,
-    "url_fuente": pl.String,
-    "fecha_consulta": pl.String,
 }
 
 REUSE_POLICY = {

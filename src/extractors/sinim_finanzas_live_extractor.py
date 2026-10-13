@@ -398,48 +398,20 @@ def fetch_data() -> tuple[list[dict[str, Any]], str, str, list[str]]:
 
 
 def _get_fallback_rows() -> list[dict[str, Any]]:
-    """Filas curadas de respaldo (3 comunas con datos verificados)."""
-    return [
-        {
-            "anio": 2024,
-            "codigo_comuna": "13101",
-            "nombre_comuna": "Santiago",
-            "ingresos_totales": 245000000000.0,
-            "gastos_totales": 231000000000.0,
-            "ingresos_propios_permanentes": 162000000000.0,
-            "fondo_comun_municipal": 39000000000.0,
-            "gasto_personal": 70500000000.0,
-            "gasto_inversion": 28500000000.0,
-        },
-        {
-            "anio": 2024,
-            "codigo_comuna": "05109",
-            "nombre_comuna": "Viña del Mar",
-            "ingresos_totales": 155000000000.0,
-            "gastos_totales": 149000000000.0,
-            "ingresos_propios_permanentes": 98000000000.0,
-            "fondo_comun_municipal": 21000000000.0,
-            "gasto_personal": 52300000000.0,
-            "gasto_inversion": 17400000000.0,
-        },
-        {
-            "anio": 2024,
-            "codigo_comuna": "08101",
-            "nombre_comuna": "Concepción",
-            "ingresos_totales": 132000000000.0,
-            "gastos_totales": 126000000000.0,
-            "ingresos_propios_permanentes": 76500000000.0,
-            "fondo_comun_municipal": 24500000000.0,
-            "gasto_personal": 41800000000.0,
-            "gasto_inversion": 15200000000.0,
-        },
-    ]
+    """Filas curadas de respaldo (3 comunas con datos verificados).
+
+    Única fuente: `_sinim_shared.FALLBACK_ROWS` (plan 133a, auditoría
+    2026-10-13); antes era una copia byte a byte del stub.
+    """
+    return FALLBACK_ROWS
 
 
 try:
+    from src.extractors._sinim_shared import FALLBACK_ROWS
     from src.extractors._sinim_shared import build_metadata as _shared_build_metadata
     from src.extractors._sinim_shared import normalize_rows as _shared_normalize_rows
 except ModuleNotFoundError:  # ejecución como script (python src/extractors/*.py)
+    from _sinim_shared import FALLBACK_ROWS
     from _sinim_shared import build_metadata as _shared_build_metadata
     from _sinim_shared import normalize_rows as _shared_normalize_rows
 

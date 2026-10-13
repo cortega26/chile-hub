@@ -49,41 +49,14 @@ REUSE_POLICY = {
     "summary": "Información municipal pública publicada por SINIM/SUBDERE; citar fuente oficial.",
 }
 
-FALLBACK_ROWS = [
-    {
-        "anio": 2024,
-        "codigo_comuna": "13101",
-        "nombre_comuna": "Santiago",
-        "ingresos_totales": 245000000000.0,
-        "gastos_totales": 231000000000.0,
-        "ingresos_propios_permanentes": 162000000000.0,
-        "fondo_comun_municipal": 39000000000.0,
-        "gasto_personal": 70500000000.0,
-        "gasto_inversion": 28500000000.0,
-    },
-    {
-        "anio": 2024,
-        "codigo_comuna": "05109",
-        "nombre_comuna": "Viña del Mar",
-        "ingresos_totales": 155000000000.0,
-        "gastos_totales": 149000000000.0,
-        "ingresos_propios_permanentes": 98000000000.0,
-        "fondo_comun_municipal": 21000000000.0,
-        "gasto_personal": 52300000000.0,
-        "gasto_inversion": 17400000000.0,
-    },
-    {
-        "anio": 2024,
-        "codigo_comuna": "08101",
-        "nombre_comuna": "Concepción",
-        "ingresos_totales": 132000000000.0,
-        "gastos_totales": 126000000000.0,
-        "ingresos_propios_permanentes": 76500000000.0,
-        "fondo_comun_municipal": 24500000000.0,
-        "gasto_personal": 41800000000.0,
-        "gasto_inversion": 15200000000.0,
-    },
-]
+try:
+    from src.extractors._sinim_shared import FALLBACK_ROWS
+    from src.extractors._sinim_shared import build_metadata as _shared_build_metadata
+    from src.extractors._sinim_shared import normalize_rows as _shared_normalize_rows
+except ModuleNotFoundError:  # ejecución como script (python src/extractors/*.py)
+    from _sinim_shared import FALLBACK_ROWS
+    from _sinim_shared import build_metadata as _shared_build_metadata
+    from _sinim_shared import normalize_rows as _shared_normalize_rows
 
 
 def fetch_data(source_url: str = SOURCE_URL) -> tuple[list[dict[str, Any]], str, str, list[str]]:
@@ -102,14 +75,6 @@ def fetch_data(source_url: str = SOURCE_URL) -> tuple[list[dict[str, Any]], str,
         notes.append(fallback_metadata_note("official_landing_fetch_failed"))
     source_mode = source_mode_from_live_success(success, data_parsed)
     return FALLBACK_ROWS, source_mode, source_url, notes
-
-
-try:
-    from src.extractors._sinim_shared import build_metadata as _shared_build_metadata
-    from src.extractors._sinim_shared import normalize_rows as _shared_normalize_rows
-except ModuleNotFoundError:  # ejecución como script (python src/extractors/*.py)
-    from _sinim_shared import build_metadata as _shared_build_metadata
-    from _sinim_shared import normalize_rows as _shared_normalize_rows
 
 
 def normalize_rows(rows: list[dict[str, Any]]) -> pl.DataFrame:
