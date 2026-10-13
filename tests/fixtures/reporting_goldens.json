@@ -1,0 +1,368 @@
+{
+  "check_sources_table": {
+    "expected": "chile-hub check-sources\n\n┏━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n┃ dataset     ┃ status  ┃ code ┃ latency ┃ source name   ┃ url                                              ┃\n┡━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩\n│ indicadores │ online  │ 200  │ 123ms   │ mindicador.cl │ https://mindicador.cl/api                        │\n│ comunas     │ offline │ N/A  │ N/A     │ BCN ArcGIS    │ https://www.arcgis.com/sharing/rest/content/i... │\n└─────────────┴─────────┴──────┴─────────┴───────────────┴──────────────────────────────────────────────────┘\n",
+    "input": [
+      {
+        "dataset": "indicadores",
+        "latency_ms": 123,
+        "source_name": "mindicador.cl",
+        "status": "online",
+        "status_code": 200,
+        "url": "https://mindicador.cl/api"
+      },
+      {
+        "dataset": "comunas",
+        "latency_ms": null,
+        "source_name": "BCN ArcGIS",
+        "status": "offline",
+        "status_code": null,
+        "url": "https://www.arcgis.com/sharing/rest/content/items/1234567890abcdef"
+      }
+    ]
+  },
+  "drift_table": {
+    "expected": "chile-hub drift\n\ndatasets=22 | drifted=2 | healthy=20 | fallback=1 | partial_coverage=1 | degraded=0\n\n\n\n┏━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━┓\n┃ dataset    ┃ drift   ┃ mode ┃ coverage ┃ degradation ┃ warnings ┃\n┡━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━╇━━━━━━━━━━┩\n│ regiones   │ healthy │ live │ full     │ none        │ 0        │\n│ provincias │ healthy │ live │ full     │ none        │ 0        │\n└────────────┴─────────┴──────┴──────────┴─────────────┴──────────┘\n\n",
+    "input": {
+      "dataset_count": 22,
+      "datasets": [
+        {
+          "coverage_ratio": 1.0,
+          "coverage_status": "full",
+          "coverage_summary": "Cobertura completa: 16/16 filas respecto del baseline esperado.",
+          "dataset": "regiones",
+          "degradation_impact": "Sin degradación operativa detectada en este build.",
+          "degradation_status": "none",
+          "diagnostic_summary": "Sin degradación operativa detectada en este build.",
+          "documentation": "docs/datasets/regiones.md",
+          "drift_status": "healthy",
+          "drift_summary": "Sin drift operativo detectado en este build.",
+          "recommended_action": "Ninguna.",
+          "source_mode": "live",
+          "warning_count": 0
+        },
+        {
+          "coverage_ratio": 1.0,
+          "coverage_status": "full",
+          "coverage_summary": "Cobertura completa: 56/56 filas respecto del baseline esperado.",
+          "dataset": "provincias",
+          "degradation_impact": "Sin degradación operativa detectada en este build.",
+          "degradation_status": "none",
+          "diagnostic_summary": "Sin degradación operativa detectada en este build.",
+          "documentation": "docs/datasets/provincias.md",
+          "drift_status": "healthy",
+          "drift_summary": "Sin drift operativo detectado en este build.",
+          "recommended_action": "Ninguna.",
+          "source_mode": "live",
+          "warning_count": 0
+        }
+      ],
+      "degraded_count": 0,
+      "drifted_count": 2,
+      "fallback_count": 1,
+      "generated_at_utc": "2026-10-11T16:08:27.299461+00:00",
+      "healthy_count": 20,
+      "partial_coverage_count": 1
+    }
+  },
+  "health_table": {
+    "expected": "chile-hub health\n\noverall=warn | datasets=22 | ok=20 | warn=1 | error=0 | live=21 | fallback=0 | stale=0 | drifted=1\n\n\n\n┏━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━┓\n┃ dataset             ┃ severity ┃ mode ┃ freshness ┃ validation ┃ reuse ┃ coverage       ┃ drift   ┃ warnings ┃\n┡━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━┩\n│ autoridades_electas │ ok       │ live │ fresh     │ ok         │ ready │ full           │ healthy │ 0        │\n│ calidad_aire        │ ok       │ live │ fresh     │ ok         │ ready │ not_applicable │ healthy │ 1        │\n└─────────────────────┴──────────┴──────┴───────────┴────────────┴───────┴────────────────┴─────────┴──────────┘\n\n",
+    "input": {
+      "dataset_count": 22,
+      "datasets": [
+        {
+          "actionable_warning_count": 0,
+          "coverage_expected": false,
+          "coverage_ratio": 1.0,
+          "coverage_status": "full",
+          "dataset": "autoridades_electas",
+          "degradation_status": "none",
+          "diagnostic_summary": "Sin degradación operativa detectada en este build.",
+          "drift_status": "healthy",
+          "freshness_status": "fresh",
+          "publishability_status": "ready",
+          "recommended_action": "Ninguna.",
+          "redistribution_ok": true,
+          "retired": false,
+          "reuse_status": "open-attribution",
+          "severity": "ok",
+          "source_detail": "WSDiputado.asmx/retornarDiputadosPeriodoActual + camara.cl + senado.cl (Scrapling)",
+          "source_mode": "live",
+          "validation_status": "ok",
+          "warning_count": 0
+        },
+        {
+          "actionable_warning_count": 0,
+          "coverage_expected": false,
+          "coverage_ratio": null,
+          "coverage_status": "not_applicable",
+          "dataset": "calidad_aire",
+          "degradation_status": "none",
+          "diagnostic_summary": "cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación",
+          "drift_status": "healthy",
+          "freshness_status": "fresh",
+          "publishability_status": "ready",
+          "recommended_action": "Ninguna.",
+          "redistribution_ok": true,
+          "retired": false,
+          "reuse_status": "public-api-review-terms",
+          "severity": "ok",
+          "source_detail": "Promedios diarios por estación y contaminante (MP2.5, MP10, SO2, NO2, CO, O3) desde el JSON del SINCA. Cobertura parcial por diseño (~65 comunas con estación). Serie incremental desde la primera cosecha.",
+          "source_mode": "live",
+          "validation_status": "ok",
+          "warning_count": 1
+        }
+      ],
+      "degradation_warning_count": 1,
+      "degraded_count": 0,
+      "drifted_count": 1,
+      "error_count": 0,
+      "fallback_count": 0,
+      "generated_at_utc": "2026-10-11T16:08:27.299461+00:00",
+      "live_count": 21,
+      "ok_count": 20,
+      "overall_status": "warn",
+      "partial_coverage_count": 1,
+      "publishable_count": 21,
+      "retired_count": 1,
+      "review_approaching_count": 22,
+      "review_due_count": 0,
+      "review_terms_count": 0,
+      "stale_count": 0,
+      "top_issue": {
+        "attention_priority": 0,
+        "build_freshness_status": "fresh",
+        "dataset": "indicadores",
+        "degradation_status": "warning",
+        "diagnostic_summary": "indicadores live refresh reused last published artifact for missing codes: ipc",
+        "drift_status": "drifted",
+        "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción.",
+        "source_detail": "public_api_with_published_backfill",
+        "warning_count": 1
+      },
+      "top_issue_summary": "indicadores: indicadores live refresh reused last published artifact for missing codes: ipc [source_detail=public_api_with_published_backfill; warnings=1; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]",
+      "unknown_coverage_count": 0,
+      "unknown_freshness_count": 0,
+      "unknown_reuse_count": 0,
+      "warn_count": 1,
+      "warning_count": 6
+    }
+  },
+  "inventory_table": {
+    "expected": "chile-hub inventory\n\n┏━━━━━━━━━━━━┳━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━┓\n┃ dataset    ┃ mode ┃ records ┃ outputs      ┃ size   ┃ freshness ┃ coverage ┃ drift   ┃\n┡━━━━━━━━━━━━╇━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━┩\n│ regiones   │ live │ 16      │ json,parquet │ 2.4 KB │ fresh     │ full     │ healthy │\n│ provincias │ live │ 56      │ json,parquet │ 9.9 KB │ fresh     │ full     │ healthy │\n└────────────┴──────┴─────────┴──────────────┴────────┴───────────┴──────────┴─────────┘\n",
+    "input": [
+      {
+        "artifact_count": 2,
+        "artifacts": [
+          {
+            "output_type": "json",
+            "path": "data/normalized/regiones.json",
+            "size_bytes": 1146
+          },
+          {
+            "output_type": "parquet",
+            "path": "data/normalized/regiones.parquet",
+            "size_bytes": 1318
+          }
+        ],
+        "attribution_required": true,
+        "confidence_tier": "Tier B",
+        "coverage_ratio": 1.0,
+        "coverage_status": "full",
+        "dataset": "regiones",
+        "degradation_impact": "Sin degradación operativa detectada en este build.",
+        "degradation_status": "none",
+        "drift_status": "healthy",
+        "drift_summary": "Sin drift operativo detectado en este build.",
+        "freshness_age_hours": 0.05,
+        "freshness_status": "fresh",
+        "published_outputs": [
+          "json",
+          "parquet"
+        ],
+        "record_count": 16,
+        "reuse_license": "CC BY",
+        "reuse_status": "open-attribution",
+        "source_mode": "live",
+        "total_size_bytes": 2464,
+        "validation_status": "ok",
+        "warning_count": 0
+      },
+      {
+        "artifact_count": 2,
+        "artifacts": [
+          {
+            "output_type": "json",
+            "path": "data/normalized/provincias.json",
+            "size_bytes": 7389
+          },
+          {
+            "output_type": "parquet",
+            "path": "data/normalized/provincias.parquet",
+            "size_bytes": 2768
+          }
+        ],
+        "attribution_required": true,
+        "confidence_tier": "Tier B",
+        "coverage_ratio": 1.0,
+        "coverage_status": "full",
+        "dataset": "provincias",
+        "degradation_impact": "Sin degradación operativa detectada en este build.",
+        "degradation_status": "none",
+        "drift_status": "healthy",
+        "drift_summary": "Sin drift operativo detectado en este build.",
+        "freshness_age_hours": 0.05,
+        "freshness_status": "fresh",
+        "published_outputs": [
+          "json",
+          "parquet"
+        ],
+        "record_count": 56,
+        "reuse_license": "CC BY",
+        "reuse_status": "open-attribution",
+        "source_mode": "live",
+        "total_size_bytes": 10157,
+        "validation_status": "ok",
+        "warning_count": 0
+      }
+    ]
+  },
+  "packages_table": {
+    "expected": "chile-hub packages\n\n┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n┃ package_type ┃ size       ┃ checksum ┃ path                                             ┃\n┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩\n│ zip          │ 30260.5 KB │ sha256   │ data/normalized/chile-hub-publishable-bundle.zip │\n└──────────────┴────────────┴──────────┴──────────────────────────────────────────────────┘\n",
+    "input": [
+      {
+        "checksum_algorithm": "sha256",
+        "checksum_path": "data/normalized/chile-hub-publishable-bundle.zip.sha256",
+        "package_type": "zip",
+        "path": "data/normalized/chile-hub-publishable-bundle.zip",
+        "sha256": "cf82219130b008768494a59e9e8310521b5eea0787cf9b5adfc6df3eb86ec729",
+        "size_bytes": 30986751,
+        "verification_command": "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256"
+      }
+    ]
+  },
+  "provenance_table": {
+    "expected": "chile-hub provenance\n\ndatasets=22 | live=21 | fallback=1\n\n\n\n┏━━━━━━━━━━━━┳━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n┃ dataset    ┃ mode ┃ source     ┃ freshness ┃ warnings ┃ refreshed_at_utc                 ┃\n┡━━━━━━━━━━━━╇━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩\n│ regiones   │ live │ bcn_arcgis │ fresh     │ 0        │ 2026-10-11T16:05:33.617249+00:00 │\n│ provincias │ live │ bcn_arcgis │ fresh     │ 0        │ 2026-10-11T16:05:33.617249+00:00 │\n└────────────┴──────┴────────────┴───────────┴──────────┴──────────────────────────────────┘\n\n",
+    "input": {
+      "dataset_count": 22,
+      "datasets": [
+        {
+          "dataset": "regiones",
+          "diagnostic_summary": "bcn_skipped_null_code_records: 1",
+          "documentation": "docs/datasets/regiones.md",
+          "freshness_label": "fresh (0.05h / 2160h)",
+          "freshness_status": "fresh",
+          "refreshed_at_utc": "2026-10-11T16:05:33.617249+00:00",
+          "reuse_status": "open-attribution",
+          "source_detail": "bcn_arcgis",
+          "source_mode": "live",
+          "source_name": "BCN ArcGIS",
+          "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
+          "warning_count": 0
+        },
+        {
+          "dataset": "provincias",
+          "diagnostic_summary": "bcn_skipped_null_code_records: 1",
+          "documentation": "docs/datasets/provincias.md",
+          "freshness_label": "fresh (0.05h / 2160h)",
+          "freshness_status": "fresh",
+          "refreshed_at_utc": "2026-10-11T16:05:33.617249+00:00",
+          "reuse_status": "open-attribution",
+          "source_detail": "bcn_arcgis",
+          "source_mode": "live",
+          "source_name": "BCN ArcGIS",
+          "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
+          "warning_count": 0
+        }
+      ],
+      "fallback_count": 1,
+      "generated_at_utc": "2026-10-11T16:08:27.299461+00:00",
+      "live_count": 21
+    }
+  },
+  "redistribution_table": {
+    "expected": "chile-hub redistribution\n\nready=22 | review_terms=0 | unknown=0 | datasets=22\n\n\n\n┏━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━┓\n┃ dataset    ┃ status ┃ reuse_status     ┃ attribution ┃ license ┃\n┡━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━╇━━━━━━━━━┩\n│ regiones   │ ready  │ open-attribution │ yes         │ CC BY   │\n│ provincias │ ready  │ open-attribution │ yes         │ CC BY   │\n└────────────┴────────┴──────────────────┴─────────────┴─────────┘\n\n",
+    "input": {
+      "dataset_count": 22,
+      "datasets": [
+        {
+          "attribution_required": true,
+          "dataset": "regiones",
+          "documentation": "docs/datasets/regiones.md",
+          "license": "CC BY",
+          "license_url": "https://datos.bcn.cl/es/informacion/lo-que-esta-haciendo-bcn",
+          "publishability_status": "ready",
+          "recommended_action": "Publicable con atribucion y referencia de fuente.",
+          "redistribution_ok": true,
+          "reuse_status": "open-attribution",
+          "summary": "Derivada de datos abiertos BCN reutilizables con atribucion."
+        },
+        {
+          "attribution_required": true,
+          "dataset": "provincias",
+          "documentation": "docs/datasets/provincias.md",
+          "license": "CC BY",
+          "license_url": "https://datos.bcn.cl/es/informacion/lo-que-esta-haciendo-bcn",
+          "publishability_status": "ready",
+          "recommended_action": "Publicable con atribucion y referencia de fuente.",
+          "redistribution_ok": true,
+          "reuse_status": "open-attribution",
+          "summary": "Derivada de datos abiertos BCN reutilizables con atribucion."
+        }
+      ],
+      "generated_at_utc": "2026-10-11T16:08:27.299461+00:00",
+      "ready_count": 22,
+      "review_terms_count": 0,
+      "unknown_count": 0
+    }
+  },
+  "summary_table": {
+    "expected": "chile-hub summary\n\n┏━━━━━━━━━━━━┳━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━┓\n┃ dataset    ┃ mode ┃ records ┃ freshness ┃ coverage ┃ validation ┃ drift   ┃ warnings ┃\n┡━━━━━━━━━━━━╇━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━┩\n│ regiones   │ live │ 16      │ fresh     │ full     │ ok         │ healthy │ 0        │\n│ provincias │ live │ 56      │ fresh     │ full     │ ok         │ healthy │ 0        │\n└────────────┴──────┴─────────┴───────────┴──────────┴────────────┴─────────┴──────────┘\n",
+    "input": [
+      {
+        "attribution_required": true,
+        "confidence_tier": "Tier B",
+        "coverage_ratio": 1.0,
+        "coverage_status": "full",
+        "dataset": "regiones",
+        "degradation_impact": "Sin degradación operativa detectada en este build.",
+        "degradation_status": "none",
+        "drift_status": "healthy",
+        "drift_summary": "Sin drift operativo detectado en este build.",
+        "freshness_age_hours": 0.05,
+        "freshness_status": "fresh",
+        "join_keys": [
+          "codigo_region"
+        ],
+        "record_count": 16,
+        "reuse_license": "CC BY",
+        "reuse_status": "open-attribution",
+        "source_mode": "live",
+        "validation_status": "ok",
+        "warning_count": 0
+      },
+      {
+        "attribution_required": true,
+        "confidence_tier": "Tier B",
+        "coverage_ratio": 1.0,
+        "coverage_status": "full",
+        "dataset": "provincias",
+        "degradation_impact": "Sin degradación operativa detectada en este build.",
+        "degradation_status": "none",
+        "drift_status": "healthy",
+        "drift_summary": "Sin drift operativo detectado en este build.",
+        "freshness_age_hours": 0.05,
+        "freshness_status": "fresh",
+        "join_keys": [
+          "codigo_provincia",
+          "codigo_region"
+        ],
+        "record_count": 56,
+        "reuse_license": "CC BY",
+        "reuse_status": "open-attribution",
+        "source_mode": "live",
+        "validation_status": "ok",
+        "warning_count": 0
+      }
+    ]
+  }
+}

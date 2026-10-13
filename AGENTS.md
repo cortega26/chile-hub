@@ -134,7 +134,7 @@ chile-hub/
 │   ├── build_dev_db.py            Orquestador (600 líneas): main() + fases (_load_inputs, _compute_validations, _write_data_artifacts, _generate_reports)
 │   ├── builders/                  Módulos del pipeline extraídos de build_dev_db.py (formats, metadata, reports, artifacts, datasets, catalog, landing, io_utils, _shared, dcat_catalog, data_package, doc_sync, geo, _logging)
 │   ├── chile_hub/                 Paquete Python instalable (ChileHub API + CLI + data manager)
-│   │   ├── core.py                ChileHub class + API pública (2 027 líneas)
+│   │   ├── core.py                ChileHub class + API pública (1 366 líneas)
 │   │   ├── cli.py                 CLI entry points (build_parser/_main/main — TECHDEBT-02, movido de core.py)
 │   │   ├── contracts.py           Schemas de contrato runtime
 │   │   ├── datasets.py            Definición de Dataset(StrEnum) y tipos
@@ -205,7 +205,7 @@ codegraph impact validate_comunas                   # Qué se rompe si cambio es
 **Reglas para acotar lecturas y ahorrar tokens:**
 - Usar `Read` con `offset`/`limit` — nunca leer archivos grandes enteros de golpe.
 - `base.py` (146 líneas) es seguro de leer completo. `validation.py` (1 958 líneas) — leer por validador individual.
-- `build_dev_db.py` (600 líneas) y `src/chile_hub/core.py` (2 027 líneas) — usar estas áncoras:
+- `build_dev_db.py` (600 líneas) y `src/chile_hub/core.py` (1 366 líneas) — usar estas áncoras:
 
 | Archivo | Líneas de interés |
 |---|---|

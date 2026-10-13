@@ -1031,6 +1031,63 @@ class ArtifactStoreTests(unittest.TestCase):
         self.assertTrue(hub.health().get("_test_marker_134a"))
 
 
+class ReportingGoldensTests(unittest.TestCase):
+    """Plan 134b (auditoría 2026-10-13): goldens de salida EXACTA de los
+    `render_*` puros movidos a `_reporting`.
+
+    El advisor señaló que los tests existentes de tablas solo usan substrings
+    (`assertIn`) — no garantizan el texto completo. Acá se congelan 8 tablas
+    deterministas con inputs podados (2 entradas por lista, capturados una vez;
+    los renderers son puros, así que el golden es estable). Las tablas
+    dependientes de reloj (`snapshot_*`, `freshness_audit`, `runtime_status`)
+    quedan con asserts estructurales a propósito.
+    """
+
+    GOLDEN_PATH = ROOT_DIR / "tests" / "fixtures" / "reporting_goldens.json"
+
+    def test_renderers_match_exact_golden_output(self):
+        from chile_hub import _reporting
+
+        goldens = json.loads(self.GOLDEN_PATH.read_text(encoding="utf-8"))
+        self.assertEqual(
+            len(goldens),
+            8,
+            "El fixture de goldens cambió de tamaño: si es deliberado, regenera "
+            "tests/fixtures/reporting_goldens.json con inputs podados y documenta el porqué.",
+        )
+        for name, case in sorted(goldens.items()):
+            with self.subTest(table=name):
+                renderer = getattr(_reporting, f"render_{name}")
+                self.assertEqual(renderer(case["input"]), case["expected"])
+
+    def test_hub_table_methods_delegate_to_reporting(self):
+        """La fachada conserva los métodos públicos delegando en `_reporting`."""
+        import inspect as _inspect
+
+        for method in (
+            "summary_table",
+            "snapshot_text",
+            "snapshot_table",
+            "shared_artifacts_table",
+            "report_index_table",
+            "overview_table",
+            "inventory_table",
+            "check_sources_table",
+            "status_table",
+            "health_table",
+            "runtime_status_table",
+            "freshness_audit_table",
+            "packages_table",
+            "redistribution_table",
+            "provenance_table",
+            "drift_table",
+            "top_issue_table",
+        ):
+            with self.subTest(method=method):
+                src = _inspect.getsource(getattr(ChileHub, method))
+                self.assertIn("_reporting.render_", src, f"{method} no delega en _reporting")
+
+
 class PublicSurfaceGuardrailTests(unittest.TestCase):
     """Plan 134a (auditoría 2026-10-13): congela la superficie pública de
     `ChileHub` (inventario + firmas) ANTES de partir el god object en módulos
