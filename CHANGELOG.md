@@ -12,6 +12,58 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.48.3 - 2026-10-13
+
+### Corregido
+
+- **ci**: Align ruff pins and decouple Lighthouse guardrail from exact action SHA
+  ([#165](https://github.com/cortega26/chile-hub/pull/165),
+  [`9f1badd`](https://github.com/cortega26/chile-hub/commit/9f1badd63e996654d431a739d1f0053d5e78b327))
+
+### Mantenimiento
+
+- **deps**: Bump actions/download-artifact from 8.0.1 to 8.0.2
+  ([#164](https://github.com/cortega26/chile-hub/pull/164),
+  [`de370ff`](https://github.com/cortega26/chile-hub/commit/de370ff17412b94e97c76933deabffbcab63898c))
+
+- **deps**: Bump astral-sh/setup-uv from 10.2.0 to 10.3.0
+  ([#162](https://github.com/cortega26/chile-hub/pull/162),
+  [`80c4f6f`](https://github.com/cortega26/chile-hub/commit/80c4f6f56fb220e7a79f26b955bb5b4287efeef1))
+
+- **deps**: Bump the codeql-action group with 2 updates
+  ([#161](https://github.com/cortega26/chile-hub/pull/161),
+  [`d9c19e9`](https://github.com/cortega26/chile-hub/commit/d9c19e922f2cfe10be7e96ec479f8edf7807e509))
+
+- **deps**: Sync uv.lock [skip ci] ([#160](https://github.com/cortega26/chile-hub/pull/160),
+  [`d2b459a`](https://github.com/cortega26/chile-hub/commit/d2b459ae5ee16facf3d498f42786fdb796db6632))
+
+- **deps**: Sync uv.lock [skip ci] ([#159](https://github.com/cortega26/chile-hub/pull/159),
+  [`2fd1bf7`](https://github.com/cortega26/chile-hub/commit/2fd1bf76b5e4f0bc102da7863da4501a43e69a98))
+
+- **deps**: Update polars requirement ([#159](https://github.com/cortega26/chile-hub/pull/159),
+  [`2fd1bf7`](https://github.com/cortega26/chile-hub/commit/2fd1bf76b5e4f0bc102da7863da4501a43e69a98))
+
+- **deps**: Update polars requirement from <2,>=1.44.1 to >=1.44.1,<3 in the python-runtime group
+  ([#159](https://github.com/cortega26/chile-hub/pull/159),
+  [`2fd1bf7`](https://github.com/cortega26/chile-hub/commit/2fd1bf76b5e4f0bc102da7863da4501a43e69a98))
+
+- **deps-dev**: Bump the python-dev group with 4 updates
+  ([#160](https://github.com/cortega26/chile-hub/pull/160),
+  [`d2b459a`](https://github.com/cortega26/chile-hub/commit/d2b459ae5ee16facf3d498f42786fdb796db6632))
+
+### Integración continua
+
+- Align ruff pins with pyproject 0.17.0 after Dependabot bump
+  ([#165](https://github.com/cortega26/chile-hub/pull/165),
+  [`9f1badd`](https://github.com/cortega26/chile-hub/commit/9f1badd63e996654d431a739d1f0053d5e78b327))
+
+### Tests
+
+- **ci**: Make Lighthouse upload guardrail survive action pin bumps
+  ([#165](https://github.com/cortega26/chile-hub/pull/165),
+  [`9f1badd`](https://github.com/cortega26/chile-hub/commit/9f1badd63e996654d431a739d1f0053d5e78b327))
+
+
 ## 1.48.2 - 2026-10-10
 
 ### Corregido
