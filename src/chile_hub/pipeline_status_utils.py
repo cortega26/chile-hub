@@ -12,8 +12,6 @@ from pathlib import Path
 
 from ._paths import ROOT_DIR  # fuente única de raíz del proyecto (TECHDEBT-05)
 
-UTC = UTC
-
 
 def write_text_atomic(content, path):
     path_obj = Path(path)

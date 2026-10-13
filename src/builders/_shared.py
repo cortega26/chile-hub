@@ -7,10 +7,8 @@ y por `build_dev_db.py` sin riesgo de imports circulares.
 
 import json
 import os
-from datetime import UTC
+from datetime import UTC as UTC  # re-export explícito (F401-safe) para builders
 from typing import Any
-
-UTC = UTC
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 

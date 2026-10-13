@@ -21,7 +21,7 @@ import time
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from src.extractors.http_utils import fetch_with_retry
+from src.extractors.http_utils import fetch_with_retry  # noqa: E402
 
 SOURCE_REGISTRY_PATH = "data/source_registry.json"
 TIMEOUT_SECONDS = 20
@@ -31,7 +31,7 @@ HEADERS = {"User-Agent": "chile-hub source-url-liveness-check (github-actions)"}
 def load_urls() -> list[str]:
     import json
 
-    with open(SOURCE_REGISTRY_PATH, encoding="utf-8") as f:
+    with open(SOURCE_REGISTRY_PATH, "r", encoding="utf-8") as f:
         registry = json.load(f)
     urls = sorted({str(entry.get("official_url", "")).strip() for entry in registry})
     return [u for u in urls if u and u.startswith("http")]

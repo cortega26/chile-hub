@@ -18,8 +18,6 @@ from typing import Any
 
 import polars as pl
 
-UTC = UTC
-
 
 def _compute_snapshot_hash(path: Path | None) -> str | None:
     """SHA-256 streaming del snapshot crudo, si existe."""

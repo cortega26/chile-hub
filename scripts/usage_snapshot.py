@@ -27,8 +27,6 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-UTC = UTC
-
 REPO_OWNER = "cortega26"
 REPO_NAME = "chile-hub"
 BUNDLE_ASSET_NAME = "chile-hub-publishable-bundle.zip"

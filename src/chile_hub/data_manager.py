@@ -28,7 +28,6 @@ ENV_DISABLE_UPDATE_CHECK = "CHILE_HUB_NO_UPDATE_CHECK"
 ENV_LANGUAGE = "CHILE_HUB_LANG"
 UPDATE_CHECK_INTERVAL = timedelta(days=7)
 UPDATE_CHECK_TIMEOUT = 3
-UTC = UTC
 SUPPORT_URL = f"https://github.com/sponsors/{DEFAULT_REPOSITORY.split('/')[0]}"
 BUY_ME_A_COFFEE_URL = f"https://www.buymeacoffee.com/{DEFAULT_REPOSITORY.split('/')[0]}"
 

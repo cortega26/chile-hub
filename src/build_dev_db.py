@@ -1,7 +1,6 @@
 import json
 import os
 import sys
-from datetime import UTC
 
 import polars as pl
 
@@ -18,7 +17,6 @@ from src.builders._logging import get_logger
 
 log = get_logger("build_dev_db")
 
-UTC = UTC
 
 # Rutas, constantes y configuración de catálogo compartidas (re-exportadas para
 # mantener compatibilidad con scripts externos y tests que las importan desde aquí;

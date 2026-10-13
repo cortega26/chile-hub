@@ -10,7 +10,6 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
-UTC = UTC
 BUNDLE_PATH = ROOT_DIR / "data" / "normalized" / "hub_bundle.json"
 # El ZIP publicable no se versiona (Plan 130): la landing lo descarga desde el
 # asset del último GitHub Release. Mantener en sync con RELEASE_DOWNLOAD_BASE de app.js.

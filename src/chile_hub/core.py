@@ -12,6 +12,7 @@ from typing import Any, Literal, cast
 import polars as pl
 import requests
 
+from ._paths import NORMALIZED_DIR, ROOT_DIR  # noqa: F401  (re-export: ROOT_DIR/NORMALIZED_DIR)
 from ._render import render_table
 from .data_manager import ChileHubDataManager
 from .datasets import Dataset
@@ -29,10 +30,6 @@ from .pipeline_status_utils import (
 )
 from .regions import REGION_ALIASES, normalize_region_name
 from .text import normalize_comuna_name
-
-UTC = UTC
-
-from ._paths import NORMALIZED_DIR, ROOT_DIR  # noqa: F401  (re-export: ROOT_DIR/NORMALIZED_DIR)
 
 DATASET_CATALOG_PATH = NORMALIZED_DIR / "dataset_catalog.json"
 
