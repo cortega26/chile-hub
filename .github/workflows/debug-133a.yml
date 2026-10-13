@@ -1,7 +1,8 @@
 name: Debug 133a import
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [audit/133a-single-source]
 
 permissions:
   contents: read
