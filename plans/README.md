@@ -918,7 +918,7 @@ registry MCP (`54c1691`; `sync_server_json_version` en
 | # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de / solapa | Estado |
 |---|------|----------|----------|--------|---------------------|--------|
 | 131 | [Correctitud y quick wins](131-audit-p0-correctitud-quick-wins.md) | P1 | S-M | LOW-MED | — | TODO |
-| 132 | [Descomposición pipeline build + CLI + C901](132-audit-decomposicion-pipeline-build.md) | P1 | M | MED | 131 | TODO |
+| 132 | [Descomposición pipeline build + CLI + C901](132-audit-decomposicion-pipeline-build.md) | P1 | M | MED | 131 | IN PROGRESS (2026-10-13: 132a — `builders/inputs.py` tabla única + `_load_inputs` fachada, 963→607 líneas; pendientes 132b metadata/hub_health y 132c CLI/spec/C901) |
 | 133 | [Extractores: fuente única + descomposición](133-audit-single-source-dry.md) | P2 | M-L | LOW-MED | 131; coordina con 132 (C901) | TODO |
 | 134 | [ChileHub: fachada/store/presentación + B019](134-audit-chilehub-facade-split.md) | P2 | L | MED | 131 (ignore B019); advisor antes de ejecutar | TODO |
 | 135 | [validation: paquete con fachada](135-audit-validation-package.md) | P2 | M | MED | 132 (checker §5) | TODO |

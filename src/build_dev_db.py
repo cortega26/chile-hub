@@ -1,8 +1,5 @@
-import json
 import os
 import sys
-
-import polars as pl
 
 # ── Ajuste de sys.path ────────────────────────────────────────────────────────
 # `python src/build_dev_db.py` no incluye el directorio raíz en sys.path, por lo
@@ -55,10 +52,6 @@ from src.builders.catalog import (
     write_pipeline_metadata,
 )
 from src.builders.data_package import build_data_package, write_data_package_json
-from src.builders.datasets import (
-    build_perfil_territorial_comunal,
-    derive_geography_layers,
-)
 from src.builders.dcat_catalog import write_dcat_catalog_json
 from src.builders.doc_sync import sync_all_docs
 from src.builders.formats import (
@@ -69,6 +62,7 @@ from src.builders.formats import (
     build_flat_files,
     build_sqlite,
 )
+from src.builders.inputs import load_staging_inputs
 from src.builders.io_utils import (
     compute_sha256,
     write_json_atomic,
@@ -115,7 +109,6 @@ from src.builders.reports import (
     write_redistribution_report_json,
     write_source_readiness_json,
 )
-from src.builders.staging_schema import STAGING_SCHEMAS, apply_date_casts
 from src.pipeline_status_utils import (
     build_hub_health,
     write_dataset_catalog_markdown_file,
@@ -154,369 +147,13 @@ from src.validation import (
 
 
 def _load_inputs():
-    """Carga metadatos de staging y lee todos los DataFrames de origen."""
-    previous_pipeline_metadata = None
-    previous_metadata_path = os.path.join(NORMALIZED_DIR, "pipeline_metadata.json")
-    if os.path.exists(previous_metadata_path):
-        try:
-            with open(previous_metadata_path, encoding="utf-8") as f:
-                previous_pipeline_metadata = json.load(f)
-        except json.JSONDecodeError:
-            previous_pipeline_metadata = None
+    """Carga metadatos de staging y lee todos los DataFrames de origen.
 
-    # Rutas de origen (Staging)
-    comunas_csv = os.path.join(STAGING_DIR, "comunas.csv")
-    indicadores_csv = os.path.join(STAGING_DIR, "indicadores.csv")
-    censo_csv = os.path.join(STAGING_DIR, "censo_comunal.csv")
-    salud_csv = os.path.join(STAGING_DIR, "establecimientos_salud.csv")
-    censo_hogares_csv = os.path.join(STAGING_DIR, "censo_hogares_viviendas.csv")
-    electoral_csv = os.path.join(STAGING_DIR, "distritos_electorales.csv")
-    educacionales_csv = os.path.join(STAGING_DIR, "establecimientos_educacionales.csv")
-    finanzas_csv = os.path.join(STAGING_DIR, "finanzas_municipales.csv")
-    resultados_educacionales_csv = os.path.join(STAGING_DIR, "resultados_educacionales.csv")
-    siedu_csv = os.path.join(STAGING_DIR, "indicadores_urbanos_siedu.csv")
-    empresas_csv = os.path.join(STAGING_DIR, "empresas.csv")
-    pobreza_comunal_csv = os.path.join(STAGING_DIR, "pobreza_comunal.csv")
-    consumo_electrico_csv = os.path.join(STAGING_DIR, "consumo_electrico_comunal.csv")
-    partidos_politicos_csv = os.path.join(STAGING_DIR, "partidos_politicos.csv")
-    autoridades_electas_csv = os.path.join(STAGING_DIR, "autoridades_electas.csv")
-    estadisticas_vitales_csv = os.path.join(STAGING_DIR, "estadisticas_vitales.csv")
-    permisos_edificacion_csv = os.path.join(STAGING_DIR, "permisos_edificacion.csv")
-    calidad_aire_csv = os.path.join(STAGING_DIR, "calidad_aire.csv")
-
-    required_staging = (
-        comunas_csv,
-        indicadores_csv,
-        censo_csv,
-        salud_csv,
-        censo_hogares_csv,
-        electoral_csv,
-        educacionales_csv,
-        finanzas_csv,
-        resultados_educacionales_csv,
-        siedu_csv,
-    )
-    if any(not os.path.exists(path) for path in required_staging):
-        raise SystemExit(
-            "Error: No se encuentran los archivos CSV en staging. Corre los extractores primero."
-        )
-
-    metadata_checks = [
-        ("comunas.metadata.json", COMUNAS_METADATA_PATH, "subdere_extractor.py"),
-        ("indicadores.metadata.json", INDICADORES_METADATA_PATH, "bcentral_extractor.py"),
-        ("censo_comunal.metadata.json", CENSO_METADATA_PATH, "censo_extractor.py"),
-        ("establecimientos_salud.metadata.json", SALUD_METADATA_PATH, "salud_extractor.py"),
-        (
-            "censo_hogares_viviendas.metadata.json",
-            CENSO_HOGARES_METADATA_PATH,
-            "censo_hogares_viviendas_extractor.py",
-        ),
-        ("distritos_electorales.metadata.json", ELECTORAL_METADATA_PATH, "electoral_extractor.py"),
-        (
-            "establecimientos_educacionales.metadata.json",
-            os.path.join(STAGING_DIR, "establecimientos_educacionales.metadata.json"),
-            "mineduc_establecimientos_extractor.py",
-        ),
-        (
-            "finanzas_municipales.metadata.json",
-            FINANZAS_METADATA_PATH,
-            "sinim_finanzas_extractor.py",
-        ),
-        (
-            "resultados_educacionales.metadata.json",
-            RESULTADOS_EDUCACIONALES_METADATA_PATH,
-            "mineduc_resultados_extractor.py",
-        ),
-        ("indicadores_urbanos_siedu.metadata.json", SIEDU_METADATA_PATH, "siedu_extractor.py"),
-    ]
-    for filename, path, extractor in metadata_checks:
-        if not os.path.exists(path):
-            raise SystemExit(
-                f"Error: No se encuentra {filename} en data/staging/. "
-                f"Corre el extractor primero: python src/extractors/{extractor}"
-            )
-
-    comunas_metadata = load_metadata(COMUNAS_METADATA_PATH)
-    indicadores_metadata = load_metadata(INDICADORES_METADATA_PATH)
-    censo_metadata = load_metadata(CENSO_METADATA_PATH)
-    salud_metadata = load_metadata(SALUD_METADATA_PATH)
-    censo_hogares_metadata = load_metadata(CENSO_HOGARES_METADATA_PATH)
-    electoral_metadata = load_metadata(ELECTORAL_METADATA_PATH)
-    educacionales_metadata = load_metadata(
-        os.path.join(STAGING_DIR, "establecimientos_educacionales.metadata.json")
-    )
-    finanzas_metadata = load_metadata(FINANZAS_METADATA_PATH)
-    resultados_educacionales_metadata = load_metadata(RESULTADOS_EDUCACIONALES_METADATA_PATH)
-    siedu_metadata = load_metadata(SIEDU_METADATA_PATH)
-    empresas_metadata = (
-        load_metadata(EMPRESAS_METADATA_PATH) if os.path.exists(EMPRESAS_METADATA_PATH) else None
-    )
-    pobreza_comunal_metadata = (
-        load_metadata(POBREZA_COMUNAL_METADATA_PATH)
-        if os.path.exists(POBREZA_COMUNAL_METADATA_PATH)
-        else None
-    )
-    consumo_electrico_metadata = (
-        load_metadata(CONSUMO_ELECTRICO_COMUNAL_METADATA_PATH)
-        if os.path.exists(CONSUMO_ELECTRICO_COMUNAL_METADATA_PATH)
-        else None
-    )
-    partidos_politicos_metadata = (
-        load_metadata(PARTIDOS_POLITICOS_METADATA_PATH)
-        if os.path.exists(PARTIDOS_POLITICOS_METADATA_PATH)
-        else None
-    )
-    autoridades_electas_metadata = (
-        load_metadata(AUTORIDADES_ELECTAS_METADATA_PATH)
-        if os.path.exists(AUTORIDADES_ELECTAS_METADATA_PATH)
-        else None
-    )
-    estadisticas_vitales_metadata = (
-        load_metadata(ESTADISTICAS_VITALES_METADATA_PATH)
-        if os.path.exists(ESTADISTICAS_VITALES_METADATA_PATH)
-        else None
-    )
-    permisos_edificacion_metadata = (
-        load_metadata(PERMISOS_EDIFICACION_METADATA_PATH)
-        if os.path.exists(PERMISOS_EDIFICACION_METADATA_PATH)
-        else None
-    )
-    calidad_aire_metadata = (
-        load_metadata(CALIDAD_AIRE_METADATA_PATH)
-        if os.path.exists(CALIDAD_AIRE_METADATA_PATH)
-        else None
-    )
-
-    metadata_files = [
-        ("comunas", comunas_metadata, "subdere_extractor.py"),
-        ("indicadores", indicadores_metadata, "bcentral_extractor.py"),
-        ("censo_comunal", censo_metadata, "censo_extractor.py"),
-        ("establecimientos_salud", salud_metadata, "salud_extractor.py"),
-        ("censo_hogares_viviendas", censo_hogares_metadata, "censo_hogares_viviendas_extractor.py"),
-        ("distritos_electorales", electoral_metadata, "electoral_extractor.py"),
-        (
-            "establecimientos_educacionales",
-            educacionales_metadata,
-            "mineduc_establecimientos_extractor.py",
-        ),
-        ("finanzas_municipales", finanzas_metadata, "sinim_finanzas_extractor.py"),
-        (
-            "resultados_educacionales",
-            resultados_educacionales_metadata,
-            "mineduc_resultados_extractor.py",
-        ),
-        ("indicadores_urbanos_siedu", siedu_metadata, "siedu_extractor.py"),
-    ]
-    for name, meta, extractor in metadata_files:
-        if meta is None:
-            raise SystemExit(
-                f"Error: No se encuentran los metadatos para {name} en data/staging/. "
-                f"Corre el extractor primero: python src/extractors/{extractor}"
-            )
-    indicadores_metadata["indicator_codes"] = sorted(
-        df_code for df_code in indicadores_metadata.get("indicator_codes", [])
-    )
-    indicadores_metadata["indicator_delivery"] = build_indicator_delivery(indicadores_metadata)
-
-    # Cargar datos desde staging
-    # Especificamos explícitamente el tipo de dato de los códigos a String para no perder ceros
-    df_comunas = pl.read_csv(comunas_csv, schema_overrides=STAGING_SCHEMAS["comunas"])
-
-    df_indicadores = pl.read_csv(
-        indicadores_csv, schema_overrides=STAGING_SCHEMAS["indicadores"]
-    ).with_columns(pl.col("fecha").str.to_date("%Y-%m-%d"))
-    df_censo = pl.read_csv(censo_csv, schema_overrides=STAGING_SCHEMAS["censo_comunal"])
-    df_salud = pl.read_csv(salud_csv, schema_overrides=STAGING_SCHEMAS["establecimientos_salud"])
-    df_censo_hogares = pl.read_csv(
-        censo_hogares_csv, schema_overrides=STAGING_SCHEMAS["censo_hogares_viviendas"]
-    )
-    df_electoral = pl.read_csv(
-        electoral_csv, schema_overrides=STAGING_SCHEMAS["distritos_electorales"]
-    )
-    df_educacionales = pl.read_csv(
-        educacionales_csv, schema_overrides=STAGING_SCHEMAS["establecimientos_educacionales"]
-    )
-    df_finanzas = pl.read_csv(
-        finanzas_csv, schema_overrides=STAGING_SCHEMAS["finanzas_municipales"]
-    )
-    df_resultados_educacionales = pl.read_csv(
-        resultados_educacionales_csv,
-        schema_overrides=STAGING_SCHEMAS["resultados_educacionales"],
-    )
-    df_siedu = pl.read_csv(siedu_csv, schema_overrides=STAGING_SCHEMAS["indicadores_urbanos_siedu"])
-
-    # Empresas: dataset opcional (nuevo, puede no existir en builds anteriores)
-    df_empresas = None
-    if os.path.exists(empresas_csv) and empresas_metadata is not None:
-        df_empresas = apply_date_casts(
-            pl.read_csv(empresas_csv, schema_overrides=STAGING_SCHEMAS["empresas"]), "empresas"
-        )
-        log.info("dataset_loaded", dataset="empresas", records=df_empresas.height)
-    else:
-        log.info("dataset_skipped", dataset="empresas", reason="not_found_in_staging")
-
-    # Pobreza comunal: dataset opcional (nuevo, puede no existir en builds anteriores)
-    df_pobreza_comunal = None
-    if os.path.exists(pobreza_comunal_csv) and pobreza_comunal_metadata is not None:
-        df_pobreza_comunal = pl.read_csv(
-            pobreza_comunal_csv, schema_overrides=STAGING_SCHEMAS["pobreza_comunal"]
-        )
-        log.info("dataset_loaded", dataset="pobreza_comunal", records=df_pobreza_comunal.height)
-    else:
-        log.info("dataset_skipped", dataset="pobreza_comunal", reason="not_found_in_staging")
-
-    # Consumo eléctrico: dataset opcional (nuevo)
-    df_consumo_electrico = None
-    if os.path.exists(consumo_electrico_csv) and consumo_electrico_metadata is not None:
-        df_consumo_electrico = pl.read_csv(
-            consumo_electrico_csv, schema_overrides=STAGING_SCHEMAS["consumo_electrico_comunal"]
-        )
-        log.info(
-            "dataset_loaded",
-            dataset="consumo_electrico_comunal",
-            records=df_consumo_electrico.height,
-        )
-    else:
-        log.info(
-            "dataset_skipped",
-            dataset="consumo_electrico_comunal",
-            reason="not_found_in_staging",
-        )
-
-    # Partidos políticos: dataset opcional (nuevo)
-    df_partidos_politicos = None
-    if os.path.exists(partidos_politicos_csv) and partidos_politicos_metadata is not None:
-        df_partidos_politicos = pl.read_csv(partidos_politicos_csv, infer_schema_length=None)
-        log.info(
-            "dataset_loaded",
-            dataset="partidos_politicos",
-            records=df_partidos_politicos.height,
-        )
-    else:
-        log.info("dataset_skipped", dataset="partidos_politicos", reason="not_found_in_staging")
-
-    # Autoridades electas: dataset opcional (nuevo)
-    df_autoridades_electas = None
-    if os.path.exists(autoridades_electas_csv) and autoridades_electas_metadata is not None:
-        df_autoridades_electas = pl.read_csv(
-            autoridades_electas_csv, schema_overrides=STAGING_SCHEMAS["autoridades_electas"]
-        )
-        log.info(
-            "dataset_loaded",
-            dataset="autoridades_electas",
-            records=df_autoridades_electas.height,
-        )
-    else:
-        log.info("dataset_skipped", dataset="autoridades_electas", reason="not_found_in_staging")
-
-    # Estadísticas vitales: dataset opcional (nuevo)
-    df_estadisticas_vitales = None
-    if os.path.exists(estadisticas_vitales_csv) and estadisticas_vitales_metadata is not None:
-        df_estadisticas_vitales = pl.read_csv(
-            estadisticas_vitales_csv, schema_overrides=STAGING_SCHEMAS["estadisticas_vitales"]
-        )
-        log.info(
-            "dataset_loaded",
-            dataset="estadisticas_vitales",
-            records=df_estadisticas_vitales.height,
-        )
-    else:
-        log.info("dataset_skipped", dataset="estadisticas_vitales", reason="not_found_in_staging")
-
-    # Permisos de edificación: dataset opcional (nuevo)
-    df_permisos_edificacion = None
-    if os.path.exists(permisos_edificacion_csv) and permisos_edificacion_metadata is not None:
-        df_permisos_edificacion = pl.read_csv(
-            permisos_edificacion_csv, schema_overrides=STAGING_SCHEMAS["permisos_edificacion"]
-        )
-        log.info(
-            "dataset_loaded",
-            dataset="permisos_edificacion",
-            records=df_permisos_edificacion.height,
-        )
-    else:
-        log.info("dataset_skipped", dataset="permisos_edificacion", reason="not_found_in_staging")
-
-    # Calidad del aire: dataset opcional (nuevo)
-    df_calidad_aire = None
-    if os.path.exists(calidad_aire_csv) and calidad_aire_metadata is not None:
-        df_calidad_aire = pl.read_csv(
-            calidad_aire_csv, schema_overrides=STAGING_SCHEMAS["calidad_aire"]
-        )
-        log.info(
-            "dataset_loaded",
-            dataset="calidad_aire",
-            records=df_calidad_aire.height,
-        )
-    else:
-        log.info("dataset_skipped", dataset="calidad_aire", reason="not_found_in_staging")
-
-    # Nota (Plan 091, revertido dos veces): NO fallar por opcionales ausentes
-    # o a medio-estado aquí. El harness offline sanciona CSV-sin-metadata como
-    # configuración legítima (las constantes *_METADATA_PATH ni siquiera se
-    # parchean en tests) y la garantía Phase-1 es "omitted optional does not
-    # block a core build". El gate estricto vive en verify_pipeline.py
-    # --profile publication (missing/non-live/stale). Ver ROADMAP.
-    df_regiones, df_provincias = derive_geography_layers(df_comunas)
-    df_perfil_territorial = build_perfil_territorial_comunal(
-        df_comunas,
-        df_censo,
-        df_censo_hogares,
-        df_salud,
-        df_educacionales,
-        df_electoral,
-        df_finanzas,
-        df_resultados_educacionales,
-        df_siedu,
-        df_vitales=df_estadisticas_vitales,
-        df_permisos=df_permisos_edificacion,
-        df_calidad=df_calidad_aire,
-    )
-
-    dfs = {
-        "comunas": df_comunas,
-        "indicadores": df_indicadores,
-        "censo": df_censo,
-        "salud": df_salud,
-        "censo_hogares": df_censo_hogares,
-        "electoral": df_electoral,
-        "educacionales": df_educacionales,
-        "finanzas": df_finanzas,
-        "resultados_educacionales": df_resultados_educacionales,
-        "siedu": df_siedu,
-        "empresas": df_empresas,
-        "pobreza_comunal": df_pobreza_comunal,
-        "consumo_electrico": df_consumo_electrico,
-        "partidos_politicos": df_partidos_politicos,
-        "autoridades_electas": df_autoridades_electas,
-        "estadisticas_vitales": df_estadisticas_vitales,
-        "permisos_edificacion": df_permisos_edificacion,
-        "calidad_aire": df_calidad_aire,
-        "regiones": df_regiones,
-        "provincias": df_provincias,
-        "perfil_territorial": df_perfil_territorial,
-    }
-    meta = {
-        "comunas": comunas_metadata,
-        "indicadores": indicadores_metadata,
-        "censo": censo_metadata,
-        "salud": salud_metadata,
-        "censo_hogares": censo_hogares_metadata,
-        "electoral": electoral_metadata,
-        "educacionales": educacionales_metadata,
-        "finanzas": finanzas_metadata,
-        "resultados_educacionales": resultados_educacionales_metadata,
-        "siedu": siedu_metadata,
-        "empresas": empresas_metadata,
-        "pobreza_comunal": pobreza_comunal_metadata,
-        "consumo_electrico": consumo_electrico_metadata,
-        "partidos_politicos": partidos_politicos_metadata,
-        "autoridades_electas": autoridades_electas_metadata,
-        "estadisticas_vitales": estadisticas_vitales_metadata,
-        "permisos_edificacion": permisos_edificacion_metadata,
-        "calidad_aire": calidad_aire_metadata,
-    }
-    return dfs, meta, previous_pipeline_metadata
+    Fachada de `src.builders.inputs.load_staging_inputs` (plan 132a): pasa los
+    globales del módulo para preservar los overrides de los tests de
+    caracterización (`patch.multiple` sobre STAGING_DIR/NORMALIZED_DIR).
+    """
+    return load_staging_inputs(STAGING_DIR, NORMALIZED_DIR)
 
 
 def _compute_validations(dfs, meta):
