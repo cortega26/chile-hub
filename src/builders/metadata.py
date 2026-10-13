@@ -397,445 +397,232 @@ def enrich_dataset_metadata(dataset_metadata, validations):
     return enriched
 
 
+def _enriched_entry(
+    dataset,
+    catalog_key,
+    base_metadata,
+    df,
+    *,
+    include_dataset=True,
+    alias_for=None,
+    include_reuse=True,
+    extra=None,
+    trailing_extra=None,
+):
+    """Entrada enriquecida estándar (Plan 132c, auditoría 2026-10-13).
+
+    Reproduce el orden de claves del dict original (el artefacto es publicado):
+    base → [dataset] → [alias_for] → record_count → fields → [extra] →
+    [reuse_policy] → freshness → [trailing_extra].
+    """
+    entry: dict = {**base_metadata}
+    if include_dataset:
+        entry["dataset"] = dataset
+    if alias_for is not None:
+        entry["alias_for"] = alias_for
+    entry["record_count"] = df.height
+    entry["fields"] = df.columns
+    if extra:
+        entry.update(extra)
+    if include_reuse:
+        entry["reuse_policy"] = DATASET_CATALOG_CONFIG[catalog_key]["reuse_policy"]
+    entry["freshness"] = build_freshness(
+        base_metadata.get("refreshed_at_utc"),
+        DATASET_CATALOG_CONFIG[catalog_key]["freshness_policy"]["max_age_hours"],
+    )
+    if trailing_extra:
+        entry.update(trailing_extra)
+    return entry
+
+
+def _optional_dataset_entry(
+    name,
+    df,
+    base_metadata,
+    *,
+    source_detail_default="",
+    require_metadata=True,
+):
+    """Entrada de un dataset opcional; `{}` si el insumo no está (Plan 091).
+
+    Con `require_metadata=False` reproduce el caso `empresas`: el original solo
+    exige el frame (la metadata se asume presente cuando el frame lo está).
+    """
+    if df is None or (require_metadata and base_metadata is None):
+        return {}
+    return {
+        name: {
+            "dataset": name,
+            "source_name": base_metadata.get("source_name", ""),
+            "source_url": base_metadata.get("source_url", ""),
+            "source_mode": base_metadata.get("source_mode", "fallback"),
+            "source_detail": base_metadata.get("source_detail", source_detail_default),
+            "refreshed_at_utc": base_metadata.get("refreshed_at_utc", ""),
+            "record_count": df.height,
+            "fields": df.columns,
+            "notes": base_metadata.get("notes", []),
+            "reuse_policy": DATASET_CATALOG_CONFIG[name]["reuse_policy"],
+            "freshness": build_freshness(
+                base_metadata.get("refreshed_at_utc", ""),
+                DATASET_CATALOG_CONFIG[name]["freshness_policy"]["max_age_hours"],
+            ),
+        }
+    }
+
+
+def _metadata_perfil_territorial(dfs, meta):
+    """Perfil territorial: capa derivada.
+
+    `source_mode` es "live" solo si TODOS los upstreams lo son de verdad:
+    "monthly" es fuente genuina (ver NON_FALLBACK_SOURCE_MODES y ADR-014), no
+    un respaldo hardcodeado.
+    """
+    upstreams = (
+        meta["comunas"],
+        meta["censo"],
+        meta["censo_hogares"],
+        meta["salud"],
+        meta["electoral"],
+        meta["educacionales"],
+        meta["finanzas"],
+        meta["resultados_educacionales"],
+        meta["siedu"],
+    )
+    return {
+        "dataset": "perfil_territorial_comunal",
+        "source_name": "chile-hub",
+        "source_url": "https://github.com/cortega26/chile-hub",
+        "source_mode": "live"
+        if all(metadata.get("source_mode") in NON_FALLBACK_SOURCE_MODES for metadata in upstreams)
+        else "fallback",
+        "source_detail": "derived_from_validated_chile_hub_layers",
+        "refreshed_at_utc": datetime.now(UTC).isoformat(),
+        "record_count": dfs["perfil_territorial"].height,
+        "fields": dfs["perfil_territorial"].columns,
+        "notes": [
+            "derived_dataset",
+            "upstreams: comunas,censo_comunal,censo_hogares_viviendas,establecimientos_salud,establecimientos_educacionales,distritos_electorales,finanzas_municipales,resultados_educacionales,indicadores_urbanos_siedu",
+        ],
+        "reuse_policy": DATASET_CATALOG_CONFIG["perfil_territorial_comunal"]["reuse_policy"],
+        "freshness": build_freshness(
+            datetime.now(UTC).isoformat(),
+            DATASET_CATALOG_CONFIG["perfil_territorial_comunal"]["freshness_policy"][
+                "max_age_hours"
+            ],
+        ),
+    }
+
+
 def build_dataset_metadata(dfs, meta):
-    """Construye el diccionario de metadatos enriquecidos por dataset."""
-    df_comunas = dfs["comunas"]
-    df_indicadores = dfs["indicadores"]
-    _indicador_max_dates, _indicador_ages = build_indicator_ages(df_indicadores)
-    df_censo = dfs["censo"]
-    df_salud = dfs["salud"]
-    df_censo_hogares = dfs["censo_hogares"]
-    df_electoral = dfs["electoral"]
-    df_educacionales = dfs["educacionales"]
-    df_finanzas = dfs["finanzas"]
-    df_resultados_educacionales = dfs["resultados_educacionales"]
-    df_siedu = dfs["siedu"]
-    df_empresas = dfs["empresas"]
-    df_pobreza_comunal = dfs["pobreza_comunal"]
-    df_consumo_electrico = dfs["consumo_electrico"]
-    df_partidos_politicos = dfs["partidos_politicos"]
-    df_autoridades_electas = dfs["autoridades_electas"]
-    df_estadisticas_vitales = dfs["estadisticas_vitales"]
-    df_permisos_edificacion = dfs["permisos_edificacion"]
-    df_calidad_aire = dfs["calidad_aire"]
-    df_regiones = dfs["regiones"]
-    df_provincias = dfs["provincias"]
-    df_perfil_territorial = dfs["perfil_territorial"]
-    comunas_metadata = meta["comunas"]
-    indicadores_metadata = meta["indicadores"]
-    censo_metadata = meta["censo"]
-    salud_metadata = meta["salud"]
-    censo_hogares_metadata = meta["censo_hogares"]
-    electoral_metadata = meta["electoral"]
-    educacionales_metadata = meta["educacionales"]
-    finanzas_metadata = meta["finanzas"]
-    resultados_educacionales_metadata = meta["resultados_educacionales"]
-    siedu_metadata = meta["siedu"]
-    empresas_metadata = meta["empresas"]
-    pobreza_comunal_metadata = meta["pobreza_comunal"]
-    consumo_electrico_metadata = meta["consumo_electrico"]
-    partidos_politicos_metadata = meta["partidos_politicos"]
-    autoridades_electas_metadata = meta["autoridades_electas"]
-    estadisticas_vitales_metadata = meta["estadisticas_vitales"]
-    permisos_edificacion_metadata = meta["permisos_edificacion"]
-    calidad_aire_metadata = meta["calidad_aire"]
+    """Construye el diccionario de metadatos enriquecidos por dataset.
+
+    Plan 132c (auditoría 2026-10-13): el bloque original de 443 líneas se
+    descompone en helpers por patrón (`_enriched_entry`,
+    `_optional_dataset_entry`, `_metadata_perfil_territorial`); este
+    orquestador conserva el ORDEN de las claves del dict original.
+    """
+    indicador_codes = sorted(dfs["indicadores"]["codigo_indicador"].unique().to_list())
+    indicador_max_dates, indicador_ages = build_indicator_ages(dfs["indicadores"])
 
     return {
-        "regiones": {
-            **comunas_metadata,
-            "dataset": "regiones",
-            "record_count": df_regiones.height,
-            "fields": df_regiones.columns,
-            "reuse_policy": DATASET_CATALOG_CONFIG["regiones"]["reuse_policy"],
-            "freshness": build_freshness(
-                comunas_metadata.get("refreshed_at_utc"),
-                DATASET_CATALOG_CONFIG["regiones"]["freshness_policy"]["max_age_hours"],
-            ),
-        },
-        "provincias": {
-            **comunas_metadata,
-            "dataset": "provincias",
-            "record_count": df_provincias.height,
-            "fields": df_provincias.columns,
-            "reuse_policy": DATASET_CATALOG_CONFIG["provincias"]["reuse_policy"],
-            "freshness": build_freshness(
-                comunas_metadata.get("refreshed_at_utc"),
-                DATASET_CATALOG_CONFIG["provincias"]["freshness_policy"]["max_age_hours"],
-            ),
-        },
-        "comunas": {
-            **comunas_metadata,
-            "dataset": "comunas",
-            "record_count": df_comunas.height,
-            "fields": df_comunas.columns,
-            "reuse_policy": DATASET_CATALOG_CONFIG["comunas"]["reuse_policy"],
-            "freshness": build_freshness(
-                comunas_metadata.get("refreshed_at_utc"),
-                DATASET_CATALOG_CONFIG["comunas"]["freshness_policy"]["max_age_hours"],
-            ),
-        },
-        "comunas_enriquecidas": {
-            **comunas_metadata,
-            "dataset": "comunas_enriquecidas",
-            "alias_for": "comunas",
-            "record_count": df_comunas.height,
-            "fields": df_comunas.columns,
-            "reuse_policy": DATASET_CATALOG_CONFIG["comunas"]["reuse_policy"],
-            "freshness": build_freshness(
-                comunas_metadata.get("refreshed_at_utc"),
-                DATASET_CATALOG_CONFIG["comunas"]["freshness_policy"]["max_age_hours"],
-            ),
-        },
-        "indicadores": {
-            **indicadores_metadata,
-            "dataset": "indicadores",
-            "record_count": df_indicadores.height,
-            "fields": df_indicadores.columns,
-            "indicator_codes": sorted(df_indicadores["codigo_indicador"].unique().to_list()),
-            "indicator_max_date": _indicador_max_dates,
-            "indicator_age_days": _indicador_ages,
-            "indicator_delivery": build_indicator_delivery(
-                {
-                    **indicadores_metadata,
-                    "indicator_codes": sorted(
-                        df_indicadores["codigo_indicador"].unique().to_list()
-                    ),
-                }
-            ),
-            "reuse_policy": DATASET_CATALOG_CONFIG["indicadores"]["reuse_policy"],
-            "freshness": build_freshness(
-                indicadores_metadata.get("refreshed_at_utc"),
-                DATASET_CATALOG_CONFIG["indicadores"]["freshness_policy"]["max_age_hours"],
-            ),
-        },
-        "censo_comunal": {
-            **censo_metadata,
-            "dataset": "censo_comunal",
-            "record_count": df_censo.height,
-            "fields": df_censo.columns,
-            "reuse_policy": DATASET_CATALOG_CONFIG["censo_comunal"]["reuse_policy"],
-            "freshness": build_freshness(
-                censo_metadata.get("refreshed_at_utc"),
-                DATASET_CATALOG_CONFIG["censo_comunal"]["freshness_policy"]["max_age_hours"],
-            ),
-        },
-        "establecimientos_salud": {
-            **salud_metadata,
-            "dataset": "establecimientos_salud",
-            "record_count": df_salud.height,
-            "fields": df_salud.columns,
-            "reuse_policy": DATASET_CATALOG_CONFIG["establecimientos_salud"]["reuse_policy"],
-            "freshness": build_freshness(
-                salud_metadata.get("refreshed_at_utc"),
-                DATASET_CATALOG_CONFIG["establecimientos_salud"]["freshness_policy"][
-                    "max_age_hours"
-                ],
-            ),
-        },
-        "establecimientos_educacionales": {
-            **educacionales_metadata,
-            "dataset": "establecimientos_educacionales",
-            "record_count": df_educacionales.height,
-            "fields": df_educacionales.columns,
-            "reuse_policy": DATASET_CATALOG_CONFIG["establecimientos_educacionales"][
-                "reuse_policy"
-            ],
-            "freshness": build_freshness(
-                educacionales_metadata.get("refreshed_at_utc"),
-                DATASET_CATALOG_CONFIG["establecimientos_educacionales"]["freshness_policy"][
-                    "max_age_hours"
-                ],
-            ),
-        },
-        "censo_hogares_viviendas": {
-            **censo_hogares_metadata,
-            "record_count": df_censo_hogares.height,
-            "fields": df_censo_hogares.columns,
-            "freshness": build_freshness(
-                censo_hogares_metadata.get("refreshed_at_utc"),
-                DATASET_CATALOG_CONFIG["censo_hogares_viviendas"]["freshness_policy"][
-                    "max_age_hours"
-                ],
-            ),
-        },
-        "distritos_electorales": {
-            **electoral_metadata,
-            "record_count": df_electoral.height,
-            "fields": df_electoral.columns,
-            "freshness": build_freshness(
-                electoral_metadata.get("refreshed_at_utc"),
-                DATASET_CATALOG_CONFIG["distritos_electorales"]["freshness_policy"][
-                    "max_age_hours"
-                ],
-            ),
-        },
-        "finanzas_municipales": {
-            **finanzas_metadata,
-            "dataset": "finanzas_municipales",
-            "record_count": df_finanzas.height,
-            "fields": df_finanzas.columns,
-            "reuse_policy": DATASET_CATALOG_CONFIG["finanzas_municipales"]["reuse_policy"],
-            "freshness": build_freshness(
-                finanzas_metadata.get("refreshed_at_utc"),
-                DATASET_CATALOG_CONFIG["finanzas_municipales"]["freshness_policy"]["max_age_hours"],
-            ),
-        },
-        "resultados_educacionales": {
-            **resultados_educacionales_metadata,
-            "dataset": "resultados_educacionales",
-            "record_count": df_resultados_educacionales.height,
-            "fields": df_resultados_educacionales.columns,
-            "reuse_policy": DATASET_CATALOG_CONFIG["resultados_educacionales"]["reuse_policy"],
-            "freshness": build_freshness(
-                resultados_educacionales_metadata.get("refreshed_at_utc"),
-                DATASET_CATALOG_CONFIG["resultados_educacionales"]["freshness_policy"][
-                    "max_age_hours"
-                ],
-            ),
-        },
-        "indicadores_urbanos_siedu": {
-            **siedu_metadata,
-            "dataset": "indicadores_urbanos_siedu",
-            "record_count": df_siedu.height,
-            "fields": df_siedu.columns,
-            "reuse_policy": DATASET_CATALOG_CONFIG["indicadores_urbanos_siedu"]["reuse_policy"],
-            "freshness": build_freshness(
-                siedu_metadata.get("refreshed_at_utc"),
-                DATASET_CATALOG_CONFIG["indicadores_urbanos_siedu"]["freshness_policy"][
-                    "max_age_hours"
-                ],
-            ),
-            "coverage": siedu_metadata.get("coverage", {}),
-        },
-        "perfil_territorial_comunal": {
-            "dataset": "perfil_territorial_comunal",
-            "source_name": "chile-hub",
-            "source_url": "https://github.com/cortega26/chile-hub",
-            # Una capa derivada sólo es "fallback" si algún upstream lo es de
-            # verdad: "monthly" es fuente genuina (ver NON_FALLBACK_SOURCE_MODES
-            # y ADR-014), no un respaldo hardcodeado.
-            "source_mode": "live"
-            if all(
-                metadata.get("source_mode") in NON_FALLBACK_SOURCE_MODES
-                for metadata in (
-                    comunas_metadata,
-                    censo_metadata,
-                    censo_hogares_metadata,
-                    salud_metadata,
-                    electoral_metadata,
-                    educacionales_metadata,
-                    finanzas_metadata,
-                    resultados_educacionales_metadata,
-                    siedu_metadata,
-                )
-            )
-            else "fallback",
-            "source_detail": "derived_from_validated_chile_hub_layers",
-            "refreshed_at_utc": datetime.now(UTC).isoformat(),
-            "record_count": df_perfil_territorial.height,
-            "fields": df_perfil_territorial.columns,
-            "notes": [
-                "derived_dataset",
-                "upstreams: comunas,censo_comunal,censo_hogares_viviendas,establecimientos_salud,establecimientos_educacionales,distritos_electorales,finanzas_municipales,resultados_educacionales,indicadores_urbanos_siedu",
-            ],
-            "reuse_policy": DATASET_CATALOG_CONFIG["perfil_territorial_comunal"]["reuse_policy"],
-            "freshness": build_freshness(
-                datetime.now(UTC).isoformat(),
-                DATASET_CATALOG_CONFIG["perfil_territorial_comunal"]["freshness_policy"][
-                    "max_age_hours"
-                ],
-            ),
-        },
-        **(
-            {
-                "empresas": {
-                    "dataset": "empresas",
-                    "source_name": empresas_metadata.get("source_name", ""),
-                    "source_url": empresas_metadata.get("source_url", ""),
-                    "source_mode": empresas_metadata.get("source_mode", "fallback"),
-                    "source_detail": empresas_metadata.get(
-                        "source_detail", "datos_gob_cl_ckan_api"
-                    ),
-                    "refreshed_at_utc": empresas_metadata.get("refreshed_at_utc", ""),
-                    "record_count": df_empresas.height,
-                    "fields": df_empresas.columns,
-                    "notes": empresas_metadata.get("notes", []),
-                    "reuse_policy": DATASET_CATALOG_CONFIG["empresas"]["reuse_policy"],
-                    "freshness": build_freshness(
-                        empresas_metadata.get("refreshed_at_utc", ""),
-                        DATASET_CATALOG_CONFIG["empresas"]["freshness_policy"]["max_age_hours"],
-                    ),
-                }
-            }
-            if df_empresas is not None
-            else {}
+        "regiones": _enriched_entry("regiones", "regiones", meta["comunas"], dfs["regiones"]),
+        "provincias": _enriched_entry(
+            "provincias", "provincias", meta["comunas"], dfs["provincias"]
         ),
-        **(
-            {
-                "pobreza_comunal": {
-                    "dataset": "pobreza_comunal",
-                    "source_name": pobreza_comunal_metadata.get("source_name", ""),
-                    "source_url": pobreza_comunal_metadata.get("source_url", ""),
-                    "source_mode": pobreza_comunal_metadata.get("source_mode", "fallback"),
-                    "source_detail": pobreza_comunal_metadata.get("source_detail", ""),
-                    "refreshed_at_utc": pobreza_comunal_metadata.get("refreshed_at_utc", ""),
-                    "record_count": df_pobreza_comunal.height,
-                    "fields": df_pobreza_comunal.columns,
-                    "notes": pobreza_comunal_metadata.get("notes", []),
-                    "reuse_policy": DATASET_CATALOG_CONFIG["pobreza_comunal"]["reuse_policy"],
-                    "freshness": build_freshness(
-                        pobreza_comunal_metadata.get("refreshed_at_utc", ""),
-                        DATASET_CATALOG_CONFIG["pobreza_comunal"]["freshness_policy"][
-                            "max_age_hours"
-                        ],
-                    ),
-                }
-            }
-            if df_pobreza_comunal is not None and pobreza_comunal_metadata is not None
-            else {}
+        "comunas": _enriched_entry("comunas", "comunas", meta["comunas"], dfs["comunas"]),
+        "comunas_enriquecidas": _enriched_entry(
+            "comunas_enriquecidas",
+            "comunas",
+            meta["comunas"],
+            dfs["comunas"],
+            alias_for="comunas",
         ),
-        **(
-            {
-                "consumo_electrico_comunal": {
-                    "dataset": "consumo_electrico_comunal",
-                    "source_name": consumo_electrico_metadata.get("source_name", ""),
-                    "source_url": consumo_electrico_metadata.get("source_url", ""),
-                    "source_mode": consumo_electrico_metadata.get("source_mode", "fallback"),
-                    "source_detail": consumo_electrico_metadata.get("source_detail", ""),
-                    "refreshed_at_utc": consumo_electrico_metadata.get("refreshed_at_utc", ""),
-                    "record_count": df_consumo_electrico.height,
-                    "fields": df_consumo_electrico.columns,
-                    "notes": consumo_electrico_metadata.get("notes", []),
-                    "reuse_policy": DATASET_CATALOG_CONFIG["consumo_electrico_comunal"][
-                        "reuse_policy"
-                    ],
-                    "freshness": build_freshness(
-                        consumo_electrico_metadata.get("refreshed_at_utc", ""),
-                        DATASET_CATALOG_CONFIG["consumo_electrico_comunal"]["freshness_policy"][
-                            "max_age_hours"
-                        ],
-                    ),
-                }
-            }
-            if df_consumo_electrico is not None and consumo_electrico_metadata is not None
-            else {}
+        "indicadores": _enriched_entry(
+            "indicadores",
+            "indicadores",
+            meta["indicadores"],
+            dfs["indicadores"],
+            extra={
+                "indicator_codes": indicador_codes,
+                "indicator_max_date": indicador_max_dates,
+                "indicator_age_days": indicador_ages,
+                "indicator_delivery": build_indicator_delivery(
+                    {**meta["indicadores"], "indicator_codes": indicador_codes}
+                ),
+            },
         ),
-        **(
-            {
-                "partidos_politicos": {
-                    "dataset": "partidos_politicos",
-                    "source_name": partidos_politicos_metadata.get("source_name", ""),
-                    "source_url": partidos_politicos_metadata.get("source_url", ""),
-                    "source_mode": partidos_politicos_metadata.get("source_mode", "fallback"),
-                    "source_detail": partidos_politicos_metadata.get("source_detail", ""),
-                    "refreshed_at_utc": partidos_politicos_metadata.get("refreshed_at_utc", ""),
-                    "record_count": df_partidos_politicos.height,
-                    "fields": df_partidos_politicos.columns,
-                    "notes": partidos_politicos_metadata.get("notes", []),
-                    "reuse_policy": DATASET_CATALOG_CONFIG["partidos_politicos"]["reuse_policy"],
-                    "freshness": build_freshness(
-                        partidos_politicos_metadata.get("refreshed_at_utc", ""),
-                        DATASET_CATALOG_CONFIG["partidos_politicos"]["freshness_policy"][
-                            "max_age_hours"
-                        ],
-                    ),
-                }
-            }
-            if df_partidos_politicos is not None and partidos_politicos_metadata is not None
-            else {}
+        "censo_comunal": _enriched_entry(
+            "censo_comunal", "censo_comunal", meta["censo"], dfs["censo"]
         ),
-        **(
-            {
-                "autoridades_electas": {
-                    "dataset": "autoridades_electas",
-                    "source_name": autoridades_electas_metadata.get("source_name", ""),
-                    "source_url": autoridades_electas_metadata.get("source_url", ""),
-                    "source_mode": autoridades_electas_metadata.get("source_mode", "fallback"),
-                    "source_detail": autoridades_electas_metadata.get("source_detail", ""),
-                    "refreshed_at_utc": autoridades_electas_metadata.get("refreshed_at_utc", ""),
-                    "record_count": df_autoridades_electas.height,
-                    "fields": df_autoridades_electas.columns,
-                    "notes": autoridades_electas_metadata.get("notes", []),
-                    "reuse_policy": DATASET_CATALOG_CONFIG["autoridades_electas"]["reuse_policy"],
-                    "freshness": build_freshness(
-                        autoridades_electas_metadata.get("refreshed_at_utc", ""),
-                        DATASET_CATALOG_CONFIG["autoridades_electas"]["freshness_policy"][
-                            "max_age_hours"
-                        ],
-                    ),
-                }
-            }
-            if df_autoridades_electas is not None and autoridades_electas_metadata is not None
-            else {}
+        "establecimientos_salud": _enriched_entry(
+            "establecimientos_salud",
+            "establecimientos_salud",
+            meta["salud"],
+            dfs["salud"],
         ),
-        **(
-            {
-                "estadisticas_vitales": {
-                    "dataset": "estadisticas_vitales",
-                    "source_name": estadisticas_vitales_metadata.get("source_name", ""),
-                    "source_url": estadisticas_vitales_metadata.get("source_url", ""),
-                    "source_mode": estadisticas_vitales_metadata.get("source_mode", "fallback"),
-                    "source_detail": estadisticas_vitales_metadata.get("source_detail", ""),
-                    "refreshed_at_utc": estadisticas_vitales_metadata.get("refreshed_at_utc", ""),
-                    "record_count": df_estadisticas_vitales.height,
-                    "fields": df_estadisticas_vitales.columns,
-                    "notes": estadisticas_vitales_metadata.get("notes", []),
-                    "reuse_policy": DATASET_CATALOG_CONFIG["estadisticas_vitales"]["reuse_policy"],
-                    "freshness": build_freshness(
-                        estadisticas_vitales_metadata.get("refreshed_at_utc", ""),
-                        DATASET_CATALOG_CONFIG["estadisticas_vitales"]["freshness_policy"][
-                            "max_age_hours"
-                        ],
-                    ),
-                }
-            }
-            if df_estadisticas_vitales is not None and estadisticas_vitales_metadata is not None
-            else {}
+        "establecimientos_educacionales": _enriched_entry(
+            "establecimientos_educacionales",
+            "establecimientos_educacionales",
+            meta["educacionales"],
+            dfs["educacionales"],
         ),
-        **(
-            {
-                "permisos_edificacion": {
-                    "dataset": "permisos_edificacion",
-                    "source_name": permisos_edificacion_metadata.get("source_name", ""),
-                    "source_url": permisos_edificacion_metadata.get("source_url", ""),
-                    "source_mode": permisos_edificacion_metadata.get("source_mode", "fallback"),
-                    "source_detail": permisos_edificacion_metadata.get("source_detail", ""),
-                    "refreshed_at_utc": permisos_edificacion_metadata.get("refreshed_at_utc", ""),
-                    "record_count": df_permisos_edificacion.height,
-                    "fields": df_permisos_edificacion.columns,
-                    "notes": permisos_edificacion_metadata.get("notes", []),
-                    "reuse_policy": DATASET_CATALOG_CONFIG["permisos_edificacion"]["reuse_policy"],
-                    "freshness": build_freshness(
-                        permisos_edificacion_metadata.get("refreshed_at_utc", ""),
-                        DATASET_CATALOG_CONFIG["permisos_edificacion"]["freshness_policy"][
-                            "max_age_hours"
-                        ],
-                    ),
-                }
-            }
-            if df_permisos_edificacion is not None and permisos_edificacion_metadata is not None
-            else {}
+        "censo_hogares_viviendas": _enriched_entry(
+            "censo_hogares_viviendas",
+            "censo_hogares_viviendas",
+            meta["censo_hogares"],
+            dfs["censo_hogares"],
+            include_dataset=False,
+            include_reuse=False,
         ),
-        **(
-            {
-                "calidad_aire": {
-                    "dataset": "calidad_aire",
-                    "source_name": calidad_aire_metadata.get("source_name", ""),
-                    "source_url": calidad_aire_metadata.get("source_url", ""),
-                    "source_mode": calidad_aire_metadata.get("source_mode", "fallback"),
-                    "source_detail": calidad_aire_metadata.get("source_detail", ""),
-                    "refreshed_at_utc": calidad_aire_metadata.get("refreshed_at_utc", ""),
-                    "record_count": df_calidad_aire.height,
-                    "fields": df_calidad_aire.columns,
-                    "notes": calidad_aire_metadata.get("notes", []),
-                    "reuse_policy": DATASET_CATALOG_CONFIG["calidad_aire"]["reuse_policy"],
-                    "freshness": build_freshness(
-                        calidad_aire_metadata.get("refreshed_at_utc", ""),
-                        DATASET_CATALOG_CONFIG["calidad_aire"]["freshness_policy"]["max_age_hours"],
-                    ),
-                }
-            }
-            if df_calidad_aire is not None and calidad_aire_metadata is not None
-            else {}
+        "distritos_electorales": _enriched_entry(
+            "distritos_electorales",
+            "distritos_electorales",
+            meta["electoral"],
+            dfs["electoral"],
+            include_dataset=False,
+            include_reuse=False,
         ),
+        "finanzas_municipales": _enriched_entry(
+            "finanzas_municipales", "finanzas_municipales", meta["finanzas"], dfs["finanzas"]
+        ),
+        "resultados_educacionales": _enriched_entry(
+            "resultados_educacionales",
+            "resultados_educacionales",
+            meta["resultados_educacionales"],
+            dfs["resultados_educacionales"],
+        ),
+        "indicadores_urbanos_siedu": _enriched_entry(
+            "indicadores_urbanos_siedu",
+            "indicadores_urbanos_siedu",
+            meta["siedu"],
+            dfs["siedu"],
+            trailing_extra={"coverage": meta["siedu"].get("coverage", {})},
+        ),
+        "perfil_territorial_comunal": _metadata_perfil_territorial(dfs, meta),
+        **_optional_dataset_entry(
+            "empresas",
+            dfs["empresas"],
+            meta["empresas"],
+            source_detail_default="datos_gob_cl_ckan_api",
+            require_metadata=False,
+        ),
+        **_optional_dataset_entry(
+            "pobreza_comunal", dfs["pobreza_comunal"], meta["pobreza_comunal"]
+        ),
+        **_optional_dataset_entry(
+            "consumo_electrico_comunal", dfs["consumo_electrico"], meta["consumo_electrico"]
+        ),
+        **_optional_dataset_entry(
+            "partidos_politicos", dfs["partidos_politicos"], meta["partidos_politicos"]
+        ),
+        **_optional_dataset_entry(
+            "autoridades_electas", dfs["autoridades_electas"], meta["autoridades_electas"]
+        ),
+        **_optional_dataset_entry(
+            "estadisticas_vitales", dfs["estadisticas_vitales"], meta["estadisticas_vitales"]
+        ),
+        **_optional_dataset_entry(
+            "permisos_edificacion", dfs["permisos_edificacion"], meta["permisos_edificacion"]
+        ),
+        **_optional_dataset_entry("calidad_aire", dfs["calidad_aire"], meta["calidad_aire"]),
     }
