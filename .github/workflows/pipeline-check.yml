@@ -452,7 +452,7 @@ jobs:
           done
 
       - name: Upload generated pipeline output
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ${{ env.PIPELINE_ARTIFACT }}
           # P1 de la review del PR #77 (write-races): index/app viajan en el
@@ -559,7 +559,7 @@ jobs:
 
       - name: Upload Lighthouse report
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: lighthouse-report
           path: /tmp/chile-hub-lighthouse.json
@@ -568,7 +568,7 @@ jobs:
 
       - name: Upload landing visual QA captures
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: landing-visual-qa
           path: /tmp/chile-hub-visual-qa/*.png
