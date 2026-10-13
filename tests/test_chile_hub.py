@@ -2040,7 +2040,9 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn('python-version: ["3.11", "3.12", "3.13", "3.14"]', self.workflow_text)
         self.assertNotIn('"3.10"', self.workflow_text)
         self.assertIn("uv build", self.workflow_text)
-        self.assertIn("uvx twine check dist/*", self.workflow_text)
+        # ADR-024: twine corre desde el lock (twine==7.0.0 del dev-pin), no
+        # con `uvx` sin versión que resolvía latest en cada corrida.
+        self.assertIn("uv run --frozen --extra dev twine check dist/*", self.workflow_text)
         self.assertIn(
             'python -c "from chile_hub import ChileHub; print(ChileHub)"', self.workflow_text
         )
