@@ -919,7 +919,7 @@ registry MCP (`54c1691`; `sync_server_json_version` en
 |---|------|----------|----------|--------|---------------------|--------|
 | 131 | [Correctitud y quick wins](131-audit-p0-correctitud-quick-wins.md) | P1 | S-M | LOW-MED | — | TODO |
 | 132 | [Descomposición pipeline build + CLI + C901](132-audit-decomposicion-pipeline-build.md) | P1 | M | MED | 131 | DONE (2026-10-13 — 132a #169, `build_hub_health` #170, `build_dataset_metadata` #171, CLI #172, `parse_dataset_spec` + trinquete C901 en este PR) |
-| 133 | [Extractores: fuente única + descomposición](133-audit-single-source-dry.md) | P2 | M-L | LOW-MED | 131; coordina con 132 (C901) | IN PROGRESS (2026-10-13: 133a DONE #174 — `FALLBACK_ROWS`/`SCHEMA` a fuente única; 133b — globales `_LAST_*` → retorno explícito, en este PR; pendiente: god functions `_parse_comuna_sheet`/`fetch_data`) |
+| 133 | [Extractores: fuente única + descomposición](133-audit-single-source-dry.md) | P2 | M-L | LOW-MED | 131; coordina con 132 (C901) | DONE (2026-10-13 — 133a #174: `FALLBACK_ROWS`/`SCHEMA` a fuente única; 133b #175: globales `_LAST_*` → retorno explícito; 133c: `_parse_comuna_sheet` F61→C11 y `fetch_data` E40→C16, `src/extractors` sin E/F) |
 | 134 | [ChileHub: fachada/store/presentación + B019](134-audit-chilehub-facade-split.md) | P2 | L | MED | 131 (ignore B019); advisor antes de ejecutar | TODO |
 | 135 | [validation: paquete con fachada](135-audit-validation-package.md) | P2 | M | MED | 132 (checker §5) | TODO |
 | 136 | [Verificadores: utilidades + descomposición](136-audit-verificadores.md) | P2 | M | MED | 133 (D5); 132 (C901) | TODO |
