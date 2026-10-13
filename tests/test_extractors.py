@@ -5697,6 +5697,92 @@ class FetchModeIsolationTests(unittest.TestCase):
         self.assertFalse(hasattr(res_extractor, "_LAST_SENTINEL_DROP_COUNT"))
 
 
+class VitalesGodFunctionHelpersTests(unittest.TestCase):
+    """Plan 133c (auditoría 2026-10-13): contratos de los helpers extraídos al
+    descomponer las god functions de vitales (`_parse_comuna_sheet` F61 y
+    `fetch_data` E40) — pines de los seams internos, no duplican el coverage
+    de `_parse_comuna_sheet` end-to-end."""
+
+    def test_build_colmap_mapea_defunciones_repartidas_y_sexo(self):
+        from src.extractors.estadisticas_vitales_extractor import _build_colmap
+
+        group_row = ["", "nacidos vivos", "", "defunciones", ""]
+        prev_row = ["", "", "", "", ""]
+        next_row = ["", "hombre", "mujer", "generales", ""]
+        colmap = _build_colmap(group_row, prev_row, next_row, has_sexo=True)
+        # La etiqueta "DEFUNCIONES" + "Generales" (2015/2019) se combina en una
+        # sola columna total; nacimientos se abre por sexo.
+        self.assertEqual(colmap[1], ("nacimiento", "hombre"))
+        self.assertEqual(colmap[2], ("nacimiento", "mujer"))
+        self.assertEqual(colmap[3], ("defuncion", "total"))
+        self.assertEqual(set(colmap), {1, 2, 3})
+
+    def test_skip_reason_clasifica_estructura_vs_comuna(self):
+        from src.extractors.estadisticas_vitales_extractor import _skip_reason
+
+        lookup = {"santiago": ("13101", "13", "Santiago")}
+        provinces = {"santiago"}
+        casos = [
+            # TOTAL va primero: es la única fila que además acumula totales.
+            (("TOTAL", "TOTAL", "TOTAL", "total"), "total"),
+            (("FUENTE: INE", "FUENTE: INE", "FUENTE: INE", "fuente: ine"), "pie"),
+            (
+                (
+                    "ARICA Y PARINACOTA",
+                    "ARICA Y PARINACOTA",
+                    "ARICA Y PARINACOTA",
+                    "arica y parinacota",
+                ),
+                "region",
+            ),
+            # Comuna real (provincia homónima presente en lookup): sin skip.
+            (("Santiago", "Santiago", "SANTIAGO", "santiago"), ""),
+        ]
+        for (label_raw, label, upper, clean), esperado in casos:
+            with self.subTest(caso=label):
+                self.assertEqual(
+                    _skip_reason(
+                        label_raw, label, upper, clean, 0, {}, provinces, lookup, "indent", True
+                    ),
+                    esperado,
+                )
+
+    def test_select_anuario_jobs_modos(self):
+        from src.extractors import estadisticas_vitales_extractor as ev
+
+        anuarios = [
+            (2020, "Anuario 2020", "https://x/2020.xlsx"),
+            (2021, "Anuario 2021", "https://x/2021.xlsx"),
+            (2022, "Anuario 2022", "https://x/2022.xlsx"),
+        ]
+        with (
+            patch.object(ev, "_discover_anuario_docs", return_value=anuarios),
+            patch.object(ev, "_staging_years_present", return_value=None),
+        ):
+            jobs, mode, notes = ev._select_anuario_jobs(force_full=False)
+        self.assertEqual(len(jobs), 3)
+        self.assertEqual(mode, "full")
+        self.assertEqual(notes, [])
+
+        with (
+            patch.object(ev, "_discover_anuario_docs", return_value=anuarios),
+            patch.object(ev, "_staging_years_present", return_value={2020, 2021}),
+        ):
+            jobs, mode, notes = ev._select_anuario_jobs(force_full=False)
+        # Faltantes + el más reciente: solo 2022 (también es el latest).
+        self.assertEqual([j[0] for j in jobs], [2022])
+        self.assertEqual(mode, "incremental")
+        self.assertTrue(any("fetch incremental: 1 de 3" in n for n in notes))
+
+        with (
+            patch.object(ev, "_discover_anuario_docs", return_value=anuarios),
+            patch.object(ev, "_staging_years_present", return_value={2020, 2021, 2022}),
+        ):
+            jobs, mode, _notes = ev._select_anuario_jobs(force_full=True)
+        self.assertEqual(len(jobs), 3)
+        self.assertEqual(mode, "full")
+
+
 class PermisosEdificacionExtractorTests(unittest.TestCase):
     """Tests unitarios para el extractor de permisos de edificación (MINVU CEDOC)."""
 

@@ -367,54 +367,53 @@ def _detect_indent_convention(
     return True
 
 
-def _parse_comuna_sheet(
-    rows: list[list],
-    year: int,
-    lookup: dict,
-    provinces: set[str],
-    url_fuente: str,
-    fecha_fuente: str,
-) -> tuple[list[dict], dict[str, int], list[str]]:
-    """Parsea la tabla comunal a filas (anio, comuna, evento, sexo, cantidad).
+def _norm_cell(value: object) -> str:
+    """Normaliza una celda cruda para comparación (None → "")."""
+    return norm_text(str(value)) if value is not None else ""
 
-    Tolera los layouts 2010-2023: grupos con o sin split de sexo, etiqueta
-    de defunciones repartida en dos filas ("DEFUNCIONES" + "Generales") y
-    convención de indentado invertida (provincia indentada vs comuna
-    indentada). Retorna (filas, totales_nacionales, notas).
+
+def _detect_group_rows(rows: list[list]) -> tuple[int, list[str], list[str], list[str], bool]:
+    """Localiza la fila de grupos ("Nacidos Vivos") y normaliza la cabecera.
+
+    Retorna (group_idx, group_row, prev_row, next_row, has_sexo); `next_row`
+    es la fila de sexo (Hombre/Mujer) solo si `has_sexo` es True.
     """
-    norm = lambda v: norm_text(str(v)) if v is not None else ""  # noqa: E731
-    provinces = set(provinces) | PROVINCIAS_EXTRA
-
-    # Fila de grupos: primera con "nacidos vivos".
     try:
         group_idx = next(
-            i for i, r in enumerate(rows[:20]) if any(norm(c) == "nacidos vivos" for c in r)
+            i for i, r in enumerate(rows[:20]) if any(_norm_cell(c) == "nacidos vivos" for c in r)
         )
     except StopIteration:
         raise KeyError("no se encontró la fila de grupos (Nacidos Vivos)") from None
-    group_row = [norm(c) for c in rows[group_idx]]
-    prev_row = [norm(c) for c in rows[group_idx - 1]] if group_idx > 0 else []
-    # Fila de sexo: la siguiente, solo si trae Hombre/Mujer.
-    next_row = [norm(c) for c in rows[group_idx + 1]]
+    group_row = [_norm_cell(c) for c in rows[group_idx]]
+    prev_row = [_norm_cell(c) for c in rows[group_idx - 1]] if group_idx > 0 else []
+    next_row = [_norm_cell(c) for c in rows[group_idx + 1]]
     has_sexo = "hombre" in next_row
-    sexo_row = next_row if has_sexo else []
+    return group_idx, group_row, prev_row, next_row, has_sexo
 
-    # Mapeo columna -> (evento, sexo). Las celdas combinadas solo tienen
-    # valor en la primera columna: forward-fill por fila. La etiqueta de
-    # grupo puede repartirse en dos filas ("DEFUNCIONES" + "Generales"):
-    # se combinan prev+curr salvo que prev sea un fragmento de título.
+
+def _build_colmap(
+    group_row: list[str], prev_row: list[str], next_row: list[str], has_sexo: bool
+) -> dict[int, tuple[str, str]]:
+    """Mapea columna → (evento, sexo) combinando las filas de cabecera.
+
+    Las celdas combinadas solo tienen valor en la primera columna: forward-fill
+    por fila. La etiqueta de grupo puede repartirse en dos filas ("DEFUNCIONES"
+    + "Generales"): se combinan prev+curr salvo que prev sea un fragmento de
+    título, y el fragmento de la fila superior solo aplica en su misma columna
+    (sin forward-fill: un grupo vecino fusionado como "POBLACION" en 2016
+    contaminaría la columna actual).
+    """
+
     def _ffill(cells: list[str], j: int) -> str:
         while j > 0 and not cells[j]:
             j -= 1
         return cells[j] if j < len(cells) else ""
 
+    sexo_row = next_row if has_sexo else []
     colmap: dict[int, tuple[str, str]] = {}
     width = max(len(group_row), len(prev_row), len(sexo_row))
     for j in range(1, width):
         c = group_row[j] if j < len(group_row) else ""
-        # Etiqueta de la fila superior SOLO si está en la misma columna (sin
-        # forward-fill: un grupo vecino fusionado como "POBLACION" en 2016
-        # contaminaría la columna actual).
         p = prev_row[j] if prev_row and j < len(prev_row) else ""
         combo = f"{p} {c}".strip() if (p and len(p) <= 15) else c
         if not combo:
@@ -436,55 +435,141 @@ def _parse_comuna_sheet(
 
     if not colmap:
         raise KeyError("no se encontraron columnas de nacimientos/defunciones")
+    return colmap
 
-    header_end = group_idx + 2
-    indented_is_province = _detect_indent_convention(rows, header_end, provinces, lookup)
 
-    def _canon(raw: str) -> str:
-        return COMUNA_ALIAS.get(norm_text(raw.strip()), norm_text(raw.strip()))
+def _canon_comuna(raw: str) -> str:
+    """Alias canónico de una etiqueta de comuna (COMUNA_ALIAS + norm)."""
+    return COMUNA_ALIAS.get(norm_text(raw.strip()), norm_text(raw.strip()))
 
-    def _es_total(upper: str) -> bool:
-        return upper in ("TOTAL", "TOTAL PAIS", "TOTAL PAÍS")
 
-    def _es_pie(upper: str) -> bool:
-        return upper.startswith(("FUENTE", "NOTA", "P:"))
+def _es_total(upper: str) -> bool:
+    return upper in ("TOTAL", "TOTAL PAIS", "TOTAL PAÍS")
 
-    def _es_region(label: str, clean: str) -> bool:
+
+def _es_pie(upper: str) -> bool:
+    return upper.startswith(("FUENTE", "NOTA", "P:"))
+
+
+def _es_region(label: str, clean: str, lookup: dict) -> bool:
+    """True si la etiqueta es una región (fila estructural, no comuna).
+
+    Mayúsculas ("ARICA Y PARINACOTA") o cualquier grafía mapeable
+    ("XV Región de...", "Región Metropolitana"). La guarda `clean not in
+    lookup` evita confundir la comuna Aysén con la región homónima.
+    """
+    upper = label.upper()
+    return (upper == label and len(label) > 3) or (
+        _codigo_region_etiqueta(label) is not None and clean not in lookup
+    )
+
+
+def _ultima_pos_contenidos(body: list[tuple[int, list]], lookup: dict) -> dict[str, int]:
+    """Posición de la ÚLTIMA ocurrencia de cada etiqueta de contenido.
+
+    Entre filas de contenido (no región/total/pie), la provincia homónima
+    siempre precede a su comuna ("Arica"/"Arica", "Coyhaique"/"Coihayque"):
+    la ocurrencia temprana es la fila estructural y la última, la comuna.
+    """
+    ultima_pos: dict[str, int] = {}
+    for i, r in body:
+        label = r[0].strip()
         upper = label.upper()
-        # Mayúsculas ("ARICA Y PARINACOTA") o cualquier grafía mapeable
-        # ("XV Región de...", "Región Metropolitana"). La guarda
-        # `clean not in lookup` evita confundir la comuna Aysén con la
-        # región homónima.
-        return (upper == label and len(label) > 3) or (
-            _codigo_region_etiqueta(label) is not None and clean not in lookup
-        )
+        if (
+            not _es_total(upper)
+            and not _es_pie(upper)
+            and not _es_region(label, _canon_comuna(r[0]), lookup)
+        ):
+            ultima_pos[_canon_comuna(r[0])] = i
+    return ultima_pos
 
+
+def _skip_reason(
+    label_raw: str,
+    label: str,
+    upper: str,
+    clean: str,
+    idx: int,
+    ultima_pos: dict[str, int],
+    provinces: set[str],
+    lookup: dict,
+    modo: str,
+    indented_is_province: bool,
+) -> str:
+    """Motivo por el que una fila del cuerpo no se emite ("" = es comuna)."""
+    if _es_total(upper):
+        return "total"
+    if _es_pie(upper):
+        return "pie"
+    if _es_region(label, clean, lookup):
+        return "region"
+    if ultima_pos.get(clean, idx) != idx:
+        return "estructural"  # ocurrencia temprana: fila estructural (provincia)
+    if clean.startswith(("provincia ", "prov.")):
+        return "prefijo"
+    if clean in provinces and clean not in lookup:
+        # Provincia sin comuna homónima (vale en los tres layouts: en "bare"
+        # es la única señal; en "indent"/"prefix" silencia filas de provincia
+        # indentadas por quirk del archivo).
+        return "provincia"
+    if modo == "indent" and indented_is_province:
+        if label_raw != label_raw.lstrip():
+            return "provincia_indentada"  # estilo 2021-2023
+    elif modo == "indent" and label_raw == label_raw.lstrip() and clean in provinces:
+        return "provincia_sin_indentar"  # estilo 2018-2020
+    return ""
+
+
+def _classify_body_rows(
+    rows: list[list], header_end: int, provinces: set[str], lookup: dict
+) -> tuple[list[tuple[int, list]], str, bool]:
+    """Filas de cuerpo, layout (prefix/indent/bare) y sentido del indentado.
+
+    Tres layouts de jerarquía según el año:
+    - "prefix" (2010-2015): provincias marcadas "Provincia X", sin indentado.
+    - "indent" (2018-2023): provincias vs comunas por indentación
+      (el sentido se invierte en 2018-2020; lo detecta _detect_indent_convention).
+    - "bare" (2017): sin indentado ni prefijo; solo queda la estructura.
+    """
     body = [
         (i, r)
         for i, r in enumerate(rows[header_end:])
         if r and isinstance(r[0], str) and r[0].strip()
     ]
-    # Tres layouts de jerarquía según el año:
-    # - "prefix" (2010-2015): provincias marcadas "Provincia X", sin indentado.
-    # - "indent" (2018-2023): provincias vs comunas por indentación
-    #   (el sentido se invierte en 2018-2020; lo detecta _detect_indent_convention).
-    # - "bare" (2017): sin indentado ni prefijo; solo queda la estructura.
-    tiene_prefijo = any(_canon(r[0]).startswith(("provincia ", "prov.")) for _, r in body)
+    tiene_prefijo = any(_canon_comuna(r[0]).startswith(("provincia ", "prov.")) for _, r in body)
     tiene_indent = any(r[0] != r[0].lstrip() for _, r in body)
     modo = "prefix" if tiene_prefijo else ("indent" if tiene_indent else "bare")
-    # Entre filas de contenido (no región/total/pie), conservar solo la
-    # ÚLTIMA ocurrencia de cada etiqueta: la provincia homónima siempre
-    # precede a su comuna ("Arica"/"Arica", "Coyhaique"/"Coihayque").
-    contenidos = [
-        (i, r)
-        for i, r in body
-        if not _es_total(r[0].strip().upper())
-        and not _es_pie(r[0].strip().upper())
-        and not _es_region(r[0].strip(), _canon(r[0]))
-    ]
-    ultima_pos = {}
-    for i, r in contenidos:
-        ultima_pos[_canon(r[0])] = i
+    indented_is_province = _detect_indent_convention(rows, header_end, provinces, lookup)
+    return body, modo, indented_is_province
+
+
+def _parse_comuna_sheet(
+    rows: list[list],
+    year: int,
+    lookup: dict,
+    provinces: set[str],
+    url_fuente: str,
+    fecha_fuente: str,
+) -> tuple[list[dict], dict[str, int], list[str]]:
+    """Parsea la tabla comunal a filas (anio, comuna, evento, sexo, cantidad).
+
+    Tolera los layouts 2010-2023: grupos con o sin split de sexo, etiqueta
+    de defunciones repartida en dos filas ("DEFUNCIONES" + "Generales") y
+    convención de indentado invertida (provincia indentada vs comuna
+    indentada). Retorna (filas, totales_nacionales, notas).
+
+    Plan 133c (auditoría 2026-10-13): el bloque original (radon F61) se
+    descompone en `_detect_group_rows`, `_build_colmap`, `_classify_body_rows`,
+    `_ultima_pos_contenidos` y `_skip_reason`; esta función orquesta y emite.
+    """
+    provinces = set(provinces) | PROVINCIAS_EXTRA
+
+    group_idx, group_row, prev_row, next_row, has_sexo = _detect_group_rows(rows)
+    colmap = _build_colmap(group_row, prev_row, next_row, has_sexo)
+
+    header_end = group_idx + 2
+    body, modo, indented_is_province = _classify_body_rows(rows, header_end, provinces, lookup)
+    ultima_pos = _ultima_pos_contenidos(body, lookup)
 
     out: list[dict] = []
     totals: dict[str, int] = {}
@@ -494,33 +579,28 @@ def _parse_comuna_sheet(
         label_raw = r[0]
         label = label_raw.strip()
         upper = label.upper()
-        clean = _canon(label)
+        clean = _canon_comuna(label)
 
-        if _es_total(upper):
+        reason = _skip_reason(
+            label_raw,
+            label,
+            upper,
+            clean,
+            i,
+            ultima_pos,
+            provinces,
+            lookup,
+            modo,
+            indented_is_province,
+        )
+        if reason == "total":
             for j, (evento, sexo) in colmap.items():
                 totals[f"{evento}_{sexo}"] = totals.get(f"{evento}_{sexo}", 0) + _to_int(
                     r[j] if j < len(r) else None
                 )
             continue
-        if _es_pie(upper):
-            # Pie de tabla (fuente, notas metodológicas).
+        if reason:
             continue
-        if _es_region(label, clean):
-            continue
-        if ultima_pos.get(clean, i) != i:
-            continue  # ocurrencia temprana: fila estructural (provincia)
-        if clean.startswith(("provincia ", "prov.")):
-            continue
-        if clean in provinces and clean not in lookup:
-            # Provincia sin comuna homónima (vale en los tres layouts: en
-            # "bare" es la única señal; en "indent"/"prefix" silencia filas
-            # de provincia indentadas por quirk del archivo).
-            continue
-        if modo == "indent" and indented_is_province:
-            if label_raw != label_raw.lstrip():
-                continue  # provincia indentada (estilo 2021-2023)
-        elif modo == "indent" and label_raw == label_raw.lstrip() and clean in provinces:
-            continue  # provincia sin indentar (estilo 2018-2020)
 
         # Fila de comuna.
         hit = lookup.get(clean)
@@ -584,29 +664,16 @@ def _gate_reconciliacion(rows: list[dict], totals: dict[str, int]) -> tuple[list
     return kept, [f"ERROR de reconciliación ({detalle}); filas omitidas"]
 
 
-def fetch_data() -> tuple[list[dict], str, str, str, list[str]]:
-    """Obtiene estadísticas vitales comunales desde el INE.
+def _select_anuario_jobs(
+    force_full: bool,
+) -> tuple[list[tuple[int, str, str, Path | None]], str, list[str]]:
+    """Descubre anuarios y arma los jobs (incremental o full) — Plan 118.
 
-    Incremental (Plan 118): si el staging consolidado ya existe, solo se
-    descargan los anuarios ausentes + el más reciente (la fuente puede
-    republicar el último año); el merge con el staging previo lo hace
-    `process_estadisticas_vitales`. Sin staging legible, fetch completo.
-
-    Retorna (rows, source_mode, fetch_mode, source_url, notes).
+    Sin staging legible (o con `CHILE_HUB_VITALES_FULL=1`) devuelve el fetch
+    completo. Retorna (jobs, fetch_mode, notas); ante fallo de descubrimiento
+    retorna jobs vacíos (el llamador reconstruye desde snapshots).
     """
-    fetch_mode = "full"
-
-    ensure_staging_directories()
     notes: list[str] = []
-    all_rows: list[dict] = []
-    fecha_fuente = datetime.datetime.now(UTC).strftime("%Y-%m-%d")
-
-    try:
-        lookup, provinces = _load_comunas_lookup()
-    except FileNotFoundError as exc:
-        return FALLBACK_ROWS, "fallback", "full", EEVV_PAGE, [str(exc)]
-
-    force_full = os.environ.get("CHILE_HUB_VITALES_FULL") == "1"
     try:
         anuarios = _discover_anuario_docs()
         # (anio, titulo, url, path_prefijado). path None = descargar.
@@ -636,53 +703,120 @@ def fetch_data() -> tuple[list[dict], str, str, str, list[str]]:
                 )
     except (requests.RequestException, ValueError, KeyError) as exc:
         notes.append(f"descubrimiento de anuarios falló ({exc})")
-        jobs = []
-        fetch_mode = "full"
+        return [], "full", notes
+    return jobs, fetch_mode, notes
+
+
+def _snapshot_jobs() -> tuple[list[tuple[int, str, str, Path | None]], list[str]]:
+    """Jobs reconstruidos desde snapshots raw locales (descubrimiento caído)."""
+    por_archivo: list[tuple[int, str, str, Path | None]] = []
+    for snap in sorted(Path(RAW_DIR).glob("ine_estadisticas_vitales_*.xlsx")):
+        m = re.fullmatch(r"ine_estadisticas_vitales_(\d{4})_.*\.xlsx", snap.name)
+        if m:
+            por_archivo.append(
+                (int(m.group(1)), f"snapshot {snap.name}", f"snapshot:{snap.name}", snap)
+            )
+    if not por_archivo:
+        return [], ["sin anuarios definitivos ni snapshots previos disponibles"]
+    return por_archivo, [
+        f"descubrimiento no disponible; reconstruyendo desde {len(por_archivo)} snapshots locales"
+    ]
+
+
+def _resolve_anuario_path(year: int, url: str, preset_path: Path | None, notes: list[str]) -> Path:
+    """Path del xlsx del año: preset, descarga live o snapshot local (Plan 118)."""
+    if preset_path is not None:
+        return preset_path
+    try:
+        return _download_xlsx(url, year)
+    except (requests.RequestException, OSError) as exc:
+        snapshots = sorted(Path(RAW_DIR).glob(f"ine_estadisticas_vitales_{year}_*.xlsx"))
+        if not snapshots:
+            raise
+        path = snapshots[-1]
+        notes.append(f"{year}: descarga falló, usando snapshot {path.name} ({exc})")
+        return path
+
+
+def _parse_anuario_file(
+    path: Path,
+    year: int,
+    lookup: dict,
+    provinces: set[str],
+    url_fuente: str,
+    fecha_fuente: str,
+) -> tuple[str, list[dict], dict[str, int], list[str]]:
+    """Abre el xlsx, ubica la hoja comunal y la parsea a filas canónicas."""
+    wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
+    try:
+        sheet_name, sheet_rows = _find_comuna_sheet(wb)
+    finally:
+        wb.close()
+    rows, totals, sheet_notes = _parse_comuna_sheet(
+        sheet_rows, year, lookup, provinces, url_fuente, fecha_fuente
+    )
+    return sheet_name, rows, totals, sheet_notes
+
+
+def _omitidos_notes(errores: dict[int, list[str]], all_rows: list[dict]) -> list[str]:
+    """Notas de años omitidos (solo si ningún archivo del año aportó filas).
+
+    Las notas ERROR siempre se reportan: indican datos descartados por no
+    reconciliar (p. ej. el suplemento neonatal 2016 no trae tabla comunal
+    general, pero el archivo de nacimientos del mismo año sí).
+    """
+    anios_con_filas = {r["anio"] for r in all_rows}
+    out: list[str] = []
+    for year in sorted(errores):
+        msgs = errores[year]
+        urgentes = [m for m in msgs if "ERROR" in m]
+        resto = [m for m in msgs if "ERROR" not in m]
+        out.extend(f"{year}: {m}" for m in urgentes)
+        if year not in anios_con_filas and resto:
+            out.append(f"{year}: año omitido ({'; '.join(resto)})")
+    return out
+
+
+def fetch_data() -> tuple[list[dict], str, str, str, list[str]]:
+    """Obtiene estadísticas vitales comunales desde el INE.
+
+    Incremental (Plan 118): si el staging consolidado ya existe, solo se
+    descargan los anuarios ausentes + el más reciente (la fuente puede
+    republicar el último año); el merge con el staging previo lo hace
+    `process_estadisticas_vitales`. Sin staging legible, fetch completo.
+
+    Retorna (rows, source_mode, fetch_mode, source_url, notes).
+    """
+    ensure_staging_directories()
+    notes: list[str] = []
+    fecha_fuente = datetime.datetime.now(UTC).strftime("%Y-%m-%d")
+
+    try:
+        lookup, provinces = _load_comunas_lookup()
+    except FileNotFoundError as exc:
+        return FALLBACK_ROWS, "fallback", "full", EEVV_PAGE, [str(exc)]
+
+    force_full = os.environ.get("CHILE_HUB_VITALES_FULL") == "1"
+    jobs, fetch_mode, discover_notes = _select_anuario_jobs(force_full)
+    notes.extend(discover_notes)
 
     if not jobs:
         # Sitio no disponible: reconstruir desde snapshots crudos locales
         # (un job por archivo; años con varios archivos se fusionan igual
         # que en descubrimiento, p. ej. nacimientos + suplementos de 2016).
-        por_archivo: list[tuple[int, str, str, Path | None]] = []
-        for snap in sorted(Path(RAW_DIR).glob("ine_estadisticas_vitales_*.xlsx")):
-            m = re.fullmatch(r"ine_estadisticas_vitales_(\d{4})_.*\.xlsx", snap.name)
-            if m:
-                por_archivo.append(
-                    (int(m.group(1)), f"snapshot {snap.name}", f"snapshot:{snap.name}", snap)
-                )
-        if not por_archivo:
-            notes.append("sin anuarios definitivos ni snapshots previos disponibles")
+        jobs, snap_notes = _snapshot_jobs()
+        notes.extend(snap_notes)
+        if not jobs:
             return FALLBACK_ROWS, "fallback", "full", EEVV_PAGE, notes
-        notes.append(
-            f"descubrimiento no disponible; reconstruyendo desde {len(por_archivo)} "
-            "snapshots locales"
-        )
-        jobs = por_archivo
 
+    all_rows: list[dict] = []
     any_live = False
     errores: dict[int, list[str]] = {}
     for year, title, url, preset_path in jobs:
         try:
-            if preset_path is not None:
-                path = preset_path
-            else:
-                try:
-                    path = _download_xlsx(url, year)
-                except (requests.RequestException, OSError) as exc:
-                    snapshots = sorted(
-                        Path(RAW_DIR).glob(f"ine_estadisticas_vitales_{year}_*.xlsx")
-                    )
-                    if not snapshots:
-                        raise
-                    path = snapshots[-1]
-                    notes.append(f"{year}: descarga falló, usando snapshot {path.name} ({exc})")
-            wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
-            try:
-                sheet_name, sheet_rows = _find_comuna_sheet(wb)
-            finally:
-                wb.close()
-            rows, totals, sheet_notes = _parse_comuna_sheet(
-                sheet_rows, year, lookup, provinces, url, fecha_fuente
+            path = _resolve_anuario_path(year, url, preset_path, notes)
+            sheet_name, rows, totals, sheet_notes = _parse_anuario_file(
+                path, year, lookup, provinces, url, fecha_fuente
             )
             notes.extend(sheet_notes)
             if not rows:
@@ -707,18 +841,8 @@ def fetch_data() -> tuple[list[dict], str, str, str, list[str]]:
         except Exception as exc:
             errores.setdefault(year, []).append(f"'{title}': {exc}")
             continue
-    # Solo reportar años omitidos si NINGÚN archivo del año aportó filas
-    # (p. ej. el suplemento neonatal 2016 no trae tabla comunal general, pero
-    # el archivo de nacimientos del mismo año sí). Las notas ERROR siempre
-    # se reportan: indican datos descartados por no reconciliar.
-    anios_con_filas = {r["anio"] for r in all_rows}
-    for year in sorted(errores):
-        msgs = errores[year]
-        urgentes = [m for m in msgs if "ERROR" in m]
-        resto = [m for m in msgs if "ERROR" not in m]
-        notes.extend(f"{year}: {m}" for m in urgentes)
-        if year not in anios_con_filas and resto:
-            notes.append(f"{year}: año omitido ({'; '.join(resto)})")
+
+    notes.extend(_omitidos_notes(errores, all_rows))
 
     if not all_rows:
         return FALLBACK_ROWS, "fallback", "full", EEVV_PAGE, notes

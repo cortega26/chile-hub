@@ -111,6 +111,10 @@ documentar cómo resuelve imports; esto decide el Step 1.
 
 ### Step 4 — C4: fuera los globales de estado
 
+> **Hecho (133b, #175)**: `fetch_data()`/`fetch_resources()` retornan el
+> `fetch_mode` explícito y `parse_resources()` el conteo de centinelas; los
+> `_LAST_*` eliminados con guardrail `FetchModeIsolationTests`.
+
 - Reemplazar `_LAST_FETCH_MODE`/`_LAST_SENTINEL_DROP_COUNT` por campos de
   `ExtractionResult` (o retorno explícito) en `estadisticas_vitales_extractor`
   y `res_extractor`; `write_staging(...)` ya recibe el result (Plan 125).
@@ -118,6 +122,14 @@ documentar cómo resuelve imports; esto decide el Step 1.
   (el bug que el global permite).
 
 ### Step 5 — Descomposición de god functions (orden por grade)
+
+> **E/F hechos (133c, este PR)**: `_parse_comuna_sheet` F61→C11 y `fetch_data`
+> E40→C16; `src/extractors` sin E/F en radon (done criterion). Los D
+> preexistentes (`_parse_sheet` 28, `process_indicators` 25, `fetch_all_history`
+> 24, `extract_indicadores` 22, `build_electoral_df` 29, `fetch_data` de
+> calidad_aire 25) quedan **fuera del criterio** ("sin D/E/F nuevo") — si se
+> baja el umbral del trinquete en el futuro, descomponerlos por sección con el
+> mismo patrón que 133c.
 
 - `_parse_comuna_sheet`: extraer `_detect_group_row`, `_build_colmap`,
   `_iter_data_rows`; el layout por años queda como tabla de variantes.
