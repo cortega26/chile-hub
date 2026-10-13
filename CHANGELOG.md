@@ -12,6 +12,30 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.49.1 - 2026-10-13
+
+### Corregido
+
+- **audit**: Limpia re-export de UTC y companions del batch de lint
+  ([#168](https://github.com/cortega26/chile-hub/pull/168),
+  [`92966c5`](https://github.com/cortega26/chile-hub/commit/92966c51dd131406b859071e6dcf6a1c660f345a))
+
+- **audit**: Plan 131 — correctitud P0 + trinquete de lint
+  ([#168](https://github.com/cortega26/chile-hub/pull/168),
+  [`92966c5`](https://github.com/cortega26/chile-hub/commit/92966c51dd131406b859071e6dcf6a1c660f345a))
+
+### Mantenimiento
+
+- **ci**: Sync coverage badge from verified tests [skip ci]
+  ([`b72c40d`](https://github.com/cortega26/chile-hub/commit/b72c40dfe8a1eff5d5e232e6a8b5c6cb70fd5018))
+
+### Documentación
+
+- **audit**: Auditoría de prácticas 2026-10-13 + planes 131–138
+  ([#167](https://github.com/cortega26/chile-hub/pull/167),
+  [`f3e923c`](https://github.com/cortega26/chile-hub/commit/f3e923c82a4dca69be32e0156d30e8c493d11545))
+
+
 ## 1.49.0 - 2026-10-13
 
 ### Mantenimiento
