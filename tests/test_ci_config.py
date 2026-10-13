@@ -323,7 +323,6 @@ class RuffRatchetGuardrailTests(unittest.TestCase):
         "RUF001",
         "RUF002",
         "RUF003",
-        "B019",
         "SIM117",
     }
 

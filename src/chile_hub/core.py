@@ -1,4 +1,3 @@
-import functools
 import importlib.resources
 import json
 import warnings
@@ -14,6 +13,7 @@ import requests
 
 from ._paths import NORMALIZED_DIR, ROOT_DIR  # noqa: F401  (re-export: ROOT_DIR/NORMALIZED_DIR)
 from ._render import render_table
+from ._store import ArtifactStore
 from .data_manager import ChileHubDataManager
 from .datasets import Dataset
 from .exceptions import (
@@ -120,73 +120,14 @@ class ChileHub:
 
         self.normalized_dir = self.catalog_path.resolve().parent
         self.root_dir = self.normalized_dir.parents[1]
-        self.catalog = self._load_catalog()
+        self._store = ArtifactStore(self.normalized_dir)
+        self.catalog = self._store.load_catalog(self.catalog_path)
         # Cache LRU acotado (Plan 093): un proceso longevo que tocaba muchos
         # datasets (p. ej. empresas ~1.6M filas + cross_view) crecía sin cota
         # hasta OOM. Política: al superar _DF_CACHE_MAXSIZE se expulsa el
         # menos recientemente usado; la entrada expulsada se relee de Parquet
         # (correcto, solo más lento). Ver load_polars() y clear_cache().
         self._df_cache: dict[str, pl.DataFrame] = {}
-
-    def _load_catalog(self) -> dict[str, Any]:
-        try:
-            with self.catalog_path.open("r", encoding="utf-8") as f:
-                return json.load(f)  # type: ignore[no-any-return]  # json.load → dict en runtime
-        except FileNotFoundError as exc:
-            raise ChileHubDataError(
-                f"Catálogo de datasets no encontrado en {self.catalog_path}. "
-                f"Usa ChileHub() sin argumentos para descargar el bundle automáticamente, "
-                f"o asegúrate de que el directorio '{self.catalog_path.parent}' contiene "
-                f"los datos normalizados (ejecuta 'make build' si estás en desarrollo)."
-            ) from exc
-
-    def _load_json_artifact(self, filename: str) -> dict[str, Any]:
-        with (self.normalized_dir / filename).open("r", encoding="utf-8") as f:
-            return json.load(f)  # type: ignore[no-any-return]
-
-    @functools.lru_cache(maxsize=1)
-    def _load_artifact_manifest(self) -> dict[str, Any]:
-        return self._load_json_artifact("artifact_manifest.json")
-
-    @functools.lru_cache(maxsize=1)
-    def _load_hub_health(self) -> dict[str, Any]:
-        return self._load_json_artifact("hub_health.json")
-
-    @functools.lru_cache(maxsize=1)
-    def _load_hub_status(self) -> dict[str, Any]:
-        return self._load_json_artifact("hub_status.json")
-
-    @functools.lru_cache(maxsize=1)
-    def _load_dataset_status(self) -> dict[str, Any]:
-        return self._load_json_artifact("dataset_status.json")
-
-    @functools.lru_cache(maxsize=1)
-    def _load_dataset_changelog(self) -> dict[str, Any]:
-        return self._load_json_artifact("dataset_changelog.json")
-
-    @functools.lru_cache(maxsize=1)
-    def _load_hub_bundle(self) -> dict[str, Any]:
-        return self._load_json_artifact("hub_bundle.json")
-
-    @functools.lru_cache(maxsize=1)
-    def _load_redistribution_report(self) -> dict[str, Any]:
-        return self._load_json_artifact("redistribution_report.json")
-
-    @functools.lru_cache(maxsize=1)
-    def _load_provenance_report(self) -> dict[str, Any]:
-        return self._load_json_artifact("provenance_report.json")
-
-    @functools.lru_cache(maxsize=1)
-    def _load_drift_report(self) -> dict[str, Any]:
-        return self._load_json_artifact("drift_report.json")
-
-    @functools.lru_cache(maxsize=1)
-    def _load_source_readiness(self) -> dict[str, Any]:
-        return self._load_json_artifact("source_readiness.json")
-
-    @functools.lru_cache(maxsize=1)
-    def _load_dataset_quality(self) -> dict[str, Any]:
-        return self._load_json_artifact("dataset_quality.json")
 
     @staticmethod
     def _status_rank(status: str) -> int:
@@ -934,7 +875,7 @@ class ChileHub:
         maturity_lower = maturity.lower().strip() if maturity else ""
 
         # Cargar source_readiness para maturity_status
-        source_readiness = self._load_source_readiness()
+        source_readiness = self._store.load_source_readiness()
         maturity_by_dataset = {
             entry["dataset"]: entry.get("maturity_status", "")
             for entry in source_readiness.get("datasets", [])
@@ -1197,7 +1138,7 @@ class ChileHub:
         return "\n".join(lines) + "\n"
 
     def artifacts(self, dataset_name=None):
-        manifest = self._load_artifact_manifest()
+        manifest = self._store.load_artifact_manifest()
         artifacts = manifest.get("artifacts", [])
         if dataset_name is None:
             return artifacts
@@ -1533,26 +1474,26 @@ class ChileHub:
         )
 
     def health(self):
-        health = self._load_hub_health()
+        health = self._store.load_hub_health()
         if "top_issue_summary" not in health:
             health["top_issue_summary"] = format_top_issue_summary(health.get("top_issue"))
         return health
 
     def status(self):
-        status = self._load_hub_status()
+        status = self._store.load_hub_status()
         if "top_issue_summary" not in status:
             status["top_issue_summary"] = format_top_issue_summary(status.get("top_issue"))
         return status
 
     def dataset_status(self):
-        return self._load_dataset_status()
+        return self._store.load_dataset_status()
 
     def dataset_changelog(self):
-        return self._load_dataset_changelog()
+        return self._store.load_dataset_changelog()
 
     def source_readiness(self):
         """Devuelve el reporte de madurez de fuente por dataset."""
-        return self._load_source_readiness()
+        return self._store.load_source_readiness()
 
     def check_sources(self, timeout: int = 5) -> list[dict[str, Any]]:
         """Verifica la conectividad de red con las fuentes de datos oficiales."""
@@ -1635,7 +1576,7 @@ class ChileHub:
 
     def dataset_quality(self):
         """Devuelve la tarjeta de puntuación de calidad multidimensional por dataset."""
-        return self._load_dataset_quality()
+        return self._store.load_dataset_quality()
 
     def status_table(self):
         status = self.status()
@@ -1928,13 +1869,13 @@ class ChileHub:
         return "\n".join(lines) + "\n"
 
     def bundle(self):
-        return self._load_hub_bundle()
+        return self._store.load_hub_bundle()
 
     def packages(self):
         bundle_packages = self.bundle().get("packages", [])
         if bundle_packages:
             return bundle_packages
-        manifest = self._load_artifact_manifest()
+        manifest = self._store.load_artifact_manifest()
         return manifest.get("packages", [])
 
     def packages_table(self):
@@ -1982,7 +1923,7 @@ class ChileHub:
         }
 
     def redistribution(self):
-        return self._load_redistribution_report()
+        return self._store.load_redistribution_report()
 
     def redistribution_table(self):
         report = self.redistribution()
@@ -2017,7 +1958,7 @@ class ChileHub:
         return "\n".join(lines) + "\n"
 
     def provenance(self):
-        return self._load_provenance_report()
+        return self._store.load_provenance_report()
 
     def provenance_table(self):
         report = self.provenance()
@@ -2050,7 +1991,7 @@ class ChileHub:
         return "\n".join(lines) + "\n"
 
     def drift(self):
-        return self._load_drift_report()
+        return self._store.load_drift_report()
 
     def drift_table(self):
         report = self.drift()

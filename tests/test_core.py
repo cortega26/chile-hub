@@ -971,6 +971,66 @@ class ChileHubResolveByCoordsTests(unittest.TestCase):
         self.assertIsNot(after_clear, after_touch)
 
 
+class ArtifactStoreTests(unittest.TestCase):
+    """Plan 134a (auditoría 2026-10-13, B019): caché por instancia en el store.
+
+    Antes: `lru_cache(maxsize=1)` sobre métodos retenía cada hub en una caché
+    de clase (fuga real para consumidores que crean un hub por request). Ahora
+    la caché vive y muere con el hub; el contenido es el mismo y `load_*`
+    devuelve el mismo objeto (los consumidores mutan in-place).
+    """
+
+    def test_hub_is_not_retained_by_class_level_cache(self):
+        import gc
+        import weakref
+
+        hub = _hub()
+        # Poblar los loaders cacheados del store.
+        hub.health()
+        hub.status()
+        hub.bundle()
+        hub.dataset_changelog()
+        ref = weakref.ref(hub)
+        del hub
+        gc.collect()
+        self.assertIsNone(
+            ref(),
+            "El hub quedó retenido tras `del`: buscar cachés a nivel clase "
+            "(B019) — ArtifactStore debe cachear por instancia",
+        )
+
+    def test_store_cache_is_per_instance(self):
+        import tempfile
+
+        from chile_hub._store import ArtifactStore
+
+        with tempfile.TemporaryDirectory() as dir_a, tempfile.TemporaryDirectory() as dir_b:
+            Path(dir_a, "x.json").write_text('{"v": 1}', encoding="utf-8")
+            Path(dir_b, "x.json").write_text('{"v": 2}', encoding="utf-8")
+            store_a = ArtifactStore(Path(dir_a))
+            store_b = ArtifactStore(Path(dir_b))
+            self.assertEqual(store_a.load_json("x.json"), {"v": 1})
+            self.assertEqual(store_b.load_json("x.json"), {"v": 2})
+
+    def test_load_json_returns_same_cached_object(self):
+        import tempfile
+
+        from chile_hub._store import ArtifactStore
+
+        with tempfile.TemporaryDirectory() as tmp:
+            Path(tmp, "x.json").write_text('{"v": 1}', encoding="utf-8")
+            store = ArtifactStore(Path(tmp))
+            first = store.load_json("x.json")
+            self.assertIs(store.load_json("x.json"), first)
+
+    def test_health_returns_cached_object_and_persists_mutations(self):
+        hub = _hub()
+        first = hub.health()
+        first["_test_marker_134a"] = True
+        self.assertIs(hub.health(), first)
+        self.assertTrue(hub.health().get("_test_marker_134a"))
+
+
 class PublicSurfaceGuardrailTests(unittest.TestCase):
     """Plan 134a (auditoría 2026-10-13): congela la superficie pública de
     `ChileHub` (inventario + firmas) ANTES de partir el god object en módulos
