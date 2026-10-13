@@ -12,6 +12,61 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.49.2 - 2026-10-13
+
+### Corregido
+
+- **extractores**: Import por paquete del SCHEMA compartido (CI #174)
+  ([#174](https://github.com/cortega26/chile-hub/pull/174),
+  [`7a11e57`](https://github.com/cortega26/chile-hub/commit/7a11e5715f349f51668a807fd9a34edc0e741610))
+
+### Mantenimiento
+
+- **ci**: Debug-133a dispara en push para diagnóstico del import
+  ([#174](https://github.com/cortega26/chile-hub/pull/174),
+  [`7a11e57`](https://github.com/cortega26/chile-hub/commit/7a11e5715f349f51668a807fd9a34edc0e741610))
+
+- **ci**: Workflow temporal de diagnóstico para el import de autoridades_shared
+  ([#174](https://github.com/cortega26/chile-hub/pull/174),
+  [`7a11e57`](https://github.com/cortega26/chile-hub/commit/7a11e5715f349f51668a807fd9a34edc0e741610))
+
+### Refactorizado
+
+- **build**: Tabla única de insumos + _load_inputs como fachada (plan 132a)
+  ([#169](https://github.com/cortega26/chile-hub/pull/169),
+  [`d4eba57`](https://github.com/cortega26/chile-hub/commit/d4eba57d96e9a4583317514f767553b5e2a7776a))
+
+- **build**: Tabla única de insumos + fachada _load_inputs (plan 132a)
+  ([#169](https://github.com/cortega26/chile-hub/pull/169),
+  [`d4eba57`](https://github.com/cortega26/chile-hub/commit/d4eba57d96e9a4583317514f767553b5e2a7776a))
+
+- **builders**: Descompone build_dataset_metadata en helpers (plan 132c)
+  ([#171](https://github.com/cortega26/chile-hub/pull/171),
+  [`258d36b`](https://github.com/cortega26/chile-hub/commit/258d36b775bf2ca893652b844b54bc5a704f6baa))
+
+- **cli**: Parser por grupos y dispatch por handlers (plan 132d)
+  ([#172](https://github.com/cortega26/chile-hub/pull/172),
+  [`7dec1f9`](https://github.com/cortega26/chile-hub/commit/7dec1f9bf1320833b93c6fcf6205dc3825545f19))
+
+- **extractores**: Fuente única para SINIM y SCHEMA de autoridades (plan 133a)
+  ([#174](https://github.com/cortega26/chile-hub/pull/174),
+  [`7a11e57`](https://github.com/cortega26/chile-hub/commit/7a11e5715f349f51668a807fd9a34edc0e741610))
+
+- **registry**: Descompone parse_dataset_spec + trinquete C901 (plan 132e)
+  ([#173](https://github.com/cortega26/chile-hub/pull/173),
+  [`66988fb`](https://github.com/cortega26/chile-hub/commit/66988fbe888b47870c265527ee2cc511faa59405))
+
+- **reports**: Descompone build_hub_health en helpers (plan 132b)
+  ([#170](https://github.com/cortega26/chile-hub/pull/170),
+  [`1639ee8`](https://github.com/cortega26/chile-hub/commit/1639ee8c8c76e79248f93d9c59075603fed64011))
+
+### Tests
+
+- **build**: Invariantes de STAGING_INPUTS (plan 132a)
+  ([#169](https://github.com/cortega26/chile-hub/pull/169),
+  [`d4eba57`](https://github.com/cortega26/chile-hub/commit/d4eba57d96e9a4583317514f767553b5e2a7776a))
+
+
 ## 1.49.1 - 2026-10-13
 
 ### Corregido
