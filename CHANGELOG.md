@@ -12,6 +12,36 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.49.0 - 2026-10-13
+
+### Mantenimiento
+
+- **ci**: Sync coverage badge from verified tests [skip ci]
+  ([`5160a37`](https://github.com/cortega26/chile-hub/commit/5160a37efe992ba88ce0a6c8f02326a10fedec41))
+
+- **deps**: Bump actions/upload-artifact from 7.0.1 to 7.0.2
+  ([#163](https://github.com/cortega26/chile-hub/pull/163),
+  [`0cb4e10`](https://github.com/cortega26/chile-hub/commit/0cb4e106c70c116ee275d65dc8768f62c90dcba7))
+
+### Integración continua
+
+- Reemplaza el uvx twine sin pin por uv run desde el lock (ADR-024)
+  ([#166](https://github.com/cortega26/chile-hub/pull/166),
+  [`cd976c2`](https://github.com/cortega26/chile-hub/commit/cd976c2ddca762d74efaef4fe92be6d50bb3b8e7))
+
+### Agregado
+
+- **ci**: Adopta la política de autosanación (ADR-024)
+  ([#166](https://github.com/cortega26/chile-hub/pull/166),
+  [`cd976c2`](https://github.com/cortega26/chile-hub/commit/cd976c2ddca762d74efaef4fe92be6d50bb3b8e7))
+
+### Tests
+
+- **ci**: La aserción del matrix usa twine desde el lock (ADR-024)
+  ([#166](https://github.com/cortega26/chile-hub/pull/166),
+  [`cd976c2`](https://github.com/cortega26/chile-hub/commit/cd976c2ddca762d74efaef4fe92be6d50bb3b8e7))
+
+
 ## 1.48.3 - 2026-10-13
 
 ### Corregido
