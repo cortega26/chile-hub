@@ -1,6 +1,6 @@
 # Plans — chile-hub
 
-Planes de implementación generados por auditoría `/improve deep` en commits `ba2f434` (2026-06-13), `a2cd288` (2026-06-19), `c486e7c` (2026-07-07) y `1464109` (2026-09-29 — planes 111–130, ver sección al final), y por `/improve plan` (mejoras de librerías/dependencias) en commit `140c8ea` (2026-06-29).
+Planes de implementación generados por auditoría `/improve deep` en commits `ba2f434` (2026-06-13), `a2cd288` (2026-06-19), `c486e7c` (2026-07-07) y `1464109` (2026-09-29 — planes 111–130, ver sección al final), por `/improve plan` (mejoras de librerías/dependencias) en commit `140c8ea` (2026-06-29), y por la **auditoría de prácticas de software** (2026-10-13, commit `886a062` — planes 131–138, ver sección al final).
 
 > **Auditoría `/improve next` — dirección/roadmap (2026-07-26, commit `63cc106`)**:
 > se revalidaron los cinco hallazgos con mayor palanca: resolución nombres→CUT
@@ -897,3 +897,59 @@ registry MCP (`54c1691`; `sync_server_json_version` en
 - Todo lo demás listado por los subagentes quedó en plan o ya estaba en las
   listas de rechazados de auditorías previas (guardrails y §"Hallazgos
   considerados y rechazados" de arriba).
+
+## Auditoría de prácticas de software 2026-10-13 (commit `886a062`) — planes 131–138
+
+> **Contexto**: auditoría de mejores prácticas (SOLID, DRY, KISS, PEP-8,
+> Zen de Python) sobre `src/`, `scripts/`, `tests/` y los gates, con
+> herramientas automáticas + revisión dirigida. Reporte:
+> [`docs/best-practices-audit-2026-10-13.md`](../docs/best-practices-audit-2026-10-13.md).
+> Hallazgos clave: cinco módulos concentran la complejidad (`core.py` 2 078 L /
+> MI C, `validation.py` 1 960 L, `verify_pipeline.py` 1 961 L,
+> `pipeline_status_utils.py`, `verify_landing()` de 739 L), `mypy --strict`
+> con 767 errores, duplicaciones reales (alias de regiones, muestra SINIM,
+> `SCHEMA` de autoridades, mapeo de artefactos, unpacking `dfs`), y olores de
+> correctitud (B023, `except: pass`, `lru_cache` en métodos, `date.today()`).
+> La capa de proceso (guardrails, ADR-024, 1 370 tests, cobertura 73.3 %) está
+> sana y se refuerza con los trinquetes de 131/132/137/138.
+
+### Planes activos
+
+| # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de / solapa | Estado |
+|---|------|----------|----------|--------|---------------------|--------|
+| 131 | [Correctitud y quick wins](131-audit-p0-correctitud-quick-wins.md) | P1 | S-M | LOW-MED | — | TODO |
+| 132 | [Descomposición pipeline build + CLI + C901](132-audit-decomposicion-pipeline-build.md) | P1 | M | MED | 131 | TODO |
+| 133 | [Extractores: fuente única + descomposición](133-audit-single-source-dry.md) | P2 | M-L | LOW-MED | 131; coordina con 132 (C901) | TODO |
+| 134 | [ChileHub: fachada/store/presentación + B019](134-audit-chilehub-facade-split.md) | P2 | L | MED | 131 (ignore B019); advisor antes de ejecutar | TODO |
+| 135 | [validation: paquete con fachada](135-audit-validation-package.md) | P2 | M | MED | 132 (checker §5) | TODO |
+| 136 | [Verificadores: utilidades + descomposición](136-audit-verificadores.md) | P2 | M | MED | 133 (D5); 132 (C901) | TODO |
+| 137 | [Trinquete mypy --strict por módulo](137-audit-mypy-strict-ratchet.md) | P3 | M (rolling) | LOW | 132–135 reducen el trabajo | TODO |
+| 138 | [PEP-257 + coverage floors + pathlib](138-audit-docs-coverage-pathlib.md) | P3 | M | LOW | 132–136 (mueven archivos) | TODO |
+
+### Orden de ejecución recomendado
+
+1. **131** (quick wins + trinquete ruff) — desbloquea el resto.
+2. **132** y **133** en paralelo (sin solape de archivos).
+3. **134** → **135** → **136** (secuencial: alto impacto, revisión advisor).
+4. **137** y **138** (olas rolling; 138 al final porque mueve docs sobre lo ya movido).
+
+### Solapes de archivos (no correr en worktrees simultáneos)
+
+- **131 ∩ 132/133/138**: config ruff (`pyproject.toml`), C901 y PTH; secuencia 131 → resto.
+- **132 ∩ 138**: `pyproject.toml` (C901 vs PTH/interrogate/coverage).
+- **134 ∩ 138 ∩ 137**: `core.py` y su documentación; 138 después de 134.
+- **135 ∩ 132**: contrato del bloque `validations` (checker §5).
+- **136 ∩ 133**: mapeo artefacto→formato (D5) y `scripts/`.
+
+### Hallazgos del audit mapeados por plan
+
+- Correctitud: C1, C2, C5–C7 → 131; C3 → 134; C4 → 133.
+- Arquitectura: A1 → 134; A2 → 135; A3 → 136; A4 → 132.
+- KISS: god functions → 132 (`_load_inputs`, `_compute_validations`,
+  `build_dataset_metadata`, `build_hub_health`, `_main`/`build_parser`,
+  `parse_dataset_spec`), 133 (extractores), 134 (métodos del hub), 136
+  (`verify_landing`); trinquete C901 → 132.
+- DRY: D2 → 132; D1/D3/D4/D5 → 133 (D5 verificado en 136).
+- PEP-8/257: P1/P3 → 138; P2/P4 → 131.
+- Tipado: T1/T2 → 137.
+- Gates: G2 → 131 (ruff), 132 (complejidad), 137 (mypy), 138 (interrogate/coverage).
