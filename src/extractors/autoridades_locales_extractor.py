@@ -33,8 +33,18 @@ ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
+# SCHEMA canónico compartido del carril autoridades (plan 133a). Import por
+# paquete (`from src.extractors import X`): la forma `from src.extractors.X
+# import Y` falla de manera intermitente en algunos entornos (mismo archivo,
+# verificado en CI y local) — el import por paquete lo resuelve siempre.
 try:
-    from src.extractors.authoridades_shared import SCHEMA
+    from src.extractors import autoridades_shared as _autoridades_shared
+except ModuleNotFoundError:  # ejecución como script (python src/extractors/*.py)
+    import autoridades_shared as _autoridades_shared
+
+SCHEMA = _autoridades_shared.SCHEMA
+
+try:
     from src.extractors.base import (
         BaseExtractor,
         ensure_staging_directories,
@@ -43,7 +53,6 @@ try:
     from src.extractors.http_utils import fetch_with_retry
     from src.extractors.region_utils import REGION_A_CODIGO, norm_text
 except ModuleNotFoundError:
-    from autoridades_shared import SCHEMA
     from base import BaseExtractor, ensure_staging_directories, write_staging_csv_atomic
     from http_utils import fetch_with_retry
     from region_utils import REGION_A_CODIGO, norm_text
