@@ -9,7 +9,6 @@
 <p><strong>Datos públicos de Chile curados, normalizados, validados y listos para Python, SQL, Excel y pipelines.</strong></p>
 <p><em>La última milla entre “el dato existe” y “el dato ya sirve”.</em></p>
 
-[![GitHub stars](https://img.shields.io/github/stars/cortega26/chile-hub?style=flat&logo=github)](https://github.com/cortega26/chile-hub/stargazers)
 [![CI/CD](https://github.com/cortega26/chile-hub/actions/workflows/pipeline-check.yml/badge.svg)](https://github.com/cortega26/chile-hub/actions)
 [![PyPI version](https://img.shields.io/pypi/v/chile-hub.svg)](https://pypi.org/project/chile-hub/)
 [![PyPI downloads](https://img.shields.io/pypi/dm/chile-hub.svg)](https://pypi.org/project/chile-hub/)
