@@ -58,6 +58,11 @@ Ejemplos de uso por el agente:
 - `get_indicadores(codigo="uf", desde="2026-01-01")`
 - `get_dataset(nombre="censo_comunal", limite=5)`
 
+> Los tres resolvers son de coincidencia **exacta** y determinista (toleran
+> tildes/`ñ`/mayúsculas y alias como `RM`, nada más): lo no encontrado
+> devuelve `matched: false`, nunca una excepción ni un guess. No corrijas
+> typos por tu cuenta — un nombre mal escrito queda como no-matcheado.
+
 > El servidor es de sólo lectura por diseño. Para SQL arbitrario usa la API
 > Python (`ChileHub.sql()`) o DuckDB sobre los Parquet (ver
 > [Acceso HTTP estático](http-access.md)).

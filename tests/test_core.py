@@ -13,6 +13,7 @@ import os
 import re
 import unittest
 from pathlib import Path
+from typing import ClassVar
 from unittest import mock
 
 import polars as pl
@@ -1319,6 +1320,80 @@ class PublicSurfaceGuardrailTests(unittest.TestCase):
             {},
             f"Firma o tipo de atributo público modificado (plan 134a): {firma_cambiada}",
         )
+
+
+class ResolverParityGuardrailTests(unittest.TestCase):
+    """Plan 142 Step 4: paridad de resolutores Python ⊆ CLI ⊆ MCP (extiende 134a).
+
+    Cada resolver público de `ChileHub` debe existir como subcomando CLI y como
+    tool MCP, con el mismo contrato determinista (ADR-009). Sin excepciones
+    documentadas hoy: la tabla está completa (3/3/3). Si se agrega un resolver,
+    se agrega su fila con el subcomando y la tool.
+
+    Nota del spike fuzzy (Plan 142 Step 4, write-only, sin cambio de código):
+    346 comunas × 5 variantes de typo (sin-tilde, ñ↔n ×2, letra-menos,
+    espacio-extra) contra el matcher exacto → 73.9% match, 26.1% miss,
+    0 falsos positivos; 12 comunas tienen un vecino a distancia de edición 1
+    (p. ej. nancagua/rancagua, pemuco/temuco) y un umbral fuzzy ≤1 ya
+    misatribuye 4/346 typos de letra-menos. Recomendación: exact-only
+    (ADR-009 pregunta #1 sigue diferida); si hay demanda, un `suggest_*`
+    separado con candidatos, nunca un umbral que cambie `matched`.
+    """
+
+    # (método Python, subcomando CLI, tool MCP)
+    PARITY: ClassVar[list[tuple[str, str, str]]] = [
+        ("resolve_comunas", "resolve", "resolve_comunas"),
+        ("resolve_regiones", "resolve-regiones", "resolve_regiones"),
+        ("resolve_by_coords", "resolve-coords", "resolve_by_coords"),
+    ]
+
+    def test_python_resolvers_exist(self):
+        """Cada fila tiene su método público en `ChileHub`."""
+        for python_method, _, _ in self.PARITY:
+            with self.subTest(resolver=python_method):
+                self.assertTrue(
+                    callable(getattr(ChileHub, python_method, None)),
+                    f"ChileHub.{python_method} ausente",
+                )
+
+    def test_cli_subcommands_registered(self):
+        """Cada fila tiene su subcomando en argparse (`--help` sale 0)."""
+        import contextlib
+        import io
+
+        from chile_hub import cli
+
+        parser = cli.build_parser()
+        for _, subcommand, _ in self.PARITY:
+            with self.subTest(subcommand=subcommand):
+                self.assertIn(subcommand, cli.HANDLERS)
+                with contextlib.redirect_stdout(io.StringIO()):
+                    with self.assertRaises(SystemExit) as ctx:
+                        parser.parse_args([subcommand, "--help"])
+                self.assertEqual(ctx.exception.code, 0)
+
+    def test_mcp_tools_registered(self):
+        """Cada fila tiene su wrapper en `mcp_tools` y su `name=` en `mcp_server`.
+
+        Chequeo de texto (sin importar `mcp`): el extra es opcional y el test
+        debe pasar sin él, igual que `McpToolsTests.test_server_module_import_is_lazy`.
+        """
+        from chile_hub import mcp_tools
+
+        server_source = (ROOT_DIR / "src" / "chile_hub" / "mcp_server.py").read_text(
+            encoding="utf-8"
+        )
+        for _, _, mcp_tool in self.PARITY:
+            with self.subTest(tool=mcp_tool):
+                self.assertTrue(
+                    callable(getattr(mcp_tools, mcp_tool, None)),
+                    f"mcp_tools.{mcp_tool} ausente",
+                )
+                self.assertIn(
+                    f'name="{mcp_tool}"',
+                    server_source,
+                    f"tool {mcp_tool} no registrada en mcp_server.build_server",
+                )
 
 
 if __name__ == "__main__":
