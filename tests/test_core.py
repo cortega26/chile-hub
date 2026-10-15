@@ -762,6 +762,86 @@ class McpResolveRegionesTests(unittest.TestCase):
         self.assertIsNone(results[1]["nombre_region"])
 
 
+class McpResolveByCoordsTests(unittest.TestCase):
+    """Plan 142 Step 2: MCP `resolve_by_coords` delega en `_query`.
+
+    Geometría 100% sintética (tests/geo_fixtures.py, patrón Plan 065): nunca
+    toca red ni el artefacto real. El umbral de >= 340 geometrías se parchea
+    igual que en `ChileHubResolveByCoordsTests`.
+    """
+
+    def setUp(self):
+        clear_geometry_cache()
+
+    def tearDown(self):
+        clear_geometry_cache()
+
+    @staticmethod
+    def _fixture_path():
+        import tempfile
+
+        from geo_fixtures import write_synthetic_parquet
+
+        tmpdir = Path(tempfile.mkdtemp())
+        return write_synthetic_parquet(tmpdir / "geometria_comunal.parquet")
+
+    def test_known_point_matches_and_outside_is_unmatched(self):
+        """Punto dentro del cuadrado A → 01101; punto fuera → matched=False."""
+        from chile_hub.mcp_tools import resolve_by_coords
+
+        with mock.patch("chile_hub.geo.MIN_NON_EMPTY_GEOMETRIES", 3):
+            results = resolve_by_coords(
+                [[-19.5, -70.0], [-21.0, -71.0]],
+                geometry_path=self._fixture_path(),
+            )
+        self.assertTrue(results[0]["matched"])
+        self.assertEqual(results[0]["codigo_comuna"], "01101")
+        self.assertEqual(results[0]["input_lat"], -19.5)
+        self.assertEqual(results[0]["input_lon"], -70.0)
+        self.assertFalse(results[1]["matched"])
+        self.assertIsNone(results[1]["codigo_comuna"])
+        self.assertIsNone(results[1]["nombre_comuna"])
+
+    def test_out_of_range_raises_value_error_naming_input(self):
+        """Latitud fuera de [-90, 90] levanta ValueError nombrando el input."""
+        from chile_hub.mcp_tools import resolve_by_coords
+
+        with self.assertRaises(ValueError) as ctx:
+            resolve_by_coords([[95.0, 0.0]], geometry_path=self._fixture_path())
+        self.assertIn("input 0", str(ctx.exception))
+
+    def test_import_without_geo_extra_pulls_no_geopandas(self):
+        """Sin el extra `geo`, importar mcp_tools/mcp_server debe funcionar sin
+        meter geopandas/shapely en sys.modules (el geo sigue perezoso)."""
+        import subprocess
+        import sys
+
+        code = "\n".join(
+            [
+                "import builtins, sys",
+                "real_import = builtins.__import__",
+                "def blocked(name, *args, **kwargs):",
+                "    if name.startswith(('geopandas', 'shapely')):",
+                "        raise ImportError(f'No module named {name!r}')",
+                "    return real_import(name, *args, **kwargs)",
+                "builtins.__import__ = blocked",
+                "import chile_hub.mcp_tools, chile_hub.mcp_server",
+                "assert 'geopandas' not in sys.modules, 'geopandas en sys.modules sin extra geo'",
+                "assert 'shapely' not in sys.modules, 'shapely en sys.modules sin extra geo'",
+                "print('lazy-geo-ok')",
+            ]
+        )
+        result = subprocess.run(
+            [sys.executable, "-c", code],
+            cwd=ROOT_DIR,
+            capture_output=True,
+            text=True,
+            timeout=120,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("lazy-geo-ok", result.stdout)
+
+
 class RegionAliasParityTests(unittest.TestCase):
     """Guardrail anti-divergencia entre la tabla del paquete (fuente única) y
     la copia de fallback de `region_utils` (Plan 129).
