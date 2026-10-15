@@ -1689,7 +1689,7 @@ class PerfilEnrichmentTests(unittest.TestCase):
         )
         return (comunas, censo, hogares, salud, educ, electoral, finanzas, resultados, siedu)
 
-    def _run(self, vitales=None, permisos=None, calidad=None):
+    def _run(self, vitales=None, permisos=None, calidad=None, pobreza=None):
         from src.builders.datasets import build_perfil_territorial_comunal
 
         return build_perfil_territorial_comunal(
@@ -1697,6 +1697,7 @@ class PerfilEnrichmentTests(unittest.TestCase):
             df_vitales=vitales,
             df_permisos=permisos,
             df_calidad=calidad,
+            df_pobreza=pobreza,
         )
 
     def test_enrichment_latest_year_and_math(self):
@@ -1750,9 +1751,47 @@ class PerfilEnrichmentTests(unittest.TestCase):
             "anio_permisos_edificacion",
             "mp25_promedio_ultimo_anio",
             "anio_calidad_aire",
+            "tasa_pobreza_ingresos_ultimo_anio",
+            "tasa_pobreza_multidimensional_ultimo_anio",
+            "anio_pobreza",
         ):
             self.assertIn(col, df.columns)
             self.assertTrue(df[col].is_null().all())
+
+    def test_pobreza_latest_year_and_missing_comuna_null(self):
+        """Pobreza SAE: último año por comuna; sin estimación queda nulo."""
+        pobreza = pl.DataFrame(
+            {
+                "codigo_comuna": ["13101"] * 4,
+                "anio": [2020, 2020, 2022, 2022],
+                "dimension": ["ingresos", "multidimensional", "ingresos", "multidimensional"],
+                "tasa": [10.0, 20.0, 12.5, 22.5],
+            }
+        )
+        df = self._run(pobreza=pobreza)
+        self.assertEqual(df.height, 2)
+        row = df.filter(pl.col("codigo_comuna") == "13101").to_dicts()[0]
+        self.assertEqual(row["anio_pobreza"], 2022)
+        self.assertAlmostEqual(row["tasa_pobreza_ingresos_ultimo_anio"], 12.5)
+        self.assertAlmostEqual(row["tasa_pobreza_multidimensional_ultimo_anio"], 22.5)
+        # Comuna sin estimación SAE queda nula (no inventada)
+        row2 = df.filter(pl.col("codigo_comuna") == "13102").to_dicts()[0]
+        self.assertIsNone(row2["tasa_pobreza_ingresos_ultimo_anio"])
+        self.assertIsNone(row2["tasa_pobreza_multidimensional_ultimo_anio"])
+        self.assertIsNone(row2["anio_pobreza"])
+
+    def test_perfil_poverty_columns_nullable_but_range_checked(self):
+        """El validador acepta pobreza nula pero rechaza tasa fuera de 0-100."""
+        df = self._run()
+        ok_result = validate_perfil_territorial_comunal(df, {"notes": []}, None)
+        self.assertFalse(
+            any("tasa_pobreza" in e for e in ok_result["errors"]),
+            ok_result["errors"],
+        )
+        bad = df.with_columns(pl.lit(150.0).alias("tasa_pobreza_ingresos_ultimo_anio"))
+        bad_result = validate_perfil_territorial_comunal(bad, {"notes": []}, None)
+        self.assertEqual(bad_result["status"], "error")
+        self.assertTrue(any("tasa_pobreza_ingresos_ultimo_anio" in e for e in bad_result["errors"]))
 
 
 class IndicatorFallbackTests(unittest.TestCase):
