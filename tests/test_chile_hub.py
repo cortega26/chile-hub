@@ -2279,6 +2279,39 @@ class ChileHubCliDispatchTests(unittest.TestCase):
         exit_code, _ = self._run_main(["no-existe"])
         self.assertEqual(exit_code, 2)
 
+    def test_resolve_coords_help_exits_0(self):
+        """Plan 142 Step 3: `resolve-coords --help` sale con código 0."""
+        exit_code, output = self._run_main(["resolve-coords", "--help"])
+        self.assertEqual(exit_code, 0)
+        self.assertIn("LAT,LON", output)
+
+    def test_resolve_coords_dispatches_parsed_floats(self):
+        """Plan 142 Step 3: el CLI parsea "LAT,LON" y delega en hub.resolve_by_coords (mock, sin red)."""
+        from chile_hub import cli
+
+        df = pl.DataFrame(
+            {
+                "input_lat": [-33.4489],
+                "input_lon": [-70.6693],
+                "codigo_comuna": ["13101"],
+                "nombre_comuna": ["Santiago"],
+                "matched": [True],
+            }
+        )
+        with patch.object(cli, "ChileHub") as mock_hub_cls:
+            mock_hub_cls.return_value.resolve_by_coords.return_value = df
+            # `--`: las coordenadas empiezan con `-` y argparse las tomaría por flags.
+            exit_code, _ = self._run_main(["resolve-coords", "--", "-33.4489,-70.6693"])
+        self.assertIsNone(exit_code)
+        mock_hub_cls.return_value.resolve_by_coords.assert_called_once_with([(-33.4489, -70.6693)])
+
+    def test_resolve_coords_invalid_format_raises_clean_error(self):
+        """Un par malformado levanta ChileHubError (error limpio, sin traceback)."""
+        from chile_hub.exceptions import ChileHubError
+
+        with self.assertRaises(ChileHubError):
+            self._run_main(["resolve-coords", "no-es-coordenada"])
+
 
 class EntryPointTests(unittest.TestCase):
     """Smoke tests para puntos de entrada y código de inicialización."""
