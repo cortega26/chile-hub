@@ -23,7 +23,10 @@
     "superficie_autorizada_m2_ultimo_anio": "integer",
     "anio_permisos_edificacion": "integer",
     "mp25_promedio_ultimo_anio": "float",
-    "anio_calidad_aire": "integer"
+    "anio_calidad_aire": "integer",
+    "tasa_pobreza_ingresos_ultimo_anio": "float",
+    "tasa_pobreza_multidimensional_ultimo_anio": "float",
+    "anio_pobreza": "integer"
   },
   "nullable_columns": [
     "crecimiento_natural_ultimo_anio",
@@ -32,7 +35,10 @@
     "superficie_autorizada_m2_ultimo_anio",
     "anio_permisos_edificacion",
     "mp25_promedio_ultimo_anio",
-    "anio_calidad_aire"
+    "anio_calidad_aire",
+    "tasa_pobreza_ingresos_ultimo_anio",
+    "tasa_pobreza_multidimensional_ultimo_anio",
+    "anio_pobreza"
   ],
   "fixed_width_columns": {
     "codigo_region": 2,
@@ -106,6 +112,21 @@
       "name": "anio_calidad_aire",
       "type": "integer",
       "example": 2026
+    },
+    {
+      "name": "tasa_pobreza_ingresos_ultimo_anio",
+      "type": "float",
+      "example": 9.0
+    },
+    {
+      "name": "tasa_pobreza_multidimensional_ultimo_anio",
+      "type": "float",
+      "example": 19.5
+    },
+    {
+      "name": "anio_pobreza",
+      "type": "integer",
+      "example": 2022
     }
   ]
 }

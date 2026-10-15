@@ -297,7 +297,7 @@
     "review_by": "2026-12-31",
     "stalled_after_days": 90,
     "owner": "core",
-    "next_action": "Track readiness inherited from upstream component datasets (12 upstreams desde 2026-09: +estadisticas_vitales, +permisos_edificacion, +calidad_aire).",
+    "next_action": "Track readiness inherited from upstream component datasets (13 upstreams desde 2026-10: +estadisticas_vitales, +permisos_edificacion, +calidad_aire, +pobreza_comunal).",
     "publication_track": "stable_publishable",
     "public_bundle_eligible": true,
     "upstream_datasets": [
@@ -312,7 +312,8 @@
       "indicadores_urbanos_siedu",
       "estadisticas_vitales",
       "permisos_edificacion",
-      "calidad_aire"
+      "calidad_aire",
+      "pobreza_comunal"
     ],
     "cadencia": "bajo_demanda"
   },

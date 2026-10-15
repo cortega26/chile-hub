@@ -1,12 +1,12 @@
 # Perfil Territorial Comunal
 
 > **Carril:** `stable_publishable` — incluido en el bundle público (Plan
-> 084). Capa derivada en `build_dev_db.py` de 12 datasets upstream; su
+> 084). Capa derivada en `build_dev_db.py` de 13 datasets upstream; su
 > `freshness_policy` es `derivada`, no una fuente viva.
 
 ## Descripción
 
-Tabla derivada con una fila por comuna que consolida la DPA, Censo 2024, hogares y viviendas, salud, educación, distritos electorales, finanzas municipales, resultados educacionales, resumen SIEDU, crecimiento natural (estadísticas vitales), viviendas autorizadas (permisos de edificación) y MP2.5 promedio (calidad del aire).
+Tabla derivada con una fila por comuna que consolida la DPA, Censo 2024, hogares y viviendas, salud, educación, distritos electorales, finanzas municipales, resultados educacionales, resumen SIEDU, crecimiento natural (estadísticas vitales), viviendas autorizadas (permisos de edificación), MP2.5 promedio (calidad del aire) y tasas de pobreza SAE por ingresos y multidimensional (pobreza comunal).
 
 ## Fuente y licencia
 
@@ -38,6 +38,7 @@ Las columnas derivadas de capas parciales pueden venir nulas o en cero según co
 ## Registro de cambios
 
 - v1: Perfil derivado agregado con validación de 346 comunas únicas.
+- Pobreza SAE (2026-10): `tasa_pobreza_ingresos_ultimo_anio`, `tasa_pobreza_multidimensional_ultimo_anio` y `anio_pobreza` del último año con datos (nulos donde no hay estimación, p. ej. Antártica).
 
 ## Clasificación de salud (ADR-014)
 
@@ -64,5 +65,8 @@ respaldo. Con 346/346 comunas y cero warnings, su `drift_status` es `healthy`.
 | `anio_permisos_edificacion` | `INTEGER` | `2023` | No | — |
 | `mp25_promedio_ultimo_anio` | `DOUBLE` | `18.4` | No | — |
 | `anio_calidad_aire` | `INTEGER` | `2026` | No | — |
+| `tasa_pobreza_ingresos_ultimo_anio` | `DOUBLE` | `9.0` | No | — |
+| `tasa_pobreza_multidimensional_ultimo_anio` | `DOUBLE` | `19.5` | No | — |
+| `anio_pobreza` | `INTEGER` | `2022` | No | — |
 
 <!-- END_DATASET_SCHEMA -->
