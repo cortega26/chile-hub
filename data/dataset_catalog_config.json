@@ -341,7 +341,7 @@
     "expected_record_count": null
   },
   "finanzas_municipales": {
-    "description": "Indicadores financieros municipales anuales desde SINIM/SUBDERE. CAPA PARCIAL/CANDIDATO: 3 de 346 comunas (0.9%). Usar con precaución; no representa cobertura nacional.",
+    "description": "Indicadores financieros municipales anuales desde SINIM/SUBDERE. Cobertura 345/346 comunas (año 2024; falta Antártica 12202, hueco conocido de la fuente). Extracción mensual vía monthly-scrape.",
     "join_keys": [
       "anio",
       "codigo_comuna"
@@ -351,9 +351,7 @@
       "src/extractors/sinim_finanzas_extractor.py",
       "src/extractors/sinim_finanzas_live_extractor.py"
     ],
-    "coverage_note": "parcial_candidato_3_de_346_comunas",
-    "coverage_pct": 0.9,
-    "expected_record_count": null,
+    "expected_record_count": 345,
     "reuse_policy": {
       "status": "public-api-review-terms",
       "license": "Datos públicos municipales; términos de reutilización sujetos a revisión",
