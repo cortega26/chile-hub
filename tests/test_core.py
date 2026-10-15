@@ -707,6 +707,61 @@ class ChileHubResolveRegionesTests(unittest.TestCase):
         self.assertEqual(result.schema["codigo_region"], pl.String)
 
 
+class McpResolveRegionesTests(unittest.TestCase):
+    """Plan 142 Step 1: MCP `resolve_regiones` delega en `_query` (sin red).
+
+    Replica el patrón de `McpToolsTests` (tests/test_pipeline_logic.py) con un
+    Parquet local: el alias "RM" → 13 solo existe en la tabla de `_query`, así
+    que su match evidencia delegación y no reimplementación.
+    """
+
+    def setUp(self):
+        from chile_hub.mcp_tools import _read_parquet_cached
+
+        _read_parquet_cached.cache_clear()
+
+    def tearDown(self):
+        from chile_hub.mcp_tools import _read_parquet_cached
+
+        _read_parquet_cached.cache_clear()
+
+    @staticmethod
+    def _write_regiones(tmpdir: str) -> str:
+        pl.DataFrame(
+            {
+                "codigo_region": ["05", "13"],
+                "nombre_region": ["Región de Valparaíso", "Región Metropolitana de Santiago"],
+            }
+        ).write_parquet(Path(tmpdir) / "regiones.parquet")
+        return tmpdir
+
+    def test_resolve_regiones_happy_path_accent_insensitive(self):
+        """'Valparaiso' (sin tilde) resuelve al CUT 05 con nombre oficial."""
+        import tempfile
+
+        from chile_hub.mcp_tools import resolve_regiones
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            results = resolve_regiones(["Valparaiso"], base_url=self._write_regiones(tmpdir))
+        self.assertTrue(results[0]["matched"])
+        self.assertEqual(results[0]["codigo_region"], "05")
+        self.assertEqual(results[0]["nombre_region"], "Región de Valparaíso")
+
+    def test_resolve_regiones_alias_and_unmatched(self):
+        """El alias 'RM' delega a la tabla de `_query`; lo inexistente no raisea."""
+        import tempfile
+
+        from chile_hub.mcp_tools import resolve_regiones
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            results = resolve_regiones(["RM", "No Existe"], base_url=self._write_regiones(tmpdir))
+        self.assertTrue(results[0]["matched"])
+        self.assertEqual(results[0]["codigo_region"], "13")
+        self.assertFalse(results[1]["matched"])
+        self.assertIsNone(results[1]["codigo_region"])
+        self.assertIsNone(results[1]["nombre_region"])
+
+
 class RegionAliasParityTests(unittest.TestCase):
     """Guardrail anti-divergencia entre la tabla del paquete (fuente única) y
     la copia de fallback de `region_utils` (Plan 129).

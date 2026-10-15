@@ -17,6 +17,7 @@ from functools import lru_cache
 import polars as pl
 import requests
 
+from . import _query
 from .datasets import Dataset
 from .text import normalize_comuna_name
 
@@ -122,6 +123,20 @@ def resolve_comunas(nombres: list[str], base_url: str = PUBLIC_DATA_BASE) -> lis
             }
         )
     return results
+
+
+def resolve_regiones(nombres: list[str], base_url: str = PUBLIC_DATA_BASE) -> list[dict]:
+    """Resuelve nombres de región (con tildes, prefijo "Región de/del" o alias como "RM") a su código CUT."""
+    resolved = _query.resolve_regiones(nombres, _read_dataset("regiones", base_url))
+    return [
+        {
+            "entrada": row["input"],
+            "codigo_region": row["codigo_region"],
+            "nombre_region": row["nombre_region"],
+            "matched": row["matched"],
+        }
+        for row in resolved.iter_rows(named=True)
+    ]
 
 
 def _parse_date(value: str, field: str) -> datetime.date:

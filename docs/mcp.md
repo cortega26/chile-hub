@@ -46,11 +46,13 @@ Claude Desktop (`claude_desktop_config.json`) y clientes compatibles:
 | `list_datasets` | Lista las capas disponibles y la URL de su Parquet | — |
 | `get_dataset` | Primeras filas de una capa (máximo 1000) | `nombre`, `limite` |
 | `resolve_comunas` | Nombres de comuna → código CUT de 5 caracteres | `nombres` (lista) |
+| `resolve_regiones` | Nombres de región (o alias como `RM`) → código CUT de 2 caracteres | `nombres` (lista) |
 | `get_indicadores` | Serie UF/dólar/euro/UTM/IPC | `codigo`, `desde`, `hasta`, `limite` |
 
 Ejemplos de uso por el agente:
 
 - `resolve_comunas(["Ñuñoa", "valparaiso"])` → `13120`, `05101`
+- `resolve_regiones(["Valparaiso", "RM"])` → `05`, `13`
 - `get_indicadores(codigo="uf", desde="2026-01-01")`
 - `get_dataset(nombre="censo_comunal", limite=5)`
 

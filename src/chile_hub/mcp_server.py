@@ -1,9 +1,10 @@
 """Servidor MCP (stdio) de chile-hub — datos públicos de Chile para agentes.
 
-Expone cuatro tools de sólo lectura sobre la capa HTTP estática
+Expone cinco tools de sólo lectura sobre la capa HTTP estática
 (`data/normalized/{capa}.parquet`): listar capas, leer filas, resolver nombres
-de comuna a CUT y consultar indicadores económicos. No hay hosting, telemetría
-ni escritura en disco: el servidor corre local en el cliente MCP.
+de comuna a CUT, resolver nombres de región a CUT y consultar indicadores
+económicos. No hay hosting, telemetría ni escritura en disco: el servidor
+corre local en el cliente MCP.
 
 El paquete `mcp` vive en el extra opcional `mcp`; este módulo lo importa de
 forma perezosa para que `import chile_hub` siga funcionando sin él.
@@ -24,6 +25,7 @@ from .mcp_tools import (
     get_indicadores,
     list_datasets,
     resolve_comunas,
+    resolve_regiones,
 )
 
 INSTALL_HINT = (
@@ -33,7 +35,7 @@ INSTALL_HINT = (
 
 
 def build_server() -> Any:
-    """Construye el `MCPServer` con las cuatro tools registradas.
+    """Construye el `MCPServer` con las cinco tools registradas.
 
     Importa `mcp` aquí dentro: sin el extra, el error es explícito en vez de
     romper el import del paquete.
@@ -48,9 +50,10 @@ def build_server() -> Any:
         title="chile-hub — datos públicos de Chile",
         instructions=(
             "Capa de datos curada y validada sobre fuentes oficiales de Chile. "
-            "Usa list_datasets para descubrir capas, resolve_comunas para "
-            "traducir nombres a códigos CUT (clave de cruce), get_dataset para "
-            "leer filas y get_indicadores para series económicas."
+            "Usa list_datasets para descubrir capas, resolve_comunas y "
+            "resolve_regiones para traducir nombres a códigos CUT (clave de "
+            "cruce), get_dataset para leer filas y get_indicadores para series "
+            "económicas."
         ),
         version=__version__,
     )
@@ -81,6 +84,16 @@ def build_server() -> Any:
     )
     def _resolve_comunas(nombres: list[str]) -> list[dict[str, Any]]:
         return resolve_comunas(nombres)
+
+    @server.tool(
+        name="resolve_regiones",
+        description=(
+            "Resuelve nombres de región (con tildes, prefijo 'Región de/del' o "
+            "alias como 'RM') a su código CUT de 2 caracteres y nombre oficial."
+        ),
+    )
+    def _resolve_regiones(nombres: list[str]) -> list[dict[str, Any]]:
+        return resolve_regiones(nombres)
 
     @server.tool(
         name="get_indicadores",
