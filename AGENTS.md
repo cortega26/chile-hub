@@ -671,9 +671,9 @@ grep -n "^class " tests/*.py
 | `test_packaging_runtime.py` | Sí (`make build` antes) | Empaquetado del bundle publicable (ZIP, SHA256) en runtime |
 | `test_phase1_characterization.py` | No | Arnés de caracterización Phase 1: staging sintético offline, equivalencia de build completo, alias y políticas de publicación |
 | `test_phase2_datasetspec.py` | No | DatasetSpec piloto Phase 2–3D: modelo tipado, proyecciones de compatibilidad contra catálogo/registry/contrato legacy, overlay y fallos cerrados (25 specs: complete — cubre todo el catálogo) |
-| `test_proof_of_value.py` | No | Prueba reproducible de tres cruces territoriales, cobertura, integridad CUT y hash de resultados (sin red) |
 | `test_phase4_extraction.py` | No | ExtractionResult Phase 4: modelo tipado, 3 extractores piloto (ordinary/fallback/multi-source) y adapters legacy |
 | `test_pipeline_logic.py` | No | Lógica interna de `build_dev_db.py`, invariantes CUT, fallback de indicadores, severidad de `dataset_changelog.json`, builders (`reports`, `pipeline_status_utils`) |
+| `test_proof_of_value.py` | No | Prueba reproducible de tres cruces territoriales, cobertura, integridad CUT y hash de resultados (sin red) |
 | `test_render.py` | No | Helper de renderizado de tablas (`_render.py`) |
 | `test_validation.py` | No | Funciones `validate_*()` del paquete `src/validation/`: bordes vacíos, claves duplicadas, casos límite |
 | `test_verify_pipeline.py` | Sí (`make build` antes) | Verificación de pipeline (`verify_pipeline.py`) — guardia pre-publicación de artefactos |
