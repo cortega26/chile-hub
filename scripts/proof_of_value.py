@@ -6,6 +6,7 @@ No usa red ni telemetría; no compara rendimiento con otros portales.
 from __future__ import annotations
 
 import argparse
+from collections.abc import Callable
 import hashlib
 import json
 import platform
@@ -13,10 +14,10 @@ import re
 import statistics
 import subprocess
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from time import perf_counter_ns
-from typing import Any, Callable
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATASETS = (
@@ -39,9 +40,11 @@ def read_rows(directory: Path, name: str) -> list[dict[str, Any]]:
     if not isinstance(rows, list) or not rows:
         raise ValueError(f"{name}: se esperaba una lista JSON no vacía")
     for position, row in enumerate(rows):
-        if not isinstance(row, dict) or not CUT_PATTERN.fullmatch(
-            str(row.get("codigo_comuna", ""))
-        ) or not isinstance(row.get("codigo_comuna"), str):
+        if (
+            not isinstance(row, dict)
+            or not CUT_PATTERN.fullmatch(str(row.get("codigo_comuna", "")))
+            or not isinstance(row.get("codigo_comuna"), str)
+        ):
             raise ValueError(f"{name}: CUT inválido en fila {position}")
     return rows
 
@@ -85,15 +88,19 @@ def case_censo(data: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
             raise ValueError(f"Censo 2024: población inválida en {cut}")
         if not isinstance(older, int) or not 0 <= older <= population:
             raise ValueError(f"Censo 2024: tramo 65+ inválido en {cut}")
-        top.append({
-            "codigo_comuna": cut,
-            "comuna": base[cut]["nombre_comuna"],
-            "porcentaje_65_mas": round(100 * older / population, 2),
-        })
+        top.append(
+            {
+                "codigo_comuna": cut,
+                "comuna": base[cut]["nombre_comuna"],
+                "porcentaje_65_mas": round(100 * older / population, 2),
+            }
+        )
     top.sort(key=lambda r: (-r["porcentaje_65_mas"], r["codigo_comuna"]))
     return {
         **coverage_info,
-        "poblacion_censada_en_cruce": sum(censo[c]["poblacion_censada"] for c in base.keys() & censo.keys()),
+        "poblacion_censada_en_cruce": sum(
+            censo[c]["poblacion_censada"] for c in base.keys() & censo.keys()
+        ),
         "ejemplo_top_65_mas": top[:3],
         "nota": "Censo INE 2024; ranking descriptivo, no causal.",
     }
@@ -108,10 +115,17 @@ def case_hogares(data: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
     for cut in base.keys() & homes.keys():
         households = homes[cut]["hogares_censados"]
         dwellings = homes[cut]["viviendas_censadas"]
-        if not isinstance(households, int) or households < 0 or not isinstance(dwellings, int) or dwellings < 0:
+        if (
+            not isinstance(households, int)
+            or households < 0
+            or not isinstance(dwellings, int)
+            or dwellings < 0
+        ):
             raise ValueError(f"Hogares 2024: recuento inválido en {cut}")
         code = base[cut]["codigo_region"]
-        region = regions.setdefault(code, {"codigo_region": code, "hogares": 0, "viviendas": 0})
+        region = regions.setdefault(
+            code, {"codigo_region": code, "hogares": 0, "viviendas": 0}
+        )
         region["hogares"] += households
         region["viviendas"] += dwellings
     largest = sorted(regions.values(), key=lambda r: (-r["hogares"], r["codigo_region"]))
@@ -128,7 +142,11 @@ def case_hogares(data: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
 def case_pobreza(data: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
     """Cruza perfil territorial y pobreza SAE 2022 sin equiparar años."""
     base = unique_by_cut(data["perfil_territorial_comunal"], "perfil_territorial_comunal")
-    selected = [r for r in data["pobreza_comunal"] if r.get("dimension") == "ingresos" and r.get("anio") == 2022]
+    selected = [
+        r
+        for r in data["pobreza_comunal"]
+        if r.get("dimension") == "ingresos" and r.get("anio") == 2022
+    ]
     if not selected:
         raise ValueError("Pobreza: no existe la serie SAE ingresos 2022")
     poverty = unique_by_cut(selected, "pobreza_comunal ingresos 2022")
@@ -138,21 +156,28 @@ def case_pobreza(data: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
         rate = poverty[cut]["tasa"]
         if not isinstance(rate, (int, float)) or not 0 <= rate <= 100:
             raise ValueError(f"Pobreza 2022: tasa fuera de rango en {cut}")
-        sample.append({
-            "codigo_comuna": cut,
-            "comuna": base[cut]["nombre_comuna"],
-            "tasa_pobreza_ingresos_2022_pct": round(rate, 2),
-            "poblacion_censada_2024": base[cut].get("poblacion_censada"),
-        })
+        sample.append(
+            {
+                "codigo_comuna": cut,
+                "comuna": base[cut]["nombre_comuna"],
+                "tasa_pobreza_ingresos_2022_pct": round(rate, 2),
+                "poblacion_censada_2024": base[cut].get("poblacion_censada"),
+            }
+        )
     sample.sort(key=lambda r: r["codigo_comuna"])
     return {
         **coverage_info,
         "ejemplo_cruce": sample[:3],
-        "nota": "SAE 2022 + Censo 2024: cortes distintos; no implica causalidad ni tasa actualizada.",
+        "nota": (
+            "SAE 2022 + Censo 2024: cortes distintos; "
+            "no implica causalidad ni tasa actualizada."
+        ),
     }
 
 
-CASES: tuple[tuple[str, tuple[str, ...], Callable[[dict[str, list[dict[str, Any]]]], dict[str, Any]]], ...] = (
+CASES: tuple[
+    tuple[str, tuple[str, ...], Callable[[dict[str, list[dict[str, Any]]]], dict[str, Any]]], ...
+] = (
     ("censo_y_territorio", ("comunas", "censo_comunal"), case_censo),
     ("hogares_por_region", ("comunas", "censo_hogares_viviendas"), case_hogares),
     ("perfil_y_pobreza", ("perfil_territorial_comunal", "pobreza_comunal"), case_pobreza),
@@ -185,34 +210,44 @@ def run_proof(directory: Path, runs: int = 5, expected_communes: int = 346) -> d
             result = task(data)
             elapsed_ms.append(round((perf_counter_ns() - started) / 1e6, 3))
             if result["total_comunas"] != expected_communes:
-                raise ValueError(f"{title}: {result['total_comunas']} comunas, esperadas {expected_communes}")
+                raise ValueError(
+                    f"{title}: {result['total_comunas']} comunas, esperadas {expected_communes}"
+                )
             if first_result is None:
                 first_result = result
             elif result != first_result:
                 raise ValueError(f"{title}: resultados no deterministas")
         assert first_result is not None
-        canonical = json.dumps(first_result, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
-        evidence.append({
-            "caso": title,
-            "entradas": list(inputs),
-            "resultado": first_result,
-            "resultado_sha256": sha256_hex(canonical.encode("utf-8")),
-            "duracion_ms": {
-                "min": min(elapsed_ms),
-                "mediana": round(statistics.median(elapsed_ms), 3),
-                "max": max(elapsed_ms),
-                "repeticiones": runs,
-            },
-        })
+        canonical = json.dumps(
+            first_result, sort_keys=True, ensure_ascii=False, separators=(",", ":")
+        )
+        evidence.append(
+            {
+                "caso": title,
+                "entradas": list(inputs),
+                "resultado": first_result,
+                "resultado_sha256": sha256_hex(canonical.encode("utf-8")),
+                "duracion_ms": {
+                    "min": min(elapsed_ms),
+                    "mediana": round(statistics.median(elapsed_ms), 3),
+                    "max": max(elapsed_ms),
+                    "repeticiones": runs,
+                },
+            }
+        )
     try:
         git_sha = subprocess.check_output(
-            ["git", "rev-parse", "HEAD"], cwd=PROJECT_ROOT, stderr=subprocess.DEVNULL, text=True, timeout=3
+            ["git", "rev-parse", "HEAD"],
+            cwd=PROJECT_ROOT,
+            stderr=subprocess.DEVNULL,
+            text=True,
+            timeout=3,
         ).strip()
     except (FileNotFoundError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
         git_sha = None
     return {
         "schema_version": 1,
-        "generated_at_utc": datetime.now(timezone.utc).isoformat(),
+        "generated_at_utc": datetime.now(UTC).isoformat(),
         "repository_commit": git_sha,
         "python": platform.python_version(),
         "platform": platform.platform(),
@@ -229,7 +264,9 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data-dir", type=Path, default=PROJECT_ROOT / "data" / "normalized")
     parser.add_argument("--runs", type=int, default=5)
-    parser.add_argument("--output", type=Path, help="Ruta opcional del informe JSON (fuera de data/normalized)")
+    parser.add_argument(
+        "--output", type=Path, help="Ruta opcional del informe JSON (fuera de data/normalized)"
+    )
     args = parser.parse_args(argv)
     try:
         report = run_proof(args.data_dir.resolve(), runs=args.runs)
@@ -238,15 +275,19 @@ def main(argv: list[str] | None = None) -> int:
             if out.is_relative_to((PROJECT_ROOT / "data" / "normalized").resolve()):
                 raise ValueError("El informe no puede sobrescribir artefactos de data/normalized")
             out.parent.mkdir(parents=True, exist_ok=True)
-            out.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            out.write_text(
+                json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+            )
     except ValueError as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2
     print("Chile Hub — evidencia reproducible (sin comparación externa)")
     for case in report["cases"]:
         coverage_info = case["resultado"]
-        print(f"{case['caso']}: {coverage_info['comunas_cruzadas']}/{coverage_info['total_comunas']} "
-              f"CUT ({coverage_info['cobertura_pct']}%); mediana {case['duracion_ms']['mediana']} ms")
+        print(
+            f"{case['caso']}: {coverage_info['comunas_cruzadas']}/{coverage_info['total_comunas']} "
+            f"CUT ({coverage_info['cobertura_pct']}%); mediana {case['duracion_ms']['mediana']} ms"
+        )
     if args.output:
         print(f"Informe: {args.output.resolve()}")
     return 0
