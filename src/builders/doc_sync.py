@@ -280,6 +280,10 @@ _AGENTS_TEST_DESCRIPTIONS = {
         "ExtractionResult Phase 4: modelo tipado, 3 extractores piloto "
         "(ordinary/fallback/multi-source) y adapters legacy"
     ),
+    "test_proof_of_value.py": (
+        "Prueba reproducible de tres cruces territoriales, cobertura, "
+        "integridad CUT y hash de resultados (sin red)"
+    ),
 }
 
 # Estas pruebas crean todo ``data/normalized/`` bajo un directorio temporal;

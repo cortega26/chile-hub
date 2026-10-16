@@ -1,0 +1,40 @@
+name: Chile Hub — prueba reproducible de valor
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "scripts/proof_of_value.py"
+      - "tests/test_proof_of_value.py"
+      - ".github/workflows/value-proof.yml"
+      - "data/normalized/*.json"
+
+permissions:
+  contents: read
+
+jobs:
+  value-proof:
+    name: Contratos CUT + cruces territoriales (sin red)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout (artefactos JSON versionados)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+      - name: Unit tests sin dependencias
+        run: python -m unittest discover -s tests -p 'test_proof_of_value.py' -v
+      - name: Ejecución con datos publicados
+        run: |
+          mkdir -p evidence
+          python scripts/proof_of_value.py --runs 5 --output evidence/chile-hub-value-proof.json
+          python -m json.tool evidence/chile-hub-value-proof.json > /dev/null
+      - name: Exportar evidencia JSON y hashes
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: chile-hub-value-proof
+          path: evidence/chile-hub-value-proof.json
+          if-no-files-found: error
+          retention-days: 30
