@@ -133,6 +133,55 @@ class SinimDailyJobGuardrailTests(unittest.TestCase):
         self.assertIn("docs/extraction-lanes.md", agents)
 
 
+class FinanzasCoverageSyncGuardrailTests(unittest.TestCase):
+    """Plan 143: el catálogo describía `finanzas_municipales` como
+    "3 de 346 comunas (0.9%)" mientras el parquet normalizado contenía 345
+    filas live del scrape mensual SINIM — la doc mentía y el carril
+    `stable_publishable` perdía credibilidad. La copia que renderiza es el
+    DatasetSpec (`documentation.description`, con overlay sobre el catálogo
+    legacy), y `expected_record_count` se proyecta desde el contrato; este
+    guardrail vigila esa copia efectiva, no solo el JSON legacy."""
+
+    SPEC_PATH = ROOT_DIR / "data" / "dataset_specs" / "finanzas_municipales.json"
+    CONTRACT_PATH = ROOT_DIR / "contracts" / "datasets" / "finanzas_municipales.schema.json"
+
+    def test_finanzas_coverage_literals_match_live_build(self):
+        spec = json.loads(self.SPEC_PATH.read_text(encoding="utf-8"))
+        description = spec["documentation"]["description"]
+        self.assertNotIn(
+            "3 de 346",
+            description,
+            "La descripción de finanzas_municipales volvió al texto stale "
+            "de 3 comunas (el build live cubre 345/346).",
+        )
+        self.assertNotIn(
+            "0.9",
+            description,
+            "La descripción de finanzas_municipales volvió al coverage_pct "
+            "stale de 0.9% (Plan 143).",
+        )
+        self.assertIsNone(
+            spec.get("coverage_note"),
+            "coverage_note stale resucitado en el spec (Plan 143 lo eliminó).",
+        )
+        self.assertIsNone(
+            spec.get("coverage_pct"),
+            "coverage_pct stale resucitado en el spec (Plan 143 lo eliminó).",
+        )
+        self.assertNotIn(
+            "Pendiente: workflow mensual",
+            spec["source"]["next_action"],
+            "El next_action volvió al texto 'Pendiente 3.3/3.4' ya cerrado "
+            "y verificado en 2026-10-15 (Plan 143).",
+        )
+        contract = json.loads(self.CONTRACT_PATH.read_text(encoding="utf-8"))
+        self.assertIsNotNone(
+            contract.get("expected_record_count"),
+            "expected_record_count volvió a null: el build live produce "
+            "345 filas y el contrato debe declararlo (Plan 143).",
+        )
+
+
 class AutoridadesElectasScraplingGuardrailTests(unittest.TestCase):
     """Regresión: en el job diario de Pipeline Check (cache-miss → extracción
     completa), autoridades_electas_extractor.py corría con el python del venv

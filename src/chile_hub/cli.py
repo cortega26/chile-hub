@@ -421,6 +421,16 @@ def build_parser():
         "Nombres de región a resolver",
     )
 
+    # Subcomando: resolve-coords (reusa el parser de resolve: pares LAT,LON)
+    # Nota: las coordenadas chilenas empiezan con `-`, así que argparse exige
+    # el separador `--` antes del primer par (ej. `resolve-coords -- -33.4,-70.6`).
+    _add_resolve_parser(
+        subparsers,
+        "resolve-coords",
+        "Resuelve coordenadas LAT,LON a códigos CUT de comuna (match determinista)",
+        "Pares LAT,LON a resolver (ej. -- -33.4489,-70.6693)",
+    )
+
     _add_search_parser(subparsers)
 
     # Subcomando: validate
@@ -720,6 +730,31 @@ def _cmd_resolve_regiones(args):
     _output_dataframe(df, args.output, args.format)
 
 
+def _parse_coords_pairs(names):
+    """Parsea pares "LAT,LON" del CLI a tuplas de float (resolve-coords)."""
+    points = []
+    for raw in names:
+        try:
+            lat_str, lon_str = raw.split(",")
+            points.append((float(lat_str), float(lon_str)))
+        except ValueError:
+            raise ChileHubError(
+                f"Coordenada inválida {raw!r}: se espera el formato LAT,LON "
+                "(ej. -33.4489,-70.6693)."
+            ) from None
+    return points
+
+
+def _cmd_resolve_coords(args):
+    hub = ChileHub()
+    points = _parse_coords_pairs(args.names)
+    try:
+        df = hub.resolve_by_coords(points)
+    except ValueError as exc:
+        raise ChileHubError(str(exc)) from None
+    _output_dataframe(df, args.output, args.format)
+
+
 def _cmd_search(args):
     hub = ChileHub()
     results = hub.search_datasets(
@@ -803,6 +838,7 @@ HANDLERS = {
     "cross": _cmd_cross,
     "resolve": _cmd_resolve,
     "resolve-regiones": _cmd_resolve_regiones,
+    "resolve-coords": _cmd_resolve_coords,
     "search": _cmd_search,
     "validate": _cmd_validate,
     "summary": _cmd_summary,

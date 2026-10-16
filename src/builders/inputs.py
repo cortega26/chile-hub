@@ -274,6 +274,7 @@ def load_staging_inputs(
         df_vitales=optional_frames["estadisticas_vitales"],
         df_permisos=optional_frames["permisos_edificacion"],
         df_calidad=optional_frames["calidad_aire"],
+        df_pobreza=optional_frames["pobreza_comunal"],
     )
 
     frames: dict[str, pl.DataFrame | None] = {**required_frames, **optional_frames}

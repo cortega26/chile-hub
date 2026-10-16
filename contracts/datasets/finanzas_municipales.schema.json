@@ -20,7 +20,7 @@
   "fixed_width_columns": {
     "codigo_comuna": 5
   },
-  "expected_record_count": null,
+  "expected_record_count": 345,
   "coverage_policy": "partial_expected",
   "publish_outputs": [
     "parquet",

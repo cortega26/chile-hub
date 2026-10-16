@@ -189,7 +189,7 @@ El mismo estado se publica en el sitio, con historial de builds y detalle por ca
 ### Respaldo adicional
 
 <!-- START_TEST_COUNT -->
-- **1400 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
+- **1414 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
 <!-- END_TEST_COUNT -->
 <!-- START_ADR_COUNT -->
 - **24 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
@@ -745,7 +745,7 @@ Autor y mantenedor: **Carlos Ortega** — ORCID [0009-0000-3470-6181](https://or
 | `latitud` / `longitud` | `DOUBLE` | `"Coordenadas geográficas"` |
 | `estado_funcionamiento` | `VARCHAR` | `"Vigente"` |
 
-**11. finanzas_municipales** — Indicadores financieros municipales anuales desde SINIM/SUBDERE. CAPA PARCIAL/CANDIDATO: 3 de 346 comunas (0.9%). Usar con precaución; no representa cobertura nacional. (PK: anio, codigo_comuna)
+**11. finanzas_municipales** — Indicadores financieros municipales anuales desde SINIM/SUBDERE. Cobertura 345/346 comunas (año 2024; falta Antártica 12202, hueco conocido de la fuente). Extracción mensual vía monthly-scrape. (PK: anio, codigo_comuna)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
 | `anio` | `INTEGER` | `2024` |
@@ -787,6 +787,9 @@ Autor y mantenedor: **Carlos Ortega** — ORCID [0009-0000-3470-6181](https://or
 | `anio_permisos_edificacion` | `INTEGER` | `2023` |
 | `mp25_promedio_ultimo_anio` | `DOUBLE` | `18.4` |
 | `anio_calidad_aire` | `INTEGER` | `2026` |
+| `tasa_pobreza_ingresos_ultimo_anio` | `DOUBLE` | `9.0` |
+| `tasa_pobreza_multidimensional_ultimo_anio` | `DOUBLE` | `19.5` |
+| `anio_pobreza` | `INTEGER` | `2022` |
 
 **15. empresas** — Registro de Empresas y Sociedades (RES) con RUT, razon social, tipo societario, capital, fecha de constitucion y comuna de domicilio. (PK: rut)
 | Columna | Tipo | Ejemplo |

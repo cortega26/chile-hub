@@ -230,7 +230,7 @@
     "stalled_after_days": 90,
     "owner": "core",
     "degradation_reason": "resolved_2026-06-30_live_extractor_implemented",
-    "next_action": "Fase 3.2 PoC exitoso: extractor live implementado (sinim_finanzas_live_extractor.py). Cobertura 345/346 municipios (2024). Pendiente: workflow mensual (3.3) y metadata de cadencia (3.4).",
+    "next_action": "Verificado 2026-10-15 (Plan 143): 3.3 cerrada — monthly-scrape.yml activo (cron día 1, 03:00 UTC, corre sinim_finanzas_live_extractor.py); 3.4 cerrada — cadencia mensual declarada. Último snapshot live 2026-09-01: 345/346 comunas, año 2024 (falta Antártica 12202). Run 2026-10-01: scrape OK pero rebuild falló, snapshot retenido; reintenta el próximo ciclo mensual.",
     "publication_track": "stable_publishable",
     "public_bundle_eligible": true,
     "legal_note": "El sitio declara sin fines comerciales junto a badge CC BY 2.0 CL. Chile-hub es no comercial. Restricción NC debe declararse en reuse_policy.",
@@ -297,7 +297,7 @@
     "review_by": "2026-12-31",
     "stalled_after_days": 90,
     "owner": "core",
-    "next_action": "Track readiness inherited from upstream component datasets (12 upstreams desde 2026-09: +estadisticas_vitales, +permisos_edificacion, +calidad_aire).",
+    "next_action": "Track readiness inherited from upstream component datasets (13 upstreams desde 2026-10: +estadisticas_vitales, +permisos_edificacion, +calidad_aire, +pobreza_comunal).",
     "publication_track": "stable_publishable",
     "public_bundle_eligible": true,
     "upstream_datasets": [
@@ -312,7 +312,8 @@
       "indicadores_urbanos_siedu",
       "estadisticas_vitales",
       "permisos_edificacion",
-      "calidad_aire"
+      "calidad_aire",
+      "pobreza_comunal"
     ],
     "cadencia": "bajo_demanda"
   },
@@ -392,10 +393,10 @@
     "live_ready": false,
     "fallback_allowed": true,
     "publish_blocking": true,
-    "review_by": "2026-10-21",
+    "review_by": "2026-12-31",
     "stalled_after_days": 90,
     "owner": "core",
-    "next_action": "Cobertura 345/346 (falta codigo_comuna=12202/Antártica, hueco conocido de la fuente BCN — ver ADR-012). Evaluar promoción a stable_publishable una vez confirmada cadencia de refresco y estabilidad del endpoint ArcGIS (region 12/Magallanes requiere fallback comuna-por-comuna por payload combinado grande).",
+    "next_action": "Capa candidata (decisión 2026-10-15, planes 139/145): 345/346 comunas (Antártica codigo_comuna=12202 ausente aguas arriba en la fuente BCN, ver ADR-012). Promover a stable_publishable solo con ingestión en build_dev_db.py + dueño de cadencia de refresco + contrato en partial_expected. Refresco actual: manual vía geometria-comunal.yml.",
     "publication_track": "candidate",
     "public_bundle_eligible": false,
     "cadencia": "bajo_demanda"

@@ -48,7 +48,7 @@ Las propuestas de nuevas capas se evalúan con los criterios públicos de
 | [`establecimientos_educacionales`](establecimientos_educacionales.md) | Directorio oficial del Ministerio de Educación (MINEDUC) con Rol Base de Datos (RBD), ubicación y dependencia administrativa. |
 | [`establecimientos_salud`](establecimientos_salud.md) | Directorio vigente de establecimientos de salud con tipo, dependencia, urgencia y ubicacion. |
 | [`estadisticas_vitales`](estadisticas_vitales.md) | Nacimientos y defunciones por comuna de residencia y sexo, desde los Anuarios de Estadísticas Vitales del INE (definitivos, 2010 en adelante). |
-| [`finanzas_municipales`](finanzas_municipales.md) | Indicadores financieros municipales anuales desde SINIM/SUBDERE. CAPA PARCIAL/CANDIDATO: 3 de 346 comunas (0.9%). Usar con precaución; no representa cobertura nacional. |
+| [`finanzas_municipales`](finanzas_municipales.md) | Indicadores financieros municipales anuales desde SINIM/SUBDERE. Cobertura 345/346 comunas (año 2024; falta Antártica 12202, hueco conocido de la fuente). Extracción mensual vía monthly-scrape. |
 | [`geometria_comunal`](geometria_comunal.md) | Límites poligonales de las 346 comunas de Chile (GeoParquet, geometría 'generalizada' — simplificada para cartografía a escala nacional, no apta para trabajo de precisión geodésica ni catastral). Fuente: BCN ArcGIS (tematico/Comunas_Generalizadas). Artefacto separado de `comunas`, unido por `codigo_comuna`. |
 | [`indicadores`](indicadores.md) | Serie de indicadores economicos diarios de referencia para analisis y software. |
 | [`indicadores_urbanos_siedu`](indicadores_urbanos_siedu.md) | Indicadores urbanos SIEDU en formato largo con cobertura comunal parcial esperada. |

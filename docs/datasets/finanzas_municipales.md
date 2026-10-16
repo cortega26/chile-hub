@@ -4,6 +4,10 @@
 
 Indicadores financieros municipales anuales provenientes de SINIM/SUBDERE, normalizados por comuna para cruces territoriales.
 
+**Cobertura:** 345/346 comunas, año 2024. Falta Antártica (`12202`), hueco conocido de la fuente (administración especial sin municipio en SINIM).
+
+**Cadencia:** extracción mensual vía `monthly-scrape.yml` (cron día 1, 03:00 UTC, extractor live `sinim_finanzas_live_extractor.py`); último snapshot live 2026-09-01. Freshness anual (`max_age_hours: 8760`).
+
 ## Fuente y licencia
 
 - Fuente: SINIM - SUBDERE
@@ -40,7 +44,12 @@ FROM 'data/normalized/finanzas_municipales.parquet';
 
 ## Limitaciones
 
-La primera versión usa una capa fallback curada hasta configurar una exportación directa estable desde SINIM. Los metadatos `source_mode` y `source_detail` indican si el build es publicable como live.
+La serie proviene del extractor live mensual (Playwright contra SINIM, snapshot
+versionado en git). Si un ciclo mensual falla, el build retiene el último snapshot
+bueno — ver `source_mode` y `refreshed_at_utc` en
+`data/staging/finanzas_municipales.metadata.json` para la vigencia efectiva.
+Antártica (`12202`) no tiene municipio en SINIM y queda fuera de la serie por
+diseño (contrato `coverage_policy: "partial_expected"`).
 
 ## Registro de cambios
 
