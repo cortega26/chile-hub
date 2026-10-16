@@ -13,10 +13,12 @@ from __future__ import annotations
 import datetime
 import io
 from functools import lru_cache
+from pathlib import Path
 
 import polars as pl
 import requests
 
+from . import _query
 from .datasets import Dataset
 from .text import normalize_comuna_name
 
@@ -122,6 +124,41 @@ def resolve_comunas(nombres: list[str], base_url: str = PUBLIC_DATA_BASE) -> lis
             }
         )
     return results
+
+
+def resolve_regiones(nombres: list[str], base_url: str = PUBLIC_DATA_BASE) -> list[dict]:
+    """Resuelve nombres de región (con tildes, prefijo "Región de/del" o alias como "RM") a su código CUT."""
+    resolved = _query.resolve_regiones(nombres, _read_dataset("regiones", base_url))
+    return [
+        {
+            "entrada": row["input"],
+            "codigo_region": row["codigo_region"],
+            "nombre_region": row["nombre_region"],
+            "matched": row["matched"],
+        }
+        for row in resolved.iter_rows(named=True)
+    ]
+
+
+def resolve_by_coords(
+    puntos: list[list[float]],
+    geometry_path: str | Path | None = None,
+) -> list[dict]:
+    """Resuelve coordenadas ``[[lat, lon], ...]`` a la comuna que las contiene.
+
+    Delega en ``_query.resolve_by_coords`` (mismo contrato que
+    ``ChileHub.resolve_by_coords``): puntos válidos fuera de Chile devuelven
+    ``matched=False`` con comuna nula; coordenadas fuera de rango levantan
+    ``ValueError`` nombrando el input. Requiere el extra opcional ``geo``
+    (``pip install chile-hub[geo]``) — geopandas/shapely solo se importan al
+    resolver, nunca al importar este módulo.
+    """
+    points = [(float(lat), float(lon)) for lat, lon in puntos]
+    resolved = _query.resolve_by_coords(
+        points,
+        geometry_path=Path(geometry_path) if geometry_path is not None else None,
+    )
+    return resolved.to_dicts()
 
 
 def _parse_date(value: str, field: str) -> datetime.date:

@@ -13,6 +13,7 @@ import os
 import re
 import unittest
 from pathlib import Path
+from typing import ClassVar
 from unittest import mock
 
 import polars as pl
@@ -707,6 +708,141 @@ class ChileHubResolveRegionesTests(unittest.TestCase):
         self.assertEqual(result.schema["codigo_region"], pl.String)
 
 
+class McpResolveRegionesTests(unittest.TestCase):
+    """Plan 142 Step 1: MCP `resolve_regiones` delega en `_query` (sin red).
+
+    Replica el patrón de `McpToolsTests` (tests/test_pipeline_logic.py) con un
+    Parquet local: el alias "RM" → 13 solo existe en la tabla de `_query`, así
+    que su match evidencia delegación y no reimplementación.
+    """
+
+    def setUp(self):
+        from chile_hub.mcp_tools import _read_parquet_cached
+
+        _read_parquet_cached.cache_clear()
+
+    def tearDown(self):
+        from chile_hub.mcp_tools import _read_parquet_cached
+
+        _read_parquet_cached.cache_clear()
+
+    @staticmethod
+    def _write_regiones(tmpdir: str) -> str:
+        pl.DataFrame(
+            {
+                "codigo_region": ["05", "13"],
+                "nombre_region": ["Región de Valparaíso", "Región Metropolitana de Santiago"],
+            }
+        ).write_parquet(Path(tmpdir) / "regiones.parquet")
+        return tmpdir
+
+    def test_resolve_regiones_happy_path_accent_insensitive(self):
+        """'Valparaiso' (sin tilde) resuelve al CUT 05 con nombre oficial."""
+        import tempfile
+
+        from chile_hub.mcp_tools import resolve_regiones
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            results = resolve_regiones(["Valparaiso"], base_url=self._write_regiones(tmpdir))
+        self.assertTrue(results[0]["matched"])
+        self.assertEqual(results[0]["codigo_region"], "05")
+        self.assertEqual(results[0]["nombre_region"], "Región de Valparaíso")
+
+    def test_resolve_regiones_alias_and_unmatched(self):
+        """El alias 'RM' delega a la tabla de `_query`; lo inexistente no raisea."""
+        import tempfile
+
+        from chile_hub.mcp_tools import resolve_regiones
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            results = resolve_regiones(["RM", "No Existe"], base_url=self._write_regiones(tmpdir))
+        self.assertTrue(results[0]["matched"])
+        self.assertEqual(results[0]["codigo_region"], "13")
+        self.assertFalse(results[1]["matched"])
+        self.assertIsNone(results[1]["codigo_region"])
+        self.assertIsNone(results[1]["nombre_region"])
+
+
+class McpResolveByCoordsTests(unittest.TestCase):
+    """Plan 142 Step 2: MCP `resolve_by_coords` delega en `_query`.
+
+    Geometría 100% sintética (tests/geo_fixtures.py, patrón Plan 065): nunca
+    toca red ni el artefacto real. El umbral de >= 340 geometrías se parchea
+    igual que en `ChileHubResolveByCoordsTests`.
+    """
+
+    def setUp(self):
+        clear_geometry_cache()
+
+    def tearDown(self):
+        clear_geometry_cache()
+
+    @staticmethod
+    def _fixture_path():
+        import tempfile
+
+        from geo_fixtures import write_synthetic_parquet
+
+        tmpdir = Path(tempfile.mkdtemp())
+        return write_synthetic_parquet(tmpdir / "geometria_comunal.parquet")
+
+    def test_known_point_matches_and_outside_is_unmatched(self):
+        """Punto dentro del cuadrado A → 01101; punto fuera → matched=False."""
+        from chile_hub.mcp_tools import resolve_by_coords
+
+        with mock.patch("chile_hub.geo.MIN_NON_EMPTY_GEOMETRIES", 3):
+            results = resolve_by_coords(
+                [[-19.5, -70.0], [-21.0, -71.0]],
+                geometry_path=self._fixture_path(),
+            )
+        self.assertTrue(results[0]["matched"])
+        self.assertEqual(results[0]["codigo_comuna"], "01101")
+        self.assertEqual(results[0]["input_lat"], -19.5)
+        self.assertEqual(results[0]["input_lon"], -70.0)
+        self.assertFalse(results[1]["matched"])
+        self.assertIsNone(results[1]["codigo_comuna"])
+        self.assertIsNone(results[1]["nombre_comuna"])
+
+    def test_out_of_range_raises_value_error_naming_input(self):
+        """Latitud fuera de [-90, 90] levanta ValueError nombrando el input."""
+        from chile_hub.mcp_tools import resolve_by_coords
+
+        with self.assertRaises(ValueError) as ctx:
+            resolve_by_coords([[95.0, 0.0]], geometry_path=self._fixture_path())
+        self.assertIn("input 0", str(ctx.exception))
+
+    def test_import_without_geo_extra_pulls_no_geopandas(self):
+        """Sin el extra `geo`, importar mcp_tools/mcp_server debe funcionar sin
+        meter geopandas/shapely en sys.modules (el geo sigue perezoso)."""
+        import subprocess
+        import sys
+
+        code = "\n".join(
+            [
+                "import builtins, sys",
+                "real_import = builtins.__import__",
+                "def blocked(name, *args, **kwargs):",
+                "    if name.startswith(('geopandas', 'shapely')):",
+                "        raise ImportError(f'No module named {name!r}')",
+                "    return real_import(name, *args, **kwargs)",
+                "builtins.__import__ = blocked",
+                "import chile_hub.mcp_tools, chile_hub.mcp_server",
+                "assert 'geopandas' not in sys.modules, 'geopandas en sys.modules sin extra geo'",
+                "assert 'shapely' not in sys.modules, 'shapely en sys.modules sin extra geo'",
+                "print('lazy-geo-ok')",
+            ]
+        )
+        result = subprocess.run(
+            [sys.executable, "-c", code],
+            cwd=ROOT_DIR,
+            capture_output=True,
+            text=True,
+            timeout=120,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("lazy-geo-ok", result.stdout)
+
+
 class RegionAliasParityTests(unittest.TestCase):
     """Guardrail anti-divergencia entre la tabla del paquete (fuente única) y
     la copia de fallback de `region_utils` (Plan 129).
@@ -1184,6 +1320,80 @@ class PublicSurfaceGuardrailTests(unittest.TestCase):
             {},
             f"Firma o tipo de atributo público modificado (plan 134a): {firma_cambiada}",
         )
+
+
+class ResolverParityGuardrailTests(unittest.TestCase):
+    """Plan 142 Step 4: paridad de resolutores Python ⊆ CLI ⊆ MCP (extiende 134a).
+
+    Cada resolver público de `ChileHub` debe existir como subcomando CLI y como
+    tool MCP, con el mismo contrato determinista (ADR-009). Sin excepciones
+    documentadas hoy: la tabla está completa (3/3/3). Si se agrega un resolver,
+    se agrega su fila con el subcomando y la tool.
+
+    Nota del spike fuzzy (Plan 142 Step 4, write-only, sin cambio de código):
+    346 comunas × 5 variantes de typo (sin-tilde, ñ↔n ×2, letra-menos,
+    espacio-extra) contra el matcher exacto → 73.9% match, 26.1% miss,
+    0 falsos positivos; 12 comunas tienen un vecino a distancia de edición 1
+    (p. ej. nancagua/rancagua, pemuco/temuco) y un umbral fuzzy ≤1 ya
+    misatribuye 4/346 typos de letra-menos. Recomendación: exact-only
+    (ADR-009 pregunta #1 sigue diferida); si hay demanda, un `suggest_*`
+    separado con candidatos, nunca un umbral que cambie `matched`.
+    """
+
+    # (método Python, subcomando CLI, tool MCP)
+    PARITY: ClassVar[list[tuple[str, str, str]]] = [
+        ("resolve_comunas", "resolve", "resolve_comunas"),
+        ("resolve_regiones", "resolve-regiones", "resolve_regiones"),
+        ("resolve_by_coords", "resolve-coords", "resolve_by_coords"),
+    ]
+
+    def test_python_resolvers_exist(self):
+        """Cada fila tiene su método público en `ChileHub`."""
+        for python_method, _, _ in self.PARITY:
+            with self.subTest(resolver=python_method):
+                self.assertTrue(
+                    callable(getattr(ChileHub, python_method, None)),
+                    f"ChileHub.{python_method} ausente",
+                )
+
+    def test_cli_subcommands_registered(self):
+        """Cada fila tiene su subcomando en argparse (`--help` sale 0)."""
+        import contextlib
+        import io
+
+        from chile_hub import cli
+
+        parser = cli.build_parser()
+        for _, subcommand, _ in self.PARITY:
+            with self.subTest(subcommand=subcommand):
+                self.assertIn(subcommand, cli.HANDLERS)
+                with contextlib.redirect_stdout(io.StringIO()):
+                    with self.assertRaises(SystemExit) as ctx:
+                        parser.parse_args([subcommand, "--help"])
+                self.assertEqual(ctx.exception.code, 0)
+
+    def test_mcp_tools_registered(self):
+        """Cada fila tiene su wrapper en `mcp_tools` y su `name=` en `mcp_server`.
+
+        Chequeo de texto (sin importar `mcp`): el extra es opcional y el test
+        debe pasar sin él, igual que `McpToolsTests.test_server_module_import_is_lazy`.
+        """
+        from chile_hub import mcp_tools
+
+        server_source = (ROOT_DIR / "src" / "chile_hub" / "mcp_server.py").read_text(
+            encoding="utf-8"
+        )
+        for _, _, mcp_tool in self.PARITY:
+            with self.subTest(tool=mcp_tool):
+                self.assertTrue(
+                    callable(getattr(mcp_tools, mcp_tool, None)),
+                    f"mcp_tools.{mcp_tool} ausente",
+                )
+                self.assertIn(
+                    f'name="{mcp_tool}"',
+                    server_source,
+                    f"tool {mcp_tool} no registrada en mcp_server.build_server",
+                )
 
 
 if __name__ == "__main__":
