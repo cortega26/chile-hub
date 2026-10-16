@@ -2,6 +2,12 @@ name: Chile Hub — prueba reproducible de valor
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - "scripts/proof_of_value.py"
+      - "tests/test_proof_of_value.py"
+      - ".github/workflows/value-proof.yml"
+      - "data/normalized/*.json"
 
 permissions:
   contents: read
