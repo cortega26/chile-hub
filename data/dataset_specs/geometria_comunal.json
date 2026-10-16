@@ -23,10 +23,10 @@
     "live_ready": false,
     "fallback_allowed": true,
     "publish_blocking": true,
-    "review_by": "2026-10-21",
+    "review_by": "2026-12-31",
     "stalled_after_days": 90,
     "owner": "core",
-    "next_action": "Cobertura 345/346 (falta codigo_comuna=12202/Antártica, hueco conocido de la fuente BCN — ver ADR-012). Evaluar promoción a stable_publishable una vez confirmada cadencia de refresco y estabilidad del endpoint ArcGIS (region 12/Magallanes requiere fallback comuna-por-comuna por payload combinado grande)."
+    "next_action": "Capa candidata (decisión 2026-10-15, planes 139/145): 345/346 comunas (Antártica codigo_comuna=12202 ausente aguas arriba en la fuente BCN, ver ADR-012). Promover a stable_publishable solo con ingestión en build_dev_db.py + dueño de cadencia de refresco + contrato en partial_expected. Refresco actual: manual vía geometria-comunal.yml."
   },
   "reuse_policy": {
     "status": "open-attribution",
