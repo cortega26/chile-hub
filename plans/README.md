@@ -953,3 +953,62 @@ registry MCP (`54c1691`; `sync_server_json_version` en
 - PEP-8/257: P1/P3 → 138; P2/P4 → 131.
 - Tipado: T1/T2 → 137.
 - Gates: G2 → 131 (ruff), 132 (complejidad), 137 (mypy), 138 (interrogate/coverage).
+
+---
+
+## Auditoría `/improve next` 2026-10-15 (commit `bd77d34`) — planes 139–144
+
+> **Contexto**: auditoría de dirección sobre el estado `bd77d34` (branch
+> `audit/136-verifiers`). Método: recon completo (README, product-spec,
+> ROADMAP, planes/README, registry, catálogo, BACKLOG, sostenibilidad) + vet
+> del advisor contra el código y los artefactos reales (conteos Polars,
+> `ls` de staging/normalized, grep de superficie). Foco exclusivo en
+> *dirección* (hacia dónde llevar el proyecto), no en bugs: el repo está
+> maduro (22 construibles, 21 publicables, 25 registradas, 24 ADRs, ~1400
+> tests, MCP + HF + SEO + DOI + comuna pages entregados) y las waves 111–130
+> y 131–135 están DONE. Por eso los hallazgos **no** son "más datasets" sino
+> cerrar 6 asimetrías de superficie ya insinuadas por la arquitectura.
+>
+> **Selección**: el mantenedor pidió planes para todos los hallazgos
+> net-positivos → 6 planes (139–144), todos diseño/spike salvo el tramo
+> editorial de cada uno. Ningún plan agrega un dataset nuevo (ADR-011 /
+> anti-patrón #10) ni toca carriles de otro plan.
+
+### Planes activos
+
+| # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de / solapa | Estado |
+|---|------|----------|----------|--------|---------------------|--------|
+| 139 | [Promote geometria_comunal candidate to stable](139-geometria-stable-promotion.md) | P1 | M | MED | Superado por 145/146 | BLOCKED-CLOSED (2026-10-15 — 2 rounds probaron que la promoción exige cambio de pipeline; decisión (C) aceptada y ejecutada en 146; rama `advisor/139-geometria-stable-promotion` queda como registro, NO mergear) |
+| 145 | [Wire geometria_comunal into the build pipeline (spike + decision)](145-geometria-pipeline-spike.md) | P1 | S | LOW | 139 (reuses its evidence + metadata-half branch) | DONE (2026-10-15 — worktree `/tmp/opencode/chile-hub-145`, cero cambios, status limpio; recomienda (C) revert con nueva `review_by` + condición explícita; lista de archivos para (A) + riesgos + pregunta al mantenedor en el reporte) |
+| 146 | [Close-out geometria decision (C) + monthly rebuild one-liner](146-geometria-closeout-monthly-fix.md) | P1 | S | LOW | 145 (decisión (C) aceptada 2026-10-15) | DONE (2026-10-15 — worktree `/tmp/opencode/chile-hub-146`, branch `advisor/146-geometria-closeout`, commits `553b254`+`1f20cb6`; review_by 2026-12-31 + condición idéntica en spec/registry, one-liner `uv run`; focal 183 + doctor/lint/format verdes; prueba mensual real pendiente del schedule) |
+| 140 | [Segregate autoridades_locales for stable alcaldes](140-autoridades-segregated-alcaldes.md) | P2 | S-M | LOW-MED | — (diseño/spike; implementación posterior a decisión de licencia) | DONE (2026-10-15 — worktree `/tmp/opencode/chile-hub-140`, branch `advisor/140-autoridades-segregation-spike`, commit `8c141d0`; apéndice docs-only + doctor verde; recomienda A (dos claves) con diffs triple-copia; hallazgos: sin `validate_autoridades_locales` (exento), `periodo_inicio` es la única celda share-alike en filas alcalde) |
+| 141 | [Enrich perfil_territorial_comunal with pobreza](141-perfil-pobreza-enrichment.md) | P2 | S + spike | LOW | — | DONE (2026-10-15 — worktree `/tmp/opencode/chile-hub-141`, branch `advisor/141-perfil-pobreza`, commits `2b94608`+`719245f`+`c4d2dcb`; focal 656 + doctor/lint/format verdes; suite 1397 + 3 golden con firma contract-before-data conocida; prueba offline replicada por el reviewer: 346 filas/52 cols, validador ok, contrato ok — CI build-and-test cierra el gap al mergear; empresas: DEFER con match 97.7% medido) |
+| 142 | [Resolver parity across Python, CLI, and MCP](142-resolver-parity-mcp-cli.md) | P2 | S | LOW | — | DONE (2026-10-15 — worktree `/tmp/opencode/chile-hub-142`, branch `advisor/142-resolver-parity`, commits `77d5dee`+`8bfaef2`+`8fedcc2`+`0b9e28e`; suite 1409 + 2 skip, doctor/lint/format verdes; fuzzy spike: exact-only se mantiene, 0 falsos positivos) |
+| 143 | [Fix finanzas_municipales credibility gap](143-finanzas-credibility-gap.md) | P2 | S-M | LOW-MED | — (coordina wording `coverage_policy` con 139) | DONE (2026-10-15 — worktree `/tmp/opencode/chile-hub-143`, branch `advisor/143-finanzas-credibility`, commits `f46655b`+`bee90fa`; suite 1399 + 2 skip, doctor/lint/format verdes; húmedo: 1er intento STOP por overlay DatasetSpec no contemplado, re-scoped y re-ejecutado) |
+| 144 | [Honest adoption funnel before 2026-11-01 review](144-adoption-funnel-review.md) | P2 | S-M (≤15 h) | LOW | — (lee 139–143 solo para números consistentes) | DONE (2026-10-15 — worktree `/tmp/opencode/chile-hub-144`, branch `advisor/144-adoption-funnel`, commits `fe3d205`+`a241a72`; funnel + refresh Anexo M + fila cronología; 1.6h ≤ 15h; veredicto D sin cambios, 0 orgs verificables; sin contacto externo ni dinero) |
+
+### Orden de ejecución recomendado
+
+1. **143** primero (verdad de cobertura de finanzas en 1–2 h; desambigua el ejemplo de `coverage_policy` que 139 reutiliza). → DONE 2026-10-15.
+2. **139 + 142** en paralelo (sin solape de archivos: registry/catálogo/geometría vs `_query`/CLI/MCP). → 142 DONE 2026-10-15; 139 BLOCKED (premisa falsa: la promoción exige cambio de pipeline; ver 145).
+3. **141** (perfil; toca `datasets.py`/`inputs.py` — secuenciar después de 139 para no mezclar revisiones de bundle).
+4. **140** (spike de licencia; sin código — puede correr en cualquier momento, pero su decisión informa la narrativa de bundle de 139).
+5. **144** al final (funnel honesto; cita los números que 139–143 dejen estables; alimenta la revisión 2026-11-01).
+6. **145** (spike + decisión de pipeline de geometría) antes de reintentar 139; la decisión del mantenedor (A/B/C) desbloquea la implementación.
+
+### Solapes de archivos (no correr en worktrees simultáneos)
+
+- **139 ∩ 143**: redacción de `coverage_policy` / excepción de cobertura (SIEDU precedent); secuencia 143 → 139.
+- **141 ∩ 139**: narrativa de bundle estable (`perfil` consume finanzas; geometría entra al bundle) — sin solape de archivos, pero secuenciar evita revisiones cruzadas.
+- **144 ∩ resto**: solo lectura de números; sin solape.
+
+### Hallazgos considerados y rechazados (2026-10-15 — dirección)
+
+- **Agregar un dataset nuevo sobre fuente frágil**: rechazado (ADR-011 / anti-patrón #10; gate de adopción de Auditoría 3). Profundidad sobre BCN/SIIT existentes sí; amplitud sobre scraping HTML no.
+- **Programa de patrocinios / tiers / SPONSORS.md / sección en landing**: rechazado — `plans/110` HOLD, veredicto D, revisión 2026-11-01. Solo el funnel de medición (144) dentro del cap 15 h y sin pedir dinero.
+- **Telemetría en el paquete**: rechazado por ética de apertura (solo contadores públicos).
+- **API premium / paywall**: rechazado (dato CC-BY pequeño; `docs/backlog/08`).
+- **README/docs en inglés**: rechazado (audiencia primaria chilena).
+- **Kaggle / conda-forge**: diferidos hasta medir el efecto HF (plan 129 métrica 274).
+- **Firma/atestación sigstore**: diferido hasta un segundo publicador (plan 111).
+- **Refresh programado de geometría (manual → schedule)**: diferido a decisión del mantenedor (ver plan 139); no bloquea la promoción.
