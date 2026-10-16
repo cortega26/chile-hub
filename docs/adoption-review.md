@@ -8,8 +8,8 @@
 
 | Canal | Métrica | Valor | Fuente |
 |:---|:---|---:|:---|
-| PyPI | Instalaciones / mes | **2.218** | `data/normalized/adoption.json` (semanal, CI) |
-| PyPI | Instalaciones / semana | 1.172 | ídem |
+| PyPI | Descargas / mes (baseline 2026-09-26, pre-corrección — ver entrada 2026-09-30) | **2.218** | `data/normalized/adoption.json` (semanal, CI) |
+| PyPI | Descargas / semana (ídem) | 1.172 | ídem |
 | Hugging Face | Descargas / mes | **135** | API HF (`/api/datasets/cortega26/chile-hub`) |
 | Hugging Face | Likes | 0 | ídem |
 | GitHub | Stars / forks | 90 / 10 | API GitHub |
@@ -97,3 +97,44 @@ gh api repos/cortega26/chile-hub --jq '{stars: .stargazers_count, forks: .forks_
 - Detalle y método reproducible:
   [`docs/sostenibilidad/auditoria-3-2026-09-29.md`](sostenibilidad/auditoria-3-2026-09-29.md)
   (§0 y Anexo M).
+
+### 2026-10-15 — revisión (plan 144, método Anexo M)
+
+Método: [`Auditoría 3, Anexo M`](sostenibilidad/auditoria-3-2026-09-29.md#anexo-m-método-reproducible).
+Definiciones y frases permitidas: [`docs/adoption-funnel.md`](adoption-funnel.md)
+(creado en este plan). Resto del plan 107 ejecutado dentro del tope §E
+(GSC saltado sin token; sitemap, issues y schedule verificados abajo).
+
+- PyPI: 6.638 descargas `without_mirrors` en 30 días (2026-09-15 → 2026-10-14,
+  pypistats) con 61 releases en el período → ≈109 por release. Sigue midiendo
+  cadencia, no usuarios. `data/normalized/adoption.json` (generado 2026-10-12):
+  mes 4.225 / semana 1.859 / día 98.
+- Bundle: **169** descargas acumuladas en GitHub Releases (80 releases con el
+  asset `chile-hub-publishable-bundle.zip`, API paginada hoy). Discrepancia
+  honesta: al 30-sep se citó un total real de 224; el acumulado de hoy es menor,
+  consistente con limpieza posterior de releases/assets viejos (causa no
+  verificada — no se afirma crecimiento contra el 30-sep; la tasa se deriva por
+  delta entre revisiones futuras).
+- HF: 444 descargas, 0 likes — fuente: API HF (`lastModified` 2026-10-13).
+  (26-sep: 197; `adoption.json` 12-oct: 387.)
+- GitHub: stars 129, forks 12 — fuente: API GitHub. (Baseline 26-sep: 90/10.)
+- Tráfico del repo (solo mantenedor, no citable externamente): 166 vistas /
+  98 únicos en 14 días — fuente: `traffic/views`.
+- Dependents: 0 (GitHub network + deps.dev v1.49.2). Sponsors: 0.
+  Issues/discussions de terceros: 0.
+- Search Console: `sin dato` (pendiente operador — plan 107, Step 1 saltado sin
+  token de GSC).
+- Issues de leads: #107, #108, #109 — OPEN con labels `enhancement,dataset`.
+- Zenodo: `sin dato` (API sin respuesta el 2026-10-15; concept DOI vigente
+  `10.5281/zenodo.22968698`, sin citas downstream verificadas conocidas).
+- Schedule diario: 2026-10-15 `success` + `Publish verified data: success`.
+  (10-14 `failure` — `log-failed` sin líneas de error visibles, no se investiga
+  en este plan; 10-13 `cancelled`.)
+- Notas: sitemap índice + 3 hijos en 200/200/200; veredicto D sin cambios
+  (0 organizaciones verificables, PyPI = cadencia). Etiqueta del badge
+  `adoption_badge.json` ("instalaciones/mes") sigue pendiente de corrección —
+  hallazgo ya registrado en Auditoría 3 §0, fuera del alcance de este plan.
+- Horas plan 144 (tope §E 15 h): baseline 0,3 + refresh Anexo M y checks
+  107 (Steps 2–4) 0,5 + `adoption-funnel.md` 0,5 + este refresh 0,3 ≈ **1,6 h**.
+  Acciones con credenciales preparadas como lista de traspaso, no enviadas
+  (`adoption-funnel.md` § Acciones de operador).
