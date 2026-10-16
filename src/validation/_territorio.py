@@ -105,6 +105,19 @@ def validate_perfil_territorial_comunal(
     duplicated_columns = sorted({column for column in df.columns if df.columns.count(column) > 1})
     if duplicated_columns:
         errors.append(f"perfil_territorial_comunal has duplicate columns: {duplicated_columns}")
+    for rate_col in (
+        "tasa_pobreza_ingresos_ultimo_anio",
+        "tasa_pobreza_multidimensional_ultimo_anio",
+    ):
+        if rate_col in df.columns and df.height:
+            out_of_range = df.filter(
+                pl.col(rate_col).is_not_null() & ((pl.col(rate_col) < 0) | (pl.col(rate_col) > 100))
+            ).height
+            if out_of_range:
+                errors.append(
+                    f"perfil_territorial_comunal {rate_col} out of 0-100 range "
+                    f"in {out_of_range} rows"
+                )
     if metadata and metadata.get("notes"):
         warnings.extend(
             note for note in metadata.get("notes", []) if "metric_unavailable" in str(note)

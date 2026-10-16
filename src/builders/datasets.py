@@ -88,6 +88,37 @@ def _latest_calidad_summary(df_calidad):
     )
 
 
+def _latest_pobreza_summary(df_pobreza):
+    """Tasas de pobreza SAE del último año con datos (una fila por comuna).
+
+    Retorna None si el upstream no está disponible; el llamador agrega las
+    columnas como nulas para mantener el esquema estable. Comunas sin
+    estimación SAE (p. ej. Antártica) quedan nulas, igual que las comunas
+    sin estación en _latest_calidad_summary.
+    """
+    if df_pobreza is None or df_pobreza.height == 0:
+        return None
+    ultimo = df_pobreza["anio"].max()
+    return (
+        df_pobreza.filter(pl.col("anio") == ultimo)
+        .group_by("codigo_comuna")
+        .agg(
+            pl.col("tasa")
+            .filter(pl.col("dimension") == "ingresos")
+            .first()
+            .alias("tasa_pobreza_ingresos_ultimo_anio"),
+            pl.col("tasa")
+            .filter(pl.col("dimension") == "multidimensional")
+            .first()
+            .alias("tasa_pobreza_multidimensional_ultimo_anio"),
+        )
+        .with_columns(
+            pl.col("codigo_comuna").cast(pl.String),
+            pl.lit(ultimo).cast(pl.Int64).alias("anio_pobreza"),
+        )
+    )
+
+
 def build_perfil_territorial_comunal(
     df_comunas,
     df_censo,
@@ -101,6 +132,7 @@ def build_perfil_territorial_comunal(
     df_vitales=None,
     df_permisos=None,
     df_calidad=None,
+    df_pobreza=None,
 ):
     salud_counts = (
         df_salud.group_by("codigo_comuna")
@@ -153,6 +185,7 @@ def build_perfil_territorial_comunal(
     vitales_summary = _latest_vitales_summary(df_vitales)
     permisos_summary = _latest_permisos_summary(df_permisos)
     calidad_summary = _latest_calidad_summary(df_calidad)
+    pobreza_summary = _latest_pobreza_summary(df_pobreza)
 
     perfil = (
         df_comunas.join(
@@ -214,6 +247,14 @@ def build_perfil_territorial_comunal(
         perfil = perfil.with_columns(
             pl.lit(None, dtype=pl.Float64).alias("mp25_promedio_ultimo_anio"),
             pl.lit(None, dtype=pl.Int64).alias("anio_calidad_aire"),
+        )
+    if pobreza_summary is not None:
+        perfil = perfil.join(pobreza_summary, on="codigo_comuna", how="left")
+    else:
+        perfil = perfil.with_columns(
+            pl.lit(None, dtype=pl.Float64).alias("tasa_pobreza_ingresos_ultimo_anio"),
+            pl.lit(None, dtype=pl.Float64).alias("tasa_pobreza_multidimensional_ultimo_anio"),
+            pl.lit(None, dtype=pl.Int64).alias("anio_pobreza"),
         )
     return perfil.with_columns(
         pl.col("establecimientos_salud_total").fill_null(0).cast(pl.Int64),
