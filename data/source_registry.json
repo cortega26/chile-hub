@@ -230,7 +230,7 @@
     "stalled_after_days": 90,
     "owner": "core",
     "degradation_reason": "resolved_2026-06-30_live_extractor_implemented",
-    "next_action": "Fase 3.2 PoC exitoso: extractor live implementado (sinim_finanzas_live_extractor.py). Cobertura 345/346 municipios (2024). Pendiente: workflow mensual (3.3) y metadata de cadencia (3.4).",
+    "next_action": "Verificado 2026-10-15 (Plan 143): 3.3 cerrada — monthly-scrape.yml activo (cron día 1, 03:00 UTC, corre sinim_finanzas_live_extractor.py); 3.4 cerrada — cadencia mensual declarada. Último snapshot live 2026-09-01: 345/346 comunas, año 2024 (falta Antártica 12202). Run 2026-10-01: scrape OK pero rebuild falló, snapshot retenido; reintenta el próximo ciclo mensual.",
     "publication_track": "stable_publishable",
     "public_bundle_eligible": true,
     "legal_note": "El sitio declara sin fines comerciales junto a badge CC BY 2.0 CL. Chile-hub es no comercial. Restricción NC debe declararse en reuse_policy.",

@@ -29,7 +29,7 @@
     "review_by": "2026-12-31",
     "stalled_after_days": 90,
     "owner": "core",
-    "next_action": "Fase 3.2 PoC exitoso: extractor live implementado (sinim_finanzas_live_extractor.py). Cobertura 345/346 municipios (2024). Pendiente: workflow mensual (3.3) y metadata de cadencia (3.4).",
+    "next_action": "Verificado 2026-10-15 (Plan 143): 3.3 cerrada — monthly-scrape.yml activo (cron día 1, 03:00 UTC, corre sinim_finanzas_live_extractor.py); 3.4 cerrada — cadencia mensual declarada. Último snapshot live 2026-09-01: 345/346 comunas, año 2024 (falta Antártica 12202). Run 2026-10-01: scrape OK pero rebuild falló, snapshot retenido; reintenta el próximo ciclo mensual.",
     "degradation_reason": "resolved_2026-06-30_live_extractor_implemented",
     "legal_note": "El sitio declara sin fines comerciales junto a badge CC BY 2.0 CL. Chile-hub es no comercial. Restricción NC debe declararse en reuse_policy.",
     "source_mode": "mensual"
@@ -47,7 +47,7 @@
     "label": "anual"
   },
   "documentation": {
-    "description": "Indicadores financieros municipales anuales desde SINIM/SUBDERE. CAPA PARCIAL/CANDIDATO: 3 de 346 comunas (0.9%). Usar con precaución; no representa cobertura nacional.",
+    "description": "Indicadores financieros municipales anuales desde SINIM/SUBDERE. Cobertura 345/346 comunas (año 2024; falta Antártica 12202, hueco conocido de la fuente). Extracción mensual vía monthly-scrape.",
     "path": "docs/datasets/finanzas_municipales.md",
     "usage_examples": {
       "python": "from chile_hub import ChileHub\nhub = ChileHub()\ndf = hub.load_polars('finanzas_municipales')",
@@ -65,7 +65,5 @@
   "join_keys": [
     "anio",
     "codigo_comuna"
-  ],
-  "coverage_note": "parcial_candidato_3_de_346_comunas",
-  "coverage_pct": 0.9
+  ]
 }
