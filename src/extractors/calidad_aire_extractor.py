@@ -51,9 +51,9 @@ except ModuleNotFoundError:
     )
 
 try:
-    from src.extractors.http_utils import fetch_with_retry
+    from src.extractors.http_utils import stealth_get as _stealth_get
 except ModuleNotFoundError:
-    from http_utils import fetch_with_retry
+    from http_utils import stealth_get as _stealth_get
 
 try:
     from src.extractors.region_utils import norm_text
@@ -318,9 +318,9 @@ def fetch_data() -> tuple[list[dict], str, str, list[str]]:
 
     hoy = datetime.datetime.now(UTC).strftime("%Y-%m-%d")
     try:
-        with fetch_with_retry(LISTADO_URL, timeout=120) as response:
-            response.raise_for_status()
-            payload = response.json()
+        response = _stealth_get(LISTADO_URL, timeout=120)
+        response.raise_for_status()
+        payload = response.json()
         target = _snapshot_path()
         target.write_bytes(response.content)
     except (requests.RequestException, OSError, ValueError) as exc:

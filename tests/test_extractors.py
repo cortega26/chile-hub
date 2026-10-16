@@ -6178,7 +6178,7 @@ class CalidadAireExtractorTests(unittest.TestCase):
                 patch.object(calidad_aire_extractor, "STAGING_DIR", tmpdir),
                 patch.object(
                     calidad_aire_extractor,
-                    "fetch_with_retry",
+                    "_stealth_get",
                     side_effect=_requests.RequestException("listado caído"),
                 ),
             ):
@@ -6207,7 +6207,7 @@ class CalidadAireExtractorTests(unittest.TestCase):
                 patch.object(calidad_aire_extractor, "ensure_staging_directories"),
                 patch.object(
                     calidad_aire_extractor,
-                    "fetch_with_retry",
+                    "_stealth_get",
                     side_effect=_requests.RequestException("offline"),
                 ),
             ):
@@ -6236,7 +6236,7 @@ class CalidadAireExtractorTests(unittest.TestCase):
                 patch.object(calidad_aire_extractor, "ensure_staging_directories"),
                 patch.object(
                     calidad_aire_extractor,
-                    "fetch_with_retry",
+                    "_stealth_get",
                     side_effect=_requests.RequestException("offline"),
                 ),
             ):
@@ -6252,7 +6252,6 @@ class CalidadAireExtractorTests(unittest.TestCase):
         response = MagicMock()
         response.content = json.dumps(self._payload()).encode("utf-8")
         response.json.return_value = self._payload()
-        response.__enter__.return_value = response
 
         with tempfile.TemporaryDirectory() as tmpdir:
             target = Path(tmpdir) / "sinca_listadomapa_20261010.json"
@@ -6262,7 +6261,7 @@ class CalidadAireExtractorTests(unittest.TestCase):
                 ),
                 patch.object(calidad_aire_extractor, "_snapshot_path", return_value=target),
                 patch.object(calidad_aire_extractor, "ensure_staging_directories"),
-                patch.object(calidad_aire_extractor, "fetch_with_retry", return_value=response),
+                patch.object(calidad_aire_extractor, "_stealth_get", return_value=response),
             ):
                 rows, mode, _, notes = calidad_aire_extractor.fetch_data()
 
@@ -6283,13 +6282,91 @@ class CalidadAireExtractorTests(unittest.TestCase):
                 patch.object(calidad_aire_extractor, "STAGING_DIR", tmpdir),
                 patch.object(
                     calidad_aire_extractor,
-                    "fetch_with_retry",
+                    "_stealth_get",
                     side_effect=_requests.RequestException("listado caído"),
                 ),
             ):
                 rows, mode, _, _ = calidad_aire_extractor.fetch_data()
             self.assertEqual(rows, calidad_aire_extractor.FALLBACK_ROWS)
             self.assertEqual(mode, "fallback")
+
+    def test_fetch_data_uses_stealth_get_for_listado(self):
+        """Plan 147: el listado SINCA sale por `_stealth_get` (anti-403,
+        mismo patrón que permisos 2026-09-25), no por requests desnudo."""
+        response = MagicMock()
+        response.content = json.dumps(self._payload()).encode("utf-8")
+        response.json.return_value = self._payload()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            target = Path(tmpdir) / "sinca_listadomapa_20261010.json"
+            with (
+                patch.object(
+                    calidad_aire_extractor, "_load_comunas_lookup", return_value=self.FAKE_LOOKUP
+                ),
+                patch.object(calidad_aire_extractor, "_snapshot_path", return_value=target),
+                patch.object(calidad_aire_extractor, "ensure_staging_directories"),
+                patch.object(
+                    calidad_aire_extractor, "_stealth_get", return_value=response
+                ) as stealth,
+            ):
+                rows, mode, _, _ = calidad_aire_extractor.fetch_data()
+            stealth.assert_called_once_with(calidad_aire_extractor.LISTADO_URL, timeout=120)
+            self.assertEqual(mode, "live")
+            self.assertEqual(len(rows), 1)
+
+    def test_fetch_data_403_uses_snapshot_fallback(self):
+        """Plan 147: un 403 del WAF (runners CI 2026-10-16) no se reintenta y
+        cae al snapshot de disco en fallback."""
+        import requests as _requests
+
+        err = _requests.HTTPError("403 Client Error: Forbidden")
+        err.response = MagicMock(status_code=403)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            snapshot = Path(tmpdir) / "sinca_listadomapa_20261015.json"
+            snapshot.write_text(json.dumps(self._payload()), encoding="utf-8")
+            with (
+                patch.object(
+                    calidad_aire_extractor, "_load_comunas_lookup", return_value=self.FAKE_LOOKUP
+                ),
+                patch.object(calidad_aire_extractor, "RAW_DIR", tmpdir),
+                patch.object(calidad_aire_extractor, "STAGING_DIR", tmpdir),
+                patch.object(calidad_aire_extractor, "_stealth_get", side_effect=err),
+            ):
+                rows, mode, _, notes = calidad_aire_extractor.fetch_data()
+            self.assertEqual(mode, "fallback")
+            self.assertTrue(len(rows) > 0)
+            self.assertTrue(any("sinca_listadomapa_20261015.json" in n for n in notes))
+
+    def test_fetch_data_degrades_without_curl_cffi(self):
+        """Plan 147: sin curl_cffi, `_stealth_get` degrada a requests con
+        headers de navegador y el listado sigue marcado live (sin red real)."""
+        from src.extractors import http_utils as hu
+
+        captured = {}
+        response = MagicMock()
+        response.content = json.dumps(self._payload()).encode("utf-8")
+        response.json.return_value = self._payload()
+
+        def fake_fetch(url, **kwargs):
+            captured.update(kwargs)
+            return response
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            target = Path(tmpdir) / "sinca_listadomapa_20261010.json"
+            with (
+                patch.object(hu, "_CURL_CFFI_AVAILABLE", False),
+                patch.object(hu, "fetch_with_retry", side_effect=fake_fetch),
+                patch.object(
+                    calidad_aire_extractor, "_load_comunas_lookup", return_value=self.FAKE_LOOKUP
+                ),
+                patch.object(calidad_aire_extractor, "_snapshot_path", return_value=target),
+                patch.object(calidad_aire_extractor, "ensure_staging_directories"),
+            ):
+                rows, mode, _, _ = calidad_aire_extractor.fetch_data()
+            self.assertEqual(mode, "live")
+            self.assertEqual(len(rows), 1)
+            self.assertIn("Mozilla", captured["headers"]["User-Agent"])
+            self.assertNotIn("impersonate", captured)
 
     def test_run_dry_run_returns_validation_without_writing(self):
         with tempfile.TemporaryDirectory() as tmpdir:
