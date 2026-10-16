@@ -6,7 +6,6 @@ No usa red ni telemetría; no compara rendimiento con otros portales.
 from __future__ import annotations
 
 import argparse
-from collections.abc import Callable
 import hashlib
 import json
 import platform
@@ -14,6 +13,7 @@ import re
 import statistics
 import subprocess
 import sys
+from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
 from time import perf_counter_ns
