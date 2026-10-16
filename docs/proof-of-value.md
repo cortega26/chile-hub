@@ -35,6 +35,26 @@ python -m unittest discover -s tests -p 'test_proof_of_value.py' -v
 # o: pytest tests/test_proof_of_value.py -q
 ```
 
+## Primera ejecución comprobada en GitHub Actions
+
+**Evidencia de CI:** [ejecución #38920062928](https://github.com/cortega26/chile-hub/actions/runs/38920062928)
+(2026-10-16, GitHub-hosted Ubuntu, Python 3.13), con **7/7 pruebas
+unitarias aprobadas** y el artifact `chile-hub-value-proof` generado con
+hashes de entrada y salida.
+
+| Escenario | Claves CUT cruzadas | Duración mediana local (5 repeticiones) |
+|:---|---:|---:|
+| Censo 2024 + territorio | 346/346 (100 %) | 2,695 ms |
+| Hogares/viviendas por región | 346/346 (100 %) | 2,249 ms |
+| Perfil + pobreza SAE ingresos 2022 | 345/346 (99,71 %) | 8,685 ms |
+
+Estas duraciones corresponden **solo a lectura JSON + cálculo en ese runner**.
+No representan tiempos de obtención de fuentes originales, onboarding de
+usuarios ni una diferencia medida con portales alternativos. Los artifacts
+de Actions tienen retención limitada; el código y el comando son la fuente
+reproducible. La [ejecución manual del workflow](https://github.com/cortega26/chile-hub/actions/workflows/value-proof.yml)
+permite volver a generar el informe en cualquier momento.
+
 ## Qué demuestra realmente
 
 | Caso | Entradas normalizadas | Evidencia | Qué NO demuestra |
