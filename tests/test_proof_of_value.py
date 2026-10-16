@@ -46,7 +46,8 @@ class ValueProofTests(unittest.TestCase):
             "pobreza_comunal": [
                 {"codigo_comuna": c, "dimension": "ingresos", "anio": 2022, "tasa": 11.5 + i}
                 for i, c in enumerate(codes[:2])
-            ] + [
+            ]
+            + [
                 {"codigo_comuna": c, "dimension": "multidimensional", "anio": 2022, "tasa": 20.0}
                 for c in codes[:2]
             ],
