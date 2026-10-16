@@ -123,9 +123,7 @@ def case_hogares(data: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
         ):
             raise ValueError(f"Hogares 2024: recuento inválido en {cut}")
         code = base[cut]["codigo_region"]
-        region = regions.setdefault(
-            code, {"codigo_region": code, "hogares": 0, "viviendas": 0}
-        )
+        region = regions.setdefault(code, {"codigo_region": code, "hogares": 0, "viviendas": 0})
         region["hogares"] += households
         region["viviendas"] += dwellings
     largest = sorted(regions.values(), key=lambda r: (-r["hogares"], r["codigo_region"]))
@@ -169,8 +167,7 @@ def case_pobreza(data: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
         **coverage_info,
         "ejemplo_cruce": sample[:3],
         "nota": (
-            "SAE 2022 + Censo 2024: cortes distintos; "
-            "no implica causalidad ni tasa actualizada."
+            "SAE 2022 + Censo 2024: cortes distintos; no implica causalidad ni tasa actualizada."
         ),
     }
 
