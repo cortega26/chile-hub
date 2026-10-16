@@ -80,7 +80,7 @@ jobs:
       - name: Rebuild normalized artifacts
         if: steps.scrape.outcome == 'success'
         run: |
-          python src/build_dev_db.py
+          uv run python src/build_dev_db.py
 
       - name: Commit updated data (if changed)
         if: steps.scrape.outcome == 'success'
