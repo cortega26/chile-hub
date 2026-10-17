@@ -43,7 +43,18 @@ jobs:
           enable-cache: true
       - name: Dependencies
         run: uv sync --extra dev --extra pipeline
+      - name: Explain immutable-snapshot publication on push
+        if: github.event_name == 'push'
+        run: |
+          echo "Config/code-only push: no new DGAC harvest. Revalidate the versioned official snapshot and its SHA-256 before canonical publication."
+          test -s data/staging/precipitaciones_dgac.csv
+          test -s data/staging/precipitaciones_dgac.metadata.json
       - name: Harvest 143 monthly government sources
+        # Live network refresh belongs to scheduled/manual runs. Re-downloading
+        # all 143 unchanged 2013–2026 source files for a metadata-only push
+        # creates an unnecessary dependency on transient datos.gob.cl 5xx.
+        # The next step still rejects corrupt, absent or unlicensed snapshots.
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: uv run python src/extractors/precipitaciones_dgac_extractor.py
       - name: Semantic quality, contract, SHA and actual Parquet
         run: uv run python scripts/verify_dgac_publication.py
