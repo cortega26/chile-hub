@@ -23,8 +23,11 @@ SOURCE_URL = "https://datos.gob.cl/organization/direccion_general_de_aeronautica
 
 def extract(output: Path = DEFAULT_OUTPUT) -> dict:
     """Descarga, verifica y publica un snapshot de origen real o aborta."""
-    metadata = harvest(output)
+    temp_output = output.with_name(output.stem + ".incomplete.csv")
+    metadata = harvest(temp_output)
     if metadata["months"] != 143 or metadata["record_count"] < 120_000:
+        temp_output.unlink(missing_ok=True)
+        temp_output.with_suffix(".metadata.json").unlink(missing_ok=True)
         raise RuntimeError("DGAC: cobertura histórica insuficiente para publicación")
     canonical = {
         **metadata,
@@ -45,12 +48,14 @@ def extract(output: Path = DEFAULT_OUTPUT) -> dict:
         },
     }
     # Metadata del harvest ya existe; reemplazo atómico del sidecar.
-    metadata_path = output.with_suffix(".metadata.json")
-    tmp_path = metadata_path.with_suffix(metadata_path.suffix + ".tmp")
-    tmp_path.write_text(
+    temp_meta = temp_output.with_suffix(".metadata.json")
+    temp_meta.write_text(
         json.dumps(canonical, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
-    tmp_path.replace(metadata_path)
+    # Sólo después de completar toda la cosecha y sus gates básicos:
+    output.parent.mkdir(parents=True, exist_ok=True)
+    temp_output.replace(output)
+    temp_meta.replace(output.with_suffix(".metadata.json"))
     return canonical
 
 
