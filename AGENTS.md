@@ -70,6 +70,7 @@ Actualmente registra veintiséis (<!-- START_AGENTS_DATASET_COUNT -->26<!-- END_
 | **Estadísticas Vitales** | INE | Nacimientos y defunciones por comuna de residencia y sexo, anuarios definitivos 2010 en adelante |
 | **Permisos de Edificación** | MINVU CEDOC | Viviendas en unidades y superficie por comuna y año, serie desde 2002 |
 | **Calidad del Aire** | MMA / SINCA | Promedios diarios de contaminantes por estación (~65 comunas, serie incremental) |
+| **Precipitaciones DGAC** | DGAC / datos.gob.cl | Precipitaciones diarias por estación, histórico 2013–2026; 143 meses validados, cobertura discontinua y licencias por fuente |
 
 **El objetivo no es tener todos los datos de Chile. Es entregar un número pequeño de datasets
 limpios, versionados, validados y consumibles en una línea de código.**
@@ -140,9 +141,10 @@ chile-hub/
 │   │   ├── _salud.py              establecimientos de salud
 │   │   ├── _economia.py           indicadores / finanzas / empresas / consumo / pobreza
 │   │   ├── _territorio.py         SIEDU / perfil / POI / geometría / permisos / aire
+│   │   ├── _clima.py              Precipitaciones DGAC históricas por estación
 │   │   ├── _politica.py           distritos / partidos / autoridades
 │   │   └── _anomalias.py          detect_series_anomalies
-│   ├── build_dev_db.py            Orquestador (600 líneas): main() + fases (_load_inputs, _compute_validations, _write_data_artifacts, _generate_reports)
+│   ├── build_dev_db.py            Orquestador (619 líneas): main() + fases (_load_inputs, _compute_validations, _write_data_artifacts, _generate_reports)
 │   ├── builders/                  Módulos del pipeline extraídos de build_dev_db.py (formats, metadata, reports, artifacts, datasets, catalog, landing, io_utils, _shared, dcat_catalog, data_package, doc_sync, geo, _logging)
 │   ├── chile_hub/                 Paquete Python instalable (ChileHub API + CLI + data manager)
 │   │   ├── core.py                ChileHub class + API pública (1 250 líneas)
