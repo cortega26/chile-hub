@@ -2548,7 +2548,6 @@ class DgacPublicationGateTests(unittest.TestCase):
         self.assertEqual(dgac["publication_track"], "stable_publishable")
 
 
-
 class CommittedSnapshotVerificationTests(unittest.TestCase):
     """Rechaza archivos alterados; nunca certifica un release por accidente."""
 
@@ -2622,7 +2621,6 @@ class CommittedSnapshotVerificationTests(unittest.TestCase):
             workflow,
         )
         self.assertIn("python scripts/verify_pipeline.py --profile", workflow)
-
 
 
 if __name__ == "__main__":
