@@ -323,7 +323,11 @@ jobs:
           git checkout -- data/staging/finanzas_municipales.csv data/staging/finanzas_municipales.metadata.json 2>/dev/null || true
 
       - name: Build outputs
-        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        # Siempre reconstruir los artefactos efímeros desde staging antes de
+        # verificar. En PR/push no hay extracción viva: se usa el staging
+        # versionado y se ejecuta perfil readiness, nunca publication.
+        # Antes se comprobaba el contrato nuevo contra pipeline_metadata.json
+        # anterior (DGAC / perfil pobreza), haciendo CI roja sin probar código.
         run: python src/build_dev_db.py
 
       - name: Check build-synced files
