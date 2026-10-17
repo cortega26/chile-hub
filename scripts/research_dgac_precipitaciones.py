@@ -247,6 +247,7 @@ def harvest(output: Path, *, start_year: int = 2013, end_year: int = 2026) -> di
     all_rows: list[dict[str, str]] = []
     source_files: list[dict[str, Any]] = []
     duplicate_resources: list[dict[str, str]] = []
+    invalid_sources: list[str] = []
     seen: set[tuple[str, str]] = set()
     for (year, semester), name in packages.items():
         package = _package(name)
@@ -258,7 +259,11 @@ def harvest(output: Path, *, start_year: int = 2013, end_year: int = 2026) -> di
         hashes: dict[int, str] = {}
         for resource in resource_list:
             month = int(resource["month"])
-            payload = _request(resource["url"])
+            try:
+                payload = _request(resource["url"])
+            except SourceError as exc:
+                invalid_sources.append(f"{year}-{month:02d}: {exc}")
+                continue
             digest = hashlib.sha256(payload).hexdigest()
             if month in hashes:
                 if hashes[month] != digest:
@@ -270,13 +275,17 @@ def harvest(output: Path, *, start_year: int = 2013, end_year: int = 2026) -> di
                 )
                 continue
             hashes[month] = digest
-            parsed = parse_csv(
-                payload,
-                year=year,
-                month=month,
-                url=resource["url"],
-                license_id=license_id,
-            )
+            try:
+                parsed = parse_csv(
+                    payload,
+                    year=year,
+                    month=month,
+                    url=resource["url"],
+                    license_id=license_id,
+                )
+            except SourceError as exc:
+                invalid_sources.append(f"{year}-{month:02d}: {exc}")
+                continue
             for row in parsed:
                 key = (row["fecha"], row["id_estacion"])
                 if key in seen:
@@ -294,6 +303,11 @@ def harvest(output: Path, *, start_year: int = 2013, end_year: int = 2026) -> di
                 }
             )
     expected = sum(6 for _ in packages)
+    if invalid_sources:
+        raise SourceError(
+            f"{len(invalid_sources)} archivos mensuales no normalizables:\\n"
+            + "\n".join(invalid_sources)
+        )
     if len(source_files) != expected:
         raise SourceError(f"Esperaba {expected} meses; encontré {len(source_files)}")
     all_rows.sort(key=lambda row: (row["fecha"], row["id_estacion"]))
