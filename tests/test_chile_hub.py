@@ -2188,9 +2188,18 @@ class DatasetEnumTests(unittest.TestCase):
         catalog_path = Path("data/dataset_catalog_config.json")
         catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
         catalog_ids = set(catalog)
+        registry = json.loads(Path("data/source_registry.json").read_text(encoding="utf-8"))
+        published = {
+            entry["dataset"] for entry in registry
+            if entry["publication_track"] == "stable_publishable"
+        }
 
         vals = Dataset.values()
-        self.assertEqual(set(vals), catalog_ids)
+        # El enum cubre todas las capas estables; conserva algunos nombres
+        # históricos aunque ahora sean candidatos. No contiene candidatos
+        # nuevos sin API (geometría, delincuencia, autoridades locales).
+        self.assertTrue(published <= set(vals))
+        self.assertTrue(set(vals) <= catalog_ids)
         self.assertIn("comunas", vals)
         self.assertIn("regiones", vals)
         self.assertIn("empresas", vals)
