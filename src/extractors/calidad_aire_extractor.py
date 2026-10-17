@@ -20,6 +20,8 @@ monitoreo (verificado contra el inventario; documentado en NOTES).
 """
 
 import datetime
+import hashlib
+import json
 import html as html_module
 import os
 import sys
@@ -457,9 +459,98 @@ def build_metadata(df: pl.DataFrame, mode: str, source_url: str, notes: list[str
     return metadata
 
 
+def _recent_verified_live_snapshot(
+    *, now: datetime.datetime | None = None
+) -> tuple[pl.DataFrame, dict[str, Any]] | None:
+    """Conserva datos live *ya publicados*, nunca muestras ni snapshots vencidos.
+
+    Se usa solo si SINCA está indisponible: se comprueba la integridad SHA del
+    Parquet contra el manifiesto público, el timestamp original, el recuento
+    de observaciones y el TTL declarado por la capa. No se finge una nueva
+    fecha de cosecha. Si falla un solo gate, retorna None y publicación seguirá
+    bloqueada con source_mode=fallback.
+    """
+    try:
+        path = Path(HISTORY_PARQUET_PATH)
+        catalog = json.loads(
+            (Path(NORMALIZED_DIR) / "dataset_catalog.json").read_text(encoding="utf-8")
+        )
+        bundle = json.loads(
+            (Path(NORMALIZED_DIR) / "hub_bundle.json").read_text(encoding="utf-8")
+        )
+        info = next(
+            item for item in catalog["datasets"] if item["dataset"] == "calidad_aire"
+        )
+        entry = next(
+            item for item in bundle["datasets"] if item["dataset"] == "calidad_aire"
+        )
+        if info.get("source_mode") != "live" or entry.get("source_mode") != "live":
+            return None
+        if info.get("refreshed_at_utc") != entry.get("refreshed_at_utc"):
+            return None
+        source_date = datetime.datetime.fromisoformat(info["refreshed_at_utc"])
+        if source_date.tzinfo is None:
+            return None
+        now_utc = now or datetime.datetime.now(UTC)
+        age = (now_utc - source_date).total_seconds()
+        max_age_hours = int(info["freshness_policy"]["max_age_hours"])
+        if not (0 <= age <= max_age_hours * 3600):
+            return None
+        artifact = next(
+            a for a in entry["artifacts"] if a.get("path") == "data/normalized/calidad_aire.parquet"
+        )
+        if hashlib.sha256(path.read_bytes()).hexdigest() != artifact["sha256"]:
+            return None
+        frame = pl.read_parquet(path)
+        if (
+            frame.height < 100
+            or frame.height != info["record_count"]
+            or frame.height != entry["record_count"]
+            or not set(REQUIRED_COLUMNS).issubset(frame.columns)
+        ):
+            return None
+        return frame, info
+    except (
+        OSError,
+        ValueError,
+        TypeError,
+        KeyError,
+        StopIteration,
+        pl.exceptions.PolarsError,
+    ):
+        return None
+
+
 def process_calidad_aire() -> dict:
     """Ejecuta el flujo completo de extracción y staging."""
     rows, mode, source_url, notes = fetch_data()
+    if mode == "fallback":
+        verified = _recent_verified_live_snapshot()
+        if verified is not None:
+            frame, original = verified
+            # Nada de FALLBACK_ROWS: el contenido es exactamente el Parquet
+            # originalmente obtenido en vivo, cuyo hash acabamos de verificar.
+            frame = frame.with_columns(pl.col("fecha").cast(pl.String))
+            snapshot_notes = [
+                *original.get("notes", []),
+                *notes,
+                "SINCA inaccesible: no se descargaron nuevas mediciones; "
+                "se mantiene snapshot real previamente publicado dentro de su TTL, "
+                "con timestamp original intacto y SHA-256 verificado.",
+            ]
+            metadata = build_metadata(frame, "live", source_url, snapshot_notes)
+            metadata["refreshed_at_utc"] = original["refreshed_at_utc"]
+            metadata["snapshot_reused"] = True
+            metadata["snapshot_reuse_reason"] = "source_unavailable"
+            metadata["last_refresh_attempt_utc"] = datetime.datetime.now(UTC).isoformat()
+            ensure_staging_directories()
+            frame.write_csv(STAGING_CSV_PATH)
+            write_staging_metadata(METADATA_PATH, metadata)
+            print(
+                f"calidad_aire: {frame.height} filas live certificadas conservadas "
+                f"(sin datos nuevos; fuente original {original['refreshed_at_utc']})"
+            )
+            return metadata
     df_new = normalize_rows(rows)
 
     # Serie incremental: fusionar con el historial (staging actual o, si no
