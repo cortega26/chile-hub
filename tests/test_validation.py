@@ -2394,21 +2394,22 @@ class DgacStableValidationTests(unittest.TestCase):
     def test_missing_measurements_are_not_interpreted_as_zero(self):
         from src.validation import validate_precipitaciones_dgac
 
-        df = pl.DataFrame({
-            "fecha": ["2026-01-01", "2026-01-02"],
-            "id_estacion": ["180005", "180005"],
-            "nombre_estacion": ["Arica", "Arica"],
-            "latitud_dms": ["18 S", "18 S"],
-            "altitud_m": [50.0, 50.0],
-            "precipitacion_mm": [None, 0.0],
-            "url_fuente": ["https://datos.gob.cl/x"] * 2,
-            "licencia_fuente": ["cc-by", "cc-zero"],
-        })
+        df = pl.DataFrame(
+            {
+                "fecha": ["2026-01-01", "2026-01-02"],
+                "id_estacion": ["180005", "180005"],
+                "nombre_estacion": ["Arica", "Arica"],
+                "latitud_dms": ["18 S", "18 S"],
+                "altitud_m": [50.0, 50.0],
+                "precipitacion_mm": [None, 0.0],
+                "url_fuente": ["https://datos.gob.cl/x"] * 2,
+                "licencia_fuente": ["cc-by", "cc-zero"],
+            }
+        )
         result = validate_precipitaciones_dgac(df)
         self.assertFalse(any("negativa" in error for error in result["errors"]))
         self.assertIn("cobertura", " ".join(result["errors"]))
         self.assertTrue(result["expected_warnings"])
-
 
 
 if __name__ == "__main__":
