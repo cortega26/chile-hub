@@ -29,8 +29,14 @@ PACKAGES = {
     (2025, 2): "precipitaciones-2do-semestre-2025",
 }
 COLUMNS = (
-    "fecha", "id_estacion", "nombre_estacion", "latitud_dms", "altitud_m",
-    "precipitacion_mm", "url_fuente", "licencia_fuente",
+    "fecha",
+    "id_estacion",
+    "nombre_estacion",
+    "latitud_dms",
+    "altitud_m",
+    "precipitacion_mm",
+    "url_fuente",
+    "licencia_fuente",
 )
 RESOURCE_RE = re.compile(r"precipitacion[_ ](\d{2})(\d{4})\.csv", re.IGNORECASE)
 MISSING = frozenset(("", "S/I", "S/D", "NA", "N/A", "NULL", "-", "///"))
@@ -44,14 +50,17 @@ def _request(url: str, *, retries: int = 3) -> bytes:
     for attempt in range(retries):
         try:
             request = urllib.request.Request(
-                url, headers={"User-Agent": "chile-hub-research/1.0 (+https://github.com/cortega26/chile-hub)"}
+                url,
+                headers={
+                    "User-Agent": "chile-hub-research/1.0 (+https://github.com/cortega26/chile-hub)"
+                },
             )
             with urllib.request.urlopen(request, timeout=35) as response:
                 return response.read()
         except (OSError, urllib.error.URLError) as exc:
             if attempt == retries - 1:
                 raise SourceError(f"No se pudo descargar {url}: {exc}") from exc
-            time.sleep(2 ** attempt)
+            time.sleep(2**attempt)
     raise AssertionError("unreachable")
 
 
@@ -66,7 +75,9 @@ def _package(name: str) -> dict[str, Any]:
     return payload["result"]
 
 
-def resources_for_package(package: dict[str, Any], year: int, months: range) -> list[dict[str, str]]:
+def resources_for_package(
+    package: dict[str, Any], year: int, months: range
+) -> list[dict[str, str]]:
     """Exige exactamente un CSV por cada mes, sin deduplicar arbitrariamente."""
     resources: dict[int, dict[str, str]] = {}
     for item in package.get("resources", []):
@@ -113,7 +124,9 @@ def _number(value: str, *, nullable: bool = False) -> float | None:
     return parsed
 
 
-def parse_csv(payload: bytes, *, year: int, month: int, url: str, license_id: str) -> list[dict[str, str]]:
+def parse_csv(
+    payload: bytes, *, year: int, month: int, url: str, license_id: str
+) -> list[dict[str, str]]:
     """Lee 8 columnas *sin cabecera*; CKAN suele tomar la primera fila como header."""
     content = _decode(payload)
     try:
@@ -130,7 +143,9 @@ def parse_csv(payload: bytes, *, year: int, month: int, url: str, license_id: st
                 continue
             raise SourceError(f"Primera fila desconocida ({year}-{month:02d}): {cells!r}")
         if len(cells) != 8:
-            raise SourceError(f"{year}-{month:02d}:{line} esperaba 8 columnas; recibió {len(cells)}")
+            raise SourceError(
+                f"{year}-{month:02d}:{line} esperaba 8 columnas; recibió {len(cells)}"
+            )
         code, name, lat, alt, y, m, d, rain = [cell.strip() for cell in cells]
         if not re.fullmatch(r"\d{6}", code):
             raise SourceError(f"{year}-{month:02d}:{line}: código estación inválido {code!r}")
@@ -240,14 +255,24 @@ def harvest(output: Path) -> dict[str, Any]:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--output", type=Path, default=Path(__file__).resolve().parents[1] /
-        "data" / "research" / "precipitaciones_dgac_2024_2025.csv",
+        "--output",
+        type=Path,
+        default=Path(__file__).resolve().parents[1]
+        / "data"
+        / "research"
+        / "precipitaciones_dgac_2024_2025.csv",
     )
     args = parser.parse_args()
     meta = harvest(args.output)
-    print(json.dumps({key: meta[key] for key in (
-        "dataset", "period", "record_count", "station_count", "sha256"
-    )}, ensure_ascii=False))
+    print(
+        json.dumps(
+            {
+                key: meta[key]
+                for key in ("dataset", "period", "record_count", "station_count", "sha256")
+            },
+            ensure_ascii=False,
+        )
+    )
 
 
 if __name__ == "__main__":
