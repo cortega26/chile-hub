@@ -95,6 +95,7 @@ class StagingInputsTableTests(unittest.TestCase):
     requerido cambie sin revisar el harness Phase 1 (que lo asume)."""
 
     REQUIRED_NAMES: ClassVar[set[str]] = {
+        "precipitaciones_dgac",
         "comunas",
         "indicadores",
         "censo",
@@ -4375,8 +4376,8 @@ class ValidationCoverageTests(unittest.TestCase):
         from scripts import check_validation_registration as cvr
 
         functions = cvr.validation_functions()
-        # 23 validadores definidos en el paquete, exactamente una vez cada uno.
-        self.assertEqual(len(functions), 23)
+        # El nuevo validador DGAC amplía el inventario real.
+        self.assertEqual(len(functions), 24)
         self.assertIn("comunas", functions)  # definida en _dpa.py
 
     def test_validate_def_in_init_fails_the_split_contract(self):
@@ -5067,7 +5068,7 @@ class DriftTaxonomyTests(unittest.TestCase):
         self.assertEqual(coverage["expected_reason"], "sólo comunas urbanas")
 
     def test_all_five_partial_expected_contracts_are_covered(self):
-        """Los 5 contratos con coverage_policy=partial_expected.
+        """Contratos con coverage_policy=partial_expected, incluido DGAC.
 
         Hoy sólo finanzas_municipales e indicadores_urbanos_siedu alcanzan
         coverage_status=partial; en resultados_educacionales,
@@ -5092,6 +5093,7 @@ class DriftTaxonomyTests(unittest.TestCase):
                 "delincuencia_comunal",
                 "finanzas_municipales",
                 "indicadores_urbanos_siedu",
+                "precipitaciones_dgac",
                 "resultados_educacionales",
             ],
         )
