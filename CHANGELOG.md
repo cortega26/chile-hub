@@ -12,6 +12,169 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.50.0 - 2026-10-17
+
+### Corregido
+
+- **calidad_aire**: Fetch listado SINCA via stealth_get (anti-403)
+  ([`5d0fcf6`](https://github.com/cortega26/chile-hub/commit/5d0fcf6e6ea108dfe54c919923a47e98c06ae431))
+
+- **ci**: Generate truthful current-run readiness provenance before syncing coverage badge
+  ([`cfcf7a9`](https://github.com/cortega26/chile-hub/commit/cfcf7a9f54fd6f94f0a9621900300bc4819310e4))
+
+- **ci**: Monthly scrape rebuild uses uv run for project deps
+  ([`1f20cb6`](https://github.com/cortega26/chile-hub/commit/1f20cb6d863748f6f01efa6e5129856b25c0c831))
+
+- **ci**: Restore real PR/push verification, DGAC regression tests and schedule alerts
+  ([#194](https://github.com/cortega26/chile-hub/pull/194),
+  [`4e7a6e0`](https://github.com/cortega26/chile-hub/commit/4e7a6e0bac6e70b3720d873cde54371b312b0da2))
+
+- **ci**: Verify immutable DGAC snapshot on main pushes before canonical publication
+  ([#193](https://github.com/cortega26/chile-hub/pull/193),
+  [`5942dc7`](https://github.com/cortega26/chile-hub/commit/5942dc7940ec6fff92b95f03da6f07a03db72842))
+
+- **dgac**: Repair source registry enums and trigger canonical publication
+  ([#192](https://github.com/cortega26/chile-hub/pull/192),
+  [`73f5e91`](https://github.com/cortega26/chile-hub/commit/73f5e91199e3e8c2acd83eb87df62c2666210e4c))
+
+- **site**: Align publication and active candidate counters with source registry
+  ([#189](https://github.com/cortega26/chile-hub/pull/189),
+  [`0f6f9a4`](https://github.com/cortega26/chile-hub/commit/0f6f9a4989f1fc62a4cc383a684441328109a4a3))
+
+- **site**: Remove individual DGAC research feature from homepage
+  ([#190](https://github.com/cortega26/chile-hub/pull/190),
+  [`bc31e56`](https://github.com/cortega26/chile-hub/commit/bc31e56b4cdf843148422420441cc8037a78b757))
+
+### Mantenimiento
+
+- **adoption**: Publish reproducible territorial value proof
+  ([`6ff375c`](https://github.com/cortega26/chile-hub/commit/6ff375c207bb0839b3e008cb6afcb4adbe4c0360))
+
+- **ci**: Sync coverage badge from verified tests [skip ci]
+  ([`be5b2d6`](https://github.com/cortega26/chile-hub/commit/be5b2d6e47fcf30336f8ab96e05e65ccb15bcfc2))
+
+- **ci**: Sync coverage badge from verified tests [skip ci]
+  ([`126ec0f`](https://github.com/cortega26/chile-hub/commit/126ec0f25bf87133e0c04397bd4abb3035a2f0d4))
+
+- **ci**: Sync coverage badge from verified tests [skip ci]
+  ([`0b7a5f5`](https://github.com/cortega26/chile-hub/commit/0b7a5f5a18d11720ca1df347e88aaa341652ffcc))
+
+- **ci**: Sync coverage badge from verified tests [skip ci]
+  ([`c09613d`](https://github.com/cortega26/chile-hub/commit/c09613d88254d61bf59c532a4454f766ea237521))
+
+- **ci**: Sync coverage badge from verified tests [skip ci]
+  ([`d4419ca`](https://github.com/cortega26/chile-hub/commit/d4419ca725af57dc19d15c93a701305069db331f))
+
+- **geometria**: Close-out decision (C), conditioned review_by 2026-12-31
+  ([`553b254`](https://github.com/cortega26/chile-hub/commit/553b25435774ac11ef9e9920c6c1ec8867bc5db5))
+
+- **sync**: Regenerate derived blocks after plans 141-143 merge (landing JSON-LD, README
+  layers/schema)
+  ([`9a41961`](https://github.com/cortega26/chile-hub/commit/9a4196176999813b7c5afb01057b5339c8e5b214))
+
+- **sync**: Test-count badge after plan 147
+  ([`ecaa668`](https://github.com/cortega26/chile-hub/commit/ecaa668eb0d61758669ebc09b01a27b34ef16a73))
+
+### Documentación
+
+- **adopcion**: Embudo honesto sin telemetria pre-revision 2026-11-01
+  ([`fe3d205`](https://github.com/cortega26/chile-hub/commit/fe3d20514b579984be00f5087fe132576629c9f7))
+
+- **adopcion**: Refresh Anexo M 2026-10-15 + fila cronologia plan 144
+  ([`a241a72`](https://github.com/cortega26/chile-hub/commit/a241a72d495c73b2c7fa9d813b86088392cd90a5))
+
+- **finanzas**: Sync coverage to 345-row live build across spec, catalog, registry, contract
+  ([`f46655b`](https://github.com/cortega26/chile-hub/commit/f46655b60a603156636e9caff7868ae84419232e))
+
+- **perfil**: Contract+doc+spec+registry for pobreza SAE columns
+  ([`719245f`](https://github.com/cortega26/chile-hub/commit/719245fef65932660524456a05a3134cd205cd5a))
+
+- **perfil**: Empresas tributaria-vs-DPA spike note, defer density column
+  ([`c4d2dcb`](https://github.com/cortega26/chile-hub/commit/c4d2dcba39d0b58b31eaa143c8509cbed7d43693))
+
+- **readme**: Remove DGAC research spotlight and proof-of-value promotional blocks
+  ([`77bcd97`](https://github.com/cortega26/chile-hub/commit/77bcd9783c06b908d786e4d55f030417cc941841))
+
+- **site**: Showcase verified DGAC precipitation research across site and guides
+  ([#188](https://github.com/cortega26/chile-hub/pull/188),
+  [`c0fb654`](https://github.com/cortega26/chile-hub/commit/c0fb65461751940c0265b80e9f6f32623115b67e))
+
+### Agregado
+
+- **cli**: Add resolve-coords subcommand (plan 142 step 3)
+  ([`8fedcc2`](https://github.com/cortega26/chile-hub/commit/8fedcc2aedc87b27b859f60e65bc65820df930cc))
+
+- **data**: Publish DGAC historical precipitation layer (2013–2026)
+  ([#191](https://github.com/cortega26/chile-hub/pull/191),
+  [`f0ab451`](https://github.com/cortega26/chile-hub/commit/f0ab451afd098782191484aaf72995fae8faecd8))
+
+- **mcp**: Add resolve_by_coords tool with lazy geo (plan 142 step 2)
+  ([`8bfaef2`](https://github.com/cortega26/chile-hub/commit/8bfaef2bc498b4a4b5a1453437debfdf8ed992c8))
+
+- **mcp**: Add resolve_regiones tool (plan 142 step 1)
+  ([`77d5dee`](https://github.com/cortega26/chile-hub/commit/77d5dee5da7314c3f0803f8897adae51b2932958))
+
+- **perfil**: Thread pobreza SAE summary into perfil_territorial_comunal
+  ([`2b94608`](https://github.com/cortega26/chile-hub/commit/2b94608ae73d964caac05b8a1a5d9d4fa17f8b22))
+
+- **research**: DGAC daily precipitation reproducible candidate
+  ([#186](https://github.com/cortega26/chile-hub/pull/186),
+  [`6cf3f79`](https://github.com/cortega26/chile-hub/commit/6cf3f79bfd82b97de7be701a4ed3a12fc5136f69))
+
+- **research**: Extend DGAC precipitation archive to 143 valid months, 2013–2026
+  ([#187](https://github.com/cortega26/chile-hub/pull/187),
+  [`7fb3f7b`](https://github.com/cortega26/chile-hub/commit/7fb3f7b8e85fe745c1a6495aba0424a32cfd23db))
+
+### Refactorizado
+
+- **chile_hub**: ArtifactStore con caché por instancia; B019 fuera (plan 134a)
+  ([#177](https://github.com/cortega26/chile-hub/pull/177),
+  [`5380adb`](https://github.com/cortega26/chile-hub/commit/5380adb995d7e7ae5e1971e797206d457b6f0a41))
+
+- **chile_hub**: Guardrail de superficie + ArtifactStore con caché por instancia (plan 134a)
+  ([#177](https://github.com/cortega26/chile-hub/pull/177),
+  [`5380adb`](https://github.com/cortega26/chile-hub/commit/5380adb995d7e7ae5e1971e797206d457b6f0a41))
+
+- **chile_hub**: Motor de consulta a _query; sql() se queda (plan 134c)
+  ([#179](https://github.com/cortega26/chile-hub/pull/179),
+  [`6219f50`](https://github.com/cortega26/chile-hub/commit/6219f503ec6b6a7af704b448c203e15a3b92d4b1))
+
+- **chile_hub**: Renderizadores de tablas a _reporting con goldens (plan 134b)
+  ([#178](https://github.com/cortega26/chile-hub/pull/178),
+  [`8f924f0`](https://github.com/cortega26/chile-hub/commit/8f924f0f42e74529a8938d11f2b65ad129400e2e))
+
+- **extractores**: Descompone _parse_comuna_sheet y fetch_data (plan 133c)
+  ([#176](https://github.com/cortega26/chile-hub/pull/176),
+  [`3a5c54c`](https://github.com/cortega26/chile-hub/commit/3a5c54cf9fb557b3ba4474c1a5a109889ae9186e))
+
+- **extractores**: Fetch_mode y centinelas por retorno explícito (plan 133b)
+  ([#175](https://github.com/cortega26/chile-hub/pull/175),
+  [`e1348f4`](https://github.com/cortega26/chile-hub/commit/e1348f499c66b1e9df417999da0a7a99fc73c4dc))
+
+- **validation**: Paquete por dominio con fachada (plan 135)
+  ([#180](https://github.com/cortega26/chile-hub/pull/180),
+  [`e0b0ea5`](https://github.com/cortega26/chile-hub/commit/e0b0ea5551d22ccd851b5a150916336f48803912))
+
+### Tests
+
+- Resolver parity guardrail + fuzzy spike note (plan 142 step 4)
+  ([`0b9e28e`](https://github.com/cortega26/chile-hub/commit/0b9e28eb15fa8d1c6804934831d3743fbea2af9d))
+
+- **calidad_aire**: Cover stealth_get wiring, 403 fallback, no-curl_cffi degrade
+  ([`b931f63`](https://github.com/cortega26/chile-hub/commit/b931f6367420f690df234fa9245663b0819805ee))
+
+- **ci**: Guardrail against finanzas coverage re-drift (plan 143)
+  ([`bee90fa`](https://github.com/cortega26/chile-hub/commit/bee90faafc0f57858ae3e3011ac0d4dffe6a6e48))
+
+- **core**: Guardrail de superficie pública de ChileHub + regla companion (134a)
+  ([#177](https://github.com/cortega26/chile-hub/pull/177),
+  [`5380adb`](https://github.com/cortega26/chile-hub/commit/5380adb995d7e7ae5e1971e797206d457b6f0a41))
+
+- **extractores**: Cubre los helpers extraídos de las god functions (133c)
+  ([#176](https://github.com/cortega26/chile-hub/pull/176),
+  [`3a5c54c`](https://github.com/cortega26/chile-hub/commit/3a5c54cf9fb557b3ba4474c1a5a109889ae9186e))
+
+
 ## 1.49.2 - 2026-10-13
 
 ### Corregido
