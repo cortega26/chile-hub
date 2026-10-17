@@ -323,11 +323,10 @@ jobs:
           git checkout -- data/staging/finanzas_municipales.csv data/staging/finanzas_municipales.metadata.json 2>/dev/null || true
 
       - name: Build outputs
-        # Siempre reconstruir los artefactos efímeros desde staging antes de
-        # verificar. En PR/push no hay extracción viva: se usa el staging
-        # versionado y se ejecuta perfil readiness, nunca publication.
-        # Antes se comprobaba el contrato nuevo contra pipeline_metadata.json
-        # anterior (DGAC / perfil pobreza), haciendo CI roja sin probar código.
+        # El build completo necesita staging de otros extractores, no versionado.
+        # Sólo schedule/dispatch restauran staging del cache o extraen en vivo.
+        # PR/push validan el snapshot inmutable con otro control independiente.
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: python src/build_dev_db.py
 
       - name: Check build-synced files
@@ -344,7 +343,15 @@ jobs:
             exit 1
           fi
 
+      - name: Check committed published snapshot and DGAC source
+        # No mezclar contrato NUEVO con un pipeline_metadata.json de una
+        # publicación ANTERIOR. Este gate sí comprueba integridad real del
+        # último snapshot versionado y del staging DGAC, sin certificar publish.
+        if: github.event_name == 'pull_request' || github.event_name == 'push' || github.event_name == 'merge_group'
+        run: python scripts/verify_committed_snapshot.py
+
       - name: Verify pipeline artifacts
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         id: verify-pipeline
         # Inputs de texto libre vía env, no interpolados en el script (evita
         # inyección de shell desde workflow_dispatch).
@@ -363,6 +370,7 @@ jobs:
             --allow-record-drop "$ALLOW_RECORD_DROP"
 
       - name: Explain verification profile
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: |
           if [[ "${{ steps.verify-pipeline.outputs.profile }}" == "publication" ]]; then
             {
@@ -381,6 +389,7 @@ jobs:
           fi
 
       - name: Write pipeline artifact provenance
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: |
           python - <<'PY'
           import json
