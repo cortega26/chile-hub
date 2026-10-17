@@ -37,52 +37,6 @@
 
 </div>
 
----
-
-### Investigación abierta: precipitaciones diarias de Chile, 2013–2026
-
-El extractor experimental de la **DGAC** consolidó **141.436 observaciones**
-de **33 estaciones** correspondientes a **143 meses válidos**. El resultado
-fue verificado dos veces contra archivos oficiales, con el mismo hash SHA-256,
-y cuenta con pruebas para formatos históricos y trazabilidad por recurso.
-
-- [Metodología, cobertura, licencias, limitaciones y ejecución local](docs/research-dgac-precipitaciones.md).
-- [Evidencia reproducible en GitHub Actions](https://github.com/cortega26/chile-hub/actions/runs/38991196698).
-- [Ficha en el sitio de documentación](https://tooltician.com/chile-hub/reference/research-dgac-precipitaciones/).
-
-> **Estado:** la capa `precipitaciones_dgac` se incorpora al catálogo
-> estable al publicar el snapshot validado y el nuevo bundle. La metodología
-> mantiene el histórico de auditoría y los huecos por licencia y calidad.
-> La serie **no es continua**: 2014 y el primer semestre de 2015
-> se excluyen por restricciones de licencia; enero de 2017 está en cuarentena
-> porque el archivo etiquetado como lluvia contiene temperaturas.
-
-**Contadores de la portada:** las capas publicadas y candidatas activas se
-calculan a partir de [`data/source_registry.json`](data/source_registry.json),
-no del `hub_bundle.json` de un build anterior. Las capas deprecadas se
-distinguen de las candidatas activas; las precipitaciones DGAC entran al catálogo ordinario al completarse
-la publicación, sin tarjeta especial ni anuncios individuales.
-
-## Comprueba el valor con tres pruebas reproducibles
-
-Un cruce de datos públicos debe **funcionar, dejar rastro y mostrar qué datos faltan**.
-Este repositorio incluye una [prueba de valor reproducible](docs/proof-of-value.md)
-que cruza Censo 2024, hogares y estimaciones comunales de pobreza con claves CUT.
-
-```bash
-python scripts/proof_of_value.py --runs 5 --output /tmp/chile-hub-value-proof.json
-```
-
-El resultado incorpora **cobertura de cruces, claves sin correspondencia,
-tiempos observados y hashes SHA-256 de entradas y resultados**. No exige
-instalación de paquetes adicionales ni acceder a redes externas. Puedes
-[revisar el protocolo y sus límites](docs/proof-of-value.md), o abrir los
-[notebooks de investigación existentes](examples/notebooks/README.md).
-
-> La reproducibilidad no es una prueba de superioridad frente a otro proveedor
-> ni constituye por sí sola evidencia de adopción. No publicamos comparaciones
-> de ahorro de tiempo sin una línea base independiente.
-
 ## El dato público existe. El problema es dejarlo listo para usar.
 
 Si trabajas con datos de Chile, probablemente ya conoces la fricción: archivos Excel con formatos cambiantes, códigos territoriales que pierden ceros, fuentes dispersas, APIs inconsistentes y cruces que fallan por diferencias mínimas de nombres.
