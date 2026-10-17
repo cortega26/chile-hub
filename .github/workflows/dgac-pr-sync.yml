@@ -1,5 +1,5 @@
 name: DGAC PR canonical documentation sync
-# One-shot rerun after registering the new extractor in doc_sync.
+# One-shot rerun after reconciling editorial orchestrator-line-count anchors.
 
 on:
   push:
