@@ -350,6 +350,43 @@ def write_legacy_build_staging_fixture(destination: Path, *, include_candidate: 
         write_csv(name, rows)
         write_metadata(name, rows)
 
+    # El harness Phase 1 caracteriza la construcción, no el umbral de volumen
+    # climático. Un fixture pequeño ejerce schema/keys/licencias; la suite DGAC
+    # independiente valida >=120.000 registros reales y la CI de publicación
+    # aplica el umbral sin excepción. Nunca se distribuya este fixture.
+    from datetime import date, timedelta
+
+    first_day = date(2013, 1, 1)
+    dgac_rows = [
+        {
+            "fecha": (first_day + timedelta(days=day)).isoformat(),
+            "id_estacion": f"{100000 + station:06d}",
+            "nombre_estacion": f"Estacion test {station}",
+            "latitud_dms": "18 S",
+            "altitud_m": "50.0",
+            "precipitacion_mm": "1.0",
+            "url_fuente": "https://datos.gob.cl/test-fixture-no-publicable",
+            "licencia_fuente": "cc-by",
+        }
+        for station in range(24)
+        for day in range(4)
+    ]
+    write_csv("precipitaciones_dgac", dgac_rows)
+    write_metadata("precipitaciones_dgac", dgac_rows)
+    dgac_metadata_path = destination / "precipitaciones_dgac.metadata.json"
+    dgac_metadata = json.loads(dgac_metadata_path.read_text(encoding="utf-8"))
+    dgac_metadata.update(
+        {
+            "months": 143,
+            "station_count": 24,
+            "source_files": [{"month": "2013-01", "sha256": "offline-fixture"}],
+            "quarantined_source_months": {"2017-01": "temperatures excluded"},
+        }
+    )
+    dgac_metadata_path.write_text(
+        json.dumps(dgac_metadata, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+
     if include_candidate:
         candidate_rows = [
             {
