@@ -124,14 +124,14 @@ def resources_for_package(
         if month not in months:
             continue
         grouped.setdefault(month, []).append(
-            {"url": str(item["url"]), "name": str(item.get("name", "")),
-             "month": str(month)}
+            {"url": str(item["url"]), "name": str(item.get("name", "")), "month": str(month)}
         )
     missing = set(months) - set(grouped)
     if missing:
         raise SourceError(f"Faltan CSV del año {year}, meses: {sorted(missing)}")
     return [
-        candidate for month in sorted(grouped)
+        candidate
+        for month in sorted(grouped)
         for candidate in sorted(grouped[month], key=lambda r: r["url"])
     ]
 
@@ -214,9 +214,7 @@ def parse_csv(
     return result
 
 
-def harvest(
-    output: Path, *, start_year: int = 2013, end_year: int = 2026
-) -> dict[str, Any]:
+def harvest(output: Path, *, start_year: int = 2013, end_year: int = 2026) -> dict[str, Any]:
     """Cosecha los períodos abiertos declarados o falla sin publicar parcial.
 
     No se exige continuidad donde hay licencias distintas o períodos no
@@ -224,10 +222,7 @@ def harvest(
     """
     if not 2013 <= start_year <= end_year <= 2026:
         raise SourceError("Rango admitido: 2013 <= inicio <= fin <= 2026")
-    packages = {
-        key: name for key, name in PACKAGES.items()
-        if start_year <= key[0] <= end_year
-    }
+    packages = {key: name for key, name in PACKAGES.items() if start_year <= key[0] <= end_year}
     all_rows: list[dict[str, str]] = []
     source_files: list[dict[str, Any]] = []
     duplicate_resources: list[dict[str, str]] = []
@@ -250,13 +245,15 @@ def harvest(
                         f"{year}-{month:02d}: recursos duplicados con contenido distinto"
                     )
                 duplicate_resources.append(
-                    {"year_month": f"{year}-{month:02d}",
-                     "url": resource["url"], "sha256": digest}
+                    {"year_month": f"{year}-{month:02d}", "url": resource["url"], "sha256": digest}
                 )
                 continue
             hashes[month] = digest
             parsed = parse_csv(
-                payload, year=year, month=month, url=resource["url"],
+                payload,
+                year=year,
+                month=month,
+                url=resource["url"],
                 license_id=license_id,
             )
             for row in parsed:
@@ -302,7 +299,8 @@ def harvest(
         "missing_measurements": sum(row["precipitacion_mm"] == "" for row in all_rows),
         "counts_by_year": years,
         "excluded_source_periods": {
-            key: reason for key, reason in EXCLUDED_SOURCE_PERIODS.items()
+            key: reason
+            for key, reason in EXCLUDED_SOURCE_PERIODS.items()
             if (key == "2014" and start_year <= 2014 <= end_year)
             or (key.startswith("2015") and start_year <= 2015 <= end_year)
             or (key.startswith("2026") and start_year <= 2026 <= end_year)
@@ -345,9 +343,7 @@ def main() -> None:
     parser.add_argument("--start-year", type=int, default=2013)
     parser.add_argument("--end-year", type=int, default=2026)
     args = parser.parse_args()
-    meta = harvest(
-        args.output, start_year=args.start_year, end_year=args.end_year
-    )
+    meta = harvest(args.output, start_year=args.start_year, end_year=args.end_year)
     print(
         json.dumps(
             {
