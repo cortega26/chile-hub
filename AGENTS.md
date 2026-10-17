@@ -43,7 +43,7 @@ entender la arquitectura, las reglas no negociables y las convenciones del proye
 ## 1. Propósito del proyecto
 
 `chile-hub` es una capa de datos pública, curada y reproducible sobre **datos oficiales de Chile**.
-Actualmente registra veinticinco (<!-- START_AGENTS_DATASET_COUNT -->25<!-- END_AGENTS_DATASET_COUNT -->) capas, de las cuales 21 viajan en el bundle público (ver convención de conteos junto al badge de README.md):
+Actualmente registra veintiséis (<!-- START_AGENTS_DATASET_COUNT -->26<!-- END_AGENTS_DATASET_COUNT -->) capas, de las cuales 22 viajan en el bundle público (ver convención de conteos junto al badge de README.md):
 
 | Capa | Fuente | Descripción |
 |:---|:---|:---|
@@ -675,7 +675,7 @@ grep -n "^class " tests/*.py
 | `test_pipeline_logic.py` | No | Lógica interna de `build_dev_db.py`, invariantes CUT, fallback de indicadores, severidad de `dataset_changelog.json`, builders (`reports`, `pipeline_status_utils`) |
 | `test_proof_of_value.py` | No | Prueba reproducible de tres cruces territoriales, cobertura, integridad CUT y hash de resultados (sin red) |
 | `test_render.py` | No | Helper de renderizado de tablas (`_render.py`) |
-| `test_research_dgac_precipitaciones.py` | No | Candidato DGAC: CSV sin cabeceras, cobertura de meses, licencias, hashes y fallos cerrados (sin red) |
+| `test_research_dgac_precipitaciones.py` | No | Histórico DGAC: CSV sin cabeceras, cobertura de meses, licencias, hashes y fallos cerrados (sin red) |
 | `test_validation.py` | No | Funciones `validate_*()` del paquete `src/validation/`: bordes vacíos, claves duplicadas, casos límite |
 | `test_verify_pipeline.py` | Sí (`make build` antes) | Verificación de pipeline (`verify_pipeline.py`) — guardia pre-publicación de artefactos |
 
