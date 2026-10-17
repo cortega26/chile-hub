@@ -207,12 +207,30 @@ def _assert_zip_sidecar_matches(normalized: Path) -> None:
     assert declared == hashlib.sha256(bundle.read_bytes()).hexdigest()
 
 
+def _validate_dgac_isolated_fixture(df, metadata):
+    """Mantiene las validaciones reales salvo el mínimo histórico de volumen.
+
+    Los builds Phase 1 son fixtures acotados. El extractor/validador de DGAC
+    mantiene el umbral de 120.000 sin excepción fuera de estos tests.
+    """
+    from src.validation import validate_precipitaciones_dgac
+
+    result = validate_precipitaciones_dgac(df, metadata)
+    minimum_error = "cobertura histórica por debajo de 120.000 observaciones"
+    result["errors"] = [error for error in result["errors"] if error != minimum_error]
+    result["status"] = "error" if result["errors"] else "ok"
+    return result
+
+
 def _offline_synthetic_staging(
     destination: Path, *, include_candidate: bool = True
-) -> dict[str, str]:
+) -> dict:
     """Create a test-owned staging tree from static literals only."""
     write_legacy_build_staging_fixture(destination, include_candidate=include_candidate)
-    overrides = {"STAGING_DIR": str(destination)}
+    overrides = {
+        "STAGING_DIR": str(destination),
+        "validate_precipitaciones_dgac": _validate_dgac_isolated_fixture,
+    }
     for attribute in REQUIRED_METADATA_PATHS:
         overrides[attribute] = str(destination / Path(getattr(build_dev_db, attribute)).name)
     return overrides
