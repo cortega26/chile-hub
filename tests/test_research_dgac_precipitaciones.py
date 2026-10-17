@@ -101,7 +101,7 @@ class DgacResearchTests(unittest.TestCase):
                 (
                     "CodigoNacional,NombreEstacion,Latitud,Altura,"
                     "Año,Mes,Dia,T.Maxima,T.Minima\n"
-                ).encode("utf-8") + sample_csv(2017, 1),
+                ).encode() + sample_csv(2017, 1),
                 year=2017,
                 month=1,
                 url="https://datos.gob.cl/2017.csv",
