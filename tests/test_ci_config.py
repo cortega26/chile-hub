@@ -2548,8 +2548,6 @@ class DgacPublicationGateTests(unittest.TestCase):
         self.assertEqual(dgac["publication_track"], "stable_publishable")
 
 
-
-
 if __name__ == "__main__":
     import pytest
 
