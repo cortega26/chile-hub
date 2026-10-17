@@ -81,6 +81,32 @@ class DgacResearchTests(unittest.TestCase):
         )
         self.assertEqual(len(rows), 112)
         self.assertEqual(rows[0]["fecha"], "2016-01-01")
+        # 2026 usa encabezados en mayúsculas y terminología diferente.
+        modern = (
+            "CODIGO NACIONAL,NOMBRE DE LA ESTACIÓN,LATITUD,ALTITUD,"
+            "AÑO,MES,DÍA,PRECIPITACIÓN (MM)\\n"
+        )
+        rows = dgac.parse_csv(
+            modern.replace("\\\\n", "\\n").encode("utf-8") + sample_csv(2026, 1),
+            year=2026,
+            month=1,
+            url="https://datos.gob.cl/2026.csv",
+            license_id="cc-zero",
+        )
+        self.assertEqual(len(rows), 112)
+        self.assertEqual(rows[0]["fecha"], "2026-01-01")
+        # Un encabezado T.Maxima/T.Minima es temperatura, no lluvia.
+        with self.assertRaisesRegex(dgac.SourceError, "Primera fila desconocida"):
+            dgac.parse_csv(
+                (
+                    "CodigoNacional,NombreEstacion,Latitud,Altura,"
+                    "Año,Mes,Dia,T.Maxima,T.Minima\\n"
+                ).replace("\\\\n", "\\n").encode("utf-8") + sample_csv(2017, 1),
+                year=2017,
+                month=1,
+                url="https://datos.gob.cl/2017.csv",
+                license_id="cc-by",
+            )
 
     def test_missing_measurement_is_not_zero(self):
         rows = dgac.parse_csv(
@@ -179,6 +205,7 @@ class DgacResearchTests(unittest.TestCase):
         self.assertEqual(sum(6 for _ in dgac.PACKAGES), 144)
         self.assertNotIn((2014, 1), dgac.PACKAGES)
         self.assertNotIn((2015, 1), dgac.PACKAGES)
+        self.assertIn((2017, 1), dgac.QUARANTINED_SOURCE_MONTHS)
         self.assertEqual(dgac.PACKAGES[(2015, 2)], "precipitacion-2o-semestre-2015")
         self.assertEqual(dgac.PACKAGES[(2026, 1)], "precipitacion-1er-semestre-2026")
 
