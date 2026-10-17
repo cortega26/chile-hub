@@ -283,5 +283,62 @@ class DgacResearchTests(unittest.TestCase):
             self.assertFalse(outfile.with_suffix(".metadata.json").exists())
 
 
+    def test_production_wrapper_preserves_previous_snapshot_on_rejected_harvest(self):
+        from src.extractors import precipitaciones_dgac_extractor as production
+
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "precipitaciones_dgac.csv"
+            old_meta = out.with_suffix(".metadata.json")
+            out.write_text("previous snapshot", encoding="utf-8")
+            old_meta.write_text('{"retained":true}', encoding="utf-8")
+
+            def incomplete(path):
+                path.write_text("invalid snapshot", encoding="utf-8")
+                path.with_suffix(".metadata.json").write_text("{}", encoding="utf-8")
+                return {"months": 141, "record_count": 50}
+
+            with patch.object(production, "harvest", side_effect=incomplete):
+                with self.assertRaisesRegex(RuntimeError, "cobertura"):
+                    production.extract(out)
+            self.assertEqual(out.read_text(encoding="utf-8"), "previous snapshot")
+            self.assertEqual(old_meta.read_text(encoding="utf-8"), '{"retained":true}')
+
+    def test_semantic_validator_rejects_unlicensed_and_negative_rain(self):
+        import polars as pl
+
+        from src.validation import validate_precipitaciones_dgac
+
+        data = pl.DataFrame(
+            {
+                "fecha": ["2017-01-01", "2017-01-01"],
+                "id_estacion": ["180005", "180005"],
+                "nombre_estacion": ["Arica", "Arica"],
+                "latitud_dms": ["18 S", "18 S"],
+                "altitud_m": [50.0, 50.0],
+                "precipitacion_mm": [-2.0, 0.0],
+                "url_fuente": ["https://datos.gob.cl/x"] * 2,
+                "licencia_fuente": ["cc-nc", "cc-by"],
+            }
+        )
+        status = validate_precipitaciones_dgac(data)
+        self.assertEqual(status["status"], "error")
+        self.assertTrue(any("duplicada" in x for x in status["errors"]))
+        self.assertTrue(any("negativa" in x for x in status["errors"]))
+        self.assertTrue(any("licencias" in x for x in status["errors"]))
+
+    def test_publish_verifier_rejects_tampered_source_hash(self):
+        from scripts.verify_dgac_publication import verify_and_write
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            csv_path = root / "dgac.csv"
+            meta_path = root / "dgac.metadata.json"
+            csv_path.write_text("tampered", encoding="utf-8")
+            meta_path.write_text('{"sha256":"not-a-real-hash"}', encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "SHA-256"):
+                verify_and_write(csv_path, meta_path, root / "out")
+            self.assertFalse((root / "out").exists())
+
+
 if __name__ == "__main__":
     unittest.main()
