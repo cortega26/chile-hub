@@ -7,6 +7,8 @@ on:
       - ".github/workflows/dgac-publish.yml"
       - "src/extractors/precipitaciones_dgac_extractor.py"
       - "contracts/datasets/precipitaciones_dgac.schema.json"
+      - "data/source_registry.json"
+      - "data/dataset_specs/precipitaciones_dgac.json"
   workflow_dispatch:
   schedule:
     # Refresco trimestral de los mismos meses verificados; nuevos meses

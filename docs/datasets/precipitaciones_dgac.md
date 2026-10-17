@@ -61,6 +61,12 @@ duplicados resueltos e incidencias; [CI DGAC
 
 ## Refresco y mantenimiento
 
+El registro canónico utiliza `access_method: api` y
+`fallback_policy: none`, valores admitidos por los controles de publicación.
+En concreto, `api` identifica consultas al catálogo CKAN oficial de
+datos.gob.cl y descargas de archivos CSV por recurso; `none` prohíbe
+sustituir una descarga fallida por datos ficticios o un snapshot no validado.
+
 El extractor de producción `src/extractors/precipitaciones_dgac_extractor.py`
 reutiliza el parser DGAC auditado y escribe en `data/staging/` solo al
 completar toda la cobertura aprobada. El workflow de actualización
