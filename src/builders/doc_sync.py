@@ -525,6 +525,7 @@ _README_DATASET_DOMAINS = {
     "permisos_edificacion": "Economía",
     "indicadores_urbanos_siedu": "Indicadores urbanos",
     "calidad_aire": "Medio ambiente",
+    "precipitaciones_dgac": "Medio ambiente",
     "partidos_politicos": "Política",
     "autoridades_electas": "Política",
     "autoridades_locales": "Política",
