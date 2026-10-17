@@ -350,10 +350,10 @@ def write_legacy_build_staging_fixture(destination: Path, *, include_candidate: 
         write_csv(name, rows)
         write_metadata(name, rows)
 
-    # Capa DGAC: el nuevo requerimiento estable necesita una fuente offline
-    # determinista con clave diaria de 24 estaciones y 120.000 observaciones.
-    # Los fixtures NO usan internet ni copian CSV históricos de producción.
-    # Es una serie sintética declarada como test, nunca distribuible.
+    # El harness Phase 1 caracteriza la construcción, no el umbral de volumen
+    # climático. Un fixture pequeño ejerce schema/keys/licencias; la suite DGAC
+    # independiente valida >=120.000 registros reales y la CI de publicación
+    # aplica el umbral sin excepción. Nunca se distribuya este fixture.
     from datetime import date, timedelta
 
     first_day = date(2013, 1, 1)
@@ -369,7 +369,7 @@ def write_legacy_build_staging_fixture(destination: Path, *, include_candidate: 
             "licencia_fuente": "cc-by",
         }
         for station in range(24)
-        for day in range(5000)
+        for day in range(4)
     ]
     write_csv("precipitaciones_dgac", dgac_rows)
     write_metadata("precipitaciones_dgac", dgac_rows)
