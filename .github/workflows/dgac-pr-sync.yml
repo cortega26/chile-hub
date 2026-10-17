@@ -1,4 +1,5 @@
 name: DGAC PR canonical documentation sync
+# One-shot rerun after registering the new extractor in doc_sync.
 
 on:
   push:
