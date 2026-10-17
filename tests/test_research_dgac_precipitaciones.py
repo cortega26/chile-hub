@@ -53,6 +53,35 @@ class DgacResearchTests(unittest.TestCase):
         self.assertEqual(rows[0]["id_estacion"], "180005")
         self.assertEqual(rows[0]["precipitacion_mm"], "0.0")
 
+    def test_legacy_source_formats_in_existing_header_regression(self):
+        # La DGAC 2013 usa ';' y comas dentro del nombre de estación.
+        line = "180005;Chacalluta, Arica Ap.;18&deg 21' 20'' S;50;2013;01;01;0.0"
+        content = "\n".join([line.replace(";01;0.0", f";{day:02d};0.0") for day in range(1, 29)])
+        # 4 estaciones x 28 días para superar el gate mínimo.
+        content = "\n".join(
+            content.replace("180005;", f"{180005 + station};") for station in range(4)
+        ).encode("utf-8")
+        rows = dgac.parse_csv(
+            content,
+            year=2013,
+            month=1,
+            url="https://datos.gob.cl/legacy.csv",
+            license_id="cc-by",
+        )
+        self.assertEqual(len(rows), 112)
+        self.assertIn("°", rows[0]["latitud_dms"])
+        # En 2016 el origen sí incluye cabecera; no contaría como observación.
+        header = "CodigoNacional,NombreEstacion,Latitud,Altura,Año,Mes,Dia,SumaDiaria\n"
+        rows = dgac.parse_csv(
+            header.encode("utf-8") + sample_csv(2016, 1),
+            year=2016,
+            month=1,
+            url="https://datos.gob.cl/with-header.csv",
+            license_id="cc-by",
+        )
+        self.assertEqual(len(rows), 112)
+        self.assertEqual(rows[0]["fecha"], "2016-01-01")
+
     def test_missing_measurement_is_not_zero(self):
         rows = dgac.parse_csv(
             sample_csv(missing=True),
