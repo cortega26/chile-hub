@@ -1,4 +1,4 @@
-name: DGAC precipitation research verification
+name: DGAC precipitation full-history verification
 
 on:
   pull_request:
@@ -16,7 +16,7 @@ jobs:
   dgac-research:
     name: Validate DGAC daily precipitation candidate
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 20
     steps:
       - name: Checkout candidate
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -26,18 +26,18 @@ jobs:
           python-version: "3.13"
       - name: Offline unit and contract tests
         run: python -m unittest discover -s tests -p 'test_research_dgac_precipitaciones.py' -v
-      - name: Obtain 24 official monthly CSVs and validate
+      - name: Obtain open-license historical CSVs and validate
         run: |
           mkdir -p evidence
           python scripts/research_dgac_precipitaciones.py \
-            --output evidence/precipitaciones_dgac_2024_2025.csv
-          python -m json.tool evidence/precipitaciones_dgac_2024_2025.metadata.json > /dev/null
+            --output evidence/precipitaciones_dgac_historico_2013_2026.csv
+          python -m json.tool evidence/precipitaciones_dgac_historico_2013_2026.metadata.json > /dev/null
       - name: Archive research evidence without publishing to the stable bundle
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: dgac-precipitations-2024-2025-candidate
+          name: dgac-precipitations-2013-2026-candidate
           path: |
-            evidence/precipitaciones_dgac_2024_2025.csv
-            evidence/precipitaciones_dgac_2024_2025.metadata.json
+            evidence/precipitaciones_dgac_historico_2013_2026.csv
+            evidence/precipitaciones_dgac_historico_2013_2026.metadata.json
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 30
