@@ -123,8 +123,7 @@ def check_hero_publication_status(index_html):
     expected = render_hero_publication_status_block()
     if actual != expected:
         return [
-            "El contador de capas publicadas/candidatas está desfasado "
-            "de data/source_registry.json"
+            "El contador de capas publicadas/candidatas está desfasado de data/source_registry.json"
         ]
     return []
 
