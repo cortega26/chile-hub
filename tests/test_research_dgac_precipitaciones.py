@@ -83,8 +83,7 @@ class DgacResearchTests(unittest.TestCase):
         self.assertEqual(rows[0]["fecha"], "2016-01-01")
         # 2026 usa encabezados en mayúsculas y terminología diferente.
         modern = (
-            "CODIGO NACIONAL,NOMBRE DE LA ESTACIÓN,LATITUD,ALTITUD,"
-            "AÑO,MES,DÍA,PRECIPITACIÓN (MM)\n"
+            "CODIGO NACIONAL,NOMBRE DE LA ESTACIÓN,LATITUD,ALTITUD,AÑO,MES,DÍA,PRECIPITACIÓN (MM)\n"
         )
         rows = dgac.parse_csv(
             modern.encode("utf-8") + sample_csv(2026, 1),
@@ -99,9 +98,9 @@ class DgacResearchTests(unittest.TestCase):
         with self.assertRaisesRegex(dgac.SourceError, "Primera fila desconocida"):
             dgac.parse_csv(
                 (
-                    "CodigoNacional,NombreEstacion,Latitud,Altura,"
-                    "Año,Mes,Dia,T.Maxima,T.Minima\n"
-                ).encode() + sample_csv(2017, 1),
+                    "CodigoNacional,NombreEstacion,Latitud,Altura,Año,Mes,Dia,T.Maxima,T.Minima\n"
+                ).encode()
+                + sample_csv(2017, 1),
                 year=2017,
                 month=1,
                 url="https://datos.gob.cl/2017.csv",
