@@ -439,16 +439,19 @@ def verify_landing():  # noqa: C901  # plan 136
             (ROOT_DIR / "data" / "source_registry.json").read_text(encoding="utf-8")
         )
         stable_sources = [
-            source for source in source_registry
+            source
+            for source in source_registry
             if source["publication_track"] == "stable_publishable"
         ]
         active_candidates = [
-            source for source in source_registry
+            source
+            for source in source_registry
             if source["publication_track"] == "candidate"
             and source["maturity_status"] != "deprecated"
         ]
         deprecated_candidates = [
-            source for source in source_registry
+            source
+            for source in source_registry
             if source["publication_track"] == "candidate"
             and source["maturity_status"] == "deprecated"
         ]
@@ -577,10 +580,10 @@ def verify_landing():  # noqa: C901  # plan 136
             if f"{len(deprecated_candidates)} deprecadas" not in candidate_summary:
                 fail(f"El catálogo no distingue capas deprecadas: {candidate_summary}")
             for source in deprecated_candidates:
-                if page.locator(f'#candidate-{source["dataset"]}').count() != 0:
+                if page.locator(f"#candidate-{source['dataset']}").count() != 0:
                     fail(f"Se muestra una capa deprecada como activa: {source['dataset']}")
             for source in active_candidates:
-                if page.locator(f'#candidate-{source["dataset"]}').count() != 1:
+                if page.locator(f"#candidate-{source['dataset']}").count() != 1:
                     fail(f"Falta candidata activa en el catálogo: {source['dataset']}")
             first_candidate_name = active_candidates[0]["dataset"]
             page.fill("#catalog-search-input", first_candidate_name)
