@@ -1,9 +1,8 @@
-# Candidato de investigación — precipitaciones diarias históricas DGAC (2013–2026)
+# Procedencia y auditoría — precipitaciones históricas DGAC (2013–2026)
 
-**Carril:** `under-review` / `candidate`. **No está todavía en el
-bundle estable, la API pública `ChileHub` ni el catálogo de capas
-publicables.** El CSV y su metadata se generan como artefactos de un
-workflow de investigación independiente.
+**Capa:** [`precipitaciones_dgac`](datasets/precipitaciones_dgac.md).
+El extractor de investigación mantiene evidencia independiente y reproducible;
+la distribución permanente requiere un nuevo bundle validado por CI.
 
 **Fuente primaria:** Dirección General de Aeronáutica Civil (DGAC),
 [datos.gob.cl](https://datos.gob.cl/organization/direccion_general_de_aeronautica_civil),
@@ -128,10 +127,10 @@ estos casos y para no confundir temperaturas con precipitaciones.
   La extracción es reproducible en esta corrida; la disponibilidad futura
   de archivos depende del portal oficial.
 
-**Antes de promoción a la API principal:** validar cobertura mensual
-y densidad por estación, anomalías y cambios instrumentales, revisar
-las limitaciones históricas, crear `DatasetSpec`, contrato, registro,
-validadores, CI canónica y snapshots estables sin datos falsos.
+**Para la distribución:** el `DatasetSpec`, contrato, registro, validadores,
+workflow y snapshot verificado deben pasar CI y adjuntarse al bundle.
+Las limitaciones de densidad por estación y comparabilidad histórica se
+mantienen como advertencias científicas, no como cobertura total.
 El chequeo heredado de `perfil_territorial_comunal` se gestiona
 en [issue #185](https://github.com/cortega26/chile-hub/issues/185),
 independiente de esta investigación.

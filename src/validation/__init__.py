@@ -6,6 +6,7 @@ el checker de registro (§5) escanea las DEFINICIONES del paquete.
 """
 
 from ._anomalias import detect_series_anomalies as detect_series_anomalies
+from ._clima import validate_precipitaciones_dgac as validate_precipitaciones_dgac
 from ._constants import _CATEGORIAS_VALIDAS as _CATEGORIAS_VALIDAS
 from ._constants import _CHILE_LAT_MAX as _CHILE_LAT_MAX
 from ._constants import _CHILE_LAT_MIN as _CHILE_LAT_MIN

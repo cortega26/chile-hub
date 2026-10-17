@@ -1,9 +1,14 @@
-name: DGAC precipitation full-history verification
+name: DGAC full-history and publication contract verification
 
 on:
   pull_request:
     paths:
       - "scripts/research_dgac_precipitaciones.py"
+      - "src/extractors/precipitaciones_dgac_extractor.py"
+      - "src/validation/_clima.py"
+      - "scripts/verify_dgac_publication.py"
+      - "contracts/datasets/precipitaciones_dgac.schema.json"
+      - "data/dataset_specs/precipitaciones_dgac.json"
       - "tests/test_research_dgac_precipitaciones.py"
       - "docs/research-dgac-precipitaciones.md"
       - ".github/workflows/dgac-research.yml"
@@ -14,7 +19,7 @@ permissions:
 
 jobs:
   dgac-research:
-    name: Validate DGAC daily precipitation candidate
+    name: Validate DGAC stable publishable evidence
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -24,20 +29,58 @@ jobs:
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.13"
+      - name: Install verification dependencies
+        run: python -m pip install "polars>=1.44.1,<3" "pyarrow>=24" "requests>=2.34.2" "platformdirs>=4" "rich>=14"
       - name: Offline unit and contract tests
         run: python -m unittest discover -s tests -p 'test_research_dgac_precipitaciones.py' -v
-      - name: Obtain open-license historical CSVs and validate
+      - name: Fetch staging from DGAC (143 valid historical months)
+        run: python src/extractors/precipitaciones_dgac_extractor.py
+      - name: Verify contract and prepare production CSV and Parquet
         run: |
-          mkdir -p evidence
-          python scripts/research_dgac_precipitaciones.py \
-            --output evidence/precipitaciones_dgac_historico_2013_2026.csv
-          python -m json.tool evidence/precipitaciones_dgac_historico_2013_2026.metadata.json > /dev/null
-      - name: Archive research evidence without publishing to the stable bundle
+          python scripts/verify_dgac_publication.py
+          python -m json.tool data/normalized/precipitaciones_dgac.metadata.json > /dev/null
+      - name: Verify ChileHub consumer against isolated real Parquet
+        # The full-hub builder requires cached staging for 21 unrelated layers.
+        # This test exercises the actual API and actual DGAC parquet without
+        # inventing source files for those other layers.
+        run: |
+          python - <<'PY'
+          import json
+          import shutil
+          import tempfile
+          from pathlib import Path
+          from src.chile_hub.core import ChileHub
+          from src.chile_hub.datasets import Dataset
+
+          with tempfile.TemporaryDirectory() as temp:
+              root = Path(temp)
+              out = root / "data" / "normalized"
+              out.mkdir(parents=True)
+              shutil.copy2("data/normalized/precipitaciones_dgac.parquet", out)
+              (out / "dataset_catalog.json").write_text(
+                  json.dumps({
+                      "datasets": [{
+                          "dataset": "precipitaciones_dgac",
+                          "outputs": {
+                              "parquet": "data/normalized/precipitaciones_dgac.parquet"
+                          }
+                      }]
+                  }), encoding="utf-8"
+              )
+              hub = ChileHub(data_dir=out)
+              assert "precipitaciones_dgac" in hub.list_datasets()
+              frame = hub.load_polars(Dataset.PRECIPITACIONES_DGAC)
+              assert frame.height == 141436, frame.height
+              assert frame["id_estacion"].n_unique() == 33
+              print(f"ChileHub.load_polars(): {frame.height} DGAC rows, 33 stations")
+          PY
+      - name: Archive verified production-ready evidence
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: dgac-precipitations-2013-2026-candidate
+          name: dgac-precipitations-publishable-2013-2026
           path: |
-            evidence/precipitaciones_dgac_historico_2013_2026.csv
-            evidence/precipitaciones_dgac_historico_2013_2026.metadata.json
+            data/normalized/precipitaciones_dgac.csv
+            data/normalized/precipitaciones_dgac.parquet
+            data/normalized/precipitaciones_dgac.metadata.json
           if-no-files-found: error
           retention-days: 30

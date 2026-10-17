@@ -83,7 +83,8 @@ def _request(url: str, *, retries: int = 3) -> bytes:
                 },
             )
             with urllib.request.urlopen(request, timeout=35) as response:
-                return response.read()
+                body: bytes = response.read()
+                return body
         except (OSError, urllib.error.URLError) as exc:
             if attempt == retries - 1:
                 raise SourceError(f"No se pudo descargar {url}: {exc}") from exc
@@ -99,7 +100,8 @@ def _package(name: str) -> dict[str, Any]:
     payload = json.loads(_request(url))
     if payload.get("success") is not True or not isinstance(payload.get("result"), dict):
         raise SourceError(f"CKAN no devolvió el paquete {name}")
-    return payload["result"]
+    result: dict[str, Any] = payload["result"]
+    return result
 
 
 def _resource_month(resource: dict[str, Any], year: int) -> int | None:
@@ -129,7 +131,7 @@ def resources_for_package(
         if str(item.get("format", "")).lower() != "csv":
             continue
         month = _resource_month(item, year)
-        if month not in months:
+        if month is None or month not in months:
             continue
         grouped.setdefault(month, []).append(
             {"url": str(item["url"]), "name": str(item.get("name", "")), "month": str(month)}
@@ -339,8 +341,8 @@ def harvest(output: Path, *, start_year: int = 2013, end_year: int = 2026) -> di
     data = buffer.getvalue().encode("utf-8")
     years: dict[str, int] = {}
     for row in all_rows:
-        year = row["fecha"][:4]
-        years[year] = years.get(year, 0) + 1
+        year_label = row["fecha"][:4]
+        years[year_label] = years.get(year_label, 0) + 1
     metadata = {
         "dataset": "precipitaciones_dgac",
         "publication_track": "candidate",

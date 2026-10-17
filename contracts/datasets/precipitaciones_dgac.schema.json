@@ -1,0 +1,81 @@
+{
+  "dataset": "precipitaciones_dgac",
+  "primary_key": [
+    "fecha",
+    "id_estacion"
+  ],
+  "required_columns": [
+    "fecha",
+    "id_estacion",
+    "nombre_estacion",
+    "latitud_dms",
+    "altitud_m",
+    "precipitacion_mm",
+    "url_fuente",
+    "licencia_fuente"
+  ],
+  "column_types": {
+    "fecha": "string",
+    "id_estacion": "string",
+    "nombre_estacion": "string",
+    "latitud_dms": "string",
+    "altitud_m": "float",
+    "precipitacion_mm": "float",
+    "url_fuente": "string",
+    "licencia_fuente": "string"
+  },
+  "nullable_columns": [
+    "precipitacion_mm"
+  ],
+  "fixed_width_columns": {
+    "id_estacion": 6
+  },
+  "expected_record_count": null,
+  "coverage_policy": "partial_expected",
+  "publish_outputs": [
+    "parquet"
+  ],
+  "columns": [
+    {
+      "name": "fecha",
+      "type": "string",
+      "example": "2013-01-01"
+    },
+    {
+      "name": "id_estacion",
+      "type": "string",
+      "width": 6,
+      "example": "180005"
+    },
+    {
+      "name": "nombre_estacion",
+      "type": "string",
+      "example": "Chacalluta, Arica Ap."
+    },
+    {
+      "name": "latitud_dms",
+      "type": "string",
+      "example": "18° 21' 20'' S"
+    },
+    {
+      "name": "altitud_m",
+      "type": "float",
+      "example": 50
+    },
+    {
+      "name": "precipitacion_mm",
+      "type": "float",
+      "example": 0.5
+    },
+    {
+      "name": "url_fuente",
+      "type": "string",
+      "example": "https://datos.gob.cl/dataset/.../download/precipitacion_012013.csv"
+    },
+    {
+      "name": "licencia_fuente",
+      "type": "string",
+      "example": "cc-by"
+    }
+  ]
+}

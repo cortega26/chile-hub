@@ -206,6 +206,7 @@ CATALOG_KEY_TO_ROW_FRAGMENT = {
     "estadisticas_vitales": "Estadísticas Vitales",
     "permisos_edificacion": "Permisos de Edificación",
     "calidad_aire": "Calidad del Aire",
+    "precipitaciones_dgac": "Precipitaciones DGAC",
 }
 
 

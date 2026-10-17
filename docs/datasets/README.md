@@ -56,6 +56,7 @@ Las propuestas de nuevas capas se evalúan con los criterios públicos de
 | [`perfil_territorial_comunal`](perfil_territorial_comunal.md) | Perfil comunal curado que consolida DPA, censo, salud, educación, finanzas, SIEDU y distritos. |
 | [`permisos_edificacion`](permisos_edificacion.md) | Viviendas en unidades y superficie (m2) por comuna y año —casas y departamentos— desde las estadísticas de permisos de edificación del CEDOC (MINVU), serie desde 2002. |
 | [`pobreza_comunal`](pobreza_comunal.md) | Estimaciones de pobreza comunal por ingresos y multidimensional derivadas de la encuesta CASEN mediante metodología SAE (Estimación de Áreas Pequeñas). Incluye tasa, límite inferior y superior del intervalo de confianza por comuna, año y dimensión. |
+| [`precipitaciones_dgac`](precipitaciones_dgac.md) | Precipitaciones diarias por estación meteorológica DGAC: serie 2013–2026 con 143 meses verificables, sin interpolación ni asignación de CUT; lagunas de cobertura y licencias explícitas. |
 | [`provincias`](provincias.md) | Capa derivada de provincias para cruces intermedios entre region y comuna. |
 | [`regiones`](regiones.md) | Capa derivada de regiones para filtros, joins y referencias administrativas de alto nivel. |
 | [`resultados_educacionales`](resultados_educacionales.md) | Resultados educacionales agregados por comuna y año, sin registros personales. |
@@ -65,18 +66,9 @@ Las propuestas de nuevas capas se evalúan con los criterios públicos de
 > La tabla se regenera desde `data/dataset_catalog_config.json` en cada build
 > (`make sync-docs`); no editarla a mano.
 
-## Candidatos de investigación (fuera del catálogo estable)
-
-Estos trabajos se validan independientemente y **no están disponibles**
-en la API de ChileHub, el ZIP de datos publicados ni la tabla anterior.
-No incrementan el número de capas estables.
-
-- **[Precipitaciones diarias por estación DGAC, 2013–2026](../research-dgac-precipitaciones.md)**:
-  141.436 observaciones de 33 estaciones, 143 meses aprovechables.
-  Extractor reproducible con CI, datos de origen y hashes verificables.
-  Requiere evaluación longitudinal antes de promoverse al bundle estable.
-  **Exclusiones:** 2014 y 2015-I por restricciones de licencia;
-  enero de 2017 por fuente incorrectamente rotulada como precipitación.
+La serie [`precipitaciones_dgac`](precipitaciones_dgac.md) integra el catálogo
+de capas publicables. Los huecos por licencia y la cuarentena del CSV de enero
+2017 se explican en la [auditoría histórica](../research-dgac-precipitaciones.md).
 
 ## Tiers de confiabilidad
 

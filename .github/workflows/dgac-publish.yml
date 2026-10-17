@@ -1,0 +1,87 @@
+name: DGAC verified data publication
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/dgac-publish.yml"
+      - "src/extractors/precipitaciones_dgac_extractor.py"
+      - "contracts/datasets/precipitaciones_dgac.schema.json"
+  workflow_dispatch:
+  schedule:
+    # Refresco trimestral de los mismos meses verificados; nuevos meses
+    # requieren revisar fuentes, licencia, contrato y cuarentenas.
+    - cron: "17 7 15 1,4,7,10 *"
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: bot-writes-main
+  cancel-in-progress: false
+
+jobs:
+  refresh-dgac:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+      - name: Install uv
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          enable-cache: true
+      - name: Dependencies
+        run: uv sync --extra dev --extra pipeline
+      - name: Harvest 143 monthly government sources
+        run: uv run python src/extractors/precipitaciones_dgac_extractor.py
+      - name: Semantic quality, contract, SHA and actual Parquet
+        run: uv run python scripts/verify_dgac_publication.py
+      - name: Check catalog/landing synchronization
+        # Full build needs staging of other source layers. The canonical
+        # Pipeline Check workflow restores its staging cache and extracts
+        # sources before building, so do not duplicate that machinery here.
+        run: |
+          uv run python scripts/sync_docs.py --check
+          uv run python scripts/check_landing_sync.py
+      - name: Upload verifiable independent evidence
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: dgac-verified-143-months
+          path: |
+            data/normalized/precipitaciones_dgac.csv
+            data/normalized/precipitaciones_dgac.parquet
+            data/normalized/precipitaciones_dgac.metadata.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Commit verified source snapshot and public Parquet
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f \
+            data/staging/precipitaciones_dgac.csv \
+            data/staging/precipitaciones_dgac.metadata.json \
+            data/normalized/precipitaciones_dgac.parquet \
+            data/normalized/precipitaciones_dgac.csv \
+            data/normalized/precipitaciones_dgac.metadata.json
+          git add README.md AGENTS.md docs/datasets/precipitaciones_dgac.md
+          if ! git diff --cached --quiet; then
+            git commit -m "data(dgac): refresh verified historical precipitation snapshot"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - name: Run canonical publication pipeline for verified bundle
+        # Bot-created commits do not trigger push workflows; use an explicit
+        # dispatch to exercise the existing publication and release machinery.
+        # No bypass of quality, source-mode or release gates.
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run pipeline-check.yml --ref main -f publish=true

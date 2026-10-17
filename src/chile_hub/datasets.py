@@ -38,6 +38,7 @@ class Dataset(enum.StrEnum):
     ESTADISTICAS_VITALES = "estadisticas_vitales"
     PERMISOS_EDIFICACION = "permisos_edificacion"
     CALIDAD_AIRE = "calidad_aire"
+    PRECIPITACIONES_DGAC = "precipitaciones_dgac"
     FINANZAS_MUNICIPALES = "finanzas_municipales"
     RESULTADOS_EDUCACIONALES = "resultados_educacionales"
     INDICADORES_URBANOS_SIEDU = "indicadores_urbanos_siedu"

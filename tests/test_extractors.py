@@ -6899,6 +6899,35 @@ class MineducAggregationRegressionTests(unittest.TestCase):
         self.assertTrue(any("ConnectionError" in note for note in notes))
 
 
+class DgacProductionExtractorTests(unittest.TestCase):
+    def test_atomic_canonical_snapshot_contains_actual_license_and_provenance(self):
+        from src.extractors import precipitaciones_dgac_extractor as production
+
+        with tempfile.TemporaryDirectory() as dirname:
+            output = Path(dirname) / "precipitaciones_dgac.csv"
+
+            def fixture_harvest(temp_output):
+                temp_output.write_text("fecha,id_estacion\\n2026-01-01,180005\\n", encoding="utf-8")
+                temp_output.with_suffix(".metadata.json").write_text("{}", encoding="utf-8")
+                return {
+                    "dataset": "precipitaciones_dgac",
+                    "months": 143,
+                    "record_count": 141436,
+                    "generated_at_utc": "2026-10-17T00:00:00+00:00",
+                    "fields": ["fecha", "id_estacion"],
+                    "source_files": [{"license": "cc-by", "sha256": "abc"}],
+                    "sha256": "abc",
+                }
+
+            with patch.object(production, "harvest", side_effect=fixture_harvest):
+                metadata = production.extract(output)
+            saved = json.loads(output.with_suffix(".metadata.json").read_text(encoding="utf-8"))
+            self.assertEqual(metadata["publication_track"], "stable_publishable")
+            self.assertEqual(saved["source_files"][0]["license"], "cc-by")
+            self.assertEqual(saved["source_mode"], "live")
+            self.assertTrue(output.exists())
+
+
 if __name__ == "__main__":
     import sys
 

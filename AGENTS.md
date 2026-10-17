@@ -43,7 +43,7 @@ entender la arquitectura, las reglas no negociables y las convenciones del proye
 ## 1. Propósito del proyecto
 
 `chile-hub` es una capa de datos pública, curada y reproducible sobre **datos oficiales de Chile**.
-Actualmente registra veinticinco (<!-- START_AGENTS_DATASET_COUNT -->25<!-- END_AGENTS_DATASET_COUNT -->) capas, de las cuales 21 viajan en el bundle público (ver convención de conteos junto al badge de README.md):
+Actualmente registra veintiséis (<!-- START_AGENTS_DATASET_COUNT -->26<!-- END_AGENTS_DATASET_COUNT -->) capas, de las cuales 22 viajan en el bundle público (ver convención de conteos junto al badge de README.md):
 
 | Capa | Fuente | Descripción |
 |:---|:---|:---|
@@ -70,6 +70,7 @@ Actualmente registra veinticinco (<!-- START_AGENTS_DATASET_COUNT -->25<!-- END_
 | **Estadísticas Vitales** | INE | Nacimientos y defunciones por comuna de residencia y sexo, anuarios definitivos 2010 en adelante |
 | **Permisos de Edificación** | MINVU CEDOC | Viviendas en unidades y superficie por comuna y año, serie desde 2002 |
 | **Calidad del Aire** | MMA / SINCA | Promedios diarios de contaminantes por estación (~65 comunas, serie incremental) |
+| **Precipitaciones DGAC** | DGAC / datos.gob.cl | Precipitaciones diarias por estación, histórico 2013–2026; 143 meses validados, cobertura discontinua y licencias por fuente |
 
 **El objetivo no es tener todos los datos de Chile. Es entregar un número pequeño de datasets
 limpios, versionados, validados y consumibles en una línea de código.**
@@ -98,7 +99,7 @@ chile-hub/
 │
 ├── src/
 <!-- START_AGENTS_EXTRACTOR_LIST -->
-│   ├── extractors/                 22 extractores por dataset + 8 módulos compartidos (ver nota abajo)
+│   ├── extractors/                 23 extractores por dataset + 8 módulos compartidos (ver nota abajo)
 │   │   ├── _sinim_shared.py                              Normalización/metadata compartida stub+scraper (Plan 099)
 │   │   ├── autoridades_shared.py                         Esquema canónico del carril autoridades (plan 133a)
 │   │   ├── base.py                                       BaseExtractor ABC (contrato para todos los extractores)
@@ -123,6 +124,7 @@ chile-hub/
 │   │   ├── partidos_politicos_extractor.py               Partidos políticos vigentes (SERVEL) → data/staging/
 │   │   ├── permisos_edificacion_extractor.py             Permisos de edificación por comuna — viviendas (MINVU CEDOC) → data/staging/
 │   │   ├── pobreza_extractor.py                          Pobreza comunal SAE (MDS) → data/staging/
+│   │   ├── precipitaciones_dgac_extractor.py             Precipitaciones diarias por estación (DGAC, CC BY/CC0) → data/staging/
 │   │   ├── res_extractor.py                              Empresas — Registro de Empresas y Sociedades (datos.gob.cl) → data/staging/
 │   │   ├── salud_extractor.py                            Establecimientos de salud (MINSAL) → data/staging/
 │   │   ├── siedu_extractor.py                            Indicadores urbanos SIEDU (INE) → data/staging/
@@ -140,9 +142,10 @@ chile-hub/
 │   │   ├── _salud.py              establecimientos de salud
 │   │   ├── _economia.py           indicadores / finanzas / empresas / consumo / pobreza
 │   │   ├── _territorio.py         SIEDU / perfil / POI / geometría / permisos / aire
+│   │   ├── _clima.py              Precipitaciones DGAC históricas por estación
 │   │   ├── _politica.py           distritos / partidos / autoridades
 │   │   └── _anomalias.py          detect_series_anomalies
-│   ├── build_dev_db.py            Orquestador (600 líneas): main() + fases (_load_inputs, _compute_validations, _write_data_artifacts, _generate_reports)
+│   ├── build_dev_db.py            Orquestador (619 líneas): main() + fases (_load_inputs, _compute_validations, _write_data_artifacts, _generate_reports)
 │   ├── builders/                  Módulos del pipeline extraídos de build_dev_db.py (formats, metadata, reports, artifacts, datasets, catalog, landing, io_utils, _shared, dcat_catalog, data_package, doc_sync, geo, _logging)
 │   ├── chile_hub/                 Paquete Python instalable (ChileHub API + CLI + data manager)
 │   │   ├── core.py                ChileHub class + API pública (1 250 líneas)
@@ -216,7 +219,7 @@ codegraph impact validate_comunas                   # Qué se rompe si cambio es
 **Reglas para acotar lecturas y ahorrar tokens:**
 - Usar `Read` con `offset`/`limit` — nunca leer archivos grandes enteros de golpe.
 - `base.py` (146 líneas) es seguro de leer completo. El paquete `validation/` — leer por dominio (`_dpa`, `_poblacion`, `_economia`…), no entero.
-- `build_dev_db.py` (600 líneas) y `src/chile_hub/core.py` (1 250 líneas) — usar estas áncoras:
+- `build_dev_db.py` (619 líneas) y `src/chile_hub/core.py` (1 250 líneas) — usar estas áncoras:
 
 | Archivo | Líneas de interés |
 |---|---|

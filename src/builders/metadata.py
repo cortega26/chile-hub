@@ -625,4 +625,10 @@ def build_dataset_metadata(dfs, meta):
             "permisos_edificacion", dfs["permisos_edificacion"], meta["permisos_edificacion"]
         ),
         **_optional_dataset_entry("calidad_aire", dfs["calidad_aire"], meta["calidad_aire"]),
+        "precipitaciones_dgac": _enriched_entry(
+            "precipitaciones_dgac",
+            "precipitaciones_dgac",
+            meta["precipitaciones_dgac"],
+            dfs["precipitaciones_dgac"],
+        ),
     }

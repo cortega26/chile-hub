@@ -49,7 +49,7 @@ print(comunas.head())
 | **Quiero aportar un dataset** | [Aportar un dataset](contribuir-datasets.md) → [Criterios de inclusión](dataset-inclusion-criteria.md) |
 | **Necesito un dato que no existe** | [Solicitar un dataset](contribuir-datasets.md) → [Criterios de inclusión](dataset-inclusion-criteria.md) |
 | **Auditoría o reúso** | [Procedencia y licencias](https://tooltician.com/chile-hub/data/normalized/redistribution_report.md) → [Criterios de inclusión](dataset-inclusion-criteria.md) |
-| **Investigación académica o climática** | [Precipitaciones DGAC 2013–2026 (candidato validado)](research-dgac-precipitaciones.md): 141.436 observaciones de 33 estaciones, 143 meses con huecos documentados |
+| **Investigación académica o climática** | [Precipitaciones DGAC 2013–2026 (capa histórica)](datasets/precipitaciones_dgac.md): 141.436 observaciones de 33 estaciones, 143 meses con huecos documentados |
 
 ## Dónde ir
 
@@ -59,7 +59,7 @@ print(comunas.head())
 | Instalar el paquete y verificar datos locales | [Instalación](installation.md) |
 | Ver métodos, clases y excepciones del paquete | [Referencia de API](api.md) |
 | Entender qué datasets entran al hub | [Criterios de inclusión](dataset-inclusion-criteria.md) |
-| Explorar series de investigación fuera del bundle estable | [Precipitaciones históricas DGAC](research-dgac-precipitaciones.md) |
+| Auditar la serie histórica de precipitaciones DGAC | [Ficha de la capa](datasets/precipitaciones_dgac.md) · [Metodología de procedencia](research-dgac-precipitaciones.md) |
 | Revisar estabilidad de esquemas y versionado | [Compatibilidad de datasets](dataset-compatibility-policy.md) y [Política de versionado](versioning-policy.md) |
 | Proceso de release | [Release](release.md) |
 

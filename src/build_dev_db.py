@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 
 # ── Ajuste de sys.path ────────────────────────────────────────────────────────
@@ -140,6 +141,7 @@ from src.validation import (
     validate_perfil_territorial_comunal,
     validate_permisos_edificacion,
     validate_pobreza_comunal,
+    validate_precipitaciones_dgac,
     validate_provincias,
     validate_regiones,
     validate_resultados_educacionales,
@@ -176,6 +178,7 @@ def _compute_validations(dfs, meta):
     df_estadisticas_vitales = dfs["estadisticas_vitales"]
     df_permisos_edificacion = dfs["permisos_edificacion"]
     df_calidad_aire = dfs["calidad_aire"]
+    df_precipitaciones_dgac = dfs["precipitaciones_dgac"]
     df_regiones = dfs["regiones"]
     df_provincias = dfs["provincias"]
     df_perfil_territorial = dfs["perfil_territorial"]
@@ -197,6 +200,7 @@ def _compute_validations(dfs, meta):
     estadisticas_vitales_metadata = meta["estadisticas_vitales"]
     permisos_edificacion_metadata = meta["permisos_edificacion"]
     calidad_aire_metadata = meta["calidad_aire"]
+    precipitaciones_dgac_metadata = meta["precipitaciones_dgac"]
 
     # Una sola copia de la allowlist DPA (Plan 093): antes se copiaba la
     # columna codigo_comuna (~15 veces, una por validador). Los validadores
@@ -317,6 +321,9 @@ def _compute_validations(dfs, meta):
             if df_calidad_aire is not None
             else {}
         ),
+        "precipitaciones_dgac": validate_precipitaciones_dgac(
+            df_precipitaciones_dgac, precipitaciones_dgac_metadata
+        ),
         "perfil_territorial_comunal": validate_perfil_territorial_comunal(
             df_perfil_territorial,
             {
@@ -359,6 +366,7 @@ def _write_data_artifacts(dfs):
     df_estadisticas_vitales = dfs["estadisticas_vitales"]
     df_permisos_edificacion = dfs["permisos_edificacion"]
     df_calidad_aire = dfs["calidad_aire"]
+    df_precipitaciones_dgac = dfs["precipitaciones_dgac"]
     df_regiones = dfs["regiones"]
     df_provincias = dfs["provincias"]
     df_perfil_territorial = dfs["perfil_territorial"]
@@ -385,6 +393,7 @@ def _write_data_artifacts(dfs):
         extra_tables["permisos_edificacion"] = df_permisos_edificacion
     if df_calidad_aire is not None:
         extra_tables["calidad_aire"] = df_calidad_aire
+    extra_tables["precipitaciones_dgac"] = df_precipitaciones_dgac
 
     # Convertir a pandas UNA sola vez para SQLite y Excel (Plan 090).
     # Empresas tiene ~1.57M filas: la conversión es costosa y no debe
@@ -457,6 +466,16 @@ def _write_data_artifacts(dfs):
         extra_tables,
     )
     log.info("artifact_format_done", format="flat_files", progress="4/4")
+    # CSV con licencia/procedencia por fila y sidecar histórico, no solo Parquet.
+    # Ambos viajan en el manifest público (nunca se mezclan CSV CC-NC).
+    shutil.copy2(
+        os.path.join(STAGING_DIR, "precipitaciones_dgac.csv"),
+        os.path.join(NORMALIZED_DIR, "precipitaciones_dgac.csv"),
+    )
+    shutil.copy2(
+        os.path.join(STAGING_DIR, "precipitaciones_dgac.metadata.json"),
+        os.path.join(NORMALIZED_DIR, "precipitaciones_dgac.metadata.json"),
+    )
     write_parquet_atomic(
         df_censo_hogares, os.path.join(NORMALIZED_DIR, "censo_hogares_viviendas.parquet")
     )

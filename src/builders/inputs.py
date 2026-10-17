@@ -180,6 +180,13 @@ STAGING_INPUTS: tuple[StagingInput, ...] = (
         required=False,
         schema="calidad_aire",
     ),
+    StagingInput(
+        "precipitaciones_dgac",
+        "precipitaciones_dgac.csv",
+        "precipitaciones_dgac.metadata.json",
+        "precipitaciones_dgac_extractor.py",
+        required=True,
+    ),
 )
 
 

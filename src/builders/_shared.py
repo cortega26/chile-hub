@@ -54,7 +54,7 @@ VALID_SOURCE_MODES = {"live", "fallback", "monthly"}
 NON_FALLBACK_SOURCE_MODES = {"live", "monthly"}
 
 EXCEL_MAX_ROWS = 1_048_576  # Límite físico de Excel por hoja
-PUBLISHABLE_ARTIFACT_SUFFIXES = (".json", ".md", ".parquet", ".jsonl")
+PUBLISHABLE_ARTIFACT_SUFFIXES = (".json", ".md", ".parquet", ".jsonl", ".csv")
 PUBLISHABLE_BUNDLE_ZIP_NAME = "chile-hub-publishable-bundle.zip"
 PUBLISHABLE_BUNDLE_SHA256_NAME = "chile-hub-publishable-bundle.zip.sha256"
 
