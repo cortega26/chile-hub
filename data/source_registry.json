@@ -550,5 +550,27 @@
     "public_bundle_eligible": true,
     "source_notes": "JSON listadomapa2k19: inventario de ~125 estaciones (código, comuna, lat/lon) + series horarias 24h por contaminante (MP2.5, MP10, SO2, NO2, CO, O3). El extractor agrega a promedios diarios. Serie incremental desde la primera cosecha (el JSON no da historia); staging se siembra desde el Parquet publicado. Cobertura parcial por diseño (~65 comunas).",
     "cadencia": "diaria"
+  },
+  {
+    "source_id": "dgac_precipitaciones_historicas",
+    "dataset": "precipitaciones_dgac",
+    "source_name": "DGAC — datos.gob.cl",
+    "official_url": "https://datos.gob.cl/organization/direccion_general_de_aeronautica_civil",
+    "access_method": "ckan_api_csv",
+    "license_status": "open-attribution",
+    "live_extractor_status": "implemented",
+    "fallback_policy": "snapshot_verified_no_mock_data",
+    "maturity_status": "stable",
+    "live_ready": true,
+    "fallback_allowed": false,
+    "publish_blocking": true,
+    "review_by": "2027-01-15",
+    "stalled_after_days": 120,
+    "owner": "core",
+    "next_action": "Revisar publicación de nuevos semestres DGAC y cobertura por estación; mantener cuarentena de enero 2017.",
+    "publication_track": "stable_publishable",
+    "public_bundle_eligible": true,
+    "source_notes": "Serie 2013-01 a 2026-06 no continua; 2014 y enero-junio 2015 restringidos CC-NC; enero 2017 contiene T.Maxima/T.Minima y se descarta. 143 meses validados, 141436 filas y 33 estaciones en extracción CI 2026-10-17. No hay CUT comunal ni longitud.",
+    "cadencia": "trimestral"
   }
 ]
