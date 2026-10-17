@@ -18,6 +18,7 @@ import re
 import time
 import urllib.error
 import urllib.request
+import unicodedata
 from pathlib import Path
 from typing import Any
 
@@ -43,6 +44,12 @@ PACKAGES = {
 }
 # Esta lista representa huecos de *redistribución*, no prueba ausencia de
 # observaciones. El paquete legacy CKAN 2719 declara CC-NC.
+# Hallazgo observado en extracción oficial (CI #38990818461):
+# el CSV rotulado «Precipitacion_012017» trae T.Maxima y T.Minima,
+# por lo que NO son observaciones de lluvia y su inclusión sería corrupción.
+QUARANTINED_SOURCE_MONTHS = {
+    (2017, 1): "CSV titulado precipitación contiene T.Maxima/T.Minima (temperaturas)"
+}
 EXCLUDED_SOURCE_PERIODS = {
     "2014": "2014 disponible en paquete legacy 2719 CC-NC; excluido por licencia",
     "2015-01/2015-06": "2015-I disponible en paquete legacy 2719 CC-NC; excluido",
@@ -184,18 +191,25 @@ def parse_csv(
             continue
         if line == 1 and not cells[0].strip().isdigit():
             # Algunos archivos futuros podrían traer encabezados; nunca inferirlos por CKAN.
-            if len(cells) == 8 and (
-                [cell.strip().lower() for cell in cells]
-                == [
-                    "codigonacional",
-                    "nombreestacion",
-                    "latitud",
-                    "altura",
-                    "año",
-                    "mes",
-                    "dia",
-                    "sumadiaria",
-                ]
+            labels = [
+                re.sub(
+                    r"[^a-z0-9]",
+                    "",
+                    unicodedata.normalize("NFKD", cell)
+                    .encode("ascii", "ignore")
+                    .decode("ascii")
+                    .lower(),
+                )
+                for cell in cells
+            ]
+            if (
+                len(labels) == 8
+                and labels[0] == "codigonacional"
+                and labels[1] in ("nombreestacion", "nombredeestacion", "nombredelaestacion")
+                and labels[2] == "latitud"
+                and labels[3] in ("altura", "altitud", "altituddelaestacion")
+                and labels[4:7] == ["ano", "mes", "dia"]
+                and labels[7] in ("sumadiaria", "precipitacionmm")
             ):
                 continue
             raise SourceError(f"Primera fila desconocida ({year}-{month:02d}): {cells!r}")
@@ -259,6 +273,10 @@ def harvest(output: Path, *, start_year: int = 2013, end_year: int = 2026) -> di
         hashes: dict[int, str] = {}
         for resource in resource_list:
             month = int(resource["month"])
+            if (year, month) in QUARANTINED_SOURCE_MONTHS:
+                # La exclusión explícita se publica en metadata; no leer
+                # temperaturas como precipitación ni inventar cero mm.
+                continue
             try:
                 payload = _request(resource["url"])
             except SourceError as exc:
@@ -302,7 +320,12 @@ def harvest(output: Path, *, start_year: int = 2013, end_year: int = 2026) -> di
                     "license": license_id,
                 }
             )
-    expected = sum(6 for _ in packages)
+    quarantined = {
+        f"{year}-{month:02d}": reason
+        for (year, month), reason in QUARANTINED_SOURCE_MONTHS.items()
+        if any(year == key[0] for key in packages)
+    }
+    expected = sum(6 for _ in packages) - len(quarantined)
     if invalid_sources:
         raise SourceError(
             f"{len(invalid_sources)} archivos mensuales no normalizables:\\n"
@@ -340,6 +363,7 @@ def harvest(output: Path, *, start_year: int = 2013, end_year: int = 2026) -> di
             or (key.startswith("2015") and start_year <= 2015 <= end_year)
             or (key.startswith("2026") and start_year <= 2026 <= end_year)
         },
+        "quarantined_source_months": quarantined,
         "duplicate_resources": duplicate_resources,
         "fields": list(COLUMNS),
         "sha256": hashlib.sha256(data).hexdigest(),
@@ -349,6 +373,7 @@ def harvest(output: Path, *, start_year: int = 2013, end_year: int = 2026) -> di
             "No se imputa lluvia ni se sustituyen faltantes por ceros.",
             "2026 solo primer semestre; comparaciones anuales requieren años completos.",
             "2014/2015-I del catálogo legacy CC-NC excluidos; no se inventa continuidad.",
+            "2017-01 excluido: la DGAC publicó temperaturas bajo nombre de precipitaciones.",
             "Licencia registrada por archivo; las diferencias requieren atribución adecuada.",
             "Fuera del bundle estable hasta validación de calidad longitudinal.",
         ],
