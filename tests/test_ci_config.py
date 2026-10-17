@@ -2537,9 +2537,7 @@ class DgacPublicationGateTests(unittest.TestCase):
     def test_registry_and_spec_use_known_access_and_fallback_policies(self):
         registry = json.loads((ROOT_DIR / "data/source_registry.json").read_text(encoding="utf-8"))
         spec = json.loads(
-            (ROOT_DIR / "data/dataset_specs/precipitaciones_dgac.json").read_text(
-                encoding="utf-8"
-            )
+            (ROOT_DIR / "data/dataset_specs/precipitaciones_dgac.json").read_text(encoding="utf-8")
         )
         dgac = next(row for row in registry if row["dataset"] == "precipitaciones_dgac")
         for item in (dgac, spec["source"]):
