@@ -1,6 +1,12 @@
 name: DGAC verified data publication
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/dgac-publish.yml"
+      - "src/extractors/precipitaciones_dgac_extractor.py"
+      - "contracts/datasets/precipitaciones_dgac.schema.json"
   workflow_dispatch:
   schedule:
     # Refresco trimestral de los mismos meses verificados; nuevos meses
@@ -61,7 +67,7 @@ jobs:
           git add -f             data/staging/precipitaciones_dgac.csv             data/staging/precipitaciones_dgac.metadata.json             data/normalized/precipitaciones_dgac.parquet             data/normalized/precipitaciones_dgac.metadata.json
           git add README.md AGENTS.md docs/datasets/precipitaciones_dgac.md
           if ! git diff --cached --quiet; then
-            git commit -m "data(dgac): refresh verified historical precipitation snapshot [skip ci]"
+            git commit -m "data(dgac): refresh verified historical precipitation snapshot"
             git pull --rebase origin main
             git push origin HEAD:main
           fi
