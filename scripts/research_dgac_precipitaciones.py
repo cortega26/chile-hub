@@ -1,4 +1,4 @@
-"""Candidato de investigación: precipitaciones diarias DGAC (2024-2025).
+"""Candidato de investigación: precipitaciones diarias DGAC (2013-2026).
 
 Fuente primaria: archivos CSV mensuales publicados por la DGAC en datos.gob.cl.
 NO forma parte del bundle estable de chile-hub. Uso manual y fail-loud.
@@ -22,11 +22,30 @@ from typing import Any
 
 API = "https://datos.gob.cl/api/3/action"
 SOURCE = "Dirección General de Aeronáutica Civil (DGAC) — datos.gob.cl"
+# Se fijan paquetes concretos (sin búsqueda fuzzy durante la cosecha) para evitar
+# confundir series de temperatura y paquetes duplicados de 2015/2025.
+# 2014 y 2015-I aparecen en un paquete legado CC-NC; quedan excluidos.
 PACKAGES = {
+    (2013, 1): "precipitaciones-primer-semestre-2013",
+    (2013, 2): "precipitaciones-segundo-semestre-2013",
+    (2015, 2): "precipitacion-2o-semestre-2015",
+    **{
+        (year, half): f"precipitaciones-{period}-semestre-{year}"
+        for year in range(2016, 2024)
+        for half, period in ((1, "primer"), (2, "segundo"))
+    },
     (2024, 1): "precipitaciones-2024",
     (2024, 2): "precipitaciones-2do-semestre-del-ano-2024",
     (2025, 1): "precipitacion-1er-semestre-2025",
     (2025, 2): "precipitaciones-2do-semestre-2025",
+    (2026, 1): "precipitacion-1er-semestre-2026",
+}
+# Esta lista representa huecos de *redistribución*, no prueba ausencia de
+# observaciones. El paquete legacy CKAN 2719 declara CC-NC.
+EXCLUDED_SOURCE_PERIODS = {
+    "2014": "2014 disponible en paquete legacy 2719 CC-NC; excluido por licencia",
+    "2015-01/2015-06": "2015-I disponible en paquete legacy 2719 CC-NC; excluido",
+    "2026-07/2026-12": "2026-II aún no figura como paquete mensual en la fuente",
 }
 COLUMNS = (
     "fecha",
@@ -75,29 +94,46 @@ def _package(name: str) -> dict[str, Any]:
     return payload["result"]
 
 
+def _resource_month(resource: dict[str, Any], year: int) -> int | None:
+    """Mes desde URL real, no desde nombre de recurso (variable en 2015/2023)."""
+    from urllib.parse import urlparse
+
+    url = str(resource.get("url", ""))
+    parsed = urlparse(url)
+    if parsed.scheme != "https" or parsed.netloc != "datos.gob.cl":
+        raise SourceError(f"Recurso externo o inseguro: {url}")
+    filename = parsed.path.rsplit("/", 1)[-1]
+    match = RESOURCE_RE.fullmatch(filename)
+    if not match:
+        return None
+    month, file_year = map(int, match.groups())
+    if file_year != year or not 1 <= month <= 12:
+        return None
+    return month
+
+
 def resources_for_package(
     package: dict[str, Any], year: int, months: range
 ) -> list[dict[str, str]]:
-    """Exige exactamente un CSV por cada mes, sin deduplicar arbitrariamente."""
-    resources: dict[int, dict[str, str]] = {}
+    """Exige cobertura mensual, pero conserva duplicados para comparar hashes."""
+    grouped: dict[int, list[dict[str, str]]] = {}
     for item in package.get("resources", []):
-        name = str(item.get("name", "")).strip()
-        match = RESOURCE_RE.search(name)
-        if not match or item.get("format", "").lower() != "csv":
+        if str(item.get("format", "")).lower() != "csv":
             continue
-        month, item_year = map(int, match.groups())
-        if item_year != year or month not in months:
+        month = _resource_month(item, year)
+        if month not in months:
             continue
-        if month in resources:
-            raise SourceError(f"Dos recursos CSV para {year}-{month:02d}")
-        url = item.get("url", "")
-        if not url.startswith("https://datos.gob.cl/"):
-            raise SourceError(f"URL no oficial para {name}: {url}")
-        resources[month] = {"url": url, "name": name}
-    missing = set(months) - set(resources)
+        grouped.setdefault(month, []).append(
+            {"url": str(item["url"]), "name": str(item.get("name", "")),
+             "month": str(month)}
+        )
+    missing = set(months) - set(grouped)
     if missing:
         raise SourceError(f"Faltan CSV del año {year}, meses: {sorted(missing)}")
-    return [resources[m] for m in sorted(resources)]
+    return [
+        candidate for month in sorted(grouped)
+        for candidate in sorted(grouped[month], key=lambda r: r["url"])
+    ]
 
 
 def _decode(payload: bytes) -> str:
@@ -178,24 +214,50 @@ def parse_csv(
     return result
 
 
-def harvest(output: Path) -> dict[str, Any]:
-    """Obtiene todos los meses o falla sin publicar un resultado incompleto."""
+def harvest(
+    output: Path, *, start_year: int = 2013, end_year: int = 2026
+) -> dict[str, Any]:
+    """Cosecha los períodos abiertos declarados o falla sin publicar parcial.
+
+    No se exige continuidad donde hay licencias distintas o períodos no
+    publicados: se consignan como excluded_source_periods.
+    """
+    if not 2013 <= start_year <= end_year <= 2026:
+        raise SourceError("Rango admitido: 2013 <= inicio <= fin <= 2026")
+    packages = {
+        key: name for key, name in PACKAGES.items()
+        if start_year <= key[0] <= end_year
+    }
     all_rows: list[dict[str, str]] = []
-    source_files = []
+    source_files: list[dict[str, Any]] = []
+    duplicate_resources: list[dict[str, str]] = []
     seen: set[tuple[str, str]] = set()
-    for (year, semester), name in PACKAGES.items():
+    for (year, semester), name in packages.items():
         package = _package(name)
         license_id = str(package.get("license_id", ""))
         if license_id not in ("cc-by", "cc-zero"):
-            raise SourceError(f"Licencia inesperada {name}: {license_id!r}")
+            raise SourceError(f"Licencia no redistribuible {name}: {license_id!r}")
         months = range(1, 7) if semester == 1 else range(7, 13)
-        for resource in resources_for_package(package, year, months):
-            match = RESOURCE_RE.search(resource["name"])
-            assert match is not None
-            month = int(match.group(1))
+        resource_list = resources_for_package(package, year, months)
+        hashes: dict[int, str] = {}
+        for resource in resource_list:
+            month = int(resource["month"])
             payload = _request(resource["url"])
+            digest = hashlib.sha256(payload).hexdigest()
+            if month in hashes:
+                if hashes[month] != digest:
+                    raise SourceError(
+                        f"{year}-{month:02d}: recursos duplicados con contenido distinto"
+                    )
+                duplicate_resources.append(
+                    {"year_month": f"{year}-{month:02d}",
+                     "url": resource["url"], "sha256": digest}
+                )
+                continue
+            hashes[month] = digest
             parsed = parse_csv(
-                payload, year=year, month=month, url=resource["url"], license_id=license_id
+                payload, year=year, month=month, url=resource["url"],
+                license_id=license_id,
             )
             for row in parsed:
                 key = (row["fecha"], row["id_estacion"])
@@ -205,20 +267,27 @@ def harvest(output: Path) -> dict[str, Any]:
             all_rows.extend(parsed)
             source_files.append(
                 {
+                    "year_month": f"{year}-{month:02d}",
+                    "package": name,
                     "url": resource["url"],
-                    "sha256": hashlib.sha256(payload).hexdigest(),
+                    "sha256": digest,
                     "rows": len(parsed),
                     "license": license_id,
                 }
             )
-    if len(source_files) != 24:
-        raise SourceError(f"Esperaba 24 meses; encontré {len(source_files)}")
+    expected = sum(6 for _ in packages)
+    if len(source_files) != expected:
+        raise SourceError(f"Esperaba {expected} meses; encontré {len(source_files)}")
     all_rows.sort(key=lambda row: (row["fecha"], row["id_estacion"]))
     buffer = io.StringIO(newline="")
-    writer = csv.DictWriter(buffer, fieldnames=COLUMNS, lineterminator="\n")
+    writer = csv.DictWriter(buffer, fieldnames=COLUMNS, lineterminator="\\n")
     writer.writeheader()
     writer.writerows(all_rows)
     data = buffer.getvalue().encode("utf-8")
+    years: dict[str, int] = {}
+    for row in all_rows:
+        year = row["fecha"][:4]
+        years[year] = years.get(year, 0) + 1
     metadata = {
         "dataset": "precipitaciones_dgac",
         "publication_track": "candidate",
@@ -226,27 +295,38 @@ def harvest(output: Path) -> dict[str, Any]:
         "source_name": SOURCE,
         "source_url": "https://datos.gob.cl/organization/direccion_general_de_aeronautica_civil",
         "source_mode": "live",
-        "period": "2024-01-01/2025-12-31",
-        "months": 24,
+        "period": f"{min(row['fecha'] for row in all_rows)}/{max(row['fecha'] for row in all_rows)}",
+        "months": len(source_files),
         "record_count": len(all_rows),
         "station_count": len({row["id_estacion"] for row in all_rows}),
         "missing_measurements": sum(row["precipitacion_mm"] == "" for row in all_rows),
+        "counts_by_year": years,
+        "excluded_source_periods": {
+            key: reason for key, reason in EXCLUDED_SOURCE_PERIODS.items()
+            if (key == "2014" and start_year <= 2014 <= end_year)
+            or (key.startswith("2015") and start_year <= 2015 <= end_year)
+            or (key.startswith("2026") and start_year <= 2026 <= end_year)
+        },
+        "duplicate_resources": duplicate_resources,
         "fields": list(COLUMNS),
         "sha256": hashlib.sha256(data).hexdigest(),
         "source_files": source_files,
         "notes": [
-            "Mediciones en estaciones; sin CUT comunal ni interpolación espacial.",
-            "Los datos faltantes se conservan vacíos, no se convierten en cero.",
-            "2024-I CC BY; demás paquetes CC0 al momento de la inspección.",
-            "Candidato: fuera del bundle hasta validar extracción end-to-end y contratos.",
+            "Estaciones observacionales; sin CUT comunal ni interpolación.",
+            "No se imputa lluvia ni se sustituyen faltantes por ceros.",
+            "2026 solo primer semestre; comparaciones anuales requieren años completos.",
+            "2014/2015-I del catálogo legacy CC-NC excluidos; no se inventa continuidad.",
+            "Licencia registrada por archivo; las diferencias requieren atribución adecuada.",
+            "Fuera del bundle estable hasta validación de calidad longitudinal.",
         ],
     }
     output.parent.mkdir(parents=True, exist_ok=True)
-    # Escribir solo cuando los 24 meses hayan superado todas las validaciones.
     tmp_csv = output.with_suffix(output.suffix + ".tmp")
     tmp_json = output.with_suffix(".metadata.json.tmp")
     tmp_csv.write_bytes(data)
-    tmp_json.write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    tmp_json.write_text(
+        json.dumps(metadata, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8"
+    )
     tmp_csv.replace(output)
     tmp_json.replace(output.with_suffix(".metadata.json"))
     return metadata
@@ -260,10 +340,14 @@ def main() -> None:
         default=Path(__file__).resolve().parents[1]
         / "data"
         / "research"
-        / "precipitaciones_dgac_2024_2025.csv",
+        / "precipitaciones_dgac_historico_2013_2026.csv",
     )
+    parser.add_argument("--start-year", type=int, default=2013)
+    parser.add_argument("--end-year", type=int, default=2026)
     args = parser.parse_args()
-    meta = harvest(args.output)
+    meta = harvest(
+        args.output, start_year=args.start_year, end_year=args.end_year
+    )
     print(
         json.dumps(
             {
