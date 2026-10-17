@@ -393,7 +393,9 @@ jobs:
           fi
 
       - name: Write pipeline artifact provenance
-        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        # El badge de cobertura también se sincroniza en push. El artefacto
+        # debe llevar provenance del run actual, incluso cuando se verifica
+        # solamente el snapshot publicado (nunca publication-grade en push).
         run: |
           python - <<'PY'
           import json
@@ -401,6 +403,12 @@ jobs:
           from pathlib import Path
 
           profile = "${{ steps.verify-pipeline.outputs.profile }}"
+          if not profile:
+              # PR/push no regeneran datos: pasan el guardián del snapshot.
+              # Su provenance solo acredita readiness, no publicación.
+              if "${{ github.event_name }}" not in {"push", "pull_request", "merge_group"}:
+                  raise SystemExit("Missing publication verification profile")
+              profile = "readiness"
           metadata = {
               "verification_profile": profile,
               "require_live": profile == "publication",
