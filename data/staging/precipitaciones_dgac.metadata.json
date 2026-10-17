@@ -1,7 +1,7 @@
 {
   "dataset": "precipitaciones_dgac",
   "publication_track": "stable_publishable",
-  "generated_at_utc": "2026-10-17T03:09:23.043358+00:00",
+  "generated_at_utc": "2026-10-17T03:25:07.715081+00:00",
   "source_name": "DGAC — datos.gob.cl",
   "source_url": "https://datos.gob.cl/organization/direccion_general_de_aeronautica_civil",
   "source_mode": "live",
@@ -1212,7 +1212,7 @@
     "Fuera del bundle estable hasta validación de calidad longitudinal."
   ],
   "source_detail": "CKAN: 143 archivos-mes, 2013–2026, licencias CC BY/CC0",
-  "refreshed_at_utc": "2026-10-17T03:09:23.043358+00:00",
+  "refreshed_at_utc": "2026-10-17T03:25:07.715081+00:00",
   "reuse_policy": {
     "status": "open-attribution",
     "license": "CC BY + CC0 (por archivo)",
