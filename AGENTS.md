@@ -218,7 +218,7 @@ codegraph impact validate_comunas                   # Qué se rompe si cambio es
 **Reglas para acotar lecturas y ahorrar tokens:**
 - Usar `Read` con `offset`/`limit` — nunca leer archivos grandes enteros de golpe.
 - `base.py` (146 líneas) es seguro de leer completo. El paquete `validation/` — leer por dominio (`_dpa`, `_poblacion`, `_economia`…), no entero.
-- `build_dev_db.py` (600 líneas) y `src/chile_hub/core.py` (1 250 líneas) — usar estas áncoras:
+- `build_dev_db.py` (619 líneas) y `src/chile_hub/core.py` (1 250 líneas) — usar estas áncoras:
 
 | Archivo | Líneas de interés |
 |---|---|
