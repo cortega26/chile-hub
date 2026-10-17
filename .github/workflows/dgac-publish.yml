@@ -15,6 +15,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: bot-writes-main
@@ -64,10 +65,22 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f             data/staging/precipitaciones_dgac.csv             data/staging/precipitaciones_dgac.metadata.json             data/normalized/precipitaciones_dgac.parquet             data/normalized/precipitaciones_dgac.metadata.json
+          git add -f \
+            data/staging/precipitaciones_dgac.csv \
+            data/staging/precipitaciones_dgac.metadata.json \
+            data/normalized/precipitaciones_dgac.parquet \
+            data/normalized/precipitaciones_dgac.csv \
+            data/normalized/precipitaciones_dgac.metadata.json
           git add README.md AGENTS.md docs/datasets/precipitaciones_dgac.md
           if ! git diff --cached --quiet; then
             git commit -m "data(dgac): refresh verified historical precipitation snapshot"
             git pull --rebase origin main
             git push origin HEAD:main
           fi
+      - name: Run canonical publication pipeline for verified bundle
+        # Bot-created commits do not trigger push workflows; use an explicit
+        # dispatch to exercise the existing publication and release machinery.
+        # No bypass of quality, source-mode or release gates.
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run pipeline-check.yml --ref main -f publish=true
