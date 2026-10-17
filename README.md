@@ -39,6 +39,8 @@
 
 ---
 
+> **Investigación en evaluación:** [precipitaciones diarias DGAC 2024–2025](docs/research-dgac-precipitaciones.md) — extractor reproducible y pruebas offline. Candidato, aún no disponible en el bundle público; no cuenta como dataset publicable.
+
 ## Comprueba el valor con tres pruebas reproducibles
 
 Un cruce de datos públicos debe **funcionar, dejar rastro y mostrar qué datos faltan**.
