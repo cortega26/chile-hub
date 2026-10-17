@@ -2565,27 +2565,44 @@ class CommittedSnapshotVerificationTests(unittest.TestCase):
             (root / "data/normalized/legacy.json").write_bytes(payload)
             (root / "data/staging/precipitaciones_dgac.csv").write_bytes(b"official")
             (root / "data/staging/precipitaciones_dgac.metadata.json").write_text(
-                json.dumps({
-                    "sha256": hashlib.sha256(b"official").hexdigest(),
-                    "months": 143, "record_count": 141436,
-                    "station_count": 33, "source_mode": "live",
-                }), encoding="utf-8"
+                json.dumps(
+                    {
+                        "sha256": hashlib.sha256(b"official").hexdigest(),
+                        "months": 143,
+                        "record_count": 141436,
+                        "station_count": 33,
+                        "source_mode": "live",
+                    }
+                ),
+                encoding="utf-8",
             )
             (root / "data/normalized/artifact_manifest.json").write_text(
-                json.dumps({
-                    "artifact_count": 1,
-                    "artifacts": [{
-                        "path": "data/normalized/legacy.json", "dataset": "legacy",
-                        "size_bytes": len(payload),
-                        "sha256": hashlib.sha256(payload).hexdigest(),
-                    }],
-                }), encoding="utf-8"
+                json.dumps(
+                    {
+                        "artifact_count": 1,
+                        "artifacts": [
+                            {
+                                "path": "data/normalized/legacy.json",
+                                "dataset": "legacy",
+                                "size_bytes": len(payload),
+                                "sha256": hashlib.sha256(payload).hexdigest(),
+                            }
+                        ],
+                    }
+                ),
+                encoding="utf-8",
             )
             (root / "data/source_registry.json").write_text(
-                json.dumps([
-                    {"dataset": "legacy", "publication_track": "stable_publishable"},
-                    {"dataset": "precipitaciones_dgac", "publication_track": "stable_publishable"},
-                ]), encoding="utf-8"
+                json.dumps(
+                    [
+                        {"dataset": "legacy", "publication_track": "stable_publishable"},
+                        {
+                            "dataset": "precipitaciones_dgac",
+                            "publication_track": "stable_publishable",
+                        },
+                    ]
+                ),
+                encoding="utf-8",
             )
             result = verify_snapshot(root)
             self.assertEqual(
@@ -2600,7 +2617,10 @@ class CommittedSnapshotVerificationTests(unittest.TestCase):
     def test_pr_verification_cannot_claim_live_publication(self):
         workflow = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
         self.assertIn("python scripts/verify_committed_snapshot.py", workflow)
-        self.assertIn("if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'", workflow)
+        self.assertIn(
+            "if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'",
+            workflow,
+        )
         self.assertIn("python scripts/verify_pipeline.py --profile", workflow)
 
 
