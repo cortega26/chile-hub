@@ -1,0 +1,63 @@
+{
+  "spec_version": "1.0",
+  "dataset": "precipitaciones_dgac",
+  "kind": "direct",
+  "publication_track": "stable_publishable",
+  "public_bundle_eligible": true,
+  "maturity_status": "stable",
+  "confidence_tier": "Tier B",
+  "extraction_lane": "trimestral",
+  "extractor": "src/extractors/precipitaciones_dgac_extractor.py",
+  "contract_path": "contracts/datasets/precipitaciones_dgac.schema.json",
+  "validator": "validate_precipitaciones_dgac",
+  "alias_for": null,
+  "dependencies": [],
+  "source": {
+    "source_id": "dgac_precipitaciones_historicas",
+    "source_name": "DGAC — datos.gob.cl",
+    "official_url": "https://datos.gob.cl/organization/direccion_general_de_aeronautica_civil",
+    "access_method": "ckan_api_csv",
+    "license_status": "open-attribution",
+    "live_extractor_status": "implemented",
+    "fallback_policy": "snapshot_verified_no_mock_data",
+    "live_ready": true,
+    "fallback_allowed": false,
+    "publish_blocking": true,
+    "review_by": "2027-01-15",
+    "stalled_after_days": 120,
+    "owner": "core",
+    "next_action": "Revisar publicación de nuevos semestres DGAC y cobertura por estación; mantener cuarentena de enero 2017.",
+    "source_notes": "Serie 2013-01 a 2026-06 no continua; 2014 y enero-junio 2015 restringidos CC-NC; enero 2017 contiene T.Maxima/T.Minima y se descarta. 143 meses validados, 141436 filas y 33 estaciones en extracción CI 2026-10-17. No hay CUT comunal ni longitud."
+  },
+  "reuse_policy": {
+    "status": "open-attribution",
+    "license": "CC BY + CC0 (licencia individual por archivo)",
+    "license_url": "https://datos.gob.cl/organization/direccion_general_de_aeronautica_civil",
+    "attribution_required": true,
+    "redistribution_ok": true,
+    "summary": "Solo CSV de paquetes DGAC cc-by y cc-zero; 2014 y 2015-I CC-NC excluidos y enero 2017 en cuarentena por datos de temperatura."
+  },
+  "freshness_policy": {
+    "max_age_hours": 2160,
+    "label": "trimestral"
+  },
+  "documentation": {
+    "description": "Precipitaciones diarias por estación meteorológica DGAC: serie 2013–2026 con 143 meses verificables, sin interpolación ni asignación de CUT; lagunas de cobertura y licencias explícitas.",
+    "path": "docs/datasets/precipitaciones_dgac.md",
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars(\"precipitaciones_dgac\")\nlluvia = df.filter(pl.col(\"precipitacion_mm\").is_not_null())",
+      "duckdb": "SELECT fecha, id_estacion, precipitacion_mm FROM 'data/normalized/precipitaciones_dgac.parquet' WHERE precipitacion_mm IS NOT NULL ORDER BY fecha DESC LIMIT 20;",
+      "cli": "chile-hub show precipitaciones_dgac"
+    }
+  },
+  "outputs": {
+    "parquet": "data/normalized/precipitaciones_dgac.parquet",
+    "duckdb_table": "precipitaciones_dgac",
+    "sqlite_table": "precipitaciones_dgac",
+    "excel_sheet": "Precipitaciones DGAC"
+  },
+  "join_keys": [
+    "fecha",
+    "id_estacion"
+  ]
+}
