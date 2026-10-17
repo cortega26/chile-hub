@@ -2548,6 +2548,63 @@ class DgacPublicationGateTests(unittest.TestCase):
         self.assertEqual(dgac["publication_track"], "stable_publishable")
 
 
+
+class CommittedSnapshotVerificationTests(unittest.TestCase):
+    """Rechaza archivos alterados; nunca certifica un release por accidente."""
+
+    def test_snapshot_integrity_without_staging_of_other_sources(self):
+        import hashlib
+
+        from scripts.verify_committed_snapshot import verify_snapshot
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "data/normalized").mkdir(parents=True)
+            (root / "data/staging").mkdir(parents=True)
+            payload = b"published"
+            (root / "data/normalized/legacy.json").write_bytes(payload)
+            (root / "data/staging/precipitaciones_dgac.csv").write_bytes(b"official")
+            (root / "data/staging/precipitaciones_dgac.metadata.json").write_text(
+                json.dumps({
+                    "sha256": hashlib.sha256(b"official").hexdigest(),
+                    "months": 143, "record_count": 141436,
+                    "station_count": 33, "source_mode": "live",
+                }), encoding="utf-8"
+            )
+            (root / "data/normalized/artifact_manifest.json").write_text(
+                json.dumps({
+                    "artifact_count": 1,
+                    "artifacts": [{
+                        "path": "data/normalized/legacy.json", "dataset": "legacy",
+                        "size_bytes": len(payload),
+                        "sha256": hashlib.sha256(payload).hexdigest(),
+                    }],
+                }), encoding="utf-8"
+            )
+            (root / "data/source_registry.json").write_text(
+                json.dumps([
+                    {"dataset": "legacy", "publication_track": "stable_publishable"},
+                    {"dataset": "precipitaciones_dgac", "publication_track": "stable_publishable"},
+                ]), encoding="utf-8"
+            )
+            result = verify_snapshot(root)
+            self.assertEqual(
+                result["stable_layers_awaiting_canonical_publication"],
+                ["precipitaciones_dgac"],
+            )
+            self.assertFalse(result["publication_certified"])
+            (root / "data/normalized/legacy.json").write_bytes(b"tampered")
+            with self.assertRaisesRegex(ValueError, "desfasado"):
+                verify_snapshot(root)
+
+    def test_pr_verification_cannot_claim_live_publication(self):
+        workflow = PIPELINE_CHECK_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("python scripts/verify_committed_snapshot.py", workflow)
+        self.assertIn("if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'", workflow)
+        self.assertIn("python scripts/verify_pipeline.py --profile", workflow)
+
+
+
 if __name__ == "__main__":
     import pytest
 
