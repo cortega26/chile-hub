@@ -23,10 +23,18 @@ def sample_csv(year=2025, month=7, *, invalid=None, missing=False):
             rain = "S/I" if missing and day == 2 and station == 0 else "0.0"
             if invalid is not None and day == 1 and station == 0:
                 rain = invalid
-            writer.writerow([
-                180005 + station, "Chacalluta, Arica Ap.",
-                "18° 21' 20'' S", 51, year, month, day, rain,
-            ])
+            writer.writerow(
+                [
+                    180005 + station,
+                    "Chacalluta, Arica Ap.",
+                    "18° 21' 20'' S",
+                    51,
+                    year,
+                    month,
+                    day,
+                    rain,
+                ]
+            )
     return output.getvalue().encode("utf-8")
 
 
@@ -34,7 +42,10 @@ class DgacResearchTests(unittest.TestCase):
     def test_headerless_csv_preserves_first_observation_and_station_id(self):
         # CKAN datastore_search interpreta la primera observación como cabecera.
         rows = dgac.parse_csv(
-            sample_csv(), year=2025, month=7, url="https://datos.gob.cl/x",
+            sample_csv(),
+            year=2025,
+            month=7,
+            url="https://datos.gob.cl/x",
             license_id="cc-zero",
         )
         self.assertEqual(len(rows), 112)
@@ -44,29 +55,44 @@ class DgacResearchTests(unittest.TestCase):
 
     def test_missing_measurement_is_not_zero(self):
         rows = dgac.parse_csv(
-            sample_csv(missing=True), year=2025, month=7,
-            url="https://datos.gob.cl/x", license_id="cc-zero",
+            sample_csv(missing=True),
+            year=2025,
+            month=7,
+            url="https://datos.gob.cl/x",
+            license_id="cc-zero",
         )
         self.assertEqual(rows[1]["precipitacion_mm"], "")
 
     def test_negative_precipitation_fails(self):
         with self.assertRaisesRegex(dgac.SourceError, "negativa"):
             dgac.parse_csv(
-                sample_csv(invalid="-2"), year=2025, month=7,
-                url="https://datos.gob.cl/x", license_id="cc-zero",
+                sample_csv(invalid="-2"),
+                year=2025,
+                month=7,
+                url="https://datos.gob.cl/x",
+                license_id="cc-zero",
             )
 
     def test_wrong_month_fails(self):
         with self.assertRaisesRegex(dgac.SourceError, "fuera del período"):
             dgac.parse_csv(
-                sample_csv(month=8), year=2025, month=7,
-                url="https://datos.gob.cl/x", license_id="cc-zero",
+                sample_csv(month=8),
+                year=2025,
+                month=7,
+                url="https://datos.gob.cl/x",
+                license_id="cc-zero",
             )
 
     def test_ambiguous_or_incomplete_resources_fail(self):
-        package = {"resources": [{"name": "Precipitacion_072025.csv",
-                                  "format": "csv",
-                                  "url": "https://datos.gob.cl/x"}]}
+        package = {
+            "resources": [
+                {
+                    "name": "Precipitacion_072025.csv",
+                    "format": "csv",
+                    "url": "https://datos.gob.cl/x",
+                }
+            ]
+        }
         with self.assertRaisesRegex(dgac.SourceError, "Faltan CSV"):
             dgac.resources_for_package(package, 2025, range(7, 13))
         duplicated = {"resources": [*package["resources"], *package["resources"]]}
@@ -123,7 +149,9 @@ class DgacResearchTests(unittest.TestCase):
     def test_invalid_source_does_not_publish_partial_output(self):
         with tempfile.TemporaryDirectory() as tmp:
             outfile = Path(tmp) / "observaciones.csv"
-            with patch.object(dgac, "_package", return_value={"license_id": "cc-zero", "resources": []}):
+            with patch.object(
+                dgac, "_package", return_value={"license_id": "cc-zero", "resources": []}
+            ):
                 with self.assertRaises(dgac.SourceError):
                     dgac.harvest(outfile)
             self.assertFalse(outfile.exists())
