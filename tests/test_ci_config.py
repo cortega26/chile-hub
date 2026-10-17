@@ -2480,7 +2480,11 @@ class LandingPublicationRegistryTests(unittest.TestCase):
         from src.builders.landing import publication_counts_from_registry
 
         sample = [
-            {"dataset": "a", "publication_track": "stable_publishable", "maturity_status": "stable"},
+            {
+                "dataset": "a",
+                "publication_track": "stable_publishable",
+                "maturity_status": "stable",
+            },
             {"dataset": "b", "publication_track": "candidate", "maturity_status": "candidate"},
             {"dataset": "c", "publication_track": "candidate", "maturity_status": "deprecated"},
             {"dataset": "d", "publication_track": "candidate", "maturity_status": "under-review"},
@@ -2518,11 +2522,9 @@ class LandingPublicationRegistryTests(unittest.TestCase):
     def test_web_candidate_cards_use_fresh_registry_not_stale_bundle(self):
         script = LANDING_APP.read_text(encoding="utf-8")
         self.assertIn('dataUrl("data/source_registry.json")', script)
-        self.assertIn('renderCandidateSection(sourceRegistry, catalogGrid)', script)
+        self.assertIn("renderCandidateSection(sourceRegistry, catalogGrid)", script)
         self.assertIn('source.maturity_status !== "deprecated"', script)
-        self.assertNotIn('renderCandidateSection(bundle, catalogGrid', script)
-
-
+        self.assertNotIn("renderCandidateSection(bundle, catalogGrid", script)
 
 if __name__ == "__main__":
     import pytest
