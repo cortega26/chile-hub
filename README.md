@@ -19,9 +19,9 @@
 <!-- START_PYTHON_BADGE -->
 [![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-3776AB.svg?style=flat&logo=python&logoColor=white)]()
 <!-- END_PYTHON_BADGE -->
-<!-- Convención de conteos (Plan 097): badge = 22 CONSTRUIBLES (claves del catálogo con `outputs`, lo que `make build` genera localmente, incl. consumo_electrico en carril candidate) · 21 PUBLICABLES (registry `publication_track: stable_publishable` + elegibles al ZIP) · 20 en el manifest (alias comunas_enriquecidas sin artefacto físico) · 25 REGISTRADAS (claves del catálogo) · 28 DOCS (con archivados). Fórmula del badge: sync_readme_dataset_badge() en src/builders/doc_sync.py. -->
+<!-- Convención de conteos (Plan 097): badge = 23 CONSTRUIBLES (claves del catálogo con `outputs`, lo que `make build` genera localmente, incl. consumo_electrico en carril candidate) · 22 PUBLICABLES (registry `publication_track: stable_publishable` + elegibles al ZIP) · 20 en el manifest (alias comunas_enriquecidas sin artefacto físico) · 26 REGISTRADAS (claves del catálogo) · 28 DOCS (con archivados). Fórmula del badge: sync_readme_dataset_badge() en src/builders/doc_sync.py. -->
 <!-- START_DATASET_BADGE -->
-[![Datasets](https://img.shields.io/badge/Datasets-22%20capas-16a34a.svg)]()
+[![Datasets](https://img.shields.io/badge/Datasets-23%20capas-16a34a.svg)]()
 <!-- END_DATASET_BADGE -->
 
 <p>
@@ -50,8 +50,9 @@ y cuenta con pruebas para formatos históricos y trazabilidad por recurso.
 - [Evidencia reproducible en GitHub Actions](https://github.com/cortega26/chile-hub/actions/runs/38991196698).
 - [Ficha en el sitio de documentación](https://tooltician.com/chile-hub/reference/research-dgac-precipitaciones/).
 
-> **Estado: candidato de investigación (under-review).** No se encuentra en
-> la API ChileHub, el catálogo de capas estables ni el bundle publicable.
+> **Estado:** la capa `precipitaciones_dgac` se incorpora al catálogo
+> estable al publicar el snapshot validado y el nuevo bundle. La metodología
+> mantiene el histórico de auditoría y los huecos por licencia y calidad.
 > La serie **no es continua**: 2014 y el primer semestre de 2015
 > se excluyen por restricciones de licencia; enero de 2017 está en cuarentena
 > porque el archivo etiquetado como lluvia contiene temperaturas.
@@ -59,8 +60,8 @@ y cuenta con pruebas para formatos históricos y trazabilidad por recurso.
 **Contadores de la portada:** las capas publicadas y candidatas activas se
 calculan a partir de [`data/source_registry.json`](data/source_registry.json),
 no del `hub_bundle.json` de un build anterior. Las capas deprecadas se
-distinguen de las candidatas activas; la investigación DGAC se mantiene
-fuera de ese registro de capas hasta su eventual promoción.
+distinguen de las candidatas activas; las precipitaciones DGAC entran al catálogo ordinario al completarse
+la publicación, sin tarjeta especial ni anuncios individuales.
 
 ## Comprueba el valor con tres pruebas reproducibles
 
