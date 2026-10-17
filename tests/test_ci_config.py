@@ -1218,9 +1218,7 @@ class ReleaseSnapshotWeightGuardrailTests(unittest.TestCase):
             "data/normalized/precipitaciones_dgac.parquet",
         }
         dgac_size = sum(
-            (ROOT_DIR / path).stat().st_size
-            for path in dgac_files
-            if (ROOT_DIR / path).is_file()
+            (ROOT_DIR / path).stat().st_size for path in dgac_files if (ROOT_DIR / path).is_file()
         )
         self.assertLess(dgac_size, 75 * 1024 * 1024, "DGAC superó su presupuesto propio")
         self.assertLess(
