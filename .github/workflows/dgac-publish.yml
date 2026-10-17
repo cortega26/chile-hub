@@ -45,11 +45,12 @@ jobs:
         run: uv run python src/extractors/precipitaciones_dgac_extractor.py
       - name: Semantic quality, contract, SHA and actual Parquet
         run: uv run python scripts/verify_dgac_publication.py
-      - name: Verify complete pipeline and sync documentation
+      - name: Check catalog/landing synchronization
+        # Full build needs staging of other source layers. The canonical
+        # Pipeline Check workflow restores its staging cache and extracts
+        # sources before building, so do not duplicate that machinery here.
         run: |
-          uv run python src/build_dev_db.py
-          uv run python scripts/verify_pipeline.py --profile dev
-          uv run python scripts/sync_docs.py
+          uv run python scripts/sync_docs.py --check
           uv run python scripts/check_landing_sync.py
       - name: Upload verifiable independent evidence
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
