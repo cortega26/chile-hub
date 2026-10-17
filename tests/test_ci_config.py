@@ -1210,10 +1210,23 @@ class ReleaseSnapshotWeightGuardrailTests(unittest.TestCase):
             path = ROOT_DIR / name
             if path.is_file():
                 total += path.stat().st_size
+        # El histórico DGAC incorporó CSV y Parquet oficiales. Su costo
+        # se mide por separado, sin elevar el presupuesto de otros archivos.
+        dgac_files = {
+            "data/staging/precipitaciones_dgac.csv",
+            "data/normalized/precipitaciones_dgac.csv",
+            "data/normalized/precipitaciones_dgac.parquet",
+        }
+        dgac_size = sum(
+            (ROOT_DIR / path).stat().st_size
+            for path in dgac_files
+            if (ROOT_DIR / path).is_file()
+        )
+        self.assertLess(dgac_size, 75 * 1024 * 1024, "DGAC superó su presupuesto propio")
         self.assertLess(
-            total,
+            total - dgac_size,
             160 * 1024 * 1024,
-            f"el árbol versionado pesa {total / 1024 / 1024:.1f} MB (>160 MB)",
+            f"árbol sin DGAC pesa {(total - dgac_size) / 1024 / 1024:.1f} MB (>160 MB)",
         )
 
     def test_publishable_bundle_zip_is_not_tracked(self):
@@ -1404,7 +1417,8 @@ class LandingCandidateLaneGuardrailTests(unittest.TestCase):
     def test_verify_landing_checks_candidate_section(self):
         content = (ROOT_DIR / "scripts" / "verify_landing.py").read_text(encoding="utf-8")
         self.assertIn("#cat-candidate", content)
-        self.assertIn("candidate_datasets", content)
+        self.assertIn("active_candidates", content)
+        self.assertIn("source_registry.json", content)
         self.assertIn(".candidate-card", content)
         self.assertIn('"0 capas"', content)
 
