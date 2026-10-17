@@ -35,10 +35,10 @@ sys.path.insert(0, str(ROOT_DIR))
 from src.builders.landing import (
     CATALOG_JSON_LD_START_MARKER,
     extract_catalog_json_ld_block,
+    extract_hero_publication_status_block,
     normalize_site_url,
     render_catalog_json_ld_block,
     render_hero_publication_status_block,
-    extract_hero_publication_status_block,
 )
 
 INDEX_PATH = ROOT_DIR / "index.html"
