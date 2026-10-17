@@ -113,6 +113,13 @@ STAGING_SCHEMAS: dict[str, dict[str, type[pl.DataType] | pl.DataType]] = {
         "unidades_departamentos": pl.Int64,
         "superficie_m2_departamentos": pl.Int64,
     },
+    "precipitaciones_dgac": {
+        "fecha": pl.String,
+        "id_estacion": pl.String,
+        "latitud_dms": pl.String,
+        "altitud_m": pl.Float64,
+        "precipitacion_mm": pl.Float64,
+    },
     "calidad_aire": {
         "codigo_region": pl.String,
         "codigo_comuna": pl.String,
