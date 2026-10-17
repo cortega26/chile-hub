@@ -16,9 +16,9 @@ import io
 import json
 import re
 import time
+import unicodedata
 import urllib.error
 import urllib.request
-import unicodedata
 from pathlib import Path
 from typing import Any
 
@@ -184,9 +184,7 @@ def parse_csv(
         except csv.Error as exc:
             raise SourceError(f"Separador CSV no detectable ({year}-{month:02d})") from exc
     result: list[dict[str, str]] = []
-    for line, cells in enumerate(
-        csv.reader(io.StringIO(content), delimiter=delimiter), start=1
-    ):
+    for line, cells in enumerate(csv.reader(io.StringIO(content), delimiter=delimiter), start=1):
         if not cells or all(not c.strip() for c in cells):
             continue
         if line == 1 and not cells[0].strip().isdigit():
@@ -328,7 +326,7 @@ def harvest(output: Path, *, start_year: int = 2013, end_year: int = 2026) -> di
     expected = sum(6 for _ in packages) - len(quarantined)
     if invalid_sources:
         raise SourceError(
-            f"{len(invalid_sources)} archivos mensuales no normalizables:\\n"
+            f"{len(invalid_sources)} archivos mensuales no normalizables:\n"
             + "\n".join(invalid_sources)
         )
     if len(source_files) != expected:
@@ -382,9 +380,7 @@ def harvest(output: Path, *, start_year: int = 2013, end_year: int = 2026) -> di
     tmp_csv = output.with_suffix(output.suffix + ".tmp")
     tmp_json = output.with_suffix(".metadata.json.tmp")
     tmp_csv.write_bytes(data)
-    tmp_json.write_text(
-        json.dumps(metadata, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-    )
+    tmp_json.write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     tmp_csv.replace(output)
     tmp_json.replace(output.with_suffix(".metadata.json"))
     return metadata
