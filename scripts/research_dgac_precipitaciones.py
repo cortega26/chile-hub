@@ -57,7 +57,7 @@ COLUMNS = (
     "url_fuente",
     "licencia_fuente",
 )
-RESOURCE_RE = re.compile(r"precipitacion[_ ](\d{2})(\d{4})\.csv", re.IGNORECASE)
+RESOURCE_RE = re.compile(r"precipitacion[_ ]?(\d{2})(\d{4})(?:\d)?\.csv$", re.IGNORECASE)
 MISSING = frozenset(("", "S/I", "S/D", "NA", "N/A", "NULL", "-", "///"))
 
 
@@ -280,7 +280,7 @@ def harvest(
         raise SourceError(f"Esperaba {expected} meses; encontré {len(source_files)}")
     all_rows.sort(key=lambda row: (row["fecha"], row["id_estacion"]))
     buffer = io.StringIO(newline="")
-    writer = csv.DictWriter(buffer, fieldnames=COLUMNS, lineterminator="\\n")
+    writer = csv.DictWriter(buffer, fieldnames=COLUMNS, lineterminator="\n")
     writer.writeheader()
     writer.writerows(all_rows)
     data = buffer.getvalue().encode("utf-8")
@@ -325,7 +325,7 @@ def harvest(
     tmp_json = output.with_suffix(".metadata.json.tmp")
     tmp_csv.write_bytes(data)
     tmp_json.write_text(
-        json.dumps(metadata, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8"
+        json.dumps(metadata, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
     tmp_csv.replace(output)
     tmp_json.replace(output.with_suffix(".metadata.json"))
