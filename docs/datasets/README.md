@@ -65,18 +65,9 @@ Las propuestas de nuevas capas se evalúan con los criterios públicos de
 > La tabla se regenera desde `data/dataset_catalog_config.json` en cada build
 > (`make sync-docs`); no editarla a mano.
 
-## Candidatos de investigación (fuera del catálogo estable)
-
-Estos trabajos se validan independientemente y **no están disponibles**
-en la API de ChileHub, el ZIP de datos publicados ni la tabla anterior.
-No incrementan el número de capas estables.
-
-- **[Precipitaciones diarias por estación DGAC, 2013–2026](../research-dgac-precipitaciones.md)**:
-  141.436 observaciones de 33 estaciones, 143 meses aprovechables.
-  Extractor reproducible con CI, datos de origen y hashes verificables.
-  Requiere evaluación longitudinal antes de promoverse al bundle estable.
-  **Exclusiones:** 2014 y 2015-I por restricciones de licencia;
-  enero de 2017 por fuente incorrectamente rotulada como precipitación.
+La serie [`precipitaciones_dgac`](precipitaciones_dgac.md) integra el catálogo
+de capas publicables. Los huecos por licencia y la cuarentena del CSV de enero
+2017 se explican en la [auditoría histórica](../research-dgac-precipitaciones.md).
 
 ## Tiers de confiabilidad
 
