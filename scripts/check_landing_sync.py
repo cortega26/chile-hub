@@ -4,7 +4,8 @@
 
 1. el bloque JSON-LD `DataCatalog` de `index.html`, desde `data/dataset_catalog_config.json`;
 2. el `PUBLIC_DATA_BASE` de `app.js`, desde `[tool.chile_hub] public_site_url`;
-3. el cache-buster `app.js?v={version}` de `index.html`, desde `[project] version`.
+3. el conteo de capas publicadas/candidatas, desde `data/source_registry.json`;
+4. el cache-buster `app.js?v={version}` de `index.html`, desde `[project] version`.
 
 Si el catálogo (o la URL, o la versión) cambia y no se vuelve a correr el build,
 esos archivos quedan desfasados. El gate de CI que lo detecta
@@ -34,8 +35,10 @@ sys.path.insert(0, str(ROOT_DIR))
 from src.builders.landing import (
     CATALOG_JSON_LD_START_MARKER,
     extract_catalog_json_ld_block,
+    extract_hero_publication_status_block,
     normalize_site_url,
     render_catalog_json_ld_block,
+    render_hero_publication_status_block,
 )
 
 INDEX_PATH = ROOT_DIR / "index.html"
@@ -112,6 +115,19 @@ def describe_json_ld_drift(actual, expected):
     return "el JSON-LD difiere del generado (largo distinto)"
 
 
+def check_hero_publication_status(index_html):
+    """Compara las cifras públicas y candidatas con source_registry.json."""
+    actual = extract_hero_publication_status_block(index_html)
+    if actual is None:
+        return ["Faltan marcadores o bloque de conteos del hero en index.html"]
+    expected = render_hero_publication_status_block()
+    if actual != expected:
+        return [
+            "El contador de capas publicadas/candidatas está desfasado de data/source_registry.json"
+        ]
+    return []
+
+
 def check_app_data_base(app_js, public_site_url):
     """app.js debe apuntar al mismo host publicado que index.html."""
     expected = f'const PUBLIC_DATA_BASE = "{public_site_url}data/normalized";'
@@ -152,6 +168,7 @@ def main():
 
     problems = [
         *check_json_ld_block(index_html, public_site_url),
+        *check_hero_publication_status(index_html),
         *check_app_data_base(app_js, public_site_url),
         *check_app_cache_buster(index_html, version),
     ]

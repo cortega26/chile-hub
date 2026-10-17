@@ -122,6 +122,11 @@ jobs:
       - name: Check landing sync (JSON-LD/app.js derivados del catálogo)
         run: python scripts/check_landing_sync.py
 
+      - name: Test landing publication status against source registry
+        # Independiente del job de datos: los snapshots obsoletos no deben
+        # ocultar errores de conteos y candidatas de la portada.
+        run: uv run pytest -q tests/test_ci_config.py -k LandingPublicationRegistryTests
+
       # AGENTS.md es prosa curada (no bloque delimitado): verifica sus hechos
       # contables (anclas de líneas, listas de módulos, tabla de capas del §1)
       # contra el código — el caso real que motivó este gate fue la deriva de

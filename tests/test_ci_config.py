@@ -2473,6 +2473,60 @@ class TestSignalIntegrityGuardrailTests(unittest.TestCase):
         self.assertIn("build_server", step)
 
 
+class LandingPublicationRegistryTests(unittest.TestCase):
+    """Evita anuncios falsos de candidatas tras cambios del catálogo o bundle."""
+
+    def test_counts_active_deprecated_and_stable_without_bundle(self):
+        from src.builders.landing import publication_counts_from_registry
+
+        sample = [
+            {
+                "dataset": "a",
+                "publication_track": "stable_publishable",
+                "maturity_status": "stable",
+            },
+            {"dataset": "b", "publication_track": "candidate", "maturity_status": "candidate"},
+            {"dataset": "c", "publication_track": "candidate", "maturity_status": "deprecated"},
+            {"dataset": "d", "publication_track": "candidate", "maturity_status": "under-review"},
+        ]
+        self.assertEqual(
+            publication_counts_from_registry(sample),
+            {"stable": 1, "active_candidate": 2, "deprecated_candidate": 1},
+        )
+
+    def test_rejects_duplicate_dataset_entries_in_public_status(self):
+        from src.builders.landing import publication_counts_from_registry
+
+        duplicate = [
+            {"dataset": "a", "publication_track": "stable_publishable"},
+            {"dataset": "a", "publication_track": "stable_publishable"},
+        ]
+        with self.assertRaisesRegex(ValueError, "duplicado"):
+            publication_counts_from_registry(duplicate)
+
+    def test_hero_generated_from_real_registry_and_gate_rejects_drift(self):
+        from check_landing_sync import check_hero_publication_status
+
+        from src.builders.landing import publication_counts_from_registry
+
+        html = (ROOT_DIR / "index.html").read_text(encoding="utf-8")
+        counts = publication_counts_from_registry()
+        self.assertEqual(check_hero_publication_status(html), [])
+        outdated = html.replace(
+            f"{counts['active_candidate']} candidatas activas",
+            "99 candidatas activas",
+            1,
+        )
+        self.assertNotEqual(check_hero_publication_status(outdated), [])
+
+    def test_web_candidate_cards_use_fresh_registry_not_stale_bundle(self):
+        script = LANDING_APP.read_text(encoding="utf-8")
+        self.assertIn('dataUrl("data/source_registry.json")', script)
+        self.assertIn("renderCandidateSection(sourceRegistry, catalogGrid)", script)
+        self.assertIn('source.maturity_status !== "deprecated"', script)
+        self.assertNotIn("renderCandidateSection(bundle, catalogGrid", script)
+
+
 if __name__ == "__main__":
     import pytest
 
