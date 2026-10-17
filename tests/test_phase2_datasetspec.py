@@ -175,6 +175,7 @@ class TestPublicInventoryPolicy:
             "estadisticas_vitales",
             "permisos_edificacion",
             "calidad_aire",
+            "precipitaciones_dgac",
             "finanzas_municipales",
             "resultados_educacionales",
             "indicadores_urbanos_siedu",
