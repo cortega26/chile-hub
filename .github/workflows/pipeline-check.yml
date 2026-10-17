@@ -755,6 +755,9 @@ jobs:
       # El token solo puede escribir issues en este job; el workflow deja el
       # resto en read-only (principio de menor privilegio, plan 109).
       issues: write
+    # Este job no hace checkout. gh necesita el repositorio explícito.
+    env:
+      GH_REPO: ${{ github.repository }}
     steps:
       - name: Ensure tracking label exists
         env:
