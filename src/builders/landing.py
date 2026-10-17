@@ -15,6 +15,9 @@ import re
 
 from src.builders._shared import DATASET_CATALOG_CONFIG, ROOT_DIR
 
+HERO_PUBLICATION_START_MARKER = "<!-- START_HERO_PUBLICATION_STATUS -->"
+HERO_PUBLICATION_END_MARKER = "<!-- END_HERO_PUBLICATION_STATUS -->"
+
 CATALOG_JSON_LD_START_MARKER = "<!-- START_DATA_CATALOG_JSON_LD -->"
 CATALOG_JSON_LD_END_MARKER = "<!-- END_DATA_CATALOG_JSON_LD -->"
 
@@ -55,6 +58,61 @@ CREATORS = {
     "perfil_territorial_comunal": "chile-hub (Capa derivada a partir de datasets validados de chile-hub)",
     "empresas": "Registro de Empresas y Sociedades (RES) - Ministerio de Economía de Chile",
 }
+
+
+def publication_counts_from_registry(registry=None):
+    """Estado verificable desde source_registry, no desde un bundle desfasado."""
+    if registry is None:
+        path = os.path.join(ROOT_DIR, "data", "source_registry.json")
+        with open(path, encoding="utf-8") as handle:
+            registry = json.load(handle)
+    if not isinstance(registry, list):
+        raise ValueError("source_registry.json debe ser una lista")
+
+    counts = {"stable": 0, "active_candidate": 0, "deprecated_candidate": 0}
+    seen = set()
+    for entry in registry:
+        key = entry["dataset"]
+        if key in seen:
+            raise ValueError(f"Dataset duplicado en source_registry: {key}")
+        seen.add(key)
+        track = entry["publication_track"]
+        if track == "stable_publishable":
+            counts["stable"] += 1
+        elif track == "candidate":
+            if entry["maturity_status"] == "deprecated":
+                counts["deprecated_candidate"] += 1
+            else:
+                counts["active_candidate"] += 1
+        else:
+            raise ValueError(f"Carril de publicación desconocido: {key}: {track}")
+    return counts
+
+
+def render_hero_publication_status_block(registry=None):
+    """Texto de la portada derivado del registro canónico de publicación."""
+    counts = publication_counts_from_registry(registry)
+    stable = counts["stable"]
+    active = counts["active_candidate"]
+    return (
+        f"{HERO_PUBLICATION_START_MARKER}\n"
+        f'            <span class="hero-signal"><strong>{stable}</strong> capas publicadas '
+        f'<span class="hero-signal-note">· {active} candidatas activas · '
+        '<a href="#investigacion">investigación DGAC verificada</a></span></span>\n'
+        f"            {HERO_PUBLICATION_END_MARKER}"
+    )
+
+
+def extract_hero_publication_status_block(html):
+    """Devuelve bloque versionado de hero o None ante marcadores ausentes."""
+    match = re.search(
+        re.escape(HERO_PUBLICATION_START_MARKER)
+        + r".*?"
+        + re.escape(HERO_PUBLICATION_END_MARKER),
+        html,
+        flags=re.DOTALL,
+    )
+    return match.group(0) if match else None
 
 
 def normalize_site_url(public_site_url):
@@ -212,6 +270,17 @@ def sync_landing_metadata(public_site_url, version=None):
                 pattern_catalog = r'<script type="application/ld\+json">\s*\{\s*"@context":\s*"https://schema\.org",\s*"@type":\s*"DataCatalog".*?</script>'
                 new_content = re.sub(
                     pattern_catalog, lambda _: new_script, content, flags=re.DOTALL
+                )
+
+            if HERO_PUBLICATION_START_MARKER in new_content:
+                hero_pattern = (
+                    re.escape(HERO_PUBLICATION_START_MARKER)
+                    + r".*?"
+                    + re.escape(HERO_PUBLICATION_END_MARKER)
+                )
+                hero_block = render_hero_publication_status_block()
+                new_content = re.sub(
+                    hero_pattern, lambda _: hero_block, new_content, flags=re.DOTALL
                 )
 
             replacements = [
