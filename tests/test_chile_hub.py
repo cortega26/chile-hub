@@ -2452,7 +2452,6 @@ class DgacDatasetApiRegistrationTests(unittest.TestCase):
         self.assertEqual(_resolve_dataset_name("precipitaciones_dgac"), "precipitaciones_dgac")
 
 
-
 if __name__ == "__main__":
     import pytest
 
