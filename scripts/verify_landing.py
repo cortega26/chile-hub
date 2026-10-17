@@ -433,13 +433,41 @@ def verify_landing():  # noqa: C901  # plan 136
             if emoji in health_summary_text:
                 fail(f"Unexpected emoji {emoji!r} in #health-summary")
 
-        # Conteos honestos en el hero: 21 publicadas + 1 en evaluación
-        hero_signals = page.locator(".hero-signals").inner_text()
-        if "21" not in hero_signals or "evaluación" not in hero_signals:
-            fail(f"Unexpected hero signals copy: {hero_signals}")
-        hero_copy = page.locator(".intro-copy > p").last.inner_text()
-        if "Veintidós" in hero_copy:
-            fail(f"Hero copy still claims 22 published layers: {hero_copy}")
+        # Estado de publicación vivo: la fuente es source_registry.json,
+        # NO el bundle (que puede estar desfasado tras una falla de CI).
+        source_registry = json.loads(
+            (ROOT_DIR / "data" / "source_registry.json").read_text(encoding="utf-8")
+        )
+        stable_sources = [
+            source for source in source_registry
+            if source["publication_track"] == "stable_publishable"
+        ]
+        active_candidates = [
+            source for source in source_registry
+            if source["publication_track"] == "candidate"
+            and source["maturity_status"] != "deprecated"
+        ]
+        deprecated_candidates = [
+            source for source in source_registry
+            if source["publication_track"] == "candidate"
+            and source["maturity_status"] == "deprecated"
+        ]
+        hero_status = page.locator(".hero-signals .hero-signal").first.inner_text()
+        if (
+            f"{len(stable_sources)} capas publicadas" not in hero_status
+            or f"{len(active_candidates)} candidatas activas" not in hero_status
+            or "investigación DGAC verificada" not in hero_status
+        ):
+            fail(f"Hero no coincide con source_registry.json: {hero_status}")
+        research_panel = page.locator("#investigacion")
+        if research_panel.count() != 1:
+            fail("Falta la sección de investigación independiente DGAC")
+        panel_text = research_panel.inner_text()
+        if not all(term in panel_text for term in ("141.436", "33", "143", "Candidato")):
+            fail(f"Métricas DGAC incompletas o sin carril candidate: {panel_text}")
+        research_link = research_panel.locator('a[href="reference/research-dgac-precipitaciones/"]')
+        if research_link.count() != 1:
+            fail("La investigación DGAC debe enlazar su metodología técnica")
 
         # La nueva entrada orientada a tareas lleva a herramientas reales.
         paths = page.locator(".use-paths .use-path")
@@ -523,13 +551,9 @@ def verify_landing():  # noqa: C901  # plan 136
         page.fill("#catalog-search-input", "")
         page.wait_for_timeout(200)
 
-        # Candidate lane section (Plan 082): the carril candidate must be
-        # visible in its own section, filtered by search but excluded from
-        # the stable catalog count. The candidate name searched below is
-        # derived from the bundle (the registry is the source of truth for
-        # lane membership), so promoting a candidate to stable (Plan 084)
-        # does not break this check.
-        expected_candidate_count = len(bundle.get("candidate_datasets", []))
+        # Candidate lane: mostrar solo candidatas ACTIVAS del registro actual.
+        # El snapshot hub_bundle puede contener candidatas deprecadas viejas.
+        expected_candidate_count = len(active_candidates)
         candidate_section = page.locator("#cat-candidate")
         if expected_candidate_count > 0:
             if not candidate_section.is_visible():
@@ -549,7 +573,16 @@ def verify_landing():  # noqa: C901  # plan 136
                 next_action = card.locator(".candidate-next-action").inner_text()
                 if not next_action.strip():
                     fail(f"Expected non-empty next_action on candidate card {index}")
-            first_candidate_name = bundle["candidate_datasets"][0]["dataset"]
+            candidate_summary = page.locator("#cat-candidate .candidate-summary-note").inner_text()
+            if f"{len(deprecated_candidates)} deprecadas" not in candidate_summary:
+                fail(f"El catálogo no distingue capas deprecadas: {candidate_summary}")
+            for source in deprecated_candidates:
+                if page.locator(f'#candidate-{source["dataset"]}').count() != 0:
+                    fail(f"Se muestra una capa deprecada como activa: {source['dataset']}")
+            for source in active_candidates:
+                if page.locator(f'#candidate-{source["dataset"]}').count() != 1:
+                    fail(f"Falta candidata activa en el catálogo: {source['dataset']}")
+            first_candidate_name = active_candidates[0]["dataset"]
             page.fill("#catalog-search-input", first_candidate_name)
             page.wait_for_timeout(200)
             if not page.locator(f"#candidate-{first_candidate_name}").is_visible():
