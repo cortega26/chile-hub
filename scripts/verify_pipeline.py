@@ -36,7 +36,7 @@ def _derive_dataset_artifact_paths():
     paths = []
     for config in DATASET_CATALOG_CONFIG.values():
         for output_type, relative_path in config.get("outputs", {}).items():
-            if output_type in {"parquet", "json"}:
+            if output_type in {"parquet", "json", "csv", "metadata"}:
                 paths.append(ROOT_DIR / relative_path)
     return paths
 
