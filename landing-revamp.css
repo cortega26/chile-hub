@@ -332,3 +332,15 @@ main > section, main > div { min-width: 0; }
   .research-feature-metrics div { padding: .7rem; }
   .research-feature-metrics dd { font-size: 1.3rem; }
 }
+
+/* El estado público proviene del registro, no del snapshot del bundle. */
+.hero-signal-note a { color: inherit; text-underline-offset: 3px; }
+.hero-signal-note a:hover,
+.hero-signal-note a:focus-visible { color: var(--accent-green); }
+.candidate-summary-note {
+  margin: .4rem 0 1.05rem;
+  color: var(--text-secondary);
+  font-size: .83rem;
+  line-height: 1.55;
+  max-width: 84ch;
+}
