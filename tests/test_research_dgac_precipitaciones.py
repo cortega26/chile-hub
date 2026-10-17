@@ -84,10 +84,10 @@ class DgacResearchTests(unittest.TestCase):
         # 2026 usa encabezados en mayúsculas y terminología diferente.
         modern = (
             "CODIGO NACIONAL,NOMBRE DE LA ESTACIÓN,LATITUD,ALTITUD,"
-            "AÑO,MES,DÍA,PRECIPITACIÓN (MM)\\n"
+            "AÑO,MES,DÍA,PRECIPITACIÓN (MM)\n"
         )
         rows = dgac.parse_csv(
-            modern.replace("\\\\n", "\\n").encode("utf-8") + sample_csv(2026, 1),
+            modern.encode("utf-8") + sample_csv(2026, 1),
             year=2026,
             month=1,
             url="https://datos.gob.cl/2026.csv",
@@ -100,8 +100,8 @@ class DgacResearchTests(unittest.TestCase):
             dgac.parse_csv(
                 (
                     "CodigoNacional,NombreEstacion,Latitud,Altura,"
-                    "Año,Mes,Dia,T.Maxima,T.Minima\\n"
-                ).replace("\\\\n", "\\n").encode("utf-8") + sample_csv(2017, 1),
+                    "Año,Mes,Dia,T.Maxima,T.Minima\n"
+                ).encode("utf-8") + sample_csv(2017, 1),
                 year=2017,
                 month=1,
                 url="https://datos.gob.cl/2017.csv",
