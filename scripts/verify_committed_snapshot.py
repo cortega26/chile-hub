@@ -38,9 +38,11 @@ def verify_snapshot(root: Path = ROOT) -> dict:
     names = set()
     for artifact in artifacts:
         path = artifact.get("path")
-        if not isinstance(path, str) or (
-            not PurePosixPath(path).is_relative_to(PurePosixPath("data/normalized"))
-        ) or ".." in PurePosixPath(path).parts:
+        if (
+            not isinstance(path, str)
+            or (not PurePosixPath(path).is_relative_to(PurePosixPath("data/normalized")))
+            or ".." in PurePosixPath(path).parts
+        ):
             raise ValueError(f"Ruta fuera de normalized en manifest: {path!r}")
         if path in names:
             raise ValueError(f"Artefacto duplicado en manifest: {path}")
@@ -70,7 +72,9 @@ def verify_snapshot(root: Path = ROOT) -> dict:
         raise ValueError("Snapshot DGAC no corresponde a fuente oficial verificada")
 
     registry = json.loads((root / "data/source_registry.json").read_text(encoding="utf-8"))
-    stable = {entry["dataset"] for entry in registry if entry["publication_track"] == "stable_publishable"}
+    stable = {
+        entry["dataset"] for entry in registry if entry["publication_track"] == "stable_publishable"
+    }
     published = {entry["dataset"] for entry in artifacts if entry.get("dataset")}
     pending = sorted(stable - published)
     return {
