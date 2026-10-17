@@ -272,6 +272,10 @@ jobs:
             # cache-hit, para que el modo no dependa de si el cache quedó
             # envenenado con el fallback de 2 filas (drift del README diario).
             python src/extractors/permisos_edificacion_extractor.py
+            # SINCA solo expone una ventana corta en tiempo real. Un cache-hit
+            # jamás demuestra vigencia de calidad_aire: hay que refrescar y
+            # mantener source_mode=fallback si el portal no responde.
+            python src/extractors/calidad_aire_extractor.py
             # Los demás extractores usan datos cacheados de data/staging/ y data/raw/
           else
             echo "Cache no encontrado. Ejecutando extracción completa..."
