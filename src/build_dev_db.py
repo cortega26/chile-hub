@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 
 # ── Ajuste de sys.path ────────────────────────────────────────────────────────
@@ -465,6 +466,16 @@ def _write_data_artifacts(dfs):
         extra_tables,
     )
     log.info("artifact_format_done", format="flat_files", progress="4/4")
+    # CSV con licencia/procedencia por fila y sidecar histórico, no solo Parquet.
+    # Ambos viajan en el manifest público (nunca se mezclan CSV CC-NC).
+    shutil.copy2(
+        os.path.join(STAGING_DIR, "precipitaciones_dgac.csv"),
+        os.path.join(NORMALIZED_DIR, "precipitaciones_dgac.csv"),
+    )
+    shutil.copy2(
+        os.path.join(STAGING_DIR, "precipitaciones_dgac.metadata.json"),
+        os.path.join(NORMALIZED_DIR, "precipitaciones_dgac.metadata.json"),
+    )
     write_parquet_atomic(
         df_censo_hogares, os.path.join(NORMALIZED_DIR, "censo_hogares_viviendas.parquet")
     )
