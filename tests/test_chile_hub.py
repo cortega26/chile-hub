@@ -2190,7 +2190,8 @@ class DatasetEnumTests(unittest.TestCase):
         catalog_ids = set(catalog)
         registry = json.loads(Path("data/source_registry.json").read_text(encoding="utf-8"))
         published = {
-            entry["dataset"] for entry in registry
+            entry["dataset"]
+            for entry in registry
             if entry["publication_track"] == "stable_publishable"
         }
 
