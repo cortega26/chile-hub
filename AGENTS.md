@@ -961,6 +961,7 @@ protegido por un chequeo automatizado en vez de depender solo de buena voluntad.
 | Tabla de capas del README (nombre/fuente/licencia/cadencia) | `data/dataset_catalog_config.json` + mapas curados en `src/builders/reports.py` (plan 109: sin datos de build) | `scripts/sync_docs.py --check` |
 | Ejemplo de pin de versión en README | `pyproject.toml` vía `read_project_version()` | `scripts/sync_docs.py --check` |
 | Bloque JSON-LD `DataCatalog` de `index.html` | `data/dataset_catalog_config.json` vía `render_catalog_json_ld_block()` | `scripts/check_landing_sync.py` |
+| Cifras de capas publicadas/candidatas activas en el hero y tarjetas del sitio | `data/source_registry.json` vía `render_hero_publication_status_block()` y `app.js`; deprecadas y series de investigación fuera de ambos contadores | `scripts/check_landing_sync.py` + `scripts/verify_landing.py` + `tests/test_ci_config.py` |
 | `PUBLIC_DATA_BASE` de `app.js` y cache-buster `app.js?v=` | `pyproject.toml` (`[tool.chile_hub] public_site_url`, `[project] version`) | `scripts/check_landing_sync.py` |
 | Mapeo dataset ↔ extractor | `data/dataset_catalog_config.json` (campo `extractor`) | `check_companion_paths.py registry` |
 | Tabla de extractores por dominio en README | `data/dataset_catalog_config.json` vía `doc_sync.py::sync_readme_extractor_table()` | `scripts/sync_docs.py --check` |
