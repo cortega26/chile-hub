@@ -282,7 +282,6 @@ class DgacResearchTests(unittest.TestCase):
             self.assertFalse(outfile.exists())
             self.assertFalse(outfile.with_suffix(".metadata.json").exists())
 
-
     def test_production_wrapper_preserves_previous_snapshot_on_rejected_harvest(self):
         from src.extractors import precipitaciones_dgac_extractor as production
 
