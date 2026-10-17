@@ -12,7 +12,7 @@ octubre de 2026.
 
 ## Valor científico y alcance
 
-Se entregan observaciones diarias de lluvia en milímetros por estación
+El extractor produce observaciones diarias de lluvia en milímetros por estación
 meteorológica, sin interpolación ni agregación comunal ficticia. Usos:
 estacionalidad, tendencias interanuales, frecuencia de días lluviosos,
 precipitaciones extremas y comparaciones entre estaciones con cobertura
@@ -20,8 +20,8 @@ temporal suficiente. Los cambios de estación, la falta de datos y la
 calidad histórica son límites fundamentales para inferir tendencias
 climáticas.
 
-El valor agregado de chile-hub es consolidar **144 archivos-mes esperados
-de paquetes abiertos**, normalizar los CSV sin encabezados, preservar
+El valor agregado de chile-hub es consolidar **143 archivos-mes validados
+de 144 recursos mensuales declarados bajo paquetes abiertos**, normalizar los CSV sin encabezados, preservar
 valores faltantes, detectar duplicados y guardar procedencia, licencia
 y hashes SHA-256 de cada archivo.
 
@@ -37,7 +37,8 @@ y hashes SHA-256 de cada archivo.
 | 2025 | 2 semestres | 12 | CC0 |
 | 2026 | Primer semestre | 6 | CC0 |
 
-**Total declarado:** 144 meses. Los huecos de 2014 y 2015-I
+**Total: 144 meses de paquetes abiertos identificados, 143 meses incorporados
+tras cuarentena de enero 2017.** Los huecos de 2014 y 2015-I
 **no significan que no lloviera ni que la DGAC no midiera**: datos
 históricos aparecen en el paquete
 [2719](https://datos.gob.cl/dataset/2719), que declara **CC-NC**.
@@ -45,6 +46,11 @@ Como `chile-hub` permite usos comerciales, no se mezclan en el archivo
 redistribuible sin resolver las restricciones de uso. El segundo
 semestre de 2026 no está publicado en el catálogo inspeccionado.
 **No llamar la serie «continua 2013–2026».**
+
+**Integridad:** enero de 2017 figura como `Precipitacion_012017.csv` pero
+su contenido tiene columnas `T.Maxima` y `T.Minima` (temperaturas).
+Por tanto, ese mes queda en cuarentena con motivo explícito en
+`quarantined_source_months`, sin imputación ni interpretación como lluvia.
 
 Las publicaciones antiguas presentan diferencias reales que el
 extractor debe gestionar: nombres inconsistentes de recursos (2015,
@@ -97,11 +103,12 @@ declarado, licencias aceptadas y controles SHA-256 de duplicados.
 **Falla cerrado:** si un paquete abierto no puede ser recuperado o
 normalizado, el comando termina sin producir un CSV parcial y CI falla.
 
-**Compatibilidad histórica:** el parser inicial usa el esquema
-DGAC de 8 columnas sin cabeceras identificado en 2024–2025. Si
-2013 o 2015 tienen otro esquema, hay que construir un adaptador
-específico respaldado por muestras reales y tests: nunca forzar
-un parseo incompatible ni descartar filas silenciosamente.
+**Compatibilidad histórica demostrada:** 2013 contiene archivos
+separados por punto y coma; 2016 tiene una cabecera convencional;
+2026 tiene una cabecera con nombres diferentes y tildes. El extractor
+reconoce específicamente esas variantes, preserva observaciones
+sin cabecera y rechaza los formatos desconocidos. Hay tests para
+estos casos y para no confundir temperaturas con precipitaciones.
 
 ## Evidencias, madurez y gates
 
@@ -110,10 +117,16 @@ un parseo incompatible ni descartar filas silenciosamente.
   24 CSV, **24.123 registros**, **33 estaciones**, **7/7 tests**.
   SHA-256:
   `ce3da5259d9b316bebb6aa027da8a77cb8210601bf4c2925af7c14354f0495b5`.
-- **Histórico ampliado:** se debe verificar con el workflow
-  [DGAC precipitation research verification](../../.github/workflows/dgac-research.yml)
-  contra los paquetes originales. La historia no queda certificada
-  simplemente por tener el código.
+- **Histórico ampliado (certificado 2026-10-17):**
+  [workflow #38991196698](https://github.com/cortega26/chile-hub/actions/runs/38991196698)
+  **PASS** con los CSV oficiales. El extractor consolidó **141.436
+  observaciones, 33 estaciones, 143 meses** en `2013-01-01/2026-06-30`.
+  SHA-256 del CSV:
+  `0e0605843518a4f597d9e3cbed8b3840de092ef76b1fdc6472c7a294e89914a5`.
+  [Descargar CSV + metadata](https://github.com/cortega26/chile-hub/actions/runs/38991196698/artifacts/12084869269)
+  (artefacto temporal, expira el 16 de noviembre de 2026).
+  La extracción es reproducible en esta corrida; la disponibilidad futura
+  de archivos depende del portal oficial.
 
 **Antes de promoción a la API principal:** validar cobertura mensual
 y densidad por estación, anomalías y cambios instrumentales, revisar
