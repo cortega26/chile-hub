@@ -184,7 +184,19 @@ def parse_csv(
             continue
         if line == 1 and not cells[0].strip().isdigit():
             # Algunos archivos futuros podrían traer encabezados; nunca inferirlos por CKAN.
-            if len(cells) == 8 and "estacion" in cells[0].lower().replace("ó", "o"):
+            if len(cells) == 8 and (
+                [cell.strip().lower() for cell in cells]
+                == [
+                    "codigonacional",
+                    "nombreestacion",
+                    "latitud",
+                    "altura",
+                    "año",
+                    "mes",
+                    "dia",
+                    "sumadiaria",
+                ]
+            ):
                 continue
             raise SourceError(f"Primera fila desconocida ({year}-{month:02d}): {cells!r}")
         if len(cells) != 8:
