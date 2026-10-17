@@ -2443,6 +2443,16 @@ class ChileHubReportTablesTests(unittest.TestCase):
         self.assertIn("chile-hub", table)
 
 
+class DgacDatasetApiRegistrationTests(unittest.TestCase):
+    def test_dgac_is_a_typed_public_dataset_identifier(self):
+        from chile_hub.datasets import Dataset
+        from src.chile_hub.core import _resolve_dataset_name
+
+        self.assertEqual(Dataset.PRECIPITACIONES_DGAC.value, "precipitaciones_dgac")
+        self.assertEqual(_resolve_dataset_name("precipitaciones_dgac"), "precipitaciones_dgac")
+
+
+
 if __name__ == "__main__":
     import pytest
 
