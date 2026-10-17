@@ -39,6 +39,29 @@ jobs:
         run: |
           python scripts/verify_dgac_publication.py
           python -m json.tool data/normalized/precipitaciones_dgac.metadata.json > /dev/null
+      - name: Set up uv for full pipeline integration
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          enable-cache: true
+      - name: Install canonical build dependencies
+        run: uv sync --extra dev --extra pipeline
+      - name: Build full normalized hub with real DGAC snapshot
+        run: uv run python src/build_dev_db.py
+      - name: Verify reconstructed pipeline (dev profile)
+        run: uv run python scripts/verify_pipeline.py --profile dev
+      - name: Verify public Python consumer sees DGAC parquet
+        run: |
+          uv run python - <<'PY'
+          from pathlib import Path
+          from src.chile_hub.core import ChileHub
+          hub = ChileHub(data_dir=Path("data/normalized"))
+          names = hub.list_datasets()
+          assert "precipitaciones_dgac" in names, names
+          frame = hub.load_polars("precipitaciones_dgac")
+          assert frame.height == 141436, frame.height
+          assert frame["id_estacion"].n_unique() == 33
+          print(f"ChileHub API: {frame.height} DGAC records, 33 stations")
+          PY
       - name: Archive verified production-ready evidence
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
