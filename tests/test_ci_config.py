@@ -2502,6 +2502,7 @@ class LandingPublicationRegistryTests(unittest.TestCase):
 
     def test_hero_generated_from_real_registry_and_gate_rejects_drift(self):
         from check_landing_sync import check_hero_publication_status
+
         from src.builders.landing import publication_counts_from_registry
 
         html = (ROOT_DIR / "index.html").read_text(encoding="utf-8")
