@@ -53,6 +53,60 @@ class DgacResearchTests(unittest.TestCase):
         self.assertEqual(rows[0]["id_estacion"], "180005")
         self.assertEqual(rows[0]["precipitacion_mm"], "0.0")
 
+    def test_legacy_source_formats_in_existing_header_regression(self):
+        # La DGAC 2013 usa ';' y comas dentro del nombre de estación.
+        line = "180005;Chacalluta, Arica Ap.;18&deg 21' 20'' S;50;2013;01;01;0.0"
+        content = "\n".join([line.replace(";01;0.0", f";{day:02d};0.0") for day in range(1, 29)])
+        # 4 estaciones x 28 días para superar el gate mínimo.
+        content = "\n".join(
+            content.replace("180005;", f"{180005 + station};") for station in range(4)
+        ).encode("utf-8")
+        rows = dgac.parse_csv(
+            content,
+            year=2013,
+            month=1,
+            url="https://datos.gob.cl/legacy.csv",
+            license_id="cc-by",
+        )
+        self.assertEqual(len(rows), 112)
+        self.assertIn("°", rows[0]["latitud_dms"])
+        # En 2016 el origen sí incluye cabecera; no contaría como observación.
+        header = "CodigoNacional,NombreEstacion,Latitud,Altura,Año,Mes,Dia,SumaDiaria\n"
+        rows = dgac.parse_csv(
+            header.encode("utf-8") + sample_csv(2016, 1),
+            year=2016,
+            month=1,
+            url="https://datos.gob.cl/with-header.csv",
+            license_id="cc-by",
+        )
+        self.assertEqual(len(rows), 112)
+        self.assertEqual(rows[0]["fecha"], "2016-01-01")
+        # 2026 usa encabezados en mayúsculas y terminología diferente.
+        modern = (
+            "CODIGO NACIONAL,NOMBRE DE LA ESTACIÓN,LATITUD,ALTITUD,AÑO,MES,DÍA,PRECIPITACIÓN (MM)\n"
+        )
+        rows = dgac.parse_csv(
+            modern.encode("utf-8") + sample_csv(2026, 1),
+            year=2026,
+            month=1,
+            url="https://datos.gob.cl/2026.csv",
+            license_id="cc-zero",
+        )
+        self.assertEqual(len(rows), 112)
+        self.assertEqual(rows[0]["fecha"], "2026-01-01")
+        # Un encabezado T.Maxima/T.Minima es temperatura, no lluvia.
+        with self.assertRaisesRegex(dgac.SourceError, "Primera fila desconocida"):
+            dgac.parse_csv(
+                (
+                    "CodigoNacional,NombreEstacion,Latitud,Altura,Año,Mes,Dia,T.Maxima,T.Minima\n"
+                ).encode()
+                + sample_csv(2017, 1),
+                year=2017,
+                month=1,
+                url="https://datos.gob.cl/2017.csv",
+                license_id="cc-by",
+            )
+
     def test_missing_measurement_is_not_zero(self):
         rows = dgac.parse_csv(
             sample_csv(missing=True),
@@ -89,15 +143,14 @@ class DgacResearchTests(unittest.TestCase):
                 {
                     "name": "Precipitacion_072025.csv",
                     "format": "csv",
-                    "url": "https://datos.gob.cl/x",
+                    "url": "https://datos.gob.cl/x/precipitacion_072025.csv",
                 }
             ]
         }
         with self.assertRaisesRegex(dgac.SourceError, "Faltan CSV"):
             dgac.resources_for_package(package, 2025, range(7, 13))
         duplicated = {"resources": [*package["resources"], *package["resources"]]}
-        with self.assertRaisesRegex(dgac.SourceError, "Dos recursos"):
-            dgac.resources_for_package(duplicated, 2025, range(7, 8))
+        self.assertEqual(len(dgac.resources_for_package(duplicated, 2025, range(7, 8))), 2)
 
     def test_full_two_year_harvest_is_atomic_and_source_traceable(self):
         def get_package(name):
@@ -109,14 +162,14 @@ class DgacResearchTests(unittest.TestCase):
                     {
                         "name": f"Precipitacion_{month:02d}{year}.csv",
                         "format": "csv",
-                        "url": f"https://datos.gob.cl/example/{month:02d}{year}.csv",
+                        "url": f"https://datos.gob.cl/example/precipitacion_{month:02d}{year}.csv",
                     }
                     for month in months
                 ],
             }
 
         def request(url, *, retries=3):
-            token = url.rsplit("/", 1)[-1].removesuffix(".csv")
+            token = url.rsplit("/", 1)[-1].removesuffix(".csv").removeprefix("precipitacion_")
             month, year = int(token[:2]), int(token[2:])
             return sample_csv(year, month)
 
@@ -126,7 +179,7 @@ class DgacResearchTests(unittest.TestCase):
                 patch.object(dgac, "_package", side_effect=get_package),
                 patch.object(dgac, "_request", side_effect=request),
             ):
-                meta = dgac.harvest(outfile)
+                meta = dgac.harvest(outfile, start_year=2024, end_year=2025)
             self.assertEqual(meta["months"], 24)
             self.assertEqual(meta["record_count"], 112 * 24)
             self.assertEqual(meta["station_count"], 4)
@@ -145,6 +198,78 @@ class DgacResearchTests(unittest.TestCase):
                 json.loads(outfile.with_suffix(".metadata.json").read_text())["record_count"],
                 len(rows),
             )
+
+    def test_history_package_coverage_is_explicit(self):
+        self.assertEqual(len(dgac.PACKAGES), 24)
+        self.assertEqual(sum(6 for _ in dgac.PACKAGES), 144)
+        self.assertNotIn((2014, 1), dgac.PACKAGES)
+        self.assertNotIn((2015, 1), dgac.PACKAGES)
+        self.assertIn((2017, 1), dgac.QUARANTINED_SOURCE_MONTHS)
+        self.assertEqual(dgac.PACKAGES[(2015, 2)], "precipitacion-2o-semestre-2015")
+        self.assertEqual(dgac.PACKAGES[(2026, 1)], "precipitacion-1er-semestre-2026")
+
+    def test_legacy_resource_names_use_official_filename(self):
+        resources = [
+            {
+                "name": "precipitaciones diarias por estacion",
+                "format": "csv",
+                "url": "https://datos.gob.cl/dataset/x/download/precipitacion0820151.csv",
+            },
+            {
+                "name": "Precipitaciones Segundo semestre 2023",
+                "format": "csv",
+                "url": "https://datos.gob.cl/dataset/x/download/precipitacion_072023.csv",
+            },
+        ]
+        self.assertEqual(dgac._resource_month(resources[0], 2015), 8)
+        self.assertEqual(dgac._resource_month(resources[1], 2023), 7)
+        self.assertIsNone(dgac._resource_month(resources[0], 2023))
+        with self.assertRaisesRegex(dgac.SourceError, "externo"):
+            dgac._resource_month({"url": "https://example.com/precipitacion_072023.csv"}, 2023)
+
+    def test_conflicting_duplicate_month_fails_without_output(self):
+        def get_package(_name):
+            return {
+                "license_id": "cc-by",
+                "resources": [
+                    {
+                        "name": "Precipitacion_072015.csv",
+                        "format": "csv",
+                        "url": "https://datos.gob.cl/example/precipitacion_072015.csv",
+                    },
+                    {
+                        "name": "Precipitacion_072015.csv",
+                        "format": "csv",
+                        "url": "https://datos.gob.cl/extra/precipitacion_072015.csv",
+                    },
+                    *[
+                        {
+                            "name": f"Precipitacion_{month:02d}2015.csv",
+                            "format": "csv",
+                            "url": f"https://datos.gob.cl/example/precipitacion_{month:02d}2015.csv",
+                        }
+                        for month in range(8, 13)
+                    ],
+                ],
+            }
+
+        def get_payload(url, *, retries=3):
+            month = int(url.rsplit("/", 1)[-1][14:16])
+            return sample_csv(2015, month, invalid="1.0" if "/extra/" in url else None)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            outfile = Path(tmp) / "duplicados.csv"
+            with (
+                patch.object(dgac, "_package", side_effect=get_package),
+                patch.object(dgac, "_request", side_effect=get_payload),
+            ):
+                with self.assertRaisesRegex(dgac.SourceError, "contenido distinto"):
+                    dgac.harvest(outfile, start_year=2015, end_year=2015)
+            self.assertFalse(outfile.exists())
+
+    def test_invalid_year_range_fails(self):
+        with self.assertRaisesRegex(dgac.SourceError, "Rango admitido"):
+            dgac.harvest(Path("/no/escribir.csv"), start_year=2012)
 
     def test_invalid_source_does_not_publish_partial_output(self):
         with tempfile.TemporaryDirectory() as tmp:

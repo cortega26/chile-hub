@@ -1,116 +1,141 @@
-# Candidato de investigación — precipitaciones diarias DGAC 2024–2025
+# Candidato de investigación — precipitaciones diarias históricas DGAC (2013–2026)
 
-**Estado:** `under-review` / prototipo reproducible con extracción end-to-end validada en CI. **NO es una capa publicable,
-ni está incluida en el ZIP, la API `ChileHub` o el catálogo estable.** No
-incrementar el contador de datasets hasta completar los gates de ingreso.
+**Carril:** `under-review` / `candidate`. **No está todavía en el
+bundle estable, la API pública `ChileHub` ni el catálogo de capas
+publicables.** El CSV y su metadata se generan como artefactos de un
+workflow de investigación independiente.
 
-**Fuente primaria:** Dirección General de Aeronáutica Civil (DGAC), recursos
-mensuales CSV publicados en [datos.gob.cl](https://datos.gob.cl/organization/direccion_general_de_aeronautica_civil).
-Inspección del catálogo CKAN: 16 de octubre de 2026.
+**Fuente primaria:** Dirección General de Aeronáutica Civil (DGAC),
+[datos.gob.cl](https://datos.gob.cl/organization/direccion_general_de_aeronautica_civil),
+API CKAN y archivos mensuales CSV; revisión del catálogo: 16–17 de
+octubre de 2026.
 
-## Por qué vale la pena
+## Valor científico y alcance
 
-Permite estudiar precipitación diaria, intensidad/extremos observados,
-estacionalidad e irregularidad territorial por estación meteorológica. Cruce
-posterior posible con series climatológicas, hidrológicas o territoriales
-**solo** mediante un catálogo de estaciones con coordenadas/códigos verificados.
+El extractor produce observaciones diarias de lluvia en milímetros por estación
+meteorológica, sin interpolación ni agregación comunal ficticia. Usos:
+estacionalidad, tendencias interanuales, frecuencia de días lluviosos,
+precipitaciones extremas y comparaciones entre estaciones con cobertura
+temporal suficiente. Los cambios de estación, la falta de datos y la
+calidad histórica son límites fundamentales para inferir tendencias
+climáticas.
 
-**Valor específico de chile-hub:** reconstruir dos años completos a partir
-de 24 archivos mensuales dispersos, establecer esquema único, preservar
-faltantes, validar fechas/estaciones/duplicados y registrar SHA-256 por archivo
-original y por resultado.
+El valor agregado de chile-hub es consolidar **143 archivos-mes validados
+de 144 recursos mensuales declarados bajo paquetes abiertos**, normalizar los CSV sin encabezados, preservar
+valores faltantes, detectar duplicados y guardar procedencia, licencia
+y hashes SHA-256 de cada archivo.
 
-## Fuentes exactas y permisos
+### Períodos y restricciones
 
-| Período | Paquete CKAN | Licencia declarada |
-|---|---|---|
-| 2024-I | `precipitaciones-2024` | CC BY |
-| 2024-II | `precipitaciones-2do-semestre-del-ano-2024` | CC0 |
-| 2025-I | `precipitacion-1er-semestre-2025` | CC0 |
-| 2025-II | `precipitaciones-2do-semestre-2025` | CC0 |
+| Año | Paquetes aprovechables | Meses esperados | Licencia CKAN |
+|---|---:|---:|---|
+| 2013 | 2 semestres | 12 | CC BY |
+| 2014 | Ninguno redistribuible confirmado | 0 | Paquete legado CC-NC, excluido |
+| 2015 | Segundo semestre | 6 | CC BY |
+| 2016–2023 | 2 semestres por año | 96 | CC BY |
+| 2024 | 2 semestres | 12 | CC BY (I), CC0 (II) |
+| 2025 | 2 semestres | 12 | CC0 |
+| 2026 | Primer semestre | 6 | CC0 |
 
-Consultar paquetes y URLs de archivos mediante
-`https://datos.gob.cl/api/3/action/package_show?id=precipitaciones-2024`
-(análogamente para los demás slugs). La licencia es por paquete y se conserva
-por observación; **no** atribuir la licencia de chile-hub (MIT para el código)
-a los datos de la DGAC.
+**Total: 144 meses de paquetes abiertos identificados, 143 meses incorporados
+tras cuarentena de enero 2017.** Los huecos de 2014 y 2015-I
+**no significan que no lloviera ni que la DGAC no midiera**: datos
+históricos aparecen en el paquete
+[2719](https://datos.gob.cl/dataset/2719), que declara **CC-NC**.
+Como `chile-hub` permite usos comerciales, no se mezclan en el archivo
+redistribuible sin resolver las restricciones de uso. El segundo
+semestre de 2026 no está publicado en el catálogo inspeccionado.
+**No llamar la serie «continua 2013–2026».**
 
-**Ejemplo observado en CKAN:** recurso
-`Precipitacion_072025.csv`, ID `a954e2ca-44aa-443b-8a4e-b9c5fcfd1fb7`;
-estación `180005` (`Chacalluta, Arica Ap.`), fecha 2025-07-01,
-precipitación 0.0. El Datastore usa valores de la **primera observación**
-como nombres de columna (`180005`, `2025`, `7`, `1`, `0.0`);
-consumirlo sin corregir ese problema **pierde la primera observación de cada
-archivo**. El extractor prefiere el CSV original sin cabeceras.
+**Integridad:** enero de 2017 figura como `Precipitacion_012017.csv` pero
+su contenido tiene columnas `T.Maxima` y `T.Minima` (temperaturas).
+Por tanto, ese mes queda en cuarentena con motivo explícito en
+`quarantined_source_months`, sin imputación ni interpretación como lluvia.
 
-## Ejecutar
+Las publicaciones antiguas presentan diferencias reales que el
+extractor debe gestionar: nombres inconsistentes de recursos (2015,
+2021 y julio 2023), dos cargas de septiembre 2022, duplicado de julio
+2015 y un paquete separado de XLSX de 2025 con errores de clasificación
+(que no se utiliza). Los duplicados se aceptan solo si el SHA-256 de
+ambas descargas coincide; discrepancias **bloquean** la publicación.
 
-Desde la raíz del repositorio, con Python 3.11+:
+## Reproducibilidad
 
 ```bash
+# Histórico completo, por defecto:
 python scripts/research_dgac_precipitaciones.py \
+  --output /tmp/precipitaciones_dgac_historico_2013_2026.csv
+
+# Subconjunto para regresión o diagnóstico, sin cambiar el catálogo:
+python scripts/research_dgac_precipitaciones.py \
+  --start-year 2024 --end-year 2025 \
   --output /tmp/precipitaciones_dgac_2024_2025.csv
-python -m unittest tests.test_research_dgac_precipitaciones -v
+
+python -m unittest discover -s tests \
+  -p 'test_research_dgac_precipitaciones.py' -v
 ```
 
-Emite un CSV de grano `(fecha, id_estacion)` y metadatos
-`precipitaciones_dgac_2024_2025.metadata.json` en la misma carpeta.
+La ejecución crea un CSV **ordenado por fecha y estación** con
+granularidad `(fecha, id_estacion)`, más un JSON `*.metadata.json`
+con fechas, total de meses, observaciones, estaciones, faltantes,
+conteo por año, hashes originales, licencias, duplicados y períodos
+deliberadamente excluidos.
 
-| Columna | Significado |
+| Campo | Tipo / significado |
 |---|---|
-| `fecha` | ISO 8601, fecha de medición |
-| `id_estacion` | Identificador DGAC como texto, seis dígitos |
-| `nombre_estacion` | Etiqueta original DGAC |
-| `latitud_dms` | Latitud en grados/minutos/segundos sin conversión |
-| `altitud_m` | Altitud numérica de estación, metros |
-| `precipitacion_mm` | Precipitación diaria, mm; campo vacío = faltante |
-| `url_fuente` | CSV mensual oficial |
-| `licencia_fuente` | CC BY o CC0 del paquete correspondiente |
+| `fecha` | ISO 8601 |
+| `id_estacion` | Código DGAC como texto (6 dígitos) |
+| `nombre_estacion` | Nombre observado |
+| `latitud_dms` | Latitud tal como está en fuente, grados/minutos/segundos |
+| `altitud_m` | Altitud |
+| `precipitacion_mm` | Precipitación diaria en mm, vacío = sin dato |
+| `url_fuente` | URL específica del recurso oficial |
+| `licencia_fuente` | `cc-by` o `cc-zero` del paquete CKAN |
 
-El script exige **los 24 meses**, mínimo 100 registros por CSV, identificación
-de estación, fechas dentro del mes, precipitación no negativa, unicidad de
-`(fecha, id_estacion)` y licencia esperada. No genera output si falla un mes.
-Los metadatos contienen trazabilidad y hashes SHA-256. Sin interpolaciones,
-valores inventados, ni imputación de faltantes.
+No se convierten valores faltantes en cero, no se asignan códigos
+CUT sin verificación, ni se calculan promedios comunales a partir de
+estaciones aisladas.
 
-## Limitaciones y gates para promoción
+**Control de calidad:** años/meses dentro del recurso, mínimo de 100
+filas por archivo, estaciones identificadas, lluvia no negativa,
+claves estación-fecha únicas, todos los meses de cada paquete
+declarado, licencias aceptadas y controles SHA-256 de duplicados.
+**Falla cerrado:** si un paquete abierto no puede ser recuperado o
+normalizado, el comando termina sin producir un CSV parcial y CI falla.
 
-1. **Descarga certificada en CI (2026-10-17):** [workflow #38987688576](https://github.com/cortega26/chile-hub/actions/runs/38987688576)
-   descargó los 24 CSV completos (2024–2025), consolidó **24.123 observaciones
-   de 33 estaciones** y publicó un artefacto descargable con el CSV y su
-   metadata (retención de 14 días). Se ejecutaron **7/7 pruebas offline**
-   satisfactoriamente. SHA-256 del CSV:
-   `ce3da5259d9b316bebb6aa027da8a77cb8210601bf4c2925af7c14354f0495b5`.
-   [Evidencia y archivo](https://github.com/cortega26/chile-hub/actions/runs/38987688576/artifacts/12083852656).
-   Este éxito prueba extracción en ese runner y momento, no disponibilidad
-   garantizada de los enlaces en futuras ejecuciones.
-2. La cobertura es por **estaciones observacionales**, no por las 346 comunas
-   ni por una malla nacional; no extrapolar estaciones a comunas por el nombre.
-3. Comparación longitudinal requiere comprobar cambios de estaciones,
-   instrumentos, cobertura y definición de precipitación para los 24 archivos.
-4. Un archivo sin cabecera se parsea por posición de 8 columnas. Cualquier
-   cambio de formato falla de forma explícita para revisión.
-5. Los datos anteriores a 2024 y posteriores a 2025 **no están incluidos**
-   en este prototipo. La fuente publica otros períodos, pero no declarar
-   cobertura sin haberlos validado.
+**Compatibilidad histórica demostrada:** 2013 contiene archivos
+separados por punto y coma; 2016 tiene una cabecera convencional;
+2026 tiene una cabecera con nombres diferentes y tildes. El extractor
+reconoce específicamente esas variantes, preserva observaciones
+sin cabecera y rechaza los formatos desconocidos. Hay tests para
+estos casos y para no confundir temperaturas con precipitaciones.
 
-**Salida del estado `under-review`:** verificación end-to-end en un runner con
-acceso a datos.gob.cl, inspección manual de estaciones y faltantes, test de
-conteos contrastado con los CSV originales, documentación de calidad y
-contrato de esquema; recién entonces registrar en
-`data/dataset_catalog_config.json`, `data/source_registry.json`,
-`contracts/datasets/`, validadores y pipeline estándar. Revisar antes del
-**2026-11-30**; si la fuente no es reproducible, archivar el candidato.
+## Evidencias, madurez y gates
 
-**Mini-scorecard:** valor alto · legal abierto con atribución por paquete ·
-tamaño moderado (~1,8 MB de CSV crudos estimados) · cadencia semestral ·
-fragilidad de descarga/formato pendiente → `under-review`.
+- **Baseline 2024–2025 (certificado):** [GitHub Actions
+  #38987688576](https://github.com/cortega26/chile-hub/actions/runs/38987688576),
+  24 CSV, **24.123 registros**, **33 estaciones**, **7/7 tests**.
+  SHA-256:
+  `ce3da5259d9b316bebb6aa027da8a77cb8210601bf4c2925af7c14354f0495b5`.
+- **Histórico ampliado (certificado 2026-10-17):**
+  [workflow #38991196698](https://github.com/cortega26/chile-hub/actions/runs/38991196698)
+  **PASS** con los CSV oficiales. El extractor consolidó **141.436
+  observaciones, 33 estaciones, 143 meses** en `2013-01-01/2026-06-30`.
+  SHA-256 del CSV:
+  `0e0605843518a4f597d9e3cbed8b3840de092ef76b1fdc6472c7a294e89914a5`.
+  [Descargar CSV + metadata](https://github.com/cortega26/chile-hub/actions/runs/38991196698/artifacts/12084869269)
+  (artefacto temporal, expira el 16 de noviembre de 2026).
+  La extracción es reproducible en esta corrida; la disponibilidad futura
+  de archivos depende del portal oficial.
 
-**No afirmar:** que el dataset ya está publicado en el bundle estable,
-que la API principal lo expone, o que se comprobó reducción de tiempos frente
-a otros proveedores. La extracción se verificó únicamente en el workflow
-citado; el artefacto de CI tiene caducidad.
+**Antes de promoción a la API principal:** validar cobertura mensual
+y densidad por estación, anomalías y cambios instrumentales, revisar
+las limitaciones históricas, crear `DatasetSpec`, contrato, registro,
+validadores, CI canónica y snapshots estables sin datos falsos.
+El chequeo heredado de `perfil_territorial_comunal` se gestiona
+en [issue #185](https://github.com/cortega26/chile-hub/issues/185),
+independiente de esta investigación.
 
-**Citación recomendada:** DGAC, *Precipitaciones por estación* (2024–2025),
-datos.gob.cl, y Carlos Ortega, *chile-hub* como software de curación
-([DOI](https://doi.org/10.5281/zenodo.22968698)).
+**Citación:** DGAC, *Precipitaciones diarias por estación*, datos.gob.cl
+(fuente primaria, licencia por paquete); Carlos Ortega,
+*chile-hub* (software), https://doi.org/10.5281/zenodo.22968698.

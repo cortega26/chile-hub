@@ -39,7 +39,7 @@
 
 ---
 
-> **Investigación en evaluación:** [precipitaciones diarias DGAC 2024–2025](docs/research-dgac-precipitaciones.md) — extractor reproducible y pruebas offline. Candidato, aún no disponible en el bundle público; no cuenta como dataset publicable.
+> **Investigación en evaluación:** [precipitaciones diarias históricas DGAC 2013–2026](docs/research-dgac-precipitaciones.md) — extractor reproducible y pruebas offline. Candidato, aún no disponible en el bundle público; no cuenta como dataset publicable.
 
 ## Comprueba el valor con tres pruebas reproducibles
 
@@ -211,7 +211,7 @@ El mismo estado se publica en el sitio, con historial de builds y detalle por ca
 ### Respaldo adicional
 
 <!-- START_TEST_COUNT -->
-- **1431 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
+- **1436 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
 <!-- END_TEST_COUNT -->
 <!-- START_ADR_COUNT -->
 - **24 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
