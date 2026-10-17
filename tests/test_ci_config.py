@@ -2526,6 +2526,7 @@ class LandingPublicationRegistryTests(unittest.TestCase):
         self.assertIn('source.maturity_status !== "deprecated"', script)
         self.assertNotIn("renderCandidateSection(bundle, catalogGrid", script)
 
+
 if __name__ == "__main__":
     import pytest
 
