@@ -2182,9 +2182,12 @@ class DatasetEnumTests(unittest.TestCase):
 
         from src.chile_hub.datasets import Dataset
 
-        catalog_path = Path("data/normalized/dataset_catalog.json")
+        # El enum sigue el catálogo de configuración del código actual.
+        # data/normalized/dataset_catalog.json es el último RELEASE y puede
+        # estar legítimamente una publicación por detrás del registro.
+        catalog_path = Path("data/dataset_catalog_config.json")
         catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
-        catalog_ids = {entry["dataset"] for entry in catalog["datasets"]}
+        catalog_ids = set(catalog)
 
         vals = Dataset.values()
         self.assertEqual(set(vals), catalog_ids)
