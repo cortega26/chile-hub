@@ -170,9 +170,7 @@ class DgacResearchTests(unittest.TestCase):
         self.assertEqual(dgac._resource_month(resources[1], 2023), 7)
         self.assertIsNone(dgac._resource_month(resources[0], 2023))
         with self.assertRaisesRegex(dgac.SourceError, "externo"):
-            dgac._resource_month(
-                {"url": "https://example.com/precipitacion_072023.csv"}, 2023
-            )
+            dgac._resource_month({"url": "https://example.com/precipitacion_072023.csv"}, 2023)
 
     def test_conflicting_duplicate_month_fails_without_output(self):
         def get_package(_name):
