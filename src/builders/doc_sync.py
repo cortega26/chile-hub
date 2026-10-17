@@ -284,6 +284,10 @@ _AGENTS_TEST_DESCRIPTIONS = {
         "Prueba reproducible de tres cruces territoriales, cobertura, "
         "integridad CUT y hash de resultados (sin red)"
     ),
+    "test_research_dgac_precipitaciones.py": (
+        "Candidato DGAC: CSV sin cabeceras, cobertura de meses, "
+        "licencias, hashes y fallos cerrados (sin red)"
+    ),
 }
 
 # Estas pruebas crean todo ``data/normalized/`` bajo un directorio temporal;
