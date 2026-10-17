@@ -2531,6 +2531,27 @@ class LandingPublicationRegistryTests(unittest.TestCase):
         self.assertNotIn("renderCandidateSection(bundle, catalogGrid", script)
 
 
+class DgacPublicationGateTests(unittest.TestCase):
+    """La fuente es CKAN/CSV, pero el registro exige enums canónicos."""
+
+    def test_registry_and_spec_use_known_access_and_fallback_policies(self):
+        registry = json.loads((ROOT_DIR / "data/source_registry.json").read_text(encoding="utf-8"))
+        spec = json.loads(
+            (ROOT_DIR / "data/dataset_specs/precipitaciones_dgac.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        dgac = next(row for row in registry if row["dataset"] == "precipitaciones_dgac")
+        for item in (dgac, spec["source"]):
+            self.assertEqual(item["access_method"], "api")
+            self.assertEqual(item["fallback_policy"], "none")
+            self.assertTrue(item["live_ready"])
+            self.assertTrue(item["publish_blocking"])
+        self.assertEqual(dgac["publication_track"], "stable_publishable")
+
+
+
+
 if __name__ == "__main__":
     import pytest
 
