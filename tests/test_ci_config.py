@@ -2512,6 +2512,10 @@ class LandingPublicationRegistryTests(unittest.TestCase):
         html = (ROOT_DIR / "index.html").read_text(encoding="utf-8")
         counts = publication_counts_from_registry()
         self.assertEqual(check_hero_publication_status(html), [])
+        self.assertNotIn('id="investigacion"', html)
+        self.assertNotIn("research-feature", html)
+        self.assertNotIn("investigación DGAC verificada", html)
+        self.assertIn('href="reference/"', html)
         outdated = html.replace(
             f"{counts['active_candidate']} candidatas activas",
             "99 candidatas activas",

@@ -459,18 +459,13 @@ def verify_landing():  # noqa: C901  # plan 136
         if (
             f"{len(stable_sources)} capas publicadas" not in hero_status
             or f"{len(active_candidates)} candidatas activas" not in hero_status
-            or "investigación DGAC verificada" not in hero_status
         ):
             fail(f"Hero no coincide con source_registry.json: {hero_status}")
-        research_panel = page.locator("#investigacion")
-        if research_panel.count() != 1:
-            fail("Falta la sección de investigación independiente DGAC")
-        panel_text = research_panel.inner_text()
-        if not all(term in panel_text for term in ("141.436", "33", "143", "Candidato")):
-            fail(f"Métricas DGAC incompletas o sin carril candidate: {panel_text}")
-        research_link = research_panel.locator('a[href="reference/research-dgac-precipitaciones/"]')
-        if research_link.count() != 1:
-            fail("La investigación DGAC debe enlazar su metodología técnica")
+        # Ninguna serie individual ocupa una tarjeta promocional en portada.
+        if page.locator("#investigacion, .research-feature").count() != 0:
+            fail("Hay un panel de investigación individual en la portada")
+        if page.locator('a[href="reference/"]').count() == 0:
+            fail("Falta la navegación hacia las fichas en la documentación")
 
         # La nueva entrada orientada a tareas lleva a herramientas reales.
         paths = page.locator(".use-paths .use-path")

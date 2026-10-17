@@ -97,8 +97,7 @@ def render_hero_publication_status_block(registry=None):
     return (
         f"{HERO_PUBLICATION_START_MARKER}\n"
         f'            <span class="hero-signal"><strong>{stable}</strong> capas publicadas '
-        f'<span class="hero-signal-note">· {active} candidatas activas · '
-        '<a href="#investigacion">investigación DGAC verificada</a></span></span>\n'
+        f'<span class="hero-signal-note">· {active} candidatas activas</span></span>\n'
         f"            {HERO_PUBLICATION_END_MARKER}"
     )
 
