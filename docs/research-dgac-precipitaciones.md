@@ -1,6 +1,6 @@
 # Candidato de investigación — precipitaciones diarias DGAC 2024–2025
 
-**Estado:** `under-review` / prototipo reproducible. **NO es una capa publicable,
+**Estado:** `under-review` / prototipo reproducible con extracción end-to-end validada en CI. **NO es una capa publicable,
 ni está incluida en el ZIP, la API `ChileHub` o el catálogo estable.** No
 incrementar el contador de datasets hasta completar los gates de ingreso.
 
@@ -75,10 +75,15 @@ valores inventados, ni imputación de faltantes.
 
 ## Limitaciones y gates para promoción
 
-1. **Descarga no certificada de extremo a extremo:** se verificó acceso al
-   catálogo CKAN y a registros de su API Datastore; la descarga directa del
-   CSV no pudo certificarse desde este entorno. Un CI ejecutando los 24 CSV
-   es condición de aceptación, no una suposición.
+1. **Descarga certificada en CI (2026-10-17):** [workflow #38987688576](https://github.com/cortega26/chile-hub/actions/runs/38987688576)
+   descargó los 24 CSV completos (2024–2025), consolidó **24.123 observaciones
+   de 33 estaciones** y publicó un artefacto descargable con el CSV y su
+   metadata (retención de 14 días). Se ejecutaron **7/7 pruebas offline**
+   satisfactoriamente. SHA-256 del CSV:
+   `ce3da5259d9b316bebb6aa027da8a77cb8210601bf4c2925af7c14354f0495b5`.
+   [Evidencia y archivo](https://github.com/cortega26/chile-hub/actions/runs/38987688576/artifacts/12083852656).
+   Este éxito prueba extracción en ese runner y momento, no disponibilidad
+   garantizada de los enlaces en futuras ejecuciones.
 2. La cobertura es por **estaciones observacionales**, no por las 346 comunas
    ni por una malla nacional; no extrapolar estaciones a comunas por el nombre.
 3. Comparación longitudinal requiere comprobar cambios de estaciones,
@@ -101,9 +106,10 @@ contrato de esquema; recién entonces registrar en
 tamaño moderado (~1,8 MB de CSV crudos estimados) · cadencia semestral ·
 fragilidad de descarga/formato pendiente → `under-review`.
 
-**No afirmar:** que el dataset completo ya está publicado, que la API principal
-lo expone, que el período se extrajo exitosamente o que se comprobó reducción
-de tiempos frente a otros proveedores.
+**No afirmar:** que el dataset ya está publicado en el bundle estable,
+que la API principal lo expone, o que se comprobó reducción de tiempos frente
+a otros proveedores. La extracción se verificó únicamente en el workflow
+citado; el artefacto de CI tiene caducidad.
 
 **Citación recomendada:** DGAC, *Precipitaciones por estación* (2024–2025),
 datos.gob.cl, y Carlos Ortega, *chile-hub* como software de curación
