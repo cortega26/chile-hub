@@ -56,6 +56,12 @@ y cuenta con pruebas para formatos históricos y trazabilidad por recurso.
 > se excluyen por restricciones de licencia; enero de 2017 está en cuarentena
 > porque el archivo etiquetado como lluvia contiene temperaturas.
 
+**Contadores de la portada:** las capas publicadas y candidatas activas se
+calculan a partir de [`data/source_registry.json`](data/source_registry.json),
+no del `hub_bundle.json` de un build anterior. Las capas deprecadas se
+distinguen de las candidatas activas; la investigación DGAC se mantiene
+fuera de ese registro de capas hasta su eventual promoción.
+
 ## Comprueba el valor con tres pruebas reproducibles
 
 Un cruce de datos públicos debe **funcionar, dejar rastro y mostrar qué datos faltan**.
@@ -226,7 +232,7 @@ El mismo estado se publica en el sitio, con historial de builds y detalle por ca
 ### Respaldo adicional
 
 <!-- START_TEST_COUNT -->
-- **1436 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
+- **1440 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
 <!-- END_TEST_COUNT -->
 <!-- START_ADR_COUNT -->
 - **24 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
