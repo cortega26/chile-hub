@@ -6928,7 +6928,6 @@ class DgacProductionExtractorTests(unittest.TestCase):
             self.assertTrue(output.exists())
 
 
-
 if __name__ == "__main__":
     import sys
 
