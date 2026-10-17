@@ -456,7 +456,9 @@ def verify_landing():  # noqa: C901  # plan 136
             and source["maturity_status"] == "deprecated"
         ]
         # inner_text conserva saltos de línea del layout; compara palabras, no wrapping.
-        hero_status = " ".join(page.locator(".hero-signals .hero-signal").first.inner_text().split())
+        hero_status = " ".join(
+            page.locator(".hero-signals .hero-signal").first.inner_text().split()
+        )
         if (
             f"{len(stable_sources)} capas publicadas" not in hero_status
             or f"{len(active_candidates)} candidatas activas" not in hero_status
