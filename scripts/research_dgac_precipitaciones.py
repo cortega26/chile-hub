@@ -11,6 +11,7 @@ import argparse
 import csv
 import datetime as dt
 import hashlib
+import html
 import io
 import json
 import re
@@ -165,12 +166,20 @@ def parse_csv(
 ) -> list[dict[str, str]]:
     """Lee 8 columnas *sin cabecera*; CKAN suele tomar la primera fila como header."""
     content = _decode(payload)
-    try:
-        dialect = csv.Sniffer().sniff(content[:4096], delimiters=",;\t")
-    except csv.Error as exc:
-        raise SourceError(f"Separador CSV no detectable ({year}-{month:02d})") from exc
+    # En archivos 2013 hay comas *dentro* de nombres, pero columnas separadas
+    # por punto y coma; csv.Sniffer puede escoger erróneamente ','.
+    first_line = content.splitlines()[0] if content.splitlines() else ""
+    if first_line.count(";") >= 7:
+        delimiter = ";"
+    else:
+        try:
+            delimiter = csv.Sniffer().sniff(content[:4096], delimiters=",;\t").delimiter
+        except csv.Error as exc:
+            raise SourceError(f"Separador CSV no detectable ({year}-{month:02d})") from exc
     result: list[dict[str, str]] = []
-    for line, cells in enumerate(csv.reader(io.StringIO(content), dialect), start=1):
+    for line, cells in enumerate(
+        csv.reader(io.StringIO(content), delimiter=delimiter), start=1
+    ):
         if not cells or all(not c.strip() for c in cells):
             continue
         if line == 1 and not cells[0].strip().isdigit():
@@ -202,7 +211,7 @@ def parse_csv(
                 "fecha": observed.isoformat(),
                 "id_estacion": code,
                 "nombre_estacion": name,
-                "latitud_dms": lat,
+                "latitud_dms": html.unescape(lat),
                 "altitud_m": str(altitude),
                 "precipitacion_mm": "" if precip is None else str(precip),
                 "url_fuente": url,
