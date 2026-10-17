@@ -388,6 +388,9 @@ _AGENTS_EXTRACTOR_DESCRIPTIONS = {
     "calidad_aire_extractor.py": (
         "Calidad del aire por estación — promedios diarios (SINCA/MMA) → data/staging/"
     ),
+    "precipitaciones_dgac_extractor.py": (
+        "Precipitaciones diarias por estación (DGAC, CC BY/CC0) → data/staging/"
+    ),
     "consumo_electrico_extractor.py": ("Consumo eléctrico comunal (CNE) → data/staging/"),
     "partidos_politicos_extractor.py": ("Partidos políticos vigentes (SERVEL) → data/staging/"),
     "autoridades_electas_extractor.py": ("Diputados y senadores en ejercicio → data/staging/"),
