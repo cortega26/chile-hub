@@ -248,3 +248,87 @@ main > section, main > div { min-width: 0; }
 @media (prefers-reduced-motion: reduce) {
   .use-path { transition: none; }
 }
+
+/* Public-facing research track, clearly outside the stable dataset catalog. */
+.research-feature {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(245px, .7fr);
+  align-items: stretch;
+  gap: clamp(1.25rem, 3vw, 2.75rem);
+  padding: clamp(1.4rem, 3.4vw, 2.6rem);
+  background: #f6f1e8;
+  border: 1px solid #e8d8ca;
+  border-radius: 7px;
+}
+.research-feature-eyebrow {
+  margin: 0 0 .75rem;
+  font: 700 .72rem/1.4 var(--font-mono);
+  letter-spacing: .095em;
+  color: var(--accent-warm);
+}
+.research-feature h2 {
+  margin: 0 0 1rem;
+  font: 600 clamp(1.55rem, 2.7vw, 2.3rem)/1.16 var(--font-display);
+  letter-spacing: -.025em;
+  max-width: 25ch;
+}
+.research-feature-main > p:not(.research-feature-eyebrow) {
+  max-width: 70ch;
+  line-height: 1.58;
+  color: var(--text-secondary);
+  font-size: .94rem;
+}
+.research-feature .research-feature-caveat { font-size: .82rem; }
+.research-feature-caveat strong { color: var(--text-primary); }
+.research-feature-actions {
+  display: flex;
+  align-items: center;
+  gap: .8rem 1.25rem;
+  flex-wrap: wrap;
+  margin-top: 1.3rem;
+}
+.research-feature-actions a {
+  font-size: .84rem;
+  font-weight: 650;
+  text-underline-offset: 3px;
+}
+.research-feature-link { color: var(--accent-green); }
+.research-feature-source { color: var(--text-secondary); }
+.research-feature-actions a:focus-visible {
+  outline: 2px solid var(--accent-green);
+  outline-offset: 4px;
+}
+.research-feature-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .85rem;
+  margin: 0;
+  align-content: center;
+}
+.research-feature-metrics div {
+  padding: 1.1rem .9rem;
+  background: rgba(255, 255, 255, .66);
+  border: 1px solid #e8d8ca;
+  border-radius: 5px;
+  min-width: 0;
+}
+.research-feature-metrics dt {
+  font: 600 .67rem/1.4 var(--font-mono);
+  color: var(--text-secondary);
+  letter-spacing: .025em;
+}
+.research-feature-metrics dd {
+  margin: .38rem 0 0;
+  font: 600 clamp(1.23rem, 2.1vw, 1.75rem)/1.2 var(--font-display);
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+#investigacion { scroll-margin-top: 95px; }
+@media (max-width: 850px) {
+  .research-feature { grid-template-columns: 1fr; }
+}
+@media (max-width: 450px) {
+  .research-feature-metrics { gap: .45rem; }
+  .research-feature-metrics div { padding: .7rem; }
+  .research-feature-metrics dd { font-size: 1.3rem; }
+}

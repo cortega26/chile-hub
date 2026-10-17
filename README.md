@@ -39,7 +39,22 @@
 
 ---
 
-> **Investigación en evaluación:** [precipitaciones diarias históricas DGAC 2013–2026](docs/research-dgac-precipitaciones.md) — extractor reproducible y pruebas offline. Candidato, aún no disponible en el bundle público; no cuenta como dataset publicable.
+### Investigación abierta: precipitaciones diarias de Chile, 2013–2026
+
+El extractor experimental de la **DGAC** consolidó **141.436 observaciones**
+de **33 estaciones** correspondientes a **143 meses válidos**. El resultado
+fue verificado dos veces contra archivos oficiales, con el mismo hash SHA-256,
+y cuenta con pruebas para formatos históricos y trazabilidad por recurso.
+
+- [Metodología, cobertura, licencias, limitaciones y ejecución local](docs/research-dgac-precipitaciones.md).
+- [Evidencia reproducible en GitHub Actions](https://github.com/cortega26/chile-hub/actions/runs/38991196698).
+- [Ficha en el sitio de documentación](https://tooltician.com/chile-hub/reference/research-dgac-precipitaciones/).
+
+> **Estado: candidato de investigación (under-review).** No se encuentra en
+> la API ChileHub, el catálogo de capas estables ni el bundle publicable.
+> La serie **no es continua**: 2014 y el primer semestre de 2015
+> se excluyen por restricciones de licencia; enero de 2017 está en cuarentena
+> porque el archivo etiquetado como lluvia contiene temperaturas.
 
 ## Comprueba el valor con tres pruebas reproducibles
 

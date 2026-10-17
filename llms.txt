@@ -27,3 +27,8 @@ cualquier diferencia, prevalece la fuente oficial de cada capa.
 - Referencia de API: https://tooltician.com/chile-hub/reference/api/
 - Cómo citar: https://tooltician.com/chile-hub/reference/citation/
 - Repositorio: https://github.com/cortega26/chile-hub
+- Investigación DGAC (precipitaciones históricas 2013–2026):
+  https://tooltician.com/chile-hub/reference/research-dgac-precipitaciones/
+  (141.436 observaciones, 33 estaciones, 143 meses validados; candidato
+  de investigación, NO incluido en el bundle ni el catálogo estable;
+  2014, 2015-I y enero de 2017 excluidos con justificación)
