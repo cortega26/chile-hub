@@ -1385,7 +1385,9 @@ class LandingCandidateLaneGuardrailTests(unittest.TestCase):
     def test_app_js_renders_candidate_section_from_bundle(self):
         content = self._app_js()
         self.assertIn("renderCandidateSection", content)
-        self.assertIn("bundle.candidate_datasets", content)
+        self.assertIn('dataUrl("data/source_registry.json")', content)
+        self.assertIn("renderCandidateSection(sourceRegistry, catalogGrid)", content)
+        self.assertNotIn("bundle.candidate_datasets", content)
         self.assertIn('section.id = "cat-candidate"', content)
         self.assertIn('class="dataset-badge candidate"', content)
         self.assertIn("candidate-next-action", content)
