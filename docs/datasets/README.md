@@ -56,6 +56,7 @@ Las propuestas de nuevas capas se evalúan con los criterios públicos de
 | [`perfil_territorial_comunal`](perfil_territorial_comunal.md) | Perfil comunal curado que consolida DPA, censo, salud, educación, finanzas, SIEDU y distritos. |
 | [`permisos_edificacion`](permisos_edificacion.md) | Viviendas en unidades y superficie (m2) por comuna y año —casas y departamentos— desde las estadísticas de permisos de edificación del CEDOC (MINVU), serie desde 2002. |
 | [`pobreza_comunal`](pobreza_comunal.md) | Estimaciones de pobreza comunal por ingresos y multidimensional derivadas de la encuesta CASEN mediante metodología SAE (Estimación de Áreas Pequeñas). Incluye tasa, límite inferior y superior del intervalo de confianza por comuna, año y dimensión. |
+| [`precipitaciones_dgac`](precipitaciones_dgac.md) | Precipitaciones diarias por estación meteorológica DGAC: serie 2013–2026 con 143 meses verificables, sin interpolación ni asignación de CUT; lagunas de cobertura y licencias explícitas. |
 | [`provincias`](provincias.md) | Capa derivada de provincias para cruces intermedios entre region y comuna. |
 | [`regiones`](regiones.md) | Capa derivada de regiones para filtros, joins y referencias administrativas de alto nivel. |
 | [`resultados_educacionales`](resultados_educacionales.md) | Resultados educacionales agregados por comuna y año, sin registros personales. |

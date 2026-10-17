@@ -213,7 +213,7 @@ Trabajar con datos públicos chilenos suele implicar los mismos obstáculos:
 | **Procedencia documentada** | Cada dataset declara su fuente oficial exacta con URL directa al organismo público emisor (BCN, INE, MINEDUC, BCCh, MINSAL, datos.gob.cl). | [`provenance_report.md`](data/normalized/provenance_report.md) — fuente, modo y timestamp por capa |
 | **Auditoría legal explícita** | <!-- START_REDISTRIBUTION_SUMMARY -->Licencia, atribución requerida y permiso de redistribución verificados dataset por dataset — reporte regenerado en cada build en [`redistribution_report.md`](data/normalized/redistribution_report.md).<!-- END_REDISTRIBUTION_SUMMARY --> | [`redistribution_report.md`](data/normalized/redistribution_report.md) + [`AGENTS.md §6`](AGENTS.md) |
 | **Pipeline fail-loud** | Si una validación falla, el pipeline **aborta** — no publica datos corruptos, no emite advertencias silenciosas. | [`ADR-001`](docs/adr/ADR-001-pipeline-lineal-determinista.md) — fail-loud como decisión de arquitectura |
-| **Contratos de esquema** | <!-- START_CONTRACT_COUNT -->25 contratos JSON Schema ([`contracts/datasets/`](contracts/datasets/)) definen columnas esperadas, tipos, claves primarias y cobertura. Se validan **en cada build** automáticamente.<!-- END_CONTRACT_COUNT --> | [`ADR-005`](docs/adr/ADR-005-contratos-esquema-json-schema.md) + `contracts/datasets/*.json` |
+| **Contratos de esquema** | <!-- START_CONTRACT_COUNT -->26 contratos JSON Schema ([`contracts/datasets/`](contracts/datasets/)) definen columnas esperadas, tipos, claves primarias y cobertura. Se validan **en cada build** automáticamente.<!-- END_CONTRACT_COUNT --> | [`ADR-005`](docs/adr/ADR-005-contratos-esquema-json-schema.md) + `contracts/datasets/*.json` |
 | **Salud transparente** | <!-- START_HEALTH_SUMMARY -->Dashboard público con severidad, frescura, cobertura, drift y degradación por dataset — regenerado en cada build en [`hub_health.md`](data/normalized/hub_health.md).<!-- END_HEALTH_SUMMARY --> | [`hub_health.md`](data/normalized/hub_health.md) — estado completo actualizado en cada build |
 | **Calidad medida** | <!-- START_QUALITY_SUMMARY -->Puntuación compuesta A-F por dataset (validación, contrato, madurez de fuente, frescura, cobertura y política de reúso); scorecard completo en [`dataset_quality.md`](data/normalized/dataset_quality.md).<!-- END_QUALITY_SUMMARY --> | [`dataset_quality.md`](data/normalized/dataset_quality.md) — scorecard completo |
 
@@ -233,7 +233,7 @@ El mismo estado se publica en el sitio, con historial de builds y detalle por ca
 ### Respaldo adicional
 
 <!-- START_TEST_COUNT -->
-- **1440 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
+- **1443 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
 <!-- END_TEST_COUNT -->
 <!-- START_ADR_COUNT -->
 - **24 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
@@ -288,9 +288,10 @@ Mapa territorial interactivo: las 346 comunas con 7 métricas seleccionables
 | 20 | **Estadísticas Vitales** | INE | CC BY 4.0 | Anual |
 | 21 | **Permisos de Edificación** | MINVU / CEDOC | Uso c/cita | Mensual |
 | 22 | **Calidad del Aire** | MMA / SINCA | Revisión términos | Diaria |
-| 23 | **geometria_comunal** | — | — | — |
-| 24 | **Delincuencia Comunal** | CEAD / SPD | Revisión términos | — |
-| 25 | **Autoridades Locales** | BCN SIIT + Wikipedia | CC BY / CC BY-SA | — |
+| 23 | **precipitaciones_dgac** | — | — | Trimestral |
+| 24 | **geometria_comunal** | — | — | — |
+| 25 | **Delincuencia Comunal** | CEAD / SPD | Revisión términos | — |
+| 26 | **Autoridades Locales** | BCN SIIT + Wikipedia | CC BY / CC BY-SA | — |
 
 > **Métricas por build:** el modo de la última extracción, el conteo de
 > registros, la cobertura y la frescura viven en
@@ -544,7 +545,7 @@ flowchart TB
 | Servicios públicos | `salud_extractor.py`, `mineduc_establecimientos_extractor.py`, `mineduc_resultados_extractor.py` |
 | Economía | `bcentral_extractor.py`, `sinim_finanzas_extractor.py`, `sinim_finanzas_live_extractor.py`, `res_extractor.py`, `consumo_electrico_extractor.py`, `permisos_edificacion_extractor.py` |
 | Indicadores urbanos | `siedu_extractor.py` |
-| Medio ambiente | `calidad_aire_extractor.py` |
+| Medio ambiente | `calidad_aire_extractor.py`, `precipitaciones_dgac_extractor.py` |
 | Política | `partidos_politicos_extractor.py`, `autoridades_electas_extractor.py`, `autoridades_locales_extractor.py` |
 | Seguridad (carril `candidate`) | `cead_delincuencia_live_extractor.py` |
 | Derivado en `build_dev_db.py` (sin extractor) | `perfil_territorial_comunal` |
@@ -953,7 +954,19 @@ Autor y mantenedor: **Carlos Ortega** — ORCID [0009-0000-3470-6181](https://or
 | `url_fuente` | `VARCHAR` | `"https://sinca.mma.gob.cl/index.php/json/listadomapa2k19/"` |
 | `fecha_fuente` | `VARCHAR` | `"2026-09-15"` |
 
-**23. geometria_comunal** — Límites poligonales de las 346 comunas de Chile (GeoParquet, geometría 'generalizada' — simplificada para cartografía a escala nacional, no apta para trabajo de precisión geodésica ni catastral). Fuente: BCN ArcGIS (tematico/Comunas_Generalizadas). Artefacto separado de `comunas`, unido por `codigo_comuna`. (en carril candidate — datos no incluidos en el bundle público) (PK: codigo_comuna)
+**23. precipitaciones_dgac** — Precipitaciones diarias por estación meteorológica DGAC: serie 2013–2026 con 143 meses verificables, sin interpolación ni asignación de CUT; lagunas de cobertura y licencias explícitas. (PK: fecha, id_estacion)
+| Columna | Tipo | Ejemplo |
+|:---|:---|:---|
+| `fecha` | `VARCHAR` | `"2013-01-01"` |
+| `id_estacion` | `VARCHAR(6)` | `"180005"` |
+| `nombre_estacion` | `VARCHAR` | `"Chacalluta, Arica Ap."` |
+| `latitud_dms` | `VARCHAR` | `"18° 21' 20'' S"` |
+| `altitud_m` | `DOUBLE` | `50` |
+| `precipitacion_mm` | `DOUBLE` | `0.5` |
+| `url_fuente` | `VARCHAR` | `"https://datos.gob.cl/dataset/.../download/precipitacion_012013.csv"` |
+| `licencia_fuente` | `VARCHAR` | `"cc-by"` |
+
+**24. geometria_comunal** — Límites poligonales de las 346 comunas de Chile (GeoParquet, geometría 'generalizada' — simplificada para cartografía a escala nacional, no apta para trabajo de precisión geodésica ni catastral). Fuente: BCN ArcGIS (tematico/Comunas_Generalizadas). Artefacto separado de `comunas`, unido por `codigo_comuna`. (en carril candidate — datos no incluidos en el bundle público) (PK: codigo_comuna)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
 | `codigo_region` | `VARCHAR(2)` | `"01"` |
@@ -963,7 +976,7 @@ Autor y mantenedor: **Carlos Ortega** — ORCID [0009-0000-3470-6181](https://or
 | `nombre_region` | `VARCHAR` | `"Región de Tarapacá"` |
 | `geometry` | `BINARY` | `"WKB — Polygon o MultiPolygon en EPSG:4326 (WGS84), geoparquet 1.0"` |
 
-**24. delincuencia_comunal** — DEPRECATED 2026-09-15: Casos policiales de Delitos de Mayor Connotación Social (DMCS) y otras categorías por comuna y mes. Sin fuente estructurada oficial (solo scraping frágil) y no redistribuible; extractor neutralizado y fuera del scrape mensual. Ver docs/datasets/delincuencia_comunal.md. (en carril candidate — datos no incluidos en el bundle público) (PK: anio, mes, codigo_comuna, familia_delito)
+**25. delincuencia_comunal** — DEPRECATED 2026-09-15: Casos policiales de Delitos de Mayor Connotación Social (DMCS) y otras categorías por comuna y mes. Sin fuente estructurada oficial (solo scraping frágil) y no redistribuible; extractor neutralizado y fuera del scrape mensual. Ver docs/datasets/delincuencia_comunal.md. (en carril candidate — datos no incluidos en el bundle público) (PK: anio, mes, codigo_comuna, familia_delito)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
 | `codigo_comuna` | `VARCHAR(5)` | `"01101"` |
@@ -973,7 +986,7 @@ Autor y mantenedor: **Carlos Ortega** — ORCID [0009-0000-3470-6181](https://or
 | `familia_delito` | `VARCHAR` | `"robos_violentos"` |
 | `casos` | `INTEGER` | `245` |
 
-**25. autoridades_locales** — Autoridades locales/subnacionales de Chile: gobernadores regionales (Wikipedia, CC-BY-SA) y alcaldes (BCN SIIT, dato público gubernamental). Wikipedia se mantiene como fuente de gobernadores y enriquecimiento opcional de periodo_inicio para alcaldes. Dataset segregado de autoridades_electas por licencia mixta. (en carril candidate — datos no incluidos en el bundle público) (PK: id_autoridad)
+**26. autoridades_locales** — Autoridades locales/subnacionales de Chile: gobernadores regionales (Wikipedia, CC-BY-SA) y alcaldes (BCN SIIT, dato público gubernamental). Wikipedia se mantiene como fuente de gobernadores y enriquecimiento opcional de periodo_inicio para alcaldes. Dataset segregado de autoridades_electas por licencia mixta. (en carril candidate — datos no incluidos en el bundle público) (PK: id_autoridad)
 | Columna | Tipo | Ejemplo |
 |:---|:---|:---|
 | `id_autoridad` | `VARCHAR` | `"gobernador_01"` |

@@ -99,7 +99,7 @@ chile-hub/
 │
 ├── src/
 <!-- START_AGENTS_EXTRACTOR_LIST -->
-│   ├── extractors/                 22 extractores por dataset + 8 módulos compartidos (ver nota abajo)
+│   ├── extractors/                 23 extractores por dataset + 8 módulos compartidos (ver nota abajo)
 │   │   ├── _sinim_shared.py                              Normalización/metadata compartida stub+scraper (Plan 099)
 │   │   ├── autoridades_shared.py                         Esquema canónico del carril autoridades (plan 133a)
 │   │   ├── base.py                                       BaseExtractor ABC (contrato para todos los extractores)
@@ -124,6 +124,7 @@ chile-hub/
 │   │   ├── partidos_politicos_extractor.py               Partidos políticos vigentes (SERVEL) → data/staging/
 │   │   ├── permisos_edificacion_extractor.py             Permisos de edificación por comuna — viviendas (MINVU CEDOC) → data/staging/
 │   │   ├── pobreza_extractor.py                          Pobreza comunal SAE (MDS) → data/staging/
+│   │   ├── precipitaciones_dgac_extractor.py             Precipitaciones diarias por estación (DGAC, CC BY/CC0) → data/staging/
 │   │   ├── res_extractor.py                              Empresas — Registro de Empresas y Sociedades (datos.gob.cl) → data/staging/
 │   │   ├── salud_extractor.py                            Establecimientos de salud (MINSAL) → data/staging/
 │   │   ├── siedu_extractor.py                            Indicadores urbanos SIEDU (INE) → data/staging/
@@ -677,7 +678,7 @@ grep -n "^class " tests/*.py
 | `test_pipeline_logic.py` | No | Lógica interna de `build_dev_db.py`, invariantes CUT, fallback de indicadores, severidad de `dataset_changelog.json`, builders (`reports`, `pipeline_status_utils`) |
 | `test_proof_of_value.py` | No | Prueba reproducible de tres cruces territoriales, cobertura, integridad CUT y hash de resultados (sin red) |
 | `test_render.py` | No | Helper de renderizado de tablas (`_render.py`) |
-| `test_research_dgac_precipitaciones.py` | No | Histórico DGAC: CSV sin cabeceras, cobertura de meses, licencias, hashes y fallos cerrados (sin red) |
+| `test_research_dgac_precipitaciones.py` | No | Candidato DGAC: CSV sin cabeceras, cobertura de meses, licencias, hashes y fallos cerrados (sin red) |
 | `test_validation.py` | No | Funciones `validate_*()` del paquete `src/validation/`: bordes vacíos, claves duplicadas, casos límite |
 | `test_verify_pipeline.py` | Sí (`make build` antes) | Verificación de pipeline (`verify_pipeline.py`) — guardia pre-publicación de artefactos |
 
