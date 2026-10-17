@@ -207,7 +207,7 @@ def harvest(output: Path) -> dict[str, Any]:
     metadata = {
         "dataset": "precipitaciones_dgac",
         "publication_track": "candidate",
-        "generated_at_utc": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "generated_at_utc": dt.datetime.now(dt.UTC).isoformat(),
         "source_name": SOURCE,
         "source_url": "https://datos.gob.cl/organization/direccion_general_de_aeronautica_civil",
         "source_mode": "live",
