@@ -459,24 +459,32 @@ function wireDatasetExampleInteractions() {
     });
 }
 
-function renderCandidateSection(bundle, grid, artifactManifestByPath) {
-    const candidates = bundle.candidate_datasets || [];
+function renderCandidateSection(sourceRegistry, grid) {
+    // Los registros vigentes proceden del source_registry publicado junto al sitio.
+    // El hub_bundle.json puede tener snapshots antiguos y candidatas deprecadas;
+    // nunca debe decidir cuántas candidatas activas muestra la web.
+    const candidates = sourceRegistry.filter(
+        source => source.publication_track === "candidate" && source.maturity_status !== "deprecated"
+    );
+    const deprecatedCount = sourceRegistry.filter(
+        source => source.publication_track === "candidate" && source.maturity_status === "deprecated"
+    ).length;
     if (candidates.length === 0) return;
 
     const cardsHtml = candidates.map(candidate => {
-        const searchable = [candidate.dataset, candidate.maturity_status, candidate.source_detail, candidate.next_action]
-            .filter(Boolean)
-            .join(" ");
+        const searchable = [
+            candidate.dataset, candidate.maturity_status, candidate.source_name,
+            candidate.next_action
+        ].filter(Boolean).join(" ");
         return `
             <article class="dataset-card candidate-card" id="candidate-${escapeHtml(candidate.dataset)}" data-search="${escapeHtml(searchable)}">
                 <div class="dataset-card-top">
                     <div>
                         <h4 class="dataset-name">${escapeHtml(datasetDisplayName(candidate.dataset))}</h4>
-                        <div class="dataset-desc">Evaluado, no incluido en el bundle público.</div>
+                        <div class="dataset-desc">En evaluación; todavía no incluida en el bundle público.</div>
                     </div>
                     <span class="dataset-badge candidate">candidate</span>
                 </div>
-
                 <div class="dataset-facts-grid">
                     <div class="dataset-fact-mini">
                         <span class="dataset-fact-mini-label">Estado</span>
@@ -484,14 +492,12 @@ function renderCandidateSection(bundle, grid, artifactManifestByPath) {
                     </div>
                     <div class="dataset-fact-mini">
                         <span class="dataset-fact-mini-label">Fuente</span>
-                        <span class="dataset-fact-mini-value" title="${escapeHtml(candidate.source_detail || "")}">${escapeHtml(candidate.source_detail || "N/D")}</span>
+                        <span class="dataset-fact-mini-value" title="${escapeHtml(candidate.source_name || "")}">${escapeHtml(candidate.source_name || "N/D")}</span>
                     </div>
                 </div>
-
                 <div class="candidate-next-action">${escapeHtml(candidate.next_action || "Sin acción registrada.")}</div>
-
                 <div class="dataset-card-actions">
-                    <a class="btn-card-action muted" href="data/normalized/hub_bundle.json" target="_blank" rel="noopener noreferrer">Ver metadata en Bundle JSON</a>
+                    <a class="btn-card-action muted" href="reference/datasets/${encodeURIComponent(candidate.dataset)}/">Ver ficha y limitaciones</a>
                 </div>
             </article>
         `;
@@ -508,9 +514,12 @@ function renderCandidateSection(bundle, grid, artifactManifestByPath) {
                 <span class="catalog-category-count">${candidates.length}</span>
             </h3>
         </div>
-        <div class="catalog-grid-sub">
-            ${cardsHtml}
-        </div>
+        <p class="candidate-summary-note">
+            ${candidates.length} candidatas activas del registro oficial del proyecto.
+            ${deprecatedCount} deprecadas no se muestran.
+            La investigación DGAC se documenta por separado.
+        </p>
+        <div class="catalog-grid-sub">${cardsHtml}</div>
     `;
     grid.appendChild(section);
 }
@@ -923,16 +932,23 @@ function loadCatalog() {
         }),
         fetch(dataUrl("data/normalized/artifact_manifest.json"), { cache: "no-store" })
             .then(res => res.ok ? res.json() : null)
-            .catch(() => null)
+            .catch(() => null),
+        fetch(dataUrl("data/source_registry.json"), { cache: "no-store" }).then(res => {
+            if (!res.ok) throw new Error("No se pudo consultar el registro de fuentes");
+            return res.json();
+        }).then(registry => {
+            if (!Array.isArray(registry)) throw new Error("Registro de fuentes no es una lista");
+            return registry;
+        })
     ])
-        .then(([bundle, manifest]) => {
+        .then(([bundle, manifest, sourceRegistry]) => {
             artifactManifestByPath = Object.fromEntries(
                 (manifest?.artifacts || []).map(entry => [entry.path, entry])
             );
             packageManifestByPath = Object.fromEntries(
                 (manifest?.packages || []).map(entry => [entry.path, entry])
             );
-            renderCatalog(bundle);
+            renderCatalog(bundle, sourceRegistry);
         })
         .catch(err => {
             console.error("Error cargando catálogo:", err);
@@ -957,7 +973,7 @@ function loadCatalog() {
         });
 }
 
-function renderCatalog(bundle) {
+function renderCatalog(bundle, sourceRegistry) {
     const datasets = bundle.datasets || [];
     const health = bundle.health || {};
     const reports = bundle.reports || {};
@@ -1183,7 +1199,7 @@ function renderCatalog(bundle) {
 
     catalogGrid.innerHTML = categoriesHtml;
 
-    renderCandidateSection(bundle, catalogGrid, artifactManifestByPath);
+    renderCandidateSection(sourceRegistry, catalogGrid);
 
     filterCatalog();
 
