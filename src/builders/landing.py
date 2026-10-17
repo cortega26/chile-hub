@@ -106,9 +106,7 @@ def render_hero_publication_status_block(registry=None):
 def extract_hero_publication_status_block(html):
     """Devuelve bloque versionado de hero o None ante marcadores ausentes."""
     match = re.search(
-        re.escape(HERO_PUBLICATION_START_MARKER)
-        + r".*?"
-        + re.escape(HERO_PUBLICATION_END_MARKER),
+        re.escape(HERO_PUBLICATION_START_MARKER) + r".*?" + re.escape(HERO_PUBLICATION_END_MARKER),
         html,
         flags=re.DOTALL,
     )
