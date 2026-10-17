@@ -36,6 +36,12 @@ def verify_snapshot(root: Path = ROOT) -> dict:
         raise ValueError("artifact_manifest.json tiene artifact_count inconsistente")
 
     names = set()
+    verified_hashes = 0
+    # Hub_bundle contiene copias de hashes del propio manifest, que a su vez
+    # indexa hub_bundle. Es un grafo cíclico y el SHA embebido no puede
+    # coincidir con el contenido final sin rediseñar el formato del bundle.
+    # Ambos se comprueban estructuralmente, nunca se anuncian como SHA verificado.
+    cyclic_paths = {MANIFEST.as_posix(), "data/normalized/hub_bundle.json"}
     for artifact in artifacts:
         path = artifact.get("path")
         if (
@@ -50,14 +56,13 @@ def verify_snapshot(root: Path = ROOT) -> dict:
         file = root / path
         if not file.is_file() or file.stat().st_size == 0:
             raise ValueError(f"Falta archivo publicado: {path}")
-        # Auto-referencia: el manifiesto no puede incluir un hash de sí mismo
-        # actualizado sin recursión. Su estructura se valida por separado.
-        if path == MANIFEST.as_posix():
+        if path in cyclic_paths:
             continue
         if artifact.get("size_bytes") != file.stat().st_size:
             raise ValueError(f"Tamaño de artefacto desfasado: {path}")
         if artifact.get("sha256") != sha256_file(file):
             raise ValueError(f"SHA-256 de artefacto desfasado: {path}")
+        verified_hashes += 1
 
     metadata = json.loads((root / DGAC_META).read_text(encoding="utf-8"))
     if metadata.get("sha256") != sha256_file(root / DGAC_CSV):
@@ -78,7 +83,8 @@ def verify_snapshot(root: Path = ROOT) -> dict:
     published = {entry["dataset"] for entry in artifacts if entry.get("dataset")}
     pending = sorted(stable - published)
     return {
-        "manifest_artifacts_verified": len(artifacts) - 1,
+        "manifest_artifacts_verified": verified_hashes,
+        "cyclic_json_excluded_from_hash_check": sorted(names & cyclic_paths),
         "dgac_rows": metadata["record_count"],
         "dgac_months": metadata["months"],
         "stable_layers_awaiting_canonical_publication": pending,
