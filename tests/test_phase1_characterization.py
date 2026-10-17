@@ -222,9 +222,7 @@ def _validate_dgac_isolated_fixture(df, metadata):
     return result
 
 
-def _offline_synthetic_staging(
-    destination: Path, *, include_candidate: bool = True
-) -> dict:
+def _offline_synthetic_staging(destination: Path, *, include_candidate: bool = True) -> dict:
     """Create a test-owned staging tree from static literals only."""
     write_legacy_build_staging_fixture(destination, include_candidate=include_candidate)
     overrides = {
