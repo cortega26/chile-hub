@@ -831,5 +831,39 @@
       "excel_sheet": "Calidad Aire"
     },
     "documentation": "docs/datasets/calidad_aire.md"
+  },
+  "precipitaciones_dgac": {
+    "description": "Precipitaciones diarias por estación meteorológica DGAC: serie 2013–2026 con 143 meses verificables, sin interpolación ni asignación de CUT; lagunas de cobertura y licencias explícitas.",
+    "join_keys": [
+      "fecha",
+      "id_estacion"
+    ],
+    "confidence_tier": "Tier B",
+    "extractor": "src/extractors/precipitaciones_dgac_extractor.py",
+    "expected_record_count": null,
+    "reuse_policy": {
+      "status": "open-attribution",
+      "license": "CC BY + CC0 (licencia individual por archivo)",
+      "license_url": "https://datos.gob.cl/organization/direccion_general_de_aeronautica_civil",
+      "attribution_required": true,
+      "redistribution_ok": true,
+      "summary": "Solo CSV de paquetes DGAC cc-by y cc-zero; 2014 y 2015-I CC-NC excluidos y enero 2017 en cuarentena por datos de temperatura."
+    },
+    "freshness_policy": {
+      "max_age_hours": 2160,
+      "label": "trimestral"
+    },
+    "usage_examples": {
+      "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars(\"precipitaciones_dgac\")\nlluvia = df.filter(pl.col(\"precipitacion_mm\").is_not_null())",
+      "duckdb": "SELECT fecha, id_estacion, precipitacion_mm FROM 'data/normalized/precipitaciones_dgac.parquet' WHERE precipitacion_mm IS NOT NULL ORDER BY fecha DESC LIMIT 20;",
+      "cli": "chile-hub show precipitaciones_dgac"
+    },
+    "outputs": {
+      "parquet": "data/normalized/precipitaciones_dgac.parquet",
+      "duckdb_table": "precipitaciones_dgac",
+      "sqlite_table": "precipitaciones_dgac",
+      "excel_sheet": "Precipitaciones DGAC"
+    },
+    "documentation": "docs/datasets/precipitaciones_dgac.md"
   }
 }
