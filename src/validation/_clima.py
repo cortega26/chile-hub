@@ -34,7 +34,7 @@ def validate_precipitaciones_dgac(
         if df.filter(
             pl.col("id_estacion").is_null()
             | (pl.col("id_estacion").str.len_chars() != 6)
-            | (~pl.col("id_estacion").str.contains(r"^\\d{6}$"))
+            | (~pl.col("id_estacion").str.contains(r"^\d{6}$"))
         ).height:
             errors.append("código de estación inválido")
         if df.filter(pl.col("precipitacion_mm") < 0).height:
