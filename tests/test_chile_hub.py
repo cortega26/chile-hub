@@ -2033,9 +2033,13 @@ class WorkflowContractTests(unittest.TestCase):
         )
 
     def test_pipeline_check_workflow_builds_installable_package_matrix(self):
-        # Plan 095: floor >=3.11 (3.10 EOL 2026-10-31 + fork pandas 2.3.3/3.0.3
-        # en el lock). La matriz ya no incluye 3.10 a propósito.
-        self.assertIn('python-version: ["3.11", "3.12", "3.13", "3.14"]', self.workflow_text)
+        # Plan 095 + Plan 128: floor >=3.11, soporte 3.15 (3.10 EOL 2026-10-31 +
+        # fork pandas 2.3.3/3.0.3 en el lock). La matriz ya no incluye 3.10 a
+        # propósito y añade 3.15 para forward-compat.
+        self.assertIn(
+            'python-version: ["3.11", "3.12", "3.13", "3.14", "3.15"]', self.workflow_text
+        )
+        self.assertNotIn('"3.10"', self.workflow_text)
         self.assertNotIn('"3.10"', self.workflow_text)
         self.assertIn("uv build", self.workflow_text)
         # ADR-024: twine corre desde el lock (twine==7.0.0 del dev-pin), no
