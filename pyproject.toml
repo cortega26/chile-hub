@@ -7,7 +7,7 @@ name = "chile-hub"
 version = "1.50.0"
 description = "Datos públicos de Chile curados, normalizados y validados: geografía, demografía, economía, salud, educación, finanzas municipales, indicadores urbanos y distritos electorales. Listos para consumir en una línea de código con Polars, DuckDB, SQLite y Excel."
 readme = "README.md"
-requires-python = ">=3.11,<3.15"
+requires-python = ">=3.11,<3.16"
 license = "MIT"
 authors = [
     { name = "Carlos Ortega" },
@@ -30,6 +30,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
     "Topic :: Database",
     "Topic :: Scientific/Engineering :: Information Analysis",
 ]

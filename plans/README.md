@@ -802,7 +802,7 @@ ya no aplique.
 
 | # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de / solapa | Estado |
 |---|------|----------|----------|--------|---------------------|--------|
-| 128 | [Python 3.15 + DuckDB-Wasm al día](128-deps-forward-compat.md) | P1/P3 | S/M | LOW-MED | — | PARTIAL (2026-09-29: Step 2 DONE commit 915ee8c; Step 1 BLOCKED hasta 2026-10-01) |
+| 128 | [Python 3.15 + DuckDB-Wasm al día](128-deps-forward-compat.md) | P1/P3 | S/M | LOW-MED | — | DONE (2026-10-22: Step 1 ejecutado en worktree `advisor/128-deps-forward-compat`, commit `06946c2`; `requires-python >=3.11,<3.16`, classifier 3.15, matriz CI, badge README, uv.lock regenerado sin bumps de versión; Step 2 ya estaba DONE) |
 
 ### Planes archivados (auditoría `/improve deep` 2026-09-29 — Wave 1)
 
@@ -981,7 +981,7 @@ registry MCP (`54c1691`; `sync_server_json_version` en
 | 139 | [Promote geometria_comunal candidate to stable](139-geometria-stable-promotion.md) | P1 | M | MED | Superado por 145/146 | BLOCKED-CLOSED (2026-10-15 — 2 rounds probaron que la promoción exige cambio de pipeline; decisión (C) aceptada y ejecutada en 146; rama `advisor/139-geometria-stable-promotion` queda como registro, NO mergear) |
 | 145 | [Wire geometria_comunal into the build pipeline (spike + decision)](145-geometria-pipeline-spike.md) | P1 | S | LOW | 139 (reuses its evidence + metadata-half branch) | DONE (2026-10-15 — worktree `/tmp/opencode/chile-hub-145`, cero cambios, status limpio; recomienda (C) revert con nueva `review_by` + condición explícita; lista de archivos para (A) + riesgos + pregunta al mantenedor en el reporte) |
 | 146 | [Close-out geometria decision (C) + monthly rebuild one-liner](146-geometria-closeout-monthly-fix.md) | P1 | S | LOW | 145 (decisión (C) aceptada 2026-10-15) | DONE (2026-10-15 — worktree `/tmp/opencode/chile-hub-146`, branch `advisor/146-geometria-closeout`, commits `553b254`+`1f20cb6`; review_by 2026-12-31 + condición idéntica en spec/registry, one-liner `uv run`; focal 183 + doctor/lint/format verdes; prueba mensual real pendiente del schedule) |
-| 147 | [Stealth-fetch for SINCA calidad_aire (anti-403)](147-sinca-stealth-fetch.md) | P1 | S | LOW-MED | none (CI rojo 2026-10-16, 403 runner-IP ×2) | DONE (2026-10-16 — worktree `/tmp/opencode/chile-hub-147`, branch `advisor/147-sinca-stealth-fetch`, commits `5d0fcf6`+`b931f63`; transporte-only, 3 tests nuevos, focal verde; prueba CI pendiente (solo runner-IP reproduce); scrapling queda como escalación condicional) |
+| 147 | [Stealth-fetch for SINCA calidad_aire (anti-403)](147-sinca-stealth-fetch.md) | P1 | S | LOW-MED | none (CI rojo 2026-10-16, 403 runner-IP ×2) | DONE (2026-10-16 — worktree `/tmp/opencode/chile-hub-147`, branch `advisor/147-sinca-stealth-fetch`, commits `5d0fcf6`+`b931f63`; transporte-only, 3 tests nuevos, focal verde; prueba CI pendiente (solo runner-IP reproduce); scrapling queda como escalación condicional; MERGED PR #182 2026-10-16 — push-run rojo solo con los 3 golden conocidos del 141; dispatch publish 38839754648 PROBÓ stealth insuficiente (fallback persiste con impersonación → bloqueo a nivel IP, no fingerprint; scrapling NO ayudaría — mismo egress; despriorizado); publish correctamente bloqueado por fail-loud hasta que SINCA desbloquee o el mantenedor decida política) |
 | 140 | [Segregate autoridades_locales for stable alcaldes](140-autoridades-segregated-alcaldes.md) | P2 | S-M | LOW-MED | — (diseño/spike; implementación posterior a decisión de licencia) | DONE (2026-10-15 — worktree `/tmp/opencode/chile-hub-140`, branch `advisor/140-autoridades-segregation-spike`, commit `8c141d0`; apéndice docs-only + doctor verde; recomienda A (dos claves) con diffs triple-copia; hallazgos: sin `validate_autoridades_locales` (exento), `periodo_inicio` es la única celda share-alike en filas alcalde) |
 | 141 | [Enrich perfil_territorial_comunal with pobreza](141-perfil-pobreza-enrichment.md) | P2 | S + spike | LOW | — | DONE (2026-10-15 — worktree `/tmp/opencode/chile-hub-141`, branch `advisor/141-perfil-pobreza`, commits `2b94608`+`719245f`+`c4d2dcb`; focal 656 + doctor/lint/format verdes; suite 1397 + 3 golden con firma contract-before-data conocida; prueba offline replicada por el reviewer: 346 filas/52 cols, validador ok, contrato ok — CI build-and-test cierra el gap al mergear; empresas: DEFER con match 97.7% medido) |
 | 142 | [Resolver parity across Python, CLI, and MCP](142-resolver-parity-mcp-cli.md) | P2 | S | LOW | — | DONE (2026-10-15 — worktree `/tmp/opencode/chile-hub-142`, branch `advisor/142-resolver-parity`, commits `77d5dee`+`8bfaef2`+`8fedcc2`+`0b9e28e`; suite 1409 + 2 skip, doctor/lint/format verdes; fuzzy spike: exact-only se mantiene, 0 falsos positivos) |
@@ -1013,3 +1013,32 @@ registry MCP (`54c1691`; `sync_server_json_version` en
 - **Kaggle / conda-forge**: diferidos hasta medir el efecto HF (plan 129 métrica 274).
 - **Firma/atestación sigstore**: diferido hasta un segundo publicador (plan 111).
 - **Refresh programado de geometría (manual → schedule)**: diferido a decisión del mantenedor (ver plan 139); no bloquea la promoción.
+
+## Auditoría `/improve next` 2026-10-22 (commit `dff71ef`) — planes 148–149
+
+> **Contexto**: re-auditoría de categoría *dirección* (hacia dónde llevar el proyecto), no de bugs. El repo está muy maduro: todas las auditorías de dirección previas (050–063 en 2026-07, 058–063 en 2026-07, 139–144 en 2026-10) están DONE/archivadas, y las waves 111–130 (`/improve deep` 2026-09-29) están DONE salvo 128 Step 1. Queda una superficie de dirección casi cerrada; los hallazgos net-positivos son dos, ambos diseño/spike de operador y decisión (sin código, sin datasets nuevos — ADR-011 / anti-patrón #10 siguen vigentes).
+>
+> **Planes escritos por defecto (sesión no interactiva)**: 148 y 149, por palanca. El plan 128 Step 1 (Python 3.15) ya existe como PARTIAL y su gate de fecha (2026-10-01) ya pasó, así que se ejecuta tal cual; no se duplica.
+
+### Planes activos
+
+| # | Plan | Prioridad | Esfuerzo | Riesgo | Depende de | Estado |
+|---|------|----------|----------|--------|-----------|--------|
+| 148 | [Convertir el suministro en demanda vía canales oficiales (datos.gob.cl + SGD)](148-adopcion-datos-gob-cl-sgd-outreach.md) | P2 | S-M | LOW | — | DONE (2026-10-22: worktree `advisor/148-adopcion-datos-gob-cl-sgd-outreach`, 2 commits; one-pager `docs/adoption-outreach.md` con 4 acciones ROADMAP §7 + "never say" de AGENTS.md §10; fila cronología en `docs/sostenibilidad/README.md`; `make doctor`/`lint`/`format-check` verdes) |
+| 149 | [Revisar el gate de sostenibilidad el 2026-11-01 (Plan 110 sigue HOLD hasta entonces)](149-sostenibilidad-gate-2026-11-01.md) | P2 | M | LOW | 144 | DONE (2026-10-22: worktree `advisor/149-sostenibilidad-gate-2026-11-01`, commit `2c014b6`; Path A Keep HOLD — veredicto D mantenido, plan 110 sin tocar, próxima revisión abril 2027 si §E termina en Stop; fila cronología #7 en `docs/sostenibilidad/README.md`; `make doctor`/`lint`/`format-check` verdes) |
+
+### Orden de ejecución recomendado
+
+1. **128 Step 1** (Python 3.15) — ya PARTIAL, gate de fecha liberado el 2026-10-01; ejecutar tal cual, sin duplicar.
+2. **148** — outreach de datos.gob.cl + SGD (cierra la asimetría suministro/demanda; bajo esfuerzo, operator-only).
+3. **149** — decisión de sostenibilidad previa al 2026-11-01 (depende de los números estables de 144, ya DONE).
+
+### Hallazgos considerados y rechazados (2026-10-22 — dirección)
+
+| Hallazgo | Motivo |
+|---|---|
+| **mypy --strict ratchet (plan 137)** | Ya planeado (TODO) pero es categoría deuda técnica/calidad, no dirección de producto; no se re-audita aquí. |
+| **Agregar datasets nuevos sobre fuentes frágiles** | Rechazado: ADR-011 / anti-patrón #10; plan 144 veredicto D (0 adopción verificada) mantiene el gate. |
+| **Programa de patrocinios / tiers / SPONSORS.md / sección en landing** | Rechazado hasta cumplir gate §G: `plans/110` HOLD, veredicto D, revisión 2026-11-01 (plan 149). |
+| **Telemetría en el paquete / API premium / README en inglés** | Ya rechazados en auditorías previas (`ROADMAP.md §8`, `docs/backlog/08`); sin cambios. |
+| **Kaggle / conda-forge** | Diferidos: medir el efecto de HF primero (plan 129, 274 descargas). |
