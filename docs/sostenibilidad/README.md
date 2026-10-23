@@ -36,6 +36,7 @@
 | 4 | por definir | Resultado del experimento §E | Decisión entre Avanzar, Servicios, Pivotear o Stop | — | **Diferido** (no iniciado; revisión 2026-11-01) |
 | 5 | 2026-09-30 | Decisión del mantenedor (issue #125) | **No se busca sponsorship por ahora** (0 evidencia de adopción); §E no se inicia; revisión del tema el 2026-11-01 | Cierra la fase de decisión de la Auditoría 3 (D aceptado) | Vigente |
 | 6 | 2026-10-15 | [`docs/adoption-funnel.md`](../adoption-funnel.md) + revisión en [`docs/adoption-review.md`](../adoption-review.md) (plan 144) | Embudo de medición sin telemetría (etapas, refresh semanal, frases permitidas) + números refrescados vía Anexo M + resto ejecutable del plan 107 (sitemap/issues/schedule ok; GSC sin token) | Funnel definido; 107-remainder ejecutado y registrado; ninguna línea vanidosa nueva; veredicto D sin cambios | **Vigente — pendiente revisión 2026-11-01** |
+| 7 | 2026-10-22 | [`plans/149-sostenibilidad-gate-2026-11-01.md`](../../plans/149-sostenibilidad-gate-2026-11-01.md) | Pre-revisión del gate de sostenibilidad 2026-11-01: decisión Path A (Keep HOLD) — veredicto D de la Auditoría 3 mantenido, plan 110 en HOLD, sin búsqueda de sponsorship, próxima revisión abril 2027 solo si §E termina en Stop | Veredicto D sin cambios; plan 110 sigue HOLD; sin contacto a sponsors | **HOLD mantenido hasta 2026-11-01** |
 
 ## Conclusiones de la Auditoría 3 (resumen)
 
