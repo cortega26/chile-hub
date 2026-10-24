@@ -1400,24 +1400,40 @@ function renderTable() {
     nextBtn.disabled = endIdx >= filteredComunas.length;
 }
 
+function normalizeText(text) {
+    return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+// Relevancia de una comuna para el texto buscado (menor = más relevante); null si no coincide.
+// 0 nombre/código exacto · 1 nombre empieza con · 2 nombre contiene · 3 provincia · 4 región · 5 código parcial
+function matchRank(c, query) {
+    const name = c.nombre_comuna_clean;
+    if (name === query || c.codigo_comuna === query) return 0;
+    if (name.startsWith(query)) return 1;
+    if (name.includes(query)) return 2;
+    if (normalizeText(c.nombre_provincia).includes(query)) return 3;
+    if (normalizeText(c.nombre_region).includes(query)) return 4;
+    if (c.codigo_comuna.includes(query)) return 5;
+    return null;
+}
+
 // Filtro y búsqueda reactiva
 function applyFilters() {
-    const query = searchInput.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const query = normalizeText(searchInput.value);
     const selectedRegion = regionFilter.value;
 
-    filteredComunas = comunas.filter(c => {
-        // Filtro por Región
-        const matchRegion = !selectedRegion || c.codigo_region === selectedRegion;
+    const inRegion = comunas.filter(c => !selectedRegion || c.codigo_region === selectedRegion);
 
-        // Filtro de Texto (sobre comuna, provincia y región desnormalizada)
-        const matchText = !query ||
-            c.nombre_comuna_clean.includes(query) ||
-            c.nombre_provincia.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(query) ||
-            c.nombre_region.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(query) ||
-            c.codigo_comuna.includes(query);
-
-        return matchRegion && matchText;
-    });
+    if (!query) {
+        filteredComunas = inRegion;
+    } else {
+        // Ranking por tipo de coincidencia; dentro de cada grupo, mayor población primero.
+        filteredComunas = inRegion
+            .map(c => ({ c, rank: matchRank(c, query) }))
+            .filter(entry => entry.rank !== null)
+            .sort((a, b) => a.rank - b.rank || (b.c.poblacion_estimada ?? 0) - (a.c.poblacion_estimada ?? 0))
+            .map(entry => entry.c);
+    }
 
     currentPage = 1; // Reseteamos a la página 1 tras cambiar filtros
     renderTable();
