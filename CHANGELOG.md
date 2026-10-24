@@ -12,6 +12,54 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.51.0 - 2026-10-24
+
+### Corregido
+
+- **site**: Ordenar búsqueda de comunas por relevancia
+  ([#199](https://github.com/cortega26/chile-hub/pull/199),
+  [`61c393b`](https://github.com/cortega26/chile-hub/commit/61c393b14cc064972de54e34a76c27f8b2a12149))
+
+### Mantenimiento
+
+- **deps**: Actualiza dependencias transitivas con CVEs de pip-audit
+  ([#200](https://github.com/cortega26/chile-hub/pull/200),
+  [`0d41668`](https://github.com/cortega26/chile-hub/commit/0d41668fd860c9a14904ea3344929bd5af4819fe))
+
+- **deps**: Bump the codeql-action group with 2 updates
+  ([#197](https://github.com/cortega26/chile-hub/pull/197),
+  [`940a637`](https://github.com/cortega26/chile-hub/commit/940a63783461f11ff39e948c5e0b80bf10a1afff))
+
+- **deps**: Sync uv.lock [skip ci] ([#196](https://github.com/cortega26/chile-hub/pull/196),
+  [`12638e8`](https://github.com/cortega26/chile-hub/commit/12638e89f1983430d3ff12e55aaf26113f0a5f7e))
+
+- **deps-dev**: Bump the python-dev group with 5 updates
+  ([#196](https://github.com/cortega26/chile-hub/pull/196),
+  [`12638e8`](https://github.com/cortega26/chile-hub/commit/12638e89f1983430d3ff12e55aaf26113f0a5f7e))
+
+### Documentación
+
+- **outreach**: Add one-pager con 4 acciones de ROADMAP §7 para datos.gob.cl y SGD
+  ([`ef7a85d`](https://github.com/cortega26/chile-hub/commit/ef7a85d585de977dec978129e68838a4c90a49b3))
+
+- **sostenibilidad**: Pre-revisión gate 2026-11-01, HOLD mantenido (veredicto D)
+  ([`2c014b6`](https://github.com/cortega26/chile-hub/commit/2c014b6fc26118f2ac4a9af693e67d907f4192b7))
+
+- **sostenibilidad**: Registrar outreach 148 en cronología (sin contacto externo ni pedido de
+  dinero)
+  ([`179bc97`](https://github.com/cortega26/chile-hub/commit/179bc973ef6a1b7f96d03b85650f06664e713cd6))
+
+### Agregado
+
+- **deps**: Soporta Python 3.15
+  ([`06946c2`](https://github.com/cortega26/chile-hub/commit/06946c27e9b68ca38fdf712a736de49f78daaea4))
+
+### Tests
+
+- **workflow**: Matriz CI incluye Python 3.15 (plan 128)
+  ([`70be6e9`](https://github.com/cortega26/chile-hub/commit/70be6e9a0e85d35a3d5fd04402c0ddbbbcf124e3))
+
+
 ## 1.50.0 - 2026-10-17
 
 ### Corregido
