@@ -48,7 +48,7 @@ INDICADORES_NON_SYNTHETIC_DELIVERY = {
     # visible para que el gate de publicación evalúe el dato real scrapeado.
     "ine_override",
 }
-EXPECTED_DATASET_COUNT = 22
+EXPECTED_DATASET_COUNT = 23
 # Datasets candidate (p. ej. consumo_electrico_comunal) no tienen tarjeta en
 # la landing page, así que build_hub_health filtra el top_issue de los
 # artefactos estáticos (hub_health.json/hub_bundle.json/overview.json y
@@ -57,10 +57,13 @@ EXPECTED_DATASET_COUNT = 22
 # equivalentes CLI) recalculan en vivo sin ese filtro — a propósito, ya que
 # no están atados a ningún enlace HTML — así que legítimamente difieren.
 # Historial del top de BUILD: fue "empresas" hasta que issue #42 eliminó su
-# único warning accionable (quedó solo la nota RES informativa); desde
-# entonces el top real es "indicadores" (stale crónico, issue #43). Cambiar
-# este valor solo si la salud de las fuentes lo justifica.
-EXPECTED_BUILD_TOP_ISSUE = "indicadores"
+# único warning accionable; luego "indicadores" por stale crónico (issue #43),
+# que dejó de serlo al entrar el backfill publicado del IPC. Desde el
+# 2026-10-25 el top real es "calidad_aire": cobertura parcial por diseño
+# (66/346 comunas con estación) + drift, con el agregado de que su serie se
+# retiene cuando la fuente no responde (plan 150). Cambiar este valor solo si
+# la salud de las fuentes lo justifica; no para "hacer pasar" un build.
+EXPECTED_BUILD_TOP_ISSUE = "calidad_aire"
 
 
 def _assert_summary_has_recovery_source_detail(test_case, summary):
@@ -233,6 +236,7 @@ class ChileHubTests(unittest.TestCase):
                 "estadisticas_vitales",
                 "permisos_edificacion",
                 "calidad_aire",
+                "precipitaciones_dgac",
             ],
         )
 
@@ -442,6 +446,9 @@ class ChileHubTests(unittest.TestCase):
                 "estadisticas_vitales": "ok",
                 "permisos_edificacion": "ok",
                 "calidad_aire": "ok",
+                # 23 desde el 2026-10-25: precipitaciones_dgac graduó a
+                # stable_publishable (plan 150 / registry).
+                "precipitaciones_dgac": "ok",
             },
         )
         warning_counts = {item["dataset"]: item["warning_count"] for item in summary}
@@ -1447,6 +1454,7 @@ class ChileHubCliTests(unittest.TestCase):
                 "estadisticas_vitales",
                 "permisos_edificacion",
                 "calidad_aire",
+                "precipitaciones_dgac",
             ],
         )
 

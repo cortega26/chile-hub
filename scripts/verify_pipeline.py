@@ -17,6 +17,7 @@ if str(SRC_DIR) not in sys.path:
 from src.build_dev_db import DATASET_CATALOG_CONFIG
 from src.builders._shared import NON_FALLBACK_SOURCE_MODES as _NON_FALLBACK_SOURCE_MODES
 from src.builders._shared import VALID_SOURCE_MODES as _VALID_SOURCE_MODES
+from src.builders.publication_gate import MAX_HELD_BUILDS as _MAX_HELD_BUILDS
 from src.chile_hub.contracts import verify_dataset_contract as _lib_verify_contract
 from src.extractors.bcentral_extractor import max_backfill_age_days as _max_backfill_age_days
 from src.pipeline_status_utils import load_json
@@ -516,16 +517,20 @@ def verify_staging_not_newer_than_normalized():
 DEFAULT_MAX_RECORD_DROP_PCT = 20.0
 
 
-def record_drop_violations(changelog, stable_names, allow_record_drop=None):
+def record_drop_violations(changelog, stable_names, allow_record_drop=None, held_names=None):
     """Datasets stable_publishable cuyo conteo cae más que el umbral.
 
     Usa `record_count_delta` de dataset_changelog.json, que el build calcula
     contra el pipeline_metadata.json publicado antes de regenerarlo.
+
+    Los datasets retenidos (plan 150) se excluyen: su conteo es el del artefacto
+    previo por construcción, así que no aportan señal.
     """
     violations = []
+    skip = held_names or set()
     for entry in (changelog or {}).get("datasets", []):
         name = entry.get("dataset")
-        if name not in stable_names or name in (allow_record_drop or set()):
+        if name not in stable_names or name in (allow_record_drop or set()) or name in skip:
             continue
         previous = entry.get("previous_record_count")
         delta = entry.get("record_count_delta")
@@ -550,6 +555,32 @@ def stable_publishable_dataset_names(registry):
         if entry.get("publication_track") == "stable_publishable"
         and entry.get("public_bundle_eligible") is True
     }
+
+
+def _publication_hold_violations(dataset_name, hold):
+    """Integridad de la marca de retención (plan 150, ADR-025).
+
+    Un dataset retenido no se evalúa por frescura —su dato es el último bueno—
+    sino por la consistencia y la edad de la retención: sin marca completa, o
+    retenido más allá del tope, el build no puede publicarse.
+    """
+    violations = []
+    if not hold.get("retained"):
+        violations.append(f"{dataset_name}: publication_hold sin retained=true")
+    if not hold.get("reason"):
+        violations.append(f"{dataset_name}: publication_hold sin reason")
+    if not hold.get("previous_generated_at_utc"):
+        violations.append(f"{dataset_name}: publication_hold sin previous_generated_at_utc")
+    builds_held = hold.get("builds_held")
+    if not isinstance(builds_held, int) or builds_held < 1:
+        violations.append(f"{dataset_name}: publication_hold.builds_held inválido: {builds_held}")
+    elif builds_held > _MAX_HELD_BUILDS:
+        violations.append(
+            f"{dataset_name}: retenido {builds_held} builds consecutivos (tope "
+            f"{_MAX_HELD_BUILDS}). La fuente no se recuperó: decidir entre repararla, "
+            "sacarla del carril stable_publishable o retirarla (AGENTS.md §6)"
+        )
+    return violations
 
 
 def verify_publication_policy(
@@ -587,11 +618,19 @@ def verify_publication_policy(
         entry["dataset"]: entry.get("fallback_policy", "none") for entry in registry
     }
 
-    # Check stable_publishable datasets: require live + fresh
+    # Check stable_publishable datasets: require live + fresh, unless the
+    # dataset was explicitly held (plan 150, ADR-025): en ese caso se publica
+    # su última versión buena y lo que se valida es la integridad de la marca.
+    held_names = set()
     for dataset_name in sorted(stable_publicable):
         dataset = metadata.get("datasets", {}).get(dataset_name, {})
         if not dataset:
             violations.append(f"{dataset_name}: missing from pipeline_metadata")
+            continue
+        hold = dataset.get("publication_hold")
+        if hold:
+            held_names.add(dataset_name)
+            violations.extend(_publication_hold_violations(dataset_name, hold))
             continue
         freshness = dataset.get("freshness", {})
         if dataset.get("source_mode") not in NON_FALLBACK_SOURCE_MODES:
@@ -686,7 +725,11 @@ def verify_publication_policy(
                 "--allow-known-anomalies tras confirmar con la fuente, ver ADR-013)"
             )
 
-    violations.extend(record_drop_violations(changelog, stable_publicable, allow_record_drop))
+    violations.extend(
+        record_drop_violations(
+            changelog, stable_publicable, allow_record_drop, held_names=held_names
+        )
+    )
 
     if violations:
         fail("Publication policy rejected this build: " + "; ".join(violations))
@@ -695,7 +738,8 @@ def verify_publication_policy(
     candidate_count = len(candidate_names)
     print(
         "Publication policy passed: "
-        f"{stable_count} stable_publishable datasets verified, "
+        f"{stable_count} stable_publishable datasets verified "
+        f"({len(held_names)} held: {', '.join(sorted(held_names)) or 'none'}), "
         f"{candidate_count} candidate datasets excluded from public bundle."
     )
 

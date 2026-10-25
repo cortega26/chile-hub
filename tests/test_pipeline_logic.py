@@ -5299,19 +5299,38 @@ class DriftTaxonomyTests(unittest.TestCase):
         - dataset_count 21 → 22: nuevo dataset `calidad_aire`
           (SINCA, cobertura parcial declarada esperada, sin warnings
           accionables). No altera los contadores de drift/warn/retired.
+        - dataset_count 22 → 23: `precipitaciones_dgac` graduó a
+          stable_publishable (plan 150, registry, review_by 2027-01-15).
 
-        Queda `indicadores`, que es un problema real y abierto (issue #43).
+        Desde el plan 150 un dataset `held` aparece `drifted` por construcción
+        (su dato es el de la versión anterior). Por eso el invariante ya no se
+        expresa como un número fijo de drift, sino sobre el conjunto **activo y
+        refrescado**: entre esos, el único problema real y abierto sigue siendo
+        `indicadores` (issue #43). `held_count` da la señal de los retenidos.
         """
         health = json.loads((NORMALIZED_DIR / "hub_health.json").read_text(encoding="utf-8"))
-        self.assertEqual(health["drifted_count"], 1)
-        self.assertEqual(health["warn_count"], 1)
+        refreshed = [
+            entry for entry in health["datasets"] if not entry["retired"] and not entry.get("held")
+        ]
+        drifted = sorted(
+            entry["dataset"] for entry in refreshed if entry["drift_status"] == "drifted"
+        )
+        self.assertEqual(drifted, ["indicadores"])
+        self.assertEqual(
+            health["held_count"],
+            sum(1 for entry in health["datasets"] if entry.get("held") and not entry["retired"]),
+        )
         self.assertEqual(health["retired_count"], 1)
-        self.assertEqual(health["dataset_count"], 22)
+        self.assertEqual(health["dataset_count"], 23)
         self.assertEqual(health["overall_status"], "warn")
         report = json.loads((NORMALIZED_DIR / "drift_report.json").read_text(encoding="utf-8"))
-        drifted = sorted(e["dataset"] for e in report["datasets"] if e["drift_status"] == "drifted")
-        self.assertEqual(drifted, ["consumo_electrico_comunal", "indicadores"])
-        retired = sorted(e["dataset"] for e in health["datasets"] if e["retired"])
+        drifted_report = sorted(
+            entry["dataset"] for entry in report["datasets"] if entry["drift_status"] == "drifted"
+        )
+        # `calidad_aire` puede estar `held` (plan 150) y entonces aparece
+        # drifted; se afirma solo lo que es invariante.
+        self.assertTrue({"consumo_electrico_comunal", "indicadores"} <= set(drifted_report))
+        retired = sorted(entry["dataset"] for entry in health["datasets"] if entry["retired"])
         self.assertEqual(retired, ["consumo_electrico_comunal"])
 
     def test_empresas_keeps_its_expected_warning_after_the_sentinel_fix(self):

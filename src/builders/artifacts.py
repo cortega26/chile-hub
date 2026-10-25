@@ -160,8 +160,9 @@ def build_publishable_artifact_index():
     return artifact_index
 
 
-def write_artifact_manifest():
+def write_artifact_manifest(held_datasets=None):
     artifact_index = build_publishable_artifact_index()
+    held = set(held_datasets or ())
     artifacts = []
     for filename in sorted(os.listdir(NORMALIZED_DIR)):
         if not filename.endswith(PUBLISHABLE_ARTIFACT_SUFFIXES):
@@ -184,6 +185,9 @@ def write_artifact_manifest():
                 "format": artifact_metadata.get("format"),
                 "size_bytes": os.path.getsize(path),
                 "sha256": compute_sha256(path),
+                # Plan 150 / ADR-025: el consumidor debe poder distinguir un
+                # artefacto refrescado de uno retenido sin leer el catálogo.
+                "retained": artifact_metadata.get("dataset") in held,
             }
         )
 
