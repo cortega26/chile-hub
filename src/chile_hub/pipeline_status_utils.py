@@ -15,6 +15,16 @@ from ._paths import ROOT_DIR  # fuente única de raíz del proyecto (TECHDEBT-05
 
 def write_text_atomic(content, path):
     path_obj = Path(path)
+    # Los reportes Markdown se construyen concatenando campos de datos (p. ej.
+    # `notes` de un extractor). Un espacio final en un mensaje de error produce
+    # una línea con trailing whitespace: el hook `trailing-whitespace` la
+    # recorta al commitear y entonces el tamaño real del archivo deja de
+    # coincidir con el declarado en artifact_manifest.json
+    # (`verify_committed_snapshot.py` falla con "Tamaño de artefacto
+    # desfasado"). Normalizar aquí hace que el build emita ya el texto que el
+    # hook aceptaría, sin depender de que los datos no traigan espacios.
+    if isinstance(content, str) and path_obj.suffix == ".md":
+        content = "\n".join(line.rstrip() for line in content.split("\n"))
     tmp_path = path_obj.with_suffix(path_obj.suffix + ".tmp")
     tmp_path.write_text(content, encoding="utf-8")
     os.replace(str(tmp_path), str(path_obj))

@@ -28,8 +28,13 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
-def verify_snapshot(root: Path = ROOT) -> dict:
-    """Rechaza manifest o fuente alterados; distingue novedades sin publicar."""
+def verify_manifest_artifacts(root: Path = ROOT) -> dict:
+    """Verifica tamaño y SHA-256 de los artefactos listados en el manifiesto.
+
+    Se separa de `verify_snapshot` para poder reutilizarlo en tests con staging
+    sintético, donde el snapshot DGAC no existe. Devuelve el conteo verificado y
+    los artefactos excluidos por formar parte del ciclo manifest↔bundle.
+    """
     manifest = json.loads((root / MANIFEST).read_text(encoding="utf-8"))
     artifacts = manifest.get("artifacts", [])
     if not isinstance(artifacts, list) or manifest.get("artifact_count") != len(artifacts):
@@ -41,7 +46,16 @@ def verify_snapshot(root: Path = ROOT) -> dict:
     # indexa hub_bundle. Es un grafo cíclico y el SHA embebido no puede
     # coincidir con el contenido final sin rediseñar el formato del bundle.
     # Ambos se comprueban estructuralmente, nunca se anuncian como SHA verificado.
-    cyclic_paths = {MANIFEST.as_posix(), "data/normalized/hub_bundle.json"}
+    # `overview.json` (y su gemelo `.md`) pertenecen al mismo ciclo: se
+    # construyen a partir del manifest y del bundle, y se escriben después, así
+    # que su hash declarado es siempre el de la corrida anterior. Se verifican
+    # estructuralmente por el propio build (`build_overview` es determinista).
+    cyclic_paths = {
+        MANIFEST.as_posix(),
+        "data/normalized/hub_bundle.json",
+        "data/normalized/overview.json",
+        "data/normalized/overview.md",
+    }
     for artifact in artifacts:
         path = artifact.get("path")
         if (
@@ -64,6 +78,16 @@ def verify_snapshot(root: Path = ROOT) -> dict:
             raise ValueError(f"SHA-256 de artefacto desfasado: {path}")
         verified_hashes += 1
 
+    return {
+        "manifest_artifacts_verified": verified_hashes,
+        "cyclic_json_excluded_from_hash_check": sorted(cyclic_paths),
+    }
+
+
+def verify_snapshot(root: Path = ROOT) -> dict:
+    """Rechaza manifest o fuente alterados; distingue novedades sin publicar."""
+    manifest_report = verify_manifest_artifacts(root)
+
     metadata = json.loads((root / DGAC_META).read_text(encoding="utf-8"))
     if metadata.get("sha256") != sha256_file(root / DGAC_CSV):
         raise ValueError("Snapshot DGAC no coincide con SHA-256 de origen")
@@ -80,11 +104,13 @@ def verify_snapshot(root: Path = ROOT) -> dict:
     stable = {
         entry["dataset"] for entry in registry if entry["publication_track"] == "stable_publishable"
     }
-    published = {entry["dataset"] for entry in artifacts if entry.get("dataset")}
+    manifest = json.loads((root / MANIFEST).read_text(encoding="utf-8"))
+    published = {
+        entry["dataset"] for entry in manifest.get("artifacts", []) if entry.get("dataset")
+    }
     pending = sorted(stable - published)
     return {
-        "manifest_artifacts_verified": verified_hashes,
-        "cyclic_json_excluded_from_hash_check": sorted(names & cyclic_paths),
+        **manifest_report,
         "dgac_rows": metadata["record_count"],
         "dgac_months": metadata["months"],
         "stable_layers_awaiting_canonical_publication": pending,

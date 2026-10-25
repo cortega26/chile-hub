@@ -463,6 +463,15 @@ def test_current_main_builds_isolated_offline_artifacts(tmp_path: Path) -> None:
     assert "data/normalized/comunas.parquet" in members
     assert "comunas" in {entry["dataset"] for entry in bundle_catalog["datasets"]}
 
+    # Regresión (plan 150): `overview.json` se escribe después del primer
+    # manifiesto, así que su hash quedaba apuntando al archivo de la corrida
+    # anterior y `verify_committed_snapshot.py` fallaba con "SHA-256 de
+    # artefacto desfasado". Se reutiliza el gate real en vez de reimplementarlo.
+    from scripts.verify_committed_snapshot import verify_manifest_artifacts
+
+    report = verify_manifest_artifacts(stack.sandbox)  # type: ignore[attr-defined]
+    assert report["manifest_artifacts_verified"] > 0
+
 
 def test_fixed_input_rebuild_is_semantically_equivalent_and_filters_candidates(
     tmp_path: Path,
