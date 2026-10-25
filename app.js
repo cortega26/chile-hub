@@ -1119,7 +1119,7 @@ function renderCatalog(bundle, sourceRegistry) {
         },
         medioambiente: {
             title: "Medio Ambiente",
-            datasets: ["calidad_aire"]
+            datasets: ["calidad_aire", "precipitaciones_dgac"]
         }
     };
 
