@@ -1,7 +1,7 @@
 {
-  "version": "1.49.2",
+  "version": "1.51.0",
   "public_site_url": "https://tooltician.com/chile-hub/",
-  "generated_at_utc": "2026-10-15T14:39:45.554724+00:00",
+  "generated_at_utc": "2026-10-25T23:05:34.399045+00:00",
   "datasets": {
     "regiones": {
       "dataset": "regiones",
@@ -9,7 +9,7 @@
       "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
       "source_mode": "live",
       "source_detail": "bcn_arcgis",
-      "refreshed_at_utc": "2026-10-15T14:35:59.050074+00:00",
+      "refreshed_at_utc": "2026-10-25T22:46:08.939054+00:00",
       "record_count": 16,
       "fields": [
         "codigo_region",
@@ -30,9 +30,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.06,
+        "age_hours": 0.32,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-10-15T14:39:45.551895+00:00"
+        "checked_at_utc": "2026-10-25T23:05:34.391849+00:00"
       },
       "degradation": {
         "status": "none",
@@ -72,7 +72,7 @@
       "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
       "source_mode": "live",
       "source_detail": "bcn_arcgis",
-      "refreshed_at_utc": "2026-10-15T14:35:59.050074+00:00",
+      "refreshed_at_utc": "2026-10-25T22:46:08.939054+00:00",
       "record_count": 56,
       "fields": [
         "codigo_region",
@@ -95,9 +95,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.06,
+        "age_hours": 0.32,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-10-15T14:39:45.551919+00:00"
+        "checked_at_utc": "2026-10-25T23:05:34.391915+00:00"
       },
       "degradation": {
         "status": "none",
@@ -139,7 +139,7 @@
       "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
       "source_mode": "live",
       "source_detail": "bcn_arcgis",
-      "refreshed_at_utc": "2026-10-15T14:35:59.050074+00:00",
+      "refreshed_at_utc": "2026-10-25T22:46:08.939054+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -169,9 +169,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.06,
+        "age_hours": 0.32,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-10-15T14:39:45.551928+00:00"
+        "checked_at_utc": "2026-10-25T23:05:34.391939+00:00"
       },
       "degradation": {
         "status": "none",
@@ -216,7 +216,7 @@
       "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
       "source_mode": "live",
       "source_detail": "bcn_arcgis",
-      "refreshed_at_utc": "2026-10-15T14:35:59.050074+00:00",
+      "refreshed_at_utc": "2026-10-25T22:46:08.939054+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -247,9 +247,9 @@
       "alias_for": "comunas",
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.06,
+        "age_hours": 0.32,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-10-15T14:39:45.551933+00:00"
+        "checked_at_utc": "2026-10-25T23:05:34.391951+00:00"
       },
       "degradation": {
         "status": "none",
@@ -298,8 +298,8 @@
       "source_origin_url": "https://www.bcentral.cl/web/banco-central/estadisticas",
       "source_mode": "live",
       "source_detail": "public_api_with_published_backfill",
-      "refreshed_at_utc": "2026-10-15T14:36:44.278171+00:00",
-      "record_count": 724,
+      "refreshed_at_utc": "2026-10-25T22:46:11.848772+00:00",
+      "record_count": 738,
       "fields": [
         "fecha",
         "codigo_indicador",
@@ -343,24 +343,24 @@
         "summary": "Datos del Banco Central de Chile (BCCh) e INE. Libre reproducción con citación. Acceso vía mindicador.cl (API pública de la comunidad)."
       },
       "indicator_max_date": {
-        "ipc": "2026-09-01",
+        "euro": "2026-10-26",
         "utm": "2026-11-01",
-        "euro": "2026-10-15",
+        "ipc": "2026-09-01",
         "uf": "2026-11-09",
-        "dolar": "2026-10-15"
+        "dolar": "2026-10-26"
       },
       "indicator_age_days": {
-        "ipc": 44,
-        "utm": -17,
-        "euro": 0,
-        "uf": -25,
-        "dolar": 0
+        "euro": -1,
+        "utm": -7,
+        "ipc": 54,
+        "uf": -15,
+        "dolar": -1
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.05,
+        "age_hours": 0.32,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-10-15T14:39:45.551942+00:00"
+        "checked_at_utc": "2026-10-25T23:05:34.391973+00:00"
       },
       "degradation": {
         "status": "warning",
@@ -370,7 +370,7 @@
       "coverage": {
         "status": "not_applicable",
         "expected_record_count": null,
-        "actual_record_count": 724,
+        "actual_record_count": 738,
         "coverage_ratio": null,
         "summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
         "expected": false
@@ -403,8 +403,8 @@
       "source_url": "https://censo2024.ine.gob.cl/wp-content/uploads/2025/03/D1_Poblacion-censada-por-sexo-y-edad-en-grupos-quinquenales.xlsx",
       "source_mode": "live",
       "source_detail": "official_xlsx",
-      "refreshed_at_utc": "2026-10-15T14:36:44.764888+00:00",
-      "retrieved_at": "2026-10-15T14:36:44.764888+00:00",
+      "refreshed_at_utc": "2026-10-25T22:46:12.494231+00:00",
+      "retrieved_at": "2026-10-25T22:46:12.494231+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -435,16 +435,16 @@
         "summary": "Resultados oficiales del Censo 2024 publicados por el INE."
       },
       "snapshot_hash": "1f3a9c97a1b3defa47a2fc3b8495688c4e08f164063cab704e7a18c41239e009",
-      "snapshot_reference": "data/raw/ine_censo2024_comunal_20261015T143644Z.xlsx",
+      "snapshot_reference": "data/raw/ine_censo2024_comunal_20261025T224612Z.xlsx",
       "observed_period": {
         "start": "2024-01-01",
         "end": "2024-12-31"
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.05,
+        "age_hours": 0.32,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-10-15T14:39:45.551952+00:00"
+        "checked_at_utc": "2026-10-25T23:05:34.391991+00:00"
       },
       "degradation": {
         "status": "none",
@@ -488,10 +488,10 @@
     "establecimientos_salud": {
       "dataset": "establecimientos_salud",
       "source_name": "Ministerio de Salud - Establecimientos de Salud",
-      "source_url": "https://datos.gob.cl/dataset/3bf4cf7c-f638-4735-9a01-f65faae4beca/resource/2c44d782-3365-44e3-aefb-2c8b8363a1bc/download/establecimientos_20261014.csv",
+      "source_url": "https://datos.gob.cl/dataset/3bf4cf7c-f638-4735-9a01-f65faae4beca/resource/2c44d782-3365-44e3-aefb-2c8b8363a1bc/download/establecimientos_20261020.csv",
       "source_mode": "live",
       "source_detail": "datos_gob_csv",
-      "refreshed_at_utc": "2026-10-15T14:36:49.839557+00:00",
+      "refreshed_at_utc": "2026-10-25T22:46:18.806476+00:00",
       "record_count": 5782,
       "fields": [
         "codigo_establecimiento",
@@ -520,9 +520,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.05,
+        "age_hours": 0.32,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-10-15T14:39:45.551960+00:00"
+        "checked_at_utc": "2026-10-25T23:05:34.392008+00:00"
       },
       "degradation": {
         "status": "none",
@@ -588,11 +588,19 @@
         "redistribution_ok": true,
         "summary": "Directorio oficial MINEDUC publicado por el Centro de Estudios del Ministerio de Educación de Chile bajo licencia CC BY."
       },
+      "publication_hold": {
+        "retained": true,
+        "reason": "source_mode=fallback",
+        "attempted_at_utc": "2026-10-25T23:05:01.491770+00:00",
+        "previous_generated_at_utc": "2026-10-15T14:36:56.681410+00:00",
+        "since_utc": "2026-10-25T23:02:56.922790+00:00",
+        "builds_held": 3
+      },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.05,
+        "age_hours": 248.48,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-10-15T14:39:45.551967+00:00"
+        "checked_at_utc": "2026-10-25T23:05:34.392025+00:00"
       },
       "degradation": {
         "status": "none",
@@ -637,7 +645,7 @@
       "source_url": "https://censo2024.ine.gob.cl/wp-content/uploads/2025/03/V1_Viviendas-y-hogares-censados.xlsx",
       "source_mode": "live",
       "source_detail": "official_xlsx",
-      "refreshed_at_utc": "2026-10-15T14:36:48.277375+00:00",
+      "refreshed_at_utc": "2026-10-25T22:46:15.449439+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -664,9 +672,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.05,
+        "age_hours": 0.32,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-10-15T14:39:45.551974+00:00"
+        "checked_at_utc": "2026-10-25T23:05:34.392045+00:00"
       },
       "degradation": {
         "status": "none",
@@ -712,7 +720,7 @@
       "source_url": "https://www.bcn.cl/siit/observatorio/ley20840",
       "source_mode": "live",
       "source_detail": "bcn_electoral_mapping_generated",
-      "refreshed_at_utc": "2026-10-15T14:36:49.973900+00:00",
+      "refreshed_at_utc": "2026-10-25T22:46:19.112124+00:00",
       "record_count": 346,
       "fields": [
         "codigo_comuna",
@@ -731,9 +739,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.05,
+        "age_hours": 0.32,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-10-15T14:39:45.551979+00:00"
+        "checked_at_utc": "2026-10-25T23:05:34.392056+00:00"
       },
       "degradation": {
         "status": "none",
@@ -804,9 +812,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 1067.59,
+        "age_hours": 1316.02,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-10-15T14:39:45.551987+00:00"
+        "checked_at_utc": "2026-10-25T23:05:34.392073+00:00"
       },
       "degradation": {
         "status": "none",
@@ -814,11 +822,11 @@
         "recommended_action": "Ninguna."
       },
       "coverage": {
-        "status": "not_applicable",
-        "expected_record_count": null,
+        "status": "full",
+        "expected_record_count": 345,
         "actual_record_count": 345,
-        "coverage_ratio": null,
-        "summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
+        "coverage_ratio": 1.0,
+        "summary": "Cobertura completa: 345/345 filas respecto del baseline esperado.",
         "expected": false
       },
       "contract_primary_key": [
@@ -866,7 +874,7 @@
       "notes": [
         "privacy_safe_comuna_year_aggregation",
         "sit_fin_r_Y=retirado T=trasladado asistencia_only_for_P_R_students",
-        "source_file: mineduc_rendimiento_2024.rar, comunas_agregadas: 345"
+        "fallback_curated_rows_used: RuntimeError: Error al extraer RAR (code 1): "
       ],
       "reuse_policy": {
         "status": "open-attribution",
@@ -876,11 +884,19 @@
         "redistribution_ok": true,
         "summary": "Datos agregados desde publicaciones del Centro de Estudios MINEDUC; citar fuente oficial."
       },
+      "publication_hold": {
+        "retained": true,
+        "reason": "source_mode=fallback; record_count cayó 99.1% (345 -> 3)",
+        "attempted_at_utc": "2026-10-25T23:05:01.491770+00:00",
+        "previous_generated_at_utc": "2026-10-15T14:37:11.779959+00:00",
+        "since_utc": "2026-10-25T23:02:56.922790+00:00",
+        "builds_held": 3
+      },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.04,
+        "age_hours": 248.47,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-10-15T14:39:45.551994+00:00"
+        "checked_at_utc": "2026-10-25T23:05:34.392087+00:00"
       },
       "degradation": {
         "status": "none",
@@ -925,7 +941,7 @@
       "source_url": "https://www.ine.gob.cl/docs/default-source/sistema-de-indicadores-y-estandares-de-desarrollo-urbano/indicadores/actualizaci%C3%B3n-2019/matriz-siedu-publicacion.xlsm",
       "source_mode": "live",
       "source_detail": "ine_siedu_xlsm_cinco_mediciones_2018_2022",
-      "refreshed_at_utc": "2026-10-15T14:37:14.541617+00:00",
+      "refreshed_at_utc": "2026-10-25T22:46:21.918498+00:00",
       "record_count": 6701,
       "fields": [
         "anio",
@@ -963,9 +979,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.04,
+        "age_hours": 0.32,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-10-15T14:39:45.552001+00:00"
+        "checked_at_utc": "2026-10-25T23:05:34.392107+00:00"
       },
       "degradation": {
         "status": "none",
@@ -1005,7 +1021,7 @@
       "source_url": "https://github.com/cortega26/chile-hub",
       "source_mode": "live",
       "source_detail": "derived_from_validated_chile_hub_layers",
-      "refreshed_at_utc": "2026-10-15T14:39:45.552008+00:00",
+      "refreshed_at_utc": "2026-10-25T23:05:34.392129+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -1056,7 +1072,10 @@
         "superficie_autorizada_m2_ultimo_anio",
         "anio_permisos_edificacion",
         "mp25_promedio_ultimo_anio",
-        "anio_calidad_aire"
+        "anio_calidad_aire",
+        "tasa_pobreza_ingresos_ultimo_anio",
+        "tasa_pobreza_multidimensional_ultimo_anio",
+        "anio_pobreza"
       ],
       "notes": [
         "derived_dataset",
@@ -1074,7 +1093,7 @@
         "status": "fresh",
         "age_hours": 0.0,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-10-15T14:39:45.552019+00:00"
+        "checked_at_utc": "2026-10-25T23:05:34.392170+00:00"
       },
       "degradation": {
         "status": "none",
@@ -1112,7 +1131,10 @@
         "superficie_autorizada_m2_ultimo_anio": "integer",
         "anio_permisos_edificacion": "integer",
         "mp25_promedio_ultimo_anio": "float",
-        "anio_calidad_aire": "integer"
+        "anio_calidad_aire": "integer",
+        "tasa_pobreza_ingresos_ultimo_anio": "float",
+        "tasa_pobreza_multidimensional_ultimo_anio": "float",
+        "anio_pobreza": "integer"
       },
       "contract_nullable_columns": [
         "crecimiento_natural_ultimo_anio",
@@ -1121,7 +1143,10 @@
         "superficie_autorizada_m2_ultimo_anio",
         "anio_permisos_edificacion",
         "mp25_promedio_ultimo_anio",
-        "anio_calidad_aire"
+        "anio_calidad_aire",
+        "tasa_pobreza_ingresos_ultimo_anio",
+        "tasa_pobreza_multidimensional_ultimo_anio",
+        "anio_pobreza"
       ],
       "contract_exists": true,
       "drift": {
@@ -1136,7 +1161,7 @@
       "source_url": "https://datos.gob.cl/dataset/registro-de-empresas-y-sociedades",
       "source_mode": "live",
       "source_detail": "datos_gob_cl_ckan_api",
-      "refreshed_at_utc": "2026-10-15T14:37:41.724500+00:00",
+      "refreshed_at_utc": "2026-10-25T22:46:30.997389+00:00",
       "record_count": 1628433,
       "fields": [
         "rut",
@@ -1155,7 +1180,7 @@
         "region_social"
       ],
       "notes": [
-        "filas descartadas por RUT centinela ['0']: 1",
+        "filas descartadas por RUT centinela ['0']: 0",
         "Solo incluye empresas constituidas bajo el Regimen Simplificado (Ley 20.659) desde mayo 2013.",
         "No contiene dirección postal (solo comuna y región).",
         "No contiene actividad económica (giro).",
@@ -1172,9 +1197,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.03,
+        "age_hours": 0.32,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-10-15T14:39:45.552031+00:00"
+        "checked_at_utc": "2026-10-25T23:05:34.392190+00:00"
       },
       "degradation": {
         "status": "none",
@@ -1220,7 +1245,7 @@
       "source_url": "https://observatorio.ministeriodesarrollosocial.gob.cl/pobreza-comunal-2022",
       "source_mode": "live",
       "source_detail": "Estimaciones de Pobreza Comunal vía SAE desde encuesta CASEN",
-      "refreshed_at_utc": "2026-10-15T14:37:43.288676+00:00",
+      "refreshed_at_utc": "2026-10-25T22:46:32.004153+00:00",
       "record_count": 690,
       "fields": [
         "codigo_region",
@@ -1250,9 +1275,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.03,
+        "age_hours": 0.32,
         "max_age_hours": 175200,
-        "checked_at_utc": "2026-10-15T14:39:45.552038+00:00"
+        "checked_at_utc": "2026-10-25T23:05:34.392213+00:00"
       },
       "degradation": {
         "status": "none",
@@ -1318,7 +1343,7 @@
       "source_url": "http://datos.energiaabierta.cl/dataviews/241686/consumo-electrico-anual-por-comuna-y-tipo-de-cliente/",
       "source_mode": "fallback",
       "source_detail": "Consumo eléctrico anual por comuna y tipo de cliente",
-      "refreshed_at_utc": "2026-10-15T14:37:50.372761+00:00",
+      "refreshed_at_utc": "2026-10-25T22:46:37.058208+00:00",
       "record_count": 3,
       "fields": [
         "codigo_region",
@@ -1345,9 +1370,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.03,
+        "age_hours": 0.32,
         "max_age_hours": 17520,
-        "checked_at_utc": "2026-10-15T14:39:45.552045+00:00"
+        "checked_at_utc": "2026-10-25T23:05:34.392228+00:00"
       },
       "degradation": {
         "status": "warning",
@@ -1407,7 +1432,7 @@
       "source_url": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
       "source_mode": "live",
       "source_detail": "WSComun.asmx/retornarPartidosPoliticos + servel.cl/partidos-politicos (estado legal)",
-      "refreshed_at_utc": "2026-10-15T14:37:52.412593+00:00",
+      "refreshed_at_utc": "2026-10-25T22:46:39.503347+00:00",
       "record_count": 37,
       "fields": [
         "id_partido",
@@ -1435,9 +1460,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.03,
+        "age_hours": 0.32,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-10-15T14:39:45.552050+00:00"
+        "checked_at_utc": "2026-10-25T23:05:34.392245+00:00"
       },
       "degradation": {
         "status": "none",
@@ -1486,7 +1511,7 @@
       "source_url": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
       "source_mode": "live",
       "source_detail": "WSDiputado.asmx/retornarDiputadosPeriodoActual + camara.cl + senado.cl (Scrapling)",
-      "refreshed_at_utc": "2026-10-15T14:39:35.285799+00:00",
+      "refreshed_at_utc": "2026-09-25T19:32:50.839314+00:00",
       "record_count": 205,
       "fields": [
         "id_autoridad",
@@ -1522,9 +1547,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.0,
+        "age_hours": 723.55,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-10-15T14:39:45.552057+00:00"
+        "checked_at_utc": "2026-10-25T23:05:34.392264+00:00"
       },
       "degradation": {
         "status": "none",
@@ -1581,7 +1606,7 @@
       "source_url": "https://www.ine.gob.cl/estadisticas-por-tema/demografia-y-poblacion/estadisticas-vitales",
       "source_mode": "live",
       "source_detail": "Anuarios de Estadísticas Vitales (tabulados XLSX, tabla 1.2.2-04 por comuna de residencia). Solo definitivos: los boletines provisionales del INE no publican desglose comunal.",
-      "refreshed_at_utc": "2026-10-15T14:39:15.806031+00:00",
+      "refreshed_at_utc": "2026-10-25T22:46:46.649796+00:00",
       "record_count": 13840,
       "fields": [
         "anio",
@@ -1597,22 +1622,7 @@
         "fecha_fuente"
       ],
       "notes": [
-        "2010: 692 filas desde 'Anuario de estadísticas vitales 2010' (hoja 122-04; TOTAL país: 250643 nacimientos, 97930 defunciones)",
-        "2011: 692 filas desde 'Anuario de estadísticas vitales 2011' (hoja 122-04; TOTAL país: 247358 nacimientos, 94985 defunciones)",
-        "2012: 692 filas desde 'Anuario de estadísticas vitales 2012' (hoja 122-04; TOTAL país: 243635 nacimientos, 98711 defunciones)",
-        "2013: 692 filas desde 'Anuario de estadísticas vitales 2013' (hoja 1.2.2-04; TOTAL país: 242005 nacimientos, 99770 defunciones)",
-        "2014: 692 filas desde 'Anuario de estadísticas vitales 2014' (hoja 1.2.2-04; TOTAL país: 250997 nacimientos, 101960 defunciones)",
-        "2015: 692 filas desde 'Anuario de estadísticas vitales 2015' (hoja 1.2.2-04; TOTAL país: 244670 nacimientos, 103327 defunciones)",
-        "2016: 692 filas desde 'Anuario de estadísticas vitales nacimientos 2016' (hoja 1.2.2-04; TOTAL país: 231749 nacimientos, 104026 defunciones)",
-        "2017: 692 filas desde 'Anuario de estadísticas vitales 2017' (hoja 1.2.2-04; TOTAL país: 219186 nacimientos, 106388 defunciones)",
-        "2018: convención de indentado invertida (comuna indentada)",
-        "2018: 692 filas desde 'Anuario de estadísticas vitales 2018' (hoja 122-04; TOTAL país: 221731 nacimientos, 106796 defunciones)",
-        "2019: convención de indentado invertida (comuna indentada)",
-        "2019: 692 filas desde 'Anuario de estadísticas vitales 2019' (hoja 122-04; TOTAL país: 210188 nacimientos, 109658 defunciones)",
-        "2020: convención de indentado invertida (comuna indentada)",
-        "2020: 692 filas desde 'Anuario de estadísticas vitales 2020' (hoja 122-04; TOTAL país: 194978 nacimientos, 126169 defunciones)",
-        "2021: 2076 filas desde 'Anuario de estadísticas vitales 2021' (hoja 122-04; TOTAL país: 177273 nacimientos, 137629 defunciones)",
-        "2022: 2076 filas desde 'Anuario de estadísticas vitales 2022, nacimientos y defunciones' (hoja 122-04; TOTAL país: 189303 nacimientos, 136972 defunciones)",
+        "fetch incremental: 1 de 15 anuarios (faltantes + año más reciente 2023)",
         "2023: 2076 filas desde 'Anuario de estadísticas vitales 2023, nacimientos y defunciones' (hoja 122-04; TOTAL país: 174057 nacimientos, 122218 defunciones)"
       ],
       "reuse_policy": {
@@ -1625,9 +1635,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.01,
+        "age_hours": 0.31,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-10-15T14:39:45.552064+00:00"
+        "checked_at_utc": "2026-10-25T23:05:34.392281+00:00"
       },
       "degradation": {
         "status": "none",
@@ -1686,9 +1696,9 @@
       "dataset": "permisos_edificacion",
       "source_name": "MINVU — Centro de Estudios de Ciudad y Territorio (CEDOC)",
       "source_url": "https://centrodeestudios.minvu.gob.cl/repositorio/categoria/permisos-de-edificacion",
-      "source_mode": "monthly",
+      "source_mode": "live",
       "source_detail": "Viviendas en unidades y superficie (m2) por comuna y año, serie desde 2002 (MINVU CEDOC, en base a permisos otorgados por las Direcciones de Obras Municipales e INE).",
-      "refreshed_at_utc": "2026-09-25T19:08:42+00:00",
+      "refreshed_at_utc": "2026-10-25T22:46:49.459577+00:00",
       "record_count": 8650,
       "fields": [
         "anio",
@@ -1708,8 +1718,7 @@
       ],
       "notes": [
         "descubrimiento: repositorio-biblionumber",
-        "descarga falló, usando snapshot versionado minvu_permisos_edificacion_anual_20260925T190842Z.xlsx (Failed to perform, curl: (35) BoringSSL SSL_connect: Connection closed abruptly (SSL_ERROR_SYSCALL; error queue empty) in connection to catalogo.minvu.cl:443. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.)",
-        "8650 filas desde 'minvu_permisos_edificacion_anual_20260925T190842Z.xlsx' (hojas: número_total, m2_total, número_departamentos, m2_departamentos, número_casas, m2_casas; años provisionales: [2024, 2025, 2026])"
+        "8650 filas desde 'minvu_permisos_edificacion_anual_20261025T224648Z.xlsx' (hojas: número_total, m2_total, número_departamentos, m2_departamentos, número_casas, m2_casas; años provisionales: [2024, 2025, 2026])"
       ],
       "reuse_policy": {
         "status": "open-attribution",
@@ -1721,9 +1730,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 475.52,
+        "age_hours": 0.31,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-10-15T14:39:45.552072+00:00"
+        "checked_at_utc": "2026-10-25T23:05:34.392297+00:00"
       },
       "degradation": {
         "status": "none",
@@ -1811,9 +1820,9 @@
         "fecha_fuente"
       ],
       "notes": [
-        "inventario: 124 estaciones en el listado; 124 con filas emitidas",
-        "730 filas diarias nuevas desde 'sinca_listadomapa_20261015T143926Z.json'",
-        "historial: sembrado desde Parquet publicado (7732 filas)"
+        "inventario: 121 estaciones en el listado; 121 con filas emitidas",
+        "734 filas diarias nuevas desde 'sinca_listadomapa_20261025T224651Z.json'",
+        "historial: fusionado con staging existente"
       ],
       "reuse_policy": {
         "status": "public-api-review-terms",
@@ -1824,15 +1833,23 @@
         "summary": "Mediciones de calidad del aire del SINCA (MMA), API JSON pública. Organismo público chileno sin restricción explícita de reúso; citar fuente oficial."
       },
       "freshness": {
-        "status": "fresh",
-        "age_hours": 0.01,
+        "status": "stale",
+        "age_hours": 248.44,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-10-15T14:39:45.552080+00:00"
+        "checked_at_utc": "2026-10-25T23:05:34.392316+00:00"
+      },
+      "publication_hold": {
+        "retained": true,
+        "reason": "record_count cayó 73.5% (8462 -> 2244)",
+        "attempted_at_utc": "2026-10-25T23:05:01.491770+00:00",
+        "previous_generated_at_utc": "2026-10-15T14:39:26.685817+00:00",
+        "since_utc": "2026-10-25T23:03:52.580566+00:00",
+        "builds_held": 2
       },
       "degradation": {
-        "status": "none",
-        "impact": "1 observación(es) esperada(s): cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación",
-        "recommended_action": "Ninguna."
+        "status": "warning",
+        "impact": "calidad_aire freshness is stale: 248.44h since refresh, policy max is 72h",
+        "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
       },
       "coverage": {
         "status": "not_applicable",
@@ -1893,6 +1910,1282 @@
       ],
       "contract_exists": true,
       "drift": {
+        "status": "drifted",
+        "summary": "Drift detectado: degradation=warning.",
+        "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
+      }
+    },
+    "precipitaciones_dgac": {
+      "dataset": "precipitaciones_dgac",
+      "publication_track": "stable_publishable",
+      "generated_at_utc": "2026-10-17T03:25:07.715081+00:00",
+      "source_name": "DGAC — datos.gob.cl",
+      "source_url": "https://datos.gob.cl/organization/direccion_general_de_aeronautica_civil",
+      "source_mode": "live",
+      "period": "2013-01-01/2026-06-30",
+      "months": 143,
+      "record_count": 141436,
+      "station_count": 33,
+      "missing_measurements": 992,
+      "counts_by_year": {
+        "2013": 11763,
+        "2015": 5935,
+        "2016": 11841,
+        "2017": 10680,
+        "2018": 11743,
+        "2019": 11702,
+        "2020": 11854,
+        "2021": 11732,
+        "2022": 12045,
+        "2023": 12045,
+        "2024": 12078,
+        "2025": 12045,
+        "2026": 5973
+      },
+      "excluded_source_periods": {
+        "2014": "2014 disponible en paquete legacy 2719 CC-NC; excluido por licencia",
+        "2015-01/2015-06": "2015-I disponible en paquete legacy 2719 CC-NC; excluido",
+        "2026-07/2026-12": "2026-II aún no figura como paquete mensual en la fuente"
+      },
+      "quarantined_source_months": {
+        "2017-01": "CSV titulado precipitación contiene T.Maxima/T.Minima (temperaturas)"
+      },
+      "duplicate_resources": [
+        {
+          "year_month": "2015-07",
+          "url": "https://datos.gob.cl/dataset/3b84cb7a-f47f-4e69-b39b-af13c289fd00/resource/d299a9fa-dd2f-4e19-af13-0658f1b9854e/download/precipitacion0720151.csv",
+          "sha256": "f7ec92777e7b2157a40ea1643abdcb276d98c42d7b0156fcb7a5754f01334739"
+        },
+        {
+          "year_month": "2022-09",
+          "url": "https://datos.gob.cl/dataset/386d1ef2-8bd9-4e78-9460-2a58b4bcddf2/resource/8507fb28-4cf5-4b81-bd88-4e8ebf064213/download/precipitacion_092022.csv",
+          "sha256": "9e4b1609997ddefc7a74dcc54aa96a8fa238f0ed9c29c57a8d86bf1ba54176ec"
+        }
+      ],
+      "fields": [
+        "fecha",
+        "id_estacion",
+        "nombre_estacion",
+        "latitud_dms",
+        "altitud_m",
+        "precipitacion_mm",
+        "url_fuente",
+        "licencia_fuente"
+      ],
+      "sha256": "0e0605843518a4f597d9e3cbed8b3840de092ef76b1fdc6472c7a294e89914a5",
+      "source_files": [
+        {
+          "year_month": "2013-01",
+          "package": "precipitaciones-primer-semestre-2013",
+          "url": "https://datos.gob.cl/dataset/8e7c63f3-e5f2-497f-a98e-635e07c6a494/resource/4234b981-29b7-4f63-9515-94819660c7c5/download/precipitacion_012013.csv",
+          "sha256": "d2742bed6c154d8b4107d2fe50b92735c0af412298fa68a673c7c3e47229bde8",
+          "rows": 988,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2013-02",
+          "package": "precipitaciones-primer-semestre-2013",
+          "url": "https://datos.gob.cl/dataset/8e7c63f3-e5f2-497f-a98e-635e07c6a494/resource/cb5e3ee2-46c7-4113-9ce7-1d232ace345c/download/precipitacion_022013.csv",
+          "sha256": "b89d8b0f55c6565e42555142bde1e549a1c8f780bdfc62ab59e33869b373a38d",
+          "rows": 908,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2013-03",
+          "package": "precipitaciones-primer-semestre-2013",
+          "url": "https://datos.gob.cl/dataset/8e7c63f3-e5f2-497f-a98e-635e07c6a494/resource/619c8225-10e1-4adf-9d2e-ad9edb05635f/download/precipitacion_032013.csv",
+          "sha256": "c9f8c50443ab87746ea3471e5f34d78cd4c63a41dce8f010e9bc09de12612748",
+          "rows": 993,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2013-04",
+          "package": "precipitaciones-primer-semestre-2013",
+          "url": "https://datos.gob.cl/dataset/8e7c63f3-e5f2-497f-a98e-635e07c6a494/resource/55230261-4993-4021-a77c-2b78e95376f2/download/precipitacion_042013.csv",
+          "sha256": "31917ebe3f2c7a6232b350b1465c2ae595d2bc57ed3656625a858d8d46b4e5f3",
+          "rows": 972,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2013-05",
+          "package": "precipitaciones-primer-semestre-2013",
+          "url": "https://datos.gob.cl/dataset/8e7c63f3-e5f2-497f-a98e-635e07c6a494/resource/30004c07-54af-4bd4-8a4d-2c854e374648/download/precipitacion_052013.csv",
+          "sha256": "0e9a5c54ead61ec772c5f9b51a2ec3cabee2415cb4b0a3b4fb24e344f81ec675",
+          "rows": 1006,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2013-06",
+          "package": "precipitaciones-primer-semestre-2013",
+          "url": "https://datos.gob.cl/dataset/8e7c63f3-e5f2-497f-a98e-635e07c6a494/resource/6f38470c-e978-4220-90c3-87e11746098e/download/precipitacion_062013.csv",
+          "sha256": "235975e5a682e0c3924eb4f48584cd7c9f52db0e6aa0a3b6f7a582466130b816",
+          "rows": 976,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2013-07",
+          "package": "precipitaciones-segundo-semestre-2013",
+          "url": "https://datos.gob.cl/dataset/5199c4c1-601a-48e9-a6a9-c3d61a232964/resource/eeccf1ad-9a73-4bdf-ae85-7664ba05ec20/download/precipitacion_072013.csv",
+          "sha256": "97e915e198e0301b26e4fe9550096e4e6a27ce6fb57b306b519b4823cbf8e2d5",
+          "rows": 1004,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2013-08",
+          "package": "precipitaciones-segundo-semestre-2013",
+          "url": "https://datos.gob.cl/dataset/5199c4c1-601a-48e9-a6a9-c3d61a232964/resource/03db66c4-a5ee-41af-ad36-8d84fbd9e740/download/precipitacion_082013.csv",
+          "sha256": "2699e00bf84adc7d2107707955c7e6c99f2e2d3e20b23fe2cd4ea919129d8666",
+          "rows": 1009,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2013-09",
+          "package": "precipitaciones-segundo-semestre-2013",
+          "url": "https://datos.gob.cl/dataset/5199c4c1-601a-48e9-a6a9-c3d61a232964/resource/844e04a2-30eb-4af7-b5f7-fd29bfa7497f/download/precipitacion_092013.csv",
+          "sha256": "6cdcf84554e1cd444ab981c56b8d2aa7fd612b8ca3b23734380df289f6bdc637",
+          "rows": 955,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2013-10",
+          "package": "precipitaciones-segundo-semestre-2013",
+          "url": "https://datos.gob.cl/dataset/5199c4c1-601a-48e9-a6a9-c3d61a232964/resource/a74979ac-2c9c-423d-9a3d-1ad740fa4011/download/precipitacion_102013.csv",
+          "sha256": "ef49e7a5be0f01db14f2c795c92eba05a35021980cd79b90b42aad9a61f0acbc",
+          "rows": 996,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2013-11",
+          "package": "precipitaciones-segundo-semestre-2013",
+          "url": "https://datos.gob.cl/dataset/5199c4c1-601a-48e9-a6a9-c3d61a232964/resource/978a998a-ce69-441e-ad4c-8b3dac3fd207/download/precipitacion_112013.csv",
+          "sha256": "796eeba91e63960f2d72c93fa073809b00172f6ee6efb139df89bb50fb818b49",
+          "rows": 957,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2013-12",
+          "package": "precipitaciones-segundo-semestre-2013",
+          "url": "https://datos.gob.cl/dataset/5199c4c1-601a-48e9-a6a9-c3d61a232964/resource/16faa90c-d3e1-4781-98dc-b2e571e29412/download/precipitacion_122013.csv",
+          "sha256": "d8e2b390d560547e8d3f5b716a53a21c7a63fa404171e360430cb605a9fcbdb3",
+          "rows": 999,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2015-07",
+          "package": "precipitacion-2o-semestre-2015",
+          "url": "https://datos.gob.cl/dataset/3b84cb7a-f47f-4e69-b39b-af13c289fd00/resource/a7f2ab01-d123-4a39-b77e-4142d6e3840f/download/precipitacion0720151.csv",
+          "sha256": "f7ec92777e7b2157a40ea1643abdcb276d98c42d7b0156fcb7a5754f01334739",
+          "rows": 1007,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2015-08",
+          "package": "precipitacion-2o-semestre-2015",
+          "url": "https://datos.gob.cl/dataset/3b84cb7a-f47f-4e69-b39b-af13c289fd00/resource/eae703cb-6334-4534-abc8-bbee7509586b/download/precipitacion0820151.csv",
+          "sha256": "3543a7e47961d9ecb46fdb975f4968c09bad3a966d3970cda1596443fbecae25",
+          "rows": 1002,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2015-09",
+          "package": "precipitacion-2o-semestre-2015",
+          "url": "https://datos.gob.cl/dataset/3b84cb7a-f47f-4e69-b39b-af13c289fd00/resource/11770c94-c9d0-466f-af5d-4d8ef10f8167/download/precipitacion0920151.csv",
+          "sha256": "5f0edffca3e5f4086834274e3793009244036411719d79a0ab6deb31065fbc0a",
+          "rows": 970,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2015-10",
+          "package": "precipitacion-2o-semestre-2015",
+          "url": "https://datos.gob.cl/dataset/3b84cb7a-f47f-4e69-b39b-af13c289fd00/resource/bc168ef6-6f16-457a-8055-158ef08175bc/download/precipitacion1020151.csv",
+          "sha256": "e4f15a2d8f715102c2a8b3a4a004d1f56f93750174c729a91ed40ea08b24f2f1",
+          "rows": 999,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2015-11",
+          "package": "precipitacion-2o-semestre-2015",
+          "url": "https://datos.gob.cl/dataset/3b84cb7a-f47f-4e69-b39b-af13c289fd00/resource/895bce2e-ac18-4d4f-aa82-880ea242a2b7/download/precipitacion1120151.csv",
+          "sha256": "696e366bcc3de7179f49cd0c35241f3b7a1ae7f566249a29c70770a594c7230c",
+          "rows": 975,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2015-12",
+          "package": "precipitacion-2o-semestre-2015",
+          "url": "https://datos.gob.cl/dataset/3b84cb7a-f47f-4e69-b39b-af13c289fd00/resource/e306b3d4-b6fb-4294-90e9-2c5bcb89c82d/download/precipitacion1220151.csv",
+          "sha256": "1656d8ff22dd11a5b752309eeef07177b5119e7ef3bbf31affc58b221e731913",
+          "rows": 982,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2016-01",
+          "package": "precipitaciones-primer-semestre-2016",
+          "url": "https://datos.gob.cl/dataset/4a5859b0-cf98-4f11-947d-b25d4ffdacfe/resource/d7378d59-aa9f-4226-86a1-c8d472718c11/download/precipitacion_012016.csv",
+          "sha256": "80b26870d926068fcb9f872efc79cbd620738ee0281bbdd2d1241b5f2fd8719f",
+          "rows": 1001,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2016-02",
+          "package": "precipitaciones-primer-semestre-2016",
+          "url": "https://datos.gob.cl/dataset/4a5859b0-cf98-4f11-947d-b25d4ffdacfe/resource/900544d0-80ce-4ae5-8340-a8d72ae73971/download/precipitacion_022016.csv",
+          "sha256": "e89f6ba0318f9defac19e80e95ece794f4c8fb468c04337061768cecda7944c7",
+          "rows": 943,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2016-03",
+          "package": "precipitaciones-primer-semestre-2016",
+          "url": "https://datos.gob.cl/dataset/4a5859b0-cf98-4f11-947d-b25d4ffdacfe/resource/3997e4ea-798a-468c-a6bf-c23647185930/download/precipitacion_032016.csv",
+          "sha256": "793fd0f6c5991460fc07e2a817fd8a7c24171200021dfbfd9329757377c4d169",
+          "rows": 1004,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2016-04",
+          "package": "precipitaciones-primer-semestre-2016",
+          "url": "https://datos.gob.cl/dataset/4a5859b0-cf98-4f11-947d-b25d4ffdacfe/resource/d87aed8e-d2fa-4e06-a7cb-b5d4d4e18525/download/precipitacion_042016.csv",
+          "sha256": "9f570817171e53642b2f0c7ff6cfb7b89b78ded8573aaade8d44fba9bed2f072",
+          "rows": 971,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2016-05",
+          "package": "precipitaciones-primer-semestre-2016",
+          "url": "https://datos.gob.cl/dataset/4a5859b0-cf98-4f11-947d-b25d4ffdacfe/resource/3a192ac1-d317-43e4-937f-b9e8737e2995/download/precipitacion_052016.csv",
+          "sha256": "4b99213db5430deccffd723eabdf9c2b6230df6bd4f81ab55a5b9e7c0f5bee00",
+          "rows": 1003,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2016-06",
+          "package": "precipitaciones-primer-semestre-2016",
+          "url": "https://datos.gob.cl/dataset/4a5859b0-cf98-4f11-947d-b25d4ffdacfe/resource/1e7da75a-e6a5-4b92-9f95-1447d7807dba/download/precipitacion_062016.csv",
+          "sha256": "01acb27ecbec0c67a91494de1e85741800026daefc02a7740d0e6548544ca47a",
+          "rows": 971,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2016-07",
+          "package": "precipitaciones-segundo-semestre-2016",
+          "url": "https://datos.gob.cl/dataset/4e37c7e0-331d-4f5a-8bc9-7d35a8905630/resource/e8ac3a6f-766a-4989-93cb-22e222c1bf58/download/precipitacion_072016.csv",
+          "sha256": "a74cd0d7544fbd76a3ebf70fc555b574d49ced77272715616949dc438488e2c2",
+          "rows": 1008,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2016-08",
+          "package": "precipitaciones-segundo-semestre-2016",
+          "url": "https://datos.gob.cl/dataset/4e37c7e0-331d-4f5a-8bc9-7d35a8905630/resource/e656b744-b1af-4300-b19e-71f6d0cb2b52/download/precipitacion_082016.csv",
+          "sha256": "f4aed3b36681b8945761489b5d79b33ef572f8df7f51b63f936703701caf542b",
+          "rows": 1003,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2016-09",
+          "package": "precipitaciones-segundo-semestre-2016",
+          "url": "https://datos.gob.cl/dataset/4e37c7e0-331d-4f5a-8bc9-7d35a8905630/resource/27ce6e42-48f9-4682-8f3c-bc936438716d/download/precipitacion_092016.csv",
+          "sha256": "c830b9aa122c85afddad44e00a34e15cd5890674804a702740c1d996411eca8c",
+          "rows": 970,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2016-10",
+          "package": "precipitaciones-segundo-semestre-2016",
+          "url": "https://datos.gob.cl/dataset/4e37c7e0-331d-4f5a-8bc9-7d35a8905630/resource/f9e104ec-f7d0-4357-ad3e-24299d549b1d/download/precipitacion_102016.csv",
+          "sha256": "124704bb3b3c19776681593e0bf7dae250de545026f22f8a54624e7959387950",
+          "rows": 991,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2016-11",
+          "package": "precipitaciones-segundo-semestre-2016",
+          "url": "https://datos.gob.cl/dataset/4e37c7e0-331d-4f5a-8bc9-7d35a8905630/resource/da97fbf3-8fe6-4d2f-a1d0-b51b014d8ed1/download/precipitacion_112016.csv",
+          "sha256": "6d303fc50f3e454cf912d681fd027129c8b3109279eeebc9fca8ca505095f88c",
+          "rows": 973,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2016-12",
+          "package": "precipitaciones-segundo-semestre-2016",
+          "url": "https://datos.gob.cl/dataset/4e37c7e0-331d-4f5a-8bc9-7d35a8905630/resource/2d4f41ff-9c88-4a82-9b3f-c9980c9cebbd/download/precipitacion_122016.csv",
+          "sha256": "41c80f6051e219747bbb6460af7d2e0f6210eedf3bb8a6d1f5a670910f2785aa",
+          "rows": 1003,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2017-02",
+          "package": "precipitaciones-primer-semestre-2017",
+          "url": "https://datos.gob.cl/dataset/8ac8b39b-dd85-4ac6-b020-ee859fbdeb56/resource/00212451-aff5-4534-af2c-8f730f10e724/download/precipitacion_022017.csv",
+          "sha256": "7890bb030648bf76d4829cf4cc35342928d69670feb32d6d48ecd9fd994962bd",
+          "rows": 908,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2017-03",
+          "package": "precipitaciones-primer-semestre-2017",
+          "url": "https://datos.gob.cl/dataset/8ac8b39b-dd85-4ac6-b020-ee859fbdeb56/resource/f2934a5f-4037-4f0a-9c5c-900ac8645f70/download/precipitacion_032017.csv",
+          "sha256": "ed96dc4b35d8044a9ae450763249caac14fe0e2dde5d7992130590e27b1952b6",
+          "rows": 1007,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2017-04",
+          "package": "precipitaciones-primer-semestre-2017",
+          "url": "https://datos.gob.cl/dataset/8ac8b39b-dd85-4ac6-b020-ee859fbdeb56/resource/60e6f2ac-1e69-41c5-8528-4de3fa44787e/download/precipitacion_042017.csv",
+          "sha256": "427bba038b14c8b615de3cac83d575eaf28557c71ea39e32f44d893d969dead4",
+          "rows": 957,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2017-05",
+          "package": "precipitaciones-primer-semestre-2017",
+          "url": "https://datos.gob.cl/dataset/8ac8b39b-dd85-4ac6-b020-ee859fbdeb56/resource/67a2b997-0f06-417f-8a5b-d119e7476eeb/download/precipitacion_052017.csv",
+          "sha256": "035445d49aea1a9414a38f45fb49db630384a1efe7bda3a1823b14ae17365893",
+          "rows": 1001,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2017-06",
+          "package": "precipitaciones-primer-semestre-2017",
+          "url": "https://datos.gob.cl/dataset/8ac8b39b-dd85-4ac6-b020-ee859fbdeb56/resource/db2cd233-614f-49e3-949f-250885b82620/download/precipitacion_062017.csv",
+          "sha256": "cdc9b226126102fea34213a0959d192b70c8a51cbe010e593adf12602e2c1931",
+          "rows": 946,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2017-07",
+          "package": "precipitaciones-segundo-semestre-2017",
+          "url": "https://datos.gob.cl/dataset/dfc40503-aab6-4321-b825-31100eee1c06/resource/306a5b1d-9cb5-4860-b9bd-476c51b5e76f/download/precipitacion_072017.csv",
+          "sha256": "f5208be5d1bdc4a22126efa83002ea0bc87be309a533cfa1c71f11e16ec1136a",
+          "rows": 971,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2017-08",
+          "package": "precipitaciones-segundo-semestre-2017",
+          "url": "https://datos.gob.cl/dataset/dfc40503-aab6-4321-b825-31100eee1c06/resource/5ad35eac-a230-4e55-bde6-e8aa3724672f/download/precipitacion_082017.csv",
+          "sha256": "ce961cc21c57310ce59eb171c2ef7bc50282b7cb09a6d287714d23a81d8018d0",
+          "rows": 1005,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2017-09",
+          "package": "precipitaciones-segundo-semestre-2017",
+          "url": "https://datos.gob.cl/dataset/dfc40503-aab6-4321-b825-31100eee1c06/resource/5a9d7d6c-d76e-405e-bb90-341dfae82651/download/precipitacion_092017.csv",
+          "sha256": "7f4512c037b531a77b27366b331d3f4b132cf242dfaf81862a798f0b8b00e6af",
+          "rows": 951,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2017-10",
+          "package": "precipitaciones-segundo-semestre-2017",
+          "url": "https://datos.gob.cl/dataset/dfc40503-aab6-4321-b825-31100eee1c06/resource/8c37cdf3-8cb4-4cbc-9637-caaae3348127/download/precipitacion_102017.csv",
+          "sha256": "7c2ff731c0a2f00935cd3c866751bf6354b87ef89157db2adb3e69109d5218b1",
+          "rows": 981,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2017-11",
+          "package": "precipitaciones-segundo-semestre-2017",
+          "url": "https://datos.gob.cl/dataset/dfc40503-aab6-4321-b825-31100eee1c06/resource/adae496a-eecd-4e34-8a2b-16874d97fdee/download/precipitacion_112017.csv",
+          "sha256": "35d31e699463343f5ef0838bf79e785d4183573143bc761f5ae516a085d2745b",
+          "rows": 962,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2017-12",
+          "package": "precipitaciones-segundo-semestre-2017",
+          "url": "https://datos.gob.cl/dataset/dfc40503-aab6-4321-b825-31100eee1c06/resource/e0b8746e-ad0e-4c5f-8b5a-eeeb8d782f8b/download/precipitacion_122017.csv",
+          "sha256": "6d7456813c74744fb407ce6e549866a8ec529a4972fad2ba7ee89010488eb063",
+          "rows": 991,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2018-01",
+          "package": "precipitaciones-primer-semestre-2018",
+          "url": "https://datos.gob.cl/dataset/2b3223ce-2d25-4776-aceb-de68abba2cc5/resource/3d386a31-2fb6-4b46-8e7b-1b229a0d77f5/download/precipitacion_012018.csv",
+          "sha256": "02904c305691bb6f065fd38f5d142f39cfa7f89874a36146e8b94133ec6b815c",
+          "rows": 1010,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2018-02",
+          "package": "precipitaciones-primer-semestre-2018",
+          "url": "https://datos.gob.cl/dataset/2b3223ce-2d25-4776-aceb-de68abba2cc5/resource/1acf4521-bb77-4a9a-ad56-86155022f926/download/precipitacion_022018.csv",
+          "sha256": "a0e11a7e459cb76409bb19439ba2d0affa3ea0b802da76c47166035a40168995",
+          "rows": 897,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2018-03",
+          "package": "precipitaciones-primer-semestre-2018",
+          "url": "https://datos.gob.cl/dataset/2b3223ce-2d25-4776-aceb-de68abba2cc5/resource/9aab3ab1-d61f-4287-9436-fadf4c3457c3/download/precipitacion_032018.csv",
+          "sha256": "67e126048afbc4678d9a400f1adfaf5532b8988959a785c192df8bd19ea2a6f4",
+          "rows": 995,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2018-04",
+          "package": "precipitaciones-primer-semestre-2018",
+          "url": "https://datos.gob.cl/dataset/2b3223ce-2d25-4776-aceb-de68abba2cc5/resource/819ed722-4bb3-4174-bbe6-655437dedc59/download/precipitacion_042018.csv",
+          "sha256": "7b318f60ab47f1d487a2555609e4f4be361a2a3c01610070d7fcabc1898bc0e4",
+          "rows": 967,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2018-05",
+          "package": "precipitaciones-primer-semestre-2018",
+          "url": "https://datos.gob.cl/dataset/2b3223ce-2d25-4776-aceb-de68abba2cc5/resource/900fcdff-4dd0-4dd5-abdf-5e0780b7a3be/download/precipitacion_052018.csv",
+          "sha256": "f904b81c8d83ec5dbf9d282261c256da56c1dc53752fc2eb98b87960f7c64090",
+          "rows": 1002,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2018-06",
+          "package": "precipitaciones-primer-semestre-2018",
+          "url": "https://datos.gob.cl/dataset/2b3223ce-2d25-4776-aceb-de68abba2cc5/resource/8fe72c54-0638-45e6-be5e-6654b0360cda/download/precipitacion_062018.csv",
+          "sha256": "0188a2ab70241d10822b0b14e21f952d0b577dd03fe6d88582f384d82df97a8f",
+          "rows": 965,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2018-07",
+          "package": "precipitaciones-segundo-semestre-2018",
+          "url": "https://datos.gob.cl/dataset/777b1411-d2c5-4b38-a2cf-2874d69cb445/resource/7ee1e417-66b8-46b3-a05b-75450fb8dcb8/download/precipitacion_072018.csv",
+          "sha256": "16eb4d2167f0efe71af9cf31d0d2f7cb5d27620babd8c860bb3a387b80cf06f1",
+          "rows": 990,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2018-08",
+          "package": "precipitaciones-segundo-semestre-2018",
+          "url": "https://datos.gob.cl/dataset/777b1411-d2c5-4b38-a2cf-2874d69cb445/resource/f6b385a3-cdf0-42ca-9032-08e7d865333c/download/precipitacion_082018.csv",
+          "sha256": "e2b66f53ebf258879b91d15166264c3268f9e16729bbfa0ef41a8d5499d10673",
+          "rows": 1000,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2018-09",
+          "package": "precipitaciones-segundo-semestre-2018",
+          "url": "https://datos.gob.cl/dataset/777b1411-d2c5-4b38-a2cf-2874d69cb445/resource/9ada977e-7151-47e4-9507-7b53b03146c2/download/precipitacion_092018.csv",
+          "sha256": "14c11b455a6e6451f155cb7a1151381e24cc349dd25ba2e7fd3bd9ff1ab4eb49",
+          "rows": 953,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2018-10",
+          "package": "precipitaciones-segundo-semestre-2018",
+          "url": "https://datos.gob.cl/dataset/777b1411-d2c5-4b38-a2cf-2874d69cb445/resource/bb11e1e8-ae7c-4ff7-9ac1-9d777d3cdd1c/download/precipitacion_102018.csv",
+          "sha256": "684f648c7cfd4daf6d437e0e9454d46c25c514a4815f155366f34664a29480cf",
+          "rows": 1001,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2018-11",
+          "package": "precipitaciones-segundo-semestre-2018",
+          "url": "https://datos.gob.cl/dataset/777b1411-d2c5-4b38-a2cf-2874d69cb445/resource/48d27e33-a5a7-4598-8c80-21ed5d59f17a/download/precipitacion_112018.csv",
+          "sha256": "dfb2e31497e270e77619173ac3ab7182dfa7d8591b27168dc60eff1319d4ede8",
+          "rows": 964,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2018-12",
+          "package": "precipitaciones-segundo-semestre-2018",
+          "url": "https://datos.gob.cl/dataset/777b1411-d2c5-4b38-a2cf-2874d69cb445/resource/323cbb74-bdb9-4dd6-af81-2b2f081e0281/download/precipitacion_122018.csv",
+          "sha256": "dac05b1da0562adfbe9d8e34373bea85d1532f7155502f5b36794b38190ae599",
+          "rows": 999,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2019-01",
+          "package": "precipitaciones-primer-semestre-2019",
+          "url": "https://datos.gob.cl/dataset/15031665-2b17-40d0-b27e-86bcf4f4c85d/resource/1d0373f7-dee8-4b5c-a373-b712ff644ae7/download/precipitacion_012019.csv",
+          "sha256": "17b7c1957699a6f3ba3f442b58c9cb8d4a618f4ca31383e9a79a7dd3b7853c8c",
+          "rows": 1012,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2019-02",
+          "package": "precipitaciones-primer-semestre-2019",
+          "url": "https://datos.gob.cl/dataset/15031665-2b17-40d0-b27e-86bcf4f4c85d/resource/0b24e194-8121-4421-9479-ab00439ebf03/download/precipitacion_022019.csv",
+          "sha256": "05763070a0ff418676e6716c5c04d7f5d03c39db91893b4a81b4c0660b6ac3b9",
+          "rows": 913,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2019-03",
+          "package": "precipitaciones-primer-semestre-2019",
+          "url": "https://datos.gob.cl/dataset/15031665-2b17-40d0-b27e-86bcf4f4c85d/resource/47857e3e-21ac-4c90-9b9f-570940f563e3/download/precipitacion_032019.csv",
+          "sha256": "29d7a8c7c97a30da7466dd63360286a8b1840a47470d622087a2cd330c56bda8",
+          "rows": 1008,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2019-04",
+          "package": "precipitaciones-primer-semestre-2019",
+          "url": "https://datos.gob.cl/dataset/15031665-2b17-40d0-b27e-86bcf4f4c85d/resource/49f97b24-e32f-4b9f-91ee-31cc79d244db/download/precipitacion_042019.csv",
+          "sha256": "1fe31de76acb18f8957753d57c65e5331c171cc4f74ae50c5bce821f11f7e22a",
+          "rows": 969,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2019-05",
+          "package": "precipitaciones-primer-semestre-2019",
+          "url": "https://datos.gob.cl/dataset/15031665-2b17-40d0-b27e-86bcf4f4c85d/resource/67e663e0-512e-4f95-829d-78b4cb06466b/download/precipitacion_052019.csv",
+          "sha256": "43c91a4e319568e57919377fb970ceefbe231e4559643f42b670e5beb685642b",
+          "rows": 1003,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2019-06",
+          "package": "precipitaciones-primer-semestre-2019",
+          "url": "https://datos.gob.cl/dataset/15031665-2b17-40d0-b27e-86bcf4f4c85d/resource/694d6de2-f476-4ee8-845e-d802a45afa7b/download/precipitacion_062019.csv",
+          "sha256": "b41c1d7a4339be060fadd6cc8d24e4f266dc00cb40d93cc09b154e76e50fe6e8",
+          "rows": 968,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2019-07",
+          "package": "precipitaciones-segundo-semestre-2019",
+          "url": "https://datos.gob.cl/dataset/ee9bf25c-77f8-4899-bbc9-8d3cf2b1f07e/resource/d502138d-bb55-4655-9223-a4c6a7b9f404/download/precipitacion_072019.csv",
+          "sha256": "10589883e931617553104a92d4240526382b711422d26660b10b98708d6c6128",
+          "rows": 1008,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2019-08",
+          "package": "precipitaciones-segundo-semestre-2019",
+          "url": "https://datos.gob.cl/dataset/ee9bf25c-77f8-4899-bbc9-8d3cf2b1f07e/resource/014ec2fc-74ca-4ba7-8094-fa168e8f0e49/download/precipitacion_082019.csv",
+          "sha256": "a362c72134f94592d513ec1adbe3eeaf597926cf88e540a1dd17f113f45dee1e",
+          "rows": 986,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2019-09",
+          "package": "precipitaciones-segundo-semestre-2019",
+          "url": "https://datos.gob.cl/dataset/ee9bf25c-77f8-4899-bbc9-8d3cf2b1f07e/resource/b8115a29-fa07-4459-a1dc-fe77dfbf01f8/download/precipitacion_092019.csv",
+          "sha256": "971fb8b2f6d8aca4896a1950e9c22c78a6edd58ef576e932d1d9bdd4ec56874e",
+          "rows": 955,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2019-10",
+          "package": "precipitaciones-segundo-semestre-2019",
+          "url": "https://datos.gob.cl/dataset/ee9bf25c-77f8-4899-bbc9-8d3cf2b1f07e/resource/6cf13fa6-24de-42de-ae2f-63b2304c021f/download/precipitacion_102019.csv",
+          "sha256": "016cae619674ed5ffbd81294ea6a7c36f54c6aaa323b3f1321e1421c822ad629",
+          "rows": 989,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2019-11",
+          "package": "precipitaciones-segundo-semestre-2019",
+          "url": "https://datos.gob.cl/dataset/ee9bf25c-77f8-4899-bbc9-8d3cf2b1f07e/resource/2992f1c3-21cd-444a-95a2-0344c9045457/download/precipitacion_112019.csv",
+          "sha256": "cfcf90d922c7fbc07d6bfe10ec610d43a5fe7c740de04cb72f8f175d67a0106e",
+          "rows": 915,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2019-12",
+          "package": "precipitaciones-segundo-semestre-2019",
+          "url": "https://datos.gob.cl/dataset/ee9bf25c-77f8-4899-bbc9-8d3cf2b1f07e/resource/76d8fd83-863c-4f65-8450-948873f5111a/download/precipitacion_122019.csv",
+          "sha256": "fe66ef085deb551cdf25da860a65de83b448ee7afc3233dd6229f0c3457c8574",
+          "rows": 976,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2020-01",
+          "package": "precipitaciones-primer-semestre-2020",
+          "url": "https://datos.gob.cl/dataset/ab811822-ec2d-45f7-8839-9933f41a4148/resource/82ac2d58-f4fd-41ab-91f2-7ec1f2471fef/download/precipitacion_012020.csv",
+          "sha256": "8eaa8018384ff18dfc71843d34eb4e60b6494472e34f31fe1b91db0284b96017",
+          "rows": 974,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2020-02",
+          "package": "precipitaciones-primer-semestre-2020",
+          "url": "https://datos.gob.cl/dataset/ab811822-ec2d-45f7-8839-9933f41a4148/resource/5ac87d15-1aad-49e8-bc27-c99a47e69568/download/precipitacion_022020.csv",
+          "sha256": "021ae05f0a93360961aa4ba60eb08abd8fff4e1000d03ea67a1e86f070b3e65e",
+          "rows": 943,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2020-03",
+          "package": "precipitaciones-primer-semestre-2020",
+          "url": "https://datos.gob.cl/dataset/ab811822-ec2d-45f7-8839-9933f41a4148/resource/eed99560-fa91-464d-83f2-9b99055275b9/download/precipitacion_032020.csv",
+          "sha256": "434dcb43b92c8e691cdfb942e39e6e572c2082f1b0ba0261b785c801acac61e3",
+          "rows": 1014,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2020-04",
+          "package": "precipitaciones-primer-semestre-2020",
+          "url": "https://datos.gob.cl/dataset/ab811822-ec2d-45f7-8839-9933f41a4148/resource/276149ae-0b86-4daf-a8d4-12cd2b500d38/download/precipitacion_042020.csv",
+          "sha256": "d913a6e7307d7d463f3b5a9eca48d72d5c5dff271662e2eb5bd972327e31548d",
+          "rows": 978,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2020-05",
+          "package": "precipitaciones-primer-semestre-2020",
+          "url": "https://datos.gob.cl/dataset/ab811822-ec2d-45f7-8839-9933f41a4148/resource/beef3a4f-ebc2-4c14-bdb0-f8dc717d4c5a/download/precipitacion_052020.csv",
+          "sha256": "bc5bbca6cf39038f503ffe94bce90873b5cb3ac02d99448ef55a4e8f695d20d4",
+          "rows": 1006,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2020-06",
+          "package": "precipitaciones-primer-semestre-2020",
+          "url": "https://datos.gob.cl/dataset/ab811822-ec2d-45f7-8839-9933f41a4148/resource/ec104021-f684-4ec1-a0c5-a66f379d1f24/download/precipitacion_062020.csv",
+          "sha256": "63840fa03c68abd9f648187cddf06703d09bcf27e46e246a1e7794530e0da3fe",
+          "rows": 978,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2020-07",
+          "package": "precipitaciones-segundo-semestre-2020",
+          "url": "https://datos.gob.cl/dataset/7036eb0f-9f95-47ff-b3c5-e1e950cec20f/resource/4d50db4b-1c52-46b2-a1c4-e7abd643cd0e/download/precipitacion_072020.csv",
+          "sha256": "8a9bc2fe40a6c5181c0c7b24db91d11a8dc7b44b4c9ba9cce27ac8c6e4f56691",
+          "rows": 1009,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2020-08",
+          "package": "precipitaciones-segundo-semestre-2020",
+          "url": "https://datos.gob.cl/dataset/7036eb0f-9f95-47ff-b3c5-e1e950cec20f/resource/18494503-dd3e-422d-9284-45126c990a96/download/precipitacion_082020.csv",
+          "sha256": "8ff3b5bc607394d14331ca42be27b59df850cf74aeaf36a173a3684264d8902f",
+          "rows": 1001,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2020-09",
+          "package": "precipitaciones-segundo-semestre-2020",
+          "url": "https://datos.gob.cl/dataset/7036eb0f-9f95-47ff-b3c5-e1e950cec20f/resource/41faa6fb-4c72-406c-8e2a-82784ea814b6/download/precipitacion_092020.csv",
+          "sha256": "a470351bdde0fdcca592f02d05fa1af188aaf4ca64ddb3e5df36dca102187dff",
+          "rows": 973,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2020-10",
+          "package": "precipitaciones-segundo-semestre-2020",
+          "url": "https://datos.gob.cl/dataset/7036eb0f-9f95-47ff-b3c5-e1e950cec20f/resource/56609bc0-46aa-4bd4-9932-53bfd8a16bb0/download/precipitacion_102020.csv",
+          "sha256": "ee46f573397842abe7c4e891b3421495e8ab9a6e9927645a7c3f0b3297226bd9",
+          "rows": 1001,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2020-11",
+          "package": "precipitaciones-segundo-semestre-2020",
+          "url": "https://datos.gob.cl/dataset/7036eb0f-9f95-47ff-b3c5-e1e950cec20f/resource/b0bb7abe-fb29-48f1-b535-0ae8ce37479c/download/precipitacion_112020.csv",
+          "sha256": "dabda22ca16aa74dd854d1745b0245508300b153f16946ae7ef066b507b4cf8c",
+          "rows": 977,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2020-12",
+          "package": "precipitaciones-segundo-semestre-2020",
+          "url": "https://datos.gob.cl/dataset/7036eb0f-9f95-47ff-b3c5-e1e950cec20f/resource/d8978741-f8e5-4ce5-9e0b-eecf08cac1a1/download/precipitacion_122020.csv",
+          "sha256": "b393e646c4e49e20d7397bead21e9d90424847de3dfa20ae8eca5e14924aee50",
+          "rows": 1000,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2021-01",
+          "package": "precipitaciones-primer-semestre-2021",
+          "url": "https://datos.gob.cl/dataset/5dd0fe39-436f-40a4-9aab-088a745bfbf7/resource/a8a3e13b-24a2-497c-aec1-c7f54cd284b8/download/precipitacion_012021.csv",
+          "sha256": "2408ce3ea5c24f659659ee91f3a74d381ab3f11f6f1e84884b7830dd5e5e6f51",
+          "rows": 988,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2021-02",
+          "package": "precipitaciones-primer-semestre-2021",
+          "url": "https://datos.gob.cl/dataset/5dd0fe39-436f-40a4-9aab-088a745bfbf7/resource/ef3b21f6-ce34-4be5-9195-66b7c41eb3c3/download/precipitacion_022021.csv",
+          "sha256": "ccdba927907da196814dc41a9de48e261d5dd01d40ee2a9c3dba20b2cda1006e",
+          "rows": 893,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2021-03",
+          "package": "precipitaciones-primer-semestre-2021",
+          "url": "https://datos.gob.cl/dataset/5dd0fe39-436f-40a4-9aab-088a745bfbf7/resource/3fb06724-e261-47d4-aa89-ef5eea70b280/download/precipitacion_032021.csv",
+          "sha256": "d4c257efc3dc9e3bc02e09b425b09e2e2bc65fd28c6a2d91b6e39c7b6acb51a9",
+          "rows": 1014,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2021-04",
+          "package": "precipitaciones-primer-semestre-2021",
+          "url": "https://datos.gob.cl/dataset/5dd0fe39-436f-40a4-9aab-088a745bfbf7/resource/c83853b1-7a6a-47ef-a09b-6e7692912471/download/precipitacion_042021.csv",
+          "sha256": "97705f8b8db8eb0f082c0a4d6394b79816f31f1bd36f7ddb629fbde424b5b6cd",
+          "rows": 978,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2021-05",
+          "package": "precipitaciones-primer-semestre-2021",
+          "url": "https://datos.gob.cl/dataset/5dd0fe39-436f-40a4-9aab-088a745bfbf7/resource/b8d84c5c-c8b0-4621-9444-9bd93eb7937c/download/precipitacion_052021.csv",
+          "sha256": "48d4af93c4f74b9fa468ba71526f2c1622e4edb7b6e7b62a0bb947732d22490c",
+          "rows": 1004,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2021-06",
+          "package": "precipitaciones-primer-semestre-2021",
+          "url": "https://datos.gob.cl/dataset/5dd0fe39-436f-40a4-9aab-088a745bfbf7/resource/4c19b056-2ba7-438f-8d7f-8c9e9c116318/download/precipitacion_062021.csv",
+          "sha256": "0544605e2796d570856927feab91c4e7437e1c2874aad15ca95b832b073f7bf3",
+          "rows": 967,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2021-07",
+          "package": "precipitaciones-segundo-semestre-2021",
+          "url": "https://datos.gob.cl/dataset/2600df6d-8645-4f95-afe4-43efa0c77ef2/resource/86ef3660-78b8-4150-9572-ba72dd2ee34a/download/precipitacion_072021.csv",
+          "sha256": "fa3b5cb62e178c0cc6c7a25b03ba748bb33848e33e2ca298f93651843f6b318a",
+          "rows": 992,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2021-08",
+          "package": "precipitaciones-segundo-semestre-2021",
+          "url": "https://datos.gob.cl/dataset/2600df6d-8645-4f95-afe4-43efa0c77ef2/resource/2b868396-7660-48e7-a709-e9caa4f4186f/download/precipitacion_082021.csv",
+          "sha256": "735f0415373234efa860ec407568351fd16ca99d5cff71e9bd2b3bfd9aa135ad",
+          "rows": 992,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2021-09",
+          "package": "precipitaciones-segundo-semestre-2021",
+          "url": "https://datos.gob.cl/dataset/2600df6d-8645-4f95-afe4-43efa0c77ef2/resource/0e228666-1ec9-4d52-94c5-43b9bf3904b4/download/precipitacion_092021.csv",
+          "sha256": "c4577b836b8e88344d59ff8bf810c1a7ca2bf7d2fefbf9855c8256329775f3ff",
+          "rows": 960,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2021-10",
+          "package": "precipitaciones-segundo-semestre-2021",
+          "url": "https://datos.gob.cl/dataset/2600df6d-8645-4f95-afe4-43efa0c77ef2/resource/0da68eed-0884-4c4e-ae8e-328e6397ff65/download/precipitacion_102021.csv",
+          "sha256": "51db19e3cf0da3610e05f63c8c0de0547b7aba4f611ab4e64c8fa3c660fceec6",
+          "rows": 992,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2021-11",
+          "package": "precipitaciones-segundo-semestre-2021",
+          "url": "https://datos.gob.cl/dataset/2600df6d-8645-4f95-afe4-43efa0c77ef2/resource/26760ddc-ae33-4716-88d3-ff85a669eab3/download/precipitacion_112021.csv",
+          "sha256": "cad7fecd7634e1fa7b6f8f11a1bbe2cd367cc16c1c2dd00c3adc53bc40ead54c",
+          "rows": 960,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2021-12",
+          "package": "precipitaciones-segundo-semestre-2021",
+          "url": "https://datos.gob.cl/dataset/2600df6d-8645-4f95-afe4-43efa0c77ef2/resource/fcbe378a-4675-4140-85cf-9d5624386727/download/precipitacion_122021.csv",
+          "sha256": "b57c6aec92f7ea9109ab168c0ba3c49a9e719a697b7810de8d2ae7742a4861da",
+          "rows": 992,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2022-01",
+          "package": "precipitaciones-primer-semestre-2022",
+          "url": "https://datos.gob.cl/dataset/037271d8-3569-4d3d-b89a-5cb81db4e79b/resource/df04caa4-9ddf-4887-a7cf-6a924f34dac1/download/precipitacion_012022.csv",
+          "sha256": "bca05d41c4326ae90621638820cba89565f62284f4d8a3df8d3f3af3c21820e8",
+          "rows": 1023,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2022-02",
+          "package": "precipitaciones-primer-semestre-2022",
+          "url": "https://datos.gob.cl/dataset/037271d8-3569-4d3d-b89a-5cb81db4e79b/resource/6729a7a4-47cf-412a-9e8b-36da8038d3f7/download/precipitacion_022022.csv",
+          "sha256": "83fb042f4fb6f5a58aa98c3811e517eebbbed8d53ea18fb128a3a04d7c8dc239",
+          "rows": 924,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2022-03",
+          "package": "precipitaciones-primer-semestre-2022",
+          "url": "https://datos.gob.cl/dataset/037271d8-3569-4d3d-b89a-5cb81db4e79b/resource/bb7d49c1-cb6e-48b3-94b1-0b103c672027/download/precipitacion_032022.csv",
+          "sha256": "7b941532d086beee29fd5d98979dfae708e97789129050dde73619a2b031074a",
+          "rows": 1023,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2022-04",
+          "package": "precipitaciones-primer-semestre-2022",
+          "url": "https://datos.gob.cl/dataset/037271d8-3569-4d3d-b89a-5cb81db4e79b/resource/2d814d72-4306-425b-b0db-f2827dbb67a6/download/precipitacion_042022.csv",
+          "sha256": "47cba80060570dfc892c628fc439fe19c0fc9ba7823a20de1bc5ccf6a0b3ef87",
+          "rows": 990,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2022-05",
+          "package": "precipitaciones-primer-semestre-2022",
+          "url": "https://datos.gob.cl/dataset/037271d8-3569-4d3d-b89a-5cb81db4e79b/resource/c4b42992-52da-4bf7-bd75-7aa3c6479d3d/download/precipitacion_052022.csv",
+          "sha256": "3af5200d4bc6a174791c7f66fd060b74d35d715729f86290637fd976fba58e04",
+          "rows": 1023,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2022-06",
+          "package": "precipitaciones-primer-semestre-2022",
+          "url": "https://datos.gob.cl/dataset/037271d8-3569-4d3d-b89a-5cb81db4e79b/resource/6bcc096a-ca4f-4213-9422-63ae2d9e3e03/download/precipitacion_062022.csv",
+          "sha256": "1068f7e1d661e06d5c5628e5a151dcacda1abe4d5c30868d47c41fc6f9264890",
+          "rows": 990,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2022-07",
+          "package": "precipitaciones-segundo-semestre-2022",
+          "url": "https://datos.gob.cl/dataset/386d1ef2-8bd9-4e78-9460-2a58b4bcddf2/resource/704e3443-e9ad-463f-95eb-584c748d143f/download/precipitacion_072022.csv",
+          "sha256": "c8c7b8c8b99ce6bc95bc1991e828d6837c11c585f27c6739332a8aa459f52566",
+          "rows": 1023,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2022-08",
+          "package": "precipitaciones-segundo-semestre-2022",
+          "url": "https://datos.gob.cl/dataset/386d1ef2-8bd9-4e78-9460-2a58b4bcddf2/resource/5f932bb1-1f87-4795-826c-bff5bf3fe02d/download/precipitacion_082022.csv",
+          "sha256": "8847c44ae9b18248c2d50a7637644a8d63cfff0e6dacefa1a6421e6f7f07e64b",
+          "rows": 1023,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2022-09",
+          "package": "precipitaciones-segundo-semestre-2022",
+          "url": "https://datos.gob.cl/dataset/386d1ef2-8bd9-4e78-9460-2a58b4bcddf2/resource/7d7b1b8d-6771-4865-a367-7ea0196f9e00/download/precipitacion_092022.csv",
+          "sha256": "9e4b1609997ddefc7a74dcc54aa96a8fa238f0ed9c29c57a8d86bf1ba54176ec",
+          "rows": 990,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2022-10",
+          "package": "precipitaciones-segundo-semestre-2022",
+          "url": "https://datos.gob.cl/dataset/386d1ef2-8bd9-4e78-9460-2a58b4bcddf2/resource/37068e5b-d577-460e-91c1-4155635653ef/download/precipitacion_102022.csv",
+          "sha256": "863245fa298650bdab2d24bb41f469697f61d5aa9cfac8558f43638195c096fd",
+          "rows": 1023,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2022-11",
+          "package": "precipitaciones-segundo-semestre-2022",
+          "url": "https://datos.gob.cl/dataset/386d1ef2-8bd9-4e78-9460-2a58b4bcddf2/resource/90dedb2b-6375-4e92-bee3-bb22949d58b1/download/precipitacion_112022.csv",
+          "sha256": "6bacb4a1209dc5fdd58e29483f7c7c40143475c9ad93bd0fdbf65e88d5e2f8a7",
+          "rows": 990,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2022-12",
+          "package": "precipitaciones-segundo-semestre-2022",
+          "url": "https://datos.gob.cl/dataset/386d1ef2-8bd9-4e78-9460-2a58b4bcddf2/resource/788aa89f-5648-4f32-af35-6f5782b2e751/download/precipitacion_122022.csv",
+          "sha256": "1d3f780e529ad821c6101a5834694a55b2bc61ae778097bfa573a53aa04ba9bf",
+          "rows": 1023,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2023-01",
+          "package": "precipitaciones-primer-semestre-2023",
+          "url": "https://datos.gob.cl/dataset/5025f1c0-85e6-4510-9898-29cd6b4710e0/resource/578a828a-6cc5-4619-9d06-f3a201254ff5/download/precipitacion_012023.csv",
+          "sha256": "c9e133c3960e595968b58693c78044be920358e733aff9e0fd5a18257eb6d5cb",
+          "rows": 1023,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2023-02",
+          "package": "precipitaciones-primer-semestre-2023",
+          "url": "https://datos.gob.cl/dataset/5025f1c0-85e6-4510-9898-29cd6b4710e0/resource/54b47d66-1a61-4cac-9ab5-0a958398e02f/download/precipitacion_022023.csv",
+          "sha256": "a9d98d8f22e2ed9d60a441c0dfdf33f951180df980cac169fef547c2431794ad",
+          "rows": 924,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2023-03",
+          "package": "precipitaciones-primer-semestre-2023",
+          "url": "https://datos.gob.cl/dataset/5025f1c0-85e6-4510-9898-29cd6b4710e0/resource/51f03607-9874-434d-b71d-8395c74b4c2d/download/precipitacion_032023.csv",
+          "sha256": "77679878d030138bfd35521a5570ce0952ce469f12941948249c32a191b0fb7e",
+          "rows": 1023,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2023-04",
+          "package": "precipitaciones-primer-semestre-2023",
+          "url": "https://datos.gob.cl/dataset/5025f1c0-85e6-4510-9898-29cd6b4710e0/resource/114252fc-e1ed-41f6-827c-f97ae0d9ebdd/download/precipitacion_042023.csv",
+          "sha256": "fedee43e6c7ede9d518a6714dd5860a3f1740311820082ed7a2c15ffc25527d4",
+          "rows": 990,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2023-05",
+          "package": "precipitaciones-primer-semestre-2023",
+          "url": "https://datos.gob.cl/dataset/5025f1c0-85e6-4510-9898-29cd6b4710e0/resource/76d30597-4994-4008-913d-d122a1f59b25/download/precipitacion_052023.csv",
+          "sha256": "16d1ee9fc0ce42fc0263fc290f1b451048557e655a6871cdad3b25d1654e94ec",
+          "rows": 1023,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2023-06",
+          "package": "precipitaciones-primer-semestre-2023",
+          "url": "https://datos.gob.cl/dataset/5025f1c0-85e6-4510-9898-29cd6b4710e0/resource/b3930af1-2aa3-4497-88ac-18d40596b7b5/download/precipitacion_062023.csv",
+          "sha256": "217c53b9d88d537fd4b930a4292aa737a0f6cd511c630d8a5c87c9b925d8727d",
+          "rows": 990,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2023-07",
+          "package": "precipitaciones-segundo-semestre-2023",
+          "url": "https://datos.gob.cl/dataset/c454584a-b78a-4ff1-a64a-5765f4279bd9/resource/610fdb4f-9fe9-47d7-809e-4607a67b7e61/download/precipitacion_072023.csv",
+          "sha256": "3218e643f272b30871af04a0168666a8cf41bf8a6aa3b3e02da9b6593848ef72",
+          "rows": 1023,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2023-08",
+          "package": "precipitaciones-segundo-semestre-2023",
+          "url": "https://datos.gob.cl/dataset/c454584a-b78a-4ff1-a64a-5765f4279bd9/resource/39fb82a9-3132-4629-8f85-16c2f69fa268/download/precipitacion_082023.csv",
+          "sha256": "297b190e9a2e8a95b13bc4ed8c0d11e2c85cf1d328b5af6e0dec775d8cc1fda3",
+          "rows": 1023,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2023-09",
+          "package": "precipitaciones-segundo-semestre-2023",
+          "url": "https://datos.gob.cl/dataset/c454584a-b78a-4ff1-a64a-5765f4279bd9/resource/977e942e-a342-477e-b3e1-1eb2a48f9088/download/precipitacion_092023.csv",
+          "sha256": "f9e44a97575831edb6a9741bbab5bb601e2520307676cd1cbb882063b3b04b6c",
+          "rows": 990,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2023-10",
+          "package": "precipitaciones-segundo-semestre-2023",
+          "url": "https://datos.gob.cl/dataset/c454584a-b78a-4ff1-a64a-5765f4279bd9/resource/adf1dbd8-32a4-446b-be4e-92822547d119/download/precipitacion_102023.csv",
+          "sha256": "40364f5bce535e4d93f926436fe77117a15a79bf1fc03ccef43d05bd90d6ab26",
+          "rows": 1023,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2023-11",
+          "package": "precipitaciones-segundo-semestre-2023",
+          "url": "https://datos.gob.cl/dataset/c454584a-b78a-4ff1-a64a-5765f4279bd9/resource/f3535e54-f286-4f3e-902f-51a63bb06708/download/precipitacion_112023.csv",
+          "sha256": "6e5ff2ec7dd55c901f573afb40c07dc8d0d68c8207d3571146b01b552e9d02ad",
+          "rows": 990,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2023-12",
+          "package": "precipitaciones-segundo-semestre-2023",
+          "url": "https://datos.gob.cl/dataset/c454584a-b78a-4ff1-a64a-5765f4279bd9/resource/9311ca4d-7d9e-4b92-8af0-2a3728c0f984/download/precipitacion_122023.csv",
+          "sha256": "b1b3f61de458d4eec6c423699ee582a932ac8c62537c3480ccbccb378693602d",
+          "rows": 1023,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2024-01",
+          "package": "precipitaciones-2024",
+          "url": "https://datos.gob.cl/dataset/9e1b6a28-7b9c-43ee-913f-20b517b2bbb4/resource/5ef53156-a849-49d9-9b0f-a7c88b226271/download/precipitacion_012024.csv",
+          "sha256": "e5d9730d15ffdce086183e0859668bad36741cbcd967af6d70563f753ebf08f9",
+          "rows": 1023,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2024-02",
+          "package": "precipitaciones-2024",
+          "url": "https://datos.gob.cl/dataset/9e1b6a28-7b9c-43ee-913f-20b517b2bbb4/resource/820a588d-daac-4151-ae4f-76b3b64aa228/download/precipitacion_022024.csv",
+          "sha256": "37ebaae1d0691e072b6690e4f671842119b24f1b6a8cf334605975cdc3ff0c17",
+          "rows": 957,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2024-03",
+          "package": "precipitaciones-2024",
+          "url": "https://datos.gob.cl/dataset/9e1b6a28-7b9c-43ee-913f-20b517b2bbb4/resource/8e3bdb66-0376-4113-aa2f-bfb81e141120/download/precipitacion_032024.csv",
+          "sha256": "522cebb171147629d25418ffe29709460952b20545613c53f8e552e709b524b9",
+          "rows": 1023,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2024-04",
+          "package": "precipitaciones-2024",
+          "url": "https://datos.gob.cl/dataset/9e1b6a28-7b9c-43ee-913f-20b517b2bbb4/resource/2fd2b0f1-c6ad-43b7-a282-bd3dc4276d7c/download/precipitacion_042024.csv",
+          "sha256": "e5af5308a865d3a603694ab7377964177cabb0b22736024952632b990eec6e46",
+          "rows": 990,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2024-05",
+          "package": "precipitaciones-2024",
+          "url": "https://datos.gob.cl/dataset/9e1b6a28-7b9c-43ee-913f-20b517b2bbb4/resource/ad73a4d4-4cb2-4144-8c08-eb6e9520e88a/download/precipitacion_052024.csv",
+          "sha256": "f8e1ed00555732d83687ba1920bba43a2944b6c8073b53055be9e87180796ca0",
+          "rows": 1023,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2024-06",
+          "package": "precipitaciones-2024",
+          "url": "https://datos.gob.cl/dataset/9e1b6a28-7b9c-43ee-913f-20b517b2bbb4/resource/b1c63be7-c3d1-4daa-aa29-6128c5646d13/download/precipitacion_062024.csv",
+          "sha256": "d88d3a88cda7863a686aa1e4f3277b10bf15f53181fe98183a9fb6dbbb01d5cd",
+          "rows": 990,
+          "license": "cc-by"
+        },
+        {
+          "year_month": "2024-07",
+          "package": "precipitaciones-2do-semestre-del-ano-2024",
+          "url": "https://datos.gob.cl/dataset/815ce9c1-8f65-45c2-a600-119c868ec01b/resource/8f57fbc0-a6dd-4107-9672-5fa22e61f444/download/precipitacion_072024.csv",
+          "sha256": "a36e76fa946f683881f9dc28110e2bf1ffa47d89c92fa6af0c23a892ceb2aa2f",
+          "rows": 1023,
+          "license": "cc-zero"
+        },
+        {
+          "year_month": "2024-08",
+          "package": "precipitaciones-2do-semestre-del-ano-2024",
+          "url": "https://datos.gob.cl/dataset/815ce9c1-8f65-45c2-a600-119c868ec01b/resource/324e9f90-aa97-4460-9cd5-18b6397aa6dc/download/precipitacion_082024.csv",
+          "sha256": "41f1e66ca8d2a5617cc05229b3bcee8f78b7deeb239323d3fb981c7f72dba333",
+          "rows": 1023,
+          "license": "cc-zero"
+        },
+        {
+          "year_month": "2024-09",
+          "package": "precipitaciones-2do-semestre-del-ano-2024",
+          "url": "https://datos.gob.cl/dataset/815ce9c1-8f65-45c2-a600-119c868ec01b/resource/7940218f-02ae-442f-89d5-694a4f052a92/download/precipitacion_092024.csv",
+          "sha256": "e5faa4273af66d27d0629d81fd65cfa02bf3846d7022c942baa82eaa84661d3a",
+          "rows": 990,
+          "license": "cc-zero"
+        },
+        {
+          "year_month": "2024-10",
+          "package": "precipitaciones-2do-semestre-del-ano-2024",
+          "url": "https://datos.gob.cl/dataset/815ce9c1-8f65-45c2-a600-119c868ec01b/resource/4815c02b-db21-4b36-82ba-579dd10723d6/download/precipitacion_102024.csv",
+          "sha256": "2e1618c6229f1944873f3aa24bbfe4ffb932654432a171f9550cdf7a54324dde",
+          "rows": 1023,
+          "license": "cc-zero"
+        },
+        {
+          "year_month": "2024-11",
+          "package": "precipitaciones-2do-semestre-del-ano-2024",
+          "url": "https://datos.gob.cl/dataset/815ce9c1-8f65-45c2-a600-119c868ec01b/resource/c4bc2282-452b-4cf4-b369-1ea85564a3b3/download/precipitacion_112024.csv",
+          "sha256": "b17957672fabf40faecee1da83cff3e1c0177152f6c24197d6759b46e3c4e059",
+          "rows": 990,
+          "license": "cc-zero"
+        },
+        {
+          "year_month": "2024-12",
+          "package": "precipitaciones-2do-semestre-del-ano-2024",
+          "url": "https://datos.gob.cl/dataset/815ce9c1-8f65-45c2-a600-119c868ec01b/resource/dcfcfaad-05c0-47d7-8ea3-d745c05905b3/download/precipitacion_122024.csv",
+          "sha256": "7c4fc4f598872413d38966fca2fd20447dd1cb68f46bea43b98c88db9637a06f",
+          "rows": 1023,
+          "license": "cc-zero"
+        },
+        {
+          "year_month": "2025-01",
+          "package": "precipitacion-1er-semestre-2025",
+          "url": "https://datos.gob.cl/dataset/f93bf482-983e-4a1e-8e7d-ebd2579aa087/resource/47af485c-b28c-4d4e-ac69-ad138c8516d8/download/precipitacion_012025.csv",
+          "sha256": "5897579665cbf243d9019389e555e94014f050daf385057a658953bf6e0754cf",
+          "rows": 1023,
+          "license": "cc-zero"
+        },
+        {
+          "year_month": "2025-02",
+          "package": "precipitacion-1er-semestre-2025",
+          "url": "https://datos.gob.cl/dataset/f93bf482-983e-4a1e-8e7d-ebd2579aa087/resource/1f90abaa-f76b-42fa-b851-afbc7f87b916/download/precipitacion_022025.csv",
+          "sha256": "b88a1c604e21f00981a701f10963924fe4272632e3c9e5f0566a975098ff7e53",
+          "rows": 924,
+          "license": "cc-zero"
+        },
+        {
+          "year_month": "2025-03",
+          "package": "precipitacion-1er-semestre-2025",
+          "url": "https://datos.gob.cl/dataset/f93bf482-983e-4a1e-8e7d-ebd2579aa087/resource/79a67e9e-1bbe-4e06-84b3-1c84a5ac897b/download/precipitacion_032025.csv",
+          "sha256": "d4354fe089e230e7e25a3b1dd2e582686996e6212823e7e7a030cb1e30473652",
+          "rows": 1023,
+          "license": "cc-zero"
+        },
+        {
+          "year_month": "2025-04",
+          "package": "precipitacion-1er-semestre-2025",
+          "url": "https://datos.gob.cl/dataset/f93bf482-983e-4a1e-8e7d-ebd2579aa087/resource/4b13201f-3c9b-42df-8c5a-2a5b8b0bad7a/download/precipitacion_042025.csv",
+          "sha256": "e9401156d3d733cd91b321a0b4a9d789cc5588649b3ef75dbb1d0e268b45f6b6",
+          "rows": 990,
+          "license": "cc-zero"
+        },
+        {
+          "year_month": "2025-05",
+          "package": "precipitacion-1er-semestre-2025",
+          "url": "https://datos.gob.cl/dataset/f93bf482-983e-4a1e-8e7d-ebd2579aa087/resource/67620052-0ce8-4ae4-942e-7de12ff25f53/download/precipitacion_052025.csv",
+          "sha256": "70175b3c2acb8d38508a6b92c9eccc84d11f39ed86cd4de53c92ad8be28b3574",
+          "rows": 1023,
+          "license": "cc-zero"
+        },
+        {
+          "year_month": "2025-06",
+          "package": "precipitacion-1er-semestre-2025",
+          "url": "https://datos.gob.cl/dataset/f93bf482-983e-4a1e-8e7d-ebd2579aa087/resource/6a44f611-5742-48e4-adeb-cecbf06800ca/download/precipitacion_062025.csv",
+          "sha256": "606049d56168c6415db8d131669cd14ee440cc61713c3206b1dcb09d1f075d19",
+          "rows": 990,
+          "license": "cc-zero"
+        },
+        {
+          "year_month": "2025-07",
+          "package": "precipitaciones-2do-semestre-2025",
+          "url": "https://datos.gob.cl/dataset/0ff4418c-ba03-4004-8664-1d81d810433c/resource/a954e2ca-44aa-443b-8a4e-b9c5fcfd1fb7/download/precipitacion_072025.csv",
+          "sha256": "32652f6258e95687586ca663e5ec441b2bb35615cda057ad75b0fdaadc8a4b86",
+          "rows": 1023,
+          "license": "cc-zero"
+        },
+        {
+          "year_month": "2025-08",
+          "package": "precipitaciones-2do-semestre-2025",
+          "url": "https://datos.gob.cl/dataset/0ff4418c-ba03-4004-8664-1d81d810433c/resource/dbc3b023-12ee-4636-ae93-001ec891c299/download/precipitacion_082025.csv",
+          "sha256": "30424f4af90c74a035300fbfd03037fb7581d402a33a2c86a57d43b007eb175d",
+          "rows": 1023,
+          "license": "cc-zero"
+        },
+        {
+          "year_month": "2025-09",
+          "package": "precipitaciones-2do-semestre-2025",
+          "url": "https://datos.gob.cl/dataset/0ff4418c-ba03-4004-8664-1d81d810433c/resource/6fd4d2a0-b3a2-4d97-91ef-be0fb00d4783/download/precipitacion_092025.csv",
+          "sha256": "a1a41774f198ce8cd5d4f98cb61950e9a4648fe7ce38f94b1ece0b3a1cfc274f",
+          "rows": 990,
+          "license": "cc-zero"
+        },
+        {
+          "year_month": "2025-10",
+          "package": "precipitaciones-2do-semestre-2025",
+          "url": "https://datos.gob.cl/dataset/0ff4418c-ba03-4004-8664-1d81d810433c/resource/0867b2df-51b2-4ceb-9cc4-245e21ad88d2/download/precipitacion_102025.csv",
+          "sha256": "05b6048b2a7ea38a46b82f5ec0795899f82a7499d5665457ede830681c6430fb",
+          "rows": 1023,
+          "license": "cc-zero"
+        },
+        {
+          "year_month": "2025-11",
+          "package": "precipitaciones-2do-semestre-2025",
+          "url": "https://datos.gob.cl/dataset/0ff4418c-ba03-4004-8664-1d81d810433c/resource/d1243efb-8c8a-4ed3-9a41-f6547c6fda82/download/precipitacion_112025.csv",
+          "sha256": "fda05f649245f361a67303594dd3b881cb5690302f84b2f275045a22c55fe965",
+          "rows": 990,
+          "license": "cc-zero"
+        },
+        {
+          "year_month": "2025-12",
+          "package": "precipitaciones-2do-semestre-2025",
+          "url": "https://datos.gob.cl/dataset/0ff4418c-ba03-4004-8664-1d81d810433c/resource/4ac7c005-1e73-4cb6-928b-ade310292318/download/precipitacion_122025.csv",
+          "sha256": "8ed715e8a0505c311aa6034784e61dda93859785517671133b8e475a553ab97e",
+          "rows": 1023,
+          "license": "cc-zero"
+        },
+        {
+          "year_month": "2026-01",
+          "package": "precipitacion-1er-semestre-2026",
+          "url": "https://datos.gob.cl/dataset/e60928b5-1d81-4e46-a85d-2db4df598c32/resource/0abd8648-98ba-4b2b-9d5e-e9b83740c730/download/precipitacion_012026.csv",
+          "sha256": "2fbcfa24388d8773acc610894b37cc99812aa09f41cf10fba8eebfb13b4adf4d",
+          "rows": 1023,
+          "license": "cc-zero"
+        },
+        {
+          "year_month": "2026-02",
+          "package": "precipitacion-1er-semestre-2026",
+          "url": "https://datos.gob.cl/dataset/e60928b5-1d81-4e46-a85d-2db4df598c32/resource/cc82873a-ce90-420e-878f-93e2ee34c928/download/precipitacion_022026.csv",
+          "sha256": "4487a95a954080e6dae1aff966dc951c992ff1e1fa30b864f9e8f4a91907f43b",
+          "rows": 924,
+          "license": "cc-zero"
+        },
+        {
+          "year_month": "2026-03",
+          "package": "precipitacion-1er-semestre-2026",
+          "url": "https://datos.gob.cl/dataset/e60928b5-1d81-4e46-a85d-2db4df598c32/resource/782fc524-decf-4812-aa6f-12b4ca3514f7/download/precipitacion_032026.csv",
+          "sha256": "4ea423a2d478fea10f9ead019c5f89a175f9e8d67795e40bbf8bfa22d5ae0d67",
+          "rows": 1023,
+          "license": "cc-zero"
+        },
+        {
+          "year_month": "2026-04",
+          "package": "precipitacion-1er-semestre-2026",
+          "url": "https://datos.gob.cl/dataset/e60928b5-1d81-4e46-a85d-2db4df598c32/resource/252f58aa-bc55-45c0-9660-0b7d2f0d9796/download/precipitacion_042026.csv",
+          "sha256": "2d715a83f62de816b9d5710cbc54b560b9db9fabd6028d6bc9b515c54f88c083",
+          "rows": 990,
+          "license": "cc-zero"
+        },
+        {
+          "year_month": "2026-05",
+          "package": "precipitacion-1er-semestre-2026",
+          "url": "https://datos.gob.cl/dataset/e60928b5-1d81-4e46-a85d-2db4df598c32/resource/019da271-5a1c-420f-9081-bee37d0c56f6/download/precipitacion_052026.csv",
+          "sha256": "06a2d44bec8c2d339126b1c16eed682b158bda8d13876c0c36231a5a09c7673d",
+          "rows": 1023,
+          "license": "cc-zero"
+        },
+        {
+          "year_month": "2026-06",
+          "package": "precipitacion-1er-semestre-2026",
+          "url": "https://datos.gob.cl/dataset/e60928b5-1d81-4e46-a85d-2db4df598c32/resource/67847b70-e434-4ebc-951e-5ae95bc5e621/download/precipitacion_062026.csv",
+          "sha256": "6aa2f63dde5a55af3c66fe069f5f626823ceee6c23f93e1a3e93e32555db96b5",
+          "rows": 990,
+          "license": "cc-zero"
+        }
+      ],
+      "notes": [
+        "Estaciones observacionales; sin CUT comunal ni interpolación.",
+        "No se imputa lluvia ni se sustituyen faltantes por ceros.",
+        "2026 solo primer semestre; comparaciones anuales requieren años completos.",
+        "2014/2015-I del catálogo legacy CC-NC excluidos; no se inventa continuidad.",
+        "2017-01 excluido: la DGAC publicó temperaturas bajo nombre de precipitaciones.",
+        "Licencia registrada por archivo; las diferencias requieren atribución adecuada.",
+        "Fuera del bundle estable hasta validación de calidad longitudinal."
+      ],
+      "source_detail": "CKAN: 143 archivos-mes, 2013–2026, licencias CC BY/CC0",
+      "refreshed_at_utc": "2026-10-17T03:25:07.715081+00:00",
+      "reuse_policy": {
+        "status": "open-attribution",
+        "license": "CC BY + CC0 (licencia individual por archivo)",
+        "license_url": "https://datos.gob.cl/organization/direccion_general_de_aeronautica_civil",
+        "attribution_required": true,
+        "redistribution_ok": true,
+        "summary": "Solo CSV de paquetes DGAC cc-by y cc-zero; 2014 y 2015-I CC-NC excluidos y enero 2017 en cuarentena por datos de temperatura."
+      },
+      "freshness": {
+        "status": "fresh",
+        "age_hours": 211.67,
+        "max_age_hours": 2160,
+        "checked_at_utc": "2026-10-25T23:05:34.392334+00:00"
+      },
+      "degradation": {
+        "status": "none",
+        "impact": "1 observación(es) esperada(s): DGAC: cobertura parcial por diseño; 2014 y 2015-I se excluyen por CC-NC; enero 2017 en cuarentena por contener temperaturas; 2026 solo primer semestre.",
+        "recommended_action": "Ninguna."
+      },
+      "coverage": {
+        "status": "not_applicable",
+        "expected_record_count": null,
+        "actual_record_count": 141436,
+        "coverage_ratio": null,
+        "summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
+        "expected": false
+      },
+      "contract_primary_key": [
+        "fecha",
+        "id_estacion"
+      ],
+      "contract_required_columns": [
+        "fecha",
+        "id_estacion",
+        "nombre_estacion",
+        "latitud_dms",
+        "altitud_m",
+        "precipitacion_mm",
+        "url_fuente",
+        "licencia_fuente"
+      ],
+      "contract_column_types": {
+        "fecha": "string",
+        "id_estacion": "string",
+        "nombre_estacion": "string",
+        "latitud_dms": "string",
+        "altitud_m": "float",
+        "precipitacion_mm": "float",
+        "url_fuente": "string",
+        "licencia_fuente": "string"
+      },
+      "contract_nullable_columns": [
+        "precipitacion_mm"
+      ],
+      "contract_exists": true,
+      "drift": {
         "status": "healthy",
         "summary": "Sin drift operativo detectado en este build.",
         "recommended_action": "Ninguna."
@@ -1907,7 +3200,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.06
+      "freshness_age_hours": 0.32
     },
     "provincias": {
       "dataset": "provincias",
@@ -1916,7 +3209,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.06
+      "freshness_age_hours": 0.32
     },
     "comunas": {
       "dataset": "comunas",
@@ -1925,7 +3218,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.06
+      "freshness_age_hours": 0.32
     },
     "comunas_enriquecidas": {
       "dataset": "comunas_enriquecidas",
@@ -1934,12 +3227,12 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.06
+      "freshness_age_hours": 0.32
     },
     "indicadores": {
       "dataset": "indicadores",
       "status": "ok",
-      "record_count": 724,
+      "record_count": 738,
       "errors": [],
       "warnings": [
         "indicadores live refresh reused last published artifact for missing codes: ipc"
@@ -1953,7 +3246,7 @@
       ],
       "anomalies": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.05
+      "freshness_age_hours": 0.32
     },
     "censo_comunal": {
       "dataset": "censo_comunal",
@@ -1962,7 +3255,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.05
+      "freshness_age_hours": 0.32
     },
     "establecimientos_salud": {
       "dataset": "establecimientos_salud",
@@ -1971,7 +3264,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.05
+      "freshness_age_hours": 0.32
     },
     "censo_hogares_viviendas": {
       "dataset": "censo_hogares_viviendas",
@@ -1980,7 +3273,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.05
+      "freshness_age_hours": 0.32
     },
     "distritos_electorales": {
       "dataset": "distritos_electorales",
@@ -1989,7 +3282,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.05
+      "freshness_age_hours": 0.32
     },
     "establecimientos_educacionales": {
       "dataset": "establecimientos_educacionales",
@@ -1998,7 +3291,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.05
+      "freshness_age_hours": 248.48
     },
     "finanzas_municipales": {
       "dataset": "finanzas_municipales",
@@ -2007,7 +3300,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 1067.59
+      "freshness_age_hours": 1316.02
     },
     "resultados_educacionales": {
       "dataset": "resultados_educacionales",
@@ -2016,7 +3309,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.04
+      "freshness_age_hours": 248.47
     },
     "indicadores_urbanos_siedu": {
       "dataset": "indicadores_urbanos_siedu",
@@ -2030,7 +3323,7 @@
         "indicadores_urbanos_siedu has intentionally partial urban coverage"
       ],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.04
+      "freshness_age_hours": 0.32
     },
     "empresas": {
       "dataset": "empresas",
@@ -2044,7 +3337,7 @@
         "RES solo cubre constituciones bajo Ley 20.659 (regimen simplificado). No incluye empresas del regimen tradicional (Diario Oficial) ni empresas anteriores a mayo 2013."
       ],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.03
+      "freshness_age_hours": 0.32
     },
     "pobreza_comunal": {
       "dataset": "pobreza_comunal",
@@ -2058,7 +3351,7 @@
         "cobertura SAE: 345/346 comunas (99.7%) — parcial por diseño; comunas sin muestra no tienen estimación"
       ],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.03
+      "freshness_age_hours": 0.32
     },
     "consumo_electrico_comunal": {
       "dataset": "consumo_electrico_comunal",
@@ -2071,7 +3364,7 @@
         "consumo_electrico_comunal source_mode is fallback; usando datos de muestra mínima."
       ],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.03
+      "freshness_age_hours": 0.32
     },
     "partidos_politicos": {
       "dataset": "partidos_politicos",
@@ -2085,7 +3378,7 @@
         "estado_legal poblado (vía SERVEL) en 16/37 partidos"
       ],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.03
+      "freshness_age_hours": 0.32
     },
     "autoridades_electas": {
       "dataset": "autoridades_electas",
@@ -2094,7 +3387,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.0
+      "freshness_age_hours": 723.55
     },
     "estadisticas_vitales": {
       "dataset": "estadisticas_vitales",
@@ -2103,7 +3396,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.01
+      "freshness_age_hours": 0.31
     },
     "permisos_edificacion": {
       "dataset": "permisos_edificacion",
@@ -2112,7 +3405,7 @@
       "errors": [],
       "warnings": [],
       "freshness_status": "fresh",
-      "freshness_age_hours": 475.52
+      "freshness_age_hours": 0.31
     },
     "calidad_aire": {
       "dataset": "calidad_aire",
@@ -2120,13 +3413,28 @@
       "record_count": 8462,
       "errors": [],
       "warnings": [
-        "cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación"
+        "cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación",
+        "calidad_aire freshness is stale: 248.44h since refresh, policy max is 72h"
       ],
       "expected_warnings": [
         "cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación"
       ],
+      "freshness_status": "stale",
+      "freshness_age_hours": 248.44
+    },
+    "precipitaciones_dgac": {
+      "dataset": "precipitaciones_dgac",
+      "status": "ok",
+      "record_count": 141436,
+      "errors": [],
+      "warnings": [
+        "DGAC: cobertura parcial por diseño; 2014 y 2015-I se excluyen por CC-NC; enero 2017 en cuarentena por contener temperaturas; 2026 solo primer semestre."
+      ],
+      "expected_warnings": [
+        "DGAC: cobertura parcial por diseño; 2014 y 2015-I se excluyen por CC-NC; enero 2017 en cuarentena por contener temperaturas; 2026 solo primer semestre."
+      ],
       "freshness_status": "fresh",
-      "freshness_age_hours": 0.01
+      "freshness_age_hours": 211.67
     },
     "perfil_territorial_comunal": {
       "dataset": "perfil_territorial_comunal",

@@ -1,7 +1,7 @@
 {
-  "generated_at_utc": "2026-10-15T14:39:45.554724+00:00",
-  "dataset_count": 22,
-  "drifted_count": 2,
+  "generated_at_utc": "2026-10-25T23:05:34.399045+00:00",
+  "dataset_count": 23,
+  "drifted_count": 3,
   "healthy_count": 20,
   "fallback_count": 1,
   "partial_coverage_count": 1,
@@ -161,9 +161,9 @@
       "dataset": "finanzas_municipales",
       "drift_status": "healthy",
       "source_mode": "monthly",
-      "coverage_status": "not_applicable",
-      "coverage_ratio": null,
-      "coverage_summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
+      "coverage_status": "full",
+      "coverage_ratio": 1.0,
+      "coverage_summary": "Cobertura completa: 345/345 filas respecto del baseline esperado.",
       "degradation_status": "none",
       "degradation_impact": "Sin degradación operativa detectada en este build.",
       "drift_summary": "Sin drift operativo detectado en este build.",
@@ -310,7 +310,7 @@
     {
       "dataset": "permisos_edificacion",
       "drift_status": "healthy",
-      "source_mode": "monthly",
+      "source_mode": "live",
       "coverage_status": "not_applicable",
       "coverage_ratio": null,
       "coverage_summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
@@ -324,18 +324,33 @@
     },
     {
       "dataset": "calidad_aire",
+      "drift_status": "drifted",
+      "source_mode": "live",
+      "coverage_status": "not_applicable",
+      "coverage_ratio": null,
+      "coverage_summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
+      "degradation_status": "warning",
+      "degradation_impact": "calidad_aire freshness is stale: 248.44h since refresh, policy max is 72h",
+      "drift_summary": "Drift detectado: degradation=warning.",
+      "warning_count": 2,
+      "diagnostic_summary": "cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación",
+      "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción.",
+      "documentation": "docs/datasets/calidad_aire.md"
+    },
+    {
+      "dataset": "precipitaciones_dgac",
       "drift_status": "healthy",
       "source_mode": "live",
       "coverage_status": "not_applicable",
       "coverage_ratio": null,
       "coverage_summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
       "degradation_status": "none",
-      "degradation_impact": "1 observación(es) esperada(s): cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación",
+      "degradation_impact": "1 observación(es) esperada(s): DGAC: cobertura parcial por diseño; 2014 y 2015-I se excluyen por CC-NC; enero 2017 en cuarentena por contener temperaturas; 2026 solo primer semestre.",
       "drift_summary": "Sin drift operativo detectado en este build.",
       "warning_count": 1,
-      "diagnostic_summary": "cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación",
+      "diagnostic_summary": "DGAC: cobertura parcial por diseño; 2014 y 2015-I se excluyen por CC-NC; enero 2017 en cuarentena por contener temperaturas; 2026 solo primer semestre.",
       "recommended_action": "Ninguna.",
-      "documentation": "docs/datasets/calidad_aire.md"
+      "documentation": "docs/datasets/precipitaciones_dgac.md"
     }
   ]
 }

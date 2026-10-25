@@ -1,23 +1,23 @@
 {
-  "generated_at_utc": "2026-10-15T14:39:45.554724+00:00",
+  "generated_at_utc": "2026-10-25T23:05:34.399045+00:00",
   "overall_status": "warn",
-  "dataset_count": 22,
-  "live_count": 21,
+  "dataset_count": 23,
+  "live_count": 22,
   "fallback_count": 0,
-  "stale_count": 0,
-  "drifted_count": 1,
+  "stale_count": 1,
+  "drifted_count": 2,
   "degraded_count": 0,
-  "warning_count": 6,
+  "warning_count": 8,
   "top_issue": {
-    "dataset": "indicadores",
+    "dataset": "calidad_aire",
     "attention_priority": 0,
-    "warning_count": 1,
-    "build_freshness_status": "fresh",
+    "warning_count": 2,
+    "build_freshness_status": "stale",
     "drift_status": "drifted",
     "degradation_status": "warning",
-    "source_detail": "public_api_with_published_backfill",
-    "diagnostic_summary": "indicadores live refresh reused last published artifact for missing codes: ipc",
+    "source_detail": "Promedios diarios por estación y contaminante (MP2.5, MP10, SO2, NO2, CO, O3) desde el JSON del SINCA. Cobertura parcial por diseño (~65 comunas con estación). Serie incremental desde la primera cosecha.",
+    "diagnostic_summary": "cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación",
     "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
   },
-  "top_issue_summary": "indicadores: indicadores live refresh reused last published artifact for missing codes: ipc [source_detail=public_api_with_published_backfill; warnings=1; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]"
+  "top_issue_summary": "calidad_aire: cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación [source_detail=Promedios diarios por estación y contaminante (MP2.5, MP10, SO2, NO2, CO, O3) desde el JSON del SINCA. Cobertura parcial por diseño (~65 comunas con estación). Serie incremental desde la primera cosecha.; warnings=2; freshness=stale; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]"
 }

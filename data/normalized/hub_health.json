@@ -1,38 +1,39 @@
 {
-  "generated_at_utc": "2026-10-15T14:39:45.554724+00:00",
+  "generated_at_utc": "2026-10-25T23:05:34.399045+00:00",
   "overall_status": "warn",
-  "dataset_count": 22,
+  "dataset_count": 23,
   "retired_count": 1,
   "ok_count": 20,
-  "warn_count": 1,
+  "warn_count": 2,
   "error_count": 0,
-  "live_count": 21,
+  "live_count": 22,
   "fallback_count": 0,
-  "stale_count": 0,
+  "held_count": 3,
+  "stale_count": 1,
   "unknown_freshness_count": 0,
-  "publishable_count": 21,
+  "publishable_count": 22,
   "review_terms_count": 0,
   "unknown_reuse_count": 0,
   "degraded_count": 0,
-  "degradation_warning_count": 1,
+  "degradation_warning_count": 2,
   "partial_coverage_count": 1,
   "unknown_coverage_count": 0,
-  "drifted_count": 1,
-  "warning_count": 6,
-  "review_approaching_count": 22,
+  "drifted_count": 2,
+  "warning_count": 8,
+  "review_approaching_count": 23,
   "review_due_count": 0,
   "top_issue": {
-    "dataset": "indicadores",
+    "dataset": "calidad_aire",
     "attention_priority": 0,
-    "warning_count": 1,
-    "build_freshness_status": "fresh",
+    "warning_count": 2,
+    "build_freshness_status": "stale",
     "drift_status": "drifted",
     "degradation_status": "warning",
-    "source_detail": "public_api_with_published_backfill",
-    "diagnostic_summary": "indicadores live refresh reused last published artifact for missing codes: ipc",
+    "source_detail": "Promedios diarios por estación y contaminante (MP2.5, MP10, SO2, NO2, CO, O3) desde el JSON del SINCA. Cobertura parcial por diseño (~65 comunas con estación). Serie incremental desde la primera cosecha.",
+    "diagnostic_summary": "cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación",
     "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
   },
-  "top_issue_summary": "indicadores: indicadores live refresh reused last published artifact for missing codes: ipc [source_detail=public_api_with_published_backfill; warnings=1; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]",
+  "top_issue_summary": "calidad_aire: cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación [source_detail=Promedios diarios por estación y contaminante (MP2.5, MP10, SO2, NO2, CO, O3) desde el JSON del SINCA. Cobertura parcial por diseño (~65 comunas con estación). Serie incremental desde la primera cosecha.; warnings=2; freshness=stale; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]",
   "datasets": [
     {
       "dataset": "autoridades_electas",
@@ -53,28 +54,30 @@
       "source_detail": "WSDiputado.asmx/retornarDiputadosPeriodoActual + camara.cl + senado.cl (Scrapling)",
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
       "recommended_action": "Ninguna.",
-      "retired": false
+      "retired": false,
+      "held": false
     },
     {
       "dataset": "calidad_aire",
-      "severity": "ok",
+      "severity": "warn",
       "source_mode": "live",
-      "freshness_status": "fresh",
+      "freshness_status": "stale",
       "validation_status": "ok",
-      "warning_count": 1,
-      "actionable_warning_count": 0,
+      "warning_count": 2,
+      "actionable_warning_count": 1,
       "coverage_expected": false,
       "reuse_status": "public-api-review-terms",
       "redistribution_ok": true,
       "publishability_status": "ready",
-      "degradation_status": "none",
+      "degradation_status": "warning",
       "coverage_status": "not_applicable",
       "coverage_ratio": null,
-      "drift_status": "healthy",
+      "drift_status": "drifted",
       "source_detail": "Promedios diarios por estación y contaminante (MP2.5, MP10, SO2, NO2, CO, O3) desde el JSON del SINCA. Cobertura parcial por diseño (~65 comunas con estación). Serie incremental desde la primera cosecha.",
       "diagnostic_summary": "cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación",
-      "recommended_action": "Ninguna.",
-      "retired": false
+      "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción.",
+      "retired": false,
+      "held": true
     },
     {
       "dataset": "censo_comunal",
@@ -95,7 +98,8 @@
       "source_detail": "official_xlsx",
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
       "recommended_action": "Ninguna.",
-      "retired": false
+      "retired": false,
+      "held": false
     },
     {
       "dataset": "censo_hogares_viviendas",
@@ -116,7 +120,8 @@
       "source_detail": "official_xlsx",
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
       "recommended_action": "Ninguna.",
-      "retired": false
+      "retired": false,
+      "held": false
     },
     {
       "dataset": "comunas",
@@ -137,7 +142,8 @@
       "source_detail": "bcn_arcgis",
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
       "recommended_action": "Ninguna.",
-      "retired": false
+      "retired": false,
+      "held": false
     },
     {
       "dataset": "comunas_enriquecidas",
@@ -158,7 +164,8 @@
       "source_detail": "bcn_arcgis",
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
       "recommended_action": "Ninguna.",
-      "retired": false
+      "retired": false,
+      "held": false
     },
     {
       "dataset": "consumo_electrico_comunal",
@@ -179,7 +186,8 @@
       "source_detail": "Consumo eléctrico anual por comuna y tipo de cliente",
       "diagnostic_summary": "tipos de cliente: ['Comercial', 'Residencial']",
       "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción.",
-      "retired": true
+      "retired": true,
+      "held": false
     },
     {
       "dataset": "distritos_electorales",
@@ -200,7 +208,8 @@
       "source_detail": "bcn_electoral_mapping_generated",
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
       "recommended_action": "Ninguna.",
-      "retired": false
+      "retired": false,
+      "held": false
     },
     {
       "dataset": "empresas",
@@ -221,7 +230,8 @@
       "source_detail": "datos_gob_cl_ckan_api",
       "diagnostic_summary": "RES solo cubre constituciones bajo Ley 20.659 (regimen simplificado). No incluye empresas del regimen tradicional (Diario Oficial) ni empresas anteriores a mayo 2013.",
       "recommended_action": "Ninguna.",
-      "retired": false
+      "retired": false,
+      "held": false
     },
     {
       "dataset": "establecimientos_educacionales",
@@ -242,7 +252,8 @@
       "source_detail": "mineduc_datos_abiertos_rar",
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
       "recommended_action": "Ninguna.",
-      "retired": false
+      "retired": false,
+      "held": true
     },
     {
       "dataset": "establecimientos_salud",
@@ -263,7 +274,8 @@
       "source_detail": "datos_gob_csv",
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
       "recommended_action": "Ninguna.",
-      "retired": false
+      "retired": false,
+      "held": false
     },
     {
       "dataset": "estadisticas_vitales",
@@ -284,7 +296,8 @@
       "source_detail": "Anuarios de Estadísticas Vitales (tabulados XLSX, tabla 1.2.2-04 por comuna de residencia). Solo definitivos: los boletines provisionales del INE no publican desglose comunal.",
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
       "recommended_action": "Ninguna.",
-      "retired": false
+      "retired": false,
+      "held": false
     },
     {
       "dataset": "finanzas_municipales",
@@ -299,13 +312,14 @@
       "redistribution_ok": true,
       "publishability_status": "ready",
       "degradation_status": "none",
-      "coverage_status": "not_applicable",
-      "coverage_ratio": null,
+      "coverage_status": "full",
+      "coverage_ratio": 1.0,
       "drift_status": "healthy",
       "source_detail": "curated_fallback_pending_direct_export",
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
       "recommended_action": "Ninguna.",
-      "retired": false
+      "retired": false,
+      "held": false
     },
     {
       "dataset": "indicadores",
@@ -326,7 +340,8 @@
       "source_detail": "public_api_with_published_backfill",
       "diagnostic_summary": "indicadores live refresh reused last published artifact for missing codes: ipc",
       "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción.",
-      "retired": false
+      "retired": false,
+      "held": false
     },
     {
       "dataset": "indicadores_urbanos_siedu",
@@ -347,7 +362,8 @@
       "source_detail": "ine_siedu_xlsm_cinco_mediciones_2018_2022",
       "diagnostic_summary": "indicadores_urbanos_siedu has intentionally partial urban coverage",
       "recommended_action": "Ninguna.",
-      "retired": false
+      "retired": false,
+      "held": false
     },
     {
       "dataset": "partidos_politicos",
@@ -368,7 +384,8 @@
       "source_detail": "WSComun.asmx/retornarPartidosPoliticos + servel.cl/partidos-politicos (estado legal)",
       "diagnostic_summary": "estado_legal poblado (vía SERVEL) en 16/37 partidos",
       "recommended_action": "Ninguna.",
-      "retired": false
+      "retired": false,
+      "held": false
     },
     {
       "dataset": "perfil_territorial_comunal",
@@ -389,12 +406,13 @@
       "source_detail": "derived_from_validated_chile_hub_layers",
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
       "recommended_action": "Ninguna.",
-      "retired": false
+      "retired": false,
+      "held": false
     },
     {
       "dataset": "permisos_edificacion",
       "severity": "ok",
-      "source_mode": "monthly",
+      "source_mode": "live",
       "freshness_status": "fresh",
       "validation_status": "ok",
       "warning_count": 0,
@@ -410,7 +428,8 @@
       "source_detail": "Viviendas en unidades y superficie (m2) por comuna y año, serie desde 2002 (MINVU CEDOC, en base a permisos otorgados por las Direcciones de Obras Municipales e INE).",
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
       "recommended_action": "Ninguna.",
-      "retired": false
+      "retired": false,
+      "held": false
     },
     {
       "dataset": "pobreza_comunal",
@@ -431,7 +450,30 @@
       "source_detail": "Estimaciones de Pobreza Comunal vía SAE desde encuesta CASEN",
       "diagnostic_summary": "cobertura SAE: 345/346 comunas (99.7%) — parcial por diseño; comunas sin muestra no tienen estimación",
       "recommended_action": "Ninguna.",
-      "retired": false
+      "retired": false,
+      "held": false
+    },
+    {
+      "dataset": "precipitaciones_dgac",
+      "severity": "ok",
+      "source_mode": "live",
+      "freshness_status": "fresh",
+      "validation_status": "ok",
+      "warning_count": 1,
+      "actionable_warning_count": 0,
+      "coverage_expected": false,
+      "reuse_status": "open-attribution",
+      "redistribution_ok": true,
+      "publishability_status": "ready",
+      "degradation_status": "none",
+      "coverage_status": "not_applicable",
+      "coverage_ratio": null,
+      "drift_status": "healthy",
+      "source_detail": "CKAN: 143 archivos-mes, 2013–2026, licencias CC BY/CC0",
+      "diagnostic_summary": "DGAC: cobertura parcial por diseño; 2014 y 2015-I se excluyen por CC-NC; enero 2017 en cuarentena por contener temperaturas; 2026 solo primer semestre.",
+      "recommended_action": "Ninguna.",
+      "retired": false,
+      "held": false
     },
     {
       "dataset": "provincias",
@@ -452,7 +494,8 @@
       "source_detail": "bcn_arcgis",
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
       "recommended_action": "Ninguna.",
-      "retired": false
+      "retired": false,
+      "held": false
     },
     {
       "dataset": "regiones",
@@ -473,7 +516,8 @@
       "source_detail": "bcn_arcgis",
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
       "recommended_action": "Ninguna.",
-      "retired": false
+      "retired": false,
+      "held": false
     },
     {
       "dataset": "resultados_educacionales",
@@ -494,7 +538,8 @@
       "source_detail": "mineduc_rendimiento_2024_rar_agregado_por_comuna",
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
       "recommended_action": "Ninguna.",
-      "retired": false
+      "retired": false,
+      "held": true
     }
   ]
 }
