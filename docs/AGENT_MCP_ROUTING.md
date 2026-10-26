@@ -52,6 +52,13 @@ el grafo.
 para evitar el REPL genérico y `--add-mode no-memories` para no exponer una
 memoria paralela a la documentación canónica del repositorio.
 
+En este repositorio, `chrome-devtools` (registrado globalmente) se **deniega por
+permisos** porque duplica el rol de navegador de Playwright y su ventaja —el
+perfil real del usuario— no aporta a las comprobaciones de la landing. La
+denegación es de herramientas (`chrome-devtools_*`), no de servidor: así no se
+duplica una entrada MCP ni se rompe la paridad entre clientes. El servidor sigue
+conectado pero es invisible para el agente.
+
 ## Activación local
 
 - **OpenCode 1.x:** `opencode.json` registra CodeGraph y Serena por proyecto

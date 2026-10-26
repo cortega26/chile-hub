@@ -1,5 +1,12 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "permissions": [
+    {
+      "action": "chrome-devtools_*",
+      "resource": "*",
+      "effect": "deny"
+    }
+  ],
   "mcp": {
     "codegraph": {
       "type": "local",
