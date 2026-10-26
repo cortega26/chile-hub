@@ -95,6 +95,7 @@ SINCA devuelve 403 desde **tres redes distintas**, con la misma página Apache d
 | Oracle Cloud — `scrapling.Fetcher` (curl_cffi + config stealth) | 403, 199 B |
 | Oracle Cloud — `scrapling.StealthyFetcher` (**Chromium 149 headless**, Playwright 1.61) | 403, 198 B |
 | Cloudflare Workers (fetch desde el edge) | 403, 199 B |
+| Fly.io `gru` (São Paulo) | 403, 199 B |
 
 Corrección de registro: el plan 147 implementó `stealth_get` con **curl_cffi**, no
 con scrapling, y la frase "scrapling no ayudaría" del índice era una inferencia.
@@ -108,6 +109,10 @@ evidencia, no por analogía.
 En `datos.gob.cl` no hay dataset de calidad del aire en bloque: las búsquedas
 `sinca` (0), `material particulado` (1, emisiones) y `red de monitoreo aire` (0)
 solo devuelven datasets distintos.
+
+**Cuatro redes, seis clientes, el mismo 403.** También se comprobó que no es
+cuestión de ruta (todo el host responde 403), ni de DNS (las dos IPs A fallan
+igual), ni de HTTP (redirige a HTTPS), ni de IPv6 (sin ruta en la VM).
 
 **Conclusión:** `calidad_aire` no se puede refrescar desde ningún cloud probado.
 Queda en `fallback_to_last_snapshot` (publica su serie completa, no escala) y su
