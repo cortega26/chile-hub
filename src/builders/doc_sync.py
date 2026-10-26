@@ -290,7 +290,7 @@ _AGENTS_TEST_DESCRIPTIONS = {
     ),
     "test_publication_hold.py": (
         "Publicación parcial (plan 150/ADR-025): retención de la última versión "
-        "buena, fallo cerrado sin artefacto previo y escalamiento a 7 builds"
+        "buena, fallo cerrado sin artefacto previo y escalamiento a 7 días"
     ),
 }
 
