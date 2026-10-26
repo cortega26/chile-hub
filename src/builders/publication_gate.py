@@ -31,16 +31,21 @@ import polars as pl
 
 from src.builders._shared import NON_FALLBACK_SOURCE_MODES, NORMALIZED_DIR
 
-# Tras N días retenido el build falla: una degradación no puede volverse
-# silenciosa ni permanente. El umbral es **temporal**, no por número de builds:
-# varios builds el mismo día (un dispatch de diagnóstico, un rebase, un rerun)
-# inflaban un contador por build y disparaban el tope en horas. Mismo orden de
-# magnitud que la ventana del issue automático de schedule.
+# Tras N días retenido la capa se marca `overdue` y el publish abre/actualiza un
+# issue: una degradación no puede volverse silenciosa. NO es fatal: tumbar el
+# build congelaría las capas sanas, que es la caída que la retención vino a
+# evitar (ADR-025, enmienda 2026-10-26). El umbral es temporal, no por número
+# de builds: varios builds el mismo día inflaban un contador y lo agotaban.
 MAX_HELD_DAYS = 7
 
 # Alias histórico: el contador por build se conserva en el artefacto como dato
-# informativo, pero ya no decide el escalamiento.
+# informativo, pero no decide nada.
 MAX_HELD_BUILDS = MAX_HELD_DAYS
+
+# Política declarada por dataset que autoriza publicar el último snapshot bueno
+# de forma indefinida: es una decisión de catálogo, no un fallo. El tope de días
+# no aplica; la capa sigue marcada `held` con su fecha real.
+POLICY_ALLOWS_INDEFINITE_HOLD = "fallback_to_last_snapshot"
 
 # Mismo umbral que `verify_pipeline.DEFAULT_MAX_RECORD_DROP_PCT`; vive aquí para
 # que build y verificador no puedan divergir.
@@ -87,6 +92,9 @@ class HoldDecision:
     frame_key: str
     reason: str
     previous: dict = field(default_factory=dict)
+    # False cuando el registry declara `fallback_to_last_snapshot`: retener es
+    # el comportamiento esperado y no debe escalar.
+    cap_applies: bool = True
 
     @property
     def builds_held(self) -> int:
@@ -127,6 +135,7 @@ def evaluate_holds(
     `verify_pipeline` con su propia lógica de frescura.
     """
     previous_catalog = _load_previous_catalog(normalized_dir)
+    policies = {entry["dataset"]: entry.get("fallback_policy") for entry in registry}
     holds: dict[str, HoldDecision] = {}
     if not previous_catalog:
         # Primer build (o staging sintético de tests): no hay nada que retener.
@@ -170,6 +179,7 @@ def evaluate_holds(
             frame_key=frame_key,
             reason="; ".join(reasons),
             previous=previous,
+            cap_applies=policies.get(dataset) != POLICY_ALLOWS_INDEFINITE_HOLD,
         )
     return holds
 
@@ -197,8 +207,6 @@ def hold_errors(
     holds: dict[str, HoldDecision],
     *,
     normalized_dir: str | None = None,
-    max_held_days: float = MAX_HELD_DAYS,
-    now: datetime | None = None,
 ) -> list[str]:
     """Errores que hacen fallar el build antes de publicar cualquier cosa."""
     errors = []
@@ -213,17 +221,9 @@ def hold_errors(
             errors.append(f"{dataset}: el artefacto previo no declara refreshed_at_utc")
         if not os.path.exists(_previous_parquet_path(dataset, normalized_dir)):
             errors.append(f"{dataset}: falta {dataset}.parquet del build anterior")
-        # El escalamiento se mide desde la PRIMERA retención. Un hold nuevo
-        # (sin marca previa) empieza en 0 días: si no, `held_days` devolvería
-        # infinito y el primer build ya fallaría.
-        previous_hold = decision.previous.get("publication_hold")
-        days = held_days(previous_hold, now=now) if previous_hold else 0.0
-        if days > max_held_days:
-            errors.append(
-                f"{dataset}: retenido {days:.1f} días (tope {max_held_days:g}). La fuente "
-                "no se recuperó: hay que decidir entre repararla, sacarla del carril "
-                "stable_publishable o retirarla (AGENTS.md §6)."
-            )
+        # El escalamiento ya NO es fatal: la capa se marca `overdue` y el publish
+        # avisa por issue. Tumbar el build congelaría las capas sanas, que es la
+        # caída que la retención vino a evitar (ADR-025, enmienda 2026-10-26).
     return errors
 
 
@@ -254,13 +254,27 @@ def apply_holds(
         if previous.get("refreshed_at_utc"):
             base["refreshed_at_utc"] = previous["refreshed_at_utc"]
         base["record_count"] = frame.height
+        previous_hold = previous.get("publication_hold") or {}
+        since = previous_hold.get("since_utc") or attempted_at_utc
+        reference = None
+        if attempted_at_utc:
+            try:
+                reference = datetime.fromisoformat(attempted_at_utc)
+            except ValueError:
+                reference = None
+        overdue = (
+            decision.cap_applies and held_days({"since_utc": since}, now=reference) > MAX_HELD_DAYS
+        )
         base["publication_hold"] = {
             "retained": True,
             "reason": decision.reason,
             "attempted_at_utc": attempted_at_utc,
             "previous_generated_at_utc": previous.get("refreshed_at_utc"),
-            "since_utc": (previous.get("publication_hold") or {}).get("since_utc")
-            or attempted_at_utc,
+            "since_utc": since,
             "builds_held": decision.builds_held,
+            # `fallback_to_last_snapshot` en el registry: retener es lo esperado.
+            "cap_applies": decision.cap_applies,
+            # Superó MAX_HELD_DAYS con tope vigente: el publish avisa por issue.
+            "overdue": overdue,
         }
         metadata[decision.frame_key] = base

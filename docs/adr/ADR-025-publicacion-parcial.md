@@ -95,3 +95,28 @@ decidir entre reparar la fuente, sacar el dataset del carril
   falla, el frame publicado es el anterior, el contador acumula y el tope escala.
 - `scripts/verify_pipeline.py` valida la integridad de la marca y no relaja
   ninguna comprobación para datasets `fresh`.
+
+## Enmienda 2026-10-26
+
+Dos correcciones tras la primera semana en producción, ambas aprobadas por el
+mantenedor:
+
+**1. El escalamiento no tumba el build.** La versión original hacía fallar el
+build tras `MAX_HELD_DAYS`. Eso reintroduce, un nivel más arriba, la misma
+patología que esta ADR vino a eliminar: una capa degradada congelando a las
+demás. Ahora la capa se marca `overdue` y el publish abre/actualiza un issue
+(`data-hold`); `held_overdue_count` viaja en `hub_health.json`. La señal sigue
+existiendo; el daño colateral desaparece.
+
+**2. El `fallback_policy` del registry manda.** El verificador rechazaba
+cualquier `fallback` en el carril `stable_publishable`, ignorando que
+`autoridades_electas` y `partidos_politicos` declaran
+`fallback_to_last_snapshot`. Desde esta enmienda esa política se respeta: la
+capa publica su última versión buena, marcada y con su fecha real, sin tope de
+días. Las políticas `allowed_for_dev*` y `none` siguen reteniendo con
+escalamiento.
+
+Se reclasifican a `fallback_to_last_snapshot` dos capas cuyo fallback no
+degrada el dato: `establecimientos_educacionales` (recupera el mismo snapshot de
+12.898 filas) y `calidad_aire` (su serie completa se conserva en el Parquet
+publicado y el extractor la siembra siempre).

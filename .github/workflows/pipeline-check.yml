@@ -745,6 +745,38 @@ jobs:
           git pull --rebase --autostash origin main
           git push origin HEAD:main
 
+      - name: Open or update data-hold issue (retención vencida)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Plan 150 / ADR-025 (enmienda 2026-10-26): una retención que pasó
+          # MAX_HELD_DAYS no tumba el build —congelaría las capas sanas— pero
+          # tampoco puede pasar inadvertida. Se abre/actualiza un issue con la
+          # lista exacta, y se cierra solo cuando no queda ninguna vencida.
+          overdue=$(python - <<'PYDATA'
+          import json
+          health = json.load(open("data/normalized/hub_health.json"))
+          names = sorted(d["dataset"] for d in health.get("datasets", []) if d.get("held_overdue"))
+          print(",".join(names))
+          PYDATA
+          )
+          run_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          label="data-hold"
+          gh label create "$label"             --description "Retención de datos vencida (plan 150 / ADR-025)"             --color FBCA04 --force >/dev/null
+          issue=$(gh issue list --label "$label" --state open --json number --jq '.[0].number')
+          if [ -n "$overdue" ]; then
+            body=$(printf '## Retención de datos vencida\n\nCapas que superaron el tope de retención y siguen publicando su última versión buena:\n\n%s\n\nRun: %s\n\nDecidir por capa: reparar la fuente, sacarla del carril `stable_publishable` o retirarla (AGENTS.md §6). El publish **no** se bloquea, para no congelar las capas sanas.\n' \
+              "$(printf '%s' "$overdue" | tr ',' '\n' | sed 's/^/- `/' | sed 's/$/`/')" "$run_url")
+            if [ -n "$issue" ]; then
+              gh issue comment "$issue" --body "$body"
+            else
+              gh issue create --title "Retención de datos vencida" --label "$label" --body "$body"
+            fi
+          elif [ -n "$issue" ]; then
+            gh issue close "$issue" \
+              --comment "Ninguna retención supera el tope: ${run_url}."
+          fi
+
       - name: Close schedule failure issue (if open)
         env:
           GH_TOKEN: ${{ github.token }}

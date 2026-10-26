@@ -362,6 +362,8 @@ def _dataset_health_entry(dataset_name, dataset, validation, retired_datasets):
         "retired": dataset_name in retired_datasets,
         # Plan 150 / ADR-025: el dato publicado es la última versión buena.
         "held": bool(dataset.get("publication_hold")),
+        # Retención que superó el tope: señal para el issue automático.
+        "held_overdue": bool((dataset.get("publication_hold") or {}).get("overdue")),
     }
 
 
@@ -382,6 +384,7 @@ def _health_counters(active):
         # Plan 150: retenidos en su última versión buena. Se cuentan aparte y
         # no alteran overall_status: la señal ya la da su propia degradación.
         "held_count": sum(1 for entry in active if entry.get("held")),
+        "held_overdue_count": sum(1 for entry in active if entry.get("held_overdue")),
         "stale_count": sum(1 for entry in active if entry["freshness_status"] == "stale"),
         "unknown_freshness_count": sum(
             1 for entry in active if entry["freshness_status"] == "unknown"
@@ -462,6 +465,7 @@ def build_hub_health(metadata):
         "live_count": counters["live_count"],
         "fallback_count": counters["fallback_count"],
         "held_count": counters["held_count"],
+        "held_overdue_count": counters["held_overdue_count"],
         "stale_count": counters["stale_count"],
         "unknown_freshness_count": counters["unknown_freshness_count"],
         "publishable_count": counters["publishable_count"],
@@ -640,6 +644,7 @@ def build_hub_health_markdown(health):
         f"- `live_count`: `{health.get('live_count', 0)}`",
         f"- `fallback_count`: `{health.get('fallback_count', 0)}`",
         f"- `held_count`: `{health.get('held_count', 0)}`",
+        f"- `held_overdue_count`: `{health.get('held_overdue_count', 0)}`",
         f"- `stale_count`: `{health.get('stale_count', 0)}`",
         f"- `publishable_count`: `{health.get('publishable_count', 0)}`",
         f"- `review_terms_count`: `{health.get('review_terms_count', 0)}`",
