@@ -288,6 +288,10 @@ _AGENTS_TEST_DESCRIPTIONS = {
         "Candidato DGAC: CSV sin cabeceras, cobertura de meses, "
         "licencias, hashes y fallos cerrados (sin red)"
     ),
+    "test_remote_staging.py": (
+        "Staging remoto (plan 153): allowlist, solo live/monthly, conteo "
+        "consistente y tolerancia a un espejo incompleto (sin red)"
+    ),
     "test_weekly_triage.py": (
         "Triaje semanal (plan 152): solo señales accionables, orden editorial "
         "estable y tolerancia a artefactos ausentes (sin red)"

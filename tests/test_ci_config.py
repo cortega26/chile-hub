@@ -53,6 +53,30 @@ LANDING_APP = ROOT_DIR / "app.js"
 VERIFY_LANDING_SCRIPT = ROOT_DIR / "scripts" / "verify_landing.py"
 
 
+class RemoteStagingStepGuardrailTests(unittest.TestCase):
+    """El staging remoto debe aplicarse ANTES del build y seguir siendo opcional.
+
+    Plan 153: cuatro fuentes (MINEDUC x2, MDS, Senado) bloquean el egress de
+    GitHub y responden desde la VM de OCI. La VM escribe el espejo y el pipeline
+    lo copia en `data/staging/` justo antes de construir. Si el paso se mueve
+    después del build, los datos remotos no llegan a los artefactos y la
+    regresión es silenciosa: el build usaría los fallbacks locales.
+    """
+
+    def test_pipeline_applies_remote_staging_before_building(self):
+        workflow = (ROOT_DIR / ".github" / "workflows" / "pipeline-check.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("scripts/apply_remote_staging.py", workflow)
+        self.assertLess(
+            workflow.index("scripts/apply_remote_staging.py"),
+            workflow.index("name: Build outputs"),
+            "El staging remoto debe aplicarse antes de 'Build outputs'.",
+        )
+        # Opcional por diseño: si el espejo no responde, el pipeline continúa.
+        self.assertIn("Espejo remoto no disponible", workflow)
+
+
 class SinimDailyJobGuardrailTests(unittest.TestCase):
     """Regresión: el job diario de Pipeline Check corría
     sinim_finanzas_extractor.py (un stub que siempre escribe 3 filas de
