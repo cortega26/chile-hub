@@ -286,6 +286,9 @@ def write_hub_bundle_json(pipeline_metadata, hub_health, dataset_catalog, artifa
             "error_count": hub_health.get("error_count"),
             "live_count": hub_health.get("live_count"),
             "fallback_count": hub_health.get("fallback_count"),
+            # Plan 150 / ADR-025: capas publicadas en su última versión buena.
+            # Debe viajar en el bundle porque es lo que consume la landing.
+            "held_count": hub_health.get("held_count"),
             "stale_count": hub_health.get("stale_count"),
             "publishable_count": hub_health.get("publishable_count"),
             "review_terms_count": hub_health.get("review_terms_count"),
