@@ -15,7 +15,7 @@ Todas las cifras están fechadas y se refieren a contadores públicos, sin telem
 | Señal | Valor (fecha) | Qué mide | Reporte vivo |
 |:---|:---|:---|:---|
 | Activaciones del bundle | ~27 al mes (169 acumuladas en GitHub Releases, 80 releases con el asset; 2026-10-15) | Proxy real de activación de la librería | `data/normalized/hub_health.md` |
-| Capas públicas en el bundle | 21 (de 25 registradas en el catálogo) | Alcance del bundle publicable | `dataset_quality.md` |
+| Capas públicas en el bundle | 22 (de 26 registradas en el catálogo; 2026-10-26) | Alcance del bundle publicable | `dataset_quality.md` |
 | Espejo Hugging Face | 444 descargas, 0 likes (2026-10-15; 274 al 2026-09-29) | Uso vía `hf://` y subsets | `redistribution_report.md` |
 | PyPI | 6.638 descargas sin espejos en 30 días (2026-09-15 → 2026-10-14), ~109 por release | Cadencia de publicación, **no** adopción | `data/normalized/hub_health.md` |
 | Uso verificable | 0 organizaciones (rúbrica U/D/W, 2026-10-15) | Adopción verificable | `hub_health.md` |
