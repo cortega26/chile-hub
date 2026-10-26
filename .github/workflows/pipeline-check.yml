@@ -326,6 +326,23 @@ jobs:
           # a leftover fallback write can shadow the versioned copy here.
           git checkout -- data/staging/finanzas_municipales.csv data/staging/finanzas_municipales.metadata.json 2>/dev/null || true
 
+      - name: Apply remote staging (VM egress)
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: |
+          # Plan 153: cuatro fuentes oficiales bloquean el egress de GitHub pero
+          # responden desde la VM de OCI (Santiago), que escribe este espejo.
+          # Aquí solo se lee: allowlist fija, solo source_mode live/monthly y
+          # record_count consistente (scripts/apply_remote_staging.py). Si el
+          # espejo no responde, se sigue con la extracción local y el gate de
+          # publicación decide (retención), como hasta ahora.
+          if git clone --depth 1 --quiet \
+              https://github.com/cortega26/chile-hub-remote-staging.git \
+              "$RUNNER_TEMP/remote-staging"; then
+            python scripts/apply_remote_staging.py "$RUNNER_TEMP/remote-staging"
+          else
+            echo "::warning::Espejo remoto no disponible; se usa la extracción local."
+          fi
+
       - name: Build outputs
         # El build completo necesita staging de otros extractores, no versionado.
         # Sólo schedule/dispatch restauran staging del cache o extraen en vivo.
