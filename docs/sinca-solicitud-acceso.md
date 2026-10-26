@@ -1,12 +1,11 @@
 # Solicitud de acceso técnico a datos del SINCA
 
-> **Estado:** borrador listo para revisión del mantenedor. **No enviado.**
-> El envío, la firma y cualquier dato de contacto son decisión y
-> responsabilidad del titular.
+> **Estado:** **enviada por el mantenedor el 2026-10-26** por el canal formal.
+> Este documento conserva el texto enviado y su anexo de evidencia.
 >
-> **Canal sugerido:** OIRS del Ministerio del Medio Ambiente (formulario
-> oficial / oficina de partes). Si confirman un correo institucional de SINCA,
-> usarlo y adjuntar este texto. No se inventa una dirección.
+> **Seguimiento:** si no hay respuesta al **2026-11-25** (30 días), registrar el
+> intento y no insistir por otra vía. Mientras tanto no cambia nada técnico: la
+> capa sigue publicando su serie completa y no escala.
 
 ---
 
