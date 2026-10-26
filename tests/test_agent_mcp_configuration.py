@@ -31,6 +31,8 @@ def test_serena_ide_mode_scoped_to_current_worktree():
         assert command[:2] == ["serena", "start-mcp-server"]
         assert command[command.index("--context") + 1] == "ide"
         assert "--project-from-cwd" in command
+        assert command[command.index("--agent-interface") + 1] == "tools"
+        assert command[command.index("--add-mode") + 1] == "no-memories"
         assert command[command.index("--open-web-dashboard") + 1] == "false"
         assert not any("/home/" in arg or "/Users/" in arg for arg in command)
     assert vscode["servers"]["serena"]["cwd"] == "${workspaceFolder}"

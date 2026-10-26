@@ -21,6 +21,10 @@ frente a `AGENTS.md`, catálogo de datasets o contratos. No inicialices
 automáticamente un CodeGraph nuevo sin revisar su configuración. Los resultados
 semánticos no demuestran que el pipeline conserve sus invariantes.
 
+**Contención de herramientas:** Serena usa además `--agent-interface tools`
+para evitar el REPL genérico y `--add-mode no-memories` para no exponer una
+memoria paralela a la documentación canónica del repositorio.
+
 ## Activación local
 
 - **OpenCode 1.x:** `opencode.json` registra CodeGraph y Serena por proyecto

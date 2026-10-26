@@ -17,6 +17,10 @@
         "--context",
         "ide",
         "--project-from-cwd",
+        "--agent-interface",
+        "tools",
+        "--add-mode",
+        "no-memories",
         "--open-web-dashboard",
         "false"
       ],
