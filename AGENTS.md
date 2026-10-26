@@ -335,8 +335,10 @@ versión buena —frame y metadatos— y se publica marcada con
 
 - Un `held` publica **el artefacto anterior**, nunca el de la corrida fallida.
 - Sin artefacto previo no hay retención posible: el build falla.
-- Tras `MAX_HELD_BUILDS` (7) retenciones consecutivas el build **falla**, para
-  que una caída no se vuelva olvido. No se sube el tope para "hacer pasar" un build.
+- Tras `MAX_HELD_DAYS` (7) días retenido el build **falla**, para
+  que una caída no se vuelva olvido. El umbral es temporal, no por número de
+  builds: varios builds el mismo día no deben agotarlo. No se sube el tope para
+  "hacer pasar" un build.
 - El invariante de esta sección no cambia: ningún dato degradado se publica. Lo
   que se acota es el radio de impacto de una fuente caída.
 

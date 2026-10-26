@@ -47,7 +47,7 @@ La marca `publication_hold` viaja en el catálogo, el manifiesto (`retained: tru
 y `hub_health.json` (`held_count`), con `reason`, `previous_generated_at_utc`,
 `since_utc` y `builds_held`.
 
-**Escalamiento:** a los `MAX_HELD_BUILDS` (7) builds consecutivos el build
+**Escalamiento:** a los `MAX_HELD_DAYS` (7) días retenido el build
 **falla**. Una retención no puede volverse silenciosa ni permanente; obliga a
 decidir entre reparar la fuente, sacar el dataset del carril
 `stable_publishable` o retirarlo (AGENTS.md §6).
@@ -72,7 +72,7 @@ decidir entre reparar la fuente, sacar el dataset del carril
 - Una fuente caída deja de congelar el resto del catálogo.
 - El consumidor puede distinguir un dato refrescado de uno retenido sin leer
   prosa: `publication_hold` en el catálogo y `retained` en el manifiesto.
-- La retención tiene fecha de caducidad operativa (7 builds), no se eterniza.
+- La retención tiene fecha de caducidad operativa (7 días), no se eterniza.
 
 **Negativas y riesgos**
 

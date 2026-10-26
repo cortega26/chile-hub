@@ -116,13 +116,15 @@ Una retención no puede ser permanente ni silenciosa:
 
 - Se registra `publication_hold.since_utc` (primera vez retenido, se arrastra
   entre builds) y `publication_hold.builds_held` (contador).
-- A los **7 builds retenidos** (≈1 semana), el build **falla** con un mensaje que
+- A los **7 días retenidos**, el build **falla** con un mensaje que
   nombra el dataset y su causa. Eso convierte una degradación silenciosa en una
   decisión que alguien tiene que tomar.
 - `held_count` se expone en `hub_health.json` y en `pipeline_status.md`.
 
-Umbral justificado: el schedule es diario, así que 7 builds ≈ una semana, la
-misma ventana que el issue automático de fallo de schedule.
+Umbral justificado: 7 días es la misma ventana que el issue automático de fallo
+de schedule. Es **temporal y no por número de builds** a propósito: un dispatch
+de diagnóstico, un rebase o un rerun inflarían un contador por build y agotarían
+el tope en horas (regresión detectada el 2026-10-26 en la primera corrida real).
 
 ### Flujo del build
 
@@ -198,7 +200,7 @@ aparecen `held` con `previous_generated_at_utc` igual al del snapshot publicado.
 
 ### Step 3: Verificador
 
-Implementar §"Verificador" y el umbral de 7 builds.
+Implementar §"Verificador" y el umbral de 7 días.
 
 **Verificar**: `--profile publication` sale 0 y reporta `M held`.
 **Verificar**: quitar el artefacto previo de un `held` → falla con mensaje
@@ -263,7 +265,7 @@ Parar y reportar si:
   plan 109).
 - Un test de contrato de la API pública se rompe por un campo eliminado o
   renombrado (solo se admiten campos nuevos).
-- Aparece la tentación de "arreglar" el umbral de 7 builds para que pase: es un
+- Aparece la tentación de "arreglar" el umbral de 7 días para que pase: es un
   STOP, no un ajuste.
 
 ## Maintenance notes
