@@ -197,6 +197,14 @@ El mismo estado se publica en el sitio, con historial de builds y detalle por ca
 - **Trazabilidad completa:** cada build registra timestamp, versión de extractor y
   snapshot de entrada en [`provenance_report.md`](data/normalized/provenance_report.md).
 
+### Menos trabajo repetido
+
+Reconstruir la serie completa de **empresas** exige 13 archivos anuales (≈215 MB)
+y parsear 1,6 millones de filas. El bundle con las 22 capas, ya normalizadas y
+validadas, pesa **31 MB**. No medimos el ahorro energético: es una propiedad del
+diseño —el trabajo pesado se hace una vez por build y se comparte—, no una cifra
+de carbono.
+
 > Para una explicación más detallada de la arquitectura y las decisiones de diseño,
 > lee el [caso de estudio: cómo está construido chile-hub](docs/case-study-construccion-chile-hub.md).
 
