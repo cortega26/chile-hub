@@ -12,6 +12,24 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.55.0 - 2026-10-26
+
+### Mantenimiento
+
+- **ci**: Sync coverage badge from verified tests [skip ci]
+  ([`28e9184`](https://github.com/cortega26/chile-hub/commit/28e91842ed97db22ee9e85ba31726516e0d04985))
+
+- **docs**: Sincronizar el contador de tests tras el rebase
+  ([#220](https://github.com/cortega26/chile-hub/pull/220),
+  [`8c4fe01`](https://github.com/cortega26/chile-hub/commit/8c4fe01965945338571ecd6e1b8566f7d0efaf3d))
+
+### Agregado
+
+- **extracción**: Staging remoto desde la VM OCI para las fuentes que bloquean GitHub
+  ([#220](https://github.com/cortega26/chile-hub/pull/220),
+  [`8c4fe01`](https://github.com/cortega26/chile-hub/commit/8c4fe01965945338571ecd6e1b8566f7d0efaf3d))
+
+
 ## 1.54.1 - 2026-10-26
 
 ### Corregido
