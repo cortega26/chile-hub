@@ -86,12 +86,21 @@ senadores.
 SINCA devuelve 403 desde **tres redes distintas**, con la misma página Apache de
 199 bytes:
 
-| Egress | Resultado |
+| Cliente / egress | Resultado |
 |:--|:--|
-| GitHub Actions | 403 |
-| Oracle Cloud (Santiago) | 403 |
-| Cloudflare Workers | 403 |
-| curl plano vs `curl_cffi` impersonando Chrome y Safari | 403 idéntico → no es fingerprint |
+| GitHub Actions (`requests`) | 403 |
+| Oracle Cloud — `curl` plano | 403 |
+| Oracle Cloud — `curl_cffi` Chrome 124 | 403, mismos 199 B |
+| Oracle Cloud — `curl_cffi` Safari 17 | 403, mismos 199 B |
+| Oracle Cloud — `scrapling.Fetcher` (curl_cffi + config stealth) | 403, 199 B |
+| Oracle Cloud — `scrapling.StealthyFetcher` (**Chromium 149 headless**, Playwright 1.61) | 403, 198 B |
+| Cloudflare Workers (fetch desde el edge) | 403, 199 B |
+
+Corrección de registro: el plan 147 implementó `stealth_get` con **curl_cffi**, no
+con scrapling, y la frase "scrapling no ayudaría" del índice era una inferencia.
+El 2026-10-26 se probó de verdad: `Fetcher` y `StealthyFetcher` con navegador
+real reciben el mismo 403. La hipótesis de fingerprint queda descartada con
+evidencia, no por analogía.
 
 `mindicador.cl` tampoco sirve desde Cloudflare: el Worker devuelve **525**
 (SSL handshake fallido contra el origen) y timeouts.
