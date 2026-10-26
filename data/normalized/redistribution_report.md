@@ -1,8 +1,8 @@
 # chile-hub redistribution report
 
-- `generated_at_utc`: `2026-10-15T14:39:45.554724+00:00`
-- `dataset_count`: `22`
-- `ready_count`: `22`
+- `generated_at_utc`: `2026-10-25T23:25:43.532012+00:00`
+- `dataset_count`: `23`
+- `ready_count`: `23`
 - `review_terms_count`: `0`
 - `unknown_count`: `0`
 
@@ -30,6 +30,7 @@
 | `estadisticas_vitales` | `ready` | CC BY 4.0 | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
 | `permisos_edificacion` | `ready` | Uso autorizado con cita (MINVU CEDOC) | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
 | `calidad_aire` | `ready` | Datos públicos MMA; sin licencia explícita, citar fuente oficial | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
+| `precipitaciones_dgac` | `ready` | CC BY + CC0 (licencia individual por archivo) | `yes` | `ok` | Publicable con atribucion y referencia de fuente. |
 
 ## regiones
 
@@ -250,3 +251,13 @@
 - `redistribution_ok`: `True`
 - `recommended_action`: Publicable con atribucion y referencia de fuente.
 - `summary`: Mediciones de calidad del aire del SINCA (MMA), API JSON pública. Organismo público chileno sin restricción explícita de reúso; citar fuente oficial.
+
+## precipitaciones_dgac
+
+- `publishability_status`: `ready`
+- `license`: `CC BY + CC0 (licencia individual por archivo)`
+- `license_url`: https://datos.gob.cl/organization/direccion_general_de_aeronautica_civil
+- `attribution_required`: `True`
+- `redistribution_ok`: `True`
+- `recommended_action`: Publicable con atribucion y referencia de fuente.
+- `summary`: Solo CSV de paquetes DGAC cc-by y cc-zero; 2014 y 2015-I CC-NC excluidos y enero 2017 en cuarentena por datos de temperatura.

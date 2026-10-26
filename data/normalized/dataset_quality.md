@@ -1,14 +1,14 @@
 # chile-hub — Calidad de datasets
 
-- `generated_at_utc`: `2026-10-15T14:39:45.554724+00:00`
-- `dataset_count`: `22`
-- `average_score`: `94.0`
-- `grade_distribution`: A=19, B=3, C=0, D=0, F=0
+- `generated_at_utc`: `2026-10-25T23:25:43.532012+00:00`
+- `dataset_count`: `23`
+- `average_score`: `93.9`
+- `grade_distribution`: A=21, B=2, C=0, D=0, F=0
 
 | Dataset | Nota | Valid | Contrato | Madurez | Frescura | Cobert | Reúso | Bloqueadores |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | :--- |
 | `autoridades_electas` | **A** (100.0) | 100 | 100 | 100 | 100 | 100 | 100 | — |
-| `calidad_aire` | **B** (85.0) | 100 | 100 | 100 | 100 | 0 | 50 | Cobertura not_applicable; Reutilización: public-api-review-terms |
+| `calidad_aire` | **B** (77.5) | 100 | 100 | 100 | 50 | 0 | 50 | Datos stale; Cobertura not_applicable; Reutilización: public-api-review-terms |
 | `censo_comunal` | **A** (100.0) | 100 | 100 | 100 | 100 | 100 | 100 | — |
 | `censo_hogares_viviendas` | **A** (100.0) | 100 | 100 | 100 | 100 | 100 | 100 | — |
 | `comunas` | **A** (100.0) | 100 | 100 | 100 | 100 | 100 | 100 | — |
@@ -19,13 +19,14 @@
 | `establecimientos_educacionales` | **A** (90.0) | 100 | 100 | 100 | 100 | 0 | 100 | Cobertura not_applicable |
 | `establecimientos_salud` | **A** (90.0) | 100 | 100 | 100 | 100 | 0 | 100 | Cobertura not_applicable |
 | `estadisticas_vitales` | **A** (90.0) | 100 | 100 | 100 | 100 | 0 | 100 | Cobertura not_applicable |
-| `finanzas_municipales` | **B** (85.0) | 100 | 100 | 100 | 100 | 0 | 50 | Cobertura not_applicable; Reutilización: public-api-review-terms |
+| `finanzas_municipales` | **A** (95.0) | 100 | 100 | 100 | 100 | 100 | 50 | Reutilización: public-api-review-terms |
 | `indicadores` | **A** (90.0) | 100 | 100 | 100 | 100 | 0 | 100 | Cobertura not_applicable |
 | `indicadores_urbanos_siedu` | **A** (97.0) | 100 | 100 | 100 | 100 | 70 | 100 | Cobertura partial |
 | `partidos_politicos` | **A** (100.0) | 100 | 100 | 100 | 100 | 100 | 100 | — |
 | `perfil_territorial_comunal` | **A** (100.0) | 100 | 100 | 100 | 100 | 100 | 100 | — |
 | `permisos_edificacion` | **A** (90.0) | 100 | 100 | 100 | 100 | 0 | 100 | Cobertura not_applicable |
 | `pobreza_comunal` | **A** (90.0) | 100 | 100 | 100 | 100 | 0 | 100 | Cobertura not_applicable |
+| `precipitaciones_dgac` | **A** (90.0) | 100 | 100 | 100 | 100 | 0 | 100 | Cobertura not_applicable |
 | `provincias` | **A** (100.0) | 100 | 100 | 100 | 100 | 100 | 100 | — |
 | `regiones` | **A** (100.0) | 100 | 100 | 100 | 100 | 100 | 100 | — |
 | `resultados_educacionales` | **A** (90.0) | 100 | 100 | 100 | 100 | 0 | 100 | Cobertura not_applicable |

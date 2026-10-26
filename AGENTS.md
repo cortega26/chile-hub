@@ -145,8 +145,8 @@ chile-hub/
 │   │   ├── _clima.py              Precipitaciones DGAC históricas por estación
 │   │   ├── _politica.py           distritos / partidos / autoridades
 │   │   └── _anomalias.py          detect_series_anomalies
-│   ├── build_dev_db.py            Orquestador (619 líneas): main() + fases (_load_inputs, _compute_validations, _write_data_artifacts, _generate_reports)
-│   ├── builders/                  Módulos del pipeline extraídos de build_dev_db.py (formats, metadata, reports, artifacts, datasets, catalog, landing, io_utils, _shared, dcat_catalog, data_package, doc_sync, geo, _logging)
+│   ├── build_dev_db.py            Orquestador (679 líneas): main() + fases (_load_inputs, _compute_validations, _write_data_artifacts, _generate_reports)
+│   ├── builders/                  Módulos del pipeline extraídos de build_dev_db.py (formats, metadata, reports, artifacts, datasets, catalog, publication_gate, landing, io_utils, _shared, dcat_catalog, data_package, doc_sync, geo, _logging)
 │   ├── chile_hub/                 Paquete Python instalable (ChileHub API + CLI + data manager)
 │   │   ├── core.py                ChileHub class + API pública (1 250 líneas)
 │   │   ├── cli.py                 CLI entry points (build_parser/_main/main — TECHDEBT-02, movido de core.py)
@@ -154,7 +154,7 @@ chile-hub/
 │   │   ├── datasets.py            Definición de Dataset(StrEnum) y tipos
 │   │   ├── exceptions.py          Excepciones de dominio de la API
 │   │   ├── data_manager.py        Descarga de bundle, cache, verificación SHA256
-│   │   ├── pipeline_status_utils.py  Reportes Markdown de salud, catálogo y redistribución (1 064 líneas)
+│   │   ├── pipeline_status_utils.py  Reportes Markdown de salud, catálogo y redistribución (1 081 líneas)
 │   │   ├── _render.py             Helper de renderizado de tablas
 │   │   └── text.py                Utils de texto compartidas
 │   ├── registry/                  DatasetSpec cohort Phase 2–3D (ADR-018): modelo tipado + proyecciones de compatibilidad (dataset_spec.py, 697 líneas)
@@ -168,7 +168,7 @@ chile-hub/
 │   ├── staging/      Datos parseados y cercanos a la fuente (CSV + metadata.json por dataset).
 │   └── normalized/   Artefactos finales publicables (Parquet, JSON, DuckDB, Excel, ZIP, reportes).
 │
-├── tests/                        18 archivos pytest — ver tabla completa en §8, no la dupliques aquí
+├── tests/                        19 archivos pytest — ver tabla completa en §8, no la dupliques aquí
 │   ├── test_chile_hub.py         API/CLI de ChileHub, contratos de artefactos, workflow, Makefile
 │   ├── test_extractors.py        Un test class por extractor + contrato de BaseExtractor
 │   ├── test_pipeline_logic.py    Lógica interna de build_dev_db.py, invariantes CUT, changelog
@@ -219,7 +219,7 @@ codegraph impact validate_comunas                   # Qué se rompe si cambio es
 **Reglas para acotar lecturas y ahorrar tokens:**
 - Usar `Read` con `offset`/`limit` — nunca leer archivos grandes enteros de golpe.
 - `base.py` (146 líneas) es seguro de leer completo. El paquete `validation/` — leer por dominio (`_dpa`, `_poblacion`, `_economia`…), no entero.
-- `build_dev_db.py` (619 líneas) y `src/chile_hub/core.py` (1 250 líneas) — usar estas áncoras:
+- `build_dev_db.py` (679 líneas) y `src/chile_hub/core.py` (1 250 líneas) — usar estas áncoras:
 
 | Archivo | Líneas de interés |
 |---|---|
@@ -325,6 +325,20 @@ if errors:
     raise SystemExit(f"Validación fallida: {errors}")
 # No usar warnings silenciosos para errores de datos críticos
 ```
+
+**Publicación parcial (plan 150, ADR-025).** Que una capa `stable_publishable` no
+pueda refrescarse **no** autoriza a publicar sus datos degradados, y tampoco debe
+congelar a las demás. El mecanismo es la retención: la capa conserva su última
+versión buena —frame y metadatos— y se publica marcada con
+`publication_hold` (`retained`, `reason`, `previous_generated_at_utc`,
+`builds_held`). Reglas no negociables:
+
+- Un `held` publica **el artefacto anterior**, nunca el de la corrida fallida.
+- Sin artefacto previo no hay retención posible: el build falla.
+- Tras `MAX_HELD_BUILDS` (7) retenciones consecutivas el build **falla**, para
+  que una caída no se vuelva olvido. No se sube el tope para "hacer pasar" un build.
+- El invariante de esta sección no cambia: ningún dato degradado se publica. Lo
+  que se acota es el radio de impacto de una fuente caída.
 
 ### 4.3 Los artefactos en data/raw/ son de solo escritura
 
@@ -654,7 +668,7 @@ pytest tests/test_chile_hub.py::ChileHubTests::test_load_polars -v
 
 <!-- START_AGENTS_TEST_TABLE -->
 
-**18 archivos** en `tests/`. Esta tabla es de **navegación por archivo**, no un
+**19 archivos** en `tests/`. Esta tabla es de **navegación por archivo**, no un
 inventario de clases — las clases cambian con frecuencia y una lista exhaustiva
 aquí quedaría stale de inmediato. Para el inventario vivo de clases:
 ```bash
@@ -677,6 +691,7 @@ grep -n "^class " tests/*.py
 | `test_phase4_extraction.py` | No | ExtractionResult Phase 4: modelo tipado, 3 extractores piloto (ordinary/fallback/multi-source) y adapters legacy |
 | `test_pipeline_logic.py` | No | Lógica interna de `build_dev_db.py`, invariantes CUT, fallback de indicadores, severidad de `dataset_changelog.json`, builders (`reports`, `pipeline_status_utils`) |
 | `test_proof_of_value.py` | No | Prueba reproducible de tres cruces territoriales, cobertura, integridad CUT y hash de resultados (sin red) |
+| `test_publication_hold.py` | No | Publicación parcial (plan 150/ADR-025): retención de la última versión buena, fallo cerrado sin artefacto previo y escalamiento a 7 builds |
 | `test_render.py` | No | Helper de renderizado de tablas (`_render.py`) |
 | `test_research_dgac_precipitaciones.py` | No | Candidato DGAC: CSV sin cabeceras, cobertura de meses, licencias, hashes y fallos cerrados (sin red) |
 | `test_validation.py` | No | Funciones `validate_*()` del paquete `src/validation/`: bordes vacíos, claves duplicadas, casos límite |

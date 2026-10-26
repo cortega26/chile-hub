@@ -450,24 +450,29 @@ def _optional_dataset_entry(
     """
     if df is None or (require_metadata and base_metadata is None):
         return {}
-    return {
-        name: {
-            "dataset": name,
-            "source_name": base_metadata.get("source_name", ""),
-            "source_url": base_metadata.get("source_url", ""),
-            "source_mode": base_metadata.get("source_mode", "fallback"),
-            "source_detail": base_metadata.get("source_detail", source_detail_default),
-            "refreshed_at_utc": base_metadata.get("refreshed_at_utc", ""),
-            "record_count": df.height,
-            "fields": df.columns,
-            "notes": base_metadata.get("notes", []),
-            "reuse_policy": DATASET_CATALOG_CONFIG[name]["reuse_policy"],
-            "freshness": build_freshness(
-                base_metadata.get("refreshed_at_utc", ""),
-                DATASET_CATALOG_CONFIG[name]["freshness_policy"]["max_age_hours"],
-            ),
-        }
+    entry = {
+        "dataset": name,
+        "source_name": base_metadata.get("source_name", ""),
+        "source_url": base_metadata.get("source_url", ""),
+        "source_mode": base_metadata.get("source_mode", "fallback"),
+        "source_detail": base_metadata.get("source_detail", source_detail_default),
+        "refreshed_at_utc": base_metadata.get("refreshed_at_utc", ""),
+        "record_count": df.height,
+        "fields": df.columns,
+        "notes": base_metadata.get("notes", []),
+        "reuse_policy": DATASET_CATALOG_CONFIG[name]["reuse_policy"],
+        "freshness": build_freshness(
+            base_metadata.get("refreshed_at_utc", ""),
+            DATASET_CATALOG_CONFIG[name]["freshness_policy"]["max_age_hours"],
+        ),
     }
+    # Plan 150 / ADR-025: la marca de retención debe sobrevivir al constructor
+    # explícito de entradas opcionales; si no, el verificador no puede
+    # distinguir "retenido" de "degradado" y rechaza el build.
+    hold = base_metadata.get("publication_hold")
+    if hold:
+        entry["publication_hold"] = hold
+    return {name: entry}
 
 
 def _metadata_perfil_territorial(dfs, meta):

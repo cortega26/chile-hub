@@ -1,6 +1,6 @@
 {
-  "generated_at_utc": "2026-10-15T14:39:45.554724+00:00",
-  "dataset_count": 22,
+  "generated_at_utc": "2026-10-25T23:25:43.532012+00:00",
+  "dataset_count": 23,
   "datasets": [
     {
       "dataset": "regiones",
@@ -10,7 +10,7 @@
       "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
       "source_mode": "live",
       "source_detail": "bcn_arcgis",
-      "refreshed_at_utc": "2026-10-15T14:35:59.050074+00:00",
+      "refreshed_at_utc": "2026-10-25T22:46:08.939054+00:00",
       "record_count": 16,
       "fields": [
         "codigo_region",
@@ -32,9 +32,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.06,
+        "age_hours": 0.66,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-10-15T14:39:45.551895+00:00"
+        "checked_at_utc": "2026-10-25T23:25:43.527612+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -74,6 +74,7 @@
         "impact": "Sin degradación operativa detectada en este build.",
         "recommended_action": "Ninguna."
       },
+      "publication_hold": null,
       "notes": [
         "bcn_skipped_null_code_records: 1",
         "bcn_supplemented_missing_comunas: 1"
@@ -87,7 +88,7 @@
       "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
       "source_mode": "live",
       "source_detail": "bcn_arcgis",
-      "refreshed_at_utc": "2026-10-15T14:35:59.050074+00:00",
+      "refreshed_at_utc": "2026-10-25T22:46:08.939054+00:00",
       "record_count": 56,
       "fields": [
         "codigo_region",
@@ -112,9 +113,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.06,
+        "age_hours": 0.66,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-10-15T14:39:45.551919+00:00"
+        "checked_at_utc": "2026-10-25T23:25:43.527639+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -154,6 +155,7 @@
         "impact": "Sin degradación operativa detectada en este build.",
         "recommended_action": "Ninguna."
       },
+      "publication_hold": null,
       "notes": [
         "bcn_skipped_null_code_records: 1",
         "bcn_supplemented_missing_comunas: 1"
@@ -167,7 +169,7 @@
       "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
       "source_mode": "live",
       "source_detail": "bcn_arcgis",
-      "refreshed_at_utc": "2026-10-15T14:35:59.050074+00:00",
+      "refreshed_at_utc": "2026-10-25T22:46:08.939054+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -199,9 +201,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.06,
+        "age_hours": 0.66,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-10-15T14:39:45.551928+00:00"
+        "checked_at_utc": "2026-10-25T23:25:43.527651+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -241,6 +243,7 @@
         "impact": "Sin degradación operativa detectada en este build.",
         "recommended_action": "Ninguna."
       },
+      "publication_hold": null,
       "notes": [
         "bcn_skipped_null_code_records: 1",
         "bcn_supplemented_missing_comunas: 1"
@@ -254,7 +257,7 @@
       "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
       "source_mode": "live",
       "source_detail": "bcn_arcgis",
-      "refreshed_at_utc": "2026-10-15T14:35:59.050074+00:00",
+      "refreshed_at_utc": "2026-10-25T22:46:08.939054+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -285,9 +288,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.06,
+        "age_hours": 0.66,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-10-15T14:39:45.551933+00:00"
+        "checked_at_utc": "2026-10-25T23:25:43.527659+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -327,6 +330,7 @@
         "impact": "Sin degradación operativa detectada en este build.",
         "recommended_action": "Ninguna."
       },
+      "publication_hold": null,
       "notes": [
         "bcn_skipped_null_code_records: 1",
         "bcn_supplemented_missing_comunas: 1"
@@ -340,8 +344,8 @@
       "source_url": "https://mindicador.cl/api",
       "source_mode": "live",
       "source_detail": "public_api_with_published_backfill",
-      "refreshed_at_utc": "2026-10-15T14:36:44.278171+00:00",
-      "record_count": 724,
+      "refreshed_at_utc": "2026-10-25T22:46:11.848772+00:00",
+      "record_count": 738,
       "fields": [
         "fecha",
         "codigo_indicador",
@@ -376,9 +380,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.05,
+        "age_hours": 0.66,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-10-15T14:39:45.551942+00:00"
+        "checked_at_utc": "2026-10-25T23:25:43.527673+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 72,
@@ -387,7 +391,7 @@
       "coverage": {
         "status": "not_applicable",
         "expected_record_count": null,
-        "actual_record_count": 724,
+        "actual_record_count": 738,
         "coverage_ratio": null,
         "summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
         "expected": false
@@ -422,6 +426,7 @@
         "impact": "indicadores live refresh reused last published artifact for missing codes: ipc",
         "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
       },
+      "publication_hold": null,
       "notes": [
         "published_backfills_used_for_codes: ipc",
         "ine_override_used_for_pairs: ipc/2026"
@@ -435,7 +440,7 @@
       "source_url": "https://censo2024.ine.gob.cl/wp-content/uploads/2025/03/D1_Poblacion-censada-por-sexo-y-edad-en-grupos-quinquenales.xlsx",
       "source_mode": "live",
       "source_detail": "official_xlsx",
-      "refreshed_at_utc": "2026-10-15T14:36:44.764888+00:00",
+      "refreshed_at_utc": "2026-10-25T22:46:12.494231+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -471,9 +476,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.05,
+        "age_hours": 0.66,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-10-15T14:39:45.551952+00:00"
+        "checked_at_utc": "2026-10-25T23:25:43.527686+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -513,6 +518,7 @@
         "impact": "Sin degradación operativa detectada en este build.",
         "recommended_action": "Ninguna."
       },
+      "publication_hold": null,
       "notes": [
         "age_bands_derived_from_quinquennial_groups"
       ]
@@ -522,10 +528,10 @@
       "description": "Directorio vigente de establecimientos de salud con tipo, dependencia, urgencia y ubicacion.",
       "alias_for": null,
       "source_name": "Ministerio de Salud - Establecimientos de Salud",
-      "source_url": "https://datos.gob.cl/dataset/3bf4cf7c-f638-4735-9a01-f65faae4beca/resource/2c44d782-3365-44e3-aefb-2c8b8363a1bc/download/establecimientos_20261014.csv",
+      "source_url": "https://datos.gob.cl/dataset/3bf4cf7c-f638-4735-9a01-f65faae4beca/resource/2c44d782-3365-44e3-aefb-2c8b8363a1bc/download/establecimientos_20261020.csv",
       "source_mode": "live",
       "source_detail": "datos_gob_csv",
-      "refreshed_at_utc": "2026-10-15T14:36:49.839557+00:00",
+      "refreshed_at_utc": "2026-10-25T22:46:18.806476+00:00",
       "record_count": 5782,
       "fields": [
         "codigo_establecimiento",
@@ -560,9 +566,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.05,
+        "age_hours": 0.66,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-10-15T14:39:45.551960+00:00"
+        "checked_at_utc": "2026-10-25T23:25:43.527696+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 1080,
@@ -602,6 +608,7 @@
         "impact": "Sin degradación operativa detectada en este build.",
         "recommended_action": "Ninguna."
       },
+      "publication_hold": null,
       "notes": []
     },
     {
@@ -641,9 +648,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.05,
+        "age_hours": 248.81,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-10-15T14:39:45.551967+00:00"
+        "checked_at_utc": "2026-10-25T23:25:43.527705+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -683,6 +690,14 @@
         "impact": "Sin degradación operativa detectada en este build.",
         "recommended_action": "Ninguna."
       },
+      "publication_hold": {
+        "retained": true,
+        "reason": "source_mode=fallback",
+        "attempted_at_utc": "2026-10-25T23:25:17.790808+00:00",
+        "previous_generated_at_utc": "2026-10-15T14:36:56.681410+00:00",
+        "since_utc": "2026-10-25T23:02:56.922790+00:00",
+        "builds_held": 7
+      },
       "notes": []
     },
     {
@@ -693,7 +708,7 @@
       "source_url": "https://censo2024.ine.gob.cl/wp-content/uploads/2025/03/V1_Viviendas-y-hogares-censados.xlsx",
       "source_mode": "live",
       "source_detail": "official_xlsx",
-      "refreshed_at_utc": "2026-10-15T14:36:48.277375+00:00",
+      "refreshed_at_utc": "2026-10-25T22:46:15.449439+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -726,9 +741,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.05,
+        "age_hours": 0.66,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-10-15T14:39:45.551974+00:00"
+        "checked_at_utc": "2026-10-25T23:25:43.527714+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -765,6 +780,7 @@
         "impact": "Sin degradación operativa detectada en este build.",
         "recommended_action": "Ninguna."
       },
+      "publication_hold": null,
       "notes": []
     },
     {
@@ -775,7 +791,7 @@
       "source_url": "https://www.bcn.cl/siit/observatorio/ley20840",
       "source_mode": "live",
       "source_detail": "bcn_electoral_mapping_generated",
-      "refreshed_at_utc": "2026-10-15T14:36:49.973900+00:00",
+      "refreshed_at_utc": "2026-10-25T22:46:19.112124+00:00",
       "record_count": 346,
       "fields": [
         "codigo_comuna",
@@ -799,9 +815,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.05,
+        "age_hours": 0.66,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-10-15T14:39:45.551979+00:00"
+        "checked_at_utc": "2026-10-25T23:25:43.527721+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -838,11 +854,12 @@
         "impact": "Sin degradación operativa detectada en este build.",
         "recommended_action": "Ninguna."
       },
+      "publication_hold": null,
       "notes": []
     },
     {
       "dataset": "finanzas_municipales",
-      "description": "Indicadores financieros municipales anuales desde SINIM/SUBDERE. CAPA PARCIAL/CANDIDATO: 3 de 346 comunas (0.9%). Usar con precaución; no representa cobertura nacional.",
+      "description": "Indicadores financieros municipales anuales desde SINIM/SUBDERE. Cobertura 345/346 comunas (año 2024; falta Antártica 12202, hueco conocido de la fuente). Extracción mensual vía monthly-scrape.",
       "alias_for": null,
       "source_name": "SINIM - SUBDERE",
       "source_url": "https://datos.sinim.gov.cl/datos_municipales.php",
@@ -878,20 +895,20 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 1067.59,
+        "age_hours": 1316.36,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-10-15T14:39:45.551987+00:00"
+        "checked_at_utc": "2026-10-25T23:25:43.527729+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
         "label": "anual"
       },
       "coverage": {
-        "status": "not_applicable",
-        "expected_record_count": null,
+        "status": "full",
+        "expected_record_count": 345,
         "actual_record_count": 345,
-        "coverage_ratio": null,
-        "summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
+        "coverage_ratio": 1.0,
+        "summary": "Cobertura completa: 345/345 filas respecto del baseline esperado.",
         "expected": false
       },
       "drift": {
@@ -920,6 +937,7 @@
         "impact": "Sin degradación operativa detectada en este build.",
         "recommended_action": "Ninguna."
       },
+      "publication_hold": null,
       "notes": [
         "live: Playwright configurando filtros SINIM",
         "live: descargando XML Spreadsheet",
@@ -964,9 +982,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.04,
+        "age_hours": 248.81,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-10-15T14:39:45.551994+00:00"
+        "checked_at_utc": "2026-10-25T23:25:43.527736+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -1006,10 +1024,18 @@
         "impact": "Sin degradación operativa detectada en este build.",
         "recommended_action": "Ninguna."
       },
+      "publication_hold": {
+        "retained": true,
+        "reason": "source_mode=fallback; record_count cayó 99.1% (345 -> 3)",
+        "attempted_at_utc": "2026-10-25T23:25:17.790808+00:00",
+        "previous_generated_at_utc": "2026-10-15T14:37:11.779959+00:00",
+        "since_utc": "2026-10-25T23:02:56.922790+00:00",
+        "builds_held": 7
+      },
       "notes": [
         "privacy_safe_comuna_year_aggregation",
         "sit_fin_r_Y=retirado T=trasladado asistencia_only_for_P_R_students",
-        "source_file: mineduc_rendimiento_2024.rar, comunas_agregadas: 345"
+        "fallback_curated_rows_used: RuntimeError: Error al extraer RAR (code 1): "
       ]
     },
     {
@@ -1020,7 +1046,7 @@
       "source_url": "https://www.ine.gob.cl/docs/default-source/sistema-de-indicadores-y-estandares-de-desarrollo-urbano/indicadores/actualizaci%C3%B3n-2019/matriz-siedu-publicacion.xlsm",
       "source_mode": "live",
       "source_detail": "ine_siedu_xlsm_cinco_mediciones_2018_2022",
-      "refreshed_at_utc": "2026-10-15T14:37:14.541617+00:00",
+      "refreshed_at_utc": "2026-10-25T22:46:21.918498+00:00",
       "record_count": 6701,
       "fields": [
         "anio",
@@ -1051,9 +1077,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.04,
+        "age_hours": 0.66,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-10-15T14:39:45.552001+00:00"
+        "checked_at_utc": "2026-10-25T23:25:43.527745+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -1096,6 +1122,7 @@
         "impact": "1 observación(es) esperada(s): indicadores_urbanos_siedu has intentionally partial urban coverage",
         "recommended_action": "Ninguna."
       },
+      "publication_hold": null,
       "notes": [
         "partial_urban_coverage_expected",
         "deduplicado_anno_mas_reciente_por_indicador_comuna",
@@ -1111,7 +1138,7 @@
       "source_url": "https://github.com/cortega26/chile-hub",
       "source_mode": "live",
       "source_detail": "derived_from_validated_chile_hub_layers",
-      "refreshed_at_utc": "2026-10-15T14:39:45.552008+00:00",
+      "refreshed_at_utc": "2026-10-25T23:25:43.527757+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -1162,7 +1189,10 @@
         "superficie_autorizada_m2_ultimo_anio",
         "anio_permisos_edificacion",
         "mp25_promedio_ultimo_anio",
-        "anio_calidad_aire"
+        "anio_calidad_aire",
+        "tasa_pobreza_ingresos_ultimo_anio",
+        "tasa_pobreza_multidimensional_ultimo_anio",
+        "anio_pobreza"
       ],
       "indicator_codes": [],
       "indicator_delivery": {},
@@ -1182,7 +1212,7 @@
         "status": "fresh",
         "age_hours": 0.0,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-10-15T14:39:45.552019+00:00"
+        "checked_at_utc": "2026-10-25T23:25:43.527776+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 1080,
@@ -1222,6 +1252,7 @@
         "impact": "Sin degradación operativa detectada en este build.",
         "recommended_action": "Ninguna."
       },
+      "publication_hold": null,
       "notes": [
         "derived_dataset",
         "upstreams: comunas,censo_comunal,censo_hogares_viviendas,establecimientos_salud,establecimientos_educacionales,distritos_electorales,finanzas_municipales,resultados_educacionales,indicadores_urbanos_siedu"
@@ -1235,7 +1266,7 @@
       "source_url": "https://datos.gob.cl/dataset/registro-de-empresas-y-sociedades",
       "source_mode": "live",
       "source_detail": "datos_gob_cl_ckan_api",
-      "refreshed_at_utc": "2026-10-15T14:37:41.724500+00:00",
+      "refreshed_at_utc": "2026-10-25T22:46:30.997389+00:00",
       "record_count": 1628433,
       "fields": [
         "rut",
@@ -1269,9 +1300,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.03,
+        "age_hours": 0.65,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-10-15T14:39:45.552031+00:00"
+        "checked_at_utc": "2026-10-25T23:25:43.527789+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 1080,
@@ -1311,8 +1342,9 @@
         "impact": "1 observación(es) esperada(s): RES solo cubre constituciones bajo Ley 20.659 (regimen simplificado). No incluye empresas del regimen tradicional (Diario Oficial) ni empresas anteriores a mayo 2013.",
         "recommended_action": "Ninguna."
       },
+      "publication_hold": null,
       "notes": [
-        "filas descartadas por RUT centinela ['0']: 1",
+        "filas descartadas por RUT centinela ['0']: 0",
         "Solo incluye empresas constituidas bajo el Regimen Simplificado (Ley 20.659) desde mayo 2013.",
         "No contiene dirección postal (solo comuna y región).",
         "No contiene actividad económica (giro).",
@@ -1328,7 +1360,7 @@
       "source_url": "https://observatorio.ministeriodesarrollosocial.gob.cl/pobreza-comunal-2022",
       "source_mode": "live",
       "source_detail": "Estimaciones de Pobreza Comunal vía SAE desde encuesta CASEN",
-      "refreshed_at_utc": "2026-10-15T14:37:43.288676+00:00",
+      "refreshed_at_utc": "2026-10-25T22:46:32.004153+00:00",
       "record_count": 690,
       "fields": [
         "codigo_region",
@@ -1361,9 +1393,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.03,
+        "age_hours": 0.65,
         "max_age_hours": 175200,
-        "checked_at_utc": "2026-10-15T14:39:45.552038+00:00"
+        "checked_at_utc": "2026-10-25T23:25:43.527802+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 175200,
@@ -1402,6 +1434,7 @@
         "impact": "1 observación(es) esperada(s): cobertura SAE: 345/346 comunas (99.7%) — parcial por diseño; comunas sin muestra no tienen estimación",
         "recommended_action": "Ninguna."
       },
+      "publication_hold": null,
       "notes": [
         "ingresos: 345 comunas con estimación desde URL oficial",
         "multidimensional: 345 comunas con estimación desde URL oficial"
@@ -1415,7 +1448,7 @@
       "source_url": "http://datos.energiaabierta.cl/dataviews/241686/consumo-electrico-anual-por-comuna-y-tipo-de-cliente/",
       "source_mode": "fallback",
       "source_detail": "Consumo eléctrico anual por comuna y tipo de cliente",
-      "refreshed_at_utc": "2026-10-15T14:37:50.372761+00:00",
+      "refreshed_at_utc": "2026-10-25T22:46:37.058208+00:00",
       "record_count": 3,
       "fields": [
         "codigo_region",
@@ -1446,9 +1479,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.03,
+        "age_hours": 0.65,
         "max_age_hours": 17520,
-        "checked_at_utc": "2026-10-15T14:39:45.552045+00:00"
+        "checked_at_utc": "2026-10-25T23:25:43.527811+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 17520,
@@ -1493,6 +1526,7 @@
         "impact": "tipos de cliente: ['Comercial', 'Residencial']; años disponibles: [2023]; consumo_electrico_comunal source_mode is fallback; usando datos de muestra mínima.",
         "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
       },
+      "publication_hold": null,
       "notes": [
         "fallback: usando datos de muestra (HTTPConnectionPool(host='datos.energiaabierta.cl', port=80): Max retries exceeded with url: /dataviews/241686/consumo-electrico-anual-por-comuna-y-tipo-de-cliente/ (Caused by NameResolutionError(\"HTTPConnection(host='datos.energiaabierta.cl', port=80): Failed to resolve 'datos.energiaabierta.cl' ([Errno -2] Name or service not known)\"))). fuente confirmada caída de forma permanente (2026-07-07): CNE migró energiaabierta.cl a WordPress y decomisionó el catálogo Junar; no existe archivo ni endpoint de reemplazo. Ver AGENTS.md §6."
       ]
@@ -1505,7 +1539,7 @@
       "source_url": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
       "source_mode": "live",
       "source_detail": "WSComun.asmx/retornarPartidosPoliticos + servel.cl/partidos-politicos (estado legal)",
-      "refreshed_at_utc": "2026-10-15T14:37:52.412593+00:00",
+      "refreshed_at_utc": "2026-10-25T22:46:39.503347+00:00",
       "record_count": 37,
       "fields": [
         "id_partido",
@@ -1534,9 +1568,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.03,
+        "age_hours": 0.65,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-10-15T14:39:45.552050+00:00"
+        "checked_at_utc": "2026-10-25T23:25:43.527819+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -1575,6 +1609,7 @@
         "impact": "1 observación(es) esperada(s): estado_legal poblado (vía SERVEL) en 16/37 partidos",
         "recommended_action": "Ninguna."
       },
+      "publication_hold": null,
       "notes": [
         "Roster de partidos de la Cámara (incluye vigentes e históricos).",
         "estado_legal/fecha_constitucion vía SERVEL: 16/37 matcheados por nombre.",
@@ -1589,7 +1624,7 @@
       "source_url": "https://opendata.camara.cl/camaradiputados/WServices/WSDiputado.asmx/retornarDiputadosPeriodoActual",
       "source_mode": "live",
       "source_detail": "WSDiputado.asmx/retornarDiputadosPeriodoActual + camara.cl + senado.cl (Scrapling)",
-      "refreshed_at_utc": "2026-10-15T14:39:35.285799+00:00",
+      "refreshed_at_utc": "2026-09-25T19:32:50.839314+00:00",
       "record_count": 205,
       "fields": [
         "id_autoridad",
@@ -1627,9 +1662,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.0,
+        "age_hours": 723.88,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-10-15T14:39:45.552057+00:00"
+        "checked_at_utc": "2026-10-25T23:25:43.527829+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -1666,6 +1701,7 @@
         "impact": "Sin degradación operativa detectada en este build.",
         "recommended_action": "Ninguna."
       },
+      "publication_hold": null,
       "notes": [
         "v1: diputados (155) + senadores (50). Gobernador_regional/alcalde viven en el dataset segregado autoridades_locales (licencia CC-BY-SA).",
         "distrito_electoral vía Scrapling: 155/155 diputados.",
@@ -1681,7 +1717,7 @@
       "source_url": "https://www.ine.gob.cl/estadisticas-por-tema/demografia-y-poblacion/estadisticas-vitales",
       "source_mode": "live",
       "source_detail": "Anuarios de Estadísticas Vitales (tabulados XLSX, tabla 1.2.2-04 por comuna de residencia). Solo definitivos: los boletines provisionales del INE no publican desglose comunal.",
-      "refreshed_at_utc": "2026-10-15T14:39:15.806031+00:00",
+      "refreshed_at_utc": "2026-10-25T22:46:46.649796+00:00",
       "record_count": 13840,
       "fields": [
         "anio",
@@ -1713,9 +1749,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.01,
+        "age_hours": 0.65,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-10-15T14:39:45.552064+00:00"
+        "checked_at_utc": "2026-10-25T23:25:43.527840+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -1755,23 +1791,9 @@
         "impact": "Sin degradación operativa detectada en este build.",
         "recommended_action": "Ninguna."
       },
+      "publication_hold": null,
       "notes": [
-        "2010: 692 filas desde 'Anuario de estadísticas vitales 2010' (hoja 122-04; TOTAL país: 250643 nacimientos, 97930 defunciones)",
-        "2011: 692 filas desde 'Anuario de estadísticas vitales 2011' (hoja 122-04; TOTAL país: 247358 nacimientos, 94985 defunciones)",
-        "2012: 692 filas desde 'Anuario de estadísticas vitales 2012' (hoja 122-04; TOTAL país: 243635 nacimientos, 98711 defunciones)",
-        "2013: 692 filas desde 'Anuario de estadísticas vitales 2013' (hoja 1.2.2-04; TOTAL país: 242005 nacimientos, 99770 defunciones)",
-        "2014: 692 filas desde 'Anuario de estadísticas vitales 2014' (hoja 1.2.2-04; TOTAL país: 250997 nacimientos, 101960 defunciones)",
-        "2015: 692 filas desde 'Anuario de estadísticas vitales 2015' (hoja 1.2.2-04; TOTAL país: 244670 nacimientos, 103327 defunciones)",
-        "2016: 692 filas desde 'Anuario de estadísticas vitales nacimientos 2016' (hoja 1.2.2-04; TOTAL país: 231749 nacimientos, 104026 defunciones)",
-        "2017: 692 filas desde 'Anuario de estadísticas vitales 2017' (hoja 1.2.2-04; TOTAL país: 219186 nacimientos, 106388 defunciones)",
-        "2018: convención de indentado invertida (comuna indentada)",
-        "2018: 692 filas desde 'Anuario de estadísticas vitales 2018' (hoja 122-04; TOTAL país: 221731 nacimientos, 106796 defunciones)",
-        "2019: convención de indentado invertida (comuna indentada)",
-        "2019: 692 filas desde 'Anuario de estadísticas vitales 2019' (hoja 122-04; TOTAL país: 210188 nacimientos, 109658 defunciones)",
-        "2020: convención de indentado invertida (comuna indentada)",
-        "2020: 692 filas desde 'Anuario de estadísticas vitales 2020' (hoja 122-04; TOTAL país: 194978 nacimientos, 126169 defunciones)",
-        "2021: 2076 filas desde 'Anuario de estadísticas vitales 2021' (hoja 122-04; TOTAL país: 177273 nacimientos, 137629 defunciones)",
-        "2022: 2076 filas desde 'Anuario de estadísticas vitales 2022, nacimientos y defunciones' (hoja 122-04; TOTAL país: 189303 nacimientos, 136972 defunciones)",
+        "fetch incremental: 1 de 15 anuarios (faltantes + año más reciente 2023)",
         "2023: 2076 filas desde 'Anuario de estadísticas vitales 2023, nacimientos y defunciones' (hoja 122-04; TOTAL país: 174057 nacimientos, 122218 defunciones)"
       ]
     },
@@ -1781,9 +1803,9 @@
       "alias_for": null,
       "source_name": "MINVU — Centro de Estudios de Ciudad y Territorio (CEDOC)",
       "source_url": "https://centrodeestudios.minvu.gob.cl/repositorio/categoria/permisos-de-edificacion",
-      "source_mode": "monthly",
+      "source_mode": "live",
       "source_detail": "Viviendas en unidades y superficie (m2) por comuna y año, serie desde 2002 (MINVU CEDOC, en base a permisos otorgados por las Direcciones de Obras Municipales e INE).",
-      "refreshed_at_utc": "2026-09-25T19:08:42+00:00",
+      "refreshed_at_utc": "2026-10-25T22:46:49.459577+00:00",
       "record_count": 8650,
       "fields": [
         "anio",
@@ -1818,9 +1840,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 475.52,
+        "age_hours": 0.65,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-10-15T14:39:45.552072+00:00"
+        "checked_at_utc": "2026-10-25T23:25:43.527850+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 1080,
@@ -1860,10 +1882,10 @@
         "impact": "Sin degradación operativa detectada en este build.",
         "recommended_action": "Ninguna."
       },
+      "publication_hold": null,
       "notes": [
         "descubrimiento: repositorio-biblionumber",
-        "descarga falló, usando snapshot versionado minvu_permisos_edificacion_anual_20260925T190842Z.xlsx (Failed to perform, curl: (35) BoringSSL SSL_connect: Connection closed abruptly (SSL_ERROR_SYSCALL; error queue empty) in connection to catalogo.minvu.cl:443. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.)",
-        "8650 filas desde 'minvu_permisos_edificacion_anual_20260925T190842Z.xlsx' (hojas: número_total, m2_total, número_departamentos, m2_departamentos, número_casas, m2_casas; años provisionales: [2024, 2025, 2026])"
+        "8650 filas desde 'minvu_permisos_edificacion_anual_20261025T224648Z.xlsx' (hojas: número_total, m2_total, número_departamentos, m2_departamentos, número_casas, m2_casas; años provisionales: [2024, 2025, 2026])"
       ]
     },
     {
@@ -1913,10 +1935,10 @@
         "summary": "Mediciones de calidad del aire del SINCA (MMA), API JSON pública. Organismo público chileno sin restricción explícita de reúso; citar fuente oficial."
       },
       "freshness": {
-        "status": "fresh",
-        "age_hours": 0.01,
+        "status": "stale",
+        "age_hours": 248.77,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-10-15T14:39:45.552080+00:00"
+        "checked_at_utc": "2026-10-25T23:25:43.527859+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 72,
@@ -1931,9 +1953,9 @@
         "expected": false
       },
       "drift": {
-        "status": "healthy",
-        "summary": "Sin drift operativo detectado en este build.",
-        "recommended_action": "Ninguna."
+        "status": "drifted",
+        "summary": "Drift detectado: degradation=warning.",
+        "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
       },
       "usage_examples": {
         "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars(\"calidad_aire\")\n# Promedio diario de MP2.5 por comuna\ndf.filter(pl.col(\"codigo_contaminante\") == \"mp25\").sort(\"valor_promedio_diario\", descending=True)",
@@ -1950,18 +1972,122 @@
       "documentation": "docs/datasets/calidad_aire.md",
       "validation_status": "ok",
       "warnings": [
-        "cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación"
+        "cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación",
+        "calidad_aire freshness is stale: 248.77h since refresh, policy max is 72h"
+      ],
+      "actionable_warnings": [
+        "calidad_aire freshness is stale: 248.77h since refresh, policy max is 72h"
+      ],
+      "degradation": {
+        "status": "warning",
+        "impact": "calidad_aire freshness is stale: 248.77h since refresh, policy max is 72h",
+        "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
+      },
+      "publication_hold": {
+        "retained": true,
+        "reason": "record_count cayó 73.5% (8462 -> 2244)",
+        "attempted_at_utc": "2026-10-25T23:25:17.790808+00:00",
+        "previous_generated_at_utc": "2026-10-15T14:39:26.685817+00:00",
+        "since_utc": "2026-10-25T23:03:52.580566+00:00",
+        "builds_held": 6
+      },
+      "notes": [
+        "inventario: 121 estaciones en el listado; 121 con filas emitidas",
+        "734 filas diarias nuevas desde 'sinca_listadomapa_20261025T224651Z.json'",
+        "historial: fusionado con staging existente"
+      ]
+    },
+    {
+      "dataset": "precipitaciones_dgac",
+      "description": "Precipitaciones diarias por estación meteorológica DGAC: serie 2013–2026 con 143 meses verificables, sin interpolación ni asignación de CUT; lagunas de cobertura y licencias explícitas.",
+      "alias_for": null,
+      "source_name": "DGAC — datos.gob.cl",
+      "source_url": "https://datos.gob.cl/organization/direccion_general_de_aeronautica_civil",
+      "source_mode": "live",
+      "source_detail": "CKAN: 143 archivos-mes, 2013–2026, licencias CC BY/CC0",
+      "refreshed_at_utc": "2026-10-17T03:25:07.715081+00:00",
+      "record_count": 141436,
+      "fields": [
+        "fecha",
+        "id_estacion",
+        "nombre_estacion",
+        "latitud_dms",
+        "altitud_m",
+        "precipitacion_mm",
+        "url_fuente",
+        "licencia_fuente"
+      ],
+      "indicator_codes": [],
+      "indicator_delivery": {},
+      "join_keys": [
+        "fecha",
+        "id_estacion"
+      ],
+      "confidence_tier": "Tier B",
+      "reuse_policy": {
+        "status": "open-attribution",
+        "license": "CC BY + CC0 (licencia individual por archivo)",
+        "license_url": "https://datos.gob.cl/organization/direccion_general_de_aeronautica_civil",
+        "attribution_required": true,
+        "redistribution_ok": true,
+        "summary": "Solo CSV de paquetes DGAC cc-by y cc-zero; 2014 y 2015-I CC-NC excluidos y enero 2017 en cuarentena por datos de temperatura."
+      },
+      "freshness": {
+        "status": "fresh",
+        "age_hours": 212.01,
+        "max_age_hours": 2160,
+        "checked_at_utc": "2026-10-25T23:25:43.527896+00:00"
+      },
+      "freshness_policy": {
+        "max_age_hours": 2160,
+        "label": "trimestral"
+      },
+      "coverage": {
+        "status": "not_applicable",
+        "expected_record_count": null,
+        "actual_record_count": 141436,
+        "coverage_ratio": null,
+        "summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
+        "expected": false
+      },
+      "drift": {
+        "status": "healthy",
+        "summary": "Sin drift operativo detectado en este build.",
+        "recommended_action": "Ninguna."
+      },
+      "usage_examples": {
+        "python": "from chile_hub import ChileHub\n\nhub = ChileHub()\ndf = hub.load_polars(\"precipitaciones_dgac\")\nlluvia = df.filter(pl.col(\"precipitacion_mm\").is_not_null())",
+        "duckdb": "SELECT fecha, id_estacion, precipitacion_mm FROM 'data/normalized/precipitaciones_dgac.parquet' WHERE precipitacion_mm IS NOT NULL ORDER BY fecha DESC LIMIT 20;",
+        "cli": "chile-hub show precipitaciones_dgac"
+      },
+      "outputs": {
+        "parquet": "data/normalized/precipitaciones_dgac.parquet",
+        "csv": "data/normalized/precipitaciones_dgac.csv",
+        "metadata": "data/normalized/precipitaciones_dgac.metadata.json",
+        "duckdb_table": "precipitaciones_dgac",
+        "sqlite_table": "precipitaciones_dgac",
+        "excel_sheet": "Precipitaciones DGAC"
+      },
+      "documentation": "docs/datasets/precipitaciones_dgac.md",
+      "validation_status": "ok",
+      "warnings": [
+        "DGAC: cobertura parcial por diseño; 2014 y 2015-I se excluyen por CC-NC; enero 2017 en cuarentena por contener temperaturas; 2026 solo primer semestre."
       ],
       "actionable_warnings": [],
       "degradation": {
         "status": "none",
-        "impact": "1 observación(es) esperada(s): cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación",
+        "impact": "1 observación(es) esperada(s): DGAC: cobertura parcial por diseño; 2014 y 2015-I se excluyen por CC-NC; enero 2017 en cuarentena por contener temperaturas; 2026 solo primer semestre.",
         "recommended_action": "Ninguna."
       },
+      "publication_hold": null,
       "notes": [
-        "inventario: 124 estaciones en el listado; 124 con filas emitidas",
-        "730 filas diarias nuevas desde 'sinca_listadomapa_20261015T143926Z.json'",
-        "historial: sembrado desde Parquet publicado (7732 filas)"
+        "Estaciones observacionales; sin CUT comunal ni interpolación.",
+        "No se imputa lluvia ni se sustituyen faltantes por ceros.",
+        "2026 solo primer semestre; comparaciones anuales requieren años completos.",
+        "2014/2015-I del catálogo legacy CC-NC excluidos; no se inventa continuidad.",
+        "2017-01 excluido: la DGAC publicó temperaturas bajo nombre de precipitaciones.",
+        "Licencia registrada por archivo; las diferencias requieren atribución adecuada.",
+        "Fuera del bundle estable hasta validación de calidad longitudinal."
       ]
     }
   ]

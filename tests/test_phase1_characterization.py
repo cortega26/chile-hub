@@ -328,6 +328,19 @@ def _isolated_main_paths(tmp_path: Path, *, include_candidate: bool = True) -> E
     return stack
 
 
+def _isolated_normalized(staging: Path) -> str:
+    """Directorio normalizado aislado para tests que ejercen `_load_inputs()`.
+
+    Desde el plan 150 la política de publicación parcial lee el catálogo
+    publicado previo para decidir qué capas se retienen. Un fixture sintético
+    debe compararse contra un directorio vacío, no contra el del repositorio,
+    o produce retenciones falsas.
+    """
+    normalized = staging.parent / "normalized-isolated"
+    normalized.mkdir(exist_ok=True)
+    return str(normalized)
+
+
 def test_offline_staging_loads_direct_and_derived_datasets_without_extractors(
     tmp_path: Path,
 ) -> None:
@@ -340,6 +353,7 @@ def test_offline_staging_loads_direct_and_derived_datasets_without_extractors(
     staging = tmp_path / "staging"
     staging.mkdir()
     overrides = _offline_synthetic_staging(staging)
+    overrides["NORMALIZED_DIR"] = _isolated_normalized(staging)
 
     with patch.multiple(build_dev_db, **overrides):
         datasets, metadata, _ = build_dev_db._load_inputs()
@@ -360,6 +374,7 @@ def test_offline_staging_invalid_data_fails_closed_before_artifact_writing(tmp_p
     staging = tmp_path / "staging"
     staging.mkdir()
     overrides = _offline_synthetic_staging(staging)
+    overrides["NORMALIZED_DIR"] = _isolated_normalized(staging)
 
     with patch.multiple(build_dev_db, **overrides):
         datasets, metadata, _ = build_dev_db._load_inputs()
@@ -376,6 +391,7 @@ def test_missing_required_csv_and_metadata_fail_closed(tmp_path: Path) -> None:
         staging = tmp_path / omitted_name
         staging.mkdir()
         overrides = _offline_synthetic_staging(staging)
+        overrides["NORMALIZED_DIR"] = _isolated_normalized(staging)
         (staging / omitted_name).unlink()
 
         with patch.multiple(build_dev_db, **overrides), pytest.raises(SystemExit):
@@ -446,6 +462,15 @@ def test_current_main_builds_isolated_offline_artifacts(tmp_path: Path) -> None:
     assert manifest_paths <= members
     assert "data/normalized/comunas.parquet" in members
     assert "comunas" in {entry["dataset"] for entry in bundle_catalog["datasets"]}
+
+    # Regresión (plan 150): `overview.json` se escribe después del primer
+    # manifiesto, así que su hash quedaba apuntando al archivo de la corrida
+    # anterior y `verify_committed_snapshot.py` fallaba con "SHA-256 de
+    # artefacto desfasado". Se reutiliza el gate real en vez de reimplementarlo.
+    from scripts.verify_committed_snapshot import verify_manifest_artifacts
+
+    report = verify_manifest_artifacts(stack.sandbox)  # type: ignore[attr-defined]
+    assert report["manifest_artifacts_verified"] > 0
 
 
 def test_fixed_input_rebuild_is_semantically_equivalent_and_filters_candidates(

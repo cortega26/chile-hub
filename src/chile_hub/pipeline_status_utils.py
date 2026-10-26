@@ -15,6 +15,16 @@ from ._paths import ROOT_DIR  # fuente única de raíz del proyecto (TECHDEBT-05
 
 def write_text_atomic(content, path):
     path_obj = Path(path)
+    # Los reportes Markdown se construyen concatenando campos de datos (p. ej.
+    # `notes` de un extractor). Un espacio final en un mensaje de error produce
+    # una línea con trailing whitespace: el hook `trailing-whitespace` la
+    # recorta al commitear y entonces el tamaño real del archivo deja de
+    # coincidir con el declarado en artifact_manifest.json
+    # (`verify_committed_snapshot.py` falla con "Tamaño de artefacto
+    # desfasado"). Normalizar aquí hace que el build emita ya el texto que el
+    # hook aceptaría, sin depender de que los datos no traigan espacios.
+    if isinstance(content, str) and path_obj.suffix == ".md":
+        content = "\n".join(line.rstrip() for line in content.split("\n"))
     tmp_path = path_obj.with_suffix(path_obj.suffix + ".tmp")
     tmp_path.write_text(content, encoding="utf-8")
     os.replace(str(tmp_path), str(path_obj))
@@ -350,6 +360,8 @@ def _dataset_health_entry(dataset_name, dataset, validation, retired_datasets):
         # Siempre presente, para que sea inspeccionable (mismo criterio
         # que coverage.expected en ADR-014).
         "retired": dataset_name in retired_datasets,
+        # Plan 150 / ADR-025: el dato publicado es la última versión buena.
+        "held": bool(dataset.get("publication_hold")),
     }
 
 
@@ -367,6 +379,9 @@ def _health_counters(active):
         # solo con cadencia menor (ver Fase 3.4, source_registry.json).
         "live_count": sum(1 for entry in active if entry["source_mode"] in {"live", "monthly"}),
         "fallback_count": sum(1 for entry in active if entry["source_mode"] == "fallback"),
+        # Plan 150: retenidos en su última versión buena. Se cuentan aparte y
+        # no alteran overall_status: la señal ya la da su propia degradación.
+        "held_count": sum(1 for entry in active if entry.get("held")),
         "stale_count": sum(1 for entry in active if entry["freshness_status"] == "stale"),
         "unknown_freshness_count": sum(
             1 for entry in active if entry["freshness_status"] == "unknown"
@@ -446,6 +461,7 @@ def build_hub_health(metadata):
         "error_count": counters["error_count"],
         "live_count": counters["live_count"],
         "fallback_count": counters["fallback_count"],
+        "held_count": counters["held_count"],
         "stale_count": counters["stale_count"],
         "unknown_freshness_count": counters["unknown_freshness_count"],
         "publishable_count": counters["publishable_count"],
@@ -623,6 +639,7 @@ def build_hub_health_markdown(health):
         f"- `error_count`: `{health.get('error_count', 0)}`",
         f"- `live_count`: `{health.get('live_count', 0)}`",
         f"- `fallback_count`: `{health.get('fallback_count', 0)}`",
+        f"- `held_count`: `{health.get('held_count', 0)}`",
         f"- `stale_count`: `{health.get('stale_count', 0)}`",
         f"- `publishable_count`: `{health.get('publishable_count', 0)}`",
         f"- `review_terms_count`: `{health.get('review_terms_count', 0)}`",

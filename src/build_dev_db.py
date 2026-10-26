@@ -1,6 +1,7 @@
 import os
 import shutil
 import sys
+from datetime import UTC, datetime
 
 # ── Ajuste de sys.path ────────────────────────────────────────────────────────
 # `python src/build_dev_db.py` no incluye el directorio raíz en sys.path, por lo
@@ -53,6 +54,7 @@ from src.builders.catalog import (
     write_pipeline_metadata,
 )
 from src.builders.data_package import build_data_package, write_data_package_json
+from src.builders.datasets import build_perfil_territorial_comunal
 from src.builders.dcat_catalog import write_dcat_catalog_json
 from src.builders.doc_sync import sync_all_docs
 from src.builders.formats import (
@@ -85,6 +87,11 @@ from src.builders.metadata import (  # noqa: F401
     load_metadata,
     load_schema_contract,
 )
+from src.builders.publication_gate import (
+    apply_holds,
+    evaluate_holds,
+    hold_errors,
+)
 from src.builders.reports import (
     MAPA_METRICAS_FILENAME,
     append_hub_health_history,
@@ -97,6 +104,7 @@ from src.builders.reports import (
     build_provenance_report,
     build_redistribution_report,
     build_source_readiness,
+    load_source_registry,
     sync_readme_layers_table,
     write_dataset_changelog_json,
     write_dataset_quality_json,
@@ -154,8 +162,55 @@ def _load_inputs():
     Fachada de `src.builders.inputs.load_staging_inputs` (plan 132a): pasa los
     globales del módulo para preservar los overrides de los tests de
     caracterización (`patch.multiple` sobre STAGING_DIR/NORMALIZED_DIR).
+
+    Aplica la política de publicación parcial (plan 150, ADR-025): un dataset
+    `stable_publishable` que este build no puede refrescar se sustituye por su
+    última versión buena —frame y metadatos— y se marca. La sustitución ocurre
+    antes de construir cualquier formato, para que parquet, JSON, DuckDB, SQLite
+    y Excel salgan consistentes.
     """
-    return load_staging_inputs(STAGING_DIR, NORMALIZED_DIR)
+    frames, metadata, previous_pipeline_metadata = load_staging_inputs(STAGING_DIR, NORMALIZED_DIR)
+    holds = evaluate_holds(metadata, load_source_registry(), NORMALIZED_DIR)
+    if holds:
+        errors = hold_errors(holds, normalized_dir=NORMALIZED_DIR)
+        if errors:
+            raise SystemExit(
+                "Publicación parcial imposible: el build no puede continuar sin publicar "
+                "datos degradados.\n" + "\n".join(f" - {error}" for error in errors)
+            )
+        apply_holds(
+            frames,
+            metadata,
+            holds,
+            normalized_dir=NORMALIZED_DIR,
+            attempted_at_utc=datetime.now(UTC).isoformat(),
+        )
+        for dataset in sorted(holds):
+            log.warning(
+                "dataset_held",
+                dataset=dataset,
+                reason=holds[dataset].reason,
+                builds_held=holds[dataset].builds_held,
+            )
+        # `perfil_territorial_comunal` es derivado: si cualquiera de sus insumos
+        # se retuvo, hay que recalcularlo desde los frames ya sustituidos para
+        # que no mezcle datos degradados con datos buenos.
+        frames["perfil_territorial"] = build_perfil_territorial_comunal(
+            frames["comunas"],
+            frames["censo"],
+            frames["censo_hogares"],
+            frames["salud"],
+            frames["educacionales"],
+            frames["electoral"],
+            frames["finanzas"],
+            frames["resultados_educacionales"],
+            frames["siedu"],
+            df_vitales=frames["estadisticas_vitales"],
+            df_permisos=frames["permisos_edificacion"],
+            df_calidad=frames["calidad_aire"],
+            df_pobreza=frames["pobreza_comunal"],
+        )
+    return frames, metadata, previous_pipeline_metadata
 
 
 def _compute_validations(dfs, meta):
@@ -548,7 +603,12 @@ def _generate_reports(pipeline_metadata, previous_pipeline_metadata, metadata_ou
     dataset_quality = build_dataset_quality(pipeline_metadata, hub_health, source_readiness)
     dataset_quality_json_output, _ = write_dataset_quality_json(dataset_quality)
     write_dataset_quality_markdown_file(dataset_quality)
-    artifact_manifest_output, artifact_manifest = write_artifact_manifest()
+    held_datasets = {
+        entry["dataset"] for entry in dataset_catalog["datasets"] if entry.get("publication_hold")
+    }
+    artifact_manifest_output, artifact_manifest = write_artifact_manifest(
+        held_datasets=held_datasets
+    )
     zip_output = write_publishable_bundle_zip()
     bundle_sha256 = compute_sha256(zip_output)
     sha256_output = write_publishable_bundle_sha256(zip_output, sha256=bundle_sha256)

@@ -1,8 +1,8 @@
 # chile-hub drift report
 
-- `generated_at_utc`: `2026-10-15T14:39:45.554724+00:00`
-- `dataset_count`: `22`
-- `drifted_count`: `2`
+- `generated_at_utc`: `2026-10-25T23:25:43.532012+00:00`
+- `dataset_count`: `23`
+- `drifted_count`: `3`
 - `healthy_count`: `20`
 - `fallback_count`: `1`
 - `partial_coverage_count`: `1`
@@ -20,7 +20,7 @@
 | `establecimientos_educacionales` | `healthy` | `live` | `not_applicable` | `none` | 0 | Ninguna. |
 | `censo_hogares_viviendas` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
 | `distritos_electorales` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
-| `finanzas_municipales` | `healthy` | `monthly` | `not_applicable` | `none` | 0 | Ninguna. |
+| `finanzas_municipales` | `healthy` | `monthly` | `full` | `none` | 0 | Ninguna. |
 | `resultados_educacionales` | `healthy` | `live` | `not_applicable` | `none` | 0 | Ninguna. |
 | `indicadores_urbanos_siedu` | `healthy` | `live` | `partial` | `none` | 1 | Ninguna. |
 | `perfil_territorial_comunal` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
@@ -30,8 +30,9 @@
 | `partidos_politicos` | `healthy` | `live` | `full` | `none` | 1 | Ninguna. |
 | `autoridades_electas` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
 | `estadisticas_vitales` | `healthy` | `live` | `not_applicable` | `none` | 0 | Ninguna. |
-| `permisos_edificacion` | `healthy` | `monthly` | `not_applicable` | `none` | 0 | Ninguna. |
-| `calidad_aire` | `healthy` | `live` | `not_applicable` | `none` | 1 | Ninguna. |
+| `permisos_edificacion` | `healthy` | `live` | `not_applicable` | `none` | 0 | Ninguna. |
+| `calidad_aire` | `drifted` | `live` | `not_applicable` | `warning` | 2 | Revisar warnings operativos del dataset antes de consumirlo en producción. |
+| `precipitaciones_dgac` | `healthy` | `live` | `not_applicable` | `none` | 1 | Ninguna. |
 
 ## regiones
 
@@ -137,7 +138,7 @@
 
 - `drift_status`: `healthy`
 - `source_mode`: `monthly`
-- `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
+- `coverage`: `Cobertura completa: 345/345 filas respecto del baseline esperado.`
 - `degradation`: Sin degradación operativa detectada en este build.
 - `warning_count`: `0`
 - `diagnostic_summary`: Sin degradación operativa detectada en este build.
@@ -236,7 +237,7 @@
 ## permisos_edificacion
 
 - `drift_status`: `healthy`
-- `source_mode`: `monthly`
+- `source_mode`: `live`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
 - `degradation`: Sin degradación operativa detectada en este build.
 - `warning_count`: `0`
@@ -245,10 +246,20 @@
 
 ## calidad_aire
 
+- `drift_status`: `drifted`
+- `source_mode`: `live`
+- `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
+- `degradation`: calidad_aire freshness is stale: 248.77h since refresh, policy max is 72h
+- `warning_count`: `2`
+- `diagnostic_summary`: cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación
+- `recommended_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.
+
+## precipitaciones_dgac
+
 - `drift_status`: `healthy`
 - `source_mode`: `live`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
-- `degradation`: 1 observación(es) esperada(s): cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación
+- `degradation`: 1 observación(es) esperada(s): DGAC: cobertura parcial por diseño; 2014 y 2015-I se excluyen por CC-NC; enero 2017 en cuarentena por contener temperaturas; 2026 solo primer semestre.
 - `warning_count`: `1`
-- `diagnostic_summary`: cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación
+- `diagnostic_summary`: DGAC: cobertura parcial por diseño; 2014 y 2015-I se excluyen por CC-NC; enero 2017 en cuarentena por contener temperaturas; 2026 solo primer semestre.
 - `recommended_action`: Ninguna.

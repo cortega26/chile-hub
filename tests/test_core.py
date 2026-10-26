@@ -325,7 +325,9 @@ class ChileHubCatalogQueriesTests(unittest.TestCase):
 
     def test_list_datasets_returns_expected_count(self):
         datasets = self.hub.list_datasets()
-        self.assertEqual(len(datasets), 22)
+        # 23 desde el 2026-10-25: `precipitaciones_dgac` graduó a
+        # stable_publishable (plan 150 / registry). Antes eran 22.
+        self.assertEqual(len(datasets), 23)
 
     def test_get_dataset_returns_dict_with_expected_fields(self):
         entry = self.hub.get_dataset("comunas")

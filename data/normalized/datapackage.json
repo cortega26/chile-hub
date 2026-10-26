@@ -2,9 +2,9 @@
   "name": "chile-hub",
   "title": "chile-hub -- Datos publicos de Chile curados",
   "description": "Capa de datos reproducible y curada sobre datasets publicos oficiales de Chile: geografia, demografia, salud, educacion, finanzas municipales e indicadores.",
-  "version": "1.49.2",
+  "version": "1.51.0",
   "homepage": "https://tooltician.com/chile-hub/",
-  "created": "2026-10-15T14:39:45.561680+00:00",
+  "created": "2026-10-25T23:25:43.541069+00:00",
   "resources": [
     {
       "name": "regiones",
@@ -546,7 +546,7 @@
       "sources": [
         {
           "title": "Ministerio de Salud - Establecimientos de Salud",
-          "path": "https://datos.gob.cl/dataset/3bf4cf7c-f638-4735-9a01-f65faae4beca/resource/2c44d782-3365-44e3-aefb-2c8b8363a1bc/download/establecimientos_20261014.csv"
+          "path": "https://datos.gob.cl/dataset/3bf4cf7c-f638-4735-9a01-f65faae4beca/resource/2c44d782-3365-44e3-aefb-2c8b8363a1bc/download/establecimientos_20261020.csv"
         }
       ],
       "licenses": [
@@ -800,7 +800,7 @@
       "format": "parquet",
       "mediatype": "application/vnd.apache.parquet",
       "title": "finanzas_municipales",
-      "description": "Indicadores financieros municipales anuales desde SINIM/SUBDERE. CAPA PARCIAL/CANDIDATO: 3 de 346 comunas (0.9%). Usar con precaución; no representa cobertura nacional.",
+      "description": "Indicadores financieros municipales anuales desde SINIM/SUBDERE. Cobertura 345/346 comunas (año 2024; falta Antártica 12202, hueco conocido de la fuente). Extracción mensual vía monthly-scrape.",
       "schema": {
         "fields": [
           {
@@ -1264,6 +1264,18 @@
           },
           {
             "name": "anio_calidad_aire",
+            "type": "integer"
+          },
+          {
+            "name": "tasa_pobreza_ingresos_ultimo_anio",
+            "type": "string"
+          },
+          {
+            "name": "tasa_pobreza_multidimensional_ultimo_anio",
+            "type": "string"
+          },
+          {
+            "name": "anio_pobreza",
             "type": "integer"
           }
         ],
@@ -2199,6 +2211,93 @@
         {
           "title": "Datos públicos MMA; sin licencia explícita, citar fuente oficial",
           "path": "https://sinca.mma.gob.cl/"
+        }
+      ]
+    },
+    {
+      "name": "precipitaciones_dgac",
+      "path": "precipitaciones_dgac.parquet",
+      "format": "parquet",
+      "mediatype": "application/vnd.apache.parquet",
+      "title": "precipitaciones_dgac",
+      "description": "Precipitaciones diarias por estación meteorológica DGAC: serie 2013–2026 con 143 meses verificables, sin interpolación ni asignación de CUT; lagunas de cobertura y licencias explícitas.",
+      "schema": {
+        "fields": [
+          {
+            "name": "fecha",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "id_estacion",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "nombre_estacion",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "latitud_dms",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "altitud_m",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "precipitacion_mm",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "url_fuente",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "licencia_fuente",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          }
+        ],
+        "missingValues": [
+          ""
+        ],
+        "primaryKey": [
+          "fecha",
+          "id_estacion"
+        ]
+      },
+      "sources": [
+        {
+          "title": "DGAC — datos.gob.cl",
+          "path": "https://datos.gob.cl/organization/direccion_general_de_aeronautica_civil"
+        }
+      ],
+      "licenses": [
+        {
+          "title": "CC BY + CC0 (licencia individual por archivo)",
+          "path": "https://datos.gob.cl/organization/direccion_general_de_aeronautica_civil"
         }
       ]
     }

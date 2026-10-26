@@ -76,6 +76,9 @@ def write_dataset_catalog(pipeline_metadata):
                 # Subconjunto que exige acción; `warnings` conserva todo (ADR-014).
                 "actionable_warnings": actionable_warnings(validation),
                 "degradation": dataset_metadata.get("degradation", {}),
+                # Plan 150 / ADR-025: si el dataset no se pudo refrescar, el
+                # artefacto publicado es el de la última versión buena.
+                "publication_hold": dataset_metadata.get("publication_hold"),
                 "notes": dataset_metadata.get("notes", []),
             }
         )
