@@ -1,6 +1,6 @@
 # ADR-025: Publicación parcial con retención marcada
 
-- **Estado:** proposed (requiere aprobación del mantenedor)
+- **Estado:** accepted (ratificado por el mantenedor el 2026-10-26)
 - **Fecha:** 2026-10-25
 - **Decisores:** mantenedor
 - **Contexto técnico:** plan 147 (diagnóstico del 403 de SINCA), plan 150 (implementación)

@@ -693,7 +693,7 @@ grep -n "^class " tests/*.py
 | `test_phase4_extraction.py` | No | ExtractionResult Phase 4: modelo tipado, 3 extractores piloto (ordinary/fallback/multi-source) y adapters legacy |
 | `test_pipeline_logic.py` | No | Lógica interna de `build_dev_db.py`, invariantes CUT, fallback de indicadores, severidad de `dataset_changelog.json`, builders (`reports`, `pipeline_status_utils`) |
 | `test_proof_of_value.py` | No | Prueba reproducible de tres cruces territoriales, cobertura, integridad CUT y hash de resultados (sin red) |
-| `test_publication_hold.py` | No | Publicación parcial (plan 150/ADR-025): retención de la última versión buena, fallo cerrado sin artefacto previo y escalamiento a 7 builds |
+| `test_publication_hold.py` | No | Publicación parcial (plan 150/ADR-025): retención de la última versión buena, fallo cerrado sin artefacto previo y escalamiento a 7 días |
 | `test_render.py` | No | Helper de renderizado de tablas (`_render.py`) |
 | `test_research_dgac_precipitaciones.py` | No | Candidato DGAC: CSV sin cabeceras, cobertura de meses, licencias, hashes y fallos cerrados (sin red) |
 | `test_validation.py` | No | Funciones `validate_*()` del paquete `src/validation/`: bordes vacíos, claves duplicadas, casos límite |

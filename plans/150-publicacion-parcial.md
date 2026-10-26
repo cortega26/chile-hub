@@ -252,7 +252,7 @@ Casos nuevos, todos sin red y con staging sintético:
 - [ ] `hub_health.json` expone `held_count` y cada retenido su `publication_hold`.
 - [ ] Ningún dataset `held` aparece sin marca de retención en el manifiesto ni en
       el bundle.
-- [ ] `ADR-025` escrito y enlazado desde `AGENTS.md`.
+- [x] `ADR-025` escrito y enlazado desde `AGENTS.md` (accepted 2026-10-26).
 - [ ] Rama con commits limpios; ningún push sin autorización.
 
 ## STOP conditions
