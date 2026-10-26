@@ -115,6 +115,8 @@ cuestión de ruta (todo el host responde 403), ni de DNS (las dos IPs A fallan
 igual), ni de HTTP (redirige a HTTPS), ni de IPv6 (sin ruta en la VM).
 
 **Conclusión:** `calidad_aire` no se puede refrescar desde ningún cloud probado.
+La vía que queda es institucional: [`docs/sinca-solicitud-acceso.md`](../docs/sinca-solicitud-acceso.md)
+contiene el borrador de solicitud (sin enviar) con el anexo de evidencia.
 Queda en `fallback_to_last_snapshot` (publica su serie completa, no escala) y su
 serie solo crece con una extracción desde red residencial. No repetir estas
 pruebas sin una fuente nueva.
