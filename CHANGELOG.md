@@ -12,6 +12,114 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.55.1 - 2026-10-26
+
+### Corregido
+
+- **ci**: Register MCP tests in canonical docs generator
+  ([#232](https://github.com/cortega26/chile-hub/pull/232),
+  [`489545a`](https://github.com/cortega26/chile-hub/commit/489545a82218a62ac4b8d8046131675783c1a0b9))
+
+### Mantenimiento
+
+- **agent**: Configure complementary Serena + CodeGraph MCP routing
+  ([#232](https://github.com/cortega26/chile-hub/pull/232),
+  [`489545a`](https://github.com/cortega26/chile-hub/commit/489545a82218a62ac4b8d8046131675783c1a0b9))
+
+- **agent**: Integrate Serena with CodeGraph via scoped MCP routing
+  ([#232](https://github.com/cortega26/chile-hub/pull/232),
+  [`489545a`](https://github.com/cortega26/chile-hub/commit/489545a82218a62ac4b8d8046131675783c1a0b9))
+
+- **agent**: Keep Serena local state out of Git and enforce guard
+  ([#232](https://github.com/cortega26/chile-hub/pull/232),
+  [`489545a`](https://github.com/cortega26/chile-hub/commit/489545a82218a62ac4b8d8046131675783c1a0b9))
+
+- **deps**: Bump astral-sh/setup-uv from 10.3.0 to 10.3.2
+  ([#214](https://github.com/cortega26/chile-hub/pull/214),
+  [`fca5f09`](https://github.com/cortega26/chile-hub/commit/fca5f096854a3a77ad7635104559d4867199de0b))
+
+- **deps**: Bump the codeql-action group with 2 updates
+  ([#213](https://github.com/cortega26/chile-hub/pull/213),
+  [`310c2c7`](https://github.com/cortega26/chile-hub/commit/310c2c79bb66735afa77751093142fa757c117b2))
+
+- **deps**: Sync uv.lock [skip ci] ([#212](https://github.com/cortega26/chile-hub/pull/212),
+  [`3570324`](https://github.com/cortega26/chile-hub/commit/357032469f3f98012741dd1fd2f1a856e08f72a5))
+
+- **deps-dev**: Bump the python-dev group with 5 updates
+  ([#212](https://github.com/cortega26/chile-hub/pull/212),
+  [`3570324`](https://github.com/cortega26/chile-hub/commit/357032469f3f98012741dd1fd2f1a856e08f72a5))
+
+- **mcp**: Disable Serena memories and REPL duplication
+  ([#232](https://github.com/cortega26/chile-hub/pull/232),
+  [`489545a`](https://github.com/cortega26/chile-hub/commit/489545a82218a62ac4b8d8046131675783c1a0b9))
+
+### Code Style
+
+- **tests**: Apply Ruff-compatible MCP config test formatting
+  ([#232](https://github.com/cortega26/chile-hub/pull/232),
+  [`489545a`](https://github.com/cortega26/chile-hub/commit/489545a82218a62ac4b8d8046131675783c1a0b9))
+
+### Integración continua
+
+- **deps**: Ignorar el salto de major de duckdb en Dependabot
+  ([#226](https://github.com/cortega26/chile-hub/pull/226),
+  [`4162afe`](https://github.com/cortega26/chile-hub/commit/4162afeeed3893344d406d72567d51d32a843167))
+
+### Documentación
+
+- **adopcion**: Registrar Search Console y corregir la etapa 4
+  ([#233](https://github.com/cortega26/chile-hub/pull/233),
+  [`f5f614c`](https://github.com/cortega26/chile-hub/commit/f5f614ce66bd184e7fb3926230bccb882748c24b))
+
+- **agent**: Align canonical navigation map with CodeGraph and Serena
+  ([#232](https://github.com/cortega26/chile-hub/pull/232),
+  [`489545a`](https://github.com/cortega26/chile-hub/commit/489545a82218a62ac4b8d8046131675783c1a0b9))
+
+- **ci**: Regenerate AGENTS test inventory for MCP guard
+  ([#232](https://github.com/cortega26/chile-hub/pull/232),
+  [`489545a`](https://github.com/cortega26/chile-hub/commit/489545a82218a62ac4b8d8046131675783c1a0b9))
+
+- **ci**: Sync README test count after MCP contract tests
+  ([#232](https://github.com/cortega26/chile-hub/pull/232),
+  [`489545a`](https://github.com/cortega26/chile-hub/commit/489545a82218a62ac4b8d8046131675783c1a0b9))
+
+- **ci**: Synchronize AGENTS test-tree count with new regression tests
+  ([#232](https://github.com/cortega26/chile-hub/pull/232),
+  [`489545a`](https://github.com/cortega26/chile-hub/commit/489545a82218a62ac4b8d8046131675783c1a0b9))
+
+- **outreach**: Borrador de solicitud de acceso técnico a SINCA
+  ([#225](https://github.com/cortega26/chile-hub/pull/225),
+  [`903fc98`](https://github.com/cortega26/chile-hub/commit/903fc9847cb9575b04120a0d55280c6d8aec7716))
+
+- **plan 153**: Cuarta red probada (Fly.io) para SINCA
+  ([#224](https://github.com/cortega26/chile-hub/pull/224),
+  [`8bd785d`](https://github.com/cortega26/chile-hub/commit/8bd785dda12a2668f6d4704d7ac4a82662b40509))
+
+- **plan 153**: Probar scrapling de verdad contra SINCA y corregir el registro
+  ([#223](https://github.com/cortega26/chile-hub/pull/223),
+  [`45472fe`](https://github.com/cortega26/chile-hub/commit/45472fe98314176c7799a9025bbef5d90f28ec85))
+
+- **plan 153**: Registrar los descartes de calidad_aire
+  ([#222](https://github.com/cortega26/chile-hub/pull/222),
+  [`5c5b6b4`](https://github.com/cortega26/chile-hub/commit/5c5b6b4dfdff264ba9290719ae64e7955a5de8d8))
+
+- **readme**: Argumento de trabajo repetido, con cifras medidas
+  ([#229](https://github.com/cortega26/chile-hub/pull/229),
+  [`6c0507e`](https://github.com/cortega26/chile-hub/commit/6c0507e58a7bbf492dfbd5e27391c66a610d62b5))
+
+- **readme**: Cerrar el hero con el argumento del artefacto reproducible
+  ([#228](https://github.com/cortega26/chile-hub/pull/228),
+  [`a034dc1`](https://github.com/cortega26/chile-hub/commit/a034dc1d07655be4376c727787c43c39f913f726))
+
+- **readme**: Emojis en los encabezados de sección para escaneo rápido
+  ([#227](https://github.com/cortega26/chile-hub/pull/227),
+  [`2a72058`](https://github.com/cortega26/chile-hub/commit/2a720581a9b64c9f749981e91630e1a08e9d7fda))
+
+- **sinca**: Registrar el envío de la solicitud y su fecha de seguimiento
+  ([#231](https://github.com/cortega26/chile-hub/pull/231),
+  [`6fd3501`](https://github.com/cortega26/chile-hub/commit/6fd35017c433e3b9e97628d1b8d4a2832ab4abbc))
+
+
 ## 1.55.0 - 2026-10-26
 
 ### Mantenimiento
