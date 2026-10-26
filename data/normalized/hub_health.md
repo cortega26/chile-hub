@@ -1,6 +1,6 @@
 # chile-hub health summary
 
-- `generated_at_utc`: `2026-10-26T03:35:19.404290+00:00`
+- `generated_at_utc`: `2026-10-26T13:12:58.211914+00:00`
 - `overall_status`: `warn`
 - `dataset_count`: `23`
 - `ok_count`: `21`
@@ -19,11 +19,11 @@
 - `partial_coverage_count`: `1`
 - `unknown_coverage_count`: `0`
 - `drifted_count`: `1`
-- `warning_count`: `7`
-- `top_issue`: `indicadores` (freshness=fresh, drift=drifted, warnings=1)
-- `top_issue_reason`: indicadores live refresh reused last published artifact for missing codes: ipc
+- `warning_count`: `8`
+- `top_issue`: `indicadores` (freshness=fresh, drift=drifted, warnings=2)
+- `top_issue_reason`: indicadores live refresh reused raw snapshots for: uf/2026, dolar/2026, utm/2026
 - `top_issue_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.
-- `top_issue_summary`: indicadores: indicadores live refresh reused last published artifact for missing codes: ipc [source_detail=public_api_with_published_backfill; warnings=1; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]
+- `top_issue_summary`: indicadores: indicadores live refresh reused raw snapshots for: uf/2026, dolar/2026, utm/2026 [source_detail=public_api_with_published_backfill; warnings=2; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]
 
 | Dataset | Severity | Mode | Freshness | Coverage | Drift | Publishability | Degradation | Validation | Warnings |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | ---: |
@@ -40,7 +40,7 @@
 | `establecimientos_salud` | `ok` | `live` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `estadisticas_vitales` | `ok` | `live` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `finanzas_municipales` | `ok` | `monthly` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
-| `indicadores` | `warn` | `live` | `fresh` | `not_applicable` | `drifted` | `ready` | `warning` | `ok` | 1 |
+| `indicadores` | `warn` | `live` | `fresh` | `not_applicable` | `drifted` | `ready` | `warning` | `ok` | 2 |
 | `indicadores_urbanos_siedu` | `ok` | `live` | `fresh` | `partial` | `healthy` | `ready` | `none` | `ok` | 1 |
 | `partidos_politicos` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 1 |
 | `perfil_territorial_comunal` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |

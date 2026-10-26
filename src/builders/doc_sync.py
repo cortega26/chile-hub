@@ -288,6 +288,10 @@ _AGENTS_TEST_DESCRIPTIONS = {
         "Candidato DGAC: CSV sin cabeceras, cobertura de meses, "
         "licencias, hashes y fallos cerrados (sin red)"
     ),
+    "test_weekly_triage.py": (
+        "Triaje semanal (plan 152): solo señales accionables, orden editorial "
+        "estable y tolerancia a artefactos ausentes (sin red)"
+    ),
     "test_publication_hold.py": (
         "Publicación parcial (plan 150/ADR-025): retención de la última versión "
         "buena, fallo cerrado sin artefacto previo y escalamiento a 7 días"
