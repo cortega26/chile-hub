@@ -8,6 +8,14 @@ updates:
       time: "09:00"
       timezone: America/Santiago
     open-pull-requests-limit: 5
+    ignore:
+      # duckdb 2.0 (oct-2026) eliminó `.pl()` y `fetch_arrow_table()`: rompe
+      # `ChileHub.sql()` en runtime, no solo en mypy (regresión 2026-10-26).
+      # Migrar exige añadir pyarrow o pandas como dependencia runtime; es una
+      # decisión aparte, no un bump de grupo. Las actualizaciones de seguridad
+      # no se ven afectadas por `ignore`.
+      - dependency-name: "duckdb"
+        update-types: ["version-update:semver-major"]
     groups:
       python-runtime:
         patterns:
