@@ -1,6 +1,6 @@
 # chile-hub drift report
 
-- `generated_at_utc`: `2026-10-26T15:04:16.256520+00:00`
+- `generated_at_utc`: `2026-10-26T15:40:26.797869+00:00`
 - `dataset_count`: `23`
 - `drifted_count`: `2`
 - `healthy_count`: `21`
@@ -79,9 +79,9 @@
 - `drift_status`: `drifted`
 - `source_mode`: `live`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
-- `degradation`: indicadores live refresh reused raw snapshots for: uf/2026; indicadores live refresh reused last published artifact for missing codes: ipc
+- `degradation`: indicadores live refresh reused raw snapshots for: uf/2026, dolar/2026, euro/2026, utm/2026; indicadores live refresh preserved previous staging rows for: ipc/2026
 - `warning_count`: `2`
-- `diagnostic_summary`: indicadores live refresh reused raw snapshots for: uf/2026
+- `diagnostic_summary`: indicadores live refresh reused raw snapshots for: uf/2026, dolar/2026, euro/2026, utm/2026
 - `recommended_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.
 
 ## censo_comunal

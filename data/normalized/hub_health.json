@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-10-26T15:04:16.256520+00:00",
+  "generated_at_utc": "2026-10-26T15:40:26.797869+00:00",
   "overall_status": "warn",
   "dataset_count": 23,
   "retired_count": 1,
@@ -8,7 +8,7 @@
   "error_count": 0,
   "live_count": 22,
   "fallback_count": 0,
-  "held_count": 5,
+  "held_count": 1,
   "held_overdue_count": 0,
   "stale_count": 0,
   "unknown_freshness_count": 0,
@@ -30,11 +30,11 @@
     "build_freshness_status": "fresh",
     "drift_status": "drifted",
     "degradation_status": "warning",
-    "source_detail": "public_api_with_published_backfill",
-    "diagnostic_summary": "indicadores live refresh reused raw snapshots for: uf/2026",
+    "source_detail": "public_api_with_raw_recovery_partial",
+    "diagnostic_summary": "indicadores live refresh reused raw snapshots for: uf/2026, dolar/2026, euro/2026, utm/2026",
     "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
   },
-  "top_issue_summary": "indicadores: indicadores live refresh reused raw snapshots for: uf/2026 [source_detail=public_api_with_published_backfill; warnings=2; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]",
+  "top_issue_summary": "indicadores: indicadores live refresh reused raw snapshots for: uf/2026, dolar/2026, euro/2026, utm/2026 [source_detail=public_api_with_raw_recovery_partial; warnings=2; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]",
   "datasets": [
     {
       "dataset": "autoridades_electas",
@@ -56,7 +56,7 @@
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
       "recommended_action": "Ninguna.",
       "retired": false,
-      "held": true,
+      "held": false,
       "held_overdue": false
     },
     {
@@ -263,7 +263,7 @@
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
       "recommended_action": "Ninguna.",
       "retired": false,
-      "held": true,
+      "held": false,
       "held_overdue": false
     },
     {
@@ -351,8 +351,8 @@
       "coverage_status": "not_applicable",
       "coverage_ratio": null,
       "drift_status": "drifted",
-      "source_detail": "public_api_with_published_backfill",
-      "diagnostic_summary": "indicadores live refresh reused raw snapshots for: uf/2026",
+      "source_detail": "public_api_with_raw_recovery_partial",
+      "diagnostic_summary": "indicadores live refresh reused raw snapshots for: uf/2026, dolar/2026, euro/2026, utm/2026",
       "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción.",
       "retired": false,
       "held": false,
@@ -470,7 +470,7 @@
       "diagnostic_summary": "cobertura SAE: 345/346 comunas (99.7%) — parcial por diseño; comunas sin muestra no tienen estimación",
       "recommended_action": "Ninguna.",
       "retired": false,
-      "held": true,
+      "held": false,
       "held_overdue": false
     },
     {
@@ -562,7 +562,7 @@
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
       "recommended_action": "Ninguna.",
       "retired": false,
-      "held": true,
+      "held": false,
       "held_overdue": false
     }
   ]

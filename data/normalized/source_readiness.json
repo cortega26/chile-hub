@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-10-26T15:04:16.256520+00:00",
+  "generated_at_utc": "2026-10-26T15:40:26.797869+00:00",
   "dataset_count": 26,
   "stable_count": 22,
   "candidate_count": 2,
@@ -116,7 +116,7 @@
       "access_method": "api",
       "license_status": "open-attribution",
       "source_mode": "live",
-      "source_detail": "public_api_with_published_backfill",
+      "source_detail": "public_api_with_raw_recovery_partial",
       "live_ready": true,
       "fallback_allowed": true,
       "publish_blocking": true,
