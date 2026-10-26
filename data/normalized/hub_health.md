@@ -1,33 +1,33 @@
 # chile-hub health summary
 
-- `generated_at_utc`: `2026-10-26T01:17:03.245098+00:00`
+- `generated_at_utc`: `2026-10-26T01:43:16.427028+00:00`
 - `overall_status`: `warn`
 - `dataset_count`: `23`
-- `ok_count`: `20`
-- `warn_count`: `2`
+- `ok_count`: `21`
+- `warn_count`: `1`
 - `error_count`: `0`
 - `live_count`: `22`
 - `fallback_count`: `0`
-- `held_count`: `5`
-- `stale_count`: `1`
+- `held_count`: `2`
+- `stale_count`: `0`
 - `publishable_count`: `22`
 - `review_terms_count`: `0`
 - `unknown_reuse_count`: `0`
 - `degraded_count`: `0`
-- `degradation_warning_count`: `2`
+- `degradation_warning_count`: `1`
 - `partial_coverage_count`: `1`
 - `unknown_coverage_count`: `0`
-- `drifted_count`: `2`
-- `warning_count`: `8`
-- `top_issue`: `calidad_aire` (freshness=stale, drift=drifted, warnings=2)
-- `top_issue_reason`: cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación
+- `drifted_count`: `1`
+- `warning_count`: `7`
+- `top_issue`: `indicadores` (freshness=fresh, drift=drifted, warnings=1)
+- `top_issue_reason`: indicadores live refresh reused last published artifact for missing codes: ipc
 - `top_issue_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.
-- `top_issue_summary`: calidad_aire: cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación [source_detail=Promedios diarios por estación y contaminante (MP2.5, MP10, SO2, NO2, CO, O3) desde el JSON del SINCA. Cobertura parcial por diseño (~65 comunas con estación). Serie incremental desde la primera cosecha.; warnings=2; freshness=stale; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]
+- `top_issue_summary`: indicadores: indicadores live refresh reused last published artifact for missing codes: ipc [source_detail=public_api_with_published_backfill; warnings=1; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]
 
 | Dataset | Severity | Mode | Freshness | Coverage | Drift | Publishability | Degradation | Validation | Warnings |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | ---: |
 | `autoridades_electas` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
-| `calidad_aire` | `warn` | `live` | `stale` | `not_applicable` | `drifted` | `ready` | `warning` | `ok` | 2 |
+| `calidad_aire` | `ok` | `live` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 1 |
 | `censo_comunal` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `censo_hogares_viviendas` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `comunas` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
@@ -43,7 +43,7 @@
 | `indicadores_urbanos_siedu` | `ok` | `live` | `fresh` | `partial` | `healthy` | `ready` | `none` | `ok` | 1 |
 | `partidos_politicos` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 1 |
 | `perfil_territorial_comunal` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
-| `permisos_edificacion` | `ok` | `monthly` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 0 |
+| `permisos_edificacion` | `ok` | `live` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `pobreza_comunal` | `ok` | `live` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 1 |
 | `precipitaciones_dgac` | `ok` | `live` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 1 |
 | `provincias` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
