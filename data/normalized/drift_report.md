@@ -1,6 +1,6 @@
 # chile-hub drift report
 
-- `generated_at_utc`: `2026-10-26T03:35:19.404290+00:00`
+- `generated_at_utc`: `2026-10-26T12:50:05.248036+00:00`
 - `dataset_count`: `23`
 - `drifted_count`: `2`
 - `healthy_count`: `21`
@@ -30,7 +30,7 @@
 | `partidos_politicos` | `healthy` | `live` | `full` | `none` | 1 | Ninguna. |
 | `autoridades_electas` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
 | `estadisticas_vitales` | `healthy` | `live` | `not_applicable` | `none` | 0 | Ninguna. |
-| `permisos_edificacion` | `healthy` | `monthly` | `not_applicable` | `none` | 0 | Ninguna. |
+| `permisos_edificacion` | `healthy` | `live` | `not_applicable` | `none` | 0 | Ninguna. |
 | `calidad_aire` | `healthy` | `live` | `not_applicable` | `none` | 1 | Ninguna. |
 | `precipitaciones_dgac` | `healthy` | `live` | `not_applicable` | `none` | 1 | Ninguna. |
 
@@ -237,7 +237,7 @@
 ## permisos_edificacion
 
 - `drift_status`: `healthy`
-- `source_mode`: `monthly`
+- `source_mode`: `live`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
 - `degradation`: Sin degradación operativa detectada en este build.
 - `warning_count`: `0`

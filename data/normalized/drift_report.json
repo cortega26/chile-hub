@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-10-26T03:35:19.404290+00:00",
+  "generated_at_utc": "2026-10-26T12:50:05.248036+00:00",
   "dataset_count": 23,
   "drifted_count": 2,
   "healthy_count": 21,
@@ -310,7 +310,7 @@
     {
       "dataset": "permisos_edificacion",
       "drift_status": "healthy",
-      "source_mode": "monthly",
+      "source_mode": "live",
       "coverage_status": "not_applicable",
       "coverage_ratio": null,
       "coverage_summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
