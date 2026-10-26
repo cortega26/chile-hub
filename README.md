@@ -54,7 +54,7 @@ Si trabajas con datos de Chile, probablemente ya conoces la fricción: archivos 
 > [!TIP]
 > **¿Solo quieres probarlo?** Abre el [explorador SQL](https://tooltician.com/chile-hub/) y consulta los Parquet directamente en tu navegador con DuckDB-WASM. Sin instalar nada.
 
-**En 30 segundos puedes pasar de “necesito datos de Chile” a un DataFrame listo para cruzar.**
+**Un artefacto, no una síntesis.** Cada cifra viene de una corrida reproducible contra la fuente oficial, con hash, fecha y advertencias. Lo que no se puede verificar, no se publica.
 
 ## Instalar y usar en 30 segundos
 
