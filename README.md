@@ -279,7 +279,7 @@ Cada ejecución del pipeline genera en `data/normalized/`:
 
 ---
 
-## Recetas de uso
+## 🍳 Recetas de uso
 
 ¿Prefieres notebooks? Las cuatro recetas están en
 [`examples/notebooks/`](examples/notebooks/) con botón de Colab, o ejecutables
@@ -345,7 +345,7 @@ WHERE c.nombre_region = 'Valparaíso';
 
 ---
 
-## API y CLI
+## 🧰 API y CLI
 
 ### API Python compacta
 
@@ -447,7 +447,7 @@ WHERE c.nombre_region = 'Valparaíso';
 
 ---
 
-## Cómo funciona
+## ⚙️ Cómo funciona
 
 El pipeline es **lineal, determinista y estricto**: si una validación falla, el build se cancela antes de publicar datos corruptos.
 
@@ -537,7 +537,7 @@ El diagrama entidad-relación completo está en el [apéndice](#apéndice-esquem
 
 ---
 
-## Próximos pasos
+## 🗺️ Próximos pasos
 
 El roadmap actual prioriza crecer en usabilidad y confianza antes que agregar más capas.
 
@@ -553,7 +553,7 @@ El roadmap actual prioriza crecer en usabilidad y confianza antes que agregar m�
 
 ---
 
-## Desarrollo y contribución
+## 🤝 Desarrollo y contribución
 
 ### ¿Quieres aportar o pedir un dataset?
 
@@ -608,7 +608,7 @@ Para entender la arquitectura, las reglas no negociables y el flujo de trabajo, 
 
 ---
 
-## Fuentes, licencias y reúso
+## ⚖️ Fuentes, licencias y reúso
 
 ### Semáforo de redistribución
 
@@ -636,7 +636,7 @@ Autor y mantenedor: **Carlos Ortega** — ORCID [0009-0000-3470-6181](https://or
 
 ---
 
-## Apéndice: esquemas y modelo de datos
+## 📚 Apéndice: esquemas y modelo de datos
 
 <details>
 <summary><b>Schema completo de cada capa</b></summary>
