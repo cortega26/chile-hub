@@ -72,6 +72,9 @@ dist/
 # CodeGraph
 .codegraph/daemon.pid
 
+# Serena: estado local, cachés y memorias (no canónicas)
+.serena/
+
 # Auditoría privada y recordatorios
 .audit/
 
