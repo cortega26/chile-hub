@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-10-26T13:12:58.211914+00:00",
+  "generated_at_utc": "2026-10-26T15:04:16.256520+00:00",
   "dataset_count": 23,
   "drifted_count": 2,
   "healthy_count": 21,
@@ -75,10 +75,10 @@
       "coverage_ratio": null,
       "coverage_summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
       "degradation_status": "warning",
-      "degradation_impact": "indicadores live refresh reused raw snapshots for: uf/2026, dolar/2026, utm/2026; indicadores live refresh reused last published artifact for missing codes: ipc",
+      "degradation_impact": "indicadores live refresh reused raw snapshots for: uf/2026; indicadores live refresh reused last published artifact for missing codes: ipc",
       "drift_summary": "Drift detectado: degradation=warning.",
       "warning_count": 2,
-      "diagnostic_summary": "indicadores live refresh reused raw snapshots for: uf/2026, dolar/2026, utm/2026",
+      "diagnostic_summary": "indicadores live refresh reused raw snapshots for: uf/2026",
       "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción.",
       "documentation": "docs/datasets/indicadores.md"
     },

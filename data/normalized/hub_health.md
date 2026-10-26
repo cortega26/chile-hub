@@ -1,6 +1,6 @@
 # chile-hub health summary
 
-- `generated_at_utc`: `2026-10-26T13:12:58.211914+00:00`
+- `generated_at_utc`: `2026-10-26T15:04:16.256520+00:00`
 - `overall_status`: `warn`
 - `dataset_count`: `23`
 - `ok_count`: `21`
@@ -21,9 +21,9 @@
 - `drifted_count`: `1`
 - `warning_count`: `8`
 - `top_issue`: `indicadores` (freshness=fresh, drift=drifted, warnings=2)
-- `top_issue_reason`: indicadores live refresh reused raw snapshots for: uf/2026, dolar/2026, utm/2026
+- `top_issue_reason`: indicadores live refresh reused raw snapshots for: uf/2026
 - `top_issue_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.
-- `top_issue_summary`: indicadores: indicadores live refresh reused raw snapshots for: uf/2026, dolar/2026, utm/2026 [source_detail=public_api_with_published_backfill; warnings=2; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]
+- `top_issue_summary`: indicadores: indicadores live refresh reused raw snapshots for: uf/2026 [source_detail=public_api_with_published_backfill; warnings=2; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]
 
 | Dataset | Severity | Mode | Freshness | Coverage | Drift | Publishability | Degradation | Validation | Warnings |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | ---: |
