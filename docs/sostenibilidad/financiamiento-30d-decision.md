@@ -48,7 +48,7 @@
 |--:|:--|:--|
 | 1 | Si el perfil de Sponsors puede efectivamente **cobrar** (KYC, banco, datos fiscales) | Panel privado del titular |
 | 2 | Si Buy Me a Coffee permite retirar fondos desde Chile | Panel privado del titular |
-| 3 | Tráfico y consultas de búsqueda reales | Search Console (sin registrar) |
+| 3 | Tráfico y consultas de búsqueda reales | Search Console registrado el 2026-10-26, sin lecturas todavía |
 | 4 | Tratamiento tributario de un pago del exterior | Contador |
 | 5 | Si existe uso institucional no observable (academia, mirrors, uso interno) | Rúbrica U1–U3 de la Auditoría 3 §E, que no se ha ejecutado |
 | 6 | Tasa de aceptación del GitHub Fund | No publicada. No se estima |

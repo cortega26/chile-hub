@@ -41,9 +41,10 @@ dos problemas, es uno.
    fallidas. **No** es una tarea de financiamiento: es la prioridad del proyecto.
 2. **Verificar la capacidad de cobro** de GitHub Sponsors y BMC (humano, §3 de
    [`financiamiento-30d-decision.md`](financiamiento-30d-decision.md)).
-3. **Registrar Search Console.** Está pendiente desde el plan 107. Sin eso,
-   "descubrimiento orgánico" es una hipótesis sin dato. Es una acción de operador
-   ya documentada, no un experimento nuevo.
+3. **Search Console — hecho el 2026-10-26.** Propiedades de prefijo y de dominio,
+   verificadas por DNS. Falta la primera lectura: el panel no tiene histórico, así
+   que "descubrimiento orgánico" sigue siendo una hipótesis sin dato hasta que
+   haya ≥2 semanas de impresiones.
 4. **Llevar la pregunta tributaria al contador**, con la lista cerrada de §4.
 
 ### Esperar (no gastar horas)
@@ -129,15 +130,15 @@ al contador se hace **antes** de cualquier postulación, no después.
 | Perfil de GitHub Sponsors | Publicado (`hasSponsorsListing: true`), **0 sponsors** | Verificar cobro (humano) |
 | Buy Me a Coffee | Página responde 200, **0 supporters públicos** | Verificar cobro (humano) |
 | Pedido de apoyo en la CLI | Existe desde 2026-07-29 | **No tocar** |
-| Search Console | **Sin registrar** | Registrarlo: es medición, no monetización |
+| Search Console | **Registrado el 2026-10-26**, sin lecturas todavía | Confirmar el envío del sitemap y esperar ≥2 semanas de histórico |
 | Tiers, `SPONSORS.md`, sección comercial en landing | No existen | **No crear** mientras rija HOLD |
 
 **Sobre el "único cambio pequeño post-gate":** la evidencia **no** muestra fricción
-medible, porque el descubrimiento orgánico no se mide (Search Console sin
-registrar). Proponer un experimento de conversión sin línea base sería inventar la
-fricción. Por eso no se propone ningún experimento nuevo: la acción pendiente ya
-existe y está documentada en
-[`docs/adoption-funnel.md`](../adoption-funnel.md#4-descubrimiento-web-sin-medir).
+medible, porque el descubrimiento orgánico todavía no se mide (Search Console se
+registró el 2026-10-26 y el panel aún no tiene histórico). Proponer un experimento
+de conversión sin línea base sería inventar la fricción. Por eso no se propone
+ningún experimento nuevo: la acción pendiente ya existe y está documentada en
+[`docs/adoption-funnel.md`](../adoption-funnel.md#4-descubrimiento-web-instrumentado).
 
 ## 6. Presupuesto de horas
 

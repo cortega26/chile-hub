@@ -23,7 +23,7 @@
 | 1 | Actividad de publicación | Descargas PyPI normalizadas por release | Cadencia, **no** adopción |
 | 2 | Activación primaria | Descargas del bundle en GitHub Releases | Proxy real de uso de la librería |
 | 3 | Adopción espejo | Descargas/likes en Hugging Face | Uso vía `hf://` y subsets |
-| 4 | Descubrimiento web | Search Console (impresiones `/comunas/`) | **Sin medir** (ver 107) |
+| 4 | Descubrimiento web | Search Console (impresiones `/comunas/`) | **Instrumentado 2026-10-26 · sin lecturas** |
 | 5 | Citación downstream | DOI Zenodo / citas | Reúso académico verificable |
 | 6 | Usuarios verificados | Tracker manual fuera del repo | Organizaciones con U1–U3 |
 | — | Contexto (no es adopción) | Stars/forks, sponsors, dependents, issues de terceros | Ruido de fondo para la revisión |
@@ -74,15 +74,25 @@
 - **Umbral vigente** (`docs/adoption-review.md`): espejo en Kaggle solo si
   HF ≥ 2× el baseline de forma sostenida.
 
-### 4. Descubrimiento web (sin medir)
+### 4. Descubrimiento web (instrumentado)
 
-- **Fuente prevista:** Google Search Console → Rendimiento → filtrar `/comunas/`
-  y `/reference/datasets/`. Requiere registro del sitio por el operador
-  (ver [plan 107](../../plans/107-activacion-lanzamiento-handoff.md), Step 1–2).
-- **Estado:** `sin dato` hasta que el operador registre la propiedad.
+- **Fuente:** Google Search Console → Rendimiento → filtrar `/comunas/` y
+  `/reference/datasets/`.
+- **Estado:** **instrumentado el 2026-10-26.** Dos propiedades verificadas en la
+  misma cuenta: la de prefijo `https://tooltician.com/chile-hub/` —la que se lee
+  para esta etapa— y la de dominio `tooltician.com`, que es más amplia e incluye
+  pogo-lab; cualquier lectura de esa segunda se filtra por `/chile-hub/`.
+- **Verificación:** registro `TXT` `google-site-verification=…` en el apex de
+  `tooltician.com`, insertado por Google vía Cloudflare (*Domain Connect*). No hay
+  token ni archivo en el repo, así que no hay secreto que rotar — pero ese
+  registro **no debe borrarse**: sin él se pierde la verificación y el histórico.
+- **Sin lecturas todavía:** el panel arranca vacío. El primer dato se registra
+  cuando haya ≥2 semanas de impresiones.
+- **Lectura automatizada:** no implementada. La API de Search Console es de solo
+  lectura y requiere una cuenta de servicio; sin ella, la lectura es manual.
 - **Frase permitida (exacta):**
-  > "Tráfico de descubrimiento web: sin dato (Search Console no registrado;
-  > ver plan 107)."
+  > "Tráfico de descubrimiento web: instrumentado el 2026-10-26; sin lecturas
+  > todavía."
 
 ### 5. Citación downstream (DOI / Zenodo)
 
@@ -139,19 +149,21 @@ detectar movimiento, no para afirmar uso.
 Nada de lo de abajo implica contactar a nadie ni pedir dinero. Son pasos con
 credenciales que un agente sin cuentas no puede ejecutar:
 
-1. **Registrar el sitio en Google Search Console** (propiedad prefijo URL
-   `https://tooltician.com/chile-hub/`, método etiqueta HTML) y entregar el
-   token al repo (plan 107, Step 1) — sin esto la etapa 4 sigue `sin dato`.
-2. **Enviar el sitemap** en GSC tras el registro
-   (`https://tooltician.com/chile-hub/sitemap.xml`; índice + 3 hijos
-   verificados 200 el 2026-10-15).
-3. **Revisar Cloudflare Web Analytics** en busca de referrers o dominios
+> **Hecho el 2026-10-26 — registro en Search Console.** Dos propiedades
+> verificadas (prefijo `https://tooltician.com/chile-hub/` y dominio
+> `tooltician.com`) mediante `TXT` en el apex. No se entregó token al repo: no
+> hay secreto nuevo. El archivo HTML y la etiqueta meta se descartaron.
+
+1. **Confirmar en el panel el envío del sitemap**
+   (`https://tooltician.com/chile-hub/sitemap.xml`; índice + 3 hijos en 200,
+   verificados el 2026-10-26) y que *Indexación → Sitemaps* lo muestre correcto.
+2. **Revisar Cloudflare Web Analytics** en busca de referrers o dominios
    institucionales (Auditoría 3 §E, Paso 0).
-4. **Revisar correo y mensajes directos de LinkedIn** + estado de respuestas a
+3. **Revisar correo y mensajes directos de LinkedIn** + estado de respuestas a
    los leads #107–#109 (plan 107, Steps 3 y 6).
-5. **Responder por escrito la consulta al contador** sobre el vehículo de cobro
+4. **Responder por escrito la consulta al contador** sobre el vehículo de cobro
    (gate §G, condición 2) — insumo del 2026-11-01, no de este plan.
-6. **Los demás pendientes del ROADMAP** (§5/§7: registro Reutilización en
+5. **Los demás pendientes del ROADMAP** (§5/§7: registro Reutilización en
    datos.gob.cl vía ClaveÚnica, solicitud estructurada CEAD, reporte del bulk
    2015 muerto, mesa SGD) siguen como lista de traspaso del mantenedor.
 
