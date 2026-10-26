@@ -1,9 +1,9 @@
 # Precipitaciones DGAC — serie histórica diaria
 
 **Capa:** `precipitaciones_dgac`. **Granularidad:** `(fecha, id_estacion)`.
-**Estado de integración:** la promoción a `stable_publishable` está supeditada a
-la publicación permanente de los artefactos y a los gates del pipeline.
-No confundir un PR de código con un bundle publicado.
+**Estado de integración:** `stable_publishable` desde el 2026-10-25. Se publica
+en el bundle y tiene tarjeta propia en el catálogo del sitio; su reevaluación
+(`review_by`) está fijada al 2027-01-15 en `data/source_registry.json`.
 
 ## Fuente y reutilización
 

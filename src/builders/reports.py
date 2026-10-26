@@ -839,6 +839,8 @@ _DISPLAY_NAMES = {
     "estadisticas_vitales": "Estadísticas Vitales",
     "permisos_edificacion": "Permisos de Edificación",
     "calidad_aire": "Calidad del Aire",
+    "precipitaciones_dgac": "Precipitaciones DGAC",
+    "geometria_comunal": "Geometría Comunal",
 }
 
 _SOURCE_NAMES = {
@@ -866,6 +868,8 @@ _SOURCE_NAMES = {
     "estadisticas_vitales": "INE",
     "permisos_edificacion": "MINVU / CEDOC",
     "calidad_aire": "MMA / SINCA",
+    "precipitaciones_dgac": "DGAC / datos.gob.cl",
+    "geometria_comunal": "BCN ArcGIS",
 }
 
 _LICENSE_LABELS = {
@@ -893,6 +897,8 @@ _LICENSE_LABELS = {
     "estadisticas_vitales": "CC BY 4.0",
     "permisos_edificacion": "Uso c/cita",
     "calidad_aire": "Revisión términos",
+    "precipitaciones_dgac": "CC BY / CC0",
+    "geometria_comunal": "CC BY",
 }
 
 

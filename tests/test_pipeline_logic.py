@@ -5883,6 +5883,37 @@ class McpToolsTests(unittest.TestCase):
             self.assertEqual(server.name, "chile-hub")
 
 
+class ReadmeLayersTableCoverageTests(unittest.TestCase):
+    """Toda capa del catálogo debe tener nombre, fuente y licencia en la tabla.
+
+    La tabla de README.md se genera desde `DATASET_CATALOG_CONFIG` más tres mapas
+    curados en `reports.py`. Una capa nueva sin entrada aparecía con su nombre
+    crudo y `—` en fuente y licencia (pasó con `precipitaciones_dgac` y
+    `geometria_comunal`). El guardrail detecta el hueco en el PR que agrega la
+    capa, no en el README publicado semanas después.
+    """
+
+    def test_every_catalog_dataset_has_display_source_and_license(self):
+        from src.builders import reports
+
+        maps = {
+            "display": reports._DISPLAY_NAMES,
+            "source": reports._SOURCE_NAMES,
+            "license": reports._LICENSE_LABELS,
+        }
+        missing = {
+            dataset: [label for label, mapping in maps.items() if not mapping.get(dataset)]
+            for dataset in reports.DATASET_CATALOG_CONFIG
+        }
+        missing = {dataset: gaps for dataset, gaps in missing.items() if gaps}
+        self.assertEqual(
+            missing,
+            {},
+            "Capas del catálogo sin metadatos para la tabla del README "
+            f"(agregar en src/builders/reports.py): {missing}",
+        )
+
+
 class ComunaPagesTests(unittest.TestCase):
     """Plan 105: páginas SEO por comuna generadas desde el perfil territorial.
 

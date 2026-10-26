@@ -258,7 +258,10 @@ codegraph impact validate_comunas                   # Qué se rompe si cambio es
              `cead_delincuencia_live_extractor.py` neutralizado tras degradar
              `delincuencia_comunal` a rejected 2026-09-15);
              autoridades_locales_extractor.py (ad hoc);
-             geometria_comunal_extractor.py (vía `geometria-comunal.yml`, ADR-012).
+             geometria_comunal_extractor.py (vía `geometria-comunal.yml`, ADR-012);
+             precipitaciones_dgac_extractor.py (vía `dgac-publish.yml`, trimestral:
+             solo refresca meses ya verificados, un mes nuevo exige revisar fuente,
+             licencia, contrato y cuarentenas).
              sinim_finanzas_extractor.py es un stub de fallback, no un paso del
              pipeline diario — nunca invocarlo desde un job programado (ver
              `tests/test_ci_config.py::SinimDailyJobGuardrailTests`).
@@ -806,7 +809,7 @@ Corre tras un `Pipeline Check` exitoso en `main` (`workflow_run`) o
 verificado, corre `python-semantic-release` (§7), publica el paquete en PyPI y
 adjunta los artefactos de datos al GitHub Release cuando son
 publication-grade. Tras cada release, el job `hf-publish` de
-`pypi-release.yml` replica las 21 capas publicables (Parquet + catálogo, las
+`pypi-release.yml` replica las 22 capas publicables (Parquet + catálogo, las
 estables por `publication_track` del registry — Plan 070) a
 Hugging Face Hub (`cortega26/chile-hub`, requiere secret `HF_TOKEN`); nunca
 incluye el carril `candidate` y no bloquea el release si falla.

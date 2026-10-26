@@ -187,7 +187,7 @@ El mismo estado se publica en el sitio, con historial de builds y detalle por ca
 ### Respaldo adicional
 
 <!-- START_TEST_COUNT -->
-- **1466 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
+- **1467 tests** (`pytest --collect-only`) que validan extracción, contratos e integridad de datos.
 <!-- END_TEST_COUNT -->
 <!-- START_ADR_COUNT -->
 - **25 ADRs** ([`docs/adr/`](docs/adr/)) que documentan cada decisión de arquitectura con su contexto, consecuencias y tradeoffs — no solo el "qué", sino el "por qué".
@@ -204,10 +204,10 @@ El mismo estado se publica en el sitio, con historial de builds y detalle por ca
 
 ## Qué incluye
 
-> **Cómo leer los conteos:** 22 capas construibles (`make build` local, incl. 1 en carril
-> `candidate`) · 21 publicables (bundle ZIP) · 25 registradas en el catálogo (3 filas sin
-> datos aún: geometría, delincuencia, autoridades locales). La convención completa vive
-> junto al badge superior y en [`data/source_registry.json`](data/source_registry.json).
+> **Cómo leer los conteos:** 23 capas construibles (`make build` local, incl. 1 en carril
+> `candidate`) · 22 publicables (bundle ZIP) · 26 registradas en el catálogo (3 sin
+> datos: geometría, delincuencia —rejected— y autoridades locales). La convención
+> completa vive junto al badge superior y en [`data/source_registry.json`](data/source_registry.json).
 
 ![Catálogo de capas publicado en el sitio](https://raw.githubusercontent.com/cortega26/chile-hub/main/docs/assets/landing-catalogo.png)
 
@@ -242,8 +242,8 @@ Mapa territorial interactivo: las 346 comunas con 7 métricas seleccionables
 | 20 | **Estadísticas Vitales** | INE | CC BY 4.0 | Anual |
 | 21 | **Permisos de Edificación** | MINVU / CEDOC | Uso c/cita | Mensual |
 | 22 | **Calidad del Aire** | MMA / SINCA | Revisión términos | Diaria |
-| 23 | **precipitaciones_dgac** | — | — | Trimestral |
-| 24 | **geometria_comunal** | — | — | — |
+| 23 | **Precipitaciones DGAC** | DGAC / datos.gob.cl | CC BY / CC0 | Trimestral |
+| 24 | **Geometría Comunal** | BCN ArcGIS | CC BY | — |
 | 25 | **Delincuencia Comunal** | CEAD / SPD | Revisión términos | — |
 | 26 | **Autoridades Locales** | BCN SIIT + Wikipedia | CC BY / CC BY-SA | — |
 
