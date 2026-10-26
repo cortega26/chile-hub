@@ -10,10 +10,11 @@ Formato: 1 JSON diario (`listadomapa2k19`) con inventario de estaciones
 Alcance MVP: promedios diarios por (fecha, estación, contaminante) para
 MP2.5, MP10, SO2, NO2, CO y O3. La serie es incremental: cada corrida agrega
 el último día sobre el historial. Como el JSON solo trae 24 h, el historial
-se siembra desde el Parquet publicado (`data/normalized/calidad_aire.parquet`)
-cuando staging está vacío (p. ej. tras un cache-miss de CI) —excepción
-documentada al flujo staging→normalized, sin la cual la historia se
-reiniciaría en silencio.
+se siembra SIEMPRE desde el Parquet publicado
+(`data/normalized/calidad_aire.parquet`) y se fusiona con el staging actual
+—excepción documentada al flujo staging→normalized—. Sin ese piso, un staging
+perdido o truncado (cache-miss, copia vieja) reiniciaría la serie en silencio:
+el JSON del SINCA solo trae 24 h y no permite reconstruirla.
 
 Cobertura parcial por diseño: ~65 de 346 comunas tienen estación de
 monitoreo (verificado contra el inventario; documentado en NOTES).
@@ -305,7 +306,7 @@ def fetch_data() -> tuple[list[dict], str, str, list[str]]:
 
     Retorna (rows, source_mode, source_url, notes). Las filas cubren solo el
     último día disponible; el historial se siembra desde el Parquet publicado
-    (ver _seed_history_from_parquet) para no reiniciar la serie.
+    (ver _seed_history_from_parquet) para no reiniciar la serie; el Parquet es el piso, no solo el respaldo de staging vacío.
     """
     ensure_staging_directories()
     notes: list[str] = []
@@ -462,11 +463,19 @@ def process_calidad_aire() -> dict:
     rows, mode, source_url, notes = fetch_data()
     df_new = normalize_rows(rows)
 
-    # Serie incremental: fusionar con el historial (staging actual o, si no
-    # existe, el Parquet publicado) deduplicando por clave primaria. Lo
-    # nuevo va al final y gana (keep="last"): una re-cosecha del mismo día
-    # trae datos más frescos (p. ej. validación nivel 2 del operador).
+    # Serie incremental: el historial se compone SIEMPRE del Parquet publicado
+    # más el staging actual, y lo nuevo va al final y gana (keep="last"): una
+    # re-cosecha del mismo día trae datos más frescos (p. ej. validación nivel 2
+    # del operador). El Parquet es el piso de la serie: el JSON del SINCA solo
+    # trae 24 h, así que sin él un staging perdido o parcial reinicia el
+    # historial en silencio. Antes solo se sembraba cuando staging NO existía,
+    # de modo que un staging truncado (cache-miss parcial, copia vieja) perdía
+    # todo lo que el Parquet sí tenía.
     frames = []
+    seeded = _seed_history_from_parquet()
+    if seeded is not None and seeded.height > 0:
+        frames.append(seeded)
+        notes.append(f"historial: sembrado desde Parquet publicado ({seeded.height} filas)")
     if os.path.exists(STAGING_CSV_PATH):
         try:
             frames.append(
@@ -482,12 +491,7 @@ def process_calidad_aire() -> dict:
             )
             notes.append("historial: fusionado con staging existente")
         except Exception as exc:
-            notes.append(f"historial: staging ilegible, se parte de lo nuevo ({exc})")
-    else:
-        seeded = _seed_history_from_parquet()
-        if seeded is not None and seeded.height > 0:
-            frames.append(seeded)
-            notes.append(f"historial: sembrado desde Parquet publicado ({seeded.height} filas)")
+            notes.append(f"historial: staging ilegible, se continúa con lo disponible ({exc})")
 
     df = pl.concat([*frames, df_new], how="diagonal").unique(
         subset=["fecha", "id_estacion", "codigo_contaminante"], keep="last"

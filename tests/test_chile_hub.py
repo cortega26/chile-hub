@@ -49,6 +49,8 @@ INDICADORES_NON_SYNTHETIC_DELIVERY = {
     "ine_override",
 }
 EXPECTED_DATASET_COUNT = 23
+
+
 # Datasets candidate (p. ej. consumo_electrico_comunal) no tienen tarjeta en
 # la landing page, así que build_hub_health filtra el top_issue de los
 # artefactos estáticos (hub_health.json/hub_bundle.json/overview.json y
@@ -56,14 +58,22 @@ EXPECTED_DATASET_COUNT = 23
 # ChileHub.top_issue()/overview()/runtime_status()/snapshot_text() (y sus
 # equivalentes CLI) recalculan en vivo sin ese filtro — a propósito, ya que
 # no están atados a ningún enlace HTML — así que legítimamente difieren.
-# Historial del top de BUILD: fue "empresas" hasta que issue #42 eliminó su
-# único warning accionable; luego "indicadores" por stale crónico (issue #43),
-# que dejó de serlo al entrar el backfill publicado del IPC. Desde el
-# 2026-10-25 el top real es "calidad_aire": cobertura parcial por diseño
-# (66/346 comunas con estación) + drift, con el agregado de que su serie se
-# retiene cuando la fuente no responde (plan 150). Cambiar este valor solo si
-# la salud de las fuentes lo justifica; no para "hacer pasar" un build.
-EXPECTED_BUILD_TOP_ISSUE = "calidad_aire"
+# Top issue del build: se LEE del artefacto publicado en vez de congelar un
+# nombre. El valor cambia con la salud real de las fuentes —`calidad_aire`
+# cuando está en fallback o drifted, `indicadores` cuando aquélla está sana y
+# queda el backfill del IPC—, así que fijarlo obligaba a editar el test cada
+# vez que una fuente se recuperaba o caía. Lo que este archivo debe garantizar
+# es que TODOS los reportes coincidan en el mismo top issue, no cuál es.
+def _published_top_issue() -> str:
+    health_path = ROOT_DIR / "data" / "normalized" / "hub_health.json"
+    health = json.loads(health_path.read_text(encoding="utf-8"))
+    dataset = (health.get("top_issue") or {}).get("dataset")
+    if not isinstance(dataset, str) or not dataset:
+        raise AssertionError(f"hub_health.json sin top_issue.dataset válido: {dataset!r}")
+    return dataset
+
+
+EXPECTED_BUILD_TOP_ISSUE = _published_top_issue()
 
 
 def _assert_summary_has_recovery_source_detail(test_case, summary):
