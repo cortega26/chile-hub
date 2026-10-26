@@ -461,7 +461,7 @@ wheels = [
 
 [[package]]
 name = "chile-hub"
-version = "1.52.5"
+version = "1.53.0"
 source = { editable = "." }
 dependencies = [
     { name = "platformdirs" },

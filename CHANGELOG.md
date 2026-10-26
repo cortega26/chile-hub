@@ -12,6 +12,15 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.53.0 - 2026-10-26
+
+### Agregado
+
+- **publicación**: La recuperación válida de indicadores no bloquea el publish
+  ([#217](https://github.com/cortega26/chile-hub/pull/217),
+  [`47952e2`](https://github.com/cortega26/chile-hub/commit/47952e20259c0394539482edd783d2a851e1c9a2))
+
+
 ## 1.52.5 - 2026-10-26
 
 ### Corregido
