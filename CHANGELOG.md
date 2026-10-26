@@ -12,6 +12,54 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.55.0 - 2026-10-26
+
+### Mantenimiento
+
+- **ci**: Sync coverage badge from verified tests [skip ci]
+  ([`28e9184`](https://github.com/cortega26/chile-hub/commit/28e91842ed97db22ee9e85ba31726516e0d04985))
+
+- **docs**: Sincronizar el contador de tests tras el rebase
+  ([#220](https://github.com/cortega26/chile-hub/pull/220),
+  [`8c4fe01`](https://github.com/cortega26/chile-hub/commit/8c4fe01965945338571ecd6e1b8566f7d0efaf3d))
+
+### Agregado
+
+- **extracción**: Staging remoto desde la VM OCI para las fuentes que bloquean GitHub
+  ([#220](https://github.com/cortega26/chile-hub/pull/220),
+  [`8c4fe01`](https://github.com/cortega26/chile-hub/commit/8c4fe01965945338571ecd6e1b8566f7d0efaf3d))
+
+
+## 1.54.1 - 2026-10-26
+
+### Corregido
+
+- **ci**: Refrescar el manifiesto cuando DGAC commitea artefactos
+  ([#221](https://github.com/cortega26/chile-hub/pull/221),
+  [`82a19d0`](https://github.com/cortega26/chile-hub/commit/82a19d08673129d344d2407b18864cd3da0e4a8c))
+
+- **deps**: Revertir duckdb 2.0.0 — eliminó .pl() y rompió ChileHub.sql()
+  ([#221](https://github.com/cortega26/chile-hub/pull/221),
+  [`82a19d0`](https://github.com/cortega26/chile-hub/commit/82a19d08673129d344d2407b18864cd3da0e4a8c))
+
+### Mantenimiento
+
+- **deps**: Bump actions/setup-python from 7.0.0 to 7.1.0
+  ([#216](https://github.com/cortega26/chile-hub/pull/216),
+  [`4b4ccf8`](https://github.com/cortega26/chile-hub/commit/4b4ccf848e1a8f63122b43b605596404bbca91d7))
+
+- **deps**: Bump pypa/gh-action-pypi-publish from 1.14.2 to 1.14.3
+  ([#215](https://github.com/cortega26/chile-hub/pull/215),
+  [`3a0d86c`](https://github.com/cortega26/chile-hub/commit/3a0d86cdce4661e0c3daee36c354d7fbc69e36a8))
+
+- **deps**: Sync uv.lock [skip ci] ([#211](https://github.com/cortega26/chile-hub/pull/211),
+  [`d99c549`](https://github.com/cortega26/chile-hub/commit/d99c5497d0862cf14c5c6970a56c40131ec43656))
+
+- **deps-dev**: Bump the python-pipeline group with 3 updates
+  ([#211](https://github.com/cortega26/chile-hub/pull/211),
+  [`d99c549`](https://github.com/cortega26/chile-hub/commit/d99c5497d0862cf14c5c6970a56c40131ec43656))
+
+
 ## 1.54.0 - 2026-10-26
 
 ### Mantenimiento

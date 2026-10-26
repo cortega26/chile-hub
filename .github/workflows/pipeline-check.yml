@@ -57,7 +57,7 @@ jobs:
           ref: ${{ github.head_ref || github.ref_name }}
 
       - name: Set up Python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -172,7 +172,7 @@ jobs:
           fetch-depth: 1
 
       - name: Set up Python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -219,7 +219,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up Python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -325,6 +325,23 @@ jobs:
           # by that workflow; make sure neither a stale actions/cache restore nor
           # a leftover fallback write can shadow the versioned copy here.
           git checkout -- data/staging/finanzas_municipales.csv data/staging/finanzas_municipales.metadata.json 2>/dev/null || true
+
+      - name: Apply remote staging (VM egress)
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: |
+          # Plan 153: cuatro fuentes oficiales bloquean el egress de GitHub pero
+          # responden desde la VM de OCI (Santiago), que escribe este espejo.
+          # Aquí solo se lee: allowlist fija, solo source_mode live/monthly y
+          # record_count consistente (scripts/apply_remote_staging.py). Si el
+          # espejo no responde, se sigue con la extracción local y el gate de
+          # publicación decide (retención), como hasta ahora.
+          if git clone --depth 1 --quiet \
+              https://github.com/cortega26/chile-hub-remote-staging.git \
+              "$RUNNER_TEMP/remote-staging"; then
+            python scripts/apply_remote_staging.py "$RUNNER_TEMP/remote-staging"
+          else
+            echo "::warning::Espejo remoto no disponible; se usa la extracción local."
+          fi
 
       - name: Build outputs
         # El build completo necesita staging de otros extractores, no versionado.
@@ -516,7 +533,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up Python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -550,7 +567,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up Python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
