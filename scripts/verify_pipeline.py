@@ -667,25 +667,48 @@ def verify_publication_policy(
         allowed_indicator_source_details = {
             "public_api",
             "public_api_with_published_backfill",
+            # Recuperaciones válidas (plan 151): una caída transitoria de la
+            # fuente no debe bloquear el publish si el dato ENTREGADO sigue
+            # dentro de su cadencia. La edad se gatea más abajo, igual que en
+            # los backfills (ADR-016).
+            "public_api_with_raw_recovery",
+            "public_api_with_raw_recovery_partial",
+            "public_api_partial",
         }
         if indicadores.get("source_detail") not in allowed_indicator_source_details:
             violations.append(f"indicadores: source_detail={indicadores.get('source_detail')}")
-        failed_diagnostics = {
-            field: indicadores.get(field, [])
-            for field in (
-                "fetch_failures",
-                "raw_recoveries",
-                "preserved_existing_pairs",
-                "empty_live_pairs",
-            )
-            if indicadores.get(field)
+
+        # Bloquea solo los fallos SIN ruta de recuperación: antes bastaba con
+        # que existiera cualquier diagnóstico —incluidas las recuperaciones
+        # exitosas— para rechazar la publicación (run 40322837402, 2026-10-26).
+        failed_pairs = {
+            str(item).split(":", 1)[0].strip() for item in indicadores.get("fetch_failures", [])
         }
-        if failed_diagnostics:
-            violations.append(f"indicadores: recovery diagnostics={failed_diagnostics}")
+        recovered_pairs = (
+            set(indicadores.get("raw_recoveries", []))
+            | set(indicadores.get("preserved_existing_pairs", []))
+            | set(indicadores.get("empty_live_pairs", []))
+        )
+        recovered_codes = set(indicadores.get("published_backfills", []))
+        unrecovered = sorted(
+            pair
+            for pair in failed_pairs
+            if pair not in recovered_pairs and pair.split("/", 1)[0] not in recovered_codes
+        )
+        if unrecovered:
+            violations.append(f"indicadores: unrecovered fetch failures={unrecovered}")
+
+        allowed_delivery = {
+            "live",
+            "published_backfill",
+            "ine_override",
+            "raw_recovery",
+            "preserved_existing",
+        }
         unsafe_delivery = {
             code: status
             for code, status in indicadores.get("indicator_delivery", {}).items()
-            if status not in {"live", "published_backfill", "ine_override"}
+            if status not in allowed_delivery
         }
         if unsafe_delivery:
             violations.append(f"indicadores: unsafe delivery={unsafe_delivery}")
@@ -700,7 +723,12 @@ def verify_publication_policy(
         ages = indicadores.get("indicator_age_days", {})
         stale_backfills = {}
         for code, status in delivery.items():
-            if status not in {"published_backfill", "ine_override"}:
+            if status not in {
+                "published_backfill",
+                "ine_override",
+                "raw_recovery",
+                "preserved_existing",
+            }:
                 continue
             age = ages.get(code)
             if age is None:
@@ -715,7 +743,7 @@ def verify_publication_policy(
                 for code in unreviewed_stale
             )
             violations.append(
-                f"indicadores: stale published_backfill in {unreviewed_stale} ({detail}); "
+                f"indicadores: stale delivery in {unreviewed_stale} ({detail}); "
                 "la serie lleva demasiado tiempo sin dato nuevo de la fuente "
                 "(override con --allow-stale-backfills tras confirmar upstream, ver ADR-016)"
             )

@@ -384,27 +384,58 @@ class PipelineLogicTests(unittest.TestCase):
         ):
             verify_publication_policy({"datasets": datasets}, registry=registry)
 
-    def test_publication_policy_indicadores_raw_recovery_still_fails(self):
-        """indicadores with raw_recoveries fails even with candidates excluded."""
-        datasets = {
-            "indicadores": {
-                "source_mode": "live",
-                "source_detail": "public_api_with_raw_recovery",
-                "freshness": {"status": "fresh"},
-                "indicator_delivery": {"uf": "raw_recovery", "dolar": "live"},
-                "fetch_failures": ["uf/2026: timeout"],
-                "raw_recoveries": ["uf/2026"],
-                "preserved_existing_pairs": [],
-                "empty_live_pairs": [],
-            }
+    def _indicadores_recovery_metadata(self, **overrides):
+        dataset = {
+            "source_mode": "live",
+            "source_detail": "public_api_with_raw_recovery",
+            "freshness": {"status": "fresh"},
+            "indicator_delivery": {"uf": "raw_recovery", "dolar": "live"},
+            "indicator_age_days": {"uf": 1, "dolar": 0},
+            "fetch_failures": ["uf/2026: timeout"],
+            "raw_recoveries": ["uf/2026"],
+            "preserved_existing_pairs": [],
+            "empty_live_pairs": [],
+            "published_backfills": [],
         }
+        dataset.update(overrides)
+        return {"datasets": {"indicadores": dataset}}
+
+    def test_publication_policy_acepta_una_recuperacion_valida(self):
+        """Self-heal (plan 151): una caída transitoria recuperada y fresca publica.
+
+        Antes bastaba con que existiera cualquier diagnóstico —incluidas las
+        recuperaciones exitosas— para rechazar el build (run 40322837402).
+        """
+        registry = [self._stable_registry_entry("indicadores")]
+
+        verify_publication_policy(self._indicadores_recovery_metadata(), registry=registry)
+
+    def test_publication_policy_rechaza_una_recuperacion_stale(self):
+        """La recuperación no es barra libre: la edad del dato sigue mandando."""
         registry = [self._stable_registry_entry("indicadores")]
 
         with (
             patch("builtins.print"),
             self.assertRaisesRegex(SystemExit, "1"),
         ):
-            verify_publication_policy({"datasets": datasets}, registry=registry)
+            verify_publication_policy(
+                self._indicadores_recovery_metadata(indicator_age_days={"uf": 30, "dolar": 0}),
+                registry=registry,
+            )
+
+    def test_publication_policy_rechaza_un_fallo_sin_recuperacion(self):
+        """Sin ruta de recuperación, el fallo sigue bloqueando."""
+        registry = [self._stable_registry_entry("indicadores")]
+        metadata = self._indicadores_recovery_metadata(
+            raw_recoveries=[],
+            indicator_delivery={"uf": "live", "dolar": "live"},
+        )
+
+        with (
+            patch("builtins.print"),
+            self.assertRaisesRegex(SystemExit, "1"),
+        ):
+            verify_publication_policy(metadata, registry=registry)
 
     def test_dataset_contract_accepts_valid_dataframe(self):
         df = pl.DataFrame(
