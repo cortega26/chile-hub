@@ -226,6 +226,10 @@ def sync_readme_quality_summary(check_only=False):
 
 
 _AGENTS_TEST_DESCRIPTIONS = {
+    "test_agent_mcp_configuration.py": (
+        "MCP CodeGraph/Serena: paridad entre clientes, alcance de workspace "
+        "y exclusión del estado local"
+    ),
     "test_chile_hub.py": (
         "API Python de `ChileHub`, CLI, contratos de artefactos "
         "(SHA256, catálogo, ZIP), contratos de workflow/Makefile, "
