@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-10-26T01:05:03.614317+00:00",
+  "generated_at_utc": "2026-10-26T01:17:03.245098+00:00",
   "dataset_count": 23,
   "datasets": [
     {
@@ -8,9 +8,9 @@
       "source_mode": "live",
       "freshness": {
         "status": "fresh",
-        "age_hours": 725.54,
+        "age_hours": 725.74,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-10-26T01:05:03.579225+00:00"
+        "checked_at_utc": "2026-10-26T01:17:03.240196+00:00"
       },
       "record_count": 205,
       "expected_record_count": 205,
@@ -28,9 +28,9 @@
       "source_mode": "live",
       "freshness": {
         "status": "stale",
-        "age_hours": 250.43,
+        "age_hours": 250.63,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-10-26T01:05:03.579256+00:00"
+        "checked_at_utc": "2026-10-26T01:17:03.240226+00:00"
       },
       "record_count": 8462,
       "expected_record_count": null,
@@ -41,7 +41,7 @@
       "refreshed_at_utc": "2026-10-15T14:39:26.685817+00:00",
       "warnings": [
         "cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación",
-        "calidad_aire freshness is stale: 250.43h since refresh, policy max is 72h"
+        "calidad_aire freshness is stale: 250.63h since refresh, policy max is 72h"
       ],
       "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
     },
@@ -51,9 +51,9 @@
       "source_mode": "live",
       "freshness": {
         "status": "fresh",
-        "age_hours": 2.31,
+        "age_hours": 0.6,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-10-26T01:05:03.579087+00:00"
+        "checked_at_utc": "2026-10-26T01:17:03.240050+00:00"
       },
       "record_count": 346,
       "expected_record_count": 346,
@@ -61,7 +61,7 @@
       "coverage_ratio": 1.0,
       "redistribution_status": "open-attribution",
       "redistribution_ok": true,
-      "refreshed_at_utc": "2026-10-25T22:46:12.494231+00:00",
+      "refreshed_at_utc": "2026-10-26T00:41:03.148677+00:00",
       "warnings": [],
       "recommended_action": "Ninguna."
     },
@@ -71,9 +71,9 @@
       "source_mode": "live",
       "freshness": {
         "status": "fresh",
-        "age_hours": 2.31,
+        "age_hours": 0.6,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-10-26T01:05:03.579116+00:00"
+        "checked_at_utc": "2026-10-26T01:17:03.240079+00:00"
       },
       "record_count": 346,
       "expected_record_count": 346,
@@ -81,7 +81,7 @@
       "coverage_ratio": 1.0,
       "redistribution_status": "open-attribution",
       "redistribution_ok": true,
-      "refreshed_at_utc": "2026-10-25T22:46:15.449439+00:00",
+      "refreshed_at_utc": "2026-10-26T00:41:06.978342+00:00",
       "warnings": [],
       "recommended_action": "Ninguna."
     },
@@ -91,9 +91,9 @@
       "source_mode": "live",
       "freshness": {
         "status": "fresh",
-        "age_hours": 2.32,
+        "age_hours": 0.6,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-10-26T01:05:03.579043+00:00"
+        "checked_at_utc": "2026-10-26T01:17:03.240018+00:00"
       },
       "record_count": 346,
       "expected_record_count": 346,
@@ -101,7 +101,7 @@
       "coverage_ratio": 1.0,
       "redistribution_status": "open-attribution",
       "redistribution_ok": true,
-      "refreshed_at_utc": "2026-10-25T22:46:08.939054+00:00",
+      "refreshed_at_utc": "2026-10-26T00:40:57.614841+00:00",
       "warnings": [],
       "recommended_action": "Ninguna."
     },
@@ -111,9 +111,9 @@
       "source_mode": "live",
       "freshness": {
         "status": "fresh",
-        "age_hours": 2.32,
+        "age_hours": 0.6,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-10-26T01:05:03.579053+00:00"
+        "checked_at_utc": "2026-10-26T01:17:03.240026+00:00"
       },
       "record_count": 346,
       "expected_record_count": 346,
@@ -121,7 +121,7 @@
       "coverage_ratio": 1.0,
       "redistribution_status": "open-attribution",
       "redistribution_ok": true,
-      "refreshed_at_utc": "2026-10-25T22:46:08.939054+00:00",
+      "refreshed_at_utc": "2026-10-26T00:40:57.614841+00:00",
       "warnings": [],
       "recommended_action": "Ninguna."
     },
@@ -131,9 +131,9 @@
       "source_mode": "fallback",
       "freshness": {
         "status": "fresh",
-        "age_hours": 2.31,
+        "age_hours": 0.33,
         "max_age_hours": 17520,
-        "checked_at_utc": "2026-10-26T01:05:03.579207+00:00"
+        "checked_at_utc": "2026-10-26T01:17:03.240178+00:00"
       },
       "record_count": 3,
       "expected_record_count": null,
@@ -141,7 +141,7 @@
       "coverage_ratio": null,
       "redistribution_status": "open-attribution",
       "redistribution_ok": true,
-      "refreshed_at_utc": "2026-10-25T22:46:37.058208+00:00",
+      "refreshed_at_utc": "2026-10-26T00:57:31.516981+00:00",
       "warnings": [
         "tipos de cliente: ['Comercial', 'Residencial']",
         "años disponibles: [2023]",
@@ -155,9 +155,9 @@
       "source_mode": "live",
       "freshness": {
         "status": "fresh",
-        "age_hours": 2.31,
+        "age_hours": 0.6,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-10-26T01:05:03.579122+00:00"
+        "checked_at_utc": "2026-10-26T01:17:03.240086+00:00"
       },
       "record_count": 346,
       "expected_record_count": 346,
@@ -165,7 +165,7 @@
       "coverage_ratio": 1.0,
       "redistribution_status": "open-attribution",
       "redistribution_ok": true,
-      "refreshed_at_utc": "2026-10-25T22:46:19.112124+00:00",
+      "refreshed_at_utc": "2026-10-26T00:41:08.781755+00:00",
       "warnings": [],
       "recommended_action": "Ninguna."
     },
@@ -175,9 +175,9 @@
       "source_mode": "live",
       "freshness": {
         "status": "fresh",
-        "age_hours": 2.31,
+        "age_hours": 0.01,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-10-26T01:05:03.579186+00:00"
+        "checked_at_utc": "2026-10-26T01:17:03.240157+00:00"
       },
       "record_count": 1628433,
       "expected_record_count": null,
@@ -185,7 +185,7 @@
       "coverage_ratio": null,
       "redistribution_status": "open-attribution",
       "redistribution_ok": true,
-      "refreshed_at_utc": "2026-10-25T22:46:30.997389+00:00",
+      "refreshed_at_utc": "2026-10-26T01:16:24.672708+00:00",
       "warnings": [
         "RES solo cubre constituciones bajo Ley 20.659 (regimen simplificado). No incluye empresas del regimen tradicional (Diario Oficial) ni empresas anteriores a mayo 2013."
       ],
@@ -197,9 +197,9 @@
       "source_mode": "live",
       "freshness": {
         "status": "fresh",
-        "age_hours": 250.47,
+        "age_hours": 250.67,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-10-26T01:05:03.579109+00:00"
+        "checked_at_utc": "2026-10-26T01:17:03.240070+00:00"
       },
       "record_count": 12898,
       "expected_record_count": null,
@@ -217,9 +217,9 @@
       "source_mode": "live",
       "freshness": {
         "status": "fresh",
-        "age_hours": 2.31,
+        "age_hours": 0.6,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-10-26T01:05:03.579099+00:00"
+        "checked_at_utc": "2026-10-26T01:17:03.240060+00:00"
       },
       "record_count": 5782,
       "expected_record_count": null,
@@ -227,7 +227,7 @@
       "coverage_ratio": null,
       "redistribution_status": "open-attribution",
       "redistribution_ok": true,
-      "refreshed_at_utc": "2026-10-25T22:46:18.806476+00:00",
+      "refreshed_at_utc": "2026-10-26T00:41:08.596552+00:00",
       "warnings": [],
       "recommended_action": "Ninguna."
     },
@@ -237,9 +237,9 @@
       "source_mode": "live",
       "freshness": {
         "status": "fresh",
-        "age_hours": 2.3,
+        "age_hours": 0.32,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-10-26T01:05:03.579235+00:00"
+        "checked_at_utc": "2026-10-26T01:17:03.240206+00:00"
       },
       "record_count": 13840,
       "expected_record_count": null,
@@ -247,7 +247,7 @@
       "coverage_ratio": null,
       "redistribution_status": "open-attribution",
       "redistribution_ok": true,
-      "refreshed_at_utc": "2026-10-25T22:46:46.649796+00:00",
+      "refreshed_at_utc": "2026-10-26T00:58:02.154433+00:00",
       "warnings": [],
       "recommended_action": "Ninguna."
     },
@@ -257,9 +257,9 @@
       "source_mode": "monthly",
       "freshness": {
         "status": "fresh",
-        "age_hours": 1318.01,
+        "age_hours": 1318.21,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-10-26T01:05:03.579129+00:00"
+        "checked_at_utc": "2026-10-26T01:17:03.240095+00:00"
       },
       "record_count": 345,
       "expected_record_count": 345,
@@ -277,9 +277,9 @@
       "source_mode": "live",
       "freshness": {
         "status": "fresh",
-        "age_hours": 2.31,
+        "age_hours": 0.01,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-10-26T01:05:03.579071+00:00"
+        "checked_at_utc": "2026-10-26T01:17:03.240038+00:00"
       },
       "record_count": 738,
       "expected_record_count": null,
@@ -287,7 +287,7 @@
       "coverage_ratio": null,
       "redistribution_status": "open-attribution",
       "redistribution_ok": true,
-      "refreshed_at_utc": "2026-10-25T22:46:11.848772+00:00",
+      "refreshed_at_utc": "2026-10-26T01:16:19.136080+00:00",
       "warnings": [
         "indicadores live refresh reused last published artifact for missing codes: ipc"
       ],
@@ -299,9 +299,9 @@
       "source_mode": "live",
       "freshness": {
         "status": "fresh",
-        "age_hours": 2.31,
+        "age_hours": 0.43,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-10-26T01:05:03.579144+00:00"
+        "checked_at_utc": "2026-10-26T01:17:03.240114+00:00"
       },
       "record_count": 6701,
       "expected_record_count": null,
@@ -309,7 +309,7 @@
       "coverage_ratio": 0.3382,
       "redistribution_status": "open-attribution",
       "redistribution_ok": true,
-      "refreshed_at_utc": "2026-10-25T22:46:21.918498+00:00",
+      "refreshed_at_utc": "2026-10-26T00:51:08.335444+00:00",
       "warnings": [
         "indicadores_urbanos_siedu has intentionally partial urban coverage"
       ],
@@ -321,9 +321,9 @@
       "source_mode": "live",
       "freshness": {
         "status": "fresh",
-        "age_hours": 2.31,
+        "age_hours": 0.32,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-10-26T01:05:03.579215+00:00"
+        "checked_at_utc": "2026-10-26T01:17:03.240187+00:00"
       },
       "record_count": 37,
       "expected_record_count": 36,
@@ -331,7 +331,7 @@
       "coverage_ratio": 1.0278,
       "redistribution_status": "open-attribution",
       "redistribution_ok": true,
-      "refreshed_at_utc": "2026-10-25T22:46:39.503347+00:00",
+      "refreshed_at_utc": "2026-10-26T00:57:33.278786+00:00",
       "warnings": [
         "estado_legal poblado (vía SERVEL) en 16/37 partidos"
       ],
@@ -345,7 +345,7 @@
         "status": "fresh",
         "age_hours": 0.0,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-10-26T01:05:03.579174+00:00"
+        "checked_at_utc": "2026-10-26T01:17:03.240144+00:00"
       },
       "record_count": 346,
       "expected_record_count": 346,
@@ -353,19 +353,19 @@
       "coverage_ratio": 1.0,
       "redistribution_status": "open-attribution",
       "redistribution_ok": true,
-      "refreshed_at_utc": "2026-10-26T01:05:03.579154+00:00",
+      "refreshed_at_utc": "2026-10-26T01:17:03.240125+00:00",
       "warnings": [],
       "recommended_action": "Ninguna."
     },
     {
       "dataset": "permisos_edificacion",
       "validation_status": "ok",
-      "source_mode": "live",
+      "source_mode": "monthly",
       "freshness": {
         "status": "fresh",
-        "age_hours": 2.3,
+        "age_hours": 726.14,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-10-26T01:05:03.579245+00:00"
+        "checked_at_utc": "2026-10-26T01:17:03.240215+00:00"
       },
       "record_count": 8650,
       "expected_record_count": null,
@@ -373,7 +373,7 @@
       "coverage_ratio": null,
       "redistribution_status": "open-attribution",
       "redistribution_ok": true,
-      "refreshed_at_utc": "2026-10-25T22:46:49.459577+00:00",
+      "refreshed_at_utc": "2026-09-25T19:08:42+00:00",
       "warnings": [],
       "recommended_action": "Ninguna."
     },
@@ -383,9 +383,9 @@
       "source_mode": "live",
       "freshness": {
         "status": "fresh",
-        "age_hours": 2.31,
+        "age_hours": 2.51,
         "max_age_hours": 175200,
-        "checked_at_utc": "2026-10-26T01:05:03.579198+00:00"
+        "checked_at_utc": "2026-10-26T01:17:03.240168+00:00"
       },
       "record_count": 690,
       "expected_record_count": null,
@@ -405,9 +405,9 @@
       "source_mode": "live",
       "freshness": {
         "status": "fresh",
-        "age_hours": 213.67,
+        "age_hours": 213.87,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-10-26T01:05:03.579267+00:00"
+        "checked_at_utc": "2026-10-26T01:17:03.240237+00:00"
       },
       "record_count": 141436,
       "expected_record_count": null,
@@ -427,9 +427,9 @@
       "source_mode": "live",
       "freshness": {
         "status": "fresh",
-        "age_hours": 2.32,
+        "age_hours": 0.6,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-10-26T01:05:03.579027+00:00"
+        "checked_at_utc": "2026-10-26T01:17:03.240004+00:00"
       },
       "record_count": 56,
       "expected_record_count": 56,
@@ -437,7 +437,7 @@
       "coverage_ratio": 1.0,
       "redistribution_status": "open-attribution",
       "redistribution_ok": true,
-      "refreshed_at_utc": "2026-10-25T22:46:08.939054+00:00",
+      "refreshed_at_utc": "2026-10-26T00:40:57.614841+00:00",
       "warnings": [],
       "recommended_action": "Ninguna."
     },
@@ -447,9 +447,9 @@
       "source_mode": "live",
       "freshness": {
         "status": "fresh",
-        "age_hours": 2.32,
+        "age_hours": 0.6,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-10-26T01:05:03.578976+00:00"
+        "checked_at_utc": "2026-10-26T01:17:03.239975+00:00"
       },
       "record_count": 16,
       "expected_record_count": 16,
@@ -457,7 +457,7 @@
       "coverage_ratio": 1.0,
       "redistribution_status": "open-attribution",
       "redistribution_ok": true,
-      "refreshed_at_utc": "2026-10-25T22:46:08.939054+00:00",
+      "refreshed_at_utc": "2026-10-26T00:40:57.614841+00:00",
       "warnings": [],
       "recommended_action": "Ninguna."
     },
@@ -467,9 +467,9 @@
       "source_mode": "live",
       "freshness": {
         "status": "fresh",
-        "age_hours": 250.46,
+        "age_hours": 250.66,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-10-26T01:05:03.579137+00:00"
+        "checked_at_utc": "2026-10-26T01:17:03.240104+00:00"
       },
       "record_count": 345,
       "expected_record_count": null,

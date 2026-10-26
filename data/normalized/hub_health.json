@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-10-26T01:05:03.614317+00:00",
+  "generated_at_utc": "2026-10-26T01:17:03.245098+00:00",
   "overall_status": "warn",
   "dataset_count": 23,
   "retired_count": 1,
@@ -8,7 +8,7 @@
   "error_count": 0,
   "live_count": 22,
   "fallback_count": 0,
-  "held_count": 3,
+  "held_count": 5,
   "stale_count": 1,
   "unknown_freshness_count": 0,
   "publishable_count": 22,
@@ -55,7 +55,7 @@
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
       "recommended_action": "Ninguna.",
       "retired": false,
-      "held": false
+      "held": true
     },
     {
       "dataset": "calidad_aire",
@@ -412,7 +412,7 @@
     {
       "dataset": "permisos_edificacion",
       "severity": "ok",
-      "source_mode": "live",
+      "source_mode": "monthly",
       "freshness_status": "fresh",
       "validation_status": "ok",
       "warning_count": 0,
@@ -451,7 +451,7 @@
       "diagnostic_summary": "cobertura SAE: 345/346 comunas (99.7%) — parcial por diseño; comunas sin muestra no tienen estimación",
       "recommended_action": "Ninguna.",
       "retired": false,
-      "held": false
+      "held": true
     },
     {
       "dataset": "precipitaciones_dgac",

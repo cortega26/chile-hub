@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-10-26T01:05:03.614317+00:00",
+  "generated_at_utc": "2026-10-26T01:17:03.245098+00:00",
   "dataset_count": 23,
   "drifted_count": 3,
   "healthy_count": 20,
@@ -310,7 +310,7 @@
     {
       "dataset": "permisos_edificacion",
       "drift_status": "healthy",
-      "source_mode": "live",
+      "source_mode": "monthly",
       "coverage_status": "not_applicable",
       "coverage_ratio": null,
       "coverage_summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
@@ -330,7 +330,7 @@
       "coverage_ratio": null,
       "coverage_summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
       "degradation_status": "warning",
-      "degradation_impact": "calidad_aire freshness is stale: 250.43h since refresh, policy max is 72h",
+      "degradation_impact": "calidad_aire freshness is stale: 250.63h since refresh, policy max is 72h",
       "drift_summary": "Drift detectado: degradation=warning.",
       "warning_count": 2,
       "diagnostic_summary": "cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación",

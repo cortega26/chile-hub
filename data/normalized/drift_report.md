@@ -1,6 +1,6 @@
 # chile-hub drift report
 
-- `generated_at_utc`: `2026-10-26T01:05:03.614317+00:00`
+- `generated_at_utc`: `2026-10-26T01:17:03.245098+00:00`
 - `dataset_count`: `23`
 - `drifted_count`: `3`
 - `healthy_count`: `20`
@@ -30,7 +30,7 @@
 | `partidos_politicos` | `healthy` | `live` | `full` | `none` | 1 | Ninguna. |
 | `autoridades_electas` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
 | `estadisticas_vitales` | `healthy` | `live` | `not_applicable` | `none` | 0 | Ninguna. |
-| `permisos_edificacion` | `healthy` | `live` | `not_applicable` | `none` | 0 | Ninguna. |
+| `permisos_edificacion` | `healthy` | `monthly` | `not_applicable` | `none` | 0 | Ninguna. |
 | `calidad_aire` | `drifted` | `live` | `not_applicable` | `warning` | 2 | Revisar warnings operativos del dataset antes de consumirlo en producción. |
 | `precipitaciones_dgac` | `healthy` | `live` | `not_applicable` | `none` | 1 | Ninguna. |
 
@@ -237,7 +237,7 @@
 ## permisos_edificacion
 
 - `drift_status`: `healthy`
-- `source_mode`: `live`
+- `source_mode`: `monthly`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
 - `degradation`: Sin degradación operativa detectada en este build.
 - `warning_count`: `0`
@@ -249,7 +249,7 @@
 - `drift_status`: `drifted`
 - `source_mode`: `live`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
-- `degradation`: calidad_aire freshness is stale: 250.43h since refresh, policy max is 72h
+- `degradation`: calidad_aire freshness is stale: 250.63h since refresh, policy max is 72h
 - `warning_count`: `2`
 - `diagnostic_summary`: cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación
 - `recommended_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.
