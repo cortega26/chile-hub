@@ -1,6 +1,6 @@
 # chile-hub overview
 
-- `generated_at_utc`: `2026-10-26T03:22:39.468539+00:00`
+- `generated_at_utc`: `2026-10-26T03:35:19.404290+00:00`
 - `overall_status`: `warn`
 - `dataset_count`: `23`
 - `live_count`: `22`
@@ -36,7 +36,7 @@
 | `indicadores_urbanos_siedu` | `live` | `ok` | `fresh` | `partial` | `healthy` |
 | `partidos_politicos` | `live` | `ok` | `fresh` | `full` | `healthy` |
 | `perfil_territorial_comunal` | `live` | `ok` | `fresh` | `full` | `healthy` |
-| `permisos_edificacion` | `live` | `ok` | `fresh` | `not_applicable` | `healthy` |
+| `permisos_edificacion` | `monthly` | `ok` | `fresh` | `not_applicable` | `healthy` |
 | `pobreza_comunal` | `live` | `ok` | `fresh` | `not_applicable` | `healthy` |
 | `precipitaciones_dgac` | `live` | `ok` | `fresh` | `not_applicable` | `healthy` |
 | `provincias` | `live` | `ok` | `fresh` | `full` | `healthy` |
@@ -47,7 +47,7 @@
 
 - `path`: `data/normalized/chile-hub-publishable-bundle.zip`
 - `package_type`: `zip`
-- `size_bytes`: `31820817`
+- `size_bytes`: `31837489`
 - `checksum`: `sha256` via `data/normalized/chile-hub-publishable-bundle.zip.sha256`
 - `verification_command`: `shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256`
 

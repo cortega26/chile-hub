@@ -1,6 +1,6 @@
 {
-  "generated_at_utc": "2026-10-26T03:22:39.468539+00:00",
-  "previous_generated_at_utc": "2026-10-26T03:10:36.692880+00:00",
+  "generated_at_utc": "2026-10-26T03:35:19.404290+00:00",
+  "previous_generated_at_utc": "2026-10-26T03:22:39.468539+00:00",
   "dataset_count": 23,
   "datasets": [
     {
@@ -350,8 +350,8 @@
       "record_count_delta": 0,
       "added_fields": [],
       "removed_fields": [],
-      "previous_source_mode": "monthly",
-      "current_source_mode": "live",
+      "previous_source_mode": "live",
+      "current_source_mode": "monthly",
       "previous_freshness_status": "fresh",
       "current_freshness_status": "fresh",
       "previous_validation_status": "ok",
