@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-10-26T12:50:05.248036+00:00",
+  "generated_at_utc": "2026-10-26T13:12:58.211914+00:00",
   "overall_status": "warn",
   "dataset_count": 23,
   "retired_count": 1,
@@ -8,7 +8,7 @@
   "error_count": 0,
   "live_count": 22,
   "fallback_count": 0,
-  "held_count": 2,
+  "held_count": 5,
   "held_overdue_count": 0,
   "stale_count": 0,
   "unknown_freshness_count": 0,
@@ -20,21 +20,21 @@
   "partial_coverage_count": 1,
   "unknown_coverage_count": 0,
   "drifted_count": 1,
-  "warning_count": 7,
+  "warning_count": 8,
   "review_approaching_count": 23,
   "review_due_count": 0,
   "top_issue": {
     "dataset": "indicadores",
     "attention_priority": 0,
-    "warning_count": 1,
+    "warning_count": 2,
     "build_freshness_status": "fresh",
     "drift_status": "drifted",
     "degradation_status": "warning",
     "source_detail": "public_api_with_published_backfill",
-    "diagnostic_summary": "indicadores live refresh reused last published artifact for missing codes: ipc",
+    "diagnostic_summary": "indicadores live refresh reused raw snapshots for: uf/2026, dolar/2026, utm/2026",
     "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
   },
-  "top_issue_summary": "indicadores: indicadores live refresh reused last published artifact for missing codes: ipc [source_detail=public_api_with_published_backfill; warnings=1; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]",
+  "top_issue_summary": "indicadores: indicadores live refresh reused raw snapshots for: uf/2026, dolar/2026, utm/2026 [source_detail=public_api_with_published_backfill; warnings=2; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]",
   "datasets": [
     {
       "dataset": "autoridades_electas",
@@ -56,7 +56,7 @@
       "diagnostic_summary": "Sin degradación operativa detectada en este build.",
       "recommended_action": "Ninguna.",
       "retired": false,
-      "held": false,
+      "held": true,
       "held_overdue": false
     },
     {
@@ -79,7 +79,7 @@
       "diagnostic_summary": "cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación",
       "recommended_action": "Ninguna.",
       "retired": false,
-      "held": false,
+      "held": true,
       "held_overdue": false
     },
     {
@@ -341,8 +341,8 @@
       "source_mode": "live",
       "freshness_status": "fresh",
       "validation_status": "ok",
-      "warning_count": 1,
-      "actionable_warning_count": 1,
+      "warning_count": 2,
+      "actionable_warning_count": 2,
       "coverage_expected": false,
       "reuse_status": "open-attribution",
       "redistribution_ok": true,
@@ -352,7 +352,7 @@
       "coverage_ratio": null,
       "drift_status": "drifted",
       "source_detail": "public_api_with_published_backfill",
-      "diagnostic_summary": "indicadores live refresh reused last published artifact for missing codes: ipc",
+      "diagnostic_summary": "indicadores live refresh reused raw snapshots for: uf/2026, dolar/2026, utm/2026",
       "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción.",
       "retired": false,
       "held": false,
@@ -430,7 +430,7 @@
     {
       "dataset": "permisos_edificacion",
       "severity": "ok",
-      "source_mode": "live",
+      "source_mode": "monthly",
       "freshness_status": "fresh",
       "validation_status": "ok",
       "warning_count": 0,
@@ -470,7 +470,7 @@
       "diagnostic_summary": "cobertura SAE: 345/346 comunas (99.7%) — parcial por diseño; comunas sin muestra no tienen estimación",
       "recommended_action": "Ninguna.",
       "retired": false,
-      "held": false,
+      "held": true,
       "held_overdue": false
     },
     {
