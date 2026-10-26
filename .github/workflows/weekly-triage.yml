@@ -1,0 +1,69 @@
+name: Weekly triage
+
+# Plan 152: agenda operativa semanal. No modifica datos ni código: lee los
+# artefactos publicados, ordena las señales accionables por impacto y las
+# publica como un único issue actualizable. Si no hay señales, cierra el issue.
+
+on:
+  schedule:
+    # Lunes 12:00 UTC (09:00 CLST), después del publish diario de las 10:00 UTC.
+    - cron: "0 12 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: weekly-triage
+  cancel-in-progress: false
+
+jobs:
+  triage:
+    name: Build and publish weekly triage
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      # El token solo escribe issues en este job (menor privilegio).
+      issues: write
+    # Sin checkout de por medio para gh: el repositorio va explícito.
+    env:
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+
+      - name: Build triage report
+        run: python scripts/weekly_triage.py --output triage.md
+
+      - name: Count actionable signals
+        id: signals
+        run: echo "count=$(python scripts/weekly_triage.py --count)" >> "$GITHUB_OUTPUT"
+
+      - name: Publish or close the triage issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SIGNALS: ${{ steps.signals.outputs.count }}
+        run: |
+          run_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          gh label create triage \
+            --description "Triaje semanal de señales del hub (plan 152)" \
+            --color 0E8A16 --force >/dev/null
+          issue=$(gh issue list --label triage --state open --json number --jq '.[0].number')
+          if [ "$SIGNALS" != "0" ]; then
+            if [ -n "$issue" ]; then
+              gh issue comment "$issue" --body-file triage.md
+            else
+              gh issue create --title "Triaje semanal" --label triage --body-file triage.md
+            fi
+            echo "::notice::Triaje publicado con $SIGNALS señal(es) — $run_url"
+          elif [ -n "$issue" ]; then
+            gh issue comment "$issue" \
+              --body "Sin señales accionables esta semana. Cierro el issue — $run_url"
+            gh issue close "$issue"
+            echo "::notice::Sin señales; issue cerrado — $run_url"
+          else
+            echo "::notice::Sin señales y sin issue abierto; nada que hacer — $run_url"
+          fi
