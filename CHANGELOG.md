@@ -12,6 +12,21 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.52.4 - 2026-10-26
+
+### Corregido
+
+- **publicación**: Honrar fallback_policy y no congelar el hub al escalar
+  ([#209](https://github.com/cortega26/chile-hub/pull/209),
+  [`20f9d7b`](https://github.com/cortega26/chile-hub/commit/20f9d7bb4573cf35bccc04800ad57c2d83acaaaa))
+
+### Documentación
+
+- Completar la documentación de precipitaciones_dgac
+  ([#208](https://github.com/cortega26/chile-hub/pull/208),
+  [`69257d4`](https://github.com/cortega26/chile-hub/commit/69257d405d7017e6e74408468edf4f97558fafcc))
+
+
 ## 1.52.3 - 2026-10-26
 
 ### Corregido
