@@ -202,11 +202,12 @@ JSON no coinciden, confía en el JSON y actualiza esta lista.
 
 ---
 
-## 2½. Navegación del código — CodeGraph y lecturas acotadas
+## 2½. Navegación del código — CodeGraph, Serena y lecturas acotadas
 
-> **Tooling AI-native:** CodeGraph está instalado (`.codegraph/codegraph.db`) como índice
-> estructural del repositorio. Consúltalo antes de abrir archivos manualmente — resuelve
-> preguntas de "dónde está X" y "qué llama a Y" en una sola llamada, sin abrir archivos.
+> **Tooling AI-native:** si CodeGraph está instalado e indexado localmente
+> (`.codegraph/` es estado regenerable), úsalo para arquitectura, rutas de llamadas
+> e impacto antes de abrir grandes archivos. Para referencias exactas, cambios de
+> símbolos y refactorizaciones usa Serena (LSP), si está disponible.
 
 ```bash
 codegraph query "<query>"                          # Buscar símbolo, función o concepto
@@ -215,6 +216,15 @@ codegraph callees src/build_dev_db.py::main         # Qué llama esta función
 codegraph explore "validación de comunas"           # Contexto completo de un área
 codegraph impact validate_comunas                   # Qué se rompe si cambio esto
 ```
+
+**Enrutamiento sin duplicación:** CodeGraph es primario para exploración estructural
+(`codegraph_explore`); Serena para referencias, renombrados y edición semántica.
+Para literales, configuración y documentación usa herramientas nativas. Nunca
+consultes ambos MCP por la misma pregunta sin una incertidumbre concreta;
+si alguno falla, aplica búsqueda acotada y declara la limitación. Serena usa
+el contexto `ide` para reducir herramientas redundantes. No sustituyas pruebas,
+invariantes ni las fuentes canónicas por resultados MCP. Configuración por
+proyecto, comandos de verificación y criterios: `docs/AGENT_MCP_ROUTING.md`.
 
 **Reglas para acotar lecturas y ahorrar tokens:**
 - Usar `Read` con `offset`/`limit` — nunca leer archivos grandes enteros de golpe.
