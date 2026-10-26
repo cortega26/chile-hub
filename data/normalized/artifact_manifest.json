@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-10-26T01:43:16.497473+00:00",
+  "generated_at_utc": "2026-10-26T02:05:49.172644+00:00",
   "artifact_count": 67,
   "artifacts": [
     {
@@ -8,8 +8,8 @@
       "output_type": null,
       "shared_type": "artifact_manifest",
       "format": "json",
-      "size_bytes": 22135,
-      "sha256": "6854d5967061a429e99159ec6b0ffcd66bbec108d1af37daaeccd4cbd158a5c5",
+      "size_bytes": 22125,
+      "sha256": "758e28229870c86bea83ff72ff69b3c2f73c67e3cc9fd076b53337a9165c1b3e",
       "retained": false
     },
     {
@@ -99,7 +99,7 @@
       "shared_type": null,
       "format": null,
       "size_bytes": 114924,
-      "sha256": "3edc91629b7d1f830189ebcad688da6f41e4b60370fc72c2ea088dd9e8e9ed80",
+      "sha256": "5e5cff6c5ce906fb17f373ccef80dd9b1e6b46b70a21b00dfc1941bb1eb5f83b",
       "retained": false
     },
     {
@@ -108,8 +108,8 @@
       "output_type": "parquet",
       "shared_type": null,
       "format": null,
-      "size_bytes": 15260,
-      "sha256": "8e887ec7d0c5754cec9410701c1d42179a43051f105c88e5a425307f7059daff",
+      "size_bytes": 15237,
+      "sha256": "80e324a7f7beeab36775b33de292e1d1442062e8362e337645d6e4a5858fbe08",
       "retained": false
     },
     {
@@ -119,7 +119,7 @@
       "shared_type": "datapackage",
       "format": "json",
       "size_bytes": 59500,
-      "sha256": "ce5f4fc050ff86661bd3fa6d922494b06048b11c3e577c160af5c478b9040520",
+      "sha256": "64d07925fcab3a5e91a19336b4456af25f5d407bfb95799bbc6b6a014f56c027",
       "retained": false
     },
     {
@@ -128,8 +128,8 @@
       "output_type": null,
       "shared_type": "dataset_catalog",
       "format": "json",
-      "size_bytes": 82718,
-      "sha256": "88bd0f2aa51bb3fbde1cbc21cf873c459189f3211a4f8f3fc5cf63155b660202",
+      "size_bytes": 85356,
+      "sha256": "fd3b0da1a22e1433dc3f0d58bb08503af12084b46b503ddce46da63b586af432",
       "retained": false
     },
     {
@@ -138,8 +138,8 @@
       "output_type": null,
       "shared_type": "dataset_catalog",
       "format": "markdown",
-      "size_bytes": 45416,
-      "sha256": "e96b124aa09f9e7bcbe45f80d8458e74dff3292bb11dc29bd57a2276d2e7de15",
+      "size_bytes": 47151,
+      "sha256": "918b210fae884a24bceb30f57f81fbb03b3d2ec7bb3a2a8d390eebb411beacc0",
       "retained": false
     },
     {
@@ -148,8 +148,8 @@
       "output_type": null,
       "shared_type": "dataset_changelog",
       "format": "json",
-      "size_bytes": 14888,
-      "sha256": "d9b0692175d2b142e0f43f3d2122e860cd6dab6bf6708b3a74ab57ccc5f1da08",
+      "size_bytes": 14885,
+      "sha256": "0a476646e7ebb459a30365bbfc991e443d44e1b63db86a1fa76cd0de47e4ae14",
       "retained": false
     },
     {
@@ -159,7 +159,7 @@
       "shared_type": "dataset_quality",
       "format": "json",
       "size_bytes": 17455,
-      "sha256": "96aad3bd62f77f76c43a496b7ea6f7c3b5ab4a0e7e831bd42a8918f261da3c49",
+      "sha256": "23f1c143e56f0d8de7a594eea2650776b7daa641c2b3614fdaac47254df9eaf0",
       "retained": false
     },
     {
@@ -169,7 +169,7 @@
       "shared_type": "dataset_quality",
       "format": "markdown",
       "size_bytes": 3072,
-      "sha256": "ae361bdee70e2a61f493cfba1de4ba32bc292f1e0b7c5b407486667588fa1f6d",
+      "sha256": "ddef8e6bc80e1864bc1dc210f43269d80769eb079e3da0f8c3a50c91b4ee59eb",
       "retained": false
     },
     {
@@ -178,8 +178,8 @@
       "output_type": null,
       "shared_type": "dataset_status",
       "format": "json",
-      "size_bytes": 15761,
-      "sha256": "8555f0ea12bbd564985c1dbf63b1e9aa3aab1c5b028833306aa185c6ac30283e",
+      "size_bytes": 15759,
+      "sha256": "c76709c9e309e93d06bdcf001bb724117b11529f72864f11e835e93803d6b564",
       "retained": false
     },
     {
@@ -208,8 +208,8 @@
       "output_type": null,
       "shared_type": "drift_report",
       "format": "json",
-      "size_bytes": 16861,
-      "sha256": "664f6c0f47a54107c853afb42fa292b42cd4cd2f13f55e7066c7a6d846e594cd",
+      "size_bytes": 16864,
+      "sha256": "da79008ebaf3fd08600732208ee8b67ed76ec803bd9a51b08087e0f67bbbe19c",
       "retained": false
     },
     {
@@ -218,8 +218,8 @@
       "output_type": null,
       "shared_type": "drift_report",
       "format": "markdown",
-      "size_bytes": 11757,
-      "sha256": "6396523d669b468f46c4928e20c315adf88fd39dc13e8398588faf5d0b9e9e51",
+      "size_bytes": 11763,
+      "sha256": "073ed702b65c9580befd4829f75416bd555ce19906a437acb7b6f18a9e864909",
       "retained": false
     },
     {
@@ -228,8 +228,8 @@
       "output_type": "parquet",
       "shared_type": null,
       "format": null,
-      "size_bytes": 29495367,
-      "sha256": "193f02b55d54e279666e7577a6aed94dbb11f7f802ad0a017e91d96f1617a8f3",
+      "size_bytes": 29464144,
+      "sha256": "1622225b3f09a2974af5494566b49f8256161e2643e98abc92d4c680ead9c126",
       "retained": false
     },
     {
@@ -240,7 +240,7 @@
       "format": null,
       "size_bytes": 3595907,
       "sha256": "43b94b5085772b4d3336a4a1ba87273aee7314e5cbcea620b76527765f84bbee",
-      "retained": true
+      "retained": false
     },
     {
       "path": "data/normalized/establecimientos_educacionales.parquet",
@@ -250,7 +250,7 @@
       "format": null,
       "size_bytes": 358062,
       "sha256": "82033d8099fc795b6c31fe24026371e8f2cc5a7d444917a68102acbd1b5e8a1a",
-      "retained": true
+      "retained": false
     },
     {
       "path": "data/normalized/establecimientos_salud.json",
@@ -279,7 +279,7 @@
       "shared_type": null,
       "format": null,
       "size_bytes": 6726460,
-      "sha256": "44e80299efdfefeee4a19833f977dee083d5f21d02b203988b9fc769e88f6cfa",
+      "sha256": "17b9bfa4caa97301795f275ced456ca91ae1f10c39d90c186e6e785a302783e2",
       "retained": false
     },
     {
@@ -288,8 +288,8 @@
       "output_type": "parquet",
       "shared_type": null,
       "format": null,
-      "size_bytes": 37061,
-      "sha256": "236ed83f9c1f57a71dbbeb659575d8677dbc888d95d2bdedc5ec81023dc45eab",
+      "size_bytes": 37058,
+      "sha256": "3afcc5256e2190d4d76e967be265b141e548258d538acacab3df8e6cd5b24ae4",
       "retained": false
     },
     {
@@ -318,8 +318,8 @@
       "output_type": null,
       "shared_type": "hub_bundle",
       "format": "json",
-      "size_bytes": 98016,
-      "sha256": "1c473ac8e3d6b281b8f199029b4eb7e0e3c5ea0d7e1ac6dbea17609f85b24b1e",
+      "size_bytes": 97194,
+      "sha256": "968f15f4a39d2902b066b037f2435bfc74c31bfce2e60c3f5547a97fd9d11aa6",
       "retained": false
     },
     {
@@ -329,7 +329,7 @@
       "shared_type": "hub_health",
       "format": "json",
       "size_bytes": 19623,
-      "sha256": "cd56af66f592977daa80c7f90be1d712a21ff95cf0d8b61fbf105f47d0e86939",
+      "sha256": "45b08311c07f9d972d905ef9d1b2a68852169628b0d6e3a8f1fd9dc91a6ffca0",
       "retained": false
     },
     {
@@ -338,8 +338,8 @@
       "output_type": null,
       "shared_type": "hub_health",
       "format": "markdown",
-      "size_bytes": 3771,
-      "sha256": "471b886469d06fb9b825ab4195df8f12e5f41879d51ef752eaae8c1e6bc394b9",
+      "size_bytes": 3774,
+      "sha256": "06e00d56e8e2d91139329f1e2635c06070bd603700e6aaebbca9e519277cfd89",
       "retained": false
     },
     {
@@ -348,8 +348,8 @@
       "output_type": null,
       "shared_type": "hub_health_history",
       "format": "jsonl",
-      "size_bytes": 17322,
-      "sha256": "bd3e041656788f1d5726f71fae3376f50838c5b3b641855b31e135b2a145d18b",
+      "size_bytes": 17556,
+      "sha256": "a01681fe0278c369686c68ed39afb874844bfaee59422b7c09fd1779801ab049",
       "retained": false
     },
     {
@@ -359,7 +359,7 @@
       "shared_type": "hub_status",
       "format": "json",
       "size_bytes": 1022,
-      "sha256": "bf32843f13135cd167584c664544330bf68ac7cc77ee94b97273d1b8f7be2ae1",
+      "sha256": "6a2d0e24cff0c1108567ae7c7624f48178fbc7c3c315ea98bc2972b5bd101ae4",
       "retained": false
     },
     {
@@ -408,8 +408,8 @@
       "output_type": null,
       "shared_type": "overview",
       "format": "json",
-      "size_bytes": 7476,
-      "sha256": "b8a5ca2ff44728fc982b5ac7d4c246e591a2d29b0058a1952e0e0809593543c0",
+      "size_bytes": 7104,
+      "sha256": "54ce28dbcc5d587bed3914b2a9d12558355d37b8f524db631ea2ade184a22acb",
       "retained": false
     },
     {
@@ -418,8 +418,8 @@
       "output_type": null,
       "shared_type": "overview",
       "format": "markdown",
-      "size_bytes": 3757,
-      "sha256": "2e23284fd5eed92ddd2a7dbf092c57e96916569ba6836cc0d7a06331574219ac",
+      "size_bytes": 3557,
+      "sha256": "39f5cb69566d02a30f7668ae51473f6dfb1328013a847e3617a52fc80e34d951",
       "retained": false
     },
     {
@@ -429,7 +429,7 @@
       "shared_type": null,
       "format": null,
       "size_bytes": 13118,
-      "sha256": "a6f22336005c55008c483a218f827bd8e3d1a4c2aa783cf4a5c1bf2302230a08",
+      "sha256": "80289f9c97d1b90b89c923fff98af5e26a0b85dd3c730dd441220cda18734cde",
       "retained": false
     },
     {
@@ -439,7 +439,7 @@
       "shared_type": null,
       "format": null,
       "size_bytes": 5194,
-      "sha256": "6ac84ca50868f522703a9c7ce996bbab7a149666a51914fc70c786112aa2eb29",
+      "sha256": "0703b612b8feedce5394dbea15394e837d2de18d6d589cc3768b2cd801176ae1",
       "retained": false
     },
     {
@@ -448,8 +448,8 @@
       "output_type": "json",
       "shared_type": null,
       "format": null,
-      "size_bytes": 598788,
-      "sha256": "c4509c12385d1bcdc1e8dfa7b2e89e1f48af11bbb1b491f03bc132bf06d28aa5",
+      "size_bytes": 598792,
+      "sha256": "f62de42c08c10709bc738c9bc9cb6bcc3157d6269284952d9a9cf0fcae98bec9",
       "retained": false
     },
     {
@@ -458,8 +458,8 @@
       "output_type": "parquet",
       "shared_type": null,
       "format": null,
-      "size_bytes": 72787,
-      "sha256": "83b949b842eedad720fc49fce2f37d797189102362e57ee7a44b4affb98c2b67",
+      "size_bytes": 72783,
+      "sha256": "5b8e1e14da1c8dd862affcb623e44d9c566a7fe8747429ead9808ccc2d683607",
       "retained": false
     },
     {
@@ -469,7 +469,7 @@
       "shared_type": null,
       "format": null,
       "size_bytes": 4395769,
-      "sha256": "37011cecfcd284e8232066235c2f6fc7c201ce28cd652a8f587b15810b6f3ab1",
+      "sha256": "4704fc9106206d53f8f85e6238f1a6ac04437a19be808813b91295007fe790a4",
       "retained": false
     },
     {
@@ -479,7 +479,7 @@
       "shared_type": null,
       "format": null,
       "size_bytes": 93116,
-      "sha256": "b89a93756a49a909b5f170f8b90cd7a35489449974f113c18ed66f8c492c7a29",
+      "sha256": "b5d33e1605f6a3d9279e5a39e15d958acbf1a850c8e86e64f0bd8eeb45372e8f",
       "retained": false
     },
     {
@@ -488,8 +488,8 @@
       "output_type": null,
       "shared_type": "pipeline_metadata",
       "format": "json",
-      "size_bytes": 139056,
-      "sha256": "193bcffae93924a39dbf67a31a65520afd165776d60a692ba5c2c23c44c5045f",
+      "size_bytes": 141792,
+      "sha256": "7a5199e322aa7a1081c4490b4caa0c21c85d54a174924e2cc28ff6b4ad4303e4",
       "retained": false
     },
     {
@@ -498,8 +498,8 @@
       "output_type": null,
       "shared_type": "pipeline_status",
       "format": "markdown",
-      "size_bytes": 21385,
-      "sha256": "8b9cca1b9023a31f011bc3262a279b7e9b678a7d5eb63873a562ca7c98ad30e0",
+      "size_bytes": 23113,
+      "sha256": "81610f1d6ae87e1167376cc903377aaca12c272c45e647d237a7a23292b10f28",
       "retained": false
     },
     {
@@ -558,8 +558,8 @@
       "output_type": null,
       "shared_type": "provenance_report",
       "format": "json",
-      "size_bytes": 16381,
-      "sha256": "a850b4887d64dd8f9f441197177cf64de999afcaaa56c8bb503b4f5578fb6ae7",
+      "size_bytes": 16378,
+      "sha256": "e95c7dedd070c2e421f5fefb003d19541c5a783813ba86044f1aee24e28a8cd5",
       "retained": false
     },
     {
@@ -568,8 +568,8 @@
       "output_type": null,
       "shared_type": "provenance_report",
       "format": "markdown",
-      "size_bytes": 18925,
-      "sha256": "a9c602895f71315177380521d4ee179436ca22dcabdc71b189e4d4ce2e5455cb",
+      "size_bytes": 18920,
+      "sha256": "75dd27d1c064c07163f9c3152ec106d2dcde01ab89b6c708dc08427e71256d87",
       "retained": false
     },
     {
@@ -599,7 +599,7 @@
       "shared_type": "redistribution_report",
       "format": "json",
       "size_bytes": 13691,
-      "sha256": "9505907e2e742960174607c085fe7a1fe68ef4c74c46ef8da93f8ac0e7d746ee",
+      "sha256": "34c1b4ddb2bc2c47bf2fe839ced4a262be3566984c9fb4001b5bc82aa879bce7",
       "retained": false
     },
     {
@@ -609,7 +609,7 @@
       "shared_type": "redistribution_report",
       "format": "markdown",
       "size_bytes": 12818,
-      "sha256": "ef1339e813c25332b1ac74677522baf853c59e3eecd7ec029378ac87eb35ed3a",
+      "sha256": "396dc727a8b856c2e8649e20f8fb4fd7c87471b61b578091036db39f92041aef",
       "retained": false
     },
     {
@@ -640,7 +640,7 @@
       "format": null,
       "size_bytes": 87824,
       "sha256": "8299fcc575e00a7a6ff3005dfc866f5bf52c0f4b061bd28163ce989b8bc40318",
-      "retained": true
+      "retained": false
     },
     {
       "path": "data/normalized/resultados_educacionales.parquet",
@@ -650,7 +650,7 @@
       "format": null,
       "size_bytes": 15178,
       "sha256": "ad6a8fe8eee20e0643a9201fef15dfbba8b4d7b5d1d9bf7bf28baa244ba4e365",
-      "retained": true
+      "retained": false
     },
     {
       "path": "data/normalized/source_readiness.json",
@@ -658,8 +658,8 @@
       "output_type": null,
       "shared_type": "source_readiness",
       "format": "json",
-      "size_bytes": 33838,
-      "sha256": "5a64a36cabf7fced0dccedbff30d613463e2469850f53c51eb6dd6e88204ebc0",
+      "size_bytes": 33841,
+      "sha256": "189e1bc07b089d92c109e6b84980d9f5a3e4e626ad12a351ed309266cf454d22",
       "retained": false
     },
     {
@@ -668,8 +668,8 @@
       "output_type": null,
       "shared_type": "source_readiness",
       "format": "markdown",
-      "size_bytes": 8778,
-      "sha256": "0b312c767c94361d25da7e5d4977c25144baf0bb1457e02be5653da017a1905d",
+      "size_bytes": 8781,
+      "sha256": "1fde7e0f50eaa58ef59a7e8e1da51227f774680f806b71c40a31cccb64c5a774",
       "retained": false
     }
   ],
@@ -677,8 +677,8 @@
     {
       "path": "data/normalized/chile-hub-publishable-bundle.zip",
       "package_type": "zip",
-      "size_bytes": 31821269,
-      "sha256": "ce2d99ded46c04e70125f421d88a80113e684a821aacf6d319453b09720148d7",
+      "size_bytes": 31837265,
+      "sha256": "4a061b019563df645472c271dd810c78bfceb3caa7c3f3c2ac6cdc5067a8a359",
       "checksum_algorithm": "sha256",
       "checksum_path": "data/normalized/chile-hub-publishable-bundle.zip.sha256",
       "verification_command": "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256"
