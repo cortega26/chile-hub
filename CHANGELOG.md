@@ -12,6 +12,20 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.54.0 - 2026-10-26
+
+### Mantenimiento
+
+- **ci**: Sync coverage badge from verified tests [skip ci]
+  ([`8ab9228`](https://github.com/cortega26/chile-hub/commit/8ab92288e3c533ef7f1bda6cb04708bbddebd8f2))
+
+### Agregado
+
+- **ops**: Triaje semanal automático de señales
+  ([#218](https://github.com/cortega26/chile-hub/pull/218),
+  [`fee0932`](https://github.com/cortega26/chile-hub/commit/fee093277859d533b70b43c6b8d29c3825d39d6f))
+
+
 ## 1.53.0 - 2026-10-26
 
 ### Agregado
