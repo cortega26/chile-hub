@@ -219,11 +219,17 @@ codegraph impact validate_comunas                   # Qué se rompe si cambio es
 
 **Enrutamiento sin duplicación:** CodeGraph es primario para exploración estructural
 (`codegraph_explore`); Serena para referencias, renombrados y edición semántica.
-Para literales, configuración y documentación usa herramientas nativas. Nunca
-consultes ambos MCP por la misma pregunta sin una incertidumbre concreta;
-si alguno falla, aplica búsqueda acotada y declara la limitación. Serena usa
+Para literales, configuración y documentación usa herramientas nativas. La regla
+por defecto es una herramienta primaria por pregunta, con excepciones en las que
+se consultan ambas a propósito: (a) el nombre está sobrecargado (`main`, `run`,
+`validate*`) o el conteo de callers de CodeGraph no cuadra con un `grep -c`
+acotado; (b) la respuesta alimenta un renombrado, borrado o edición masiva; (c)
+el índice emite un aviso de staleness. **Nunca derives un `name_path` de Serena
+a partir de resultados de CodeGraph**; si el nombre es ambiguo, resuélvelo con
+LSP. Si alguno falla, aplica búsqueda acotada y declara la limitación. Serena usa
 el contexto `ide` para reducir herramientas redundantes. No sustituyas pruebas,
-invariantes ni las fuentes canónicas por resultados MCP. Configuración por
+invariantes ni las fuentes canónicas por resultados MCP; tras una mutación
+masiva de Serena, ejecuta `make doctor`. Configuración por
 proyecto, comandos de verificación y criterios: `docs/AGENT_MCP_ROUTING.md`.
 
 **Reglas para acotar lecturas y ahorrar tokens:**
