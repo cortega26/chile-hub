@@ -1,6 +1,6 @@
 # chile-hub health summary
 
-- `generated_at_utc`: `2026-10-26T02:40:36.298785+00:00`
+- `generated_at_utc`: `2026-10-26T03:10:36.692880+00:00`
 - `overall_status`: `warn`
 - `dataset_count`: `23`
 - `ok_count`: `21`
@@ -8,7 +8,7 @@
 - `error_count`: `0`
 - `live_count`: `22`
 - `fallback_count`: `0`
-- `held_count`: `2`
+- `held_count`: `5`
 - `held_overdue_count`: `0`
 - `stale_count`: `0`
 - `publishable_count`: `22`
@@ -44,7 +44,7 @@
 | `indicadores_urbanos_siedu` | `ok` | `live` | `fresh` | `partial` | `healthy` | `ready` | `none` | `ok` | 1 |
 | `partidos_politicos` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 1 |
 | `perfil_territorial_comunal` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
-| `permisos_edificacion` | `ok` | `live` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 0 |
+| `permisos_edificacion` | `ok` | `monthly` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `pobreza_comunal` | `ok` | `live` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 1 |
 | `precipitaciones_dgac` | `ok` | `live` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 1 |
 | `provincias` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
