@@ -696,7 +696,7 @@ pytest tests/test_chile_hub.py::ChileHubTests::test_load_polars -v
 
 <!-- START_AGENTS_TEST_TABLE -->
 
-**21 archivos** en `tests/`. Esta tabla es de **navegación por archivo**, no un
+**22 archivos** en `tests/`. Esta tabla es de **navegación por archivo**, no un
 inventario de clases — las clases cambian con frecuencia y una lista exhaustiva
 aquí quedaría stale de inmediato. Para el inventario vivo de clases:
 ```bash
@@ -705,6 +705,7 @@ grep -n "^class " tests/*.py
 
 | Archivo | Requiere `data/normalized/` | Qué cubre |
 |:---|:---:|:---|
+| `test_agent_mcp_configuration.py` | No | MCP CodeGraph/Serena: paridad entre clientes, alcance de workspace y exclusión del estado local |
 | `test_builders_artifacts.py` | Sí (`make build` antes) | Builders de artefactos publicables (bundle ZIP, SHA-256, consistencia manifiesto↔ZIP) |
 | `test_builders_formats.py` | No | Golden round-trip para writers de formatos (Parquet, JSON, Excel, DuckDB, SQLite) |
 | `test_chile_hub.py` | Sí (`make build` antes) | API Python de `ChileHub`, CLI, contratos de artefactos (SHA256, catálogo, ZIP), contratos de workflow/Makefile, `Dataset(StrEnum)` |
