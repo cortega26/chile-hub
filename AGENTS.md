@@ -168,7 +168,7 @@ chile-hub/
 │   ├── staging/      Datos parseados y cercanos a la fuente (CSV + metadata.json por dataset).
 │   └── normalized/   Artefactos finales publicables (Parquet, JSON, DuckDB, Excel, ZIP, reportes).
 │
-├── tests/                        20 archivos pytest — ver tabla completa en §8, no la dupliques aquí
+├── tests/                        21 archivos pytest — ver tabla completa en §8, no la dupliques aquí
 │   ├── test_chile_hub.py         API/CLI de ChileHub, contratos de artefactos, workflow, Makefile
 │   ├── test_extractors.py        Un test class por extractor + contrato de BaseExtractor
 │   ├── test_pipeline_logic.py    Lógica interna de build_dev_db.py, invariantes CUT, changelog
@@ -278,6 +278,15 @@ codegraph impact validate_comunas                   # Qué se rompe si cambio es
              README.md en "Check build-synced files"; plan 108). Regresión
              2026-07-19/20; ver
              `tests/test_ci_config.py::AutoridadesElectasScraplingGuardrailTests`).
+
+             Paso previo al build — `Apply remote staging (VM egress)`:
+             cuatro fuentes (MINEDUC x2, MDS, Senado) bloquean el egress de
+             GitHub y responden desde la VM de OCI, que escribe el espejo
+             `cortega26/chile-hub-remote-staging`. El paso lo copia a
+             `data/staging/` con allowlist fija, solo `source_mode` live/monthly
+             y `record_count` consistente (plan 153). Si el espejo no responde,
+             se sigue con la extracción local y decide el gate: nunca falla por
+             el espejo.
 
 2. BUILD     src/build_dev_db.py
              Lee: data/staging/
@@ -677,7 +686,7 @@ pytest tests/test_chile_hub.py::ChileHubTests::test_load_polars -v
 
 <!-- START_AGENTS_TEST_TABLE -->
 
-**20 archivos** en `tests/`. Esta tabla es de **navegación por archivo**, no un
+**21 archivos** en `tests/`. Esta tabla es de **navegación por archivo**, no un
 inventario de clases — las clases cambian con frecuencia y una lista exhaustiva
 aquí quedaría stale de inmediato. Para el inventario vivo de clases:
 ```bash
@@ -701,6 +710,7 @@ grep -n "^class " tests/*.py
 | `test_pipeline_logic.py` | No | Lógica interna de `build_dev_db.py`, invariantes CUT, fallback de indicadores, severidad de `dataset_changelog.json`, builders (`reports`, `pipeline_status_utils`) |
 | `test_proof_of_value.py` | No | Prueba reproducible de tres cruces territoriales, cobertura, integridad CUT y hash de resultados (sin red) |
 | `test_publication_hold.py` | No | Publicación parcial (plan 150/ADR-025): retención de la última versión buena, fallo cerrado sin artefacto previo y escalamiento a 7 días |
+| `test_remote_staging.py` | No | Staging remoto (plan 153): allowlist, solo live/monthly, conteo consistente y tolerancia a un espejo incompleto (sin red) |
 | `test_render.py` | No | Helper de renderizado de tablas (`_render.py`) |
 | `test_research_dgac_precipitaciones.py` | No | Candidato DGAC: CSV sin cabeceras, cobertura de meses, licencias, hashes y fallos cerrados (sin red) |
 | `test_validation.py` | No | Funciones `validate_*()` del paquete `src/validation/`: bordes vacíos, claves duplicadas, casos límite |

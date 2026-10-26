@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "chile-hub"
-version = "1.54.0"
+version = "1.55.0"
 description = "Datos públicos de Chile curados, normalizados y validados: geografía, demografía, economía, salud, educación, finanzas municipales, indicadores urbanos y distritos electorales. Listos para consumir en una línea de código con Polars, DuckDB, SQLite y Excel."
 readme = "README.md"
 requires-python = ">=3.11,<3.16"
@@ -44,7 +44,7 @@ dependencies = [
 
 [project.optional-dependencies]
 pipeline = [
-    "duckdb==2.0.0",
+    "duckdb==1.5.6",
     "pyarrow>=24.0.0",
     "pandas==3.1.0",
     "xlsxwriter==3.3.0",
@@ -60,7 +60,12 @@ query = [
     # Mismo floor que pipeline + cap mayor (Plan 096): writer y reader
     # resuelven la misma línea 1.5.x. DuckDB 2.0 (oct-2026) exigirá revisión
     # consciente, no deriva silenciosa del reader.
-    "duckdb>=1.5.5,<2.1",
+    #
+    # 2026-10-26: el bump automático a 2.0.0 rompió `ChileHub.sql()` —duckdb 2.0
+    # eliminó `.pl()` y `fetch_arrow_table()`—, así que se revierte y el cap
+    # vuelve a `<2`. Migrar exigirá añadir pyarrow o pandas como dependencia
+    # runtime (hoy no lo son) y es una decisión aparte, no un bump de grupo.
+    "duckdb>=1.5.5,<2",
 ]
 # Consumo geoespacial opcional para resolve_by_coords(): el mismo set que el
 # pipeline usa para ESCRIBIR el GeoParquet (geopandas/shapely/pyarrow), expuesto
