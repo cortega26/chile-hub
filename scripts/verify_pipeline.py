@@ -18,7 +18,6 @@ from src.build_dev_db import DATASET_CATALOG_CONFIG
 from src.builders._shared import NON_FALLBACK_SOURCE_MODES as _NON_FALLBACK_SOURCE_MODES
 from src.builders._shared import VALID_SOURCE_MODES as _VALID_SOURCE_MODES
 from src.builders.publication_gate import MAX_HELD_DAYS as _MAX_HELD_DAYS
-from src.builders.publication_gate import held_days as _held_days
 from src.chile_hub.contracts import verify_dataset_contract as _lib_verify_contract
 from src.extractors.bcentral_extractor import max_backfill_age_days as _max_backfill_age_days
 from src.pipeline_status_utils import load_json
@@ -575,14 +574,15 @@ def _publication_hold_violations(dataset_name, hold):
     builds_held = hold.get("builds_held")
     if not isinstance(builds_held, int) or builds_held < 1:
         violations.append(f"{dataset_name}: publication_hold.builds_held inválido: {builds_held}")
-    days = _held_days(hold)
-    if days == float("inf"):
+    if not hold.get("since_utc"):
         violations.append(f"{dataset_name}: publication_hold sin since_utc válido")
-    elif days > _MAX_HELD_DAYS:
-        violations.append(
-            f"{dataset_name}: retenido {days:.1f} días (tope {_MAX_HELD_DAYS}). La fuente "
-            "no se recuperó: decidir entre repararla, sacarla del carril "
-            "stable_publishable o retirarla (AGENTS.md §6)"
+    # Superar el tope NO rechaza el build: la capa queda `overdue` y el publish
+    # abre un issue. Congelar las capas sanas sería repetir la caída que la
+    # retención vino a evitar (ADR-025, enmienda 2026-10-26).
+    if hold.get("overdue"):
+        print(
+            f"WARNING [{dataset_name}]: retención vencida (>{_MAX_HELD_DAYS} días). "
+            "Revisar la fuente o el carril; ver issue de retención."
         )
     return violations
 

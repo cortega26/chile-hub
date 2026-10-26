@@ -168,39 +168,77 @@ def test_builds_held_accumulates_across_builds(tmp_path):
 
 
 def test_escalation_is_time_based_not_build_based(tmp_path):
-    """Muchos builds el mismo día no deben disparar el tope."""
+    """Muchos builds el mismo día no deben marcar la retención como vencida."""
     _previous_catalog(
         tmp_path,
         held={"retained": True, "builds_held": 99, "since_utc": "2026-10-25T00:00:00+00:00"},
     )
     _previous_parquet(tmp_path)
-
-    holds = evaluate_holds(_metadata(), REGISTRY, str(tmp_path))
-    errors = hold_errors(
-        holds,
-        normalized_dir=str(tmp_path),
-        now=datetime.fromisoformat("2026-10-26T12:00:00+00:00"),
-    )
+    frames = {"censo": pl.DataFrame({"codigo_comuna": ["01101"]})}
+    metadata = _metadata()
+    holds = evaluate_holds(metadata, REGISTRY, str(tmp_path))
 
     assert holds["censo_comunal"].builds_held == 100
-    assert errors == []
+    apply_holds(
+        frames,
+        metadata,
+        holds,
+        normalized_dir=str(tmp_path),
+        attempted_at_utc="2026-10-26T12:00:00+00:00",
+    )
+    assert metadata["censo"]["publication_hold"]["overdue"] is False
 
 
-def test_escalation_after_max_held_days_fails_closed(tmp_path):
+def test_retention_over_the_cap_is_marked_overdue_but_not_fatal(tmp_path):
+    """Superar el tope avisa, no tumba el build (enmienda 2026-10-26).
+
+    Tumbar el build congelaría las capas sanas: la misma caída que la retención
+    vino a evitar, un nivel más arriba.
+    """
     _previous_catalog(
         tmp_path,
         held={"retained": True, "builds_held": 1, "since_utc": "2026-10-01T00:00:00+00:00"},
     )
     _previous_parquet(tmp_path)
+    frames = {"censo": pl.DataFrame({"codigo_comuna": ["01101"]})}
+    metadata = _metadata()
+    holds = evaluate_holds(metadata, REGISTRY, str(tmp_path))
 
-    holds = evaluate_holds(_metadata(), REGISTRY, str(tmp_path))
-    errors = hold_errors(
+    assert hold_errors(holds, normalized_dir=str(tmp_path)) == []
+    apply_holds(
+        frames,
+        metadata,
         holds,
         normalized_dir=str(tmp_path),
-        now=datetime.fromisoformat("2026-10-25T00:00:00+00:00"),
+        attempted_at_utc="2026-10-25T00:00:00+00:00",
     )
+    assert metadata["censo"]["publication_hold"]["overdue"] is True
 
-    assert any("tope" in error for error in errors)
+
+def test_fallback_to_last_snapshot_policy_never_escalates(tmp_path):
+    """El registry declara que retener es lo esperado: no hay tope."""
+    _previous_catalog(
+        tmp_path,
+        held={"retained": True, "builds_held": 1, "since_utc": "2026-01-01T00:00:00+00:00"},
+    )
+    _previous_parquet(tmp_path)
+    registry = [{**REGISTRY[0], "fallback_policy": "fallback_to_last_snapshot"}]
+    frames = {"censo": pl.DataFrame({"codigo_comuna": ["01101"]})}
+    metadata = _metadata()
+
+    holds = evaluate_holds(metadata, registry, str(tmp_path))
+    assert holds["censo_comunal"].cap_applies is False
+
+    apply_holds(
+        frames,
+        metadata,
+        holds,
+        normalized_dir=str(tmp_path),
+        attempted_at_utc="2026-10-25T00:00:00+00:00",
+    )
+    hold = metadata["censo"]["publication_hold"]
+    assert hold["cap_applies"] is False
+    assert hold["overdue"] is False
 
 
 def test_marker_missing_required_fields_is_rejected():
@@ -212,20 +250,20 @@ def test_marker_missing_required_fields_is_rejected():
     assert any("since_utc" in v for v in violations)
 
 
-def test_marker_beyond_cap_is_rejected():
-    old = (datetime.now(UTC) - timedelta(days=MAX_HELD_DAYS + 1)).isoformat()
-    violations = _publication_hold_violations(
-        "censo_comunal",
-        {
-            "retained": True,
-            "reason": "source_mode=fallback",
-            "previous_generated_at_utc": "2026-10-15T00:00:00+00:00",
-            "builds_held": 1,
-            "since_utc": old,
-        },
-    )
+def test_overdue_marker_warns_instead_of_rejecting(capsys):
+    marker = {
+        "retained": True,
+        "reason": "source_mode=fallback",
+        "previous_generated_at_utc": "2026-10-15T00:00:00+00:00",
+        "builds_held": 1,
+        "since_utc": (datetime.now(UTC) - timedelta(days=MAX_HELD_DAYS + 1)).isoformat(),
+        "overdue": True,
+    }
 
-    assert any("tope" in v for v in violations)
+    violations = _publication_hold_violations("censo_comunal", marker)
+
+    assert violations == []
+    assert "retención vencida" in capsys.readouterr().out
 
 
 def test_held_days_tolerates_a_missing_marker():
@@ -282,19 +320,22 @@ def test_publication_policy_still_rejects_fallback_without_hold():
         )
 
 
-def test_publication_policy_rejects_hold_beyond_the_cap():
+def test_publication_policy_accepts_an_overdue_hold(capsys):
+    """Una retención vencida avisa y publica: no congela las capas sanas."""
     hold = {
         "retained": True,
         "reason": "source_mode=fallback",
         "previous_generated_at_utc": "2026-10-15T00:00:00+00:00",
         "builds_held": 1,
         "since_utc": (datetime.now(UTC) - timedelta(days=MAX_HELD_DAYS + 1)).isoformat(),
+        "overdue": True,
     }
 
-    with pytest.raises(SystemExit):
-        verify_publication_policy(
-            metadata=_policy_metadata(hold),
-            registry=POLICY_REGISTRY,
-            manifest={"artifacts": []},
-            changelog={"datasets": []},
-        )
+    verify_publication_policy(
+        metadata=_policy_metadata(hold),
+        registry=POLICY_REGISTRY,
+        manifest={"artifacts": []},
+        changelog={"datasets": []},
+    )
+
+    assert "retención vencida" in capsys.readouterr().out

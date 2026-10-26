@@ -154,7 +154,7 @@ chile-hub/
 │   │   ├── datasets.py            Definición de Dataset(StrEnum) y tipos
 │   │   ├── exceptions.py          Excepciones de dominio de la API
 │   │   ├── data_manager.py        Descarga de bundle, cache, verificación SHA256
-│   │   ├── pipeline_status_utils.py  Reportes Markdown de salud, catálogo y redistribución (1 081 líneas)
+│   │   ├── pipeline_status_utils.py  Reportes Markdown de salud, catálogo y redistribución (1 086 líneas)
 │   │   ├── _render.py             Helper de renderizado de tablas
 │   │   └── text.py                Utils de texto compartidas
 │   ├── registry/                  DatasetSpec cohort Phase 2–3D (ADR-018): modelo tipado + proyecciones de compatibilidad (dataset_spec.py, 697 líneas)
@@ -338,10 +338,14 @@ versión buena —frame y metadatos— y se publica marcada con
 
 - Un `held` publica **el artefacto anterior**, nunca el de la corrida fallida.
 - Sin artefacto previo no hay retención posible: el build falla.
-- Tras `MAX_HELD_DAYS` (7) días retenido el build **falla**, para
-  que una caída no se vuelva olvido. El umbral es temporal, no por número de
-  builds: varios builds el mismo día no deben agotarlo. No se sube el tope para
-  "hacer pasar" un build.
+- Tras `MAX_HELD_DAYS` (7) días la capa se marca `overdue` y el publish
+  **abre/actualiza un issue** (`data-hold`); el build **no** se tumba. Congelar
+  las capas sanas sería repetir la caída que la retención evita. El umbral es
+  temporal, no por número de builds: varios builds el mismo día no deben
+  agotarlo. No se sube el tope para "hacer pasar" un build.
+- Un dataset con `fallback_policy: fallback_to_last_snapshot` en el registry
+  declara que retener es lo esperado: se publica su última versión buena con su
+  fecha real (`held`) y **no** escala. Es una decisión de catálogo, no un fallo.
 - El invariante de esta sección no cambia: ningún dato degradado se publica. Lo
   que se acota es el radio de impacto de una fuente caída.
 

@@ -19,7 +19,7 @@
     "access_method": "direct_file",
     "license_status": "open-attribution",
     "live_extractor_status": "implemented",
-    "fallback_policy": "allowed_for_dev_blocked_for_publication",
+    "fallback_policy": "fallback_to_last_snapshot",
     "live_ready": true,
     "fallback_allowed": true,
     "publish_blocking": true,
