@@ -12,6 +12,21 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.52.3 - 2026-10-26
+
+### Corregido
+
+- **calidad_aire**: El Parquet publicado es el piso de la serie, no solo el respaldo
+  ([#207](https://github.com/cortega26/chile-hub/pull/207),
+  [`0ed7f2e`](https://github.com/cortega26/chile-hub/commit/0ed7f2ef55bd4eafa6509827c6d1ef4be5f66fc3))
+
+### Documentación
+
+- **adr**: ADR-025 aceptado por el mantenedor (2026-10-26)
+  ([#206](https://github.com/cortega26/chile-hub/pull/206),
+  [`ce9b0a0`](https://github.com/cortega26/chile-hub/commit/ce9b0a0493486552571412e42ffcff7f5b220172))
+
+
 ## 1.52.2 - 2026-10-26
 
 ### Corregido
