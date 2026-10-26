@@ -120,3 +120,21 @@ Se reclasifican a `fallback_to_last_snapshot` dos capas cuyo fallback no
 degrada el dato: `establecimientos_educacionales` (recupera el mismo snapshot de
 12.898 filas) y `calidad_aire` (su serie completa se conserva en el Parquet
 publicado y el extractor la siembra siempre).
+
+**3. Una recuperación válida no bloquea el publish.** El gate de `indicadores`
+rechazaba el build si existía *cualquier* diagnóstico —incluidas
+`raw_recoveries` y `preserved_existing_pairs`, que son recuperaciones exitosas— y
+consideraba inseguras sus entregas (`raw_recovery`, `preserved_existing`). El
+2026-10-26 un hipo de mindicador.cl bloqueó el publish diario pese a que la
+cadena de recuperación había entregado datos válidos.
+
+Desde esta enmienda:
+
+- Bloquea solo un fallo **sin ruta de recuperación** (`unrecovered fetch failures`).
+- `raw_recovery` y `preserved_existing` son entregas aceptadas.
+- La **edad del dato entregado** se gatea igual que en los backfills (ADR-016):
+  `raw_recovery` de una serie vieja sigue rechazándose.
+
+El invariante se mantiene: nada stale ni irrecuperable se publica. Lo que cambia
+es que una caída transitoria ya no detiene el hub cuando la recuperación
+funcionó.

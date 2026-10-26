@@ -168,7 +168,7 @@ chile-hub/
 │   ├── staging/      Datos parseados y cercanos a la fuente (CSV + metadata.json por dataset).
 │   └── normalized/   Artefactos finales publicables (Parquet, JSON, DuckDB, Excel, ZIP, reportes).
 │
-├── tests/                        19 archivos pytest — ver tabla completa en §8, no la dupliques aquí
+├── tests/                        20 archivos pytest — ver tabla completa en §8, no la dupliques aquí
 │   ├── test_chile_hub.py         API/CLI de ChileHub, contratos de artefactos, workflow, Makefile
 │   ├── test_extractors.py        Un test class por extractor + contrato de BaseExtractor
 │   ├── test_pipeline_logic.py    Lógica interna de build_dev_db.py, invariantes CUT, changelog
@@ -677,7 +677,7 @@ pytest tests/test_chile_hub.py::ChileHubTests::test_load_polars -v
 
 <!-- START_AGENTS_TEST_TABLE -->
 
-**19 archivos** en `tests/`. Esta tabla es de **navegación por archivo**, no un
+**20 archivos** en `tests/`. Esta tabla es de **navegación por archivo**, no un
 inventario de clases — las clases cambian con frecuencia y una lista exhaustiva
 aquí quedaría stale de inmediato. Para el inventario vivo de clases:
 ```bash
@@ -705,6 +705,7 @@ grep -n "^class " tests/*.py
 | `test_research_dgac_precipitaciones.py` | No | Candidato DGAC: CSV sin cabeceras, cobertura de meses, licencias, hashes y fallos cerrados (sin red) |
 | `test_validation.py` | No | Funciones `validate_*()` del paquete `src/validation/`: bordes vacíos, claves duplicadas, casos límite |
 | `test_verify_pipeline.py` | Sí (`make build` antes) | Verificación de pipeline (`verify_pipeline.py`) — guardia pre-publicación de artefactos |
+| `test_weekly_triage.py` | No | Triaje semanal (plan 152): solo señales accionables, orden editorial estable y tolerancia a artefactos ausentes (sin red) |
 
 <!-- END_AGENTS_TEST_TABLE -->
 
@@ -805,6 +806,21 @@ Si el job `publish` rechaza un dataset (por fallback, fetch fallido, o dato stal
    modificar extractores existentes con el mismo flujo que agregar uno nuevo).
 4. Si la fuente desapareció permanentemente: aplicar el protocolo de §6 (marcar como
    `stale` y evaluar exclusión del bundle).
+
+### Workflow de triaje semanal (`weekly-triage.yml`)
+
+Corre los lunes a las 12:00 UTC (después del publish diario). **No modifica datos
+ni código**: lee `hub_health.json`, `dataset_quality.json` y
+`source_readiness.json`, ordena las señales accionables por impacto y las publica
+como un único issue con label `triage`, que se actualiza por comentario y se
+cierra solo cuando no queda ninguna. Si no hay señales, no abre nada.
+
+Solo cuentan señales accionables: errores de validación, retención vencida,
+datos stale, advertencias accionables, calidad C/D y revisiones de registro
+**vencidas**. Las capas retenidas vigentes y las revisiones "por vencer" (<90 d)
+van como contexto: repetirlas cada semana convertiría el triaje en ruido.
+Lógica en `scripts/weekly_triage.py` (solo stdlib) y contrato en
+`tests/test_weekly_triage.py`.
 
 ### Workflow de release (`pypi-release.yml`)
 
