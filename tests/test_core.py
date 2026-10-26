@@ -316,6 +316,30 @@ class ChileHubBundleAndReportsTests(unittest.TestCase):
         self.assertIsInstance(pkg, dict)
 
 
+class SqlBackendContractTests(unittest.TestCase):
+    """`ChileHub.sql()` depende de la conversión nativa de duckdb a Polars.
+
+    Regresión 2026-10-26: Dependabot subió duckdb a 2.0.0 en un bump de grupo y
+    la 2.0 **eliminó** `.pl()` (y `fetch_arrow_table()`). `sql()` dejó de
+    funcionar en runtime y mypy lo detectó antes que los tests solo porque el
+    job de calidad corre primero.
+
+    Se verifica la CAPACIDAD que usa la librería, no un número de versión: si
+    duckdb la renombra a `to_polars`, este test lo dice y se adapta el código.
+    """
+
+    def test_backend_exposes_the_polars_conversion_sql_uses(self):
+        import duckdb
+
+        connection = duckdb.connect().execute("select 1 as x")
+        self.assertTrue(
+            hasattr(connection, "pl"),
+            "duckdb sin `.pl()`: ChileHub.sql() dejaría de funcionar. "
+            "La 2.0 lo eliminó; migrar exige pyarrow o pandas como dependencia "
+            "runtime (ver pyproject.toml).",
+        )
+
+
 class ChileHubCatalogQueriesTests(unittest.TestCase):
     """Tests que cubren get_dataset, get_output_path, list_datasets."""
 
