@@ -34,6 +34,7 @@ semánticos no demuestran que el pipeline conserve sus invariantes.
 - **Instalar prerrequisitos fuera del repositorio:** disponer de `codegraph`
   e inicializar/sincronizar su índice cuando corresponda; instalar Serena con
   `uv tool install -p 3.13 serena-agent` y `serena init`.
+- `.serena/` es caché/memoria local no canónica: no debe versionarse.
 - Evita entradas MCP duplicadas en configuraciones globales del mismo cliente.
   Mantén el daemon compartido habitual de CodeGraph para que varios clientes
   no compitan por escribir su índice; no dupliques procesos directos por proyecto.
