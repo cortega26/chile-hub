@@ -138,3 +138,25 @@ Definiciones y frases permitidas: [`docs/adoption-funnel.md`](adoption-funnel.md
   107 (Steps 2–4) 0,5 + `adoption-funnel.md` 0,5 + este refresh 0,3 ≈ **1,6 h**.
   Acciones con credenciales preparadas como lista de traspaso, no enviadas
   (`adoption-funnel.md` § Acciones de operador).
+
+### 2026-10-26 — Search Console registrado
+
+- **Propiedades verificadas** en la misma cuenta de Google: prefijo
+  `https://tooltician.com/chile-hub/` y dominio `tooltician.com`. Google verificó
+  automáticamente vía *proveedor de nombres de dominio*: el registro
+  `TXT google-site-verification=…` quedó en el apex de `tooltician.com`,
+  comprobado por API de Cloudflare y por DNS público (`1.1.1.1`). Ese registro no
+  debe borrarse; sin él se pierde la verificación.
+- **Nada nuevo en el repo:** no hay token ni archivo de verificación que rotar. El
+  método de archivo HTML y la etiqueta meta se descartaron al quedar la propiedad
+  verificada por DNS.
+- **Sitemap:** `https://tooltician.com/chile-hub/sitemap.xml` (índice + 3 hijos:
+  `sitemap-pages.xml`, `reference/sitemap.xml`, `comunas/sitemap.xml`) responde
+  200 en los cuatro el 2026-10-26 y está declarado en `robots.txt`. El envío
+  explícito en el panel queda como acción de operador a confirmar.
+- **Lecturas:** ninguna todavía. La etapa 4 de `adoption-funnel.md` pasa de
+  `sin dato` a *instrumentado, sin lecturas*; el primer número exige ≥2 semanas de
+  histórico, y la lectura automatizada (cuenta de servicio) sigue sin
+  implementar.
+- **Efecto en el veredicto D:** ninguno. Registrar el instrumento no crea demanda;
+  mientras no haya impresiones y clics, "descubrimiento orgánico" sigue sin dato.

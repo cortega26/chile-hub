@@ -342,7 +342,7 @@
 | Vía | Motivo | Fuente |
 |:--|:--|:--|
 | Consultoría, venta institucional, cold outreach, patrocinios corporativos, API de pago | Fuera de la estrategia de no-prospección y bajo HOLD | `docs/sostenibilidad/README.md`; este plan, §2 clase D |
-| Productos digitales de autoservicio (P3) | No hay evidencia de demanda: 0 sponsors, 0 supporters, 0 pedidos de cotización, Search Console sin registrar. Construir antes de medir intención de compra sería intuición | Auditoría 3 §0.2 (fila "Disposición a pagar": "Sin señal") |
+| Productos digitales de autoservicio (P3) | No hay evidencia de demanda: 0 sponsors, 0 supporters, 0 pedidos de cotización, Search Console registrado el 2026-10-26 pero sin lecturas. Construir antes de medir intención de compra sería intuición | Auditoría 3 §0.2 (fila "Disposición a pagar": "Sin señal") |
 | Open Collective / patrocinio fiscal (p. ej. Open Source Collective) | No es un fondo: es un **vehículo** para recibir dinero. Crear la relación es decisión del mantenedor (clase C) y no resuelve por sí solo la falta de demanda | Auditoría 3 §D.8 y adenda 3a |
 
 ## 4. Fuentes consultadas
