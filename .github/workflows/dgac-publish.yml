@@ -75,11 +75,56 @@ jobs:
             data/normalized/precipitaciones_dgac.metadata.json
           if-no-files-found: error
           retention-days: 30
+      - name: Refresh artifact manifest for DGAC assets
+        # El manifiesto indexa data/normalized/ con size+sha256. Este workflow
+        # commitea el Parquet verificado al margen del publish diario, así que
+        # sin refrescar el manifiesto el gate `Check committed published
+        # snapshot` falla en el siguiente PR con "Tamaño de artefacto
+        # desfasado" (ocurrió el 2026-10-26 con precipitaciones_dgac.parquet).
+        run: |
+          python - <<'PYMANIFEST'
+          import hashlib
+          import json
+          from pathlib import Path
+
+          manifest_path = Path("data/normalized/artifact_manifest.json")
+          if not manifest_path.is_file():
+              raise SystemExit("sin artifact_manifest.json")
+          manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+          targets = {
+              "data/normalized/precipitaciones_dgac.parquet",
+              "data/normalized/precipitaciones_dgac.csv",
+              "data/normalized/precipitaciones_dgac.metadata.json",
+          }
+          changed = False
+          for artifact in manifest.get("artifacts", []):
+              if artifact.get("path") not in targets:
+                  continue
+              path = Path(artifact["path"])
+              if not path.is_file():
+                  continue
+              payload = path.read_bytes()
+              size = len(payload)
+              sha = hashlib.sha256(payload).hexdigest()
+              if artifact.get("size_bytes") != size or artifact.get("sha256") != sha:
+                  artifact["size_bytes"] = size
+                  artifact["sha256"] = sha
+                  changed = True
+          if changed:
+              manifest_path.write_text(
+                  json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+              )
+              print("artifact_manifest.json actualizado para DGAC")
+          else:
+              print("artifact_manifest.json sin cambios")
+          PYMANIFEST
+
       - name: Commit verified source snapshot and public Parquet
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -f \
+            data/normalized/artifact_manifest.json \
             data/staging/precipitaciones_dgac.csv \
             data/staging/precipitaciones_dgac.metadata.json \
             data/normalized/precipitaciones_dgac.parquet \
