@@ -12,7 +12,9 @@ def test_agent_mcp_configs_register_same_nonredundant_servers():
     assert set(opencode) == set(vscode) == {"codegraph", "serena"}
     assert opencode["codegraph"]["command"] == ["codegraph", "serve", "--mcp"]
     assert [vscode["codegraph"]["command"], *vscode["codegraph"]["args"]] == [
-        "codegraph", "serve", "--mcp"
+        "codegraph",
+        "serve",
+        "--mcp",
     ]
     assert all(item["type"] == "local" and item["enabled"] for item in opencode.values())
     assert all(item["type"] == "stdio" for item in vscode.values())
