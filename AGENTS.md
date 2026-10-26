@@ -168,7 +168,7 @@ chile-hub/
 │   ├── staging/      Datos parseados y cercanos a la fuente (CSV + metadata.json por dataset).
 │   └── normalized/   Artefactos finales publicables (Parquet, JSON, DuckDB, Excel, ZIP, reportes).
 │
-├── tests/                        21 archivos pytest — ver tabla completa en §8, no la dupliques aquí
+├── tests/                        22 archivos pytest — ver tabla completa en §8, no la dupliques aquí
 │   ├── test_chile_hub.py         API/CLI de ChileHub, contratos de artefactos, workflow, Makefile
 │   ├── test_extractors.py        Un test class por extractor + contrato de BaseExtractor
 │   ├── test_pipeline_logic.py    Lógica interna de build_dev_db.py, invariantes CUT, changelog
@@ -202,11 +202,12 @@ JSON no coinciden, confía en el JSON y actualiza esta lista.
 
 ---
 
-## 2½. Navegación del código — CodeGraph y lecturas acotadas
+## 2½. Navegación del código — CodeGraph, Serena y lecturas acotadas
 
-> **Tooling AI-native:** CodeGraph está instalado (`.codegraph/codegraph.db`) como índice
-> estructural del repositorio. Consúltalo antes de abrir archivos manualmente — resuelve
-> preguntas de "dónde está X" y "qué llama a Y" en una sola llamada, sin abrir archivos.
+> **Tooling AI-native:** si CodeGraph está instalado e indexado localmente
+> (`.codegraph/` es estado regenerable), úsalo para arquitectura, rutas de llamadas
+> e impacto antes de abrir grandes archivos. Para referencias exactas, cambios de
+> símbolos y refactorizaciones usa Serena (LSP), si está disponible.
 
 ```bash
 codegraph query "<query>"                          # Buscar símbolo, función o concepto
@@ -215,6 +216,15 @@ codegraph callees src/build_dev_db.py::main         # Qué llama esta función
 codegraph explore "validación de comunas"           # Contexto completo de un área
 codegraph impact validate_comunas                   # Qué se rompe si cambio esto
 ```
+
+**Enrutamiento sin duplicación:** CodeGraph es primario para exploración estructural
+(`codegraph_explore`); Serena para referencias, renombrados y edición semántica.
+Para literales, configuración y documentación usa herramientas nativas. Nunca
+consultes ambos MCP por la misma pregunta sin una incertidumbre concreta;
+si alguno falla, aplica búsqueda acotada y declara la limitación. Serena usa
+el contexto `ide` para reducir herramientas redundantes. No sustituyas pruebas,
+invariantes ni las fuentes canónicas por resultados MCP. Configuración por
+proyecto, comandos de verificación y criterios: `docs/AGENT_MCP_ROUTING.md`.
 
 **Reglas para acotar lecturas y ahorrar tokens:**
 - Usar `Read` con `offset`/`limit` — nunca leer archivos grandes enteros de golpe.
@@ -686,7 +696,7 @@ pytest tests/test_chile_hub.py::ChileHubTests::test_load_polars -v
 
 <!-- START_AGENTS_TEST_TABLE -->
 
-**21 archivos** en `tests/`. Esta tabla es de **navegación por archivo**, no un
+**22 archivos** en `tests/`. Esta tabla es de **navegación por archivo**, no un
 inventario de clases — las clases cambian con frecuencia y una lista exhaustiva
 aquí quedaría stale de inmediato. Para el inventario vivo de clases:
 ```bash
@@ -695,6 +705,7 @@ grep -n "^class " tests/*.py
 
 | Archivo | Requiere `data/normalized/` | Qué cubre |
 |:---|:---:|:---|
+| `test_agent_mcp_configuration.py` | No | MCP CodeGraph/Serena: paridad entre clientes, alcance de workspace y exclusión del estado local |
 | `test_builders_artifacts.py` | Sí (`make build` antes) | Builders de artefactos publicables (bundle ZIP, SHA-256, consistencia manifiesto↔ZIP) |
 | `test_builders_formats.py` | No | Golden round-trip para writers de formatos (Parquet, JSON, Excel, DuckDB, SQLite) |
 | `test_chile_hub.py` | Sí (`make build` antes) | API Python de `ChileHub`, CLI, contratos de artefactos (SHA256, catálogo, ZIP), contratos de workflow/Makefile, `Dataset(StrEnum)` |

@@ -119,8 +119,9 @@ tests/                      15 archivos — inventario completo en AGENTS.md §8
 | Revisar que antipatrones evitar | **`AGENTS.md §10`** |
 | Financiamiento, patrocinios, grants o citar metricas de adopcion | **`docs/sostenibilidad/README.md`** — estado HOLD (veredicto D) + cronologia de auditorias |
 | CI marca un documento/test desincronizado del codigo | **`AGENTS.md §12`** — `scripts/check_companion_paths.py` |
-| Navegar archivos grandes sin leerlos en frio | **`AGENTS.md §2½`** → CodeGraph |
-| Encontrar donde esta definido un simbolo | `codegraph query <name>` o `grep -n "def <name>" src/` |
+| Explorar arquitectura o impacto sin abrir archivos completos | **`AGENTS.md §2½`** → CodeGraph (`codegraph_explore`) |
+| Localizar referencias y editar simbolos | **`AGENTS.md §2½`** → Serena (LSP); si no está disponible, `rg` acotado |
+| Configurar y enrutar ambos MCP sin duplicar llamadas | `docs/AGENT_MCP_ROUTING.md` |
 | Leer API publica de ChileHub | `src/chile_hub/core.py` (clase ChileHub, todos los metodos publicos) |
 | Leer toda la logica de validacion | `src/validation.py` (leer por validador) |
 | Leer contrato de extractors | `src/extractors/base.py` (breve — seguro de leer completo) |

@@ -49,7 +49,8 @@ htmlcov/
 .ipynb_checkpoints/
 
 # IDEs
-.vscode/
+.vscode/*
+!.vscode/mcp.json
 .idea/
 *.swp
 *.swo
@@ -70,6 +71,9 @@ dist/
 
 # CodeGraph
 .codegraph/daemon.pid
+
+# Serena: estado local, cachés y memorias (no canónicas)
+.serena/
 
 # Auditoría privada y recordatorios
 .audit/

@@ -1,0 +1,30 @@
+{
+  "servers": {
+    "codegraph": {
+      "type": "stdio",
+      "command": "codegraph",
+      "args": [
+        "serve",
+        "--mcp"
+      ],
+      "cwd": "${workspaceFolder}"
+    },
+    "serena": {
+      "type": "stdio",
+      "command": "serena",
+      "args": [
+        "start-mcp-server",
+        "--context",
+        "ide",
+        "--project-from-cwd",
+        "--agent-interface",
+        "tools",
+        "--add-mode",
+        "no-memories",
+        "--open-web-dashboard",
+        "false"
+      ],
+      "cwd": "${workspaceFolder}"
+    }
+  }
+}
