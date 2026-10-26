@@ -150,13 +150,15 @@ Definiciones y frases permitidas: [`docs/adoption-funnel.md`](adoption-funnel.md
 - **Nada nuevo en el repo:** no hay token ni archivo de verificación que rotar. El
   método de archivo HTML y la etiqueta meta se descartaron al quedar la propiedad
   verificada por DNS.
-- **Sitemap:** `https://tooltician.com/chile-hub/sitemap.xml` (índice + 3 hijos:
-  `sitemap-pages.xml`, `reference/sitemap.xml`, `comunas/sitemap.xml`) responde
-  200 en los cuatro el 2026-10-26 y está declarado en `robots.txt`. El envío
-  explícito en el panel queda como acción de operador a confirmar.
-- **Lecturas:** ninguna todavía. La etapa 4 de `adoption-funnel.md` pasa de
-  `sin dato` a *instrumentado, sin lecturas*; el primer número exige ≥2 semanas de
-  histórico, y la lectura automatizada (cuenta de servicio) sigue sin
-  implementar.
+- **Sitemap: ya estaba enviado desde el 2026-09-26**, antes de esta sesión —no
+  era una acción pendiente, contrario a lo que decía este documento—. Estado
+  *Correcto*, última lectura **2026-10-18**, **473 URLs descubiertas**. El índice
+  y sus 3 hijos (`sitemap-pages.xml`, `reference/sitemap.xml`,
+  `comunas/sitemap.xml`) responden 200 el 2026-10-26. Reenviarlo se rechaza por
+  duplicado: no hay nada que corregir.
+- **Lecturas de rendimiento:** ninguna todavía; el panel arranca vacío. El primer
+  dato de impresiones exige ≥2 semanas de histórico, y la lectura automatizada
+  (cuenta de servicio) sigue sin implementar. Las 473 URLs son
+  **descubrimiento**, no tráfico: no se presentan como visitas.
 - **Efecto en el veredicto D:** ninguno. Registrar el instrumento no crea demanda;
   mientras no haya impresiones y clics, "descubrimiento orgánico" sigue sin dato.
