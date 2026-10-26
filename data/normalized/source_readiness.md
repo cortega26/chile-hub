@@ -1,6 +1,6 @@
 # chile-hub — Madurez de fuente
 
-- `generated_at_utc`: `2026-10-26T00:25:12.586077+00:00`
+- `generated_at_utc`: `2026-10-26T00:58:49.628566+00:00`
 - `stable_count`: `22`
 - `candidate_count`: `2`
 - `experimental_count`: `0`
@@ -36,6 +36,6 @@
 | `autoridades_electas` | `stable` | `camara_senado_autoridades_electas` | `live` | `✓` | `permitido` | `✓` | `implemented` | `⏳` | ⏳ REVIEW BY 2026-12-31 — 65 días. Review 2026-10-05: extractor live y validación OK con 205/205 registros (155 diputados + 50 senadores); región y período de senadores continúan poblados desde senado.cl. Mantener stable_publishable. Próxima revisión 2026-12-31. |
 | `autoridades_locales` | `candidate` | `wikipedia_autoridades_locales` | `not_built` | `✗` | `permitido` | `✓` | `implemented` | `⏳` | ⏳ REVIEW BY 2026-12-31 — 65 días. Review 2026-10-05: la brecha de alcaldes quedó resuelta al migrar la fuente primaria a BCN SIIT (346/346 comunas). El único bloqueo para promover a stable_publishable es la licencia CC-BY-SA de los gobernadores obtenidos desde Wikipedia; buscar fuente institucional no-share-alike o definir publicación segregada compatible. Próxima revisión 2026-12-31. |
 | `estadisticas_vitales` | `stable` | `ine_estadisticas_vitales` | `live` | `✓` | `permitido` | `✓` | `implemented` | `⏳` | ⏳ REVIEW BY 2026-12-31 — 65 días. Monitorear publicación del anuario 2024 (el extractor lo incorpora solo). |
-| `permisos_edificacion` | `stable` | `minvu_permisos_edificacion` | `live` | `✓` | `permitido` | `✓` | `implemented` | `⏳` | ⏳ REVIEW BY 2026-12-31 — 65 días. Monitorear que el biblionumber 25583 siga resolviendo al XLSX anual vigente. |
+| `permisos_edificacion` | `stable` | `minvu_permisos_edificacion` | `monthly` | `✓` | `permitido` | `✓` | `implemented` | `⏳` | ⏳ REVIEW BY 2026-12-31 — 65 días. Monitorear que el biblionumber 25583 siga resolviendo al XLSX anual vigente. |
 | `calidad_aire` | `stable` | `mma_sinca_calidad_aire` | `live` | `✓` | `permitido` | `✓` | `implemented` | `⏳` | ⏳ REVIEW BY 2026-12-31 — 65 días. Vigilar estabilidad del endpoint listadomapa2k19 y crecimiento de la serie incremental. |
 | `precipitaciones_dgac` | `stable` | `dgac_precipitaciones_historicas` | `live` | `✓` | `no` | `✓` | `implemented` | `⏳` | ⏳ REVIEW BY 2027-01-15 — 80 días. Revisar publicación de nuevos semestres DGAC y cobertura por estación; mantener cuarentena de enero 2017. |
