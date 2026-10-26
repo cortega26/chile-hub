@@ -12,6 +12,21 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.52.2 - 2026-10-26
+
+### Corregido
+
+- **bundle**: Exponer held_count en el bundle público
+  ([#205](https://github.com/cortega26/chile-hub/pull/205),
+  [`c5f93d0`](https://github.com/cortega26/chile-hub/commit/c5f93d06a4a2fdfe2746718c2bf7f38ca48c639f))
+
+### Documentación
+
+- **sostenibilidad**: Investigación de financiamiento 2026 sin prospección comercial
+  ([#202](https://github.com/cortega26/chile-hub/pull/202),
+  [`d4ac00b`](https://github.com/cortega26/chile-hub/commit/d4ac00b69941cb1e1a50e4390123ffb333b95458))
+
+
 ## 1.52.1 - 2026-10-26
 
 ### Corregido
