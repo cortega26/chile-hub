@@ -12,6 +12,33 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.52.0 - 2026-10-26
+
+### Corregido
+
+- **build**: Markdown sin trailing whitespace y gate de snapshot coherente
+  ([#203](https://github.com/cortega26/chile-hub/pull/203),
+  [`87a6365`](https://github.com/cortega26/chile-hub/commit/87a63657fcb84d13669ef4459ef1b48ac2c0fa73))
+
+- **landing**: Tarjeta de precipitaciones_dgac en el catálogo
+  ([#203](https://github.com/cortega26/chile-hub/pull/203),
+  [`87a6365`](https://github.com/cortega26/chile-hub/commit/87a63657fcb84d13669ef4459ef1b48ac2c0fa73))
+
+### Mantenimiento
+
+- **ci**: Sync coverage badge from verified tests [skip ci]
+  ([`3ce0390`](https://github.com/cortega26/chile-hub/commit/3ce0390c5f18a34db2830cc80cb6772676e0627d))
+
+- **deps**: Bump opentelemetry-api ([#201](https://github.com/cortega26/chile-hub/pull/201),
+  [`3400c81`](https://github.com/cortega26/chile-hub/commit/3400c81051019bfd57afd1d10aa32ed554db99e6))
+
+### Agregado
+
+- **build**: Publicación parcial con retención marcada
+  ([#203](https://github.com/cortega26/chile-hub/pull/203),
+  [`87a6365`](https://github.com/cortega26/chile-hub/commit/87a63657fcb84d13669ef4459ef1b48ac2c0fa73))
+
+
 ## 1.51.0 - 2026-10-24
 
 ### Corregido
