@@ -42,3 +42,4 @@ def test_vscode_ignore_includes_mcp_json_only():
     assert ".vscode/*" in ignore
     assert "!.vscode/mcp.json" in ignore
     assert ".vscode/" not in ignore
+    assert ".serena/" in ignore
