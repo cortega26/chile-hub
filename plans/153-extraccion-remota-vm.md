@@ -81,6 +81,30 @@ senadores.
 - **`indicadores`**: mindicador.cl resetea TLS desde la VM. Sigue extrayéndose
   en GitHub; el arreglo del plan 151 ya tolera sus hipos.
 
+## Descartes verificados para `calidad_aire` (2026-10-26)
+
+SINCA devuelve 403 desde **tres redes distintas**, con la misma página Apache de
+199 bytes:
+
+| Egress | Resultado |
+|:--|:--|
+| GitHub Actions | 403 |
+| Oracle Cloud (Santiago) | 403 |
+| Cloudflare Workers | 403 |
+| curl plano vs `curl_cffi` impersonando Chrome y Safari | 403 idéntico → no es fingerprint |
+
+`mindicador.cl` tampoco sirve desde Cloudflare: el Worker devuelve **525**
+(SSL handshake fallido contra el origen) y timeouts.
+
+En `datos.gob.cl` no hay dataset de calidad del aire en bloque: las búsquedas
+`sinca` (0), `material particulado` (1, emisiones) y `red de monitoreo aire` (0)
+solo devuelven datasets distintos.
+
+**Conclusión:** `calidad_aire` no se puede refrescar desde ningún cloud probado.
+Queda en `fallback_to_last_snapshot` (publica su serie completa, no escala) y su
+serie solo crece con una extracción desde red residencial. No repetir estas
+pruebas sin una fuente nueva.
+
 ## Rollback
 
 1. Quitar el paso "Apply remote staging" de `pipeline-check.yml`.
