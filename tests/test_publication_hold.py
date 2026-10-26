@@ -12,15 +12,17 @@ propiedades que no pueden degradarse:
 from __future__ import annotations
 
 import json
+from datetime import UTC, datetime, timedelta
 
 import polars as pl
 import pytest
 
 from scripts.verify_pipeline import _publication_hold_violations, verify_publication_policy
 from src.builders.publication_gate import (
-    MAX_HELD_BUILDS,
+    MAX_HELD_DAYS,
     apply_holds,
     evaluate_holds,
+    held_days,
     hold_errors,
 )
 
@@ -165,16 +167,39 @@ def test_builds_held_accumulates_across_builds(tmp_path):
     assert holds["censo_comunal"].builds_held == 4
 
 
-def test_escalation_after_max_held_builds_fails_closed(tmp_path):
+def test_escalation_is_time_based_not_build_based(tmp_path):
+    """Muchos builds el mismo día no deben disparar el tope."""
     _previous_catalog(
-        tmp_path, held={"retained": True, "builds_held": MAX_HELD_BUILDS, "since_utc": "x"}
+        tmp_path,
+        held={"retained": True, "builds_held": 99, "since_utc": "2026-10-25T00:00:00+00:00"},
     )
     _previous_parquet(tmp_path)
 
     holds = evaluate_holds(_metadata(), REGISTRY, str(tmp_path))
-    errors = hold_errors(holds, normalized_dir=str(tmp_path))
+    errors = hold_errors(
+        holds,
+        normalized_dir=str(tmp_path),
+        now=datetime.fromisoformat("2026-10-26T12:00:00+00:00"),
+    )
 
-    assert holds["censo_comunal"].builds_held == MAX_HELD_BUILDS + 1
+    assert holds["censo_comunal"].builds_held == 100
+    assert errors == []
+
+
+def test_escalation_after_max_held_days_fails_closed(tmp_path):
+    _previous_catalog(
+        tmp_path,
+        held={"retained": True, "builds_held": 1, "since_utc": "2026-10-01T00:00:00+00:00"},
+    )
+    _previous_parquet(tmp_path)
+
+    holds = evaluate_holds(_metadata(), REGISTRY, str(tmp_path))
+    errors = hold_errors(
+        holds,
+        normalized_dir=str(tmp_path),
+        now=datetime.fromisoformat("2026-10-25T00:00:00+00:00"),
+    )
+
     assert any("tope" in error for error in errors)
 
 
@@ -184,20 +209,27 @@ def test_marker_missing_required_fields_is_rejected():
     assert any("reason" in v for v in violations)
     assert any("previous_generated_at_utc" in v for v in violations)
     assert any("builds_held" in v for v in violations)
+    assert any("since_utc" in v for v in violations)
 
 
 def test_marker_beyond_cap_is_rejected():
+    old = (datetime.now(UTC) - timedelta(days=MAX_HELD_DAYS + 1)).isoformat()
     violations = _publication_hold_violations(
         "censo_comunal",
         {
             "retained": True,
             "reason": "source_mode=fallback",
             "previous_generated_at_utc": "2026-10-15T00:00:00+00:00",
-            "builds_held": MAX_HELD_BUILDS + 1,
+            "builds_held": 1,
+            "since_utc": old,
         },
     )
 
     assert any("tope" in v for v in violations)
+
+
+def test_held_days_tolerates_a_missing_marker():
+    assert held_days({}) == float("inf")
 
 
 # Para las pruebas de política basta un dataset estable: el verificador exige
@@ -225,6 +257,7 @@ def test_publication_policy_accepts_a_valid_hold():
         "reason": "source_mode=fallback",
         "previous_generated_at_utc": "2026-10-15T00:00:00+00:00",
         "builds_held": 2,
+        "since_utc": datetime.now(UTC).isoformat(),
     }
 
     # No debe lanzar SystemExit.
@@ -254,7 +287,8 @@ def test_publication_policy_rejects_hold_beyond_the_cap():
         "retained": True,
         "reason": "source_mode=fallback",
         "previous_generated_at_utc": "2026-10-15T00:00:00+00:00",
-        "builds_held": MAX_HELD_BUILDS + 1,
+        "builds_held": 1,
+        "since_utc": (datetime.now(UTC) - timedelta(days=MAX_HELD_DAYS + 1)).isoformat(),
     }
 
     with pytest.raises(SystemExit):

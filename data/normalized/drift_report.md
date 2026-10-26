@@ -1,6 +1,6 @@
 # chile-hub drift report
 
-- `generated_at_utc`: `2026-10-25T23:25:43.532012+00:00`
+- `generated_at_utc`: `2026-10-26T00:25:12.586077+00:00`
 - `dataset_count`: `23`
 - `drifted_count`: `3`
 - `healthy_count`: `20`
@@ -249,7 +249,7 @@
 - `drift_status`: `drifted`
 - `source_mode`: `live`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
-- `degradation`: calidad_aire freshness is stale: 248.77h since refresh, policy max is 72h
+- `degradation`: calidad_aire freshness is stale: 249.76h since refresh, policy max is 72h
 - `warning_count`: `2`
 - `diagnostic_summary`: cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación
 - `recommended_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.

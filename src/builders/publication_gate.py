@@ -25,15 +25,22 @@ from __future__ import annotations
 import json
 import os
 from dataclasses import dataclass, field
+from datetime import UTC, datetime
 
 import polars as pl
 
 from src.builders._shared import NON_FALLBACK_SOURCE_MODES, NORMALIZED_DIR
 
-# Tras N builds retenidos (~1 semana de schedule diario) el build falla: una
-# degradación no puede volverse silenciosa ni permanente. Mismo orden de
+# Tras N días retenido el build falla: una degradación no puede volverse
+# silenciosa ni permanente. El umbral es **temporal**, no por número de builds:
+# varios builds el mismo día (un dispatch de diagnóstico, un rebase, un rerun)
+# inflaban un contador por build y disparaban el tope en horas. Mismo orden de
 # magnitud que la ventana del issue automático de schedule.
-MAX_HELD_BUILDS = 7
+MAX_HELD_DAYS = 7
+
+# Alias histórico: el contador por build se conserva en el artefacto como dato
+# informativo, pero ya no decide el escalamiento.
+MAX_HELD_BUILDS = MAX_HELD_DAYS
 
 # Mismo umbral que `verify_pipeline.DEFAULT_MAX_RECORD_DROP_PCT`; vive aquí para
 # que build y verificador no puedan divergir.
@@ -171,11 +178,27 @@ def _previous_parquet_path(dataset: str, normalized_dir: str | None = None) -> s
     return os.path.join(normalized_dir or NORMALIZED_DIR, f"{dataset}.parquet")
 
 
+def held_days(hold: dict, now: datetime | None = None) -> float:
+    """Días transcurridos desde la primera retención; `inf` si no hay marca."""
+    since = (hold or {}).get("since_utc")
+    if not since:
+        return float("inf")
+    try:
+        started = datetime.fromisoformat(since)
+    except ValueError:
+        return float("inf")
+    reference = now or datetime.now(UTC)
+    if started.tzinfo is None:
+        started = started.replace(tzinfo=UTC)
+    return (reference - started).total_seconds() / 86400
+
+
 def hold_errors(
     holds: dict[str, HoldDecision],
     *,
     normalized_dir: str | None = None,
-    max_held_builds: int = MAX_HELD_BUILDS,
+    max_held_days: float = MAX_HELD_DAYS,
+    now: datetime | None = None,
 ) -> list[str]:
     """Errores que hacen fallar el build antes de publicar cualquier cosa."""
     errors = []
@@ -190,12 +213,16 @@ def hold_errors(
             errors.append(f"{dataset}: el artefacto previo no declara refreshed_at_utc")
         if not os.path.exists(_previous_parquet_path(dataset, normalized_dir)):
             errors.append(f"{dataset}: falta {dataset}.parquet del build anterior")
-        if decision.builds_held > max_held_builds:
+        # El escalamiento se mide desde la PRIMERA retención. Un hold nuevo
+        # (sin marca previa) empieza en 0 días: si no, `held_days` devolvería
+        # infinito y el primer build ya fallaría.
+        previous_hold = decision.previous.get("publication_hold")
+        days = held_days(previous_hold, now=now) if previous_hold else 0.0
+        if days > max_held_days:
             errors.append(
-                f"{dataset}: retenido {decision.builds_held - 1} builds consecutivos "
-                f"(tope {max_held_builds}). La fuente no se recuperó: hay que decidir "
-                "entre repararla, sacarla del carril stable_publishable o retirarla "
-                "(AGENTS.md §6)."
+                f"{dataset}: retenido {days:.1f} días (tope {max_held_days:g}). La fuente "
+                "no se recuperó: hay que decidir entre repararla, sacarla del carril "
+                "stable_publishable o retirarla (AGENTS.md §6)."
             )
     return errors
 
