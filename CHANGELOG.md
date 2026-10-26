@@ -12,6 +12,15 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.52.5 - 2026-10-26
+
+### Corregido
+
+- **bundle**: Exponer held_overdue_count en el bundle público
+  ([#210](https://github.com/cortega26/chile-hub/pull/210),
+  [`0b2b463`](https://github.com/cortega26/chile-hub/commit/0b2b46325f314eb5efc8570cd5afa354a3ad0fd1))
+
+
 ## 1.52.4 - 2026-10-26
 
 ### Corregido
