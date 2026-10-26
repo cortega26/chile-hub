@@ -12,6 +12,15 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.52.1 - 2026-10-26
+
+### Corregido
+
+- **build**: Escalamiento de retención por días, no por número de builds
+  ([#204](https://github.com/cortega26/chile-hub/pull/204),
+  [`b90bd09`](https://github.com/cortega26/chile-hub/commit/b90bd0950dbb8c9cb959091e0b4d15f740a4e4ba))
+
+
 ## 1.52.0 - 2026-10-26
 
 ### Corregido
