@@ -12,6 +12,31 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.55.2 - 2026-10-30
+
+### Corregido
+
+- **deps**: Remediate msgpack CVE-2026-114613
+  ([`c5c677d`](https://github.com/cortega26/chile-hub/commit/c5c677dcad79d57ad553853d259a9ac2c09afcac))
+
+### Mantenimiento
+
+- **agent**: Deny chrome-devtools tools in this repo
+  ([`cf5a2c0`](https://github.com/cortega26/chile-hub/commit/cf5a2c02aca011641123920aea3fb2f0757a54d1))
+
+- **ci**: Sync coverage badge from verified tests [skip ci]
+  ([`e25f34f`](https://github.com/cortega26/chile-hub/commit/e25f34f023c97e2e53e6babc1197dcffed3f7559))
+
+### Documentación
+
+- **adopcion**: Corregir el sitemap — ya estaba enviado desde el 26-sep
+  ([#234](https://github.com/cortega26/chile-hub/pull/234),
+  [`69b0293`](https://github.com/cortega26/chile-hub/commit/69b02937d5ce173bfe072444c2ca0abe440d584d))
+
+- **agent**: Aclarar el contrato de enrutamiento CodeGraph/Serena
+  ([`8fef234`](https://github.com/cortega26/chile-hub/commit/8fef2348647f9880a29272a7a9aad9a84e926a26))
+
+
 ## 1.55.1 - 2026-10-26
 
 ### Corregido
