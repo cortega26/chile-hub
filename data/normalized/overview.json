@@ -1,32 +1,32 @@
 {
-  "generated_at_utc": "2026-10-26T16:26:48.305608+00:00",
+  "generated_at_utc": "2026-10-31T15:42:31.634395+00:00",
   "overall_status": "warn",
   "dataset_count": 23,
   "live_count": 22,
   "fallback_count": 0,
-  "stale_count": 0,
-  "drifted_count": 1,
+  "stale_count": 1,
+  "drifted_count": 2,
   "degraded_count": 0,
   "partial_coverage_count": 1,
   "warning_count": 8,
   "top_issue": {
-    "dataset": "indicadores",
+    "dataset": "calidad_aire",
     "attention_priority": 0,
     "warning_count": 2,
-    "build_freshness_status": "fresh",
+    "build_freshness_status": "stale",
     "drift_status": "drifted",
     "degradation_status": "warning",
-    "source_detail": "public_api_with_raw_recovery_partial",
-    "diagnostic_summary": "indicadores live refresh reused raw snapshots for: uf/2026, dolar/2026, euro/2026, utm/2026",
+    "source_detail": "Promedios diarios por estación y contaminante (MP2.5, MP10, SO2, NO2, CO, O3) desde el JSON del SINCA. Cobertura parcial por diseño (~65 comunas con estación). Serie incremental desde la primera cosecha.",
+    "diagnostic_summary": "cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación",
     "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
   },
-  "top_issue_summary": "indicadores: indicadores live refresh reused raw snapshots for: uf/2026, dolar/2026, euro/2026, utm/2026 [source_detail=public_api_with_raw_recovery_partial; warnings=2; freshness=fresh; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]",
+  "top_issue_summary": "calidad_aire: cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación [source_detail=Promedios diarios por estación y contaminante (MP2.5, MP10, SO2, NO2, CO, O3) desde el JSON del SINCA. Cobertura parcial por diseño (~65 comunas con estación). Serie incremental desde la primera cosecha.; warnings=2; freshness=stale; drift=drifted; action=Revisar warnings operativos del dataset antes de consumirlo en producción.]",
   "shared_artifact_count": 25,
   "package_count": 1,
   "primary_package": {
     "path": "data/normalized/chile-hub-publishable-bundle.zip",
     "package_type": "zip",
-    "size_bytes": 31836255,
+    "size_bytes": 31837981,
     "checksum_algorithm": "sha256",
     "checksum_path": "data/normalized/chile-hub-publishable-bundle.zip.sha256",
     "verification_command": "shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256"
@@ -68,9 +68,9 @@
       "dataset": "calidad_aire",
       "source_mode": "live",
       "validation_status": "ok",
-      "freshness_status": "fresh",
+      "freshness_status": "stale",
       "coverage_status": "not_applicable",
-      "drift_status": "healthy"
+      "drift_status": "drifted"
     },
     {
       "dataset": "censo_comunal",

@@ -1,6 +1,6 @@
 {
-  "generated_at_utc": "2026-10-26T16:26:48.305608+00:00",
-  "previous_generated_at_utc": "2026-10-26T15:40:26.797869+00:00",
+  "generated_at_utc": "2026-10-31T15:42:31.634395+00:00",
+  "previous_generated_at_utc": "2026-10-26T16:26:48.305608+00:00",
   "dataset_count": 23,
   "datasets": [
     {
@@ -33,7 +33,7 @@
       "previous_source_mode": "live",
       "current_source_mode": "live",
       "previous_freshness_status": "fresh",
-      "current_freshness_status": "fresh",
+      "current_freshness_status": "stale",
       "previous_validation_status": "ok",
       "current_validation_status": "ok",
       "change_severity": "none",
@@ -206,8 +206,8 @@
     {
       "dataset": "establecimientos_salud",
       "previous_record_count": 5782,
-      "current_record_count": 5782,
-      "record_count_delta": 0,
+      "current_record_count": 5837,
+      "record_count_delta": 55,
       "added_fields": [],
       "removed_fields": [],
       "previous_source_mode": "live",
@@ -216,7 +216,7 @@
       "current_freshness_status": "fresh",
       "previous_validation_status": "ok",
       "current_validation_status": "ok",
-      "change_severity": "none",
+      "change_severity": "patch",
       "breaking_changes": [],
       "new_columns": [],
       "removed_columns": [],
@@ -266,8 +266,8 @@
     {
       "dataset": "indicadores",
       "previous_record_count": 738,
-      "current_record_count": 738,
-      "record_count_delta": 0,
+      "current_record_count": 748,
+      "record_count_delta": 10,
       "added_fields": [],
       "removed_fields": [],
       "previous_source_mode": "live",
@@ -276,7 +276,7 @@
       "current_freshness_status": "fresh",
       "previous_validation_status": "ok",
       "current_validation_status": "ok",
-      "change_severity": "none",
+      "change_severity": "patch",
       "breaking_changes": [],
       "new_columns": [],
       "removed_columns": [],

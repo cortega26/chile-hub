@@ -1,9 +1,9 @@
 # chile-hub drift report
 
-- `generated_at_utc`: `2026-10-26T16:26:48.305608+00:00`
+- `generated_at_utc`: `2026-10-31T15:42:31.634395+00:00`
 - `dataset_count`: `23`
-- `drifted_count`: `2`
-- `healthy_count`: `21`
+- `drifted_count`: `3`
+- `healthy_count`: `20`
 - `fallback_count`: `1`
 - `partial_coverage_count`: `1`
 - `degraded_count`: `0`
@@ -14,7 +14,7 @@
 | `provincias` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
 | `comunas` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
 | `comunas_enriquecidas` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
-| `indicadores` | `drifted` | `live` | `not_applicable` | `warning` | 2 | Revisar warnings operativos del dataset antes de consumirlo en producción. |
+| `indicadores` | `drifted` | `live` | `not_applicable` | `warning` | 1 | Revisar warnings operativos del dataset antes de consumirlo en producción. |
 | `censo_comunal` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
 | `establecimientos_salud` | `healthy` | `live` | `not_applicable` | `none` | 0 | Ninguna. |
 | `establecimientos_educacionales` | `healthy` | `live` | `not_applicable` | `none` | 0 | Ninguna. |
@@ -31,7 +31,7 @@
 | `autoridades_electas` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
 | `estadisticas_vitales` | `healthy` | `live` | `not_applicable` | `none` | 0 | Ninguna. |
 | `permisos_edificacion` | `healthy` | `monthly` | `not_applicable` | `none` | 0 | Ninguna. |
-| `calidad_aire` | `healthy` | `live` | `not_applicable` | `none` | 1 | Ninguna. |
+| `calidad_aire` | `drifted` | `live` | `not_applicable` | `warning` | 2 | Revisar warnings operativos del dataset antes de consumirlo en producción. |
 | `precipitaciones_dgac` | `healthy` | `live` | `not_applicable` | `none` | 1 | Ninguna. |
 
 ## regiones
@@ -79,9 +79,9 @@
 - `drift_status`: `drifted`
 - `source_mode`: `live`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
-- `degradation`: indicadores live refresh reused raw snapshots for: uf/2026, dolar/2026, euro/2026, utm/2026; indicadores live refresh preserved previous staging rows for: ipc/2026
-- `warning_count`: `2`
-- `diagnostic_summary`: indicadores live refresh reused raw snapshots for: uf/2026, dolar/2026, euro/2026, utm/2026
+- `degradation`: indicadores live refresh reused last published artifact for missing codes: ipc
+- `warning_count`: `1`
+- `diagnostic_summary`: indicadores live refresh reused last published artifact for missing codes: ipc
 - `recommended_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.
 
 ## censo_comunal
@@ -246,13 +246,13 @@
 
 ## calidad_aire
 
-- `drift_status`: `healthy`
+- `drift_status`: `drifted`
 - `source_mode`: `live`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
-- `degradation`: 1 observación(es) esperada(s): cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación
-- `warning_count`: `1`
+- `degradation`: calidad_aire freshness is stale: 133.99h since refresh, policy max is 72h
+- `warning_count`: `2`
 - `diagnostic_summary`: cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación
-- `recommended_action`: Ninguna.
+- `recommended_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.
 
 ## precipitaciones_dgac
 
