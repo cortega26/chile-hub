@@ -5,8 +5,8 @@
   "require_live": true,
   "source_ref": "refs/heads/main",
   "source_run_event": "schedule",
-  "source_run_id": "41215413955",
-  "source_sha": "37d0c061ad340b9c8e347e8a7884b4963d21f503",
+  "source_run_id": "41326699670",
+  "source_sha": "7012d355788f4ebcd6eacc380d35ab7ea39e937d",
   "verification_profile": "publication",
   "workflow": "Pipeline Check"
 }
