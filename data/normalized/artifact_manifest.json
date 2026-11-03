@@ -548,8 +548,8 @@
       "output_type": "parquet",
       "shared_type": null,
       "format": null,
-      "size_bytes": 150952,
-      "sha256": "34002094c965c955f0abe37ab362bc041647cadf5593e86e6b0e6d1676dbb9d1",
+      "size_bytes": 154579,
+      "sha256": "9c0391084c219d4f99f0af598677416bac29c2741887eda87a24f210e5128089",
       "retained": false
     },
     {
