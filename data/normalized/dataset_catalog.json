@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-11-02T20:04:36.431226+00:00",
+  "generated_at_utc": "2026-11-03T01:52:02.235846+00:00",
   "dataset_count": 23,
   "datasets": [
     {
@@ -10,7 +10,7 @@
       "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
       "source_mode": "live",
       "source_detail": "bcn_arcgis",
-      "refreshed_at_utc": "2026-11-02T19:55:47.161462+00:00",
+      "refreshed_at_utc": "2026-11-03T01:44:09.319098+00:00",
       "record_count": 16,
       "fields": [
         "codigo_region",
@@ -32,9 +32,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.15,
+        "age_hours": 0.13,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-11-02T20:04:36.426458+00:00"
+        "checked_at_utc": "2026-11-03T01:52:02.231146+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -88,7 +88,7 @@
       "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
       "source_mode": "live",
       "source_detail": "bcn_arcgis",
-      "refreshed_at_utc": "2026-11-02T19:55:47.161462+00:00",
+      "refreshed_at_utc": "2026-11-03T01:44:09.319098+00:00",
       "record_count": 56,
       "fields": [
         "codigo_region",
@@ -113,9 +113,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.15,
+        "age_hours": 0.13,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-11-02T20:04:36.426484+00:00"
+        "checked_at_utc": "2026-11-03T01:52:02.231170+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -169,7 +169,7 @@
       "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
       "source_mode": "live",
       "source_detail": "bcn_arcgis",
-      "refreshed_at_utc": "2026-11-02T19:55:47.161462+00:00",
+      "refreshed_at_utc": "2026-11-03T01:44:09.319098+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -201,9 +201,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.15,
+        "age_hours": 0.13,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-11-02T20:04:36.426497+00:00"
+        "checked_at_utc": "2026-11-03T01:52:02.231187+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -257,7 +257,7 @@
       "source_url": "https://arcgiswebad.bcn.cl/arcgis/rest/services/Hosted/Capa_Factores/FeatureServer/0/query",
       "source_mode": "live",
       "source_detail": "bcn_arcgis",
-      "refreshed_at_utc": "2026-11-02T19:55:47.161462+00:00",
+      "refreshed_at_utc": "2026-11-03T01:44:09.319098+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -288,9 +288,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.15,
+        "age_hours": 0.13,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-11-02T20:04:36.426504+00:00"
+        "checked_at_utc": "2026-11-03T01:52:02.231238+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,
@@ -343,9 +343,9 @@
       "source_name": "Banco Central de Chile (via mindicador.cl)",
       "source_url": "https://mindicador.cl/api",
       "source_mode": "live",
-      "source_detail": "public_api_with_raw_recovery_partial",
-      "refreshed_at_utc": "2026-11-02T19:56:28.232713+00:00",
-      "record_count": 748,
+      "source_detail": "public_api_with_published_backfill",
+      "refreshed_at_utc": "2026-11-03T01:44:13.245917+00:00",
+      "record_count": 750,
       "fields": [
         "fecha",
         "codigo_indicador",
@@ -359,11 +359,11 @@
         "utm"
       ],
       "indicator_delivery": {
-        "dolar": "raw_recovery",
-        "euro": "raw_recovery",
+        "dolar": "live",
+        "euro": "live",
         "ipc": "ine_override",
-        "uf": "raw_recovery",
-        "utm": "raw_recovery"
+        "uf": "live",
+        "utm": "live"
       },
       "join_keys": [
         "fecha",
@@ -380,9 +380,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.14,
+        "age_hours": 0.13,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-11-02T20:04:36.426515+00:00"
+        "checked_at_utc": "2026-11-03T01:52:02.231256+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 72,
@@ -391,7 +391,7 @@
       "coverage": {
         "status": "not_applicable",
         "expected_record_count": null,
-        "actual_record_count": 748,
+        "actual_record_count": 750,
         "coverage_ratio": null,
         "summary": "Sin baseline de cobertura por cardinalidad para esta capa.",
         "expected": false
@@ -416,22 +416,19 @@
       "documentation": "docs/datasets/indicadores.md",
       "validation_status": "ok",
       "warnings": [
-        "indicadores live refresh reused raw snapshots for: uf/2026, dolar/2026, euro/2026, utm/2026",
-        "indicadores live refresh preserved previous staging rows for: ipc/2026"
+        "indicadores live refresh reused last published artifact for missing codes: ipc"
       ],
       "actionable_warnings": [
-        "indicadores live refresh reused raw snapshots for: uf/2026, dolar/2026, euro/2026, utm/2026",
-        "indicadores live refresh preserved previous staging rows for: ipc/2026"
+        "indicadores live refresh reused last published artifact for missing codes: ipc"
       ],
       "degradation": {
         "status": "warning",
-        "impact": "indicadores live refresh reused raw snapshots for: uf/2026, dolar/2026, euro/2026, utm/2026; indicadores live refresh preserved previous staging rows for: ipc/2026",
+        "impact": "indicadores live refresh reused last published artifact for missing codes: ipc",
         "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
       },
       "publication_hold": null,
       "notes": [
-        "raw_recovery_used_for_pairs: uf/2026, dolar/2026, euro/2026, utm/2026",
-        "preserved_existing_pairs_due_to_fetch_failure: ipc/2026",
+        "published_backfills_used_for_codes: ipc",
         "ine_override_used_for_pairs: ipc/2026"
       ]
     },
@@ -443,7 +440,7 @@
       "source_url": "https://censo2024.ine.gob.cl/wp-content/uploads/2025/03/D1_Poblacion-censada-por-sexo-y-edad-en-grupos-quinquenales.xlsx",
       "source_mode": "live",
       "source_detail": "official_xlsx",
-      "refreshed_at_utc": "2026-11-02T19:56:28.931583+00:00",
+      "refreshed_at_utc": "2026-11-03T01:44:14.570904+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -479,9 +476,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.14,
+        "age_hours": 0.13,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-11-02T20:04:36.426525+00:00"
+        "checked_at_utc": "2026-11-03T01:52:02.231271+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -534,7 +531,7 @@
       "source_url": "https://datos.gob.cl/dataset/3bf4cf7c-f638-4735-9a01-f65faae4beca/resource/2c44d782-3365-44e3-aefb-2c8b8363a1bc/download/establecimientos_20261028.csv",
       "source_mode": "live",
       "source_detail": "datos_gob_csv",
-      "refreshed_at_utc": "2026-11-02T19:56:37.189467+00:00",
+      "refreshed_at_utc": "2026-11-03T01:44:19.796371+00:00",
       "record_count": 5837,
       "fields": [
         "codigo_establecimiento",
@@ -571,7 +568,7 @@
         "status": "fresh",
         "age_hours": 0.13,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-11-02T20:04:36.426535+00:00"
+        "checked_at_utc": "2026-11-03T01:52:02.231285+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 1080,
@@ -651,9 +648,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 166.64,
+        "age_hours": 172.43,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-11-02T20:04:36.426543+00:00"
+        "checked_at_utc": "2026-11-03T01:52:02.231297+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -704,7 +701,7 @@
       "source_url": "https://censo2024.ine.gob.cl/wp-content/uploads/2025/03/V1_Viviendas-y-hogares-censados.xlsx",
       "source_mode": "live",
       "source_detail": "official_xlsx",
-      "refreshed_at_utc": "2026-11-02T19:56:35.584716+00:00",
+      "refreshed_at_utc": "2026-11-03T01:44:18.181518+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -739,7 +736,7 @@
         "status": "fresh",
         "age_hours": 0.13,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-11-02T20:04:36.426552+00:00"
+        "checked_at_utc": "2026-11-03T01:52:02.231310+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -787,7 +784,7 @@
       "source_url": "https://www.bcn.cl/siit/observatorio/ley20840",
       "source_mode": "live",
       "source_detail": "bcn_electoral_mapping_generated",
-      "refreshed_at_utc": "2026-11-02T19:56:37.382398+00:00",
+      "refreshed_at_utc": "2026-11-03T01:44:19.969059+00:00",
       "record_count": 346,
       "fields": [
         "codigo_comuna",
@@ -813,7 +810,7 @@
         "status": "fresh",
         "age_hours": 0.13,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-11-02T20:04:36.426559+00:00"
+        "checked_at_utc": "2026-11-03T01:52:02.231318+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -891,9 +888,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 1505.0,
+        "age_hours": 1510.79,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-11-02T20:04:36.426566+00:00"
+        "checked_at_utc": "2026-11-03T01:52:02.231326+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -978,9 +975,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 166.64,
+        "age_hours": 172.43,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-11-02T20:04:36.426575+00:00"
+        "checked_at_utc": "2026-11-03T01:52:02.231333+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -1035,7 +1032,7 @@
       "source_url": "https://www.ine.gob.cl/docs/default-source/sistema-de-indicadores-y-estandares-de-desarrollo-urbano/indicadores/actualizaci%C3%B3n-2019/matriz-siedu-publicacion.xlsm",
       "source_mode": "live",
       "source_detail": "ine_siedu_xlsm_cinco_mediciones_2018_2022",
-      "refreshed_at_utc": "2026-11-02T19:56:58.819286+00:00",
+      "refreshed_at_utc": "2026-11-03T01:44:30.321129+00:00",
       "record_count": 6701,
       "fields": [
         "anio",
@@ -1068,7 +1065,7 @@
         "status": "fresh",
         "age_hours": 0.13,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-11-02T20:04:36.426584+00:00"
+        "checked_at_utc": "2026-11-03T01:52:02.231348+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -1127,7 +1124,7 @@
       "source_url": "https://github.com/cortega26/chile-hub",
       "source_mode": "live",
       "source_detail": "derived_from_validated_chile_hub_layers",
-      "refreshed_at_utc": "2026-11-02T20:04:36.426594+00:00",
+      "refreshed_at_utc": "2026-11-03T01:52:02.231358+00:00",
       "record_count": 346,
       "fields": [
         "codigo_region",
@@ -1201,7 +1198,7 @@
         "status": "fresh",
         "age_hours": 0.0,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-11-02T20:04:36.426610+00:00"
+        "checked_at_utc": "2026-11-03T01:52:02.231371+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 1080,
@@ -1255,7 +1252,7 @@
       "source_url": "https://datos.gob.cl/dataset/registro-de-empresas-y-sociedades",
       "source_mode": "live",
       "source_detail": "datos_gob_cl_ckan_api",
-      "refreshed_at_utc": "2026-11-02T19:57:04.952296+00:00",
+      "refreshed_at_utc": "2026-11-03T01:44:35.468236+00:00",
       "record_count": 1628433,
       "fields": [
         "rut",
@@ -1289,9 +1286,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 0.13,
+        "age_hours": 0.12,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-11-02T20:04:36.426621+00:00"
+        "checked_at_utc": "2026-11-03T01:52:02.231384+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 1080,
@@ -1382,9 +1379,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 12.07,
+        "age_hours": 17.86,
         "max_age_hours": 175200,
-        "checked_at_utc": "2026-11-02T20:04:36.426630+00:00"
+        "checked_at_utc": "2026-11-03T01:52:02.231393+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 175200,
@@ -1437,7 +1434,7 @@
       "source_url": "http://datos.energiaabierta.cl/dataviews/241686/consumo-electrico-anual-por-comuna-y-tipo-de-cliente/",
       "source_mode": "fallback",
       "source_detail": "Consumo eléctrico anual por comuna y tipo de cliente",
-      "refreshed_at_utc": "2026-11-02T20:03:22.008198+00:00",
+      "refreshed_at_utc": "2026-11-03T01:50:52.661410+00:00",
       "record_count": 3,
       "fields": [
         "codigo_region",
@@ -1470,7 +1467,7 @@
         "status": "fresh",
         "age_hours": 0.02,
         "max_age_hours": 17520,
-        "checked_at_utc": "2026-11-02T20:04:36.426638+00:00"
+        "checked_at_utc": "2026-11-03T01:52:02.231401+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 17520,
@@ -1528,7 +1525,7 @@
       "source_url": "https://opendata.camara.cl/camaradiputados/WServices/WSComun.asmx/retornarPartidosPoliticos",
       "source_mode": "live",
       "source_detail": "WSComun.asmx/retornarPartidosPoliticos + servel.cl/partidos-politicos (estado legal)",
-      "refreshed_at_utc": "2026-11-02T20:03:24.225343+00:00",
+      "refreshed_at_utc": "2026-11-03T01:50:54.911953+00:00",
       "record_count": 37,
       "fields": [
         "id_partido",
@@ -1559,7 +1556,7 @@
         "status": "fresh",
         "age_hours": 0.02,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-11-02T20:04:36.426646+00:00"
+        "checked_at_utc": "2026-11-03T01:52:02.231408+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -1651,9 +1648,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 12.07,
+        "age_hours": 17.86,
         "max_age_hours": 87600,
-        "checked_at_utc": "2026-11-02T20:04:36.426655+00:00"
+        "checked_at_utc": "2026-11-03T01:52:02.231417+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 87600,
@@ -1706,7 +1703,7 @@
       "source_url": "https://www.ine.gob.cl/estadisticas-por-tema/demografia-y-poblacion/estadisticas-vitales",
       "source_mode": "live",
       "source_detail": "Anuarios de Estadísticas Vitales (tabulados XLSX, tabla 1.2.2-04 por comuna de residencia). Solo definitivos: los boletines provisionales del INE no publican desglose comunal.",
-      "refreshed_at_utc": "2026-11-02T20:03:52.760164+00:00",
+      "refreshed_at_utc": "2026-11-03T01:51:16.885939+00:00",
       "record_count": 13840,
       "fields": [
         "anio",
@@ -1740,7 +1737,7 @@
         "status": "fresh",
         "age_hours": 0.01,
         "max_age_hours": 8760,
-        "checked_at_utc": "2026-11-02T20:04:36.426663+00:00"
+        "checked_at_utc": "2026-11-03T01:52:02.231424+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 8760,
@@ -1829,9 +1826,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 912.93,
+        "age_hours": 918.72,
         "max_age_hours": 1080,
-        "checked_at_utc": "2026-11-02T20:04:36.426671+00:00"
+        "checked_at_utc": "2026-11-03T01:52:02.231432+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 1080,
@@ -1926,9 +1923,9 @@
       },
       "freshness": {
         "status": "stale",
-        "age_hours": 186.36,
+        "age_hours": 192.15,
         "max_age_hours": 72,
-        "checked_at_utc": "2026-11-02T20:04:36.426680+00:00"
+        "checked_at_utc": "2026-11-03T01:52:02.231441+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 72,
@@ -1963,23 +1960,23 @@
       "validation_status": "ok",
       "warnings": [
         "cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación",
-        "calidad_aire freshness is stale: 186.36h since refresh, policy max is 72h"
+        "calidad_aire freshness is stale: 192.15h since refresh, policy max is 72h"
       ],
       "actionable_warnings": [
-        "calidad_aire freshness is stale: 186.36h since refresh, policy max is 72h"
+        "calidad_aire freshness is stale: 192.15h since refresh, policy max is 72h"
       ],
       "degradation": {
         "status": "warning",
-        "impact": "calidad_aire freshness is stale: 186.36h since refresh, policy max is 72h",
+        "impact": "calidad_aire freshness is stale: 192.15h since refresh, policy max is 72h",
         "recommended_action": "Revisar warnings operativos del dataset antes de consumirlo en producción."
       },
       "publication_hold": {
         "retained": true,
         "reason": "source_mode=fallback",
-        "attempted_at_utc": "2026-11-02T20:04:10.074005+00:00",
+        "attempted_at_utc": "2026-11-03T01:51:35.356825+00:00",
         "previous_generated_at_utc": "2026-10-26T01:42:49.966386+00:00",
         "since_utc": "2026-10-26T13:12:33.924917+00:00",
-        "builds_held": 7,
+        "builds_held": 8,
         "cap_applies": false,
         "overdue": false
       },
@@ -2028,9 +2025,9 @@
       },
       "freshness": {
         "status": "fresh",
-        "age_hours": 400.66,
+        "age_hours": 406.45,
         "max_age_hours": 2160,
-        "checked_at_utc": "2026-11-02T20:04:36.426689+00:00"
+        "checked_at_utc": "2026-11-03T01:52:02.231451+00:00"
       },
       "freshness_policy": {
         "max_age_hours": 2160,

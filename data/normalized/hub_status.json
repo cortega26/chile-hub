@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-11-02T20:04:36.431226+00:00",
+  "generated_at_utc": "2026-11-03T01:52:02.235846+00:00",
   "overall_status": "warn",
   "dataset_count": 23,
   "live_count": 22,
@@ -7,7 +7,7 @@
   "stale_count": 1,
   "drifted_count": 2,
   "degraded_count": 0,
-  "warning_count": 9,
+  "warning_count": 8,
   "top_issue": {
     "dataset": "calidad_aire",
     "attention_priority": 0,

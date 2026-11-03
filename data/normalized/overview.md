@@ -1,6 +1,6 @@
 # chile-hub overview
 
-- `generated_at_utc`: `2026-11-02T20:04:36.431226+00:00`
+- `generated_at_utc`: `2026-11-03T01:52:02.235846+00:00`
 - `overall_status`: `warn`
 - `dataset_count`: `23`
 - `live_count`: `22`
@@ -9,7 +9,7 @@
 - `drifted_count`: `2`
 - `degraded_count`: `0`
 - `partial_coverage_count`: `1`
-- `warning_count`: `9`
+- `warning_count`: `8`
 - `shared_artifact_count`: `25`
 - `package_count`: `1`
 - `top_issue`: `calidad_aire` (freshness=stale, drift=drifted, warnings=2)
@@ -47,7 +47,7 @@
 
 - `path`: `data/normalized/chile-hub-publishable-bundle.zip`
 - `package_type`: `zip`
-- `size_bytes`: `31839420`
+- `size_bytes`: `31838724`
 - `checksum`: `sha256` via `data/normalized/chile-hub-publishable-bundle.zip.sha256`
 - `verification_command`: `shasum -a 256 -c data/normalized/chile-hub-publishable-bundle.zip.sha256`
 
