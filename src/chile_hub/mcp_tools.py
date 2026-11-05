@@ -19,7 +19,7 @@ import polars as pl
 import requests
 
 from . import _query
-from .datasets import Dataset
+from .datasets import DATASET_ALIASES, Dataset
 from .text import normalize_comuna_name
 
 PUBLIC_DATA_BASE = "https://tooltician.com/chile-hub/data/normalized"
@@ -33,7 +33,7 @@ def _parquet_url(base_url: str, name: str) -> str:
 
 def _dataset_url(name: str, base_url: str) -> str:
     dataset = Dataset.from_string(name)  # ValueError con sugerencia si no existe
-    return _parquet_url(base_url, dataset.value)
+    return _parquet_url(base_url, DATASET_ALIASES.get(dataset.value, dataset.value))
 
 
 def _scan_parquet(url: str) -> pl.LazyFrame:
@@ -76,14 +76,17 @@ def _read_dataset(name: str, base_url: str) -> pl.DataFrame:
 
 
 def list_datasets() -> list[dict]:
-    """Lista las capas disponibles con la URL de su Parquet público."""
-    return [
-        {
-            "nombre": dataset.value,
-            "parquet": _parquet_url(PUBLIC_DATA_BASE, dataset.value),
-        }
-        for dataset in Dataset
-    ]
+    """Lista las capas disponibles con la URL de su Parquet público.
+
+    Un alias apunta al Parquet de su dataset canónico y lo declara en `alias_de`.
+    """
+    entries = []
+    for dataset in Dataset:
+        entry = {"nombre": dataset.value, "parquet": _dataset_url(dataset.value, PUBLIC_DATA_BASE)}
+        if dataset.value in DATASET_ALIASES:
+            entry["alias_de"] = DATASET_ALIASES[dataset.value]
+        entries.append(entry)
+    return entries
 
 
 def get_dataset(name: str, limite: int = DEFAULT_LIMIT, base_url: str = PUBLIC_DATA_BASE) -> dict:
