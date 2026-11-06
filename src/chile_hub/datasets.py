@@ -14,6 +14,11 @@ from __future__ import annotations
 import enum
 from difflib import get_close_matches
 
+# Alias sin archivo propio → dataset canónico cuyo Parquet se lee. Espejo de
+# `alias_for` en data/dataset_catalog_config.json, que no viaja en el wheel;
+# `test_dataset_aliases_match_catalog` impide que diverjan.
+DATASET_ALIASES: dict[str, str] = {"comunas_enriquecidas": "comunas"}
+
 
 class Dataset(enum.StrEnum):
     """Enumeración de todos los datasets curados por ChileHub.

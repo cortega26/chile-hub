@@ -5732,6 +5732,68 @@ class McpToolsTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 get_dataset("comunas", limite=0, base_url=tmpdir)
 
+    def test_list_datasets_urls_point_to_published_files(self):
+        """Cada URL anunciada debe existir en la capa HTTP.
+
+        Regresión real (2026-11-05): `comunas_enriquecidas` se anunciaba como
+        `comunas_enriquecidas.parquet`, que responde 404 en producción.
+        """
+        from chile_hub.mcp_tools import PUBLIC_DATA_BASE, list_datasets
+
+        normalized = ROOT_DIR / "data" / "normalized"
+        for entry in list_datasets():
+            filename = entry["parquet"].removeprefix(PUBLIC_DATA_BASE + "/")
+            self.assertTrue(
+                (normalized / filename).exists(),
+                f"{entry['nombre']} anuncia {filename}, que no existe en data/normalized/",
+            )
+
+    def test_list_datasets_marks_alias(self):
+        from chile_hub.mcp_tools import list_datasets
+
+        entries = {e["nombre"]: e for e in list_datasets()}
+        alias = entries["comunas_enriquecidas"]
+        self.assertEqual(alias["alias_de"], "comunas")
+        self.assertEqual(alias["parquet"], entries["comunas"]["parquet"])
+        self.assertNotIn("alias_de", entries["comunas"])
+
+    def test_get_dataset_alias_reads_canonical_parquet(self):
+        from chile_hub.mcp_tools import get_dataset
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            df = pl.DataFrame(
+                {
+                    "codigo_comuna": ["01101", "13101"],
+                    "nombre_comuna": ["Iquique", "Santiago"],
+                }
+            )
+            # Solo existe el parquet canónico, igual que en producción.
+            self._write_parquet(tmpdir, "comunas", df)
+
+            alias = get_dataset("comunas_enriquecidas", base_url=tmpdir)
+            canonical = get_dataset("comunas", base_url=tmpdir)
+
+            self.assertEqual(alias["dataset"], "comunas_enriquecidas")
+            self.assertEqual(alias["filas_totales"], 2)
+            self.assertEqual(alias["registros"], canonical["registros"])
+            self.assertEqual(alias["registros"][0]["codigo_comuna"], "01101")
+
+    def test_dataset_aliases_match_catalog(self):
+        """El mapa de alias del paquete no puede divergir del catálogo."""
+        import json
+
+        from chile_hub.datasets import DATASET_ALIASES
+
+        catalog = json.loads(
+            (ROOT_DIR / "data" / "dataset_catalog_config.json").read_text(encoding="utf-8")
+        )
+        expected = {
+            name: entry["alias_for"]
+            for name, entry in catalog.items()
+            if isinstance(entry, dict) and entry.get("alias_for")
+        }
+        self.assertEqual(DATASET_ALIASES, expected)
+
     def test_get_dataset_unknown_name_raises(self):
         from chile_hub.mcp_tools import get_dataset
 
