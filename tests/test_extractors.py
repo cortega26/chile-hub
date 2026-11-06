@@ -5949,6 +5949,22 @@ class PermisosEdificacionExtractorTests(unittest.TestCase):
         self.assertEqual(_snapshot_refreshed_at(path), "2026-09-25T19:08:42+00:00")
         self.assertIsNone(_snapshot_refreshed_at(Path("snapshot_sin_fecha.xlsx")))
 
+    def test_minvu_discovery_curl_cffi_certificate_error_uses_known_url(self):
+        """Un fallo TLS en la página CEDOC debe usar la URL directa conocida.
+
+        Regresión schedule 2026-11-06 (#240): curl_cffi no hereda de requests.
+        """
+        from curl_cffi.requests.exceptions import CertificateVerifyError
+
+        pe = permisos_edificacion_extractor
+        with patch.object(
+            pe, "_stealth_get", side_effect=CertificateVerifyError("local issuer certificate")
+        ):
+            url, metodo = pe._discover_xlsx_url()
+
+        self.assertEqual(url, pe.HARDCODED_XLSX_URL)
+        self.assertIn("descubrimiento falló", metodo)
+
     def test_fetch_data_reuses_versioned_snapshot_as_monthly(self):
         """Si la descarga live falla y hay snapshot versionado, el modo es
         `monthly` (no `fallback` ni `live`) y refreshed_at sale del nombre.
@@ -5956,6 +5972,7 @@ class PermisosEdificacionExtractorTests(unittest.TestCase):
         Contexto real: CI no puede descargar catalogo.minvu.cl (bloqueo por
         IP); el snapshot vive en data/raw/ versionado en git.
         """
+        from curl_cffi.requests.exceptions import CertificateVerifyError
         from src.extractors import permisos_edificacion_extractor as pe
 
         fake_lookup = self.FAKE_LOOKUP
@@ -6001,7 +6018,10 @@ class PermisosEdificacionExtractorTests(unittest.TestCase):
                 patch.object(
                     pe, "_discover_xlsx_url", return_value=(pe.HARDCODED_XLSX_URL, "test")
                 ),
-                patch.object(pe, "_download_xlsx", side_effect=OSError("bloqueado por IP")),
+                patch.object(
+                    pe, "_download_xlsx",
+                    side_effect=CertificateVerifyError("unable to get local issuer certificate"),
+                ),
                 patch.object(
                     pe.openpyxl,
                     "load_workbook",
