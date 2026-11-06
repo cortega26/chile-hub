@@ -5973,6 +5973,7 @@ class PermisosEdificacionExtractorTests(unittest.TestCase):
         IP); el snapshot vive en data/raw/ versionado en git.
         """
         from curl_cffi.requests.exceptions import CertificateVerifyError
+
         from src.extractors import permisos_edificacion_extractor as pe
 
         fake_lookup = self.FAKE_LOOKUP
