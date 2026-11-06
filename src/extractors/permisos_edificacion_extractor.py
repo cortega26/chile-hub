@@ -47,9 +47,14 @@ import requests
 try:
     from curl_cffi.requests.exceptions import RequestException as _CurlRequestException
 except ImportError:  # pragma: no cover - entornos sin extra pipeline
-    _CurlRequestException = requests.RequestException
+    _CURL_REQUEST_ERRORS: tuple[type[Exception], ...] = ()
+else:
+    _CURL_REQUEST_ERRORS = (_CurlRequestException,)
 
-_HTTP_REQUEST_ERRORS = (requests.RequestException, _CurlRequestException)
+_HTTP_REQUEST_ERRORS: tuple[type[Exception], ...] = (
+    requests.RequestException,
+    *_CURL_REQUEST_ERRORS,
+)
 UTC = datetime.UTC
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
