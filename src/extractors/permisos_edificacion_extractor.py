@@ -42,6 +42,14 @@ import openpyxl
 import polars as pl
 import requests
 
+# curl_cffi usa su propia jerarquía de excepciones, independiente de requests.
+# El extra pipeline es opcional fuera de CI; conservar importación segura.
+try:
+    from curl_cffi.requests.exceptions import RequestException as _CurlRequestException
+except ImportError:  # pragma: no cover - entornos sin extra pipeline
+    _CurlRequestException = requests.RequestException
+
+_HTTP_REQUEST_ERRORS = (requests.RequestException, _CurlRequestException)
 UTC = datetime.UTC
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
@@ -236,7 +244,7 @@ def _discover_xlsx_url() -> tuple[str, str]:
                 return params["uri"][0], "repositorio-biblionumber"
             if href.startswith("http"):
                 return href, "repositorio-tracklinks"
-    except (requests.RequestException, ValueError) as exc:
+    except (*_HTTP_REQUEST_ERRORS, ValueError) as exc:
         return HARDCODED_XLSX_URL, f"directa-conocida (descubrimiento falló: {exc})"
     return HARDCODED_XLSX_URL, "directa-conocida (sin match biblionumber en página)"
 
@@ -447,14 +455,14 @@ def fetch_data() -> tuple[list[dict], str, str, list[str], str | None]:
     try:
         url, metodo = _discover_xlsx_url()
         notes.append(f"descubrimiento: {metodo}")
-    except (requests.RequestException, ValueError) as exc:
+    except (*_HTTP_REQUEST_ERRORS, ValueError) as exc:
         notes.append(f"descubrimiento falló ({exc}); usando URL directa conocida")
         url = HARDCODED_XLSX_URL
 
     try:
         try:
             path = _download_xlsx(url)
-        except (requests.RequestException, OSError) as exc:
+        except (*_HTTP_REQUEST_ERRORS, OSError) as exc:
             snapshots = sorted(Path(RAW_DIR).glob(SNAPSHOT_GLOB))
             if not snapshots:
                 raise
@@ -464,7 +472,7 @@ def fetch_data() -> tuple[list[dict], str, str, list[str], str | None]:
             notes.append(f"descarga falló, usando snapshot versionado {path.name} ({exc})")
             if refreshed_at is None:
                 notes.append("snapshot sin timestamp parseable en el nombre; no se puede fechar")
-    except (requests.RequestException, OSError) as exc:
+    except (*_HTTP_REQUEST_ERRORS, OSError) as exc:
         notes.append(f"sin datos live ni snapshot ({exc})")
         return FALLBACK_ROWS, "fallback", REPOSITORIO_URL, notes, None
 
