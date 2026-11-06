@@ -12,6 +12,44 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.55.3 - 2026-11-06
+
+### Corregido
+
+- **ci**: Checkout del ref del evento para PRs desde forks y merge queue
+  ([#242](https://github.com/cortega26/chile-hub/pull/242),
+  [`302f507`](https://github.com/cortega26/chile-hub/commit/302f507f08cd8ba1aee88e834208601e897fc47c))
+
+### Mantenimiento
+
+- **ci**: Sync coverage badge from verified tests [skip ci]
+  ([`10fc3a7`](https://github.com/cortega26/chile-hub/commit/10fc3a74c0bd0312d01134b066621fc954a539ee))
+
+- **ci**: Sync coverage badge from verified tests [skip ci]
+  ([`4afad30`](https://github.com/cortega26/chile-hub/commit/4afad305198f89607f85254213c80afd12fd3663))
+
+- **deps**: Bump astral-sh/setup-uv from 10.3.2 to 10.3.3
+  ([#239](https://github.com/cortega26/chile-hub/pull/239),
+  [`5bfa063`](https://github.com/cortega26/chile-hub/commit/5bfa063bb4d85e7e7c674de0289bf4af0ca4a3a5))
+
+- **deps**: Sync uv.lock [skip ci] ([#238](https://github.com/cortega26/chile-hub/pull/238),
+  [`a6e3ce7`](https://github.com/cortega26/chile-hub/commit/a6e3ce7801eda2acc1eaf7e1f6d5d8adde8f9fdc))
+
+- **deps**: Sync uv.lock [skip ci] ([#237](https://github.com/cortega26/chile-hub/pull/237),
+  [`132425e`](https://github.com/cortega26/chile-hub/commit/132425ee2cffd2192022fae2562f686d641ba192))
+
+- **deps-dev**: Bump the python-dev group across 1 directory with 7 updates
+  ([#238](https://github.com/cortega26/chile-hub/pull/238),
+  [`a6e3ce7`](https://github.com/cortega26/chile-hub/commit/a6e3ce7801eda2acc1eaf7e1f6d5d8adde8f9fdc))
+
+- **deps-dev**: Bump xlsxwriter ([#237](https://github.com/cortega26/chile-hub/pull/237),
+  [`132425e`](https://github.com/cortega26/chile-hub/commit/132425ee2cffd2192022fae2562f686d641ba192))
+
+- **deps-dev**: Bump xlsxwriter from 3.3.0 to 3.3.1 in the python-pipeline group
+  ([#237](https://github.com/cortega26/chile-hub/pull/237),
+  [`132425e`](https://github.com/cortega26/chile-hub/commit/132425ee2cffd2192022fae2562f686d641ba192))
+
+
 ## 1.55.2 - 2026-10-30
 
 ### Corregido
