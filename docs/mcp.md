@@ -43,7 +43,7 @@ Claude Desktop (`claude_desktop_config.json`) y clientes compatibles:
 
 | Tool | Qué hace | Parámetros |
 |:---|:---|:---|
-| `list_datasets` | Lista las capas disponibles y la URL de su Parquet | — |
+| `list_datasets` | Lista las capas disponibles y la URL de su Parquet; un alias (p. ej. `comunas_enriquecidas`) apunta al Parquet de su capa canónica e indica `alias_de` | — |
 | `get_dataset` | Primeras filas de una capa (máximo 1000) | `nombre`, `limite` |
 | `resolve_comunas` | Nombres de comuna → código CUT de 5 caracteres | `nombres` (lista) |
 | `resolve_regiones` | Nombres de región (o alias como `RM`) → código CUT de 2 caracteres | `nombres` (lista) |
