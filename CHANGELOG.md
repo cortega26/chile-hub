@@ -12,6 +12,20 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.55.4 - 2026-11-06
+
+### Corregido
+
+- **mcp**: Resuelve alias de dataset al Parquet canónico
+  ([#241](https://github.com/cortega26/chile-hub/pull/241),
+  [`a82a04e`](https://github.com/cortega26/chile-hub/commit/a82a04e7ba2f5fde6f58e07e0e6adc4ffcf81dac))
+
+### Mantenimiento
+
+- **ci**: Sync coverage badge from verified tests [skip ci]
+  ([`ca5aafd`](https://github.com/cortega26/chile-hub/commit/ca5aafdb490261d7db700bfd696ac3428249f93d))
+
+
 ## 1.55.3 - 2026-11-06
 
 ### Corregido
