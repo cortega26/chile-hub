@@ -12,6 +12,14 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.56.0 - 2026-11-06
+
+### Agregado
+
+- **mcp**: Agrega tool describe_dataset ([#244](https://github.com/cortega26/chile-hub/pull/244),
+  [`a775209`](https://github.com/cortega26/chile-hub/commit/a77520925fee6f967c79e788db1b478e5eb97c54))
+
+
 ## 1.55.4 - 2026-11-06
 
 ### Corregido
