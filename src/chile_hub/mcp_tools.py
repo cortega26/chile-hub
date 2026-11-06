@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import datetime
 import io
+import json
 from functools import lru_cache
 from pathlib import Path
 
@@ -25,6 +26,7 @@ from .text import normalize_comuna_name
 PUBLIC_DATA_BASE = "https://tooltician.com/chile-hub/data/normalized"
 DEFAULT_LIMIT = 100
 MAX_LIMIT = 1000
+CATALOG_FILE = "dataset_catalog.json"
 
 
 def _parquet_url(base_url: str, name: str) -> str:
@@ -70,6 +72,19 @@ def _read_parquet_cached(url: str) -> pl.LazyFrame:
     return _scan_parquet(url)
 
 
+@lru_cache(maxsize=4)
+def _read_catalog_cached(base_url: str) -> dict[str, dict]:
+    """Entradas de `dataset_catalog.json` por nombre, cacheadas por proceso como los Parquet."""
+    url = f"{base_url.rstrip('/')}/{CATALOG_FILE}"
+    if url.startswith(("http://", "https://")):
+        response = requests.get(url, timeout=60)
+        response.raise_for_status()
+        payload = response.json()
+    else:
+        payload = json.loads(Path(url).read_text(encoding="utf-8"))
+    return {entry["dataset"]: entry for entry in payload["datasets"]}
+
+
 def _read_dataset(name: str, base_url: str) -> pl.DataFrame:
     """DataFrame completo de una capa, pasando por la caché por proceso."""
     return _read_parquet_cached(_dataset_url(name, base_url)).collect()
@@ -106,6 +121,54 @@ def get_dataset(name: str, limite: int = DEFAULT_LIMIT, base_url: str = PUBLIC_D
         "columnas": head.columns,
         "registros": head.to_dicts(),
     }
+
+
+def describe_dataset(name: str, base_url: str = PUBLIC_DATA_BASE) -> dict:
+    """Esquema, tamaño, fuente, licencia y frescura de una capa.
+
+    Columnas y filas salen del Parquet (lo que el agente va a leer); el resto,
+    de `dataset_catalog.json`. La edad se calcula al llamar: la `freshness`
+    del catálogo se congela al momento del build.
+    """
+    dataset = Dataset.from_string(name).value
+    entry = _read_catalog_cached(base_url).get(dataset)
+    if entry is None:
+        raise ValueError(f"'{dataset}' no figura en {CATALOG_FILE}")
+
+    lazy = _read_parquet_cached(_dataset_url(dataset, base_url))
+    schema = lazy.collect_schema()
+    reuse = entry.get("reuse_policy") or {}
+    policy = entry.get("freshness_policy") or {}
+    refreshed = entry.get("refreshed_at_utc")
+    edad_horas = None
+    if refreshed:
+        delta = datetime.datetime.now(datetime.UTC) - datetime.datetime.fromisoformat(refreshed)
+        edad_horas = round(delta.total_seconds() / 3600, 1)
+    max_horas = policy.get("max_age_hours")
+
+    result = {
+        "dataset": dataset,
+        "descripcion": entry.get("description"),
+        "filas_totales": lazy.select(pl.len()).collect().item(),
+        "columnas": [{"nombre": col, "tipo": str(dtype)} for col, dtype in schema.items()],
+        "claves_de_cruce": entry.get("join_keys") or [],
+        "fuente": {"nombre": entry.get("source_name"), "url": entry.get("source_url")},
+        "licencia": {
+            "nombre": reuse.get("license"),
+            "url": reuse.get("license_url"),
+            "atribucion_requerida": reuse.get("attribution_required"),
+        },
+        "actualizado_utc": refreshed,
+        "frescura": {
+            "politica": policy.get("label"),
+            "max_horas": max_horas,
+            "edad_horas": edad_horas,
+            "vencida": (edad_horas > max_horas if edad_horas is not None and max_horas else None),
+        },
+    }
+    if dataset in DATASET_ALIASES:
+        result["alias_de"] = DATASET_ALIASES[dataset]
+    return result
 
 
 def resolve_comunas(nombres: list[str], base_url: str = PUBLIC_DATA_BASE) -> list[dict]:

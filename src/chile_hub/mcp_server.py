@@ -1,7 +1,7 @@
 """Servidor MCP (stdio) de chile-hub — datos públicos de Chile para agentes.
 
-Expone seis tools de sólo lectura sobre la capa HTTP estática
-(`data/normalized/{capa}.parquet`): listar capas, leer filas, resolver nombres
+Expone siete tools de sólo lectura sobre la capa HTTP estática
+(`data/normalized/{capa}.parquet`): listar y describir capas, leer filas, resolver nombres
 de comuna a CUT, resolver nombres de región a CUT, resolver coordenadas a
 comuna e indicadores económicos. No hay hosting, telemetría ni escritura en
 disco: el servidor corre local en el cliente MCP.
@@ -21,6 +21,7 @@ from typing import Any
 from . import __version__
 from .mcp_tools import (
     DEFAULT_LIMIT,
+    describe_dataset,
     get_dataset,
     get_indicadores,
     list_datasets,
@@ -36,7 +37,7 @@ INSTALL_HINT = (
 
 
 def build_server() -> Any:
-    """Construye el `MCPServer` con las seis tools registradas.
+    """Construye el `MCPServer` con las siete tools registradas.
 
     Importa `mcp` aquí dentro: sin el extra, el error es explícito en vez de
     romper el import del paquete.
@@ -51,7 +52,8 @@ def build_server() -> Any:
         title="chile-hub — datos públicos de Chile",
         instructions=(
             "Capa de datos curada y validada sobre fuentes oficiales de Chile. "
-            "Usa list_datasets para descubrir capas, resolve_comunas y "
+            "Usa list_datasets para descubrir capas, describe_dataset para ver "
+            "sus columnas, fuente, licencia y frescura, resolve_comunas y "
             "resolve_regiones para traducir nombres a códigos CUT (clave de "
             "cruce), resolve_by_coords para puntos (lat, lon), get_dataset "
             "para leer filas y get_indicadores para series económicas."
@@ -65,6 +67,17 @@ def build_server() -> Any:
     )
     def _list_datasets() -> list[dict[str, Any]]:
         return list_datasets()
+
+    @server.tool(
+        name="describe_dataset",
+        description=(
+            "Describe una capa: columnas y tipos, filas totales, claves de cruce, "
+            "fuente, licencia y frescura (edad actual frente a su política). "
+            "Úsala antes de get_dataset para saber qué columnas pedir."
+        ),
+    )
+    def _describe_dataset(nombre: str) -> dict[str, Any]:
+        return describe_dataset(nombre)
 
     @server.tool(
         name="get_dataset",
