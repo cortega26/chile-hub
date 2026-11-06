@@ -5664,9 +5664,10 @@ class McpToolsTests(unittest.TestCase):
     """
 
     def setUp(self):
-        from chile_hub.mcp_tools import _read_parquet_cached
+        from chile_hub.mcp_tools import _read_catalog_cached, _read_parquet_cached
 
         _read_parquet_cached.cache_clear()
+        _read_catalog_cached.cache_clear()
 
     def _write_parquet(self, tmpdir: str, name: str, df) -> str:
         df.write_parquet(Path(tmpdir) / f"{name}.parquet")
@@ -5793,6 +5794,149 @@ class McpToolsTests(unittest.TestCase):
             if isinstance(entry, dict) and entry.get("alias_for")
         }
         self.assertEqual(DATASET_ALIASES, expected)
+
+    def _write_catalog(self, tmpdir: str, entries: list[dict]) -> None:
+        import json
+
+        payload = {"dataset_count": len(entries), "datasets": entries}
+        (Path(tmpdir) / "dataset_catalog.json").write_text(json.dumps(payload), encoding="utf-8")
+
+    def _catalog_entry(self, name: str, **overrides) -> dict:
+        entry = {
+            "dataset": name,
+            "description": f"Descripción de {name}",
+            "alias_for": None,
+            "source_name": "INE",
+            "source_url": "https://www.ine.gob.cl/x.xlsx",
+            "refreshed_at_utc": "2026-11-01T00:00:00+00:00",
+            "join_keys": ["codigo_comuna"],
+            "reuse_policy": {
+                "license": "CC BY 4.0",
+                "license_url": "https://www.ine.gob.cl/terminos-de-uso",
+                "attribution_required": True,
+            },
+            "freshness_policy": {"max_age_hours": 87600, "label": "decenal"},
+        }
+        entry.update(overrides)
+        return entry
+
+    def test_describe_dataset_combines_parquet_schema_and_catalog(self):
+        from chile_hub.mcp_tools import describe_dataset
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            df = pl.DataFrame(
+                {
+                    "codigo_comuna": ["01101", "13101", "05101"],
+                    "poblacion_censada": [1, 2, 3],
+                }
+            )
+            self._write_parquet(tmpdir, "censo_comunal", df)
+            self._write_catalog(tmpdir, [self._catalog_entry("censo_comunal")])
+
+            result = describe_dataset("censo_comunal", base_url=tmpdir)
+
+        self.assertEqual(result["dataset"], "censo_comunal")
+        self.assertEqual(result["descripcion"], "Descripción de censo_comunal")
+        self.assertEqual(result["filas_totales"], 3)
+        self.assertEqual(
+            result["columnas"],
+            [
+                {"nombre": "codigo_comuna", "tipo": "String"},
+                {"nombre": "poblacion_censada", "tipo": "Int64"},
+            ],
+        )
+        self.assertEqual(result["claves_de_cruce"], ["codigo_comuna"])
+        self.assertEqual(
+            result["fuente"], {"nombre": "INE", "url": "https://www.ine.gob.cl/x.xlsx"}
+        )
+        self.assertEqual(result["licencia"]["nombre"], "CC BY 4.0")
+        self.assertTrue(result["licencia"]["atribucion_requerida"])
+        self.assertEqual(result["actualizado_utc"], "2026-11-01T00:00:00+00:00")
+        self.assertNotIn("alias_de", result)
+
+    def test_describe_dataset_alias_uses_canonical_schema(self):
+        from chile_hub.mcp_tools import describe_dataset
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            df = pl.DataFrame({"codigo_comuna": ["01101"], "nombre_comuna": ["Iquique"]})
+            self._write_parquet(tmpdir, "comunas", df)
+            self._write_catalog(
+                tmpdir,
+                [
+                    self._catalog_entry("comunas"),
+                    self._catalog_entry(
+                        "comunas_enriquecidas",
+                        alias_for="comunas",
+                        description="Comunas con coordenadas",
+                    ),
+                ],
+            )
+
+            result = describe_dataset("comunas_enriquecidas", base_url=tmpdir)
+
+        self.assertEqual(result["dataset"], "comunas_enriquecidas")
+        self.assertEqual(result["alias_de"], "comunas")
+        self.assertEqual(result["descripcion"], "Comunas con coordenadas")
+        self.assertEqual(
+            [c["nombre"] for c in result["columnas"]], ["codigo_comuna", "nombre_comuna"]
+        )
+        self.assertEqual(result["filas_totales"], 1)
+
+    def test_describe_dataset_freshness_is_computed_at_call_time(self):
+        """La edad se calcula al llamar, no se copia la del build (que queda vieja)."""
+        import datetime
+
+        from chile_hub.mcp_tools import describe_dataset
+
+        refreshed = datetime.datetime.now(datetime.UTC) - datetime.timedelta(hours=48)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            self._write_parquet(tmpdir, "indicadores", pl.DataFrame({"valor": [1.0]}))
+            self._write_catalog(
+                tmpdir,
+                [
+                    self._catalog_entry(
+                        "indicadores",
+                        refreshed_at_utc=refreshed.isoformat(),
+                        freshness_policy={"max_age_hours": 24, "label": "diaria"},
+                    )
+                ],
+            )
+
+            frescura = describe_dataset("indicadores", base_url=tmpdir)["frescura"]
+
+        self.assertEqual(frescura["politica"], "diaria")
+        self.assertEqual(frescura["max_horas"], 24)
+        self.assertAlmostEqual(frescura["edad_horas"], 48, delta=0.5)
+        self.assertTrue(frescura["vencida"])
+
+    def test_describe_dataset_missing_from_catalog_raises(self):
+        from chile_hub.mcp_tools import describe_dataset
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            self._write_parquet(tmpdir, "regiones", pl.DataFrame({"codigo_region": ["01"]}))
+            self._write_catalog(tmpdir, [])
+
+            with self.assertRaisesRegex(ValueError, "regiones"):
+                describe_dataset("regiones", base_url=tmpdir)
+            with self.assertRaises(ValueError):
+                describe_dataset("no_existe", base_url=tmpdir)
+
+    def test_describe_dataset_covers_every_published_dataset(self):
+        """Cada capa del enum se describe contra los artefactos reales del repo."""
+        from chile_hub.datasets import Dataset
+        from chile_hub.mcp_tools import describe_dataset
+
+        normalized = str(ROOT_DIR / "data" / "normalized")
+        for dataset in Dataset:
+            with self.subTest(dataset=dataset.value):
+                result = describe_dataset(dataset.value, base_url=normalized)
+                self.assertGreater(result["filas_totales"], 0)
+                self.assertTrue(result["columnas"])
+                self.assertTrue(result["descripcion"])
+
+    def test_describe_dataset_registered_in_server(self):
+        source = (ROOT_DIR / "src" / "chile_hub" / "mcp_server.py").read_text(encoding="utf-8")
+        self.assertIn('name="describe_dataset"', source)
 
     def test_get_dataset_unknown_name_raises(self):
         from chile_hub.mcp_tools import get_dataset

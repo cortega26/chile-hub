@@ -44,6 +44,7 @@ Claude Desktop (`claude_desktop_config.json`) y clientes compatibles:
 | Tool | Qué hace | Parámetros |
 |:---|:---|:---|
 | `list_datasets` | Lista las capas disponibles y la URL de su Parquet; un alias (p. ej. `comunas_enriquecidas`) apunta al Parquet de su capa canónica e indica `alias_de` | — |
+| `describe_dataset` | Columnas y tipos, filas, claves de cruce, fuente, licencia y frescura de una capa | `nombre` |
 | `get_dataset` | Primeras filas de una capa (máximo 1000) | `nombre`, `limite` |
 | `resolve_comunas` | Nombres de comuna → código CUT de 5 caracteres | `nombres` (lista) |
 | `resolve_regiones` | Nombres de región (o alias como `RM`) → código CUT de 2 caracteres | `nombres` (lista) |
@@ -56,6 +57,7 @@ Ejemplos de uso por el agente:
 - `resolve_regiones(["Valparaiso", "RM"])` → `05`, `13`
 - `resolve_by_coords([[-33.4489, -70.6693]])` → comuna de Santiago (requiere `pip install "chile-hub[geo]"`)
 - `get_indicadores(codigo="uf", desde="2026-01-01")`
+- `describe_dataset(nombre="censo_comunal")` → columnas, 346 filas, licencia CC BY 4.0, frescura
 - `get_dataset(nombre="censo_comunal", limite=5)`
 
 > Los tres resolvers son de coincidencia **exacta** y determinista (toleran
