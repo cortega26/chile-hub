@@ -6020,7 +6020,8 @@ class PermisosEdificacionExtractorTests(unittest.TestCase):
                     pe, "_discover_xlsx_url", return_value=(pe.HARDCODED_XLSX_URL, "test")
                 ),
                 patch.object(
-                    pe, "_download_xlsx",
+                    pe,
+                    "_download_xlsx",
                     side_effect=CertificateVerifyError("unable to get local issuer certificate"),
                 ),
                 patch.object(
