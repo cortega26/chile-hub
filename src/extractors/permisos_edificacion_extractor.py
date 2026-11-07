@@ -36,11 +36,22 @@ import re
 import sys
 import urllib.parse
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import openpyxl
 import polars as pl
 import requests
+
+# curl_cffi usa una jerarquía de excepciones independiente de requests.
+# El extra pipeline es opcional; mypy analiza el tipo real, mientras que
+# el runtime conserva un fallback que no altera el comportamiento de requests.
+if TYPE_CHECKING:
+    from curl_cffi.requests.exceptions import RequestException as CurlRequestException
+else:
+    try:
+        from curl_cffi.requests.exceptions import RequestException as CurlRequestException
+    except ImportError:  # pragma: no cover - entornos sin extra pipeline
+        CurlRequestException = requests.RequestException
 
 UTC = datetime.UTC
 
@@ -236,7 +247,7 @@ def _discover_xlsx_url() -> tuple[str, str]:
                 return params["uri"][0], "repositorio-biblionumber"
             if href.startswith("http"):
                 return href, "repositorio-tracklinks"
-    except (requests.RequestException, ValueError) as exc:
+    except (requests.RequestException, CurlRequestException, ValueError) as exc:
         return HARDCODED_XLSX_URL, f"directa-conocida (descubrimiento falló: {exc})"
     return HARDCODED_XLSX_URL, "directa-conocida (sin match biblionumber en página)"
 
@@ -447,14 +458,14 @@ def fetch_data() -> tuple[list[dict], str, str, list[str], str | None]:
     try:
         url, metodo = _discover_xlsx_url()
         notes.append(f"descubrimiento: {metodo}")
-    except (requests.RequestException, ValueError) as exc:
+    except (requests.RequestException, CurlRequestException, ValueError) as exc:
         notes.append(f"descubrimiento falló ({exc}); usando URL directa conocida")
         url = HARDCODED_XLSX_URL
 
     try:
         try:
             path = _download_xlsx(url)
-        except (requests.RequestException, OSError) as exc:
+        except (requests.RequestException, CurlRequestException, OSError) as exc:
             snapshots = sorted(Path(RAW_DIR).glob(SNAPSHOT_GLOB))
             if not snapshots:
                 raise
@@ -464,7 +475,7 @@ def fetch_data() -> tuple[list[dict], str, str, list[str], str | None]:
             notes.append(f"descarga falló, usando snapshot versionado {path.name} ({exc})")
             if refreshed_at is None:
                 notes.append("snapshot sin timestamp parseable en el nombre; no se puede fechar")
-    except (requests.RequestException, OSError) as exc:
+    except (requests.RequestException, CurlRequestException, OSError) as exc:
         notes.append(f"sin datos live ni snapshot ({exc})")
         return FALLBACK_ROWS, "fallback", REPOSITORIO_URL, notes, None
 
