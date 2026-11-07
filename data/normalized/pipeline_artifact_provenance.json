@@ -1,12 +1,12 @@
 {
   "allow_record_drop": "",
   "allow_stale_backfills": "",
-  "publish_input": true,
+  "publish_input": false,
   "require_live": true,
   "source_ref": "refs/heads/main",
-  "source_run_event": "workflow_dispatch",
-  "source_run_id": "41561234487",
-  "source_sha": "028f772c0d928fcad2bea7382fd2641dad1de0ec",
+  "source_run_event": "schedule",
+  "source_run_id": "42389026550",
+  "source_sha": "fd73ae8b797ec215808546c139b4da6e9ba946ec",
   "verification_profile": "publication",
   "workflow": "Pipeline Check"
 }

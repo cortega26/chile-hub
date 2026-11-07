@@ -1,6 +1,6 @@
 {
-  "generated_at_utc": "2026-11-03T01:52:02.235846+00:00",
-  "previous_generated_at_utc": "2026-11-02T20:04:36.431226+00:00",
+  "generated_at_utc": "2026-11-07T16:04:01.156977+00:00",
+  "previous_generated_at_utc": "2026-11-03T01:52:02.235846+00:00",
   "dataset_count": 23,
   "datasets": [
     {
@@ -166,8 +166,8 @@
     {
       "dataset": "empresas",
       "previous_record_count": 1628433,
-      "current_record_count": 1628433,
-      "record_count_delta": 0,
+      "current_record_count": 1645922,
+      "record_count_delta": 17489,
       "added_fields": [],
       "removed_fields": [],
       "previous_source_mode": "live",
@@ -176,7 +176,7 @@
       "current_freshness_status": "fresh",
       "previous_validation_status": "ok",
       "current_validation_status": "ok",
-      "change_severity": "none",
+      "change_severity": "patch",
       "breaking_changes": [],
       "new_columns": [],
       "removed_columns": [],
@@ -265,9 +265,9 @@
     },
     {
       "dataset": "indicadores",
-      "previous_record_count": 748,
-      "current_record_count": 750,
-      "record_count_delta": 2,
+      "previous_record_count": 750,
+      "current_record_count": 755,
+      "record_count_delta": 5,
       "added_fields": [],
       "removed_fields": [],
       "previous_source_mode": "live",
