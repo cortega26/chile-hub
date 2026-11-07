@@ -12,6 +12,49 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.56.1 - 2026-11-07
+
+### Corregido
+
+- **extractors**: Make curl exception handlers type-check with optional dependency
+  ([#246](https://github.com/cortega26/chile-hub/pull/246),
+  [`3514f29`](https://github.com/cortega26/chile-hub/commit/3514f29175120daad51b2f833e54d7a7768e50be))
+
+- **extractors**: Recover MINVU snapshot on curl_cffi certificate errors
+  ([#246](https://github.com/cortega26/chile-hub/pull/246),
+  [`3514f29`](https://github.com/cortega26/chile-hub/commit/3514f29175120daad51b2f833e54d7a7768e50be))
+
+- **extractors**: Recuperar snapshot MINVU ante error TLS de curl_cffi
+  ([#246](https://github.com/cortega26/chile-hub/pull/246),
+  [`3514f29`](https://github.com/cortega26/chile-hub/commit/3514f29175120daad51b2f833e54d7a7768e50be))
+
+- **extractors**: Type optional curl error tuple for mypy
+  ([#246](https://github.com/cortega26/chile-hub/pull/246),
+  [`3514f29`](https://github.com/cortega26/chile-hub/commit/3514f29175120daad51b2f833e54d7a7768e50be))
+
+### Code Style
+
+- **tests**: Match Ruff formatting for TLS regression fixture
+  ([#246](https://github.com/cortega26/chile-hub/pull/246),
+  [`3514f29`](https://github.com/cortega26/chile-hub/commit/3514f29175120daad51b2f833e54d7a7768e50be))
+
+- **tests**: Separate third-party and local imports
+  ([#246](https://github.com/cortega26/chile-hub/pull/246),
+  [`3514f29`](https://github.com/cortega26/chile-hub/commit/3514f29175120daad51b2f833e54d7a7768e50be))
+
+### Documentación
+
+- Sync README test count after MINVU TLS regression test
+  ([#246](https://github.com/cortega26/chile-hub/pull/246),
+  [`3514f29`](https://github.com/cortega26/chile-hub/commit/3514f29175120daad51b2f833e54d7a7768e50be))
+
+### Tests
+
+- **extractors**: Cover MINVU curl_cffi TLS fallback and discovery
+  ([#246](https://github.com/cortega26/chile-hub/pull/246),
+  [`3514f29`](https://github.com/cortega26/chile-hub/commit/3514f29175120daad51b2f833e54d7a7768e50be))
+
+
 ## 1.56.0 - 2026-11-06
 
 ### Agregado
