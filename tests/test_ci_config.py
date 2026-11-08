@@ -2661,7 +2661,6 @@ class CommittedSnapshotVerificationTests(unittest.TestCase):
         self.assertIn("python scripts/verify_pipeline.py --profile", workflow)
 
 
-
 class SocialCardPreviewTests(unittest.TestCase):
     """Evita la regresión a la miniatura ilegible de LinkedIn (noviembre de 2026)."""
 
