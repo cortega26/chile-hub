@@ -2661,6 +2661,44 @@ class CommittedSnapshotVerificationTests(unittest.TestCase):
         self.assertIn("python scripts/verify_pipeline.py --profile", workflow)
 
 
+
+class SocialCardPreviewTests(unittest.TestCase):
+    """Evita la regresión a la miniatura ilegible de LinkedIn (noviembre de 2026)."""
+
+    def test_artwork_has_social_card_dimensions_and_copy(self):
+        from xml.etree import ElementTree
+
+        svg = ElementTree.parse(ROOT_DIR / "social-card-source.svg").getroot()
+        self.assertEqual(svg.attrib["width"], "1200")
+        self.assertEqual(svg.attrib["height"], "630")
+        self.assertEqual(svg.attrib["viewBox"], "0 0 1200 630")
+        copy = " ".join(element.text or "" for element in svg.iter())
+        self.assertIn("chile-hub", copy)
+        self.assertIn("Capas de Datos de Chile", copy)
+        self.assertIn("normalizados y validados", copy)
+
+    def test_og_and_twitter_use_new_raster_asset_and_dimensions(self):
+        html = (ROOT_DIR / "index.html").read_text(encoding="utf-8")
+        image_url = "https://tooltician.com/chile-hub/social-card.png?v=2"
+        self.assertIn(f'<meta property="og:image" content="{image_url}">', html)
+        self.assertIn(f'<meta property="og:image:secure_url" content="{image_url}">', html)
+        self.assertIn(f'<meta name="twitter:image" content="{image_url}">', html)
+        self.assertIn('<meta property="og:image:type" content="image/png">', html)
+        self.assertIn('<meta property="og:image:width" content="1200">', html)
+        self.assertIn('<meta property="og:image:height" content="630">', html)
+        self.assertIn('<meta property="og:image:alt"', html)
+        self.assertIn('<meta name="twitter:image:alt"', html)
+
+    def test_pages_builds_preview_before_uploading(self):
+        workflow = PAGES_DEPLOY_WORKFLOW.read_text(encoding="utf-8")
+        self.assertLess(
+            workflow.index("Render social preview (1200x630 PNG)"),
+            workflow.index("- name: Upload Pages artifact"),
+        )
+        self.assertIn('cairosvg.svg2png(url="social-card-source.svg"', workflow)
+        self.assertIn('struct.unpack(">II", data[16:24]) == (1200, 630)', workflow)
+
+
 if __name__ == "__main__":
     import pytest
 
