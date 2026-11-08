@@ -1,6 +1,6 @@
 # chile-hub drift report
 
-- `generated_at_utc`: `2026-11-07T16:04:01.156977+00:00`
+- `generated_at_utc`: `2026-11-08T16:30:29.605950+00:00`
 - `dataset_count`: `23`
 - `drifted_count`: `3`
 - `healthy_count`: `20`
@@ -14,7 +14,7 @@
 | `provincias` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
 | `comunas` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
 | `comunas_enriquecidas` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
-| `indicadores` | `drifted` | `live` | `not_applicable` | `warning` | 2 | Revisar warnings operativos del dataset antes de consumirlo en producción. |
+| `indicadores` | `drifted` | `live` | `not_applicable` | `warning` | 1 | Revisar warnings operativos del dataset antes de consumirlo en producción. |
 | `censo_comunal` | `healthy` | `live` | `full` | `none` | 0 | Ninguna. |
 | `establecimientos_salud` | `healthy` | `live` | `not_applicable` | `none` | 0 | Ninguna. |
 | `establecimientos_educacionales` | `healthy` | `live` | `not_applicable` | `none` | 0 | Ninguna. |
@@ -79,9 +79,9 @@
 - `drift_status`: `drifted`
 - `source_mode`: `live`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
-- `degradation`: indicadores live refresh reused raw snapshots for: dolar/2026; indicadores live refresh reused last published artifact for missing codes: ipc
-- `warning_count`: `2`
-- `diagnostic_summary`: indicadores live refresh reused raw snapshots for: dolar/2026
+- `degradation`: indicadores live refresh reused last published artifact for missing codes: ipc
+- `warning_count`: `1`
+- `diagnostic_summary`: indicadores live refresh reused last published artifact for missing codes: ipc
 - `recommended_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.
 
 ## censo_comunal
@@ -249,7 +249,7 @@
 - `drift_status`: `drifted`
 - `source_mode`: `live`
 - `coverage`: `Sin baseline de cobertura por cardinalidad para esta capa.`
-- `degradation`: calidad_aire freshness is stale: 302.35h since refresh, policy max is 72h
+- `degradation`: calidad_aire freshness is stale: 326.79h since refresh, policy max is 72h
 - `warning_count`: `2`
 - `diagnostic_summary`: cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación
 - `recommended_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.

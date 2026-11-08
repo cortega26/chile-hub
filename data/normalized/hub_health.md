@@ -1,6 +1,6 @@
 # chile-hub health summary
 
-- `generated_at_utc`: `2026-11-07T16:04:01.156977+00:00`
+- `generated_at_utc`: `2026-11-08T16:30:29.605950+00:00`
 - `overall_status`: `warn`
 - `dataset_count`: `23`
 - `ok_count`: `20`
@@ -19,7 +19,7 @@
 - `partial_coverage_count`: `1`
 - `unknown_coverage_count`: `0`
 - `drifted_count`: `2`
-- `warning_count`: `9`
+- `warning_count`: `8`
 - `top_issue`: `calidad_aire` (freshness=stale, drift=drifted, warnings=2)
 - `top_issue_reason`: cobertura SINCA: 66/346 comunas (19.1%) — parcial por diseño; solo comunas con estación
 - `top_issue_action`: Revisar warnings operativos del dataset antes de consumirlo en producción.
@@ -40,7 +40,7 @@
 | `establecimientos_salud` | `ok` | `live` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `estadisticas_vitales` | `ok` | `live` | `fresh` | `not_applicable` | `healthy` | `ready` | `none` | `ok` | 0 |
 | `finanzas_municipales` | `ok` | `monthly` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
-| `indicadores` | `warn` | `live` | `fresh` | `not_applicable` | `drifted` | `ready` | `warning` | `ok` | 2 |
+| `indicadores` | `warn` | `live` | `fresh` | `not_applicable` | `drifted` | `ready` | `warning` | `ok` | 1 |
 | `indicadores_urbanos_siedu` | `ok` | `live` | `fresh` | `partial` | `healthy` | `ready` | `none` | `ok` | 1 |
 | `partidos_politicos` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 1 |
 | `perfil_territorial_comunal` | `ok` | `live` | `fresh` | `full` | `healthy` | `ready` | `none` | `ok` | 0 |
