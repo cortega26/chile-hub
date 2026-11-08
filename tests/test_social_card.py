@@ -39,12 +39,10 @@ def test_social_preview_metadata_is_absolute_raster_and_cache_busted():
 
 
 def test_pages_deploy_renders_png_before_uploading_artifact():
-    workflow = (ROOT / ".github/workflows/pages-deploy.yml").read_text(
-        encoding="utf-8"
-    )
+    workflow = (ROOT / ".github/workflows/pages-deploy.yml").read_text(encoding="utf-8")
     render = workflow.index("Render social preview (1200x630 PNG)")
     conversion = workflow.index('cairosvg.svg2png(url="social-card-source.svg"')
     upload = workflow.index("- name: Upload Pages artifact")
     assert render < conversion < upload
     assert 'data.startswith(b"\\x89PNG\\r\\n\\x1a\\n")' in workflow
-    assert "struct.unpack(\">II\", data[16:24]) == (1200, 630)" in workflow
+    assert 'struct.unpack(">II", data[16:24]) == (1200, 630)' in workflow
