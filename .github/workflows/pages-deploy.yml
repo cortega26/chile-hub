@@ -68,6 +68,22 @@ jobs:
       - name: Build per-comuna pages (SEO)
         run: uv run python scripts/build_comuna_pages.py --out-dir comunas --site-url https://tooltician.com/chile-hub
 
+      # Render the vector source into a PNG: LinkedIn/Facebook preview crawlers
+      # generally need a raster og:image, not an SVG. This replaces the old card
+      # in the Pages artifact without changing any dataset or published bundle.
+      - name: Render social preview (1200x630 PNG)
+        run: |
+          uv run --with cairosvg==2.8.2 python - <<'PY'
+          import struct
+          from pathlib import Path
+          import cairosvg
+
+          cairosvg.svg2png(url="social-card-source.svg", write_to="social-card.png")
+          data = Path("social-card.png").read_bytes()
+          assert data.startswith(b"\x89PNG\r\n\x1a\n"), "Invalid PNG social preview"
+          assert struct.unpack(">II", data[16:24]) == (1200, 630), "Incorrect social preview dimensions"
+          PY
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
