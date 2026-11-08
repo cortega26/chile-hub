@@ -12,6 +12,64 @@ son la bitácora automática generada desde los Conventional Commits.
 
 <!-- version list -->
 
+## 1.57.0 - 2026-11-08
+
+### Corregido
+
+- **pages**: Render new raster social card during deployment
+  ([#249](https://github.com/cortega26/chile-hub/pull/249),
+  [`4ce3e38`](https://github.com/cortega26/chile-hub/commit/4ce3e38e3eeb9fbadc2689ef4c775c35403ed1d5))
+
+- **site**: Emit separate valid Open Graph HTML meta tags
+  ([#249](https://github.com/cortega26/chile-hub/pull/249),
+  [`4ce3e38`](https://github.com/cortega26/chile-hub/commit/4ce3e38e3eeb9fbadc2689ef4c775c35403ed1d5))
+
+- **site**: Publish cache-busted rich LinkedIn/Open Graph image metadata
+  ([#249](https://github.com/cortega26/chile-hub/pull/249),
+  [`4ce3e38`](https://github.com/cortega26/chile-hub/commit/4ce3e38e3eeb9fbadc2689ef4c775c35403ed1d5))
+
+- **site**: Replace LinkedIn social preview card
+  ([#249](https://github.com/cortega26/chile-hub/pull/249),
+  [`4ce3e38`](https://github.com/cortega26/chile-hub/commit/4ce3e38e3eeb9fbadc2689ef4c775c35403ed1d5))
+
+### Code Style
+
+- **test**: Apply Ruff formatting to social-card regression checks
+  ([#249](https://github.com/cortega26/chile-hub/pull/249),
+  [`4ce3e38`](https://github.com/cortega26/chile-hub/commit/4ce3e38e3eeb9fbadc2689ef4c775c35403ed1d5))
+
+- **test**: Match Ruff class separation ([#249](https://github.com/cortega26/chile-hub/pull/249),
+  [`4ce3e38`](https://github.com/cortega26/chile-hub/commit/4ce3e38e3eeb9fbadc2689ef4c775c35403ed1d5))
+
+### Documentación
+
+- Synchronize test count after social preview regression checks
+  ([#249](https://github.com/cortega26/chile-hub/pull/249),
+  [`4ce3e38`](https://github.com/cortega26/chile-hub/commit/4ce3e38e3eeb9fbadc2689ef4c775c35403ed1d5))
+
+### Agregado
+
+- **site**: Add source artwork for crisp 1200x630 social card
+  ([#249](https://github.com/cortega26/chile-hub/pull/249),
+  [`4ce3e38`](https://github.com/cortega26/chile-hub/commit/4ce3e38e3eeb9fbadc2689ef4c775c35403ed1d5))
+
+### Refactorizado
+
+- **test**: Keep social-card regression coverage in existing CI test module
+  ([#249](https://github.com/cortega26/chile-hub/pull/249),
+  [`4ce3e38`](https://github.com/cortega26/chile-hub/commit/4ce3e38e3eeb9fbadc2689ef4c775c35403ed1d5))
+
+### Tests
+
+- **ci**: Guard regenerated Open Graph social-card asset
+  ([#249](https://github.com/cortega26/chile-hub/pull/249),
+  [`4ce3e38`](https://github.com/cortega26/chile-hub/commit/4ce3e38e3eeb9fbadc2689ef4c775c35403ed1d5))
+
+- **pages**: Guard OG social preview metadata and raster generation
+  ([#249](https://github.com/cortega26/chile-hub/pull/249),
+  [`4ce3e38`](https://github.com/cortega26/chile-hub/commit/4ce3e38e3eeb9fbadc2689ef4c775c35403ed1d5))
+
+
 ## 1.56.1 - 2026-11-07
 
 ### Corregido
