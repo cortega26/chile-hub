@@ -595,7 +595,7 @@ requires-dist = [
     { name = "structlog", marker = "extra == 'pipeline'", specifier = "==26.1.0" },
     { name = "tenacity", marker = "extra == 'pipeline'", specifier = "==9.2.1" },
     { name = "twine", marker = "extra == 'dev'", specifier = "==7.0.0" },
-    { name = "xlsxwriter", marker = "extra == 'pipeline'", specifier = "==3.3.1" },
+    { name = "xlsxwriter", marker = "extra == 'pipeline'", specifier = "==3.3.3" },
 ]
 provides-extras = ["pipeline", "query", "geo", "validation", "mcp", "publish", "dev", "scraping"]
 
@@ -4120,11 +4120,11 @@ wheels = [
 
 [[package]]
 name = "xlsxwriter"
-version = "3.3.1"
+version = "3.3.3"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/9c/fb/31bdbf3737222d92ef7d2db4d50089b2253dbbb63ceb6d20a4447f6b7ed0/xlsxwriter-3.3.1.tar.gz", hash = "sha256:0867761912cceac76f97ffa76eeda18c623ae9217f601be8512f55b1af4bdb6e", size = 223040, upload-time = "2026-10-28T22:52:46.592Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/fe/4e/e3df3f3de53aea3a78b9493192a8861f88d5cd4b1664e99fc3d70712bebe/xlsxwriter-3.3.3.tar.gz", hash = "sha256:ad3743bd5f96019ee75aae19a51e9c26faf03f218670b934dac1159692d0d5e3", size = 235065, upload-time = "2026-11-20T09:31:39.512Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/88/eb/1e6af9959a567901a7e7c7cef2e75883e487df223ed67f9a8977ff863bd8/xlsxwriter-3.3.1-py3-none-any.whl", hash = "sha256:8e2c89e59d733fe59e112317218c64fbbc276d90a8c144ebd6f7fa15e7ab184a", size = 180583, upload-time = "2026-10-28T22:52:45.048Z" },
+    { url = "https://files.pythonhosted.org/packages/49/bd/8314de2aec89ba343957b3a0d13d7fb0910b57955cbe9c334c6c2d3e512d/xlsxwriter-3.3.3-py3-none-any.whl", hash = "sha256:2b83c5e184d872275e87718ebc88688acc258a50fc84dcad965b3d10be6e345f", size = 191291, upload-time = "2026-11-20T09:31:38.272Z" },
 ]
 
 [[package]]
